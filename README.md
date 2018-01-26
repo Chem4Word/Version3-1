@@ -1,5 +1,5 @@
 # Introduction 
-This project is Version 3 of the Chemistry for Word Add-In
+This project is Version 3.1 of the Chemistry for Word Add-In
 
 # Getting Started
 
