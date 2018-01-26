@@ -1,7 +1,6 @@
 Copyright (c) 2018, The .NET Foundation. The software is licensed under the (the "License");
 you may not use the software except in compliance with the License.
 
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
