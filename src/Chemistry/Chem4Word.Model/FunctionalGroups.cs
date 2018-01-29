@@ -255,7 +255,7 @@ namespace Chem4Word.Model
                     new Group("OH", 1)
                 });
             ShortcutList["CH2CH2OH"] =
-                new FunctionalGroup("CHCH2OH", flippable: true, components: new List<Group>()
+                new FunctionalGroup("CH2CH2OH", flippable: true, components: new List<Group>()
                 {
                     new Group("CH2", 1),
                     new Group("CH2", 1),
