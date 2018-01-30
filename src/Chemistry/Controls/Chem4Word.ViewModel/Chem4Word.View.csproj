@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AtomGeometry.cs" />
+    <Compile Include="AtomHelpers.cs" />
     <Compile Include="AtomShape - Copy.cs" />
     <Compile Include="AtomShape.cs" />
     <Compile Include="BondGeometry.cs" />

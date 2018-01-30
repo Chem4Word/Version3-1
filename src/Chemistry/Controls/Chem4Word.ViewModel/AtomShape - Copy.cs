@@ -48,6 +48,8 @@ namespace Chem4Word.View
             public Rect BoundingBox; //the bounding box surrounds the text
         }
 
+       
+
         public float PixelsPerDip()
         {
             return (float)VisualTreeHelper.GetDpi(this).PixelsPerDip;
@@ -71,29 +73,43 @@ namespace Chem4Word.View
             public AtomTextMetrics Measure(AtomTextMetrics parentMetrics, CompassPoints direction, float pixelsPerDip)
             {
                 var atomGlyphInfo = GlyphUtils.GetGlyphs("H", GlyphUtils.GlyphTypeface, GlyphUtils.SymbolSize);
-                Point hOrigin;
+                var atomGlyphRun = GlyphUtils.GetGlyphRun(atomGlyphInfo, GlyphUtils.SymbolSize, pixelsPerDip)
+                
+                Point hydrogenCenter;
+
+                GlyphRun subRun = null;
+
+                string subscript = AtomHelpers.GetMultipliers(Count);
+
+                
+
+                if (subscript != "")
+                {
+                    GetSubscript(subscript, GlyphUtils.GlyphTypeface, GlyphUtils.ScriptSize,
+                        symbolCenter + mainHOffset);
+                }
 
                 //calculate the offset vector
                 switch (direction)
                 {
                     case CompassPoints.East:
-                        hOrigin = parentMetrics.Geocenter + new Vector((symbolInfo.width + hydrogenInfo.hwidth) / 2, 0.0);
+                        hydrogenCenter = parentMetrics.Geocenter + new Vector((parentMetrics.BoundingBox.Width + atomGlyphInfo.Width) / 2, 0.0);
                         break;
                     case CompassPoints.North:
-                        hOrigin = parentMetrics.Geocenter - new Vector(0.0, _glyphTypeface.Baseline * SymbolSize);
+                        hydrogenCenter = parentMetrics.Geocenter - new Vector(0.0, GlyphUtils.GlyphTypeface.Baseline * GlyphUtils.SymbolSize);
                         break;
                     case CompassPoints.West:
-                        hOrigin = parentMetrics.Geocenter - new Vector((symbolInfo.width + hydrogenInfo.subWidth) / 2 + hydrogenInfo.hwidth, 0.0);
+                        hydrogenCenter = parentMetrics.Geocenter - new Vector((parentMetrics.BoundingBox.Width + hydrogenInfo.subWidth) / 2 + hydrogenInfo.hwidth, 0.0);
                         break;
                     case CompassPoints.South:
-                        hOrigin = parentMetrics.Geocenter + new Vector(0.0, _glyphTypeface.Baseline * SymbolSize);
+                        hydrogenCenter = parentMetrics.Geocenter + new Vector(0.0, _glyphTypeface.Baseline * SymbolSize);
                         break;
                     default:
-                        hOrigin = parentMetrics.Geocenter + new Vector((symbolInfo.width + hydrogenInfo.hwidth) / 2, 0.0);
+                        hydrogenCenter = parentMetrics.Geocenter + new Vector((symbolInfo.width + hydrogenInfo.hwidth) / 2, 0.0);
                         break;
                 }
                 GlyphRun symbolRun = new GlyphRun(GlyphUtils.GlyphTypeface, 0, false,GlyphUtils.SymbolSize, pixelsPerDip,
-                    atomGlyphInfo.Indexes, new p);
+                    atomGlyphInfo.Indexes, new Point(0d, 0d), );
             }
 
             public AtomTextMetrics DrawSelf(DrawingContext drawingContext, AtomTextMetrics measure)
