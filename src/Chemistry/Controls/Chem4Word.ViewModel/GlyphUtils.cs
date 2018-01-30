@@ -42,8 +42,16 @@ namespace Chem4Word.ViewModel
                 throw new InvalidOperationException("No glyphtypeface found");
             }
         }
-      
 
+        public struct SubscriptInfo
+        {
+            public GlyphRun Run;
+            public Point NewOrigin;
+            public ushort[] Indexes;
+            public double Width;
+            public double[] AdvanceWidths;
+
+        }
        
 
         /// <summary>
@@ -135,18 +143,7 @@ namespace Chem4Word.ViewModel
         /// <param name="subscriptSize">size of scubscript (generally 60% of main text)</param>
         /// <param name="bottomLeft">starting point for placing the subscript</param>
         /// <returns></returns>
-        public static (GlyphRun run, Point newOrigin, ushort[] indexes, double width,
-            double[] advanceWidths)
-            GetSubscript(string script, GlyphTypeface gtf, double subscriptSize, Point bottomLeft)
-        {
-            var subscriptInfo = GetGlyphs(script, gtf, subscriptSize);
-            GlyphRun glyphRun = new GlyphRun(gtf, 0, false, subscriptSize,
-                subscriptInfo.indexes, bottomLeft + new Vector(0, gtf.CapsHeight / 2), subscriptInfo.advanceWidths, null, null, null, null,
-                null, null);
-
-            return (glyphRun, bottomLeft + new Vector(subscriptInfo.width, 0.0), subscriptInfo.indexes, subscriptInfo
-                .width, subscriptInfo.advanceWidths);
-        }
+      
 
         /// <summary>
         /// gets a bounding box holding the overall glyph run
