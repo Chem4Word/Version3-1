@@ -158,7 +158,7 @@ $(SolutionDir)\Tools\DigiCertUtil.exe sign /sha1 "6217CFB6A0926B17939F104EE2A282
 )
 
 echo "Copying file"
-xcopy "$(TargetDir)$(TargetFileName)" "$(SolutionDir)$(SolutionName)\$(OutDir)" /C /f /r /y /i
+xcopy "$(TargetDir)$(TargetFileName)" "$(SolutionDir)\Chem4Word.V3\$(OutDir)" /C /f /r /y /i
 
 :nocopy</PostBuildEvent>
   </PropertyGroup>
