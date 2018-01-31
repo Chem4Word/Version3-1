@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Chem4Word.Model.Geometry
 {
@@ -291,6 +293,37 @@ namespace Chem4Word.Model.Geometry
             }
 
             return CompassPoints.South;
+        }
+
+        public static Path BuildPath(List<Point> hull)
+        {
+            var points = hull.ToArray();
+           
+                Path path = new Path()
+                {
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1
+                };
+                if (points.Length == 0)
+                    return path;
+
+                PathSegmentCollection pathSegments = new PathSegmentCollection();
+                for (int i = 1; i < points.Length; i++)
+                    pathSegments.Add(new LineSegment(points[i], true));
+
+                path.Data = new PathGeometry()
+                {
+                    Figures = new PathFigureCollection()
+                    {
+                        new PathFigure()
+                        {
+                            StartPoint = points[0],
+                            Segments = pathSegments
+                        }
+                    }
+                };
+                return path;
+           
         }
     }
 }

@@ -89,6 +89,19 @@ namespace Chem4Word.View
             res.Union(gt.TextMetrics.TotalBoundingBox);
             TextMetrics.TotalBoundingBox = res;
         }
+
+        public bool CollidesWith(params Rect[] occupiedAreas)
+        {
+            foreach (Rect area in occupiedAreas)
+            {
+                if (area.IntersectsWith(TextMetrics.TotalBoundingBox))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     public class MainLabelText : GlyphText
@@ -110,6 +123,12 @@ namespace Chem4Word.View
         { }
     }
 
+    public class ChargeLabelText : GlyphText
+    {
+        public ChargeLabelText(string text, float pixelsPerDip) : base(text, SymbolTypeface, ScriptSize, pixelsPerDip)
+        {
+        }
+    }
 
     /// <summary>
     /// Facilitates layout and positioning of text

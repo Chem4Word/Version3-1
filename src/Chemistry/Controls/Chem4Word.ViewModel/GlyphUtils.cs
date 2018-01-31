@@ -118,7 +118,7 @@ namespace Chem4Word.ViewModel
         /// </summary>
         /// <param name="glyphRun">Glyph run to outline</param>
         /// <returns>List<Point> of geomtry tracing the GlyphRun</Point></returns>
-        public static List<Point> GetRoughGeometry(GlyphRun glyphRun)
+        public static List<Point> GetOutline(GlyphRun glyphRun)
         {
             List<Point> retval = new List<Point>();
 
@@ -174,7 +174,7 @@ namespace Chem4Word.ViewModel
         }
 
         /// <summary>
-        /// simple wrapper routine for generqating a glyph run
+        /// simple wrapper routine for generating a glyph run
         /// </summary>
         /// <param name="info"></param>
         /// <param name="glyphTypeface"></param>

@@ -9,6 +9,7 @@ using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -77,11 +78,12 @@ namespace Chem4Word.View
             public AtomTextMetrics Measure(AtomTextMetrics parentMetrics, CompassPoints direction, float pixelsPerDip)
             {
                 _subText = null;
-                Rect totalBoundingBox;
 
                 //first, get some initial size measurements
                 _mainText = new GlyphText(Text, SymbolTypeface, SymbolSize, pixelsPerDip);
                 _mainText.Premeasure();
+
+
                 //measure up the subscript (if we have one)
                 string subscriptText = AtomHelpers.GetSubText(Count);
                 if (subscriptText != "")
@@ -91,7 +93,6 @@ namespace Chem4Word.View
                 }
                 
                 //calculate the center of the H Atom depending on the direction
-
                 var groupCenter = GetAdjunctCenter(parentMetrics, direction, _mainText.GlyphInfo, _subText?.GlyphInfo);
                 //remeasure the main text
                 _mainText.MeasureAtCenter(groupCenter);
@@ -107,9 +108,6 @@ namespace Chem4Word.View
                     _mainText.Union(_subText);
                 }
 
-                //recalculate the subscript
-                //now get the subscript text, if it's needed
-                //and the glyphs associated with it
                 
            
                 //return the placement metrics for the subscripted atom.  
@@ -134,12 +132,13 @@ namespace Chem4Word.View
             }
 
             /// <summary>
-            /// Gets the centerpoint of an atom adjunct (like an implicit hydrogen plus subscrips)
+            /// Gets the centerpoint of an atom adjunct (like an implicit hydrogen plus subscripts)
+            /// The Adjunct in NH2 is H2
             /// </summary>
-            /// <param name="parentMetrics"></param>
+            /// <param name="parentMetrics">Metrics of the parent atom</param>
             /// <param name="direction">NESW direction of the adjunct respective to the atom</param>
             /// <param name="adjunctGlyphInfo">Intial measurements of the adjunct</param>
-            /// <param name="subscriptInfo">Initial measurements of the subscript (can be null)</param>
+            /// <param name="subscriptInfo">Initial measurements of the subscript (can be null for no subscripts)</param>
             /// <returns></returns>
             private static Point GetAdjunctCenter(AtomTextMetrics parentMetrics, CompassPoints direction,
                 GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo=null)
@@ -182,15 +181,25 @@ namespace Chem4Word.View
 
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
-            //first work out what the atom bounding box is:
+            
             Pen widepen = new Pen(Brushes.Black, 3.0);
-            Geometry hittestgeometry = new 
-            var bb = DefiningGeometry.GetRenderBounds(widepen);
+            
+            //first work out what the atom bounding box is:
 
-            if (bb.Contains(hitTestParameters.HitPoint))
+            List<Point> hull = Geometry<Point>.GetHull(_shapeHull, p => p);
+
+            Path pg = BasicGeometry.BuildPath(hull);
+
+
+            if (pg.Data.FillContains(hitTestParameters.HitPoint))
+            {
                 return new PointHitTestResult(this, hitTestParameters.HitPoint);
-
-            return null;
+            }
+            else
+            {
+                return null;
+            }
+            
         }
 
       
@@ -202,7 +211,6 @@ namespace Chem4Word.View
         {
             RenderAtom(drawingContext);
 
-
         }
 
         private void RenderAtom(DrawingContext drawingContext)
@@ -213,7 +221,7 @@ namespace Chem4Word.View
 
             _shapeHull.AddRange(mainAtomMetrics.Corners);
 
-            if (ParentAtom.ImplicitHydrogenCount > 0)
+            if (ParentAtom.ImplicitHydrogenCount > 0 && ParentAtom.SymbolText!="")
             {
                 SubscriptedGroup subscriptedGroup = new SubscriptedGroup(ParentAtom.ImplicitHydrogenCount, "H");
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, DefaultHOrientation.Value, PixelsPerDip());
@@ -225,23 +233,71 @@ namespace Chem4Word.View
             if (ParentAtom.IsotopeNumber != null)
             {
                 isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
+                _shapeHull.AddRange(isoMetrics.Corners);
             }
 
             if ((ParentAtom.FormalCharge ?? 0) != 0)
             {
                 LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics);
+                _shapeHull.AddRange(cMetrics.Corners);
             }
 
         }
 
         private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics)
         {
-            throw new NotImplementedException();
+            Debug.Assert((ParentAtom.FormalCharge??0)!=0);
+            var chargeString = AtomHelpers.GetChargeString(ParentAtom.FormalCharge.Value);
+            ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
+
+            //try to place the charge at 2 o clock to the atom
+            Vector chargeOffset = BasicGeometry.ScreenNorth() * GlyphUtils.SymbolSize;
+            RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter);
+            chargeText.DrawAtBottomLeft(chargeText.TextMetrics.BoundingBox.BottomLeft,drawingContext);
+            return chargeText.TextMetrics;
+
+        }
+
+        private static void RotateUntilClear(AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics,
+            Vector chargeOffset, ChargeLabelText chargeText, out Point chargeCenter)
+        {
+            Matrix rotator = new Matrix();
+            double angle = 60;
+            rotator.Rotate(angle);
+
+            chargeOffset = chargeOffset * rotator;
+
+            chargeCenter = mainAtomMetrics.Geocenter + chargeOffset;
+            chargeText.MeasureAtCenter(chargeCenter);
+            while (chargeText.CollidesWith(mainAtomMetrics.TotalBoundingBox, hMetrics.TotalBoundingBox,
+                isoMetrics.BoundingBox) & Math.Abs(angle - 30) > 0.001)
+            {
+                rotator.Rotate(30);
+                angle += 30;
+                chargeOffset = chargeOffset * rotator;
+                chargeCenter = mainAtomMetrics.Geocenter + chargeOffset;
+                chargeText.MeasureAtCenter(chargeCenter);
+            }
+
+            
+            
         }
 
         private LabelMetrics DrawIsotopeLabel(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics)
         {
-            throw new NotImplementedException();
+            Debug.Assert(ParentAtom.IsotopeNumber!=null);
+
+            string isoLabel = ParentAtom.IsotopeNumber.ToString();
+            var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
+
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth() * GlyphUtils.SymbolSize;
+            Matrix rotator = new Matrix();
+            rotator.Rotate(-60);
+            isotopeOffsetVector = isotopeOffsetVector * rotator;
+            Point isoCenter = mainAtomMetrics.Geocenter + isotopeOffsetVector;
+            isotopeText.MeasureAtCenter(isoCenter);
+            isotopeText.DrawAtBottomLeft(isotopeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
+            return isotopeText.TextMetrics;
         }
 
         private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics)
@@ -249,9 +305,32 @@ namespace Chem4Word.View
             throw new NotImplementedException();
         }
 
+        //draws rthe main atom symbol, or an ellipse if necessary
         private AtomTextMetrics DrawMainSymbol(DrawingContext drawingContext)
         {
-            throw new NotImplementedException();
+            if (ParentAtom.SymbolText == "") //implicit carbon
+            {
+                //so draw a circle
+                double radiusX = AtomWidth / 2;
+                drawingContext.DrawEllipse(Fill, null, ParentAtom.Position, radiusX, radiusX);
+                Rect boundingBox = new Rect(new Point(ParentAtom.Position.X-radiusX, ParentAtom.Position.Y-radiusX), new Point(ParentAtom.Position.X+radiusX, ParentAtom.Position.Y+radiusX));
+                return new AtomTextMetrics()
+                {
+                    BoundingBox = boundingBox,
+                    Geocenter = ParentAtom.Position,
+                    TotalBoundingBox = boundingBox
+                };
+            }
+            else
+            {
+                var symbolText = new GlyphText(ParentAtom.SymbolText, SymbolTypeface, SymbolSize, PixelsPerDip());
+                symbolText.MeasureAtCenter(ParentAtom.Position);
+
+                symbolText.DrawAtBottomLeft(symbolText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
+
+                return symbolText.TextMetrics;
+            }
+
         }
 
         private Geometry DrawIsotopeLabel(Atom parentAtom, Geometry symbolGeometry)
