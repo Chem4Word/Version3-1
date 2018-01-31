@@ -67,7 +67,6 @@ namespace Chem4Word.View
             {
                 Count = count;
                 Text = text;
-
             }
             /// <summary>
             /// Measures the dimensions of the atom prior to rendering
@@ -215,33 +214,60 @@ namespace Chem4Word.View
 
         private void RenderAtom(DrawingContext drawingContext)
         {
-            AtomTextMetrics mainAtomMetrics = DrawMainSymbol(drawingContext);
+            
             AtomTextMetrics hydrogenMetrics = null;
             LabelMetrics isoMetrics = null;
+            SubscriptedGroup subscriptedGroup =null;
+            //need to draw the atom twice as it will be obscured by the mask 
+            //but we need the metrics
 
-            _shapeHull.AddRange(mainAtomMetrics.Corners);
+            //first do all the measuring up
+            if (ParentAtom.SymbolText != "")
+            {
+                var symbolText = new GlyphText(ParentAtom.SymbolText, SymbolTypeface, SymbolSize, PixelsPerDip());
+                symbolText.MeasureAtCenter(ParentAtom.Position);
+                _shapeHull.AddRange(symbolText.Hull);
+            }
 
+            var mainAtomMetrics = DrawMainSymbol(drawingContext);
             if (ParentAtom.ImplicitHydrogenCount > 0 && ParentAtom.SymbolText!="")
             {
-                SubscriptedGroup subscriptedGroup = new SubscriptedGroup(ParentAtom.ImplicitHydrogenCount, "H");
+                subscriptedGroup = new SubscriptedGroup(ParentAtom.ImplicitHydrogenCount, "H");
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, DefaultHOrientation.Value, PixelsPerDip());
 
-                subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
+                //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
                 _shapeHull.AddRange(hydrogenMetrics.Corners);
+            }
+
+         
+
+            //recalculate the hull
+            _shapeHull = Geometry<Point>.GetHull(_shapeHull, p => p);
+            DrawMask(_shapeHull, drawingContext);
+            //then do the drawing
+
+            mainAtomMetrics = DrawMainSymbol(drawingContext);
+
+            if (ParentAtom.ImplicitHydrogenCount > 0 && ParentAtom.SymbolText != "")
+            {
+
+                subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
             }
 
             if (ParentAtom.IsotopeNumber != null)
             {
                 isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
-                _shapeHull.AddRange(isoMetrics.Corners);
             }
 
             if ((ParentAtom.FormalCharge ?? 0) != 0)
             {
                 LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics);
-                _shapeHull.AddRange(cMetrics.Corners);
             }
+        }
 
+        private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
+        {
+            drawingContext.DrawGeometry(Brushes.White, new Pen(Brushes.White, SymbolSize / 4), BasicGeometry.BuildPath(_shapeHull).Data);
         }
 
         private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics)
@@ -259,24 +285,24 @@ namespace Chem4Word.View
         }
 
         private static void RotateUntilClear(AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics,
-            Vector chargeOffset, ChargeLabelText chargeText, out Point chargeCenter)
+            Vector labelOffset, GlyphText labelText, out Point labelCenter)
         {
             Matrix rotator = new Matrix();
             double angle = 60;
             rotator.Rotate(angle);
 
-            chargeOffset = chargeOffset * rotator;
+            labelOffset = labelOffset * rotator;
 
-            chargeCenter = mainAtomMetrics.Geocenter + chargeOffset;
-            chargeText.MeasureAtCenter(chargeCenter);
-            while (chargeText.CollidesWith(mainAtomMetrics.TotalBoundingBox, hMetrics.TotalBoundingBox,
+            labelCenter = mainAtomMetrics.Geocenter + labelOffset;
+            labelText.MeasureAtCenter(labelCenter);
+            while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, hMetrics.TotalBoundingBox,
                 isoMetrics.BoundingBox) & Math.Abs(angle - 30) > 0.001)
             {
                 rotator.Rotate(30);
                 angle += 30;
-                chargeOffset = chargeOffset * rotator;
-                chargeCenter = mainAtomMetrics.Geocenter + chargeOffset;
-                chargeText.MeasureAtCenter(chargeCenter);
+                labelOffset = labelOffset * rotator;
+                labelCenter = mainAtomMetrics.Geocenter + labelOffset;
+                labelText.MeasureAtCenter(labelCenter);
             }
 
             

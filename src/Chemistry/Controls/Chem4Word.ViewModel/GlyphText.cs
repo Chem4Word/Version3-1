@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Shapes;
+using Chem4Word.Model.Geometry;
+using Chem4Word.ViewModel;
 using static Chem4Word.ViewModel.GlyphUtils;
 // ReSharper disable once CheckNamespace
 namespace Chem4Word.View
@@ -31,7 +34,28 @@ namespace Chem4Word.View
         public GlyphInfo GlyphInfo { get; protected set; }
         public AtomTextMetrics TextMetrics { get; protected set; }
 
+        public GlyphRun TextRun { get; protected set; }
         public Brush Fill { get; set; }
+        public Path Outline
+        {
+            get
+            {
+                var hull = Hull;
+                return BasicGeometry.BuildPath(hull);
+            }
+
+        }
+
+        public List<Point> Hull
+        {
+            get
+            {
+                var outline = GlyphUtils.GetOutline(TextRun);
+                List<Point> hull = Geometry<Point>.GetHull(outline, p => p);
+                return hull;
+            }
+        }
+
         public GlyphText(string text, Typeface typeface, double typesize, float pixelsPerDip)
         {
             if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
@@ -46,6 +70,8 @@ namespace Chem4Word.View
             TextMetrics = null;
 
         }
+
+
         public void MeasureAtCenter(Point center)
         {
             GlyphInfo = GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, Typesize);
@@ -81,6 +107,7 @@ namespace Chem4Word.View
 
             GlyphInfo = GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
+            TextRun = groupGlyphRun;
         }
 
         public void Union(GlyphText gt)
