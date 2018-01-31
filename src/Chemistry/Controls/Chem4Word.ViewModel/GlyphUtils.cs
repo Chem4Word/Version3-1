@@ -43,7 +43,7 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        public struct SubscriptInfo
+        public struct LayoutInfo
         {
             public GlyphRun Run;
             public Point NewOrigin;
@@ -102,7 +102,16 @@ namespace Chem4Word.ViewModel
             return new GlyphInfo {AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth};
 
         }
-        
+
+        public static GlyphUtils.GlyphInfo GetGlyphsAndInfo(string symbolText, float pixelsPerDip, out GlyphRun hydrogenGlyphRun, Point point, GlyphTypeface glyphTypeFace, double symbolSize)
+        {
+            //measure the H atom first
+            var glyphInfo = GlyphUtils.GetGlyphs(symbolText, glyphTypeFace, symbolSize);
+            hydrogenGlyphRun = GlyphUtils.GetGlyphRun(glyphInfo, glyphTypeFace,
+                symbolSize, pixelsPerDip, point);
+            //work out exactly how much we should offset from the center to get to the bottom left
+            return glyphInfo;
+        }
 
         /// <summary>
         /// Returns a rough outline of a glyph run.  useful for calculating a convex hull
@@ -151,7 +160,9 @@ namespace Chem4Word.ViewModel
         /// <param name="glyphRun"></param>
         /// <param name="origin">where the run will be centered</param>
         /// <returns></returns>
-        public static Rect GetBoundingBox(GlyphRun glyphRun, Point origin)
+        /// 
+    
+        public static Rect GetBoundingBox(this GlyphRun glyphRun, Point origin)
         {
             Rect rect = glyphRun.ComputeInkBoundingBox();
             TranslateTransform tt = new TranslateTransform(origin.X, origin.Y);
@@ -161,5 +172,25 @@ namespace Chem4Word.ViewModel
             rect.Transform(mat);
             return rect;
         }
+
+        /// <summary>
+        /// simple wrapper routine for generqating a glyph run
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="glyphTypeface"></param>
+        /// <param name="symbolSize"></param>
+        /// <param name="pixelsPerDip"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static GlyphRun GetGlyphRun(GlyphInfo info, GlyphTypeface glyphTypeface, double symbolSize, float pixelsPerDip, Point point)
+        {
+            
+            var run = new GlyphRun(glyphTypeface, 0, false, symbolSize, pixelsPerDip, info.Indexes, point, info.AdvanceWidths,
+                null,null,null,null,null,null);
+
+            return run;
+        }
+
+
     }
 }
