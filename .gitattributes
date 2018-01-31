@@ -20,7 +20,7 @@
 *.wxs text eol=crlf
 *.ps1 text eol=crlf
 *.cmd text eol=crlf
-*.ps1 text eol=crlf
+*.msc text eol=crlf
 
 # Denote all files that are truly binary and should not be modified.
 *.png binary
