@@ -8,7 +8,7 @@ namespace Chem4Word.ViewModel
 {
     public static class AtomHelpers
     {
-        public static string GetMultipliers(int hCount = 0)
+        public static string GetSubText(int hCount = 0)
         {
             string mult = "";
             int i;
