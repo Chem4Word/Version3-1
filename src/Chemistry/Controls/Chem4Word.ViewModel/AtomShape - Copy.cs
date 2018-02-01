@@ -29,9 +29,12 @@ namespace Chem4Word.ViewModel
         //    | FrameworkPropertyMetadataOptions.AffectsParentMeasure
         //    | FrameworkPropertyMetadataOptions.AffectsParentArrange;
 
+       
+            //list of points that make uop the hull of the shape
 
         private List<Point> _shapeHull;
 
+        //needs a default constructor to be used in XAML
         public AtomShape2()
         {
 
@@ -162,9 +165,6 @@ namespace Chem4Word.ViewModel
                 }
                 return adjunctCenter;
             }
-
-
-           
         }
 
 #endregion
@@ -224,10 +224,10 @@ namespace Chem4Word.ViewModel
             if (ParentAtom.ImplicitHydrogenCount > 0 && AtomSymbol!="")
             {
 
-                DefaultHOrientation = AtomHelpers.GetDefaultHOrientation(ParentAtom);
+                var defaultHOrientation = AtomHelpers.GetDefaultHOrientation(ParentAtom);
 
                 subscriptedGroup = new SubscriptedGroup(ParentAtom.ImplicitHydrogenCount, "H");
-                hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, DefaultHOrientation.Value, PixelsPerDip());
+                hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
                 _shapeHull.AddRange(hydrogenMetrics.Corners);
@@ -242,7 +242,6 @@ namespace Chem4Word.ViewModel
 
             if (ParentAtom.ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
-
                 subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
             }
 
@@ -342,7 +341,7 @@ namespace Chem4Word.ViewModel
 
       
 
-        //draws rthe main atom symbol, or an ellipse if necessary
+        //draws the main atom symbol, or an ellipse if necessary
         private AtomTextMetrics DrawMainSymbol(DrawingContext drawingContext)
         {
             if (AtomSymbol == "") //implicit carbon
@@ -371,52 +370,7 @@ namespace Chem4Word.ViewModel
         }
 
 
-     
-        public AtomTextMetrics DrawSelf(DrawingContext drawingContext, AtomTextMetrics measure)
-        {
-            GlyphUtils.GlyphInfo symbolInfo = new GlyphUtils.GlyphInfo();
-            symbolInfo.Width = 0;
-
-
-
-
-
-            if (AtomSymbol == "")
-            {
-                /*return a circle - this is styled in XAML as Transparent
-             but highlighted on a  trigger - in the editor anyhow.
-             The atomic symbol block will handle the text */
-
-                var basicAtomGeo = new EllipseGeometry(Position, Globals.AtomWidth / 2, Globals.AtomWidth / 2);
-               
-                return null;
-            }
-            else
-            {
-                //measure up first
-                   var groupGlyphInfo = GlyphUtils.GetGlyphsAndInfo(AtomSymbol, PixelsPerDip(), 
-                       out GlyphRun groupGlyphRun, new Point(0d, 0d), GlyphUtils.GlyphTypeface, GlyphUtils.SymbolSize);
-                //get the offset
-                   Vector offset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize);
-                //establish the bottom left
-                Point bottomLeft = Position + offset;
-                groupGlyphInfo = GlyphUtils.GetGlyphsAndInfo(AtomSymbol, PixelsPerDip(),
-                    out groupGlyphRun, bottomLeft, GlyphUtils.GlyphTypeface, GlyphUtils.SymbolSize);
-                drawingContext.DrawGlyphRun(Fill, groupGlyphRun);
-                Rect inkBoundingBox = groupGlyphRun.ComputeInkBoundingBox();
-                return new AtomTextMetrics
-                {
-                    BoundingBox = inkBoundingBox,
-                    Geocenter = Position,
-                    TotalBoundingBox = inkBoundingBox
-                };
-            }
-            
-             
-
-        }
       
-        #endregion
         #region Dependency Properties
 
         /// <summary>
@@ -505,7 +459,7 @@ namespace Chem4Word.ViewModel
             DependencyProperty.Register("Charge",
                 typeof(int?),
                 typeof(AtomShape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure, ChargeChanged));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, ChargeChanged));
 
         private static void ChargeChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
@@ -532,7 +486,7 @@ namespace Chem4Word.ViewModel
 
         // Using a DependencyProperty as the backing store for Isotope.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsotopeProperty =
-            DependencyProperty.Register("Isotope", typeof(int?), typeof(AtomShape), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure, IsotopeChangedCallback));
+            DependencyProperty.Register("Isotope", typeof(int?), typeof(AtomShape), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, IsotopeChangedCallback));
 
         private static void IsotopeChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
@@ -542,7 +496,7 @@ namespace Chem4Word.ViewModel
         #endregion
         #region Property wrappers
 
-        public CompassPoints? DefaultHOrientation { get; set; }
+     
         #endregion
     }
 }
