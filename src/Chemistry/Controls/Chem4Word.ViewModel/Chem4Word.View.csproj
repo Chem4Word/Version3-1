@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Chem4Word.ViewModel</RootNamespace>
     <AssemblyName>Chem4Word.ViewModel</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -17,6 +17,7 @@
     <SccProvider>SAK</SccProvider>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -74,11 +75,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AtomGeometry.cs" />
+    <Compile Include="AtomHelpers.cs" />
+    <Compile Include="AtomShape - Copy.cs" />
     <Compile Include="AtomShape.cs" />
     <Compile Include="BondGeometry.cs" />
     <Compile Include="BondShape.cs" />
     <Compile Include="CanvasAutoSize.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="GlyphText.cs" />
+    <Compile Include="GlyphUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VisualTreeHelpers.cs" />
   </ItemGroup>
