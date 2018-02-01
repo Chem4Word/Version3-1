@@ -219,7 +219,7 @@ namespace Chem4Word.ViewModel
                 _shapeHull.AddRange(symbolText.Hull);
             }
             //need to draw the atom twice as it will be obscured by the mask 
-            var mainAtomMetrics = DrawMainSymbol(drawingContext);
+            var mainAtomMetrics = DrawSelf(drawingContext);
             //if we have implcit hydrogens and we have an explicit label, draw them
             if (ParentAtom.ImplicitHydrogenCount > 0 && AtomSymbol!="")
             {
@@ -238,7 +238,7 @@ namespace Chem4Word.ViewModel
             DrawMask(_shapeHull, drawingContext);
             //then do the drawing
 
-            mainAtomMetrics = DrawMainSymbol(drawingContext);
+            mainAtomMetrics = DrawSelf(drawingContext);
 
             if (ParentAtom.ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
@@ -342,7 +342,7 @@ namespace Chem4Word.ViewModel
       
 
         //draws the main atom symbol, or an ellipse if necessary
-        private AtomTextMetrics DrawMainSymbol(DrawingContext drawingContext)
+        private AtomTextMetrics DrawSelf(DrawingContext drawingContext)
         {
             if (AtomSymbol == "") //implicit carbon
             {
