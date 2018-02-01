@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Windows;
+using System.Windows.Media;
+using Chem4Word.Model;
+using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ViewModel
 {
@@ -38,6 +42,64 @@ namespace Chem4Word.ViewModel
                 chargestring = abscharge.ToString() + chargestring;
             }
             return chargestring;
+        }
+
+        public static CompassPoints GetDefaultHOrientation(Atom parent)
+        {
+            if (parent.ImplicitHydrogenCount >= 1)
+            {
+                System.Windows.Media.Geometry hGeometry;
+                if (parent.Bonds.Count == 0)
+                {
+                    return CompassPoints.East;
+                }
+                else if (parent.Bonds.Count == 1)
+                {
+                    if (Vector.AngleBetween(BasicGeometry.ScreenNorth(),
+                        parent.Bonds[0].OtherAtom(parent).Position - parent.Position) > 0)
+                    //the bond is on the right
+                    {
+                        
+                        return CompassPoints.West;
+                    }
+                    else
+                    {
+                        //default to any old rubbish for now
+                        return CompassPoints.East;
+                        
+                    }
+                }
+                else
+                {
+                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
+                        parent.BalancingVector);
+
+                    switch (BasicGeometry.SnapTo4NESW(baFromNorth))
+                    {
+                        case CompassPoints.East:
+                            return CompassPoints.East;
+                            break;
+
+                        case CompassPoints.North:
+                            return CompassPoints.North;
+                            break;
+
+                        case CompassPoints.South:
+                            return CompassPoints.South;
+                            break;
+
+                        case CompassPoints.West:
+                            return CompassPoints.West;
+                            break;
+
+                        default:
+                            return CompassPoints.East;
+                            break;
+                    }
+                }
+ 
+            }
+            return CompassPoints.East;
         }
     }
 }

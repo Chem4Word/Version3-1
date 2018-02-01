@@ -223,6 +223,9 @@ namespace Chem4Word.ViewModel
             //if we have implcit hydrogens and we have an explicit label, draw them
             if (ParentAtom.ImplicitHydrogenCount > 0 && AtomSymbol!="")
             {
+
+                DefaultHOrientation = AtomHelpers.GetDefaultHOrientation(ParentAtom);
+
                 subscriptedGroup = new SubscriptedGroup(ParentAtom.ImplicitHydrogenCount, "H");
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, DefaultHOrientation.Value, PixelsPerDip());
 
@@ -412,21 +415,7 @@ namespace Chem4Word.ViewModel
              
 
         }
-        #region old code
-        //atom symbol drawing code
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="parentAtom"></param>
-        /// <returns></returns>
-
-
-
-
-
-
-
+      
         #endregion
         #region Dependency Properties
 
@@ -435,15 +424,7 @@ namespace Chem4Word.ViewModel
         /// </summary>
 
 
-        public CompassPoints? DefaultHOrientation
-        {
-            get { return (CompassPoints?)GetValue(DefaultHOrientationProperty); }
-            set { SetValue(DefaultHOrientationProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for DefaultHOrientation.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DefaultHOrientationProperty =
-            DependencyProperty.Register("DefaultHOrientation", typeof(CompassPoints?), typeof(AtomShape2), new PropertyMetadata(CompassPoints.East));
+     
         public Canvas DrawingCanvas
         {
             get { return (Canvas)GetValue(DrawingCanvasProperty); }
@@ -558,6 +539,10 @@ namespace Chem4Word.ViewModel
             var changedAtomShape = (AtomShape)d;
             var newval = (int?)args.NewValue;
         }
+        #endregion
+        #region Property wrappers
+
+        public CompassPoints? DefaultHOrientation { get; set; }
+        #endregion
     }
-#endregion
 }

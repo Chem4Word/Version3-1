@@ -131,7 +131,7 @@
     <PostBuildEvent>if "$(ConfigurationName)" == "Vso-Ci" (
 rem
 ) else (
-xcopy "$(TargetDir)$(TargetName).*" "$(SolutionDir)$(SolutionName)\$(OutDir)PlugIns\" /C /f /r /y /i
+xcopy "$(TargetDir)$(TargetName).*" "$(SolutionDir)\Chem4Word.V3\$(OutDir)PlugIns\" /C /f /r /y /i
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
