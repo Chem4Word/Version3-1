@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+
 namespace Chem4Word.ViewModel
 {
     public static class GlyphUtils
@@ -127,7 +126,7 @@ namespace Chem4Word.ViewModel
                 var geo = glyphRun.BuildGeometry();
                 var pg = geo.GetFlattenedPathGeometry(0.2, ToleranceType.Relative);
 
-
+               
                 foreach (var f in pg.Figures)
                 {
                     foreach (var s in f.Segments)

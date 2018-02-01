@@ -19,7 +19,7 @@ namespace Chem4Word.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -167,7 +167,7 @@ namespace Chem4Word.Properties {
         ///      &lt;cml:atom id=&quot;a0&quot; elementType=&quot;C&quot; x2=&quot;329.5&quot; y2=&quot;182.5&quot; /&gt;
         ///    &lt;/cml:atomArray&gt;
         ///    &lt;cml:bondArray&gt;&lt;/cml:bondArray&gt;
-        ///    &lt;cml:formula concise=&quot;C 1 H 4&quot;&gt;&lt;/cml:formula&gt; [rest of string was truncated]&quot;;.
+        ///    &lt;cml:formula concise=&quot;C 1 H 4&quot;&gt;&lt;/cml:fo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EmptyStructure_cml {
             get {

@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Chem4Word.Model.Geometry;
-using Chem4Word.ViewModel;
-using static Chem4Word.ViewModel.GlyphUtils;
-// ReSharper disable once CheckNamespace
-namespace Chem4Word.View
+using Chem4Word.View;
+
+namespace Chem4Word.ViewModel
 {
     /// <summary>
     /// wraps up some of the glyph handling into a handy class 
@@ -31,7 +26,7 @@ namespace Chem4Word.View
 
         private GlyphTypeface _glyphTypeface;
 
-        public GlyphInfo GlyphInfo { get; protected set; }
+        public GlyphUtils.GlyphInfo GlyphInfo { get; protected set; }
         public AtomTextMetrics TextMetrics { get; protected set; }
 
         public GlyphRun TextRun { get; protected set; }
@@ -58,7 +53,7 @@ namespace Chem4Word.View
 
         public GlyphText(string text, Typeface typeface, double typesize, float pixelsPerDip)
         {
-            if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
+            if (!GlyphUtils.SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
             {
                 throw new InvalidOperationException($"No glyph typeface found for the Windows Typeface '{typeface.FaceNames[XmlLanguage.GetLanguage("en-GB")]}'");
             }
@@ -74,8 +69,8 @@ namespace Chem4Word.View
 
         public void MeasureAtCenter(Point center)
         {
-            GlyphInfo = GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, Typesize);
-            Vector mainHOffset = GetOffsetVector(groupGlyphRun, SymbolSize);
+            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, Typesize);
+            Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize);
             TextMetrics= new AtomTextMetrics
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
@@ -91,7 +86,7 @@ namespace Chem4Word.View
 
         public void MeasureAtBottomLeft(Point bottomLeft, float PixelsPerDip)
         {
-            GlyphInfo = GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
+            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
             TextMetrics = new AtomTextMetrics
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
@@ -105,7 +100,7 @@ namespace Chem4Word.View
         public void DrawAtBottomLeft(Point bottomLeft, DrawingContext dc)
         {
 
-            GlyphInfo = GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
+            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
             TextRun = groupGlyphRun;
         }
@@ -133,26 +128,26 @@ namespace Chem4Word.View
 
     public class MainLabelText : GlyphText
     {
-        public MainLabelText(string text, float pixelsPerDip): base(text, SymbolTypeface, SymbolSize, pixelsPerDip)
+        public MainLabelText(string text, float pixelsPerDip): base(text, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, pixelsPerDip)
         { }
     }
 
 
     public class SubLabelText : GlyphText
     {
-        public SubLabelText(string text, float pixelsPerDip) : base(text, SymbolTypeface, ScriptSize, pixelsPerDip)
+        public SubLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
         { }
     }
 
     public class IsotopeLabelText : GlyphText
     {
-        public IsotopeLabelText(string text, float pixelsPerDip) : base(text, SymbolTypeface, IsotopeSize, pixelsPerDip)
+        public IsotopeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.IsotopeSize, pixelsPerDip)
         { }
     }
 
     public class ChargeLabelText : GlyphText
     {
-        public ChargeLabelText(string text, float pixelsPerDip) : base(text, SymbolTypeface, ScriptSize, pixelsPerDip)
+        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
         {
         }
     }
