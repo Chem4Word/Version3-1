@@ -106,7 +106,7 @@ namespace Chem4Word.ViewModel
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
-            dc.DrawRectangle(Brushes.Black, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
+            //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
 #endif
             TextRun = groupGlyphRun;
         }
