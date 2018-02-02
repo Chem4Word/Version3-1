@@ -32,12 +32,14 @@ namespace Chem4Word.ViewModel
         #region Members
         private List<Point> _shapeHull;
         #endregion
+
+        #region constructors
         //needs a default constructor to be used in XAML
         public AtomShape2()
         {
 
         }
-       
+        #endregion
 
         #region nested classes
         /// <summary>
@@ -140,26 +142,32 @@ namespace Chem4Word.ViewModel
             {
                 Point adjunctCenter;
                 double charHeight = (GlyphUtils.GlyphTypeface.Baseline * GlyphUtils.SymbolSize);
-                double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width);
+                double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width)/2;
                 switch (direction)
                 {
                     case CompassPoints.East:
                     default:
-                        adjunctCenter = parentMetrics.Geocenter + BasicGeometry.ScreenEast() *
-                                         adjunctWidth / 2;
+                        adjunctCenter = parentMetrics.Geocenter + BasicGeometry.ScreenEast * adjunctWidth;
                         break;
                     case CompassPoints.North:
                         adjunctCenter = parentMetrics.Geocenter +
-                                         BasicGeometry.ScreenNorth() * charHeight;
+                                         BasicGeometry.ScreenNorth * charHeight;
                         break;
                     case CompassPoints.West:
 
-                        adjunctCenter = parentMetrics.Geocenter + BasicGeometry.ScreenWest() *
-                                         (adjunctWidth / 2 + (subscriptInfo?.Width)??0);
+                        if(subscriptInfo!=null)
+                        {
+                            adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest *
+                                                                       (adjunctWidth + subscriptInfo.Value.Width));
+                        }
+                        else
+                        {
+                            adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest * (adjunctWidth));
+                        }
                         break;
                     case CompassPoints.South:
                         adjunctCenter = parentMetrics.Geocenter +
-                                         BasicGeometry.ScreenSouth() * charHeight;
+                                         BasicGeometry.ScreenSouth * charHeight;
                         break;
                 }
                 return adjunctCenter;
@@ -313,7 +321,7 @@ namespace Chem4Word.ViewModel
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth() * GlyphUtils.SymbolSize;
+            Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter);
             chargeText.DrawAtBottomLeft(chargeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
             return chargeText;
@@ -351,7 +359,7 @@ namespace Chem4Word.ViewModel
             string isoLabel = Isotope.ToString();
             var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
 
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth() * GlyphUtils.SymbolSize;
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
             Matrix rotator = new Matrix();
             rotator.Rotate(ClockDirections.Ten.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;

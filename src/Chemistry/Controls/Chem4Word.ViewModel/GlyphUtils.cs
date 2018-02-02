@@ -25,7 +25,7 @@ namespace Chem4Word.ViewModel
                 return _glyphTypeface;
             }
         }
-        public static double SymbolSize = 24;
+        public static double SymbolSize = 26;
         public static double ScriptSize = SymbolSize * 0.6;
         public static double IsotopeSize = ScriptSize * 0.8;
 
@@ -42,15 +42,15 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        public struct LayoutInfo
-        {
-            public GlyphRun Run;
-            public Point NewOrigin;
-            public ushort[] Indexes;
-            public double Width;
-            public double[] AdvanceWidths;
+        //public struct LayoutInfo
+        //{
+        //    public GlyphRun Run;
+        //    public Point NewOrigin;
+        //    public ushort[] Indexes;
+        //    public double Width;
+        //    public double[] AdvanceWidths;
 
-        }
+        //}
        
 
         /// <summary>
