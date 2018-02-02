@@ -152,7 +152,8 @@
                         Isotope="{Binding Path=IsotopeNumber}"
                         ParentAtom="{Binding Path=SelfRef}"
                         Position="{Binding Path=Position}"
-                        AtomSymbol="{Binding Path=SymbolText}">
+                        AtomSymbol="{Binding Path=SymbolText}"
+                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                         <viewModel:AtomShape2.Style>
                             <Style TargetType="{x:Type viewModel:AtomShape2}">
                                 <Setter Property="Fill">

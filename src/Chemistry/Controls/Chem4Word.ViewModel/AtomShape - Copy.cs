@@ -18,6 +18,7 @@ using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Globals = Chem4Word.View.Globals;
 using static Chem4Word.Model.Geometry.AngleMethods;
+using static  Chem4Word.ViewModel.GlyphUtils;
 namespace Chem4Word.ViewModel
 {
 
@@ -85,12 +86,14 @@ namespace Chem4Word.ViewModel
                 var groupCenter = GetAdjunctCenter(parentMetrics, direction, _mainText.GlyphInfo, _subText?.GlyphInfo);
                 //remeasure the main text
                 _mainText.MeasureAtCenter(groupCenter);
-                //get the offset for the subscript
-                Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width,
-                        GlyphUtils.GlyphTypeface.CapsHeight / 2);
+               
 
-                if (subscriptText != "")
+                if (_subText!=null) 
+                    //get the offset for the subscript
+              
                 {
+                    Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width,
+                        _subText.TextMetrics.BoundingBox.Height / 2);
                     Point subBottomLeft = _mainText.TextMetrics.TotalBoundingBox.BottomLeft + subscriptOffset;
                     _subText.MeasureAtBottomLeft(subBottomLeft,pixelsPerDip);
                     //merge the total bounbding boxes
@@ -112,8 +115,14 @@ namespace Chem4Word.ViewModel
             /// <param name="fill"></param>
             public void DrawSelf(DrawingContext drawingContext, AtomTextMetrics measure, float pixelsPerDip, Brush fill)
             {
-                _mainText.DrawAtBottomLeft(measure.TotalBoundingBox.BottomLeft, drawingContext);
-                _subText?.DrawAtBottomLeft(_subText.TextMetrics.TotalBoundingBox.BottomLeft, drawingContext);
+                _mainText.Fill = fill;
+                _mainText.DrawAtBottomLeft(measure.BoundingBox.BottomLeft, drawingContext);
+                if (_subText != null)
+                {
+                    _subText.Fill = fill;
+                    _subText.DrawAtBottomLeft(_subText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
+                }
+                
 
             }
 
@@ -127,7 +136,7 @@ namespace Chem4Word.ViewModel
             /// <param name="subscriptInfo">Initial measurements of the subscript (can be null for no subscripts)</param>
             /// <returns></returns>
             private static Point GetAdjunctCenter(AtomTextMetrics parentMetrics, CompassPoints direction,
-                GlyphUtils.GlyphInfo adjunctGlyphInfo, GlyphUtils.GlyphInfo? subscriptInfo=null)
+                GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo=null)
             {
                 Point adjunctCenter;
                 double charHeight = (GlyphUtils.GlyphTypeface.Baseline * GlyphUtils.SymbolSize);
