@@ -25,14 +25,14 @@ namespace Chem4Word.ViewModel
                 return _glyphTypeface;
             }
         }
-        public static double SymbolSize = 30;
+        public static double SymbolSize = 24;
         public static double ScriptSize = SymbolSize * 0.6;
         public static double IsotopeSize = ScriptSize * 0.8;
 
 
         public static Typeface SymbolTypeface = new Typeface(new FontFamily("Arial"),
             FontStyles.Normal,
-            FontWeights.Normal,
+            FontWeights.Bold,
             FontStretches.Normal);
         static GlyphUtils()
         {

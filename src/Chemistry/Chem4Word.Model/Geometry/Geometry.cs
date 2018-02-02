@@ -30,6 +30,18 @@ namespace Chem4Word.Model.Geometry
         Twelve
     }
 
+    public static class AngleMethods
+    {
+        public static double ToDegrees(this ClockDirections cd)
+        {
+            return 30 * (int) cd % 12;
+        }
+
+        public static double ToDegrees(this CompassPoints cp)
+        {
+            return 45 * (int)cp;
+        }
+    }
     public enum CompassPoints
     {
         North,
