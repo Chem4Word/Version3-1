@@ -71,12 +71,14 @@ namespace Chem4Word.ViewModel
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, Typesize);
             Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize);
-            TextMetrics= new AtomTextMetrics
+            TextRun = groupGlyphRun;
+            TextMetrics = new AtomTextMetrics
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
                 Geocenter = center,
                 TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset)
             };
+
         }
 
         public void Premeasure()
@@ -87,6 +89,7 @@ namespace Chem4Word.ViewModel
         public void MeasureAtBottomLeft(Point bottomLeft, float PixelsPerDip)
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
+            TextRun=groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
@@ -102,6 +105,9 @@ namespace Chem4Word.ViewModel
 
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
+#if DEBUG
+            dc.DrawRectangle(Brushes.Black, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
+#endif
             TextRun = groupGlyphRun;
         }
 

@@ -24,20 +24,20 @@ namespace Chem4Word.ViewModel
         /// </summary>
         /// <param name="charge">Int contaioning the charge value</param>
         /// <returns></returns>
-        public static string GetChargeString(int charge)
+        public static string GetChargeString(int? charge)
         {
             string chargestring = "";
 
-            if (charge > 0)
+            if ((charge ?? 0) > 0)
             {
                 chargestring = "+";
             }
-            if (charge < 0)
+            if ((charge ?? 0) < 0)
             {
                 chargestring = "-";
             }
             int abscharge = 0;
-            if ((abscharge = Math.Abs(charge)) > 1)
+            if ((abscharge = Math.Abs(charge ?? 0)) > 1)
             {
                 chargestring = abscharge.ToString() + chargestring;
             }
@@ -74,28 +74,8 @@ namespace Chem4Word.ViewModel
                     double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
                         parent.BalancingVector);
 
-                    switch (BasicGeometry.SnapTo4NESW(baFromNorth))
-                    {
-                        case CompassPoints.East:
-                            return CompassPoints.East;
-                            break;
-
-                        case CompassPoints.North:
-                            return CompassPoints.North;
-                            break;
-
-                        case CompassPoints.South:
-                            return CompassPoints.South;
-                            break;
-
-                        case CompassPoints.West:
-                            return CompassPoints.West;
-                            break;
-
-                        default:
-                            return CompassPoints.East;
-                            break;
-                    }
+                    return BasicGeometry.SnapTo4NESW(baFromNorth);
+                    
                 }
  
             }
