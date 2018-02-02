@@ -190,47 +190,18 @@ namespace Chem4Word.Model.Geometry
             return new Vector(-v.Y, v.X);
         }
 
-        public static Vector ScreenSouth()
-        {
-            return new Vector(0, 1);
-        }
+        public static Vector ScreenSouth =new Vector(0, 1);
+        
 
-        public static Vector ScreenEast()
-        {
-            return new Vector(1, 0);
-        }
+        public static Vector ScreenEast= new Vector(1, 0);
+        
 
-        public static Vector ScreenNorth()
-        {
-            return -ScreenSouth();
-        }
+        public static Vector ScreenNorth = -ScreenSouth;
+   
 
-        public static Vector ScreenWest()
-        {
-            return -ScreenEast();
-        }
-
+        public static Vector ScreenWest = -ScreenEast ;
+        
         #endregion extension methods
-
-        public static Vector NorthVector()
-        {
-            return new Vector(0, -1);
-        }
-
-        public static Vector SouthVector()
-        {
-            return -NorthVector();
-        }
-
-        public static Vector EastVector()
-        {
-            return new Vector(1, 0);
-        }
-
-        public static Vector WestVector()
-        {
-            return -EastVector();
-        }
 
         public static double Determinant(Vector vector1, Vector vector2)
         {

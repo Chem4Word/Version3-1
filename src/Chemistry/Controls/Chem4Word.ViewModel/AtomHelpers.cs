@@ -55,7 +55,7 @@ namespace Chem4Word.ViewModel
                 }
                 else if (parent.Bonds.Count == 1)
                 {
-                    if (Vector.AngleBetween(BasicGeometry.ScreenNorth(),
+                    if (Vector.AngleBetween(BasicGeometry.ScreenNorth,
                         parent.Bonds[0].OtherAtom(parent).Position - parent.Position) > 0)
                     //the bond is on the right
                     {
@@ -71,7 +71,7 @@ namespace Chem4Word.ViewModel
                 }
                 else
                 {
-                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
+                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
                         parent.BalancingVector);
 
                     return BasicGeometry.SnapTo4NESW(baFromNorth);
