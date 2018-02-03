@@ -13,6 +13,7 @@
 *.json text eol=crlf
 *.html text eol=crlf
 *.config text eol=crlf
+*.Config text eol=crlf
 *.settings text eol=crlf
 *.resx text eol=crlf
 *.wsdl text eol=crlf
@@ -26,6 +27,7 @@
 *.png binary
 *.bmp binary
 *.jpg binary
+*.gif binary
 *.pdf binary
 *.docx binary
 *.xlsx binary
