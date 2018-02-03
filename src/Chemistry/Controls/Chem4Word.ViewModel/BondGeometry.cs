@@ -58,7 +58,7 @@ namespace Chem4Word.View
             //List<PathSegment> wedgesegments = new List<PathSegment>(4);
 
             //get a right sized vector first
-            Vector bondVector = BasicGeometry.ScreenNorth();
+            Vector bondVector = BasicGeometry.ScreenNorth;
             bondVector.Normalize();
             bondVector = bondVector * bondlength;
 

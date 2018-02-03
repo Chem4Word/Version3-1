@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Chem4Word.Model.Geometry
 {
@@ -28,6 +30,18 @@ namespace Chem4Word.Model.Geometry
         Twelve
     }
 
+    public static class AngleMethods
+    {
+        public static double ToDegrees(this ClockDirections cd)
+        {
+            return 30 * ((int) cd % 12);
+        }
+
+        public static double ToDegrees(this CompassPoints cp)
+        {
+            return 45 * (int)cp;
+        }
+    }
     public enum CompassPoints
     {
         North,
@@ -176,47 +190,18 @@ namespace Chem4Word.Model.Geometry
             return new Vector(-v.Y, v.X);
         }
 
-        public static Vector ScreenSouth()
-        {
-            return new Vector(0, 1);
-        }
+        public static Vector ScreenSouth =new Vector(0, 1);
+        
 
-        public static Vector ScreenEast()
-        {
-            return new Vector(1, 0);
-        }
+        public static Vector ScreenEast= new Vector(1, 0);
+        
 
-        public static Vector ScreenNorth()
-        {
-            return -ScreenSouth();
-        }
+        public static Vector ScreenNorth = -ScreenSouth;
+   
 
-        public static Vector ScreenWest()
-        {
-            return -ScreenEast();
-        }
-
+        public static Vector ScreenWest = -ScreenEast ;
+        
         #endregion extension methods
-
-        public static Vector NorthVector()
-        {
-            return new Vector(0, -1);
-        }
-
-        public static Vector SouthVector()
-        {
-            return -NorthVector();
-        }
-
-        public static Vector EastVector()
-        {
-            return new Vector(1, 0);
-        }
-
-        public static Vector WestVector()
-        {
-            return -EastVector();
-        }
 
         public static double Determinant(Vector vector1, Vector vector2)
         {
@@ -224,7 +209,8 @@ namespace Chem4Word.Model.Geometry
         }
 
         /// <summary>
-        /// Determines whether two line segments intersect
+        /// Determines whether two line segments intersect.
+        /// Used mainly for determining cis/trans geometry of double bonds
         /// </summary>
         /// <param name="segment1Start">Point at which first segment starts</param>
         /// <param name="segment1End">Point at which first segment ends</param>
@@ -246,10 +232,13 @@ namespace Chem4Word.Model.Geometry
 
         /// <summary>
         /// intersects two straight line segments.  Returns two values that indicate
-        /// how far along the segments the intersection takes place
+        /// how far along the segments the intersection takes place.
+        /// Values between 0 and 1 for both segments indicate the lines cross
+        /// Values between 0 and 1 for ONE segment indicates that the projection
+        /// of the other segment intersects it
         /// </summary>
         /// <param name="t">proportion along the line of the first segment</param>
-        /// <param name="u">proportion along the line of the second segmnt</param>
+        /// <param name="u">proportion along the line of the second segment</param>
         /// <param name="segment1Start">what it says</param>
         /// <param name="segment1End">what it says</param>
         /// <param name="segment2Start">what it says</param>
@@ -263,6 +252,7 @@ namespace Chem4Word.Model.Geometry
             u = Determinant(segment1End - segment1Start, segment2Start - segment1Start) / det;
         }
 
+        // ReSharper disable once InconsistentNaming
         public static CompassPoints SnapTo2EW(double angleFromNorth)
         {
             if (angleFromNorth >= 0 || angleFromNorth <= -180)
@@ -273,6 +263,7 @@ namespace Chem4Word.Model.Geometry
             return CompassPoints.West;
         }
 
+        // ReSharper disable once InconsistentNaming
         public static CompassPoints SnapTo4NESW(double angleFromNorth)
         {
             if (angleFromNorth >= -45 && angleFromNorth <= 45)
@@ -291,6 +282,46 @@ namespace Chem4Word.Model.Geometry
             }
 
             return CompassPoints.South;
+        }
+        /// <summary>
+        /// Takes a list of poinst and builds a  Path object from it.
+        /// Generally used for constructing masks 
+        /// </summary>
+        /// <param name="hull">List of points makking up the path </param>
+        /// <returns></returns>
+        public static Path BuildPath(List<Point> hull, bool isClosed = true)
+        {
+            var points = hull.ToArray();
+           
+            Path path = new Path
+            {
+                StrokeThickness = 1
+            };
+
+            if (points.Length == 0)
+            {
+                return path;
+            }
+            PathSegmentCollection pathSegments = new PathSegmentCollection();
+            for (int i = 1; i < points.Length; i++)
+            {
+                pathSegments.Add(new LineSegment(points[i], true));
+            }
+            path.Data = new PathGeometry
+            { 
+                Figures = new PathFigureCollection
+                {
+                    new PathFigure
+                    { 
+                        StartPoint = points[0],
+                        Segments = pathSegments,
+                        IsClosed = isClosed
+                    }
+                }
+            };
+
+            return path;
+           
         }
     }
 }

@@ -272,7 +272,7 @@ namespace Chem4Word.Model
 
         public double Angle
         {
-            get { return Vector.AngleBetween(BasicGeometry.ScreenNorth(), BondVector); }
+            get { return Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

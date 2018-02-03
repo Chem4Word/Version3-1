@@ -14,7 +14,8 @@
     d:DesignWidth="300"
     mc:Ignorable="d debug release"
     xmlns:debug="condition:DEBUG"
-    xmlns:release="condition:!DEBUG">
+    xmlns:release="condition:!DEBUG"
+    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />
     </UserControl.Resources>
@@ -146,13 +147,15 @@
                     </view:BondShape>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type model:Atom}">
-                    <view:AtomShape
+                    <viewModel:AtomShape
                         Charge="{Binding Path=FormalCharge}"
                         Isotope="{Binding Path=IsotopeNumber}"
                         ParentAtom="{Binding Path=SelfRef}"
-                        Position="{Binding Path=Position}">
-                        <view:AtomShape.Style>
-                            <Style TargetType="{x:Type view:AtomShape}">
+                        Position="{Binding Path=Position}"
+                        AtomSymbol="{Binding Path=SymbolText}"
+                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
+                        <viewModel:AtomShape.Style>
+                            <Style TargetType="{x:Type viewModel:AtomShape}">
                                 <Setter Property="Fill">
                                     <Setter.Value>
                                         <SolidColorBrush Color="{Binding Element.Colour}" />
@@ -189,8 +192,8 @@
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
-                        </view:AtomShape.Style>
-                    </view:AtomShape>
+                        </viewModel:AtomShape.Style>
+                    </viewModel:AtomShape>
                 </DataTemplate>
             </ItemsControl.Resources>
         </ItemsControl>

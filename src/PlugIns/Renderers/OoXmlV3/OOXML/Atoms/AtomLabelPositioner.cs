@@ -199,7 +199,7 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Atoms
 
                 #region Determine NESW
 
-                double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(), atom.BalancingVector);
+                double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector);
                 CompassPoints nesw = CompassPoints.East;
 
                 if (bondCount == 1)
