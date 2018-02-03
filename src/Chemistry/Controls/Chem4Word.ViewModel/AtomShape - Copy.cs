@@ -302,10 +302,11 @@ namespace Chem4Word.ViewModel
         {
             Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
-            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString);
+            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill);
             return chargeText.TextMetrics;
 
         }
+
         /// <summary>
         /// Draws a charge or radical label at the given point
         /// </summary>
@@ -314,15 +315,18 @@ namespace Chem4Word.ViewModel
         /// <param name="hMetrics"></param>
         /// <param name="isoMetrics"></param>
         /// <param name="chargeString"></param>
+        /// <param name="fill"></param>
         /// <returns></returns>
         private ChargeLabelText DrawChargeOrRadical(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics,
-            AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString)
+            AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString, Brush fill)
         {
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
             Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter);
+            chargeText.MeasureAtCenter(chargeCenter);
+            chargeText.Fill = fill;
             chargeText.DrawAtBottomLeft(chargeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
             return chargeText;
         }
@@ -335,11 +339,20 @@ namespace Chem4Word.ViewModel
             rotator.Rotate(angle);
 
             labelOffset = labelOffset * rotator;
-
+            Rect bb= new Rect();
+            Rect bb2= new Rect();
+            if (hMetrics != null)
+            {
+                bb = hMetrics.TotalBoundingBox;
+            }
+            if (isoMetrics != null)
+            {
+                bb2 = isoMetrics.BoundingBox;
+            }
             labelCenter = mainAtomMetrics.Geocenter + labelOffset;
             labelText.MeasureAtCenter(labelCenter);
-            while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, hMetrics.TotalBoundingBox,
-                isoMetrics.BoundingBox) & Math.Abs(angle - 30) > 0.001)
+            while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, bb,
+                bb2) & Math.Abs(angle - 30) > 0.001)
             {
                 rotator.Rotate(30);
                 angle += 30;
