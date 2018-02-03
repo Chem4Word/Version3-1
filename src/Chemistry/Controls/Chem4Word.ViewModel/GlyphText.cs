@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -46,7 +47,12 @@ namespace Chem4Word.ViewModel
             get
             {
                 var outline = GlyphUtils.GetOutline(TextRun);
-                List<Point> hull = Geometry<Point>.GetHull(outline, p => p);
+
+                var sortedHull = (from Point p in outline
+                    orderby p.X ascending, p.Y descending
+                    select p).ToList();
+
+                List<Point> hull = Geometry<Point>.GetHull(sortedHull, p => p);
                 return hull;
             }
         }
