@@ -153,7 +153,7 @@ namespace Chem4Word.ViewModel
 
     public class ChargeLabelText : GlyphText
     {
-        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
+        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.IsotopeSize, pixelsPerDip)
         {
         }
     }
