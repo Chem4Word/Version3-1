@@ -32,9 +32,9 @@ namespace Chem4Word.Telemetry
             {
                 CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(new StorageCredentials(accountName, accountKey), true);
                 CloudTableClient cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
-                string tableName = "LoggingV3";
+                string tableName = "LoggingV31";
 #if DEBUG
-                tableName = "LoggingV3Debug";
+                tableName = "LoggingV31Debug";
 #endif
                 _cloudTable = cloudTableClient.GetTableReference(tableName);
             }
