@@ -199,4 +199,3 @@ Note: The following zip files (containing ChemDoodle Web)
 
 are licensed under the GPL, version 3 (http://opensource.org/licenses/GPL-3.0).
 You may not use those files except in compliance with the GPL, version 3.
-
