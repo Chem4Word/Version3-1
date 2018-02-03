@@ -34,4 +34,6 @@
 *.dll binary
 *.rtf binary
 *.pfx binary
+*.cer binary
+*.pvk binary
 Library.db binary

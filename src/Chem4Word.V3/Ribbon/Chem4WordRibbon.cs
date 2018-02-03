@@ -64,7 +64,7 @@ namespace Chem4Word
 
                 string tabLabel = "Chemistry";
 #if DEBUG
-                tabLabel += " (Debug)";
+                tabLabel += " (Debug 3.1)";
 #endif
                 if (Globals.Chem4WordV3.WordVersion == 2013)
                 {
