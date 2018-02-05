@@ -18,8 +18,9 @@ using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Globals = Chem4Word.View.Globals;
 using static Chem4Word.Model.Geometry.AngleMethods;
-using static  Chem4Word.ViewModel.GlyphUtils;
-namespace Chem4Word.ViewModel
+using static  Chem4Word.View.GlyphUtils;
+// ReSharper disable once CheckNamespace
+namespace Chem4Word.View
 {
 
     /// <summary>
@@ -138,7 +139,7 @@ namespace Chem4Word.ViewModel
             /// <param name="subscriptInfo">Initial measurements of the subscript (can be null for no subscripts)</param>
             /// <returns></returns>
             private static Point GetAdjunctCenter(AtomTextMetrics parentMetrics, CompassPoints direction,
-                GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo=null)
+                GlyphUtils.GlyphInfo adjunctGlyphInfo, GlyphUtils.GlyphInfo? subscriptInfo=null)
             {
                 Point adjunctCenter;
                 double charHeight = (GlyphUtils.GlyphTypeface.Baseline * GlyphUtils.SymbolSize);
@@ -195,7 +196,20 @@ namespace Chem4Word.ViewModel
         //    }
         //}
 
+        
+        protected override Geometry DefiningGeometry
+        {
+            get
+            {
+               
+                //so draw a circle
+                double radiusX = Globals.AtomWidth / 2;
 
+                return new EllipseGeometry(Position, radiusX, radiusX);
+
+               
+            }
+        }
 
 
         protected override void OnRender(DrawingContext drawingContext)
@@ -476,19 +490,6 @@ namespace Chem4Word.ViewModel
 #endregion
 
 
-        protected override Geometry DefiningGeometry
-        {
-            get
-            {
-               
-                //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
-
-                return new EllipseGeometry(Position, radiusX, radiusX);
-
-               
-            }
-        }
 
         public int? Isotope
         {

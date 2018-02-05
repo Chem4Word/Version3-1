@@ -55,7 +55,16 @@
                     <TextBlock TextWrapping="NoWrap" Text="{Binding}" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" />
                 </Grid>
             </Border>
+        
+
         </DataTemplate>
+
+        <Style x:Key="LibraryItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                 Color="Transparent"/>
+            </Style.Resources>
+        </Style>
     </UserControl.Resources>
     <Grid Name="MainGrid">
         <Grid.RowDefinitions>
@@ -121,6 +130,7 @@
             x:Name="GalleryList"
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
+            ItemContainerStyle="{StaticResource LibraryItemStyle}"
             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -137,6 +147,7 @@
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+           
         </ListBox>
     </Grid>
 </UserControl>

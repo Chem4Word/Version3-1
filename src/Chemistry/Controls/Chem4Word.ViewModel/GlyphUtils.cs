@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Chem4Word.ViewModel
+namespace Chem4Word.View
 {
     public static class GlyphUtils
     {
