@@ -148,6 +148,7 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type model:Atom}">
                     <viewModel:AtomShape
+                        Name="AtomShape"
                         Charge="{Binding Path=FormalCharge}"
                         Isotope="{Binding Path=IsotopeNumber}"
                         ParentAtom="{Binding Path=SelfRef}"
