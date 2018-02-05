@@ -59,13 +59,6 @@
 
         </DataTemplate>
 
-        <Style x:Key="LibraryItemStyle" TargetType="{x:Type ListBoxItem}">
-            <Style.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
-                                 Color="Transparent"/>
-                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
-            </Style.Resources>
-        </Style>
     </UserControl.Resources>
     <Grid Name="MainGrid">
         <Grid.RowDefinitions>
