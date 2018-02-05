@@ -144,6 +144,7 @@ namespace Chem4Word.Model
             get; set;
         }
 
+
         /// <summary>
         /// Do we show the symbol block? Only toggle for Carbon
         /// </summary>
@@ -410,6 +411,69 @@ namespace Chem4Word.Model
         //    }
         //}
 
+        public const double FontSize = 23;
+
+
+       //tries to get a bounding box for each atom symbol
+        public Rect BoundingBox
+        {
+            get
+            {
+                if (SymbolText != "")
+                {
+                    double halfSize = FontSize / 2;
+                    Point position = Position;
+                    Rect baseAtomBox = new Rect(
+                        new Point(position.X - halfSize, position.Y - halfSize),
+                        new Point(position.X + halfSize, position.Y + halfSize));
+                    double symbolWidth = SymbolText.Length * FontSize * 0.8;
+                    Rect mainElementBox =new Rect(new Point(position.X - halfSize, position.Y - halfSize),
+                        new Size(symbolWidth, FontSize));
+
+
+
+                    if (ImplicitHydrogenCount > 0)
+
+                    {
+                        Vector shift = new Vector();
+                        Rect hydrogenBox = baseAtomBox;
+                        switch (GetDefaultHOrientation())
+                        {
+                            case CompassPoints.East:
+                                shift = BasicGeometry.ScreenEast * FontSize;
+                                break;
+                            case CompassPoints.North:
+                                shift = BasicGeometry.ScreenNorth * FontSize;
+                                break;
+                            case CompassPoints.South:
+                                shift = BasicGeometry.ScreenSouth * FontSize;
+                                break;
+                            case CompassPoints.West:
+                                shift = BasicGeometry.ScreenWest * FontSize;
+                                break;
+
+                        }
+                        hydrogenBox.Offset(shift);
+                        mainElementBox.Union(hydrogenBox);
+                    }
+                    return mainElementBox;
+                }
+                else
+                {
+                    return new Rect(Position, Position);//empty rect
+                }
+
+            }
+        }
+
+        private Rect CenterRectOn(Point position, double fontSize, Point topleft, Point bottomRight)
+        {
+          
+
+            return new Rect(topleft,
+                bottomRight);
+        }
+
         #endregion Properties
 
         #region Constructors
@@ -499,6 +563,42 @@ namespace Chem4Word.Model
             return BasicGeometry.GetAngle(atom0.Position, atom1.Position, atom2.Position, 0.0001);
         }
 
+        public CompassPoints GetDefaultHOrientation()
+        {
+            if (ImplicitHydrogenCount >= 1)
+            {
+                if (Bonds.Count == 0)
+                {
+                    return CompassPoints.East;
+                }
+                else if (Bonds.Count == 1)
+                {
+                    if (Vector.AngleBetween(BasicGeometry.ScreenNorth,
+                            Bonds[0].OtherAtom(this).Position - Position) > 0)
+                        //the bond is on the right
+                    {
+
+                        return CompassPoints.West;
+                    }
+                    else
+                    {
+                        //default to any old rubbish for now
+                        return CompassPoints.East;
+
+                    }
+                }
+                else
+                {
+                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
+                        BalancingVector);
+
+                    return BasicGeometry.SnapTo4NESW(baFromNorth);
+
+                }
+
+            }
+            return CompassPoints.East;
+        }
         #endregion Methods
     }
 }

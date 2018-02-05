@@ -196,7 +196,10 @@ namespace Chem4Word.View
         //}
 
 
-
+        protected override Size MeasureOverride(Size constraint)
+        {
+            return base.MeasureOverride(constraint);
+        }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
@@ -251,7 +254,7 @@ namespace Chem4Word.View
             if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
 
-                var defaultHOrientation = AtomHelpers.GetDefaultHOrientation(ParentAtom);
+                var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
                 subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H");
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());

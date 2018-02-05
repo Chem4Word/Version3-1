@@ -7,7 +7,7 @@
     <ProjectGuid>{352C0710-FE0D-41CE-AC98-A1AF992F9EFF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Chem4Word.ViewModel</RootNamespace>
+    <RootNamespace>Chem4Word.View</RootNamespace>
     <AssemblyName>Chem4Word.ViewModel</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -80,6 +80,7 @@
     <Compile Include="BondGeometry.cs" />
     <Compile Include="BondShape.cs" />
     <Compile Include="CanvasAutoSize.cs" />
+    <Compile Include="ChemItemsControl.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlyphText.cs" />
     <Compile Include="GlyphUtils.cs" />
