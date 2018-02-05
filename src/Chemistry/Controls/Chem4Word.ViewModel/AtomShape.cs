@@ -18,8 +18,8 @@ using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Globals = Chem4Word.View.Globals;
 using static Chem4Word.Model.Geometry.AngleMethods;
-using static  Chem4Word.ViewModel.GlyphUtils;
-namespace Chem4Word.ViewModel
+using static  Chem4Word.View.GlyphUtils;
+namespace Chem4Word.View
 {
 
     /// <summary>

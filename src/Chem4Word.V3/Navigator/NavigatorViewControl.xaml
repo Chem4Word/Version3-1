@@ -19,24 +19,26 @@
     </UserControl.Resources>
 
     <Grid>
-        <ListBox x:Name="NavigatorList" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Path=NavigatorItems}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+        <ScrollViewer VerticalAlignment="Stretch">
+            <ItemsControl x:Name="NavigatorList" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Path=NavigatorItems}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
 
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
                         BorderBrush="{StaticResource BlueBrush}"
                         BorderThickness="2"
                         HorizontalAlignment="Stretch"
                         CornerRadius="2">
-                        <local:NavigatorItemControl
+                            <local:NavigatorItemControl
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
                             DataContext="{Binding}"
                             ActiveDocument="{Binding ElementName=NavViewControl, Path=ActiveDocument}"
                             x:Name="NavigatorItemControl" />
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>
