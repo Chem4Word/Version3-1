@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.ViewModel;
 
 namespace Chem4Word.View
 {
@@ -117,17 +118,6 @@ namespace Chem4Word.View
                             totalgeo = totalgeo.GetWidenedPathGeometry(newPen, 0.001, ToleranceType.Absolute);
                         }
 
-                        if (!string.IsNullOrEmpty(ParentBond.StartAtom?.SymbolText))
-                        {
-                            var atomGeo = AtomShape.GetBoxGeometry(ParentBond.StartAtom);
-                            totalgeo = new CombinedGeometry(GeometryCombineMode.Exclude, totalgeo, atomGeo);
-                        }
-
-                        if (!string.IsNullOrEmpty(ParentBond.EndAtom?.SymbolText))
-                        {
-                            var atomGeo = AtomShape.GetBoxGeometry(ParentBond.EndAtom);
-                            totalgeo = new CombinedGeometry(GeometryCombineMode.Exclude, totalgeo, atomGeo);
-                        }
                     }
                     totalgeo.Freeze();
                 }

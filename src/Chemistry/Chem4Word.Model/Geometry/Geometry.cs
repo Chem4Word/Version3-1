@@ -34,7 +34,7 @@ namespace Chem4Word.Model.Geometry
     {
         public static double ToDegrees(this ClockDirections cd)
         {
-            return 30 * (int) cd % 12;
+            return 30 * ((int) cd % 12);
         }
 
         public static double ToDegrees(this CompassPoints cp)
