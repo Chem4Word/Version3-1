@@ -63,6 +63,7 @@
             <Style.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                                  Color="Transparent"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
             </Style.Resources>
         </Style>
     </UserControl.Resources>
@@ -125,14 +126,15 @@
                 </Button.Content>
             </Button>
         </Grid>
-        <ListBox
-            Grid.Row="2"
+        <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch">
+        <ItemsControl
+            
             x:Name="GalleryList"
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
-            ItemContainerStyle="{StaticResource LibraryItemStyle}"
-            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-            <ListBox.ItemTemplate>
+            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+            VerticalAlignment="Stretch">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border
                         BorderBrush="{StaticResource WordBlueBrush}"
@@ -146,8 +148,9 @@
                             x:Name="GalleryItemControl" />
                     </Border>
                 </DataTemplate>
-            </ListBox.ItemTemplate>
+            </ItemsControl.ItemTemplate>
            
-        </ListBox>
+        </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>

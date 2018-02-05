@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.ViewModel;
+using Chem4Word.View;
 
 namespace Chem4Word.View
 {
