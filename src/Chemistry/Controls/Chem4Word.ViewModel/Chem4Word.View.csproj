@@ -80,7 +80,6 @@
     <Compile Include="BondGeometry.cs" />
     <Compile Include="BondShape.cs" />
     <Compile Include="CanvasAutoSize.cs" />
-    <Compile Include="ChemItemsControl.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="GlyphText.cs" />
     <Compile Include="GlyphUtils.cs" />
