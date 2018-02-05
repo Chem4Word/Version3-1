@@ -1,5 +1,13 @@
-﻿using System;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
@@ -46,7 +54,12 @@ namespace Chem4Word.View
             get
             {
                 var outline = GlyphUtils.GetOutline(TextRun);
-                List<Point> hull = Geometry<Point>.GetHull(outline, p => p);
+
+                var sortedHull = (from Point p in outline
+                    orderby p.X ascending, p.Y descending
+                    select p).ToList();
+
+                List<Point> hull = Geometry<Point>.GetHull(sortedHull, p => p);
                 return hull;
             }
         }
@@ -153,7 +166,7 @@ namespace Chem4Word.View
 
     public class ChargeLabelText : GlyphText
     {
-        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
+        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.IsotopeSize, pixelsPerDip)
         {
         }
     }

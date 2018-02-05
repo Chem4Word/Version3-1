@@ -1,4 +1,11 @@
-﻿using System;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -25,7 +32,7 @@ namespace Chem4Word.View
                 return _glyphTypeface;
             }
         }
-        public static double SymbolSize = 26;
+        public static double SymbolSize = 23;
         public static double ScriptSize = SymbolSize * 0.6;
         public static double IsotopeSize = ScriptSize * 0.8;
 
@@ -97,7 +104,9 @@ namespace Chem4Word.View
 
                 totalWidth += width;
             }
-
+#if DEBUG
+            
+#endif
             return new GlyphInfo {AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth};
 
         }

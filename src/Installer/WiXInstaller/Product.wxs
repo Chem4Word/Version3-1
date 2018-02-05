@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <!-- For automatic upgrade to work only first three parts of version number are used -->
-  <Product Id="*" Name="Chemistry Add-In for Microsoft Word 3.0.14 Release 1" Manufacturer="Chem4Word" Version="3.0.14.6591" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
+  <Product Id="*" Name="Chemistry Add-In for Microsoft Word 3.1.0 Alpha 1" Manufacturer="Chem4Word" Version="3.1.0.6605" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of Chem4Word is already installed." />
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
@@ -296,15 +296,15 @@
       <!-- Microsoft Office Tools -->
       <Component Id="Microsoft.Office.Tools.Common.v4.0.Utilities">
         <File Id="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
-        <File Id="Microsoft.Office.Tools.Common.v4.0.Utilities.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Common.v4.0.Utilities.xml" />
+        <!--<File Id="Microsoft.Office.Tools.Common.v4.0.Utilities.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Common.v4.0.Utilities.xml" />-->
       </Component>
       <Component Id="Microsoft.Office.Tools.v4.0.Framework">
         <File Id="Microsoft.Office.Tools.v4.0.Framework.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.v4.0.Framework.dll" />
-        <File Id="Microsoft.Office.Tools.v4.0.Framework.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.v4.0.Framework.xml" />
+        <!--<File Id="Microsoft.Office.Tools.v4.0.Framework.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.v4.0.Framework.xml" />-->
       </Component>
       <Component Id="Microsoft.Office.Tools.Word">
         <File Id="Microsoft.Office.Tools.Word.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.dll" />
-        <File Id="Microsoft.Office.Tools.Word.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.xml" />
+        <!--<File Id="Microsoft.Office.Tools.Word.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.xml" />-->
       </Component>
       <Component Id="Microsoft.Office.Tools.Word.v4.0.Utilities">
         <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.v4.0.Utilities.dll" />
@@ -312,7 +312,7 @@
       </Component>
       <Component Id="Microsoft.VisualStudio.Tools.Applications.Runtime">
         <File Id="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll" />
-        <File Id="Microsoft.VisualStudio.Tools.Applications.Runtime.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.xml" />
+        <!--<File Id="Microsoft.VisualStudio.Tools.Applications.Runtime.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.xml" />-->
       </Component>
     </ComponentGroup>
   </Fragment>
