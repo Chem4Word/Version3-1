@@ -4,7 +4,7 @@ using System.Windows.Media;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 
-namespace Chem4Word.ViewModel
+namespace Chem4Word.View
 {
     public static class AtomHelpers
     {

@@ -15,7 +15,7 @@
     mc:Ignorable="d debug release"
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
-    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel">
+    xmlns:viewModel="clr-namespace:Chem4Word.View;assembly=Chem4Word.ViewModel">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />
     </UserControl.Resources>
