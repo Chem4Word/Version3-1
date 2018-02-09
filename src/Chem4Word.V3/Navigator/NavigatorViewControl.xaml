@@ -20,7 +20,14 @@
 
     <Grid>
         <ScrollViewer VerticalAlignment="Stretch">
-            <ItemsControl x:Name="NavigatorList" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Path=NavigatorItems}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <ItemsControl x:Name="NavigatorList"
+                          Grid.IsSharedSizeScope="True" 
+                          ItemsSource="{Binding Path=NavigatorItems}" 
+                          HorizontalAlignment="Stretch" 
+                          HorizontalContentAlignment="Stretch"
+                          VirtualizingStackPanel.IsVirtualizing="True"
+                          ScrollViewer.CanContentScroll="True"
+                          >
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -38,6 +45,11 @@
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VirtualizationMode="Recycling"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
             </ItemsControl>
         </ScrollViewer>
     </Grid>
