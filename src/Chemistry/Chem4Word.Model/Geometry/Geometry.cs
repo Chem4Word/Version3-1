@@ -283,6 +283,26 @@ namespace Chem4Word.Model.Geometry
 
             return CompassPoints.South;
         }
+
+        public static ClockDirections SnapToClock(double angleFromNorth)
+        {
+            int tolerance = 15;
+            var sector = SnapAngleToTolerance(angleFromNorth, tolerance);
+            return (ClockDirections) sector;
+        }
+
+        private static int SnapAngleToTolerance(double angleFromNorth, int tolerance)
+        {
+
+            if (angleFromNorth < 0)
+            {
+                angleFromNorth += 360.0;
+            }
+            double adjustedAngle = angleFromNorth + tolerance;
+            int sector = (int) adjustedAngle / (tolerance * 2);
+            return sector;
+        }
+
         /// <summary>
         /// Takes a list of poinst and builds a  Path object from it.
         /// Generally used for constructing masks 

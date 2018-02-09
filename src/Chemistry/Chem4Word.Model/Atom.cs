@@ -573,11 +573,23 @@ namespace Chem4Word.Model
                 }
                 else if (Bonds.Count == 1)
                 {
-                    if (Vector.AngleBetween(BasicGeometry.ScreenNorth,
-                            Bonds[0].OtherAtom(this).Position - Position) > 0)
+                    Point otherPosition = Bonds[0].OtherAtom(this).Position;
+                    double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
+                        otherPosition - Position);
+                    Debug.Print(angleFromNorth.ToString());
+                    int clockDir = (int)BasicGeometry.SnapToClock(
+                        angleFromNorth);
+
+                    
+
+                    if (clockDir==0 | clockDir==6)
                         //the bond is on the right
                     {
 
+                        return CompassPoints.East;
+                    }
+                    else if (clockDir >= 1 & clockDir <= 5)
+                    {
                         return CompassPoints.West;
                     }
                     else
