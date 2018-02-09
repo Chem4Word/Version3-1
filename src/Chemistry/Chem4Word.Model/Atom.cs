@@ -380,7 +380,7 @@ namespace Chem4Word.Model
                     }
                 }
 
-                //Debug.WriteLine($"Atom {Id} Resultant Balancing Vector Angle is {Vector.AngleBetween(BasicGeometry.ScreenNorth, vsumVector)}");
+                //Debug.WriteLine($"Atom {Id} Resultant Balancing Vector Angle is {Vector.AngleBetween(BasicGeometry.ScreenNorth(), vsumVector)}");
                 return vsumVector;
             }
         }
@@ -440,16 +440,16 @@ namespace Chem4Word.Model
                         switch (GetDefaultHOrientation())
                         {
                             case CompassPoints.East:
-                                shift = BasicGeometry.ScreenEast * FontSize;
+                                shift = BasicGeometry.ScreenEast() * FontSize;
                                 break;
                             case CompassPoints.North:
-                                shift = BasicGeometry.ScreenNorth * FontSize;
+                                shift = BasicGeometry.ScreenNorth() * FontSize;
                                 break;
                             case CompassPoints.South:
-                                shift = BasicGeometry.ScreenSouth * FontSize;
+                                shift = BasicGeometry.ScreenSouth() * FontSize;
                                 break;
                             case CompassPoints.West:
-                                shift = BasicGeometry.ScreenWest * FontSize;
+                                shift = BasicGeometry.ScreenWest() * FontSize;
                                 break;
 
                         }
@@ -574,7 +574,7 @@ namespace Chem4Word.Model
                 else if (Bonds.Count == 1)
                 {
                     Point otherPosition = Bonds[0].OtherAtom(this).Position;
-                    double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
+                    double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
                         otherPosition - Position);
                     Debug.Print(angleFromNorth.ToString());
                     int clockDir = (int)BasicGeometry.SnapToClock(
@@ -601,7 +601,7 @@ namespace Chem4Word.Model
                 }
                 else
                 {
-                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
+                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
                         BalancingVector);
 
                     return BasicGeometry.SnapTo4NESW(baFromNorth);
