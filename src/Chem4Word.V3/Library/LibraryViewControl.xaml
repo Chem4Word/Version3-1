@@ -55,7 +55,7 @@
                     <TextBlock TextWrapping="NoWrap" Text="{Binding}" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" />
                 </Grid>
             </Border>
-        
+
 
         </DataTemplate>
 
@@ -119,31 +119,38 @@
                 </Button.Content>
             </Button>
         </Grid>
-        <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch">
-        <ItemsControl
-            
+
+        <ScrollViewer Grid.Row="2">
+            <!-- see https://stackoverflow.com/a/2784220/1134049 for the basis for the virtualization -->
+            <ItemsControl
+            VirtualizingStackPanel.IsVirtualizing="True"
+            ScrollViewer.CanContentScroll="True"
             x:Name="GalleryList"
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
             VerticalAlignment="Stretch">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VirtualizationMode="Recycling"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border
                         BorderBrush="{StaticResource WordBlueBrush}"
                         BorderThickness="2"
                         HorizontalAlignment="Stretch"
                         CornerRadius="2">
-                        <local:LibraryItemControl
+                            <local:LibraryItemControl
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
                             DataContext="{Binding Mode=OneWay}"
                             x:Name="GalleryItemControl" />
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-           
-        </ItemsControl>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </UserControl>
