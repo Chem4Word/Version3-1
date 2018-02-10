@@ -15,8 +15,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Globals = Chem4Word.View.Globals;
 using static Chem4Word.Model.Geometry.AngleMethods;
