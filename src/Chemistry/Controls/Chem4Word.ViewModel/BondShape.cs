@@ -70,7 +70,11 @@ namespace Chem4Word.View
 
         public double Angle
         {
+<<<<<<< HEAD
+            get { return Vector.AngleBetween(BasicGeometry.ScreenNorth, EndPoint.Value - StartPoint.Value); }
+=======
             get { return Vector.AngleBetween(BasicGeometry.ScreenNorth(), EndPoint.Value - StartPoint.Value); }
+>>>>>>> flexdisplay-rehash
         }
 
         public Point? EndPoint

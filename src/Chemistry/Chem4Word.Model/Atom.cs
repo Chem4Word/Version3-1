@@ -380,7 +380,11 @@ namespace Chem4Word.Model
                     }
                 }
 
+<<<<<<< HEAD
+                //Debug.WriteLine($"Atom {Id} Resultant Balancing Vector Angle is {Vector.AngleBetween(BasicGeometry.ScreenNorth, vsumVector)}");
+=======
                 //Debug.WriteLine($"Atom {Id} Resultant Balancing Vector Angle is {Vector.AngleBetween(BasicGeometry.ScreenNorth(), vsumVector)}");
+>>>>>>> flexdisplay-rehash
                 return vsumVector;
             }
         }
@@ -440,6 +444,18 @@ namespace Chem4Word.Model
                         switch (GetDefaultHOrientation())
                         {
                             case CompassPoints.East:
+<<<<<<< HEAD
+                                shift = BasicGeometry.ScreenEast * FontSize;
+                                break;
+                            case CompassPoints.North:
+                                shift = BasicGeometry.ScreenNorth * FontSize;
+                                break;
+                            case CompassPoints.South:
+                                shift = BasicGeometry.ScreenSouth * FontSize;
+                                break;
+                            case CompassPoints.West:
+                                shift = BasicGeometry.ScreenWest * FontSize;
+=======
                                 shift = BasicGeometry.ScreenEast() * FontSize;
                                 break;
                             case CompassPoints.North:
@@ -450,6 +466,7 @@ namespace Chem4Word.Model
                                 break;
                             case CompassPoints.West:
                                 shift = BasicGeometry.ScreenWest() * FontSize;
+>>>>>>> flexdisplay-rehash
                                 break;
 
                         }
@@ -573,6 +590,13 @@ namespace Chem4Word.Model
                 }
                 else if (Bonds.Count == 1)
                 {
+<<<<<<< HEAD
+                    if (Vector.AngleBetween(BasicGeometry.ScreenNorth,
+                            Bonds[0].OtherAtom(this).Position - Position) > 0)
+                        //the bond is on the right
+                    {
+
+=======
                     Point otherPosition = Bonds[0].OtherAtom(this).Position;
                     double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
                         otherPosition - Position);
@@ -590,6 +614,7 @@ namespace Chem4Word.Model
                     }
                     else if (clockDir >= 1 & clockDir <= 5)
                     {
+>>>>>>> flexdisplay-rehash
                         return CompassPoints.West;
                     }
                     else
@@ -601,7 +626,11 @@ namespace Chem4Word.Model
                 }
                 else
                 {
+<<<<<<< HEAD
+                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
+=======
                     double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth(),
+>>>>>>> flexdisplay-rehash
                         BalancingVector);
 
                     return BasicGeometry.SnapTo4NESW(baFromNorth);

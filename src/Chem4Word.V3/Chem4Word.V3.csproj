@@ -417,9 +417,12 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <None Include="Data\Chem4Word-Versions.xml" />
+<<<<<<< HEAD
+=======
     <None Include="Data\CML.xsd">
       <SubType>Designer</SubType>
     </None>
+>>>>>>> flexdisplay-rehash
     <None Include="Data\index.html" />
     <EmbeddedResource Include="Data\This-Version.xml" />
     <Content Include="Library\14-tag.png" />
