@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Data;
 
 namespace Chem4Word.Model
@@ -30,6 +31,7 @@ namespace Chem4Word.Model
 
     public class Model : ChemistryContainer, INotifyPropertyChanged
     {
+        private Rect? _boundingBox;
         private const int Padding = 25;
 
         public string CustomXmlPartGuid { get; set; }
@@ -301,28 +303,50 @@ namespace Chem4Word.Model
 
         public double DesiredWidth
         {
-            get { return ActualWidth; }
+            get { return BoundingBox.Width; }
         }
 
         public double ActualWidth
         {
-            get { return MaxX - MinX; }
+            get { return BoundingBox.Width; }
         }
 
         public double ActualHeight
         {
-            get { return MaxY - MinY; }
+            get { return BoundingBox.Height; }
         }
 
         public double DesiredHeight
         {
-            get { return MaxY - MinY; }
+            get { return BoundingBox.Height; }
         }
 
-        public double MinX => AllAtoms.Min(a => a.Position.X) - Padding;
-        public double MaxX => AllAtoms.Max(a => a.Position.X) + Padding;
-        public double MinY => AllAtoms.Min(a => a.Position.Y) - Padding;
-        public double MaxY => AllAtoms.Max(a => a.Position.Y) + Padding;
+        //used to calculate the bounds of the atom
+        public double FontSize { get; set; }
+
+        public Rect BoundingBox
+        {
+            get
+            {
+                if (_boundingBox == null)
+                {
+                    var modelRect = AllAtoms[0].BoundingBox;
+                    for  (int i=1; i<AllAtoms.Count; i++)
+                    {
+                        var atom = AllAtoms[i];
+                        modelRect.Union(atom.BoundingBox);
+                    }
+                    _boundingBox = modelRect;
+                }
+                return _boundingBox.Value;
+            }
+        }
+        public double MinX => BoundingBox.Left;
+        public double MaxX => BoundingBox.Right;
+        public double MinY => BoundingBox.Top;
+        public double MaxY => BoundingBox.Bottom;
+
+
 
         public double MeanBondLength
         {

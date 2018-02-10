@@ -417,6 +417,9 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <None Include="Data\Chem4Word-Versions.xml" />
+    <None Include="Data\CML.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Data\index.html" />
     <EmbeddedResource Include="Data\This-Version.xml" />
     <Content Include="Library\14-tag.png" />

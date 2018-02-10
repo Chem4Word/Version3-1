@@ -190,17 +190,29 @@ namespace Chem4Word.Model.Geometry
             return new Vector(-v.Y, v.X);
         }
 
-        public static Vector ScreenSouth =new Vector(0, 1);
-        
+        public static Vector ScreenSouth()
+        {
+            return new Vector(0, 1);
+        }
 
-        public static Vector ScreenEast= new Vector(1, 0);
-        
 
-        public static Vector ScreenNorth = -ScreenSouth;
-   
+        public static Vector ScreenEast()
+        {
+            return new Vector(1, 0);
+        } 
 
-        public static Vector ScreenWest = -ScreenEast ;
-        
+
+        public static Vector ScreenNorth()
+        {
+            return -ScreenSouth();
+        }
+
+
+        public static Vector ScreenWest()
+        {
+            return -ScreenEast();
+        }
+
         #endregion extension methods
 
         public static double Determinant(Vector vector1, Vector vector2)
@@ -283,6 +295,26 @@ namespace Chem4Word.Model.Geometry
 
             return CompassPoints.South;
         }
+
+        public static ClockDirections SnapToClock(double angleFromNorth)
+        {
+            int tolerance = 15;
+            var sector = SnapAngleToTolerance(angleFromNorth, tolerance);
+            return (ClockDirections) sector;
+        }
+
+        private static int SnapAngleToTolerance(double angleFromNorth, int tolerance)
+        {
+
+            if (angleFromNorth < 0)
+            {
+                angleFromNorth += 360.0;
+            }
+            double adjustedAngle = angleFromNorth + tolerance;
+            int sector = (int) adjustedAngle / (tolerance * 2);
+            return sector;
+        }
+
         /// <summary>
         /// Takes a list of poinst and builds a  Path object from it.
         /// Generally used for constructing masks 

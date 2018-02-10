@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 
-namespace Chem4Word.ViewModel
+namespace Chem4Word.View
 {
     /// <summary>
     /// wraps up some of the glyph handling into a handy class 
