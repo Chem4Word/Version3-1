@@ -5,17 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-<<<<<<< HEAD
-=======
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
->>>>>>> flexdisplay-rehash
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-<<<<<<< HEAD
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -25,11 +21,7 @@ using Chem4Word.View;
 using Globals = Chem4Word.View.Globals;
 using static Chem4Word.Model.Geometry.AngleMethods;
 using static  Chem4Word.View.GlyphUtils;
-=======
-using System.Windows.Media;
-using System.Windows.Shapes;
-using static Chem4Word.View.GlyphUtils;
->>>>>>> flexdisplay-rehash
+
 namespace Chem4Word.View
 {
 
@@ -158,47 +150,27 @@ namespace Chem4Word.View
                 {
                     case CompassPoints.East:
                     default:
-<<<<<<< HEAD
                         adjunctCenter = parentMetrics.Geocenter + BasicGeometry.ScreenEast * adjunctWidth;
                         break;
                     case CompassPoints.North:
                         adjunctCenter = parentMetrics.Geocenter +
-                                         BasicGeometry.ScreenNorth * charHeight;
-=======
-                        adjunctCenter = parentMetrics.Geocenter + BasicGeometry.ScreenEast() * adjunctWidth;
-                        break;
-                    case CompassPoints.North:
-                        adjunctCenter = parentMetrics.Geocenter +
-                                         BasicGeometry.ScreenNorth() * charHeight;
->>>>>>> flexdisplay-rehash
+                                        BasicGeometry.ScreenNorth * charHeight;
                         break;
                     case CompassPoints.West:
 
                         if(subscriptInfo!=null)
                         {
-<<<<<<< HEAD
                             adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest *
-=======
-                            adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest() *
->>>>>>> flexdisplay-rehash
                                                                        (adjunctWidth + subscriptInfo.Value.Width));
                         }
                         else
                         {
-<<<<<<< HEAD
                             adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest * (adjunctWidth));
-=======
-                            adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest() * (adjunctWidth));
->>>>>>> flexdisplay-rehash
                         }
                         break;
                     case CompassPoints.South:
                         adjunctCenter = parentMetrics.Geocenter +
-<<<<<<< HEAD
-                                         BasicGeometry.ScreenSouth * charHeight;
-=======
-                                         BasicGeometry.ScreenSouth() * charHeight;
->>>>>>> flexdisplay-rehash
+                                        BasicGeometry.ScreenSouth * charHeight;
                         break;
                 }
                 return adjunctCenter;
@@ -263,11 +235,6 @@ namespace Chem4Word.View
             LabelMetrics isoMetrics = null;
             SubscriptedGroup subscriptedGroup = null;
             _shapeHull = new List<Point>();
-<<<<<<< HEAD
-
-=======
-            var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
->>>>>>> flexdisplay-rehash
 
             //stage 1:  measure up the main atom symbol in position
             //we need the metrics first
@@ -288,12 +255,7 @@ namespace Chem4Word.View
             //if we have implcit hydrogens and we have an explicit label, draw them
             if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
-
-<<<<<<< HEAD
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
-=======
-               
->>>>>>> flexdisplay-rehash
 
                 subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H");
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
@@ -332,11 +294,7 @@ namespace Chem4Word.View
             //stage7:  draw any charges
             if ((Charge ?? 0) != 0)
             {
-<<<<<<< HEAD
                 LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics);
-            }
-=======
-                LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, defaultHOrientation);
             }
         }
 
@@ -361,8 +319,6 @@ namespace Chem4Word.View
             var chargeString = AtomHelpers.GetChargeString(Charge);
             var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString,  Fill, defaultHOrientation);
             return chargeText.TextMetrics;
-
->>>>>>> flexdisplay-rehash
         }
 
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
@@ -373,15 +329,11 @@ namespace Chem4Word.View
 #endif */
             drawingContext.DrawGeometry(backgroundMask, new Pen(backgroundMask, 3), BasicGeometry.BuildPath(_shapeHull).Data);
         }
-<<<<<<< HEAD
-=======
 
->>>>>>> flexdisplay-rehash
         /// <summary>
-        /// Draws the atomic charge if required
+        /// 
         /// </summary>
         /// <param name="drawingContext"></param>
-<<<<<<< HEAD
         /// <param name="mainAtomMetrics"></param>
         /// <param name="hMetrics"></param>
         /// <param name="isoMetrics"></param>
@@ -390,25 +342,11 @@ namespace Chem4Word.View
         {
             Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
-            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill);
+            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill, CompassPoints.East);
             return chargeText.TextMetrics;
 
         }
 
-       
-        /// <summary>
-        /// Draws a charge or radical label at the given point
-        /// </summary>
-        /// <param name="drawingContext"></param>
-        /// <param name="mainAtomMetrics"></param>
-        /// <param name="hMetrics"></param>
-        /// <param name="isoMetrics"></param>
-        /// <param name="chargeString"></param>
-        /// <param name="fill"></param>
-        /// <returns></returns>
-        private ChargeLabelText DrawChargeOrRadical(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics,
-            AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString, Brush fill)
-=======
         /// <param name="drawingContext"></param>
         /// <param name="mainAtomMetrics"></param>
         /// <param name="mainAtomMetrics"></param>
@@ -425,18 +363,12 @@ namespace Chem4Word.View
         /// </summary>
         /// <returns></returns>
         private ChargeLabelText DrawChargeOrRadical(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString, Brush fill, CompassPoints defaultHOrientation)
->>>>>>> flexdisplay-rehash
         {
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-<<<<<<< HEAD
             Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter);
-=======
-            Vector chargeOffset = BasicGeometry.ScreenNorth() * GlyphUtils.SymbolSize *0.85;
-            RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, defaultHOrientation, out var chargeCenter);
->>>>>>> flexdisplay-rehash
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
             chargeText.DrawAtBottomLeft(chargeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
@@ -444,18 +376,10 @@ namespace Chem4Word.View
         }
 
         private static void RotateUntilClear(AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics,
-<<<<<<< HEAD
             Vector labelOffset, GlyphText labelText, out Point labelCenter)
         {
             Matrix rotator = new Matrix();
             double angle = ClockDirections.Two.ToDegrees();
-=======
-            Vector labelOffset, GlyphText labelText, CompassPoints defaultHOrientation, out Point labelCenter)
-        {
-            Matrix rotator = new Matrix();
-            double angle = ClockDirections.Two.ToDegrees();
-            double increment = 0.0;
->>>>>>> flexdisplay-rehash
             rotator.Rotate(angle);
 
             labelOffset = labelOffset * rotator;
@@ -463,17 +387,12 @@ namespace Chem4Word.View
             Rect bb2= new Rect();
             if (hMetrics != null)
             {
-<<<<<<< HEAD
                 bb = hMetrics.TotalBoundingBox;
-=======
-                bb = hMetrics.BoundingBox;
->>>>>>> flexdisplay-rehash
             }
             if (isoMetrics != null)
             {
                 bb2 = isoMetrics.BoundingBox;
             }
-<<<<<<< HEAD
             labelCenter = mainAtomMetrics.Geocenter + labelOffset;
             labelText.MeasureAtCenter(labelCenter);
             while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, bb,
@@ -481,26 +400,6 @@ namespace Chem4Word.View
             {
                 rotator.Rotate(30);
                 angle += 30;
-=======
-
-            if (defaultHOrientation == CompassPoints.East)
-            {
-                increment = -15;
-            }
-            else
-            {
-                increment = 15;
-            }
-            labelCenter = mainAtomMetrics.Geocenter + labelOffset;
-            labelText.MeasureAtCenter(labelCenter);
-            while (labelText.CollidesWith(mainAtomMetrics.BoundingBox, bb,
-                bb2) & Math.Abs(angle - 30) > 0.001)
-            {
-                
-                rotator = new Matrix();
-                angle += increment;
-                rotator.Rotate(increment);
->>>>>>> flexdisplay-rehash
                 labelOffset = labelOffset * rotator;
                 labelCenter = mainAtomMetrics.Geocenter + labelOffset;
                 labelText.MeasureAtCenter(labelCenter);
@@ -517,11 +416,7 @@ namespace Chem4Word.View
             string isoLabel = Isotope.ToString();
             var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
 
-<<<<<<< HEAD
             Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
-=======
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth() * GlyphUtils.SymbolSize;
->>>>>>> flexdisplay-rehash
             Matrix rotator = new Matrix();
             rotator.Rotate(ClockDirections.Ten.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;
