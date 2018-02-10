@@ -74,7 +74,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AtomGeometry.cs" />
     <Compile Include="AtomHelpers.cs" />
     <Compile Include="AtomShape.cs" />
     <Compile Include="BondGeometry.cs" />
