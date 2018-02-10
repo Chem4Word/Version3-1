@@ -50,11 +50,7 @@ namespace Chem4Word.View
         /// is done purely in XAML through styles
         /// </summary>
         /// <param name="startPoint">Point object where the bond starts</param>
-<<<<<<< HEAD
-        /// <param name="angle">The angle from ScreenNorth:  clockwise +ve, anticlockwise -ve</param>
-=======
-        /// <param name="angle">The angle from ScreenNorth():  clockwise +ve, anticlockwise -ve</param>
->>>>>>> flexdisplay-rehash
+        /// /// <param name="angle">The angle from ScreenNorth:  clockwise +ve, anticlockwise -ve</param>
         /// <param name="bondlength">How long the bond is in pixels</param>
         /// <returns></returns>
         public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, double angle, double bondlength)
@@ -62,11 +58,8 @@ namespace Chem4Word.View
             //List<PathSegment> wedgesegments = new List<PathSegment>(4);
 
             //get a right sized vector first
-<<<<<<< HEAD
             Vector bondVector = BasicGeometry.ScreenNorth;
-=======
-            Vector bondVector = BasicGeometry.ScreenNorth();
->>>>>>> flexdisplay-rehash
+
             bondVector.Normalize();
             bondVector = bondVector * bondlength;
 

@@ -190,7 +190,6 @@ namespace Chem4Word.Model.Geometry
             return new Vector(-v.Y, v.X);
         }
 
-<<<<<<< HEAD
         public static Vector ScreenSouth =new Vector(0, 1);
         
 
@@ -201,32 +200,7 @@ namespace Chem4Word.Model.Geometry
    
 
         public static Vector ScreenWest = -ScreenEast ;
-        
-=======
-        public static Vector ScreenSouth()
-        {
-            return new Vector(0, 1);
-        }
 
-
-        public static Vector ScreenEast()
-        {
-            return new Vector(1, 0);
-        } 
-
-
-        public static Vector ScreenNorth()
-        {
-            return -ScreenSouth();
-        }
-
-
-        public static Vector ScreenWest()
-        {
-            return -ScreenEast();
-        }
-
->>>>>>> flexdisplay-rehash
         #endregion extension methods
 
         public static double Determinant(Vector vector1, Vector vector2)
@@ -309,8 +283,6 @@ namespace Chem4Word.Model.Geometry
 
             return CompassPoints.South;
         }
-<<<<<<< HEAD
-=======
 
         public static ClockDirections SnapToClock(double angleFromNorth)
         {
@@ -331,7 +303,6 @@ namespace Chem4Word.Model.Geometry
             return sector;
         }
 
->>>>>>> flexdisplay-rehash
         /// <summary>
         /// Takes a list of poinst and builds a  Path object from it.
         /// Generally used for constructing masks 

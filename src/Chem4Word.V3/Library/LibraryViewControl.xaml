@@ -55,12 +55,6 @@
                     <TextBlock TextWrapping="NoWrap" Text="{Binding}" FontSize="14" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1" />
                 </Grid>
             </Border>
-<<<<<<< HEAD
-        
-=======
-
->>>>>>> flexdisplay-rehash
-
         </DataTemplate>
 
     </UserControl.Resources>
@@ -123,62 +117,30 @@
                 </Button.Content>
             </Button>
         </Grid>
-<<<<<<< HEAD
         <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch">
         <ItemsControl
-            
-=======
-
-        <ScrollViewer Grid.Row="2">
-            <!-- see https://stackoverflow.com/a/2784220/1134049 for the basis for the virtualization -->
-            <ItemsControl
-            VirtualizingStackPanel.IsVirtualizing="True"
-            ScrollViewer.CanContentScroll="True"
->>>>>>> flexdisplay-rehash
             x:Name="GalleryList"
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
             VerticalAlignment="Stretch">
-<<<<<<< HEAD
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border
-=======
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel VirtualizationMode="Recycling"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border
->>>>>>> flexdisplay-rehash
                         BorderBrush="{StaticResource WordBlueBrush}"
                         BorderThickness="2"
                         HorizontalAlignment="Stretch"
                         CornerRadius="2">
-<<<<<<< HEAD
                         <local:LibraryItemControl
-=======
-                            <local:LibraryItemControl
->>>>>>> flexdisplay-rehash
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
                             DataContext="{Binding Mode=OneWay}"
                             x:Name="GalleryItemControl" />
-<<<<<<< HEAD
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
            
         </ItemsControl>
-=======
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
->>>>>>> flexdisplay-rehash
         </ScrollViewer>
     </Grid>
 </UserControl>
