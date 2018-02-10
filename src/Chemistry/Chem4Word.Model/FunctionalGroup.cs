@@ -6,77 +6,171 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Chem4Word.Model
 {
     /// <summary>
-    /// Identifies occruences of atoms in FGs
+    /// Identifies components of atoms in FGs
     /// </summary>
-    public struct Multiplicity
+    /// 
+    /// 
+    
+    public class Group
     {
-        public Element Element;
-        public int Count;
+        [JsonProperty("component")]
+        public string Component { get; set; }
+        [JsonProperty("count")]
+        public int Count { get; set; }
+   
+        
 
-        public Multiplicity(Element e, int c)
+        public Group(string e, int c)
         {
-            Element = e;
+            Component = e;
             Count = c;
+        }
+
+        public double AtomicWeight
+        {
+            get
+            {
+                if (FunctionalGroups.GetByName.ContainsKey(Component))
+                {
+                    return FunctionalGroups.GetByName[Component].AtomicWeight * Count;
+                }
+                else
+                {
+                    var pt = new PeriodicTable();
+                    return ((Element) pt[Component]).AtomicWeight * Count;
+                }
+            }
         }
     }
 
+
+    /// <summary>
+    /// Functional groups are serialised as JSON
+    /// {
+    /// "symbol":"CH2",
+    /// "flippable":"false"
+    /// "components":
+    /// [
+    /// {"element":"C"},
+    /// {"element":"H", "count":2},
+    /// ]
+    /// }
+    /// {
+    /// "symbol":"CH2CH2OH",
+    /// "flippable":"true"
+    /// "components":
+    /// [
+    /// {"group":"CH2"},
+    /// {"group":"CH2"},
+    /// {"element":"O"},
+    /// {"element":"H"},
+    /// ]
+    /// }
+    /// </summary>
     public class FunctionalGroup : ElementBase
     {
+        public const string TagSymbol = "symbol";
+        public const string TagComponents = "components";
+        public const string TagFlippable = "flippable";
+        public const string TagElement = "element";
+        public const string TagCount = "count";
+        public const string TagGroup = "group";
+        public const string TagShowAsSymbol = "showassymbol";
+
         private string _symbol = "";
-        private double? _atomicWeight;
+        private double _atomicWeight=0d;
 
         /// <summary>
         /// Generates a new functional group to use for a superatom
         /// </summary>
         /// <param name="symbol">Actual symbol used for the atom (mandatory)</param>
-        /// <param name="multiplicities"> Key-Value list of elements and how many</param>
+        /// <param name="components"> Key-Value list of components and how many</param>
         /// <param name="atwt">atomic weight of the atom</param>
-        /// <param name="showasabbrev">whether the element is rendered as its symbol or constructed from its multiplicities</param>
+        /// <param name="showAsSymbol">whether the element is rendered as its symbol or constructed from its components</param>
         public FunctionalGroup(string symbol,
-            List<Multiplicity> multiplicities = null,
-            double atwt = 0.0, bool showasabbrev = false)
+            List<Group> components = null,
+            double atwt = 0d, bool showAsSymbol = false, bool flippable=false)
         {
+            
             Symbol = symbol;
             AtomicWeight = atwt;
-            Multiplicities = multiplicities;
-            Abbreviate = showasabbrev;
+            Components = components;
+            this.ShowAsSymbol = showAsSymbol;
+            Flippable = flippable;
         }
 
-        public bool Abbreviate { get; set; }
+        public FunctionalGroup(JObject groupAsJson)
+        {
+            var pt = new PeriodicTable();
+            Symbol = groupAsJson[TagSymbol].ToString();
+            Flippable = groupAsJson[TagFlippable].Value<bool?>()??false;
+            ShowAsSymbol = groupAsJson[TagShowAsSymbol].Value<bool?>()??false;
+            Components = new List<Group>();
+            var complist = groupAsJson[TagComponents];
 
-        public override double AtomicWeight
+           
+            foreach (JToken c in complist)
+            {
+                
+                        Group g;
+                if (c.Value<string>(TagElement) != null)
+                {
+                    g = new Group( c.Value<string>(TagElement), c.Value<int?>("count")??1);
+                }
+                else if (c.Value<string>(TagGroup) != null)
+                {
+                    g = new Group(c.Value<string>(TagGroup).ToString(), c.Value<int?>("count") ?? 1);
+                }
+                else
+                {
+                    throw new InvalidDataException("Element/group tag missing");
+                }
+                Components.Add(g);
+            }
+                    
+        }
+        [JsonProperty("showassymbol")]
+        public bool ShowAsSymbol { get; set; }
+
+        [JsonProperty("atomicweight")]
+        public sealed override double AtomicWeight
         {
             get
             {
-                if (_atomicWeight == null)
+                if (_atomicWeight == 0d)
                 {
                     double atwt = 0.0d;
-                    if (Multiplicities != null)
+                    if (Components != null)
                     {
                         //add up the atoms' atomicv weights times their multiplicity
-                        atwt =
-                            Multiplicities.Select(x => x.Element.AtomicWeight * x.Count)
-                                .Aggregate((source, value) => source + value);
+                        foreach (Group component in Components)
+                        {
+                            atwt += component.AtomicWeight;
+                        }
                     }
                     return atwt;
                 }
-                else
-                    return _atomicWeight.Value;
+
+                return _atomicWeight;
             }
             set { _atomicWeight = value; }
         }
 
         /// <summary>
         /// Symbol refers to the 'Ph', 'Bz' etc
-        ///
+        /// It is a unique key for the functional group
         /// Symbol can also be of the form CH3, CF3, C2H5 etc
         /// </summary>
-        public override string Symbol
+        [JsonProperty("symbol")]
+        public sealed override string Symbol
         {
             get
             {
@@ -86,6 +180,7 @@ namespace Chem4Word.Model
             set { _symbol = value; }
         }
 
+        [JsonProperty("name")]
         public override string Name { get; set; }
 
         /// <summary>
@@ -95,58 +190,14 @@ namespace Chem4Word.Model
         ///
         /// Ths property can be null, which means that the symbol gets rendered
         /// </summary>
-        public List<Multiplicity> Multiplicities { get; set; }
+        [JsonProperty("components")]
+        public List<Group> Components { get; set; }
 
-        /*
         /// <summary>
-        /// Renders the superelement to a textblock
+        /// Determines whether the functional group can be flipped about the pivot
         /// </summary>
-        /// <param name="tb"></param>
-        /// <param name="flipped"></param>
-        public void Render(TextBlock tb, bool flipped)
-        {
-            //if we are NOT showing it as an abbrevation then show what the user typed in
-            if (!Abbreviate)
-            {
-                if (!flipped)
-                {
-                    foreach (Multiplicity m in Multiplicities)
-                    {
-                        AddElementRun(tb, m);
-                    }
-                }
-                else
-                {
-                    for (int i = Multiplicities.Count - 1; i >= 0; i--)
-                    {
-                        var m = Multiplicities.ElementAt(i);
-                        AddElementRun(tb, m);
-                    }
-                }
-            }
-            else
-            {
-                tb.Inlines.Add(Symbol);
-            }
-        }
-
-        private void AddElementRun(TextBlock tb, Multiplicity m)
-        {
-            tb.Inlines.Add(m.Element.Symbol);
-
-            if (m.Count > 1)
-            {
-                Run subscript = new Run();
-                subscript.Text = m.Count.ToString();
-                SetSubscript(subscript);
-                tb.Inlines.Add(subscript);
-            }
-        }
-
-        private static void SetSubscript(Run subscript)
-        {
-            Typography.SetVariants(subscript, FontVariants.Subscript);
-        }
-        */
+        [JsonProperty("flippable")]
+        public bool Flippable { get; set; }
+        
     }
 }
