@@ -20,7 +20,18 @@
 
     <Grid>
         <ScrollViewer VerticalAlignment="Stretch">
+<<<<<<< HEAD
             <ItemsControl x:Name="NavigatorList" Grid.IsSharedSizeScope="True" ItemsSource="{Binding Path=NavigatorItems}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+=======
+            <ItemsControl x:Name="NavigatorList"
+                          Grid.IsSharedSizeScope="True" 
+                          ItemsSource="{Binding Path=NavigatorItems}" 
+                          HorizontalAlignment="Stretch" 
+                          HorizontalContentAlignment="Stretch"
+                          VirtualizingStackPanel.IsVirtualizing="True"
+                          ScrollViewer.CanContentScroll="True"
+                          >
+>>>>>>> flexdisplay-rehash
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -38,6 +49,14 @@
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
+<<<<<<< HEAD
+=======
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel VirtualizationMode="Recycling"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+>>>>>>> flexdisplay-rehash
             </ItemsControl>
         </ScrollViewer>
     </Grid>
