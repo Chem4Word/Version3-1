@@ -284,11 +284,11 @@ namespace Chem4Word.Model.Geometry
             return CompassPoints.South;
         }
 
-        public static ClockDirections SnapToClock(double angleFromNorth)
+        public static int SnapToClock(double angleFromNorth)
         {
             int tolerance = 15;
             var sector = SnapAngleToTolerance(angleFromNorth, tolerance);
-            return (ClockDirections) sector;
+            return sector;
         }
 
         private static int SnapAngleToTolerance(double angleFromNorth, int tolerance)

@@ -292,7 +292,7 @@ namespace Chem4Word.View
             //stage7:  draw any charges
             if ((Charge ?? 0) != 0)
             {
-                LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics);
+                LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, ParentAtom.GetDefaultHOrientation());
             }
         }
 
@@ -311,13 +311,13 @@ namespace Chem4Word.View
         }
 
 
-        private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, CompassPoints defaultHOrientation)
-        {
-            Debug.Assert((Charge ?? 0) != 0);
-            var chargeString = AtomHelpers.GetChargeString(Charge);
-            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString,  Fill, defaultHOrientation);
-            return chargeText.TextMetrics;
-        }
+        //private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, CompassPoints defaultHOrientation)
+        //{
+        //    Debug.Assert((Charge ?? 0) != 0);
+        //    var chargeString = AtomHelpers.GetChargeString(Charge);
+        //    var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString,  Fill, defaultHOrientation);
+        //    return chargeText.TextMetrics;
+        //}
 
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
         {
@@ -335,12 +335,13 @@ namespace Chem4Word.View
         /// <param name="mainAtomMetrics"></param>
         /// <param name="hMetrics"></param>
         /// <param name="isoMetrics"></param>
+        /// <param name="defaultHOrientation"></param>
         /// <returns></returns>
-        private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics)
+        private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, CompassPoints defaultHOrientation)
         {
             Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
-            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill, CompassPoints.East);
+            var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill, defaultHOrientation);
             return chargeText.TextMetrics;
 
         }
@@ -365,8 +366,8 @@ namespace Chem4Word.View
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
-            RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter);
+            Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize*0.9;
+            RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter, defaultHOrientation);
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
             chargeText.DrawAtBottomLeft(chargeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
@@ -374,7 +375,7 @@ namespace Chem4Word.View
         }
 
         private static void RotateUntilClear(AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics,
-            Vector labelOffset, GlyphText labelText, out Point labelCenter)
+            Vector labelOffset, GlyphText labelText, out Point labelCenter, CompassPoints defHOrientation)
         {
             Matrix rotator = new Matrix();
             double angle = ClockDirections.Two.ToDegrees();
@@ -393,11 +394,23 @@ namespace Chem4Word.View
             }
             labelCenter = mainAtomMetrics.Geocenter + labelOffset;
             labelText.MeasureAtCenter(labelCenter);
+
+            double increment;
+            if (defHOrientation == CompassPoints.East)
+            {
+                increment = -10;
+            }
+            else
+            {
+                increment = 10;
+            }
             while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, bb,
                 bb2) & Math.Abs(angle - 30) > 0.001)
             {
-                rotator.Rotate(30);
-                angle += 30;
+                rotator= new Matrix();
+
+                angle += increment;
+                rotator.Rotate(increment);
                 labelOffset = labelOffset * rotator;
                 labelCenter = mainAtomMetrics.Geocenter + labelOffset;
                 labelText.MeasureAtCenter(labelCenter);
