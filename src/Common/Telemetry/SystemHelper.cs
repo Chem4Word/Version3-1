@@ -25,7 +25,7 @@ namespace Chem4Word.Telemetry
         private string CryptoRoot = @"SOFTWARE\Microsoft\Cryptography";
         private string DotNetVersionKey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
 
-        private const string DetectionFile = "files3/client-ip.php";
+        private const string DetectionFile = "files3-1/client-ip.php";
         private static readonly string[] Domains = { "https://www.chem4word.co.uk", "https://chem4word.azurewebsites.net", "http://www.chem4word.com" };
 
         public string MachineId { get; set; }

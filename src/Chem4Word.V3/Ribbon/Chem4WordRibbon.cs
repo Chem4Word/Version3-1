@@ -415,14 +415,14 @@ namespace Chem4Word
                             dr = DialogResult.OK;
                             if (model.AllErrors.Count > 0 || model.AllWarnings.Count > 0)
                             {
-                                Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", mol);
+                                //Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", mol);
                                 if (model.AllErrors.Count > 0)
                                 {
-                                    Globals.Chem4WordV3.Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, model.AllErrors));
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, model.AllErrors));
                                 }
                                 if (model.AllWarnings.Count > 0)
                                 {
-                                    Globals.Chem4WordV3.Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, model.AllWarnings));
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, model.AllWarnings));
                                 }
 
                                 ImportErrors f = new ImportErrors();
@@ -513,7 +513,7 @@ namespace Chem4Word
                             else
                             {
                                 Exception x = new Exception("Could not import file");
-                                Globals.Chem4WordV3.Telemetry.Write(module, "InvalidFile", mol);
+                                Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", mol);
                                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, x).ShowDialog();
                             }
                         }
@@ -2026,7 +2026,7 @@ namespace Chem4Word
                     string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                     string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                     int idx = temp.IndexOf(" ");
-                    fa.VersionString = $"Chem4Word V3 {temp.Substring(idx+1)} [{fvi.FileVersion}]";
+                    fa.VersionString = $"Chem4Word V3 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
                 }
                 else
                 {
