@@ -64,6 +64,7 @@ namespace Chem4Word.Model
                 case NotifyCollectionChangedAction.Remove:
                     break;
             }
+            OnPropertyChanged("Placement");
         }
 
         public Point MidPoint
@@ -123,7 +124,7 @@ namespace Chem4Word.Model
         {
             return new List<Atom>() { StartAtom, EndAtom };
         }
-
+        //bond order number <-> string mappings
         public const string OrderZero = "hbond";
         public const string OrderOther = "other";
         public const string OrderPartial01 = "partial01";
@@ -134,8 +135,13 @@ namespace Chem4Word.Model
         public const string OrderPartial23 = "partial23";
         public const string OrderTriple = "T";
 
-        private string _order;
 
+        private string _order;
+        /// <summary>
+        /// Order of the bonds.  defined as a string
+        /// If a number string is provided then it maps to a less granular 
+        /// alpha string
+        /// </summary>
         public string Order
         {
             get { return _order; }
@@ -171,7 +177,12 @@ namespace Chem4Word.Model
                 OnPropertyChanged();
             }
         }
-
+        /// <summary>
+        /// Converts a bond order string to a numeric value
+        /// </summary>
+        /// <param name="val">Numeric value of the bond order</param>
+        /// <param name="isAromatic">Is the bond part of an aromatic system</param>
+        /// <returns></returns>
         public static string OrderValueToOrder(double val, bool isAromatic = false)
         {
             if (val == 0)
@@ -216,6 +227,9 @@ namespace Chem4Word.Model
             return OrderZero;
         }
 
+        /// <summary>
+        /// Property wrapper for the bond order
+        /// </summary>
         public double? OrderValue
         {
             get
@@ -312,7 +326,9 @@ namespace Chem4Word.Model
 
             internal set { _parent = value; }
         }
-
+        /// <summary>
+        /// Returns the vector that represents the bond
+        /// </summary>
         public Vector BondVector => EndAtom.Position - StartAtom.Position;
 
         /// <summary>
@@ -541,13 +557,7 @@ namespace Chem4Word.Model
             {
                 if (endLigands.Count() == 2)
                 {
-                    if (endLigands.AreAllH())
-                    {
-                        //Already caught.
-                        // ToDo: Check with Clyde
-                        //throw new ApplicationException("This scenario should already have been caught");
-                        return null;
-                    }
+                    
                     if (endLigands.ContainNoH())
                     {
                         return null;
@@ -558,15 +568,6 @@ namespace Chem4Word.Model
                     return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
                 }
                 //Count must now be 1
-
-                if (endLigands.AreAllH())
-                {
-                    //Already caught
-                    // ToDo: Check with Clyde
-                    //throw new ApplicationException("This scenario should already have been caught");
-                    return null;
-                }
-
                 // Must now be 1 !H
                 // Double bond on the side of EndLigands' !H, bevel 1 end only.
                 return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
@@ -677,7 +678,13 @@ namespace Chem4Word.Model
 
             return vector;
         }
-
+        /// <summary>
+        /// Retruns a vector which points to the Non-Hydrogen side of a double bond
+        /// </summary>
+        /// <param name="startAtom"></param>
+        /// <param name="endAtom"></param>
+        /// <param name="startLigands"></param>
+        /// <returns></returns>
         private Vector? VectorOnSideOfNonHAtomFromStartLigands(Atom startAtom, Atom endAtom, IEnumerable<Atom> startLigands)
         {
             Vector posDisplacementVector = BondVector.Perpendicular();
@@ -769,6 +776,6 @@ namespace Chem4Word.Model
         }
 
         //bonds go under atoms on a visual display
-        public int ZIndex => 1;
+        //public int ZIndex => 1;
     }
 }

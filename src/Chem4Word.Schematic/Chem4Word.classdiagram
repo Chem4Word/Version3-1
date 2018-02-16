@@ -1,0 +1,277 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<logicalClassDesignerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/Kernel" xmlns:dm2="http://schemas.microsoft.com/dsltools/Component" xmlns:dm3="http://schemas.microsoft.com/dsltools/Activity" xmlns:dm4="http://schemas.microsoft.com/dsltools/UseCase" xmlns:dm5="http://schemas.microsoft.com/dsltools/Interaction" xmlns:dm6="http://schemas.microsoft.com/dsltools/UmlModelLibrary" xmlns:dm7="http://schemas.microsoft.com/dsltools/UmlDiagrams" xmlns:dm8="http://schemas.microsoft.com/dsltools/ModelStore" dslVersion="1.0.0.0" Id="c8f03b3c-6799-4d80-9edb-8072d94e732c" name="Chem4Word" linkedPackageId="bd295a3f-5fde-4097-a36f-669d5383c8be" xmlns="http://schemas.microsoft.com/dsltools/LogicalClassDesigner">
+  <profileInstances>
+    <packageHasProfileInstances Id="00c9328f-38da-4b18-9ac1-ee9a705832cf">
+      <profileInstance Id="937252bb-d02d-4389-b172-6d94dff89215" name="StandardProfileL2">
+        <elementDefinition Id="e34d544e-0fea-4ed6-ac5e-1b74119ac791" />
+      </profileInstance>
+      <elementDefinition Id="0caec977-1f8c-4ba3-a7db-8cc9ad9cc73b" />
+    </packageHasProfileInstances>
+    <packageHasProfileInstances Id="af0fc355-d1e7-480d-921e-53dcf875afee">
+      <profileInstance Id="db622b29-0158-48c6-b3b8-a52bd1de37f9" name="StandardProfileL3">
+        <elementDefinition Id="532ea607-fb19-44b8-8502-3351b05452be" />
+      </profileInstance>
+      <elementDefinition Id="29349502-908c-4fda-9054-c48619c59ed0" />
+    </packageHasProfileInstances>
+  </profileInstances>
+  <packagedElements>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="665ae4cb-eba5-4355-8cfc-9d85338e681b" name="Atom" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="65151825-385c-42b1-84c1-d4ab89eb12da" />
+        <suppliersInternal>
+          <dependency Id="694020f7-e531-47c6-a337-07aee7eea4a7">
+            <classMoniker Id="8c8d25aa-c7d2-4321-bbf8-ea68800320af" LastKnownName="ElementBase" />
+            <elementDefinition Id="5b31eb82-3b87-4b9f-a802-75afa06fde27" />
+          </dependency>
+        </suppliersInternal>
+        <targetEnds>
+          <association Id="eee8a9a6-2536-4364-ab66-2ee292562ed9" isDerived="false" sourceEndRoleName="Atom" targetEndRoleName="Bond" isLeaf="false" isAbstract="false">
+            <classMoniker Id="010bf779-eb74-4bf8-9242-c0bcc32b35e3" LastKnownName="Bond" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="d83f43a1-4c59-4124-a14e-4ad02ea87323" name="Atom" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Shared" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="030dea4c-30e8-4349-8b90-0faa19f98545" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="b72fa766-1fbd-48a4-91f8-dcbd9981aff5" name="Bond" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <lowerValueInternal>
+                    <literalString Id="4e520e87-e5c0-42bf-825f-7247c03df048" name="Lower" value="*">
+                      <elementDefinition Id="85a54e53-5ab7-4623-8563-07daf4920974" />
+                    </literalString>
+                  </lowerValueInternal>
+                  <upperValueInternal>
+                    <literalString Id="219fd866-fa8b-4338-bf78-fcc09f14470c" name="Upper" value="*">
+                      <elementDefinition Id="9ae344b0-54f5-4ada-a4d7-326ba6c72316" />
+                    </literalString>
+                  </upperValueInternal>
+                  <elementDefinition Id="8b644bb1-e36d-4871-a29a-181b91f33968" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="d6c0434e-5299-4a8d-ac93-ab3f6b1e65dd" />
+          </association>
+        </targetEnds>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="010bf779-eb74-4bf8-9242-c0bcc32b35e3" name="Bond" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="b2a5d62f-36fa-4b6b-b3b4-50602c4bd477" />
+        <targetEnds>
+          <association Id="5d6cfa7e-c73f-4159-bb8b-bf12bfd21471" isDerived="false" sourceEndRoleName="Bond" targetEndRoleName="StartAtom" isLeaf="false" isAbstract="false">
+            <classMoniker Id="665ae4cb-eba5-4355-8cfc-9d85338e681b" LastKnownName="Atom" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="f2a5f54b-13e4-4658-97e8-60ae069c0c9d" name="Bond" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Shared" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="41a79ea9-16e5-4cd9-9972-10fbc38f2e25" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="2bbe6cb3-2980-437c-a661-ec363abb47c4" name="StartAtom" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <elementDefinition Id="36aab673-c86a-4b16-9cc7-f827c7b44b25" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="0484b996-d0e7-438a-9b94-6d53c61e217e" />
+          </association>
+          <association Id="fa066034-34c1-46e2-ac1f-1edeb05c5f5e" isDerived="false" sourceEndRoleName="Bond" targetEndRoleName="EndAtom" isLeaf="false" isAbstract="false">
+            <classMoniker Id="665ae4cb-eba5-4355-8cfc-9d85338e681b" LastKnownName="Atom" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="f303a782-f8e7-4cd7-af32-5051c07245ee" name="Bond" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Shared" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="67ed411d-7af9-4784-b04a-1d994681c94e" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="a05f4be2-9ef9-42e6-8b44-2c3d238e52f3" name="EndAtom" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <elementDefinition Id="f8e61996-5da8-4b32-9006-f87ad346840b" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="af7426fc-1218-4e37-946c-bbaba9f49d96" />
+          </association>
+        </targetEnds>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="392bd589-ed60-4d2a-b85a-fa5bd65a7d9e" name="Element" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="098e1e75-8d2c-4a00-ac18-101d5f8d9f91" />
+        <generalsInternal>
+          <generalization Id="f3647161-cb0b-42c4-b680-3c5e08e24c10" isSubstitutable="false">
+            <classMoniker Id="8c8d25aa-c7d2-4321-bbf8-ea68800320af" LastKnownName="ElementBase" />
+            <elementDefinition Id="21755205-4c08-4bc8-b52e-4acb0d1abfd8" />
+          </generalization>
+        </generalsInternal>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="01f4249d-576b-47e2-b52f-ee9fd50e3a89" name="FunctionalGroup" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="63287c52-21e1-44b0-af53-5a448bb69045" />
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="3fa78c33-728d-41ef-886b-c00d59d6201c" name="Model" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="066e0d99-9217-4ada-9918-a4703c901fb9" />
+        <targetEnds>
+          <association Id="3b56b74c-01a6-47fd-9173-1d57bd757d62" isDerived="false" sourceEndRoleName="Model" targetEndRoleName="Molecule" isLeaf="false" isAbstract="false">
+            <classMoniker Id="805e772a-290e-4383-b146-e6cfebdf0fd9" LastKnownName="Molecule" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="0227a2e6-e8fd-40e7-870a-c7ec221a1c96" name="Model" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="89b5fb25-34ab-43b9-a0af-492676923853" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="07b30dfe-8e99-4f81-9dfb-6f31977b6592" name="Molecule" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <lowerValueInternal>
+                    <literalString Id="1b565806-6e0d-4136-83f0-9e2083e34dfb" name="Lower" value="*">
+                      <elementDefinition Id="946e191c-59fa-4ddb-97c7-aed78a90832d" />
+                    </literalString>
+                  </lowerValueInternal>
+                  <upperValueInternal>
+                    <literalString Id="45453b10-10f9-424b-a71e-58680ca25bb1" name="Upper" value="*">
+                      <elementDefinition Id="f0b06350-f9df-42e3-a22a-d11c55065d9a" />
+                    </literalString>
+                  </upperValueInternal>
+                  <elementDefinition Id="03043574-514f-4e15-8feb-4d88f48b64b9" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="0d57db2d-f751-4415-a177-47e369476ad0" />
+          </association>
+        </targetEnds>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="805e772a-290e-4383-b146-e6cfebdf0fd9" name="Molecule" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="99cf15a2-e12a-4c62-9b82-9abeea9dbe14" />
+        <targetEnds>
+          <association Id="b7bebf7a-6523-4117-9c6a-1b5b370ed1ac" isDerived="false" sourceEndRoleName="Molecule" targetEndRoleName="Atoms" isLeaf="false" isAbstract="false">
+            <classMoniker Id="665ae4cb-eba5-4355-8cfc-9d85338e681b" LastKnownName="Atom" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="b0015f6b-0651-4e59-bfa2-8a01e53d9cca" name="Molecule" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="f7a74209-e830-4b07-b565-0408be18e6ca" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="03613aab-1d87-4458-ae0a-236190daf282" name="Atoms" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <lowerValueInternal>
+                    <literalString Id="3243d090-13b4-4184-8c2c-ad8bc82399a3" name="Lower" value="*">
+                      <elementDefinition Id="042af9dc-d212-48aa-96e5-563aabc62a6c" />
+                    </literalString>
+                  </lowerValueInternal>
+                  <upperValueInternal>
+                    <literalString Id="8e7ccf53-355b-4b88-ba29-eb8950873f5a" name="Upper" value="*">
+                      <elementDefinition Id="0027f161-4aaf-450f-b10e-2416ccca49c9" />
+                    </literalString>
+                  </upperValueInternal>
+                  <elementDefinition Id="426adc93-48c0-49fe-81c7-bfdc10adfe6f" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="332b230b-274c-462a-a160-28e7dce0f1e2" />
+          </association>
+          <association Id="ed2b8cdd-7c09-44ee-8963-c5b35ce05d34" isDerived="false" sourceEndRoleName="Molecule" targetEndRoleName="Bond" isLeaf="false" isAbstract="false">
+            <classMoniker Id="010bf779-eb74-4bf8-9242-c0bcc32b35e3" LastKnownName="Bond" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="dcf5c8e3-22a7-4a2a-b7a7-f6c581e4ffeb" name="Molecule" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="2a675176-f6c7-4481-8411-fcc44acb0482" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="bc4642eb-db35-4209-8150-d14e4319563d" name="Bond" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <lowerValueInternal>
+                    <literalString Id="d2eafa82-95ec-4365-a000-b554ef05c7ee" name="Lower" value="*">
+                      <elementDefinition Id="4eeb4cea-220d-4e84-883d-531baa2c6882" />
+                    </literalString>
+                  </lowerValueInternal>
+                  <upperValueInternal>
+                    <literalString Id="2a2f9b18-d61c-4976-9ee5-f5803ec8a2be" name="Upper" value="*">
+                      <elementDefinition Id="69784a39-37cf-40b9-af8c-669b833d981b" />
+                    </literalString>
+                  </upperValueInternal>
+                  <elementDefinition Id="36de74a6-d514-40df-bda7-6ac04825caae" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="aaea5d8a-43e5-4b59-b5f9-225733a8565f" />
+          </association>
+          <association Id="471efdb4-e1bc-478a-830c-29b409f1cb71" isDerived="false" sourceEndRoleName="Molecule" targetEndRoleName="Ring" isLeaf="false" isAbstract="false">
+            <classMoniker Id="488cc15d-00d7-4995-a8cb-b5f054e88bed" LastKnownName="Ring" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="0836bae2-ab52-4747-8baa-c7f74c3ce5fe" name="Molecule" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Composite" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="2fc071e8-c790-4336-a979-4fd064624bdb" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="7dc3e47f-8237-43c9-9ac2-504eb0b6382d" name="Ring" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="true">
+                  <lowerValueInternal>
+                    <literalString Id="0b9b7cde-9264-4f57-9455-b1ac5dc57ee8" name="Lower" value="*">
+                      <elementDefinition Id="63d65bf1-a04c-4374-9fc4-76421e5457e0" />
+                    </literalString>
+                  </lowerValueInternal>
+                  <upperValueInternal>
+                    <literalString Id="49e88219-381e-4997-b2dd-d8f135142088" name="Upper" value="*">
+                      <elementDefinition Id="086fde17-d4d8-411a-bdd3-9e1f7cf4826f" />
+                    </literalString>
+                  </upperValueInternal>
+                  <elementDefinition Id="e1845510-f297-4762-85ed-377cc89effb8" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="cf2a5bff-680c-4d6b-8ca1-5475fd40edaf" />
+          </association>
+        </targetEnds>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="e406367d-5748-4f72-9be3-3105cc9ad88b" name="Reaction" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="63ce9248-e7fc-4a98-b186-4dc4744eab70" />
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="8c8d25aa-c7d2-4321-bbf8-ea68800320af" name="ElementBase" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="16d2fa68-de07-4fe3-b948-ffc7ceccbaa2" />
+      </class>
+    </logicalClassDesignerModelHasTypes>
+    <logicalClassDesignerModelHasTypes>
+      <class Id="488cc15d-00d7-4995-a8cb-b5f054e88bed" name="Ring" isAbstract="false" isLeaf="false" isActiveClass="false">
+        <elementDefinition Id="bdfb4766-a15d-4e9a-a251-5942703ce572" />
+        <targetEnds>
+          <association Id="5146f279-d574-4d7b-8bec-0cfa3c456d37" isDerived="false" sourceEndRoleName="Ring" targetEndRoleName="Atom" isLeaf="false" isAbstract="false">
+            <classMoniker Id="665ae4cb-eba5-4355-8cfc-9d85338e681b" LastKnownName="Atom" />
+            <relationshipOwnedElementsInternal>
+              <associationHasOwnedEnds>
+                <memberEnd Id="ef39058f-5414-4d41-a164-462638dbbd83" name="Ring" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="Shared" isComposite="false" isNavigableOwned="false">
+                  <elementDefinition Id="cdfdb8ef-9631-426b-b772-d98392127972" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+              <associationHasOwnedEnds>
+                <memberEnd Id="a999f180-2fb1-4865-aad8-f4633821d14d" name="Atom" isLeaf="false" isStatic="false" isReadOnly="false" isDerived="false" isDerivedUnion="false" aggregation="None" isComposite="false">
+                  <lowerValueInternal>
+                    <literalString Id="882b6005-4f25-49af-91f8-e7d8d30b3e97" name="Lower" value="*">
+                      <elementDefinition Id="cc90bde7-5c7b-4925-94e6-88dbdfc54ade" />
+                    </literalString>
+                  </lowerValueInternal>
+                  <upperValueInternal>
+                    <literalString Id="a72f99fe-0957-4bb3-8ff7-de25be6678ad" name="Upper" value="*">
+                      <elementDefinition Id="44c5b0f6-586c-4127-81c4-4110675cd865" />
+                    </literalString>
+                  </upperValueInternal>
+                  <elementDefinition Id="15cce452-9281-4f15-9ce1-a1bf5c76a74b" />
+                </memberEnd>
+              </associationHasOwnedEnds>
+            </relationshipOwnedElementsInternal>
+            <elementDefinition Id="56aabf00-8585-42ee-a6b2-2045f6d8db57" />
+          </association>
+        </targetEnds>
+      </class>
+    </logicalClassDesignerModelHasTypes>
+  </packagedElements>
+  <package Id="bd295a3f-5fde-4097-a36f-669d5383c8be" name="Chem4Word.Schematic">
+    <elementDefinition Id="06d0fac2-1d16-43a0-8f21-2a71f291df39" />
+  </package>
+</logicalClassDesignerModel>

@@ -535,6 +535,10 @@ namespace Chem4Word.Model
 
         private List<Ring> _sortedRings = null;
 
+        /// <summary>
+        /// Sorts rings for double bond placement
+        /// using Alex Clark's rules
+        /// </summary>
         public List<Ring> SortedRings
         {
             get
