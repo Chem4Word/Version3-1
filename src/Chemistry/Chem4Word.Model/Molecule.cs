@@ -577,43 +577,45 @@ namespace Chem4Word.Model
             Debug.Assert(HasRings); //no bloody point in running this unless it has rings
             Debug.Assert(RingsCalculated); //make sure that if the molecule contains rings that we have calculated them
             //1) All rings of sizes 6, 5, 7, 4 and 3 are discovered, in that order, and added to a list R.
-            var R = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
+            var prioritisedRings = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
 
-            //Define B as an array of size equal to the number of atoms, where each value is equal to the number of times the atom occurs in any of the rings R
-            Dictionary<Atom, int> B = new Dictionary<Atom, int>();
+            //Define B as an array of size equal to the number of atoms, where each value 
+            //is equal to the number of times the atom occurs in any of the rings R
+            Dictionary<Atom, int> atomFrequency = new Dictionary<Atom, int>();
             foreach (Atom atom in Atoms)
             {
-                B[atom] = atom.Rings.Count;
+                atomFrequency[atom] = atom.Rings.Count;
             }
 
-            //Define Q as an array of size equal to length of R, where each value is equal to sum of B[r], where r iterates over each of the atoms within the ring.
-            Dictionary<Ring, int> Q = new Dictionary<Ring, int>();
-            foreach (Ring ring in R)
+            //Define Q as an array of size equal to length of R, where each value is equal 
+            //to sum of B[r], where r iterates over each of the atoms within the ring.
+            Dictionary<Ring, int> cumulFreqPerRing = new Dictionary<Ring, int>();
+            foreach (Ring ring in prioritisedRings)
             {
                 int sumBr = 0;
                 foreach (Atom atom in ring.Atoms)
                 {
-                    sumBr += B[atom];
+                    sumBr += atomFrequency[atom];
                 }
 
-                Q[ring] = sumBr;
+                cumulFreqPerRing[ring] = sumBr;
             }
 
             //Perform a stable sort of the list of rings, R, so that those with the lowest values of Q are listed first.
-            var R2 = R.OrderBy(r => Q[r]);
+            var lowestCumulFreq = prioritisedRings.OrderBy(r => cumulFreqPerRing[r]);
 
             //Define D as an array of size equal to length of R, where each value is equal to the number of double bonds within the corresponding ring
-            Dictionary<Ring, int> D = new Dictionary<Ring, int>();
-            foreach (Ring ring in R2)
+            Dictionary<Ring, int> doubleBondsperRing = new Dictionary<Ring, int>();
+            foreach (Ring ring in lowestCumulFreq)
             {
-                D[ring] = ring.Bonds.Count(b => b.OrderValue == 2);
+                doubleBondsperRing[ring] = ring.Bonds.Count(b => b.OrderValue == 2);
             }
 
             //Perform a stable sort of the list of rings, R, so that those with highest values of D are listed first
 
-            var R3 = R2.OrderByDescending(r => D[r]);
+            var highestDBperRing = lowestCumulFreq.OrderByDescending(r => doubleBondsperRing[r]);
 
-            return R3.ToList();
+            return highestDBperRing.ToList();
         }
 
         //noddy nested class for ring detection
