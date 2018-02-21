@@ -99,7 +99,7 @@ namespace Chem4Word.View
                         _subText.TextMetrics.BoundingBox.Height / 2);
                     Point subBottomLeft = _mainText.TextMetrics.TotalBoundingBox.BottomLeft + subscriptOffset;
                     _subText.MeasureAtBottomLeft(subBottomLeft,pixelsPerDip);
-                    //merge the total bounbding boxes
+                    //merge the total bounding boxes
                     _mainText.Union(_subText);
                 }
                 //return the placement metrics for the subscripted atom.  
@@ -146,6 +146,8 @@ namespace Chem4Word.View
                 double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width)/2;
                 switch (direction)
                 {
+                    //all addition in this routine is *vector* addition.  
+                    //We are not adding absolute X and Y values
                     case CompassPoints.East:
                     default:
                         adjunctCenter = parentMetrics.Geocenter + BasicGeometry.ScreenEast * adjunctWidth;
@@ -179,28 +181,6 @@ namespace Chem4Word.View
 
         #region Overrides
 
-
-        //protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
-        //{
-        //    Pen widepen = new Pen(Brushes.Black, 3.0);   
-        //    //first work out what the atom bounding box is:
-        //    List<Point> hull = Geometry<Point>.GetHull(_shapeHull, p => p);
-        //    Path pg = BasicGeometry.BuildPath(hull);
-        //    if (pg.Data.FillContains(hitTestParameters.HitPoint))
-        //    {
-        //        return new PointHitTestResult(this, hitTestParameters.HitPoint);
-        //    }
-        //    else
-        //    {
-        //        return null;
-        //    }
-        //}
-
-
-        protected override Size MeasureOverride(Size constraint)
-        {
-            return base.MeasureOverride(constraint);
-        }
 
         protected override void OnRender(DrawingContext drawingContext)
         {
@@ -238,7 +218,8 @@ namespace Chem4Word.View
             //we need the metrics first
             if (AtomSymbol != "")
             {
-                var symbolText = new GlyphText(AtomSymbol, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, PixelsPerDip());
+                var symbolText = new GlyphText(AtomSymbol, 
+                    GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
                 //grab the hull for later
                 _shapeHull.AddRange(symbolText.TextMetrics.Corners);
@@ -246,11 +227,11 @@ namespace Chem4Word.View
 
             //stage 2.  grab the main atom metrics br drawing it
             //need to draw the atom twice as it will be obscured by the mask 
-            var mainAtomMetrics = DrawSelf(drawingContext);
+            var mainAtomMetrics = DrawSelf(drawingContext, true);
            
 
             //stage 3:  measure up the hydrogens
-            //if we have implcit hydrogens and we have an explicit label, draw them
+            //if we have implicit hydrogens and we have an explicit label, draw them
             if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
@@ -297,35 +278,19 @@ namespace Chem4Word.View
         }
 
 
-        private void DrawMask(DrawingContext dc, List<Rect> atomRects)
-        {
-            Brush backgroundMask = SystemColors.WindowBrush;
-            /*#if DEBUG
-                       backgroundMask = new SolidColorBrush(Colors.Orange);
-           #endif */
-            foreach (Rect r in atomRects)
-            {
-                dc.DrawRectangle(backgroundMask, new Pen(backgroundMask, 3), r);
-            }
-            
-        }
+        
 
-
-        //private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, CompassPoints defaultHOrientation)
-        //{
-        //    Debug.Assert((Charge ?? 0) != 0);
-        //    var chargeString = AtomHelpers.GetChargeString(Charge);
-        //    var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString,  Fill, defaultHOrientation);
-        //    return chargeText.TextMetrics;
-        //}
-
+        /// <summary>
+        /// Draws a background mask for the atom symbol
+        /// </summary>
+        /// <param name="shapeHull"></param>
+        /// <param name="drawingContext"></param>
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
         {
             Brush backgroundMask = SystemColors.WindowBrush;
- /*#if DEBUG
-            backgroundMask = new SolidColorBrush(Colors.Orange);
-#endif */
-            drawingContext.DrawGeometry(backgroundMask, new Pen(backgroundMask, 3), BasicGeometry.BuildPath(_shapeHull).Data);
+            drawingContext.DrawGeometry(backgroundMask, 
+                new Pen(backgroundMask, 3), 
+                BasicGeometry.BuildPath(_shapeHull).Data);
         }
 
         /// <summary>
