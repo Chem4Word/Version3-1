@@ -2050,7 +2050,7 @@ namespace Chem4Word
                     string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                     string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                     int idx = temp.IndexOf(" ");
-                    fa.VersionString = $"Chem4Word V3 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+                    fa.VersionString = $"Chem4Word V3.1 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
                 }
                 else
                 {
