@@ -136,8 +136,11 @@ namespace Chem4Word
                                 if (chosenState.Equals("2D"))
                                 {
                                     string bookmarkName = "C4W_" + guid;
+                                    if (Globals.Chem4WordV3.SystemOptions == null)
+                                    {
+                                        Globals.Chem4WordV3.LoadOptions();
+                                    }
                                     Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
-
                                     IChem4WordRenderer renderer =
                                         Globals.Chem4WordV3.GetRendererPlugIn(
                                             Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
@@ -345,6 +348,10 @@ namespace Chem4Word
             {
                 Settings optionsForm = new Settings();
 
+                if (Globals.Chem4WordV3.SystemOptions == null)
+                {
+                    Globals.Chem4WordV3.LoadOptions();
+                }
                 Options tempOptions = Globals.Chem4WordV3.SystemOptions.Clone();
 
                 optionsForm.SystemOptions = tempOptions;
@@ -465,8 +472,11 @@ namespace Chem4Word
                                 string guidString = model.CustomXmlPartGuid;
                                 string bookmarkName = "C4W_" + guidString;
 
+                                if (Globals.Chem4WordV3.SystemOptions == null)
+                                {
+                                    Globals.Chem4WordV3.LoadOptions();
+                                }
                                 Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
-
                                 IChem4WordRenderer renderer =
                                     Globals.Chem4WordV3.GetRendererPlugIn(
                                         Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
@@ -897,6 +907,10 @@ namespace Chem4Word
                         }
                     }
 
+                    if (Globals.Chem4WordV3.SystemOptions == null)
+                    {
+                        Globals.Chem4WordV3.LoadOptions();
+                    }
                     IChem4WordEditor editor =
                         Globals.Chem4WordV3.GetEditorPlugIn(Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn);
 
@@ -973,10 +987,12 @@ namespace Chem4Word
                             {
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
+                                // ChemSpider InChiKey (1.03) generator does not support 0 bonds or Elements > 104
                                 List<Bond> nullBonds = mol.Bonds.Where(b => b.OrderValue.Value < 1).ToList();
-                                if (nullBonds.Any())
+                                int max = mol.Atoms.Max(x => ((Element)x.Element).AtomicNumber);
+                                if (nullBonds.Any() && max <= 104)
                                 {
-                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Not sending structure to ChemSpider as it has bonds with order of less than one");
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to ChemSpider; Null Bonds: {nullBonds.Count} Max Atomic Number: {max}");
                                     synonyms.Add(Constants.ChemspiderInchiKeyName, "Not Requested");
                                 }
                                 else
@@ -1111,8 +1127,11 @@ namespace Chem4Word
 
                             string afterCml = cmlConverter.Export(afterModel);
 
+                            if (Globals.Chem4WordV3.SystemOptions == null)
+                            {
+                                Globals.Chem4WordV3.LoadOptions();
+                            }
                             Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
-
                             IChem4WordRenderer renderer =
                                 Globals.Chem4WordV3.GetRendererPlugIn(
                                     Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
@@ -1518,8 +1537,11 @@ namespace Chem4Word
                                 string guidString = model.CustomXmlPartGuid;
                                 string bookmarkName = "C4W_" + guidString;
 
+                                if (Globals.Chem4WordV3.SystemOptions == null)
+                                {
+                                    Globals.Chem4WordV3.LoadOptions();
+                                }
                                 Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
-
                                 IChem4WordRenderer renderer =
                                     Globals.Chem4WordV3.GetRendererPlugIn(
                                         Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
@@ -1586,12 +1608,6 @@ namespace Chem4Word
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-            if (Globals.Chem4WordV3.LibraryNames == null)
-            {
-                Globals.Chem4WordV3.LoadLibrary();
-            }
-
             BeforeButtonChecks(sender as RibbonButton);
 
             try
@@ -1617,6 +1633,10 @@ namespace Chem4Word
                         {
                             string cml = customXmlPart.XML;
                             m = new CMLConverter().Import(cml);
+                            if (Globals.Chem4WordV3.LibraryNames == null)
+                            {
+                                Globals.Chem4WordV3.LoadLibrary();
+                            }
                             LibraryModel.ImportCml(cml);
                             Globals.Chem4WordV3.LibraryNames = LibraryModel.GetLibraryNames();
                         }
@@ -1913,6 +1933,10 @@ namespace Chem4Word
 
                             string afterCml = cmlConverter.Export(model);
 
+                            if (Globals.Chem4WordV3.SystemOptions == null)
+                            {
+                                Globals.Chem4WordV3.LoadOptions();
+                            }
                             IChem4WordRenderer renderer =
                                 Globals.Chem4WordV3.GetRendererPlugIn(
                                     Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
@@ -2026,7 +2050,7 @@ namespace Chem4Word
                     string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                     string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                     int idx = temp.IndexOf(" ");
-                    fa.VersionString = $"Chem4Word V3 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+                    fa.VersionString = $"Chem4Word V3.1 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
                 }
                 else
                 {
@@ -2068,6 +2092,11 @@ namespace Chem4Word
             BeforeButtonChecks(sender as RibbonButton);
 
             UpdateHelper.ClearSettings();
+
+            if (Globals.Chem4WordV3.SystemOptions == null)
+            {
+                Globals.Chem4WordV3.LoadOptions();
+            }
 
             int behind = UpdateHelper.CheckForUpdates(Globals.Chem4WordV3.SystemOptions.AutoUpdateFrequency);
             if (behind == 0)

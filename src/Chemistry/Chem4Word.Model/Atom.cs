@@ -112,7 +112,7 @@ namespace Chem4Word.Model
             set
             {
                 _position = value;
-                OnPropertyChanged("Position");
+                OnPropertyChanged();
             }
         }
 
@@ -128,16 +128,40 @@ namespace Chem4Word.Model
             set
             {
                 _id = value;
-                OnPropertyChanged("Id");
+                OnPropertyChanged();
             }
         }
 
         /// <summary>
         /// If null, defaults to the most abundant isotope
         /// </summary>
-        public int? IsotopeNumber { get; set; }
+        /// 
+        private int? _isotopeNumber;
+        public int? IsotopeNumber
+        {
+            get
+            {
+                return _isotopeNumber;
+            }
+            set
+            {
+                _isotopeNumber = value;
+                OnPropertyChanged() ;
+            }
+        }
 
-        public int? SpinMultiplicity { get; set; }
+        public int? SpinMultiplicity
+        {
+            get
+            {
+                return _spinMultiplicity;
+            }
+            set
+            {
+                _spinMultiplicity = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool ShowHydrogens
         {
@@ -262,6 +286,7 @@ namespace Chem4Word.Model
         /// Doublet radical e.g. carbene, nitrene (packaged with the charge in molfile). Default to false.
         /// </summary>
         private bool _doubletRadical;
+        private int? _spinMultiplicity;
 
         public bool DoubletRadical
         {
@@ -270,7 +295,7 @@ namespace Chem4Word.Model
             {
                 _doubletRadical = value;
                 //Attributed call knows who we are, no need to pass "DoubletRadical" as an argument
-                //OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 
@@ -414,7 +439,7 @@ namespace Chem4Word.Model
         public const double FontSize = 23;
 
 
-       //tries to get a bounding box for each atom symbol
+        //tries to get a bounding box for each atom symbol
         public Rect BoundingBox
         {
             get
@@ -427,7 +452,7 @@ namespace Chem4Word.Model
                         new Point(position.X - halfSize, position.Y - halfSize),
                         new Point(position.X + halfSize, position.Y + halfSize));
                     double symbolWidth = SymbolText.Length * FontSize * 0.8;
-                    Rect mainElementBox =new Rect(new Point(position.X - halfSize, position.Y - halfSize),
+                    Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                         new Size(symbolWidth, FontSize));
 
 
@@ -468,7 +493,7 @@ namespace Chem4Word.Model
 
         private Rect CenterRectOn(Point position, double fontSize, Point topleft, Point bottomRight)
         {
-          
+
 
             return new Rect(topleft,
                 bottomRight);
@@ -482,11 +507,20 @@ namespace Chem4Word.Model
         {
             //set up the collections for the atom itself
             Bonds = new ObservableCollection<Bond>();
+            Bonds.CollectionChanged += Bonds_CollectionChanged;
             Rings = new ObservableCollection<Ring>();
             Rings.CollectionChanged += Rings_CollectionChanged;
             //Default values
             FormalCharge = null;
             DoubletRadical = false;
+        }
+
+        private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            //chnaging the number of bonds causes knock on effects
+            OnPropertyChanged("Degree");
+            OnPropertyChanged("ImplicitHydrogenCount");
+            OnPropertyChanged("BalancingVector");
         }
 
         private void Rings_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -581,7 +615,7 @@ namespace Chem4Word.Model
                     {
                         return CompassPoints.East;
                     }
-                    else if (clockDirection >= 6 & clockDirection <=11)
+                    else if (clockDirection >= 6 & clockDirection <= 11)
                     {
                         return CompassPoints.East;
                     }
