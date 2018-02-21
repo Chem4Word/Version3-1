@@ -987,10 +987,12 @@ namespace Chem4Word
                             {
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
+                                // ChemSpider InChiKey (1.03) generator does not support 0 bonds or Elements > 104
                                 List<Bond> nullBonds = mol.Bonds.Where(b => b.OrderValue.Value < 1).ToList();
-                                if (nullBonds.Any())
+                                int max = mol.Atoms.Max(x => ((Element)x.Element).AtomicNumber);
+                                if (nullBonds.Any() && max <= 104)
                                 {
-                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Not sending structure to ChemSpider as it has bonds with order of less than one");
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to ChemSpider; Null Bonds: {nullBonds.Count} Max Atomic Number: {max}");
                                     synonyms.Add(Constants.ChemspiderInchiKeyName, "Not Requested");
                                 }
                                 else
@@ -1606,12 +1608,6 @@ namespace Chem4Word
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-            if (Globals.Chem4WordV3.LibraryNames == null)
-            {
-                Globals.Chem4WordV3.LoadLibrary();
-            }
-
             BeforeButtonChecks(sender as RibbonButton);
 
             try
@@ -1637,6 +1633,10 @@ namespace Chem4Word
                         {
                             string cml = customXmlPart.XML;
                             m = new CMLConverter().Import(cml);
+                            if (Globals.Chem4WordV3.LibraryNames == null)
+                            {
+                                Globals.Chem4WordV3.LoadLibrary();
+                            }
                             LibraryModel.ImportCml(cml);
                             Globals.Chem4WordV3.LibraryNames = LibraryModel.GetLibraryNames();
                         }
@@ -2097,6 +2097,7 @@ namespace Chem4Word
             {
                 Globals.Chem4WordV3.LoadOptions();
             }
+
             int behind = UpdateHelper.CheckForUpdates(Globals.Chem4WordV3.SystemOptions.AutoUpdateFrequency);
             if (behind == 0)
             {

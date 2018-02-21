@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<layerModel xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" xmlns:dm1="http://schemas.microsoft.com/dsltools/SimpleShapesModel" dslVersion="1.0.0.0" Id="1ee11085-3ddf-4786-a3a7-ab48c057fcfc" xmlns="http://schemas.microsoft.com/VisualStudio/TeamArchitect/LayerDesigner">
-  <layers>
-    <layer Id="53e74b6e-dc73-4613-a518-b4948bc79dc7" name="Chem4Word.Model" />
-    <layer Id="83b85b2e-61ad-43c7-a7c1-4069e0b7cdc4" name="Chem4Word.View" />
-    <layer Id="a3d5c767-2b69-45d9-bfd6-78315d9685f7" name="Layer1" />
-  </layers>
-</layerModel>
