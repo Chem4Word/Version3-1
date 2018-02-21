@@ -28,11 +28,11 @@ namespace Chem4Word.View
         public string Text { get;  }
         public Typeface CurrentTypeface { get;  }
 
-        public double Typesize { get; }
+        public double TypeSize { get; }
 
         public float PixelsPerDip { get; }
 
-        private GlyphTypeface _glyphTypeface;
+        protected GlyphTypeface _glyphTypeface;
 
         public GlyphUtils.GlyphInfo GlyphInfo { get; protected set; }
         public AtomTextMetrics TextMetrics { get; protected set; }
@@ -72,17 +72,33 @@ namespace Chem4Word.View
             }
             Text = text;
             CurrentTypeface = typeface;
-            Typesize = typesize;
+            TypeSize = typesize;
             PixelsPerDip = pixelsPerDip;
 
             TextMetrics = null;
 
         }
 
+        public double LeadingBearing
+        {
+            get
+            {
+                return _glyphTypeface.LeftSideBearings[TextRun.GlyphIndices.First()] * TypeSize;
+            }
+        }
+
+        public double TrailingBearing
+        {
+            get
+            {
+                return _glyphTypeface.RightSideBearings[TextRun.GlyphIndices.Last()] * TypeSize;
+            }
+        }
+
 
         public void MeasureAtCenter(Point center)
         {
-            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, Typesize);
+            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize);
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
@@ -101,7 +117,7 @@ namespace Chem4Word.View
 
         public void MeasureAtBottomLeft(Point bottomLeft, float PixelsPerDip)
         {
-            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
+            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
             TextRun=groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
@@ -116,7 +132,7 @@ namespace Chem4Word.View
         public void DrawAtBottomLeft(Point bottomLeft, DrawingContext dc)
         {
 
-            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, Typesize);
+            GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
             //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
@@ -156,6 +172,8 @@ namespace Chem4Word.View
     {
         public SubLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
         { }
+
+      
     }
 
     public class IsotopeLabelText : GlyphText
