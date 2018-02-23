@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+VisualStudioVersion = 15.0.26730.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D4427174-46F5-4058-8934-4CEAFDBAF60D}"
 	ProjectSection(SolutionItems) = preProject
@@ -257,6 +257,7 @@ Global
 		{C5F54FA8-376E-442F-AE3C-DCFDC112B190}.Vso-Ci|x86.ActiveCfg = Vso-Ci|Any CPU
 		{C5F54FA8-376E-442F-AE3C-DCFDC112B190}.Vso-Ci|x86.Build.0 = Vso-Ci|Any CPU
 		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Debug|x64.Build.0 = Debug|Any CPU
 		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -277,6 +278,7 @@ Global
 		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Vso-Ci|x86.ActiveCfg = Vso-Ci|Any CPU
 		{F2BB13C0-6970-427F-9AA8-98390741EFF2}.Vso-Ci|x86.Build.0 = Vso-Ci|Any CPU
 		{F763C2B0-CB6B-42A4-9BB4-C9FB375BEC3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F763C2B0-CB6B-42A4-9BB4-C9FB375BEC3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F763C2B0-CB6B-42A4-9BB4-C9FB375BEC3C}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{F763C2B0-CB6B-42A4-9BB4-C9FB375BEC3C}.Debug|x64.Build.0 = Debug|Any CPU
 		{F763C2B0-CB6B-42A4-9BB4-C9FB375BEC3C}.Debug|x86.ActiveCfg = Debug|Any CPU

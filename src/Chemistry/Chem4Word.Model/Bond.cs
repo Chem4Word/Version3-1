@@ -124,8 +124,10 @@ namespace Chem4Word.Model
         {
             return new List<Atom>() { StartAtom, EndAtom };
         }
+
         //bond order number <-> string mappings
         public const string OrderZero = "hbond";
+
         public const string OrderOther = "other";
         public const string OrderPartial01 = "partial01";
         public const string OrderSingle = "S";
@@ -135,11 +137,11 @@ namespace Chem4Word.Model
         public const string OrderPartial23 = "partial23";
         public const string OrderTriple = "T";
 
-
         private string _order;
+
         /// <summary>
         /// Order of the bonds.  defined as a string
-        /// If a number string is provided then it maps to a less granular 
+        /// If a number string is provided then it maps to a less granular
         /// alpha string
         /// </summary>
         public string Order
@@ -177,6 +179,7 @@ namespace Chem4Word.Model
                 OnPropertyChanged();
             }
         }
+
         /// <summary>
         /// Converts a bond order string to a numeric value
         /// </summary>
@@ -326,6 +329,7 @@ namespace Chem4Word.Model
 
             internal set { _parent = value; }
         }
+
         /// <summary>
         /// Returns the vector that represents the bond
         /// </summary>
@@ -557,7 +561,6 @@ namespace Chem4Word.Model
             {
                 if (endLigands.Count() == 2)
                 {
-                    
                     if (endLigands.ContainNoH())
                     {
                         return null;
@@ -678,6 +681,7 @@ namespace Chem4Word.Model
 
             return vector;
         }
+
         /// <summary>
         /// Retruns a vector which points to the Non-Hydrogen side of a double bond
         /// </summary>

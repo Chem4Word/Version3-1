@@ -331,7 +331,7 @@ namespace Chem4Word.Model
                 if (_boundingBox == null)
                 {
                     var modelRect = AllAtoms[0].BoundingBox;
-                    for  (int i=1; i<AllAtoms.Count; i++)
+                    for (int i = 1; i < AllAtoms.Count; i++)
                     {
                         var atom = AllAtoms[i];
                         modelRect.Union(atom.BoundingBox);
@@ -341,12 +341,11 @@ namespace Chem4Word.Model
                 return _boundingBox.Value;
             }
         }
+
         public double MinX => BoundingBox.Left;
         public double MaxX => BoundingBox.Right;
         public double MinY => BoundingBox.Top;
         public double MaxY => BoundingBox.Bottom;
-
-
 
         public double MeanBondLength
         {

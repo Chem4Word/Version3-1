@@ -34,7 +34,7 @@ namespace Chem4Word.Model.Geometry
     {
         public static double ToDegrees(this ClockDirections cd)
         {
-            return 30 * ((int) cd % 12);
+            return 30 * ((int)cd % 12);
         }
 
         public static double ToDegrees(this CompassPoints cp)
@@ -42,6 +42,7 @@ namespace Chem4Word.Model.Geometry
             return 45 * (int)cp;
         }
     }
+
     public enum CompassPoints
     {
         North,
@@ -190,16 +191,13 @@ namespace Chem4Word.Model.Geometry
             return new Vector(-v.Y, v.X);
         }
 
-        public static Vector ScreenSouth =new Vector(0, 1);
-        
+        public static Vector ScreenSouth = new Vector(0, 1);
 
-        public static Vector ScreenEast= new Vector(1, 0);
-        
+        public static Vector ScreenEast = new Vector(1, 0);
 
         public static Vector ScreenNorth = -ScreenSouth;
-   
 
-        public static Vector ScreenWest = -ScreenEast ;
+        public static Vector ScreenWest = -ScreenEast;
 
         #endregion extension methods
 
@@ -293,26 +291,25 @@ namespace Chem4Word.Model.Geometry
 
         private static int SnapAngleToTolerance(double angleFromNorth, int tolerance)
         {
-
             if (angleFromNorth < 0)
             {
                 angleFromNorth += 360.0;
             }
             double adjustedAngle = angleFromNorth + tolerance;
-            int sector = (int) adjustedAngle / (tolerance * 2);
+            int sector = (int)adjustedAngle / (tolerance * 2);
             return sector;
         }
 
         /// <summary>
         /// Takes a list of poinst and builds a  Path object from it.
-        /// Generally used for constructing masks 
+        /// Generally used for constructing masks
         /// </summary>
         /// <param name="hull">List of points makking up the path </param>
         /// <returns></returns>
         public static Path BuildPath(List<Point> hull, bool isClosed = true)
         {
             var points = hull.ToArray();
-           
+
             Path path = new Path
             {
                 StrokeThickness = 1
@@ -328,11 +325,11 @@ namespace Chem4Word.Model.Geometry
                 pathSegments.Add(new LineSegment(points[i], true));
             }
             path.Data = new PathGeometry
-            { 
+            {
                 Figures = new PathFigureCollection
                 {
                     new PathFigure
-                    { 
+                    {
                         StartPoint = points[0],
                         Segments = pathSegments,
                         IsClosed = isClosed
@@ -341,7 +338,6 @@ namespace Chem4Word.Model.Geometry
             };
 
             return path;
-           
         }
     }
 }
