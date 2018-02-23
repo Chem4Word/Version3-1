@@ -579,7 +579,7 @@ namespace Chem4Word.Model
             //1) All rings of sizes 6, 5, 7, 4 and 3 are discovered, in that order, and added to a list R.
             var prioritisedRings = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
 
-            //Define B as an array of size equal to the number of atoms, where each value 
+            //Define B as an array of size equal to the number of atoms, where each value
             //is equal to the number of times the atom occurs in any of the rings R
             Dictionary<Atom, int> atomFrequency = new Dictionary<Atom, int>();
             foreach (Atom atom in Atoms)
@@ -587,7 +587,7 @@ namespace Chem4Word.Model
                 atomFrequency[atom] = atom.Rings.Count;
             }
 
-            //Define Q as an array of size equal to length of R, where each value is equal 
+            //Define Q as an array of size equal to length of R, where each value is equal
             //to sum of B[r], where r iterates over each of the atoms within the ring.
             Dictionary<Ring, int> cumulFreqPerRing = new Dictionary<Ring, int>();
             foreach (Ring ring in prioritisedRings)
