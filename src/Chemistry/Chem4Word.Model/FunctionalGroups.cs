@@ -5,13 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Chem4Word.Model
 {
@@ -23,10 +23,11 @@ namespace Chem4Word.Model
         /// </summary>
         ///
         ///
-        /// 
-        /// 
-      
+        ///
+        ///
+
         public static Dictionary<string, FunctionalGroup> ShortcutList { get; private set; }
+
         public static bool TryParse(string desc, out FunctionalGroup fg)
         {
             try
@@ -65,17 +66,17 @@ namespace Chem4Word.Model
         public static Dictionary<string, FunctionalGroup> GetByName
         {
             get
-            { 
-
+            {
                 return ShortcutList;
             }
         }
 
         public static string GetJSON()
         {
-           var result= JsonConvert.SerializeObject(ShortcutList.Values.ToList());
+            var result = JsonConvert.SerializeObject(ShortcutList.Values.ToList());
             return result;
         }
+
         public static void LoadDefaults()
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>
@@ -90,16 +91,16 @@ namespace Chem4Word.Model
                 //so that CH3 -> H3C
                 ["R1"] =
                 new FunctionalGroup("R1",
-                    components: new List<Group> {new Group("R", 1)}, atwt: 0.0d),
+                    components: new List<Group> { new Group("R", 1) }, atwt: 0.0d),
                 ["R2"] =
                 new FunctionalGroup("R2",
-                    components: new List<Group> {new Group("R", 2)}, atwt: 0.0d),
+                    components: new List<Group> { new Group("R", 2) }, atwt: 0.0d),
                 ["R3"] =
                 new FunctionalGroup("R3",
-                    components: new List<Group> {new Group("R", 3)}, atwt: 0.0d),
+                    components: new List<Group> { new Group("R", 3) }, atwt: 0.0d),
                 ["R4"] =
                 new FunctionalGroup("R4",
-                    components: new List<Group> {new Group("R", 4)}, atwt: 0.0d),
+                    components: new List<Group> { new Group("R", 4) }, atwt: 0.0d),
 
                 //generic halogen
                 ["X"] = new FunctionalGroup("X", atwt: 0.0d),

@@ -135,8 +135,9 @@ namespace Chem4Word.Model
         /// <summary>
         /// If null, defaults to the most abundant isotope
         /// </summary>
-        /// 
+        ///
         private int? _isotopeNumber;
+
         public int? IsotopeNumber
         {
             get
@@ -146,7 +147,7 @@ namespace Chem4Word.Model
             set
             {
                 _isotopeNumber = value;
-                OnPropertyChanged() ;
+                OnPropertyChanged();
             }
         }
 
@@ -167,7 +168,6 @@ namespace Chem4Word.Model
         {
             get; set;
         }
-
 
         /// <summary>
         /// Do we show the symbol block? Only toggle for Carbon
@@ -286,6 +286,7 @@ namespace Chem4Word.Model
         /// Doublet radical e.g. carbene, nitrene (packaged with the charge in molfile). Default to false.
         /// </summary>
         private bool _doubletRadical;
+
         private int? _spinMultiplicity;
 
         public bool DoubletRadical
@@ -438,7 +439,6 @@ namespace Chem4Word.Model
 
         public const double FontSize = 23;
 
-
         //tries to get a bounding box for each atom symbol
         public Rect BoundingBox
         {
@@ -455,8 +455,6 @@ namespace Chem4Word.Model
                     Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                         new Size(symbolWidth, FontSize));
 
-
-
                     if (ImplicitHydrogenCount > 0)
 
                     {
@@ -467,16 +465,18 @@ namespace Chem4Word.Model
                             case CompassPoints.East:
                                 shift = BasicGeometry.ScreenEast * FontSize;
                                 break;
+
                             case CompassPoints.North:
                                 shift = BasicGeometry.ScreenNorth * FontSize;
                                 break;
+
                             case CompassPoints.South:
                                 shift = BasicGeometry.ScreenSouth * FontSize;
                                 break;
+
                             case CompassPoints.West:
                                 shift = BasicGeometry.ScreenWest * FontSize;
                                 break;
-
                         }
                         hydrogenBox.Offset(shift);
                         mainElementBox.Union(hydrogenBox);
@@ -487,14 +487,11 @@ namespace Chem4Word.Model
                 {
                     return new Rect(Position, Position);//empty rect
                 }
-
             }
         }
 
         private Rect CenterRectOn(Point position, double fontSize, Point topleft, Point bottomRight)
         {
-
-
             return new Rect(topleft,
                 bottomRight);
         }
@@ -630,12 +627,11 @@ namespace Chem4Word.Model
                         BalancingVector);
 
                     return BasicGeometry.SnapTo4NESW(baFromNorth);
-
                 }
-
             }
             return CompassPoints.East;
         }
+
         #endregion Methods
     }
 }

@@ -5,28 +5,26 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Chem4Word.Model
 {
     /// <summary>
     /// Identifies components of atoms in FGs
     /// </summary>
-    /// 
-    /// 
-    
+    ///
+    ///
+
     public class Group
     {
         [JsonProperty("component")]
         public string Component { get; set; }
+
         [JsonProperty("count")]
         public int Count { get; set; }
-   
-        
 
         public Group(string e, int c)
         {
@@ -45,12 +43,11 @@ namespace Chem4Word.Model
                 else
                 {
                     var pt = new PeriodicTable();
-                    return ((Element) pt[Component]).AtomicWeight * Count;
+                    return ((Element)pt[Component]).AtomicWeight * Count;
                 }
             }
         }
     }
-
 
     /// <summary>
     /// Functional groups are serialised as JSON
@@ -86,7 +83,7 @@ namespace Chem4Word.Model
         public const string TagShowAsSymbol = "showassymbol";
 
         private string _symbol = "";
-        private double _atomicWeight=0d;
+        private double _atomicWeight = 0d;
 
         /// <summary>
         /// Generates a new functional group to use for a superatom
@@ -97,9 +94,8 @@ namespace Chem4Word.Model
         /// <param name="showAsSymbol">whether the element is rendered as its symbol or constructed from its components</param>
         public FunctionalGroup(string symbol,
             List<Group> components = null,
-            double atwt = 0d, bool showAsSymbol = false, bool flippable=false)
+            double atwt = 0d, bool showAsSymbol = false, bool flippable = false)
         {
-            
             Symbol = symbol;
             AtomicWeight = atwt;
             Components = components;
@@ -111,19 +107,17 @@ namespace Chem4Word.Model
         {
             var pt = new PeriodicTable();
             Symbol = groupAsJson[TagSymbol].ToString();
-            Flippable = groupAsJson[TagFlippable].Value<bool?>()??false;
-            ShowAsSymbol = groupAsJson[TagShowAsSymbol].Value<bool?>()??false;
+            Flippable = groupAsJson[TagFlippable].Value<bool?>() ?? false;
+            ShowAsSymbol = groupAsJson[TagShowAsSymbol].Value<bool?>() ?? false;
             Components = new List<Group>();
             var complist = groupAsJson[TagComponents];
 
-           
             foreach (JToken c in complist)
             {
-                
-                        Group g;
+                Group g;
                 if (c.Value<string>(TagElement) != null)
                 {
-                    g = new Group( c.Value<string>(TagElement), c.Value<int?>("count")??1);
+                    g = new Group(c.Value<string>(TagElement), c.Value<int?>("count") ?? 1);
                 }
                 else if (c.Value<string>(TagGroup) != null)
                 {
@@ -135,8 +129,8 @@ namespace Chem4Word.Model
                 }
                 Components.Add(g);
             }
-                    
         }
+
         [JsonProperty("showassymbol")]
         public bool ShowAsSymbol { get; set; }
 
@@ -198,6 +192,5 @@ namespace Chem4Word.Model
         /// </summary>
         [JsonProperty("flippable")]
         public bool Flippable { get; set; }
-        
     }
 }
