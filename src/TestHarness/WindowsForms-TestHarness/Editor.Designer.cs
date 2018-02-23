@@ -1,6 +1,6 @@
 ﻿namespace WinFormsTestHarness
 {
-    partial class FlexForm
+    partial class Editor
     {
         /// <summary>
         /// Required designer variable.
@@ -28,23 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.LoadStructure = new System.Windows.Forms.Button();
+            this.SaveChanges = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplayControl();
-            this.EditStructure = new System.Windows.Forms.Button();
+            this.editor1 = new Chem4Word.ACME.Editor();
+            this.CancelEdit = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // LoadStructure
+            // SaveChanges
             // 
-            this.LoadStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LoadStructure.Location = new System.Drawing.Point(12, 318);
-            this.LoadStructure.Name = "LoadStructure";
-            this.LoadStructure.Size = new System.Drawing.Size(75, 23);
-            this.LoadStructure.TabIndex = 0;
-            this.LoadStructure.Text = "Load";
-            this.LoadStructure.UseVisualStyleBackColor = true;
-            this.LoadStructure.Click += new System.EventHandler(this.LoadStructure_Click);
+            this.SaveChanges.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveChanges.Location = new System.Drawing.Point(397, 311);
+            this.SaveChanges.Name = "SaveChanges";
+            this.SaveChanges.Size = new System.Drawing.Size(75, 23);
+            this.SaveChanges.TabIndex = 0;
+            this.SaveChanges.Text = "Save";
+            this.SaveChanges.UseVisualStyleBackColor = true;
+            this.SaveChanges.Click += new System.EventHandler(this.SaveChanges_Click);
             // 
             // openFileDialog1
             // 
@@ -55,45 +55,47 @@
             this.elementHost1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.elementHost1.BackColor = System.Drawing.Color.White;
             this.elementHost1.Location = new System.Drawing.Point(12, 12);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(520, 300);
+            this.elementHost1.Size = new System.Drawing.Size(460, 293);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.flexDisplayControl1;
+            this.elementHost1.Child = this.editor1;
             // 
-            // EditStructure
+            // CancelEdit
             // 
-            this.EditStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.EditStructure.Location = new System.Drawing.Point(457, 318);
-            this.EditStructure.Name = "EditStructure";
-            this.EditStructure.Size = new System.Drawing.Size(75, 23);
-            this.EditStructure.TabIndex = 2;
-            this.EditStructure.Text = "Edit";
-            this.EditStructure.UseVisualStyleBackColor = true;
-            this.EditStructure.Click += new System.EventHandler(this.EditStructure_Click);
+            this.CancelEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CancelEdit.Location = new System.Drawing.Point(316, 311);
+            this.CancelEdit.Name = "CancelEdit";
+            this.CancelEdit.Size = new System.Drawing.Size(75, 23);
+            this.CancelEdit.TabIndex = 2;
+            this.CancelEdit.Text = "Cancel";
+            this.CancelEdit.UseVisualStyleBackColor = true;
+            this.CancelEdit.Click += new System.EventHandler(this.CancelEdit_Click);
             // 
-            // FlexForm
+            // Editor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(544, 353);
-            this.Controls.Add(this.EditStructure);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.ClientSize = new System.Drawing.Size(484, 346);
+            this.Controls.Add(this.CancelEdit);
             this.Controls.Add(this.elementHost1);
-            this.Controls.Add(this.LoadStructure);
-            this.Name = "FlexForm";
-            this.Text = "Flexible Display";
+            this.Controls.Add(this.SaveChanges);
+            this.Name = "Editor";
+            this.Text = "ACME Editor Host";
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button LoadStructure;
+        private System.Windows.Forms.Button SaveChanges;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Chem4Word.Controls.FlexDisplayControl flexDisplayControl1;
-        private System.Windows.Forms.Button EditStructure;
+        private System.Windows.Forms.Button CancelEdit;
+        private Chem4Word.ACME.Editor editor1;
     }
 }
 
