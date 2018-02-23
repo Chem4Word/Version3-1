@@ -13,7 +13,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.View;
 
 namespace Chem4Word.View
 {
@@ -117,7 +116,6 @@ namespace Chem4Word.View
                         {
                             totalgeo = totalgeo.GetWidenedPathGeometry(newPen, 0.001, ToleranceType.Absolute);
                         }
-
                     }
                     totalgeo.Freeze();
                 }

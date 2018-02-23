@@ -6,10 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Windows;
-using System.Windows.Media;
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.View
 {
