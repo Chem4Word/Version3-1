@@ -21,7 +21,7 @@ namespace WinFormsTestHarness
             InitializeComponent();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void LoadStructure_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
@@ -70,8 +70,10 @@ namespace WinFormsTestHarness
             }
         }
 
-        private void elementHost1_ChildChanged(object sender, System.Windows.Forms.Integration.ChildChangedEventArgs e)
+        private void EditStructure_Click(object sender, EventArgs e)
         {
+            Editor ef = new Editor();
+            ef.ShowDialog();
         }
     }
 }

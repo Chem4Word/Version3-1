@@ -77,11 +77,11 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs">
+    <Compile Include="Editor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Editor.Designer.cs">
+      <DependentUpon>Editor.cs</DependentUpon>
     </Compile>
     <Compile Include="FlexForm.cs">
       <SubType>Form</SubType>
@@ -91,8 +91,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Editor.resx">
+      <DependentUpon>Editor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FlexForm.resx">
       <DependentUpon>FlexForm.cs</DependentUpon>
@@ -121,6 +121,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj">
+      <Project>{1e3fc1f1-06cc-44bd-8004-3ef0ce7eeaa7}</Project>
+      <Name>Chem4Word.ACME</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Chemistry\Controls\Chem4Word.Controls\Chem4Word.Controls.csproj">
       <Project>{2029399E-696B-46F4-822D-BE3DF61C8256}</Project>
       <Name>Chem4Word.Controls</Name>
