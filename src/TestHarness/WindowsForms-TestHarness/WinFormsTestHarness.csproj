@@ -77,11 +77,11 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Editor.cs">
+    <Compile Include="EditorHost.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editor.Designer.cs">
-      <DependentUpon>Editor.cs</DependentUpon>
+    <Compile Include="EditorHost.Designer.cs">
+      <DependentUpon>EditorHost.cs</DependentUpon>
     </Compile>
     <Compile Include="FlexForm.cs">
       <SubType>Form</SubType>
@@ -91,8 +91,8 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Editor.resx">
-      <DependentUpon>Editor.cs</DependentUpon>
+    <EmbeddedResource Include="EditorHost.resx">
+      <DependentUpon>EditorHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FlexForm.resx">
       <DependentUpon>FlexForm.cs</DependentUpon>

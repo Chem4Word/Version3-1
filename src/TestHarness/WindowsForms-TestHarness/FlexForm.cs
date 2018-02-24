@@ -8,7 +8,9 @@
 using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -16,6 +18,8 @@ namespace WinFormsTestHarness
 {
     public partial class FlexForm : Form
     {
+        private Model model = null;
+
         public FlexForm()
         {
             InitializeComponent();
@@ -42,7 +46,6 @@ namespace WinFormsTestHarness
 
                 CMLConverter cmlConvertor = new CMLConverter();
                 SdFileConverter sdFileConverter = new SdFileConverter();
-                Model model = null;
 
                 switch (fileType)
                 {
@@ -65,15 +68,54 @@ namespace WinFormsTestHarness
                         break;
                 }
 
-                this.Text = filename;
-                this.flexDisplayControl1.Chemistry = cml;
+                ShowChemistry(filename, model);
+            }
+        }
+
+        private void ShowChemistry(string filename, Model mod)
+        {
+            if (mod != null)
+            {
+                if (mod.AllErrors.Any() || mod.AllWarnings.Any())
+                {
+                    List<string> lines = new List<string>();
+                    if (mod.AllErrors.Any())
+                    {
+                        lines.Add("Error(s)");
+                        lines.AddRange(mod.AllErrors);
+                    }
+
+                    if (mod.AllWarnings.Any())
+                    {
+                        lines.Add("Warnings(s)");
+                        lines.AddRange(mod.AllWarnings);
+                    }
+
+                    MessageBox.Show(string.Join(Environment.NewLine, lines));
+                }
+                else
+                {
+                    model = mod;
+                    this.Text = filename;
+                    this.flexDisplayControl1.Chemistry = model;
+                    EditStructure.Enabled = true;
+                }
             }
         }
 
         private void EditStructure_Click(object sender, EventArgs e)
         {
-            Editor ef = new Editor();
-            ef.ShowDialog();
+            if (model != null)
+            {
+                CMLConverter cc = new CMLConverter();
+                EditorHost editorHost = new EditorHost(cc.Export(model));
+                editorHost.ShowDialog();
+                if (editorHost.Result == DialogResult.OK)
+                {
+                    Model m = cc.Import(editorHost.OutputValue);
+                    ShowChemistry("Edited", m);
+                }
+            }
         }
     }
 }
