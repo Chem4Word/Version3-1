@@ -19,20 +19,14 @@ using Chem4Word.WebServices;
 using IChem4Word.Contracts;
 using Microsoft.Office.Core;
 using Microsoft.Office.Tools.Ribbon;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using System.Xml.XPath;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -1638,7 +1632,6 @@ namespace Chem4Word
                                 Globals.Chem4WordV3.LoadLibrary();
                             }
                             LibraryModel.ImportCml(cml);
-
                         }
 
                         CustomTaskPane custTaskPane = null;
