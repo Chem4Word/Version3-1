@@ -33,7 +33,7 @@
             this.SearchButton = new System.Windows.Forms.Button();
             this.ImportButton = new System.Windows.Forms.Button();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplayControl();
+            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplay();
             this.LabelInfo = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -120,7 +120,7 @@
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Controls.FlexDisplayControl flexDisplayControl1;
+        private Controls.FlexDisplay flexDisplayControl1;
         private System.Windows.Forms.TextBox SearchFor;
         private System.Windows.Forms.Button SearchButton;
         private System.Windows.Forms.Button ImportButton;
