@@ -39,7 +39,7 @@
             this.ScoreHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.panel1 = new System.Windows.Forms.Panel();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplayControl();
+            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplay();
             this.ShowMolfile = new System.Windows.Forms.Button();
             this.ErrorsAndWarnings = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -228,7 +228,7 @@
         private System.Windows.Forms.ColumnHeader ScoreHeader;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Controls.FlexDisplayControl flexDisplayControl1;
+        private Controls.FlexDisplay flexDisplayControl1;
         private System.Windows.Forms.Button ShowMolfile;
         private System.Windows.Forms.TextBox ErrorsAndWarnings;
     }
