@@ -106,7 +106,11 @@ namespace Chem4Word.View
         private List<Point> _flattenedPath = null;
         public List<Point> FlattenedPath
         {
-            get { return TextRun.GetOutline().Select(p => p + this.TextMetrics.OffsetVector).ToList(); }
+            get
+            {
+                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector;
+                return TextRun.GetOutline().Select(p => p + offset).ToList();
+            }
             
         }
 
