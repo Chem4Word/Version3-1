@@ -299,7 +299,14 @@ namespace Chem4Word.View
         /// <param name="drawingContext"></param>
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
         {
+            // This is where the chuffing White Background comes from
             Brush backgroundMask = SystemColors.WindowBrush;
+
+            // Temp Brush to match form's background
+            var converter = new System.Windows.Media.BrushConverter();
+            backgroundMask = (Brush)converter.ConvertFromString("#FFC0FFFF");
+
+            // Need to create brush from parent's background colour not hard code it
             drawingContext.DrawGeometry(backgroundMask, 
                 new Pen(backgroundMask, MaskOffsetWidth), 
                 BasicGeometry.BuildPath(_shapeHull).Data);
