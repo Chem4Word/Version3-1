@@ -95,17 +95,35 @@ namespace Chem4Word.View
             }
         }
 
+        public double MaxBaselineOffset
+        {
+            get
+            {
+                return GlyphInfo.UprightBaselineOffsets.Max();
+            }
+        }
+
+        private List<Point> _flattenedPath = null;
+        public List<Point> FlattenedPath
+        {
+            get { return TextRun.GetOutline().Select(p => p + this.TextMetrics.OffsetVector).ToList(); }
+            
+        }
 
         public void MeasureAtCenter(Point center)
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
-            Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize);
+            //compensate the main offset vector for any descenders
+            Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) ;
+            
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
                 Geocenter = center,
-                TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset)
+                TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
+                OffsetVector = mainHOffset
+               
             };
 
         }
@@ -123,7 +141,9 @@ namespace Chem4Word.View
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
                 Geocenter = bottomLeft,
-                TotalBoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft)
+                TotalBoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
+                FlattenedPath = GlyphUtils.GetOutline(TextRun),
+                OffsetVector = new Vector(0.0d, 0.0d)
             };
         }
 
@@ -214,6 +234,9 @@ namespace Chem4Word.View
                 return corners;
             }
         }
+
+        public List<Point> FlattenedPath { get; set; }
+        public Vector OffsetVector { get; set; }
     }
 
     public class LabelMetrics

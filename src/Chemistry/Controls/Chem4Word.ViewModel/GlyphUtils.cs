@@ -20,7 +20,7 @@ namespace Chem4Word.View
             public ushort[] Indexes;
             public double Width;
             public double[] AdvanceWidths;
-
+            public double[] UprightBaselineOffsets;
         }
 
         private static GlyphTypeface _glyphTypeface;
@@ -91,7 +91,7 @@ namespace Chem4Word.View
 
             ushort[] glyphIndexes = new ushort[symbolText.Length];
             double[] advanceWidths = new double[symbolText.Length];
-
+            double[] uprightBaselineOffsets = new double[symbolText.Length];
             double totalWidth = 0;
 
             for (int n = 0; n < symbolText.Length; n++)
@@ -102,12 +102,14 @@ namespace Chem4Word.View
                 double width = glyphTypeFace.AdvanceWidths[glyphIndex] * size;
                 advanceWidths[n] = width;
 
+                double ubo = glyphTypeFace.DistancesFromHorizontalBaselineToBlackBoxBottom[glyphIndex] * size;
+                uprightBaselineOffsets[n] = ubo;
                 totalWidth += width;
             }
 #if DEBUG
             
 #endif
-            return new GlyphInfo {AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth};
+            return new GlyphInfo {AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth, UprightBaselineOffsets = uprightBaselineOffsets};
 
         }
 

@@ -28,6 +28,7 @@ namespace Chem4Word.View
     /// </summary>
     public class AtomShape : Shape
     {
+        private const int MaskOffsetWidth = 5;
 
         //list of points that make up the hull of the shape
         #region Members
@@ -73,7 +74,8 @@ namespace Chem4Word.View
             {
                 _subText = null;
 
-                //first, get some initial size measurements
+                List<Point> mainOutline;
+                    //first, get some initial size measurements
                 _mainText = new GlyphText(Text, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, pixelsPerDip);
                 _mainText.Premeasure();
                 
@@ -89,7 +91,8 @@ namespace Chem4Word.View
                 var groupCenter = GetAdjunctCenter(parentMetrics, direction, _mainText.GlyphInfo, _subText?.GlyphInfo);
                 //remeasure the main text
                 _mainText.MeasureAtCenter(groupCenter);
-               
+
+                mainOutline = _mainText.FlattenedPath;
 
                 if (_subText!=null) 
                     //get the offset for the subscript
@@ -101,9 +104,15 @@ namespace Chem4Word.View
                     _subText.MeasureAtBottomLeft(subBottomLeft,pixelsPerDip);
                     //merge the total bounding boxes
                     _mainText.Union(_subText);
+                   mainOutline.AddRange(_subText.FlattenedPath);
+
                 }
                 //return the placement metrics for the subscripted atom.  
-                AtomTextMetrics result = new AtomTextMetrics { Geocenter = groupCenter, BoundingBox = _mainText.TextMetrics.BoundingBox, TotalBoundingBox = _mainText.TextMetrics.TotalBoundingBox};
+                AtomTextMetrics result = new AtomTextMetrics
+                {
+                    Geocenter = groupCenter, BoundingBox = _mainText.TextMetrics.BoundingBox, TotalBoundingBox = _mainText.TextMetrics.TotalBoundingBox,
+                    FlattenedPath = mainOutline
+                };
 
                 return result;
             }
@@ -222,7 +231,10 @@ namespace Chem4Word.View
                     GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
                 //grab the hull for later
-                _shapeHull.AddRange(symbolText.TextMetrics.Corners);
+                if (symbolText.FlattenedPath != null)
+                {
+                    _shapeHull.AddRange(symbolText.FlattenedPath);
+                }
             }
 
             //stage 2.  grab the main atom metrics br drawing it
@@ -240,7 +252,7 @@ namespace Chem4Word.View
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
-                _shapeHull.AddRange(hydrogenMetrics.Corners);
+                _shapeHull.AddRange(hydrogenMetrics.FlattenedPath);
             }
 
             //stage 4: draw the background mask
@@ -289,7 +301,7 @@ namespace Chem4Word.View
         {
             Brush backgroundMask = SystemColors.WindowBrush;
             drawingContext.DrawGeometry(backgroundMask, 
-                new Pen(backgroundMask, 3), 
+                new Pen(backgroundMask, MaskOffsetWidth), 
                 BasicGeometry.BuildPath(_shapeHull).Data);
         }
 
@@ -312,12 +324,12 @@ namespace Chem4Word.View
         }
 
         /// <param name="drawingContext"></param>
-        /// <param name="mainAtomMetrics"></param>
-        /// <param name="mainAtomMetrics"></param>
-        /// <param name="hMetrics"></param>
-        /// <param name="hMetrics"></param>
-        /// <param name="isoMetrics"></param>
-        /// <param name="isoMetrics"></param>
+        /// <param name="mainAtomMetrics">
+        /// </param>
+        /// <param name="hMetrics">
+        /// </param>
+        /// <param name="isoMetrics">
+        /// </param>
         /// <param name="chargeString"></param>
         /// <param name="fill"></param>
         /// <param name="defaultHOrientation"></param>
@@ -421,7 +433,8 @@ namespace Chem4Word.View
                 {
                     BoundingBox = boundingBox,
                     Geocenter = Position,
-                    TotalBoundingBox = boundingBox
+                    TotalBoundingBox = boundingBox,
+                    FlattenedPath = new List<Point> { boundingBox.BottomLeft,boundingBox.TopLeft, boundingBox.TopRight, boundingBox.BottomRight}
                 };
             }
             else
