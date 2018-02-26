@@ -122,9 +122,17 @@
             x:Name="GalleryList"
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
+            VirtualizingStackPanel.IsVirtualizing="True"
+            ScrollViewer.CanContentScroll="True"
             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
             VerticalAlignment="Stretch">
-            <ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border
                         BorderBrush="{StaticResource WordBlueBrush}"
