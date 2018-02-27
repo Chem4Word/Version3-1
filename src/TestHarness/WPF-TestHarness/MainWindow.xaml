@@ -29,8 +29,8 @@
             Grid.Column="0"
             Grid.ColumnSpan="2" />
 
-        <Controls:FlexDisplay
-            x:Name="FlexDisplay1"
+        <Controls:Display
+            x:Name="Display1"
             Grid.Row="1"
             Grid.Column="0"
             BorderBrush="Black"

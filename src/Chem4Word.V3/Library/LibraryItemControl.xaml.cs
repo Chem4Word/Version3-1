@@ -57,7 +57,7 @@ namespace Chem4Word.Library
                 ActiveDocument = Globals.Chem4WordV3.Application.ActiveDocument;
                 if (ActiveDocument?.ActiveWindow?.Selection != null)
                 {
-                    Navigator.NavigatorSupport.InsertChemistry(true, ActiveDocument.Application, FlexDisplay);
+                    Navigator.NavigatorSupport.InsertChemistry(true, ActiveDocument.Application, Display);
                 }
             }
             catch (Exception ex)

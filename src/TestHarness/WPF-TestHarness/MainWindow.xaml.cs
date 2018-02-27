@@ -22,7 +22,7 @@ namespace ControlTestHarness
             InitializeComponent();
         }
 
-        private void FlexDisplay_Loaded(object sender, RoutedEventArgs e)
+        private void Display_Loaded(object sender, RoutedEventArgs e)
         {
         }
 

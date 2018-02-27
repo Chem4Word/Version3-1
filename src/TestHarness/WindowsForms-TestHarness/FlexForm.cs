@@ -97,7 +97,7 @@ namespace WinFormsTestHarness
                 {
                     model = mod;
                     this.Text = filename;
-                    this.flexDisplay1.Chemistry = model;
+                    this.display1.Chemistry = model;
                     EditStructure.Enabled = true;
                 }
             }
