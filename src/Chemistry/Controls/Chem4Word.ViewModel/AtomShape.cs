@@ -28,7 +28,7 @@ namespace Chem4Word.View
     /// </summary>
     public class AtomShape : Shape
     {
-        private const int MaskOffsetWidth = 5;
+        private const double MaskOffsetWidth = 2.5;
 
         //list of points that make up the hull of the shape
         #region Members
