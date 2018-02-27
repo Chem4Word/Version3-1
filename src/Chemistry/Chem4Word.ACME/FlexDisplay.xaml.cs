@@ -18,12 +18,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ChemistryModel = Chem4Word.Model.Model;
 
-namespace Chem4Word.Controls
+namespace Chem4Word.ACME
 {
     /// <summary>
     /// Interaction logic for FlexDisplay.xaml
     /// </summary>
-    [ToolboxItem(false)]
     public partial class FlexDisplay : UserControl
     {
         public FlexDisplay()

@@ -32,7 +32,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.EditStructure = new System.Windows.Forms.Button();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplay();
+            this.flexDisplay1 = new Chem4Word.ACME.FlexDisplay();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -73,7 +73,7 @@
             this.elementHost1.Size = new System.Drawing.Size(520, 300);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.flexDisplayControl1;
+            this.elementHost1.Child = this.flexDisplay1;
             // 
             // FlexForm
             // 
@@ -94,8 +94,8 @@
         private System.Windows.Forms.Button LoadStructure;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Chem4Word.Controls.FlexDisplay flexDisplayControl1;
         private System.Windows.Forms.Button EditStructure;
+        private Chem4Word.ACME.FlexDisplay flexDisplay1;
     }
 }
 

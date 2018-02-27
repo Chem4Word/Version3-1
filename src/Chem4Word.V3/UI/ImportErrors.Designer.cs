@@ -40,7 +40,7 @@
             this.panelFormulae = new System.Windows.Forms.Panel();
             this.panelNames = new System.Windows.Forms.Panel();
             this.elementHost2 = new System.Windows.Forms.Integration.ElementHost();
-            this.flexDisplay = new Chem4Word.Controls.FlexDisplay();
+            this.flexDisplay = new Chem4Word.ACME.FlexDisplay();
             ((System.ComponentModel.ISupportInitialize)(this.OuterSplitContainer)).BeginInit();
             this.OuterSplitContainer.Panel1.SuspendLayout();
             this.OuterSplitContainer.Panel2.SuspendLayout();
@@ -241,7 +241,7 @@
         private System.Windows.Forms.SplitContainer OuterSplitContainer;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Integration.ElementHost elementHost2;
-        private Controls.FlexDisplay flexDisplay;
+        private ACME.FlexDisplay flexDisplay;
         public System.Windows.Forms.SplitContainer InnerSplitContainer;
         private System.Windows.Forms.Panel panelFormulae;
         private System.Windows.Forms.Panel panelNames;

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.FlexDisplay1 = new Chem4Word.Controls.FlexDisplay();
+            this.FlexDisplay1 = new Chem4Word.ACME.FlexDisplay();
             this.SuspendLayout();
             // 
             // elementHost1
@@ -58,6 +58,6 @@
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Chem4Word.Controls.FlexDisplay FlexDisplay1;
+        private Chem4Word.ACME.FlexDisplay FlexDisplay1;
     }
 }

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Chem4Word.Library"
              xmlns:nav="clr-namespace:Chem4Word.Navigator"
-             xmlns:controls="clr-namespace:Chem4Word.Controls;assembly=Chem4Word.Controls"
+             xmlns:controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
              x:Name="LibraryControl" x:Class="Chem4Word.Library.LibraryItemControl"
              mc:Ignorable="d"
 
@@ -56,7 +56,7 @@
                 <Binding Path="Name" UpdateSourceTrigger="LostFocus"
                  Converter="{StaticResource NameConverter}" Mode="TwoWay">
                     <Binding.ValidationRules>
-                        <local:NameValidationRule />
+                        <!--<local:NameValidationRule />-->
                     </Binding.ValidationRules>
                 </Binding>
             </TextBox.Text>
