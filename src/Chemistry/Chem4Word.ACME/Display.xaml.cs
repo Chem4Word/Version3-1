@@ -39,6 +39,7 @@ namespace Chem4Word.ACME
             set { SetValue(BackgroundColorProperty, value); }
         }
 
+
         public static readonly DependencyProperty BackgroundColorProperty =
             DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(Display), new PropertyMetadata(null));
 
