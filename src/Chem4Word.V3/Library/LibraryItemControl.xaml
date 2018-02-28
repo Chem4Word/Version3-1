@@ -17,7 +17,7 @@
                 <ResourceDictionary Source="LibraryResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <local:DefaultNameConverter x:Key="NameConverter" />
-            <controls:DoNothingConverter x:Key="DoNothingConverter" />
+            <!--<controls:DoNothingConverter x:Key="DoNothingConverter" />-->
 
             <ControlTemplate x:Key="NameValTemplate">
                 <DockPanel>
@@ -78,7 +78,7 @@
                      BorderThickness="0" BorderBrush="Transparent" />
         </Expander>
         <nav:FormulaBlock FontSize="16" Foreground="{StaticResource WordBlueBrush}"
-                          Grid.Row="2" x:Name="FormulaBlock" Formula="{Binding Path=Formula, Converter={StaticResource DoNothingConverter}}" />
+                          Grid.Row="2" x:Name="FormulaBlock" Formula="{Binding Path=Formula}" />
         <controls:Display
             Name="Display"
                 Grid.Row="3"
