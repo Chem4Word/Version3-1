@@ -11,6 +11,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace Chem4Word.Searcher.OpsinPlugIn
 {
@@ -118,7 +119,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;
             }
-
+            display1.Background = Brushes.White;
             ImportButton.Enabled = false;
             LabelInfo.Text = "";
             AcceptButton = SearchButton;

@@ -19,6 +19,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Media;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -63,6 +64,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                     Top = (int)TopLeft.Y;
                 }
 
+                display1.Background = Brushes.White;
                 NextButton.Enabled = false;
                 PreviousButton.Enabled = false;
                 ImportButton.Enabled = false;
