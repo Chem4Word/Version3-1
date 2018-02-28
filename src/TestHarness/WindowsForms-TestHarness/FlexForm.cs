@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace WinFormsTestHarness
 {
@@ -98,6 +99,8 @@ namespace WinFormsTestHarness
                     model = mod;
                     this.Text = filename;
                     this.display1.Chemistry = model;
+                    display1.ShowCarbonLabels = true;
+                    //display1.BackgroundColor =  // ToDo: Convert BackColor;
                     EditStructure.Enabled = true;
                 }
             }

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using ChemistryModel = Chem4Word.Model.Model;
 
 namespace Chem4Word.ACME
@@ -31,6 +32,15 @@ namespace Chem4Word.ACME
         }
 
         #region Public Properties
+
+        public Color BackgroundColor
+        {
+            get { return (Color)GetValue(BackgroundColorProperty); }
+            set { SetValue(BackgroundColorProperty, value); }
+        }
+
+        public static readonly DependencyProperty BackgroundColorProperty =
+            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(Display), new PropertyMetadata(null));
 
         public bool ShowCarbonLabels
         {
