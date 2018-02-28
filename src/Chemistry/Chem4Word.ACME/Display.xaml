@@ -155,6 +155,7 @@
                         ParentAtom="{Binding Path=SelfRef}"
                         Position="{Binding Path=Position}"
                         AtomSymbol="{Binding Path=SymbolText}"
+                        BackgroundColor="{Binding ElementName=Uc, Path=BackgroundColor}"
                         ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                         <viewModel:AtomShape.Style>
                             <Style TargetType="{x:Type viewModel:AtomShape}">
@@ -163,9 +164,7 @@
                                         <SolidColorBrush Color="{Binding Element.Colour}" />
                                     </Setter.Value>
                                 </Setter>
-                                <Setter Property="Mask" Value="{Binding ElementName=ACMEDisplay, Path=Background}">
-                                    
-                                </Setter>
+
                                 <debug:Setter Property="ToolTip">
                                     <debug:Setter.Value>
                                         <StackPanel>

@@ -508,6 +508,15 @@ namespace Chem4Word.View
 
         #endregion Atom DPs
 
+        public Color BackgroundColor
+        {
+            get { return (Color)GetValue(BackgroundColorProperty); }
+            set { SetValue(BackgroundColorProperty, value); }
+        }
+
+        public static readonly DependencyProperty BackgroundColorProperty =
+            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(AtomShape), new PropertyMetadata(null));
+
         #region Charge DP
 
         public int? Charge

@@ -161,6 +161,7 @@ namespace Chem4Word.ACME
 
                     Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
+                    Debug.Write(BackgroundColor.ToString());
                     if (ShowCarbonLabels)
                     {
                         foreach (var atom in chemistryModel.AllAtoms)
