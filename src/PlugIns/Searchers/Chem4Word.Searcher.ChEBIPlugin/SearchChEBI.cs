@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace Chem4Word.Searcher.ChEBIPlugin
 {
@@ -303,7 +304,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;
                 }
-
+                display1.Background = Brushes.White;
                 ResultsListView.Enabled = false;
                 ResultsListView.Items.Clear();
 

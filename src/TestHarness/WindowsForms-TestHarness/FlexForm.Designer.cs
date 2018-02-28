@@ -68,6 +68,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.elementHost1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.elementHost1.BackColorTransparent = true;
             this.elementHost1.Location = new System.Drawing.Point(12, 12);
             this.elementHost1.Name = "elementHost1";
             this.elementHost1.Size = new System.Drawing.Size(520, 300);
@@ -85,6 +86,7 @@
             this.Controls.Add(this.LoadStructure);
             this.Name = "FlexForm";
             this.Text = "Flexible Display";
+            this.Load += new System.EventHandler(this.FlexForm_Load);
             this.ResumeLayout(false);
 
         }

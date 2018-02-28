@@ -118,21 +118,19 @@
             </Button>
         </Grid>
         <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch">
-        <ItemsControl
+        <ListBox
             x:Name="GalleryList"
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
             VirtualizingStackPanel.IsVirtualizing="True"
             ScrollViewer.CanContentScroll="True"
             HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-            VerticalAlignment="Stretch">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+            VerticalAlignment="Stretch"
+            Background="{x:Static SystemColors.WindowBrush}"
+            >
+            
 
-                <ItemsControl.ItemTemplate>
+            <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border
                         BorderBrush="{StaticResource WordBlueBrush}"
@@ -143,12 +141,26 @@
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
                             DataContext="{Binding Mode=OneWay}"
-                            x:Name="GalleryItemControl" />
+                            x:Name="GalleryItemControl"
+                            
+                            >
+                            <local:LibraryItemControl.Style>
+                                <Style TargetType="{x:Type local:LibraryItemControl}">
+                                    
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}" Value="true">
+                                                <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=Background}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </local:LibraryItemControl.Style>
+
+                            </local:LibraryItemControl>
                     </Border>
                 </DataTemplate>
-            </ItemsControl.ItemTemplate>
+            </ListBox.ItemTemplate>
            
-        </ItemsControl>
+        </ListBox>
         </ScrollViewer>
     </Grid>
 </UserControl>

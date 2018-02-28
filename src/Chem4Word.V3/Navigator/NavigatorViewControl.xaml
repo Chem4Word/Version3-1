@@ -11,6 +11,7 @@
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d"
+    Background="{x:Static SystemColors.WindowBrush}"
     x:Name="NavViewControl">
     <UserControl.Resources>
         <SolidColorBrush x:Key="BlueBrush">

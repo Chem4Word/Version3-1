@@ -16,7 +16,7 @@
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
     xmlns:viewModel="clr-namespace:Chem4Word.View;assembly=Chem4Word.ViewModel"
-    x:Name="Uc">
+    x:Name="ACMEDisplay">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />
     </UserControl.Resources>
@@ -155,7 +155,6 @@
                         ParentAtom="{Binding Path=SelfRef}"
                         Position="{Binding Path=Position}"
                         AtomSymbol="{Binding Path=SymbolText}"
-                        BackgroundColor="{Binding ElementName=Uc, Path=BackgroundColor}"
                         ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                         <viewModel:AtomShape.Style>
                             <Style TargetType="{x:Type viewModel:AtomShape}">
