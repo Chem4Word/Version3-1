@@ -6,8 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Chem4Word.Navigator"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:library="clr-namespace:Chem4Word.Library"
     d:DesignWidth="300"
     mc:Ignorable="d"
+    Background="{Binding RelativeSource={RelativeSource AncestorType=local:NavigatorView}, Path=Background}"
     x:Name="NavItemControl" Loaded="NavItemControl_Loaded">
 
     <UserControl.Resources>
@@ -43,7 +45,9 @@
                 Height="150"
                 Margin="8"
                 HorizontalAlignment="Stretch"
-                Chemistry="{Binding Path=ChemicalStructure}"/>
+                Chemistry="{Binding Path=ChemicalStructure}"
+            Background="{Binding ElementName=NavItemControl, Path=Background}"
+            />
         <StackPanel
                 Grid.Row="2"
                 HorizontalAlignment="Stretch"

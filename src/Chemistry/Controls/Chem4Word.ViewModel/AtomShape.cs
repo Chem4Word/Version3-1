@@ -297,9 +297,9 @@ namespace Chem4Word.View
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
         {
             // This is where the chuffing White Background comes from
-            Brush backgroundMask = SystemColors.WindowBrush;
-            drawingContext.DrawGeometry(backgroundMask,
-                new Pen(backgroundMask, MaskOffsetWidth),
+            
+            drawingContext.DrawGeometry(Mask,
+                new Pen(Mask, MaskOffsetWidth),
                 BasicGeometry.BuildPath(_shapeHull).Data);
         }
 
@@ -491,6 +491,20 @@ namespace Chem4Word.View
         // Using a DependencyProperty as the backing store for ParentAtom.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ParentAtomProperty =
             DependencyProperty.Register("ParentAtom", typeof(Atom), typeof(AtomShape), new PropertyMetadata(null));
+
+
+
+        public Brush Mask
+        {
+            get { return (Brush)GetValue(MaskProperty); }
+            set { SetValue(MaskProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Mask.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MaskProperty =
+            DependencyProperty.Register("Mask", typeof(Brush), typeof(AtomShape), new FrameworkPropertyMetadata(SystemColors.WindowBrush, FrameworkPropertyMetadataOptions.AffectsRender));
+
+
 
         #endregion Atom DPs
 

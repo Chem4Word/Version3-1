@@ -103,7 +103,7 @@ namespace Chem4Word.View
             }
         }
 
-        private List<Point> _flattenedPath = null;
+
         public List<Point> FlattenedPath
         {
             get

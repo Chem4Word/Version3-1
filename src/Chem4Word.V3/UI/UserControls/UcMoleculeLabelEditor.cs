@@ -15,6 +15,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Windows.Media;
 
 namespace Chem4Word.UI.UserControls
 {
@@ -180,6 +181,7 @@ namespace Chem4Word.UI.UserControls
         private void UcMoleculeLabelEditor_Load(object sender, EventArgs e)
         {
             // Do Nothing
+            display1.Background = System.Windows.Media.Brushes.White;
         }
 
         private void OnAddNameClick(object sender, EventArgs e)
@@ -220,6 +222,11 @@ namespace Chem4Word.UI.UserControls
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
             }
+        }
+
+        private void elementHost1_ChildChanged(object sender, System.Windows.Forms.Integration.ChildChangedEventArgs e)
+        {
+
         }
     }
 }

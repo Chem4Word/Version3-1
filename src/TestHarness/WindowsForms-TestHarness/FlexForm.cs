@@ -9,6 +9,7 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -100,7 +101,7 @@ namespace WinFormsTestHarness
                     this.Text = filename;
                     this.display1.Chemistry = model;
                     display1.ShowCarbonLabels = true;
-                    //display1.BackgroundColor =  // ToDo: Convert BackColor;
+                    display1.Background = new SolidColorBrush(System.Windows.Media.Colors.Gray);
                     EditStructure.Enabled = true;
                 }
             }
@@ -119,6 +120,11 @@ namespace WinFormsTestHarness
                     ShowChemistry("Edited", m);
                 }
             }
+        }
+
+        private void FlexForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

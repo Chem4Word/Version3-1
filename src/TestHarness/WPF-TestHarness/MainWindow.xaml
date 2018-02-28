@@ -29,13 +29,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="2" />
 
-        <Controls:Display
-            x:Name="Display1"
-            Grid.Row="1"
-            Grid.Column="0"
-            BorderBrush="Black"
-            BorderThickness="3"
-            Chemistry="{Binding ElementName=SelectStructureCombo, Path=SelectedValue.Tag}" />
+        <Controls:Display x:Name="Display1" Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="3" Chemistry="{Binding ElementName=SelectStructureCombo, Path=SelectedValue.Tag}" />
 
         <StackPanel Grid.Row="1" Grid.Column="1">
             <TextBlock Name="MolBlock">

@@ -33,15 +33,21 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-        public Color BackgroundColor
+
+
+
+        public Brush Mask
         {
-            get { return (Color)GetValue(BackgroundColorProperty); }
-            set { SetValue(BackgroundColorProperty, value); }
+            get { return (Brush)GetValue(MaskProperty); }
+            set { SetValue(MaskProperty, value); }
         }
 
+        // Using a DependencyProperty as the backing store for Mask.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MaskProperty =
+            DependencyProperty.Register("Mask", typeof(Brush), typeof(Display), new FrameworkPropertyMetadata((Brush)BackgroundProperty.DefaultMetadata.DefaultValue,
+                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
+                    FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-        public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(Display), new PropertyMetadata(null));
 
         public bool ShowCarbonLabels
         {
@@ -51,7 +57,9 @@ namespace Chem4Word.ACME
 
         public static readonly DependencyProperty ShowCarbonLabelsProperty
             = DependencyProperty.Register("ShowCarbonLabels", typeof(bool), typeof(Display),
-                new PropertyMetadata(default(bool)));
+                new FrameworkPropertyMetadata(false,
+                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
+                    FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         #region Chemistry (DependencyProperty)
 
@@ -90,7 +98,9 @@ namespace Chem4Word.ACME
         }
 
         public static readonly DependencyProperty ChemistryWidthProperty = DependencyProperty.Register(
-            "ChemistryWidth", typeof(double), typeof(Display), new PropertyMetadata(default(double)));
+            "ChemistryWidth", typeof(double), typeof(Display), new FrameworkPropertyMetadata(default(double),
+                FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
+                FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         #endregion ChemistryWidth (DependencyProperty)
 
@@ -103,7 +113,9 @@ namespace Chem4Word.ACME
         }
 
         public static readonly DependencyProperty ChemistryHeightProperty = DependencyProperty.Register(
-            "ChemistryHeight", typeof(double), typeof(Display), new PropertyMetadata(default(double)));
+            "ChemistryHeight", typeof(double), typeof(Display), new FrameworkPropertyMetadata(default(double),
+                FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
+                FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         #endregion ChemistryHeight (DependencyProperty)
 
