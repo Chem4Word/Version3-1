@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME;
 using Chem4Word.Controls;
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
@@ -24,7 +25,7 @@ namespace Chem4Word.Navigator
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
 
-        public static void InsertChemistry(bool isCopy, Application app, FlexDisplay flexDisplay)
+        public static void InsertChemistry(bool isCopy, Application app, Display display)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -66,7 +67,7 @@ namespace Chem4Word.Navigator
                 try
                 {
                     CMLConverter cmlConverter = new CMLConverter();
-                    Model.Model chem = cmlConverter.Import(flexDisplay.Chemistry);
+                    Model.Model chem = cmlConverter.Import(display.Chemistry);
                     double before = chem.MeanBondLength;
                     if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                         || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)

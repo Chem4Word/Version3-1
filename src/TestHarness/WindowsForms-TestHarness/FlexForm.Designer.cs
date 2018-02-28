@@ -32,7 +32,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.EditStructure = new System.Windows.Forms.Button();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.flexDisplayControl1 = new Chem4Word.Controls.FlexDisplay();
+            this.display1 = new Chem4Word.ACME.Display();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -67,13 +67,13 @@
             this.elementHost1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.elementHost1.BackColor = System.Drawing.Color.White;
+            this.elementHost1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.elementHost1.Location = new System.Drawing.Point(12, 12);
             this.elementHost1.Name = "elementHost1";
             this.elementHost1.Size = new System.Drawing.Size(520, 300);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.flexDisplayControl1;
+            this.elementHost1.Child = this.display1;
             // 
             // FlexForm
             // 
@@ -94,8 +94,8 @@
         private System.Windows.Forms.Button LoadStructure;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Chem4Word.Controls.FlexDisplay flexDisplayControl1;
         private System.Windows.Forms.Button EditStructure;
+        private Chem4Word.ACME.Display display1;
     }
 }
 

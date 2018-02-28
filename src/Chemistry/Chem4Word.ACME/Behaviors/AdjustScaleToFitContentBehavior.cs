@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 
-namespace Chem4Word.Controls.Behaviors
+namespace Chem4Word.ACME.Behaviors
 {
     public class AdjustScaleToFitContentBehavior : Behavior<FrameworkElement>
     {

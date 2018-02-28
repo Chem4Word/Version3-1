@@ -389,7 +389,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                                 lastMolfile = new StreamReader(resStream).ReadToEnd();
                                 SdFileConverter sdFileConverter = new SdFileConverter();
                                 Model.Model model = sdFileConverter.Import(lastMolfile);
-                                this.flexDisplayControl1.Chemistry = model;
+                                this.display1.Chemistry = model;
                                 if (model.AllWarnings.Count > 0 || model.AllErrors.Count > 0)
                                 {
                                     Telemetry.Write(module, "Exception(Data)", lastMolfile);

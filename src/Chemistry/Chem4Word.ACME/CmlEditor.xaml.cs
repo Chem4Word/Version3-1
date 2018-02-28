@@ -11,20 +11,20 @@ using System.Windows.Controls;
 namespace Chem4Word.ACME
 {
     /// <summary>
-    /// Interaction logic for Editor.xaml
+    /// Interaction logic for CmlEditor.xaml
     /// </summary>
-    public partial class Editor : UserControl
+    public partial class CmlEditor : UserControl
     {
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
         public event EventHandler OnOkButtonClick;
 
-        public Editor()
+        public CmlEditor()
         {
             InitializeComponent();
         }
 
-        public Editor(string cml)
+        public CmlEditor(string cml)
         {
             InitializeComponent();
             cmlText.Text = cml;

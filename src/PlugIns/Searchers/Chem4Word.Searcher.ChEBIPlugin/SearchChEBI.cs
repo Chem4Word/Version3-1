@@ -54,7 +54,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
         private void EnableImport()
         {
             bool state = ResultsListView.SelectedItems.Count > 0
-                         && flexDisplayControl1.Chemistry != null
+                         && display1.Chemistry != null
                          && string.IsNullOrEmpty(ErrorsAndWarnings.Text);
             ImportButton.Enabled = state;
             if (ShowMolfile.Visible)
@@ -69,7 +69,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
             ErrorsAndWarnings.Text = "";
             using (new WaitCursor())
             {
-                flexDisplayControl1.Chemistry = null;
+                display1.Chemistry = null;
                 if (!string.IsNullOrEmpty(SearchFor.Text))
                 {
                     ChebiWebServiceService ws = new ChebiWebServiceService();
@@ -170,7 +170,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
             {
                 CMLConverter conv = new CMLConverter();
 
-                var expModel = (Model.Model)flexDisplayControl1.Chemistry;
+                var expModel = (Model.Model)display1.Chemistry;
                 double before = expModel.MeanBondLength;
                 expModel.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
                 double after = expModel.MeanBondLength;
@@ -234,7 +234,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     if (itemUnderCursor != null)
                     {
                         UpdateDisplay();
-                        if (flexDisplayControl1.Chemistry != null)
+                        if (display1.Chemistry != null)
                         {
                             ResultsListView.SelectedItems.Clear();
                             itemUnderCursor.Selected = true;
@@ -361,11 +361,11 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                         ErrorsAndWarnings.Text = string.Join(Environment.NewLine, lines);
                     }
                     ChebiId = le.chebiId;
-                    flexDisplayControl1.Chemistry = _lastModel;
+                    display1.Chemistry = _lastModel;
                 }
                 else
                 {
-                    flexDisplayControl1.Chemistry = null;
+                    display1.Chemistry = null;
                     ErrorsAndWarnings.Text = "No structure available.";
                 }
 
