@@ -97,10 +97,10 @@ namespace WinFormsTestHarness
                 else
                 {
                     model = mod;
-                    this.Text = filename;
-                    this.display1.Chemistry = model;
-                    display1.ShowCarbonLabels = true;
-                    //display1.BackgroundColor =  // ToDo: Convert BackColor;
+                    Text = filename;
+                    //display1.ShowCarbonLabels = true;
+                    display1.BackgroundColor = Color.FromArgb(elementHost1.BackColor.A, elementHost1.BackColor.R, elementHost1.BackColor.G, elementHost1.BackColor.B);
+                    display1.Chemistry = model;
                     EditStructure.Enabled = true;
                 }
             }
