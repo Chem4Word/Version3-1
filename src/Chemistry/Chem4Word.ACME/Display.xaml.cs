@@ -33,21 +33,15 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-
-
-
-        public Brush Mask
+        public Color BackgroundColor
         {
-            get { return (Brush)GetValue(MaskProperty); }
-            set { SetValue(MaskProperty, value); }
+            get { return (Color)GetValue(BackgroundColorProperty); }
+            set { SetValue(BackgroundColorProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Mask.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MaskProperty =
-            DependencyProperty.Register("Mask", typeof(Brush), typeof(Display), new FrameworkPropertyMetadata((Brush)BackgroundProperty.DefaultMetadata.DefaultValue,
-                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                    FrameworkPropertyMetadataOptions.AffectsMeasure));
 
+        public static readonly DependencyProperty BackgroundColorProperty =
+            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(Display), new PropertyMetadata(null));
 
         public bool ShowCarbonLabels
         {
@@ -57,9 +51,7 @@ namespace Chem4Word.ACME
 
         public static readonly DependencyProperty ShowCarbonLabelsProperty
             = DependencyProperty.Register("ShowCarbonLabels", typeof(bool), typeof(Display),
-                new FrameworkPropertyMetadata(false,
-                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                    FrameworkPropertyMetadataOptions.AffectsMeasure));
+                new PropertyMetadata(default(bool)));
 
         #region Chemistry (DependencyProperty)
 
@@ -161,6 +153,7 @@ namespace Chem4Word.ACME
 
                     Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
+                    Debug.Write(BackgroundColor.ToString());
                     if (ShowCarbonLabels)
                     {
                         foreach (var atom in chemistryModel.AllAtoms)

@@ -9,7 +9,6 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -98,11 +97,17 @@ namespace WinFormsTestHarness
                 else
                 {
                     model = mod;
-                    this.Text = filename;
-                    this.display1.Chemistry = model;
+                    Text = filename;
                     display1.ShowCarbonLabels = true;
-                    display1.Background = new SolidColorBrush(System.Windows.Media.Colors.Gray);
-                    display1.Mask = new SolidColorBrush(System.Windows.Media.Color.FromArgb(elementHost1.BackColor.A, elementHost1.BackColor.R, elementHost1.BackColor.G, elementHost1.BackColor.B));
+
+                    // PickUp elementHost's BackGround Colour
+                    display1.BackgroundColor = Color.FromArgb(elementHost1.BackColor.A, elementHost1.BackColor.R, elementHost1.BackColor.G, elementHost1.BackColor.B);
+
+                    // Specify a colour
+                    //display1.BackgroundColor = System.Windows.Media.Colors.Beige;
+                    //elementHost1.BackColor = System.Drawing.Color.Beige;
+
+                    display1.Chemistry = model;
                     EditStructure.Enabled = true;
                 }
             }
@@ -121,11 +126,6 @@ namespace WinFormsTestHarness
                     ShowChemistry("Edited", m);
                 }
             }
-        }
-
-        private void FlexForm_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

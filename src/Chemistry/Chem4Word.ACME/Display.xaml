@@ -155,6 +155,7 @@
                         ParentAtom="{Binding Path=SelfRef}"
                         Position="{Binding Path=Position}"
                         AtomSymbol="{Binding Path=SymbolText}"
+                        BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
                         ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                         <viewModel:AtomShape.Style>
                             <Style TargetType="{x:Type viewModel:AtomShape}">
