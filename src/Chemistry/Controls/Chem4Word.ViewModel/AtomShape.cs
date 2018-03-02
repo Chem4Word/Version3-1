@@ -299,18 +299,24 @@ namespace Chem4Word.View
             // This is where the chuffing White Background comes from
             //Brush backgroundMask = SystemColors.WindowBrush;
 
-            Brush backgroundMask;
-            if (BackgroundColor.ToString().Equals("#00000000"))
+            //Brush backgroundMask;
+            //if (BackgroundColor.ToString().Equals("#00000000"))
+            //{
+            //    backgroundMask = SystemColors.WindowBrush;
+            //}
+            //else
+            //{
+            //    //backgroundMask = new SolidColorBrush(BackgroundColor);
+            //    backgroundMask = BackgroundColor;
+            //}
+
+            if (BackgroundColor == null)
             {
-                backgroundMask = SystemColors.WindowBrush;
-            }
-            else
-            {
-                backgroundMask = new SolidColorBrush(BackgroundColor);
+                BackgroundColor = SystemColors.WindowBrush;
             }
 
-            drawingContext.DrawGeometry(backgroundMask,
-                new Pen(backgroundMask, MaskOffsetWidth),
+            drawingContext.DrawGeometry(BackgroundColor,
+                new Pen(BackgroundColor, MaskOffsetWidth),
                 BasicGeometry.BuildPath(_shapeHull).Data);
         }
 
@@ -505,14 +511,17 @@ namespace Chem4Word.View
 
         #endregion Atom DPs
 
-        public Color BackgroundColor
+        public Brush BackgroundColor
         {
-            get { return (Color)GetValue(BackgroundColorProperty); }
+            get { return (Brush)GetValue(BackgroundColorProperty); }
             set { SetValue(BackgroundColorProperty, value); }
         }
 
         public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(AtomShape), new PropertyMetadata(null));
+            DependencyProperty.Register("BackgroundColor",
+                typeof(Brush),
+                typeof(AtomShape),
+                new PropertyMetadata(SystemColors.WindowBrush));
 
         #region Charge DP
 

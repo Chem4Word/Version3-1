@@ -100,17 +100,23 @@ namespace WinFormsTestHarness
                     Text = filename;
                     display1.ShowCarbonLabels = true;
 
-                    // PickUp elementHost's BackGround Colour
-                    display1.BackgroundColor = Color.FromArgb(elementHost1.BackColor.A, elementHost1.BackColor.R, elementHost1.BackColor.G, elementHost1.BackColor.B);
-
                     // Specify a colour
-                    //display1.BackgroundColor = System.Windows.Media.Colors.Beige;
-                    //elementHost1.BackColor = System.Drawing.Color.Beige;
+                    elementHost1.BackColor = System.Drawing.Color.Green;
+
+                    // Send elementHost's BackGround Colour to ACME.Display
+                    display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
 
                     display1.Chemistry = model;
                     EditStructure.Enabled = true;
                 }
             }
+        }
+
+        private Brush ColorToBrush(System.Drawing.Color colour)
+        {
+            string hex = $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";
+            var converter = new BrushConverter();
+            return (Brush)converter.ConvertFromString(hex);
         }
 
         private void EditStructure_Click(object sender, EventArgs e)

@@ -33,15 +33,15 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-        public Color BackgroundColor
+        public Brush BackgroundColor
         {
-            get { return (Color)GetValue(BackgroundColorProperty); }
+            get { return (Brush)GetValue(BackgroundColorProperty); }
             set { SetValue(BackgroundColorProperty, value); }
         }
 
 
         public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(Display), new PropertyMetadata(null));
+            DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display), new PropertyMetadata(null));
 
         public bool ShowCarbonLabels
         {
@@ -153,7 +153,6 @@ namespace Chem4Word.ACME
 
                     Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
-                    Debug.Write(BackgroundColor.ToString());
                     if (ShowCarbonLabels)
                     {
                         foreach (var atom in chemistryModel.AllAtoms)
