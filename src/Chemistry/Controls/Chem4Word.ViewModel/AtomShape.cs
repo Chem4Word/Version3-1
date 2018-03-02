@@ -296,20 +296,6 @@ namespace Chem4Word.View
         /// <param name="drawingContext"></param>
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
         {
-            // This is where the chuffing White Background comes from
-            //Brush backgroundMask = SystemColors.WindowBrush;
-
-            //Brush backgroundMask;
-            //if (BackgroundColor.ToString().Equals("#00000000"))
-            //{
-            //    backgroundMask = SystemColors.WindowBrush;
-            //}
-            //else
-            //{
-            //    //backgroundMask = new SolidColorBrush(BackgroundColor);
-            //    backgroundMask = BackgroundColor;
-            //}
-
             if (BackgroundColor == null)
             {
                 BackgroundColor = SystemColors.WindowBrush;
@@ -317,7 +303,7 @@ namespace Chem4Word.View
 
             drawingContext.DrawGeometry(BackgroundColor,
                 new Pen(BackgroundColor, MaskOffsetWidth),
-                BasicGeometry.BuildPath(_shapeHull).Data);
+                BasicGeometry.BuildPath(shapeHull).Data);
         }
 
         /// <summary>

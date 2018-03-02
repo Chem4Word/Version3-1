@@ -101,10 +101,10 @@ namespace WinFormsTestHarness
                     display1.ShowCarbonLabels = true;
 
                     // Specify a colour
-                    elementHost1.BackColor = System.Drawing.Color.Green;
+                    //elementHost1.BackColor = System.Drawing.Color.Green;
 
                     // Send elementHost's BackGround Colour to ACME.Display
-                    display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+                    //display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
 
                     display1.Chemistry = model;
                     EditStructure.Enabled = true;
