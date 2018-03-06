@@ -296,11 +296,14 @@ namespace Chem4Word.View
         /// <param name="drawingContext"></param>
         private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
         {
-            // This is where the chuffing White Background comes from
-            
-            drawingContext.DrawGeometry(Mask,
-                new Pen(Mask, MaskOffsetWidth),
-                BasicGeometry.BuildPath(_shapeHull).Data);
+            if (BackgroundColor == null)
+            {
+                BackgroundColor = SystemColors.WindowBrush;
+            }
+
+            drawingContext.DrawGeometry(BackgroundColor,
+                new Pen(BackgroundColor, MaskOffsetWidth),
+                BasicGeometry.BuildPath(shapeHull).Data);
         }
 
         /// <summary>
@@ -492,30 +495,19 @@ namespace Chem4Word.View
         public static readonly DependencyProperty ParentAtomProperty =
             DependencyProperty.Register("ParentAtom", typeof(Atom), typeof(AtomShape), new PropertyMetadata(null));
 
-
-
-        public Brush Mask
-        {
-            get { return (Brush)GetValue(MaskProperty); }
-            set { SetValue(MaskProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Mask.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MaskProperty =
-            DependencyProperty.Register("Mask", typeof(Brush), typeof(AtomShape), new FrameworkPropertyMetadata(SystemColors.WindowBrush, FrameworkPropertyMetadataOptions.AffectsRender));
-
-
-
         #endregion Atom DPs
 
-        public Color BackgroundColor
+        public Brush BackgroundColor
         {
-            get { return (Color)GetValue(BackgroundColorProperty); }
+            get { return (Brush)GetValue(BackgroundColorProperty); }
             set { SetValue(BackgroundColorProperty, value); }
         }
 
         public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor", typeof(Color), typeof(AtomShape), new PropertyMetadata(null));
+            DependencyProperty.Register("BackgroundColor",
+                typeof(Brush),
+                typeof(AtomShape),
+                new FrameworkPropertyMetadata(SystemColors.WindowBrush, FrameworkPropertyMetadataOptions.AffectsRender));
 
         #region Charge DP
 

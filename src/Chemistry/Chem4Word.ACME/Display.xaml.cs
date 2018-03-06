@@ -33,33 +33,16 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-
-
-
-        public Brush Mask
+        public Brush BackgroundColor
         {
-            get { return (Brush)GetValue(MaskProperty); }
-            set { SetValue(MaskProperty, value); }
+            get { return (Brush)GetValue(BackgroundColorProperty); }
+            set { SetValue(BackgroundColorProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Mask.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MaskProperty =
-            DependencyProperty.Register("Mask", typeof(Brush), typeof(Display), new FrameworkPropertyMetadata((Brush)BackgroundProperty.DefaultMetadata.DefaultValue,
-                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                    FrameworkPropertyMetadataOptions.AffectsMeasure));
-
-
-        public bool ShowCarbonLabels
-        {
-            get { return (bool)GetValue(ShowCarbonLabelsProperty); }
-            set { SetValue(ShowCarbonLabelsProperty, value); }
-        }
-
-        public static readonly DependencyProperty ShowCarbonLabelsProperty
-            = DependencyProperty.Register("ShowCarbonLabels", typeof(bool), typeof(Display),
-                new FrameworkPropertyMetadata(false,
-                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                    FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public static readonly DependencyProperty BackgroundColorProperty =
+            DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display),
+                new FrameworkPropertyMetadata(SystemColors.WindowBrush,
+                    FrameworkPropertyMetadataOptions.AffectsRender));
 
         #region Chemistry (DependencyProperty)
 
@@ -161,16 +144,6 @@ namespace Chem4Word.ACME
 
                     Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
-                    if (ShowCarbonLabels)
-                    {
-                        foreach (var atom in chemistryModel.AllAtoms)
-                        {
-                            if (atom.Element.Equals(Globals.PeriodicTable.C))
-                            {
-                                atom.ShowSymbol = true;
-                            }
-                        }
-                    }
                     Placeholder.DataContext = chemistryModel;
                 }
                 else

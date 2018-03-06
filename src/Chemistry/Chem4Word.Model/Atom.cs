@@ -164,11 +164,6 @@ namespace Chem4Word.Model
             }
         }
 
-        public bool ShowHydrogens
-        {
-            get; set;
-        }
-
         /// <summary>
         /// Do we show the symbol block? Only toggle for Carbon
         /// </summary>
