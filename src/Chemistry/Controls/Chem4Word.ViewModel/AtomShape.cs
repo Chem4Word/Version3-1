@@ -507,7 +507,7 @@ namespace Chem4Word.View
             DependencyProperty.Register("BackgroundColor",
                 typeof(Brush),
                 typeof(AtomShape),
-                new PropertyMetadata(SystemColors.WindowBrush));
+                new FrameworkPropertyMetadata(SystemColors.WindowBrush, FrameworkPropertyMetadataOptions.AffectsRender));
 
         #region Charge DP
 

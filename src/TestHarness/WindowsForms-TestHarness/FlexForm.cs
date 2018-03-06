@@ -73,6 +73,31 @@ namespace WinFormsTestHarness
             }
         }
 
+        private void ChangeBackground_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = colorDialog1.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                elementHost1.BackColor = colorDialog1.Color;
+                display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+            }
+        }
+
+        private void EditStructure_Click(object sender, EventArgs e)
+        {
+            if (model != null)
+            {
+                CMLConverter cc = new CMLConverter();
+                EditorHost editorHost = new EditorHost(cc.Export(model));
+                editorHost.ShowDialog();
+                if (editorHost.Result == DialogResult.OK)
+                {
+                    Model m = cc.Import(editorHost.OutputValue);
+                    ShowChemistry("Edited", m);
+                }
+            }
+        }
+
         private void ShowChemistry(string filename, Model mod)
         {
             if (mod != null)
@@ -97,15 +122,11 @@ namespace WinFormsTestHarness
                 else
                 {
                     model = mod;
-                    Text = filename;
-                    display1.ShowCarbonLabels = true;
-
-                    // Specify a colour
-                    //elementHost1.BackColor = System.Drawing.Color.Green;
-
-                    // Send elementHost's BackGround Colour to ACME.Display
-                    //display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
-
+                    if (!string.IsNullOrEmpty(filename))
+                    {
+                        Text = filename;
+                    }
+                    display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;
                     EditStructure.Enabled = true;
                 }
@@ -117,21 +138,6 @@ namespace WinFormsTestHarness
             string hex = $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";
             var converter = new BrushConverter();
             return (Brush)converter.ConvertFromString(hex);
-        }
-
-        private void EditStructure_Click(object sender, EventArgs e)
-        {
-            if (model != null)
-            {
-                CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(model));
-                editorHost.ShowDialog();
-                if (editorHost.Result == DialogResult.OK)
-                {
-                    Model m = cc.Import(editorHost.OutputValue);
-                    ShowChemistry("Edited", m);
-                }
-            }
         }
     }
 }

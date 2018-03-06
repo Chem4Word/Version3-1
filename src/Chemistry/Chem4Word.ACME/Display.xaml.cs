@@ -39,19 +39,10 @@ namespace Chem4Word.ACME
             set { SetValue(BackgroundColorProperty, value); }
         }
 
-
         public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display), new PropertyMetadata(null));
-
-        public bool ShowCarbonLabels
-        {
-            get { return (bool)GetValue(ShowCarbonLabelsProperty); }
-            set { SetValue(ShowCarbonLabelsProperty, value); }
-        }
-
-        public static readonly DependencyProperty ShowCarbonLabelsProperty
-            = DependencyProperty.Register("ShowCarbonLabels", typeof(bool), typeof(Display),
-                new PropertyMetadata(default(bool)));
+            DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display),
+                new FrameworkPropertyMetadata(SystemColors.WindowBrush,
+                    FrameworkPropertyMetadataOptions.AffectsRender));
 
         #region Chemistry (DependencyProperty)
 
@@ -153,16 +144,6 @@ namespace Chem4Word.ACME
 
                     Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
-                    if (ShowCarbonLabels)
-                    {
-                        foreach (var atom in chemistryModel.AllAtoms)
-                        {
-                            if (atom.Element.Equals(Globals.PeriodicTable.C))
-                            {
-                                atom.ShowSymbol = true;
-                            }
-                        }
-                    }
                     Placeholder.DataContext = chemistryModel;
                 }
                 else
