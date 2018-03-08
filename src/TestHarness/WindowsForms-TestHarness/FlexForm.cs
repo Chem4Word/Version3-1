@@ -128,7 +128,9 @@ namespace WinFormsTestHarness
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;
+                    ShowCarbons.Checked = false;
                     EditStructure.Enabled = true;
+                    ShowCarbons.Enabled = true;
                 }
             }
         }
@@ -138,6 +140,21 @@ namespace WinFormsTestHarness
             string hex = $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";
             var converter = new BrushConverter();
             return (Brush)converter.ConvertFromString(hex);
+        }
+
+        private void ShowCarbons_CheckedChanged(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                foreach (var atom in model.AllAtoms)
+                {
+                    if (atom.Element.Symbol.Equals("C"))
+                    {
+                        atom.ShowSymbol = ShowCarbons.Checked;
+                    }
+                }
+            }
         }
     }
 }

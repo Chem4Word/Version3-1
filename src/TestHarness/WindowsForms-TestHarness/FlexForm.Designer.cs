@@ -35,6 +35,7 @@
             this.display1 = new Chem4Word.ACME.Display();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.ChangeBackground = new System.Windows.Forms.Button();
+            this.ShowCarbons = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -80,7 +81,7 @@
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(110, 438);
+            this.ChangeBackground.Location = new System.Drawing.Point(118, 438);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -88,11 +89,25 @@
             this.ChangeBackground.UseVisualStyleBackColor = true;
             this.ChangeBackground.Click += new System.EventHandler(this.ChangeBackground_Click);
             // 
+            // ShowCarbons
+            // 
+            this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ShowCarbons.AutoSize = true;
+            this.ShowCarbons.Enabled = false;
+            this.ShowCarbons.Location = new System.Drawing.Point(211, 442);
+            this.ShowCarbons.Name = "ShowCarbons";
+            this.ShowCarbons.Size = new System.Drawing.Size(124, 17);
+            this.ShowCarbons.TabIndex = 4;
+            this.ShowCarbons.Text = "Show Carbon Labels";
+            this.ShowCarbons.UseVisualStyleBackColor = true;
+            this.ShowCarbons.CheckedChanged += new System.EventHandler(this.ShowCarbons_CheckedChanged);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 473);
+            this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.EditStructure);
             this.Controls.Add(this.elementHost1);
@@ -100,6 +115,7 @@
             this.Name = "FlexForm";
             this.Text = "Flexible Display";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -112,6 +128,7 @@
         private Chem4Word.ACME.Display display1;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Button ChangeBackground;
+        private System.Windows.Forms.CheckBox ShowCarbons;
     }
 }
 
