@@ -14,7 +14,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace WinFormsTestHarness
 {
@@ -166,7 +165,7 @@ namespace WinFormsTestHarness
             {
                 if (model.AllAtoms.Any())
                 {
-                    Molecule modelMolecule = model.Molecules.Where(m=>m.Atoms.Any()).FirstOrDefault();
+                    Molecule modelMolecule = model.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
                     var atom = modelMolecule.Atoms[0];
                     foreach (var neighbouringBond in atom.Bonds)
                     {
@@ -175,7 +174,6 @@ namespace WinFormsTestHarness
                     }
 
                     modelMolecule.Atoms.Remove(atom);
-               
                 }
 
                 model.RefreshMolecules();
