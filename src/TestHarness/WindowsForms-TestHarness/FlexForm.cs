@@ -165,7 +165,15 @@ namespace WinFormsTestHarness
             {
                 if (model.AllAtoms.Any())
                 {
-                    model.AllAtoms.RemoveAt(0);
+                    var modelMolecule = model.Molecules[0];
+                    var atom = modelMolecule.Atoms[0];
+                    foreach (var neighbouringBond in atom.Bonds)
+                    {
+                        neighbouringBond.OtherAtom(atom).Bonds.Remove(neighbouringBond);
+                        modelMolecule.Bonds.Remove(neighbouringBond);
+                    }
+
+                    modelMolecule.Atoms.Remove(atom);
                 }
             }
         }

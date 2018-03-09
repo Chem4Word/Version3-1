@@ -531,6 +531,8 @@ namespace Chem4Word.Model
             OnPropertyChanged("Degree");
             OnPropertyChanged("ImplicitHydrogenCount");
             OnPropertyChanged("BalancingVector");
+            OnPropertyChanged("ShowSymbol");
+            OnPropertyChanged("SymbolText");
         }
 
         private void Rings_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
