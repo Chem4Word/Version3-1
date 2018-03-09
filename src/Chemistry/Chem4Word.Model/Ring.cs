@@ -205,7 +205,7 @@ namespace Chem4Word.Model
                       select n;
             var nextatoms = adj.ToArray();
 
-            Debug.Assert(nextatoms.Count() == 2);
+            //Debug.Assert(nextatoms.Count() == 2);
 
             Vector v1 = nextatoms[0].Position - start.Position;
 

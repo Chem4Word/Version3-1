@@ -177,6 +177,8 @@ namespace WinFormsTestHarness
                     modelMolecule.Atoms.Remove(atom);
                
                 }
+
+                model.RefreshMolecules();
             }
         }
     }
