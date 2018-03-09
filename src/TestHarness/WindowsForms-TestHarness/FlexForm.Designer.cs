@@ -36,6 +36,7 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.ChangeBackground = new System.Windows.Forms.Button();
             this.ShowCarbons = new System.Windows.Forms.CheckBox();
+            this.RemoveAtom = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -102,11 +103,24 @@
             this.ShowCarbons.UseVisualStyleBackColor = true;
             this.ShowCarbons.CheckedChanged += new System.EventHandler(this.ShowCarbons_CheckedChanged);
             // 
+            // button1
+            // 
+            this.RemoveAtom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.RemoveAtom.Enabled = false;
+            this.RemoveAtom.Location = new System.Drawing.Point(381, 438);
+            this.RemoveAtom.Name = "RemoveAtom";
+            this.RemoveAtom.Size = new System.Drawing.Size(97, 23);
+            this.RemoveAtom.TabIndex = 5;
+            this.RemoveAtom.Text = "Remove Atom";
+            this.RemoveAtom.UseVisualStyleBackColor = true;
+            this.RemoveAtom.Click += new System.EventHandler(this.RemoveAtom_Click);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 473);
+            this.Controls.Add(this.RemoveAtom);
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.EditStructure);
@@ -129,6 +143,7 @@
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Button ChangeBackground;
         private System.Windows.Forms.CheckBox ShowCarbons;
+        private System.Windows.Forms.Button RemoveAtom;
     }
 }
 

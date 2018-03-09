@@ -129,8 +129,9 @@ namespace WinFormsTestHarness
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;
                     ShowCarbons.Checked = false;
-                    EditStructure.Enabled = true;
                     ShowCarbons.Enabled = true;
+                    EditStructure.Enabled = true;
+                    RemoveAtom.Enabled = true;
                 }
             }
         }
@@ -153,6 +154,18 @@ namespace WinFormsTestHarness
                     {
                         atom.ShowSymbol = ShowCarbons.Checked;
                     }
+                }
+            }
+        }
+
+        private void RemoveAtom_Click(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                if (model.AllAtoms.Any())
+                {
+                    model.AllAtoms.RemoveAt(0);
                 }
             }
         }
