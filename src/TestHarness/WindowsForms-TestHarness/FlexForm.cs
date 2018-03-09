@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace WinFormsTestHarness
 {
@@ -174,6 +175,7 @@ namespace WinFormsTestHarness
                     }
 
                     modelMolecule.Atoms.Remove(atom);
+               
                 }
             }
         }
