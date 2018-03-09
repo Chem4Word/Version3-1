@@ -165,7 +165,7 @@ namespace WinFormsTestHarness
             {
                 if (model.AllAtoms.Any())
                 {
-                    var modelMolecule = model.Molecules[0];
+                    Molecule modelMolecule = model.Molecules.Where(m=>m.Atoms.Any()).FirstOrDefault();
                     var atom = modelMolecule.Atoms[0];
                     foreach (var neighbouringBond in atom.Bonds)
                     {

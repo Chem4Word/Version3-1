@@ -533,6 +533,11 @@ namespace Chem4Word.Model
             OnPropertyChanged("BalancingVector");
             OnPropertyChanged("ShowSymbol");
             OnPropertyChanged("SymbolText");
+
+            foreach (Bond bond in Bonds.Where(b=>b.OrderValue==2))
+            {
+                bond.NotifyPlacementChanged();
+            }
         }
 
         private void Rings_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
