@@ -23,7 +23,7 @@ namespace Chem4Word.Model
     [DebuggerDisplay("Atoms: {Atoms.Count} Priority: {Priority}")]
     public class Ring : IComparer<Ring>
     {
-        //private Point? _centroid;
+        private Point? _centroid;
 
         public int Priority
         {
@@ -157,7 +157,11 @@ namespace Chem4Word.Model
         {
             get
             {
-                return Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
+                if (_centroid == null)
+                {
+                    _centroid = Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
+                }
+                return _centroid;
             }
         }
 
