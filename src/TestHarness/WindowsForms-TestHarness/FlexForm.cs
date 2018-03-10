@@ -200,25 +200,28 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
-                var rnd = new Random(DateTime.Now.Millisecond);
-
-                var maxAtoms = model.AllAtoms.Count;
-                int targetAtom = rnd.Next(0, maxAtoms);
-
-                var elements = Globals.PeriodicTable.Elements;
-                int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
-                var x = elements.Values.Where(v => v.AtomicNumber == newElement).FirstOrDefault();
-
-                if (x == null)
+                if (model.AllAtoms.Any())
                 {
-                    Debugger.Break();
+                    var rnd = new Random(DateTime.Now.Millisecond);
+
+                    var maxAtoms = model.AllAtoms.Count;
+                    int targetAtom = rnd.Next(0, maxAtoms);
+
+                    var elements = Globals.PeriodicTable.Elements;
+                    int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
+                    var x = elements.Values.Where(v => v.AtomicNumber == newElement).FirstOrDefault();
+
+                    if (x == null)
+                    {
+                        Debugger.Break();
+                    }
+                    model.AllAtoms[targetAtom].Element = x as ElementBase;
+                    if (x.Symbol.Equals("C"))
+                    {
+                        model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                    }
+                    model.RefreshMolecules();
                 }
-                model.AllAtoms[targetAtom].Element = x as ElementBase;
-                if (x.Symbol.Equals("C"))
-                {
-                    model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
-                }
-                model.RefreshMolecules();
             }
         }
     }
