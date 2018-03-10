@@ -1,0 +1,407 @@
+{
+  "Id": "bb3183b8-0f39-4f6e-8dfd-25de4fe23e5d",
+  "Version": "3.1.1",
+  "Date": "31-Jan-2018",
+  "Groups": [
+    {
+      "Symbol": "R#",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R1",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R2",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R3",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R4",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R5",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R6",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R7",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R8",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R9",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R10",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R11",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R12",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R13",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R14",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R15",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "R16",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "R",
+          "Count": 1
+        }
+      ]
+    },
+    {
+      "Symbol": "Me",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C"
+        },
+        {
+          "Element": "H",
+          "Count": 2
+        }
+      ]
+    },
+    {
+      "Symbol": "Et",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 2
+        },
+        {
+          "Element": "H",
+          "Count": 5
+        }
+      ]
+    },
+    {
+      "Symbol": "Pr",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 3
+        },
+        {
+          "Element": "H",
+          "Count": 7
+        }
+      ]
+    },
+    {
+      "Symbol": "iPr",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 3
+        },
+        {
+          "Element": "H",
+          "Count": 7
+        }
+      ]
+    },
+    {
+      "Symbol": "i-Pr",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 3
+        },
+        {
+          "Element": "H",
+          "Count": 7
+        }
+      ]
+    },
+    {
+      "Symbol": "Bu",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 4
+        },
+        {
+          "Element": "H",
+          "Count": 9
+        }
+      ]
+    },
+    {
+      "Symbol": "iBu",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 4
+        },
+        {
+          "Element": "H",
+          "Count": 9
+        }
+      ]
+    },
+    {
+      "Symbol": "i-Bu",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 4
+        },
+        {
+          "Element": "H",
+          "Count": 9
+        }
+      ]
+    },
+    {
+      "Symbol": "tBu",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 4
+        },
+        {
+          "Element": "H",
+          "Count": 9
+        }
+      ]
+    },
+    {
+      "Symbol": "t-Bu",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 4
+        },
+        {
+          "Element": "H",
+          "Count": 9
+        }
+      ]
+    },
+    {
+      "Symbol": "Ph",
+      "Flippable": false,
+      "ShowAsSymbol": true,
+      "Components": [
+        {
+          "Element": "C",
+          "Count": 6
+        },
+        {
+          "Element": "H",
+          "Count": 5
+        }
+      ]
+    },
+    {
+      "Symbol": "CH2",
+      "Flippable": false,
+      "ShowAsSymbol": false,
+      "Components": [
+        {
+          "Element": "C"
+        },
+        {
+          "Element": "H",
+          "Count": 2
+        }
+      ]
+    },
+    {
+      "Symbol": "CH2OH",
+      "Flippable": true,
+      "ShowAsSymbol": false,
+      "Components": [
+        {
+          "Group": "CH2"
+        },
+        {
+          "Element": "O"
+        },
+        {
+          "Element": "H"
+        }
+      ]
+    },
+    {
+      "Symbol": "CH2CH2OH",
+      "Flippable": true,
+      "ShowAsSymbol": false,
+      "Components": [
+        {
+          "Group": "CH2"
+        },
+        {
+          "Group": "CH2"
+        },
+        {
+          "Element": "O"
+        },
+        {
+          "Element": "H"
+        }
+      ]
+    }
+  ]
+}
