@@ -9,23 +9,26 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Chem4Word.Model
 {
     public static class FunctionalGroups
     {
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+
         /// <summary>
-        /// keys represent text as a user might type in a superatom,
+        /// ShortcutList represent text as a user might type in a superatom,
         /// actual values control how they are rendered
         /// </summary>
-        ///
-        ///
-        ///
-        ///
-
         public static Dictionary<string, FunctionalGroup> ShortcutList { get; private set; }
 
         public static bool TryParse(string desc, out FunctionalGroup fg)
@@ -42,10 +45,130 @@ namespace Chem4Word.Model
             }
         }
 
+        public static SQLiteConnection DatabaseConnection
+        {
+            get
+            {
+                // ToDo: Figure out How to get the Folder and File below :-
+                //string path = Path.Combine(Globals.Chem4WordV3.AddInInfo.ProgramDataPath, Constants.FunctionalGroupsFileName);
+                //string path = Path.Combine(@"C:\ProgramData\Chem4Word.V3", "FunctionalGroups.db");
+                string path = @"C:\Dev\vso\chem4word\Version3-1\src\Chem4Word.V3\Data\FunctionalGroups.db";
+                // Source https://www.connectionstrings.com/sqlite/
+                var conn = new SQLiteConnection($"Data Source={path};Synchronous=Full");
+                return conn.OpenAndReturn();
+            }
+        }
+
+        public static void LoadFromDatabsae()
+        {
+            ShortcutList = new Dictionary<string, FunctionalGroup>();
+
+            SQLiteDataReader names = GetAllGroupNames("Element");
+            while (names.Read())
+            {
+                string name = names["Name"] as string;
+                FunctionalGroup fg = new FunctionalGroup(name);
+                bool flippable = (bool)names["Flippable"];
+                bool showAsSymbol = (bool)names["ShowAsSymbol"];
+                fg.Flippable = flippable;
+                fg.ShowAsSymbol = showAsSymbol;
+                fg.Components = new List<Group>();
+                SQLiteDataReader components = GetGroupDetails(name);
+                while (components.Read())
+                {
+                    string compName = components["Name"].ToString();
+                    int count = int.Parse(components["Quantity"].ToString());
+                    fg.Components.Add(new Group(compName, count));
+                }
+                ShortcutList.Add(name, fg);
+                Debug.WriteLine(name);
+            }
+
+            names = GetAllGroupNames("Group");
+            while (names.Read())
+            {
+                string name = names["Name"] as string;
+                FunctionalGroup fg = new FunctionalGroup(name);
+                bool flippable = (bool)names["Flippable"];
+                bool showAsSymbol = (bool)names["ShowAsSymbol"];
+                fg.Flippable = flippable;
+                fg.ShowAsSymbol = showAsSymbol;
+                fg.Components = new List<Group>();
+                SQLiteDataReader components = GetGroupDetails(name);
+                while (components.Read())
+                {
+                    string compName = components["Name"].ToString();
+                    int count = int.Parse(components["Quantity"].ToString());
+                    fg.Components.Add(new Group(compName, count));
+                }
+                ShortcutList.Add(name, fg);
+                Debug.WriteLine(name);
+            }
+            names.Close();
+            names.Dispose();
+        }
+
+        private static SQLiteDataReader GetGroupDetails(string name)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("Select c.Type, c.Name, gc.Quantity");
+                sb.AppendLine("From Groups g");
+                sb.AppendLine("Inner Join GroupComponents gc ON gc.GroupId = g.Id");
+                sb.AppendLine("Inner Join Components c ON gc.ComponentId = c.Id");
+                // Convert to Parameterised Query later on
+                sb.AppendLine($"Where g.Name = '{name}'");
+                sb.AppendLine("Order By gc.Ordered");
+
+                SQLiteConnection conn = DatabaseConnection;
+                SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
+                return command.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Debugger.Break();
+                //new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                return null;
+            }
+        }
+
+        private static SQLiteDataReader GetAllGroupNames(string type)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("Select g.Name, Max(c.Type) AS MaxType, g.Flippable, g.ShowAsSymbol");
+                sb.AppendLine("From Groups g");
+                sb.AppendLine("Inner Join GroupComponents gc ON gc.GroupId = g.Id");
+                sb.AppendLine("Inner Join Components c ON gc.ComponentId = c.Id");
+                sb.AppendLine("Group By g.Id, g.Name");
+                // Convert to Parameterised Query later on
+                sb.AppendLine($"Having c.Type = '{type}'");
+                sb.AppendLine("Order By g.Id");
+
+                SQLiteConnection conn = DatabaseConnection;
+                SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
+                return command.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                Debugger.Break();
+                //new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                return null;
+            }
+        }
+
         public static void LoadFromFile(string fileName)
         {
-            System.IO.FileStream fs = new FileStream(fileName, FileMode.Open);
-            System.IO.StreamReader tr = new StreamReader(fs);
+            FileStream fs = new FileStream(fileName, FileMode.Open);
+            StreamReader tr = new StreamReader(fs);
             var fgJSON = tr.ReadToEnd();
 
             Load(fgJSON);

@@ -11,12 +11,19 @@ namespace Chem4WordTests
     public class FunctionalGroupTests
     {
         [TestMethod]
-       
         public void GetFunctionalGroups()
         {
             FunctionalGroup fg;
             FunctionalGroups.LoadDefaults();
             fg = FunctionalGroups.GetByName["CH3"];
+            Assert.IsNotNull(fg);
+        }
+
+        [TestMethod]
+        public void LoadFromDatabase()
+        {
+            FunctionalGroups.LoadFromDatabsae();
+            FunctionalGroup fg = FunctionalGroups.GetByName["R1"];
             Assert.IsNotNull(fg);
         }
 
@@ -51,6 +58,7 @@ namespace Chem4WordTests
             Assert.IsTrue(FunctionalGroups.GetByName.Count==2);
             GetJSONString();
         }
+
         [TestMethod]
         public void GetJSONString()
         {
