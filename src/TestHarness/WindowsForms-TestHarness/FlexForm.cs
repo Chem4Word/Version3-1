@@ -9,6 +9,7 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -127,6 +128,7 @@ namespace WinFormsTestHarness
                         Text = filename;
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+                    model.ScaleToAverageBondLength(40);
                     // -------------------------------------------------------------------------
                     // Cheat by setting Carbons, Displaying structure, then turning Carbons off.
                     // -------------------------------------------------------------------------
@@ -137,7 +139,9 @@ namespace WinFormsTestHarness
                     ShowCarbons.Checked = false;
                     ShowCarbons.Enabled = true;
                     EditStructure.Enabled = true;
+                    ShowCarbons.Enabled = true;
                     RemoveAtom.Enabled = true;
+                    RandomElement.Enabled = true;
                 }
             }
         }
@@ -187,6 +191,29 @@ namespace WinFormsTestHarness
                     modelMolecule.Atoms.Remove(atom);
                 }
 
+                model.RefreshMolecules();
+            }
+        }
+
+        private void RandomElement_Click(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                var rnd = new Random(DateTime.Now.Millisecond);
+
+                var maxAtoms = model.AllAtoms.Count;
+                int targetAtom = rnd.Next(0, maxAtoms);
+
+                var elements = Globals.PeriodicTable.Elements;
+                int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
+                var x = elements.Values.Where(v => v.AtomicNumber == newElement).FirstOrDefault();
+
+                if (x == null)
+                {
+                    Debugger.Break();
+                }
+                model.AllAtoms[targetAtom].Element = x as ElementBase;
                 model.RefreshMolecules();
             }
         }
