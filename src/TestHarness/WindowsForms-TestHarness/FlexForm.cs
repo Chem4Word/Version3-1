@@ -214,6 +214,10 @@ namespace WinFormsTestHarness
                     Debugger.Break();
                 }
                 model.AllAtoms[targetAtom].Element = x as ElementBase;
+                if (x.Symbol.Equals("C"))
+                {
+                    model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                }
                 model.RefreshMolecules();
             }
         }
