@@ -127,11 +127,24 @@ namespace WinFormsTestHarness
                         Text = filename;
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+                    SetCarbons(model, true);
                     display1.Chemistry = model;
+                    SetCarbons(model, false);
                     ShowCarbons.Checked = false;
                     ShowCarbons.Enabled = true;
                     EditStructure.Enabled = true;
                     RemoveAtom.Enabled = true;
+                }
+            }
+        }
+
+        private void SetCarbons(Model model, bool state)
+        {
+            foreach (var atom in model.AllAtoms)
+            {
+                if (atom.Element.Symbol.Equals("C"))
+                {
+                    atom.ShowSymbol = state;
                 }
             }
         }
@@ -148,13 +161,7 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
-                foreach (var atom in model.AllAtoms)
-                {
-                    if (atom.Element.Symbol.Equals("C"))
-                    {
-                        atom.ShowSymbol = ShowCarbons.Checked;
-                    }
-                }
+                SetCarbons(model, ShowCarbons.Checked);
             }
         }
 
