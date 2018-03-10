@@ -127,9 +127,13 @@ namespace WinFormsTestHarness
                         Text = filename;
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
-                    SetCarbons(model, true);
+                    // -------------------------------------------------------------------------
+                    // Cheat by setting Carbons, Displaying structure, then turning Carbons off.
+                    // -------------------------------------------------------------------------
+                    SetCarbons(model, true); // <-- Cheat
                     display1.Chemistry = model;
-                    SetCarbons(model, false);
+                    SetCarbons(model, false); // <-- Cheat
+
                     ShowCarbons.Checked = false;
                     ShowCarbons.Enabled = true;
                     EditStructure.Enabled = true;
