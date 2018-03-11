@@ -71,7 +71,14 @@ namespace Chem4Word.UI
             this.importGalleryButton = new System.Windows.Forms.Button();
             this.tabFunctionalGroups = new System.Windows.Forms.TabPage();
             this.GroupComponents = new System.Windows.Forms.DataGridView();
+            this.ComponenetType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ComponentName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ComponentCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ComponentOrder = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.FunctionalGroups = new System.Windows.Forms.DataGridView();
+            this.GroupName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GroupIsFlippable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ShowGroupAsSymbol = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tabMaintenance = new System.Windows.Forms.TabPage();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -80,13 +87,6 @@ namespace Chem4Word.UI
             this.OpenPlugInFolder = new System.Windows.Forms.Button();
             this.OpenLibraryFolder = new System.Windows.Forms.Button();
             this.OpenSettingsFolder = new System.Windows.Forms.Button();
-            this.ComponenetType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ComponentName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ComponentCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ComponentOrder = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GroupName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GroupIsFlippable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.ShowGroupAsSymbol = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.OptionsTab.SuspendLayout();
             this.tabPlugIns.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -580,6 +580,26 @@ namespace Chem4Word.UI
             this.GroupComponents.Size = new System.Drawing.Size(470, 127);
             this.GroupComponents.TabIndex = 1;
             // 
+            // ComponenetType
+            // 
+            this.ComponenetType.HeaderText = "Type";
+            this.ComponenetType.Name = "ComponenetType";
+            // 
+            // ComponentName
+            // 
+            this.ComponentName.HeaderText = "Name";
+            this.ComponentName.Name = "ComponentName";
+            // 
+            // ComponentCount
+            // 
+            this.ComponentCount.HeaderText = "Count";
+            this.ComponentCount.Name = "ComponentCount";
+            // 
+            // ComponentOrder
+            // 
+            this.ComponentOrder.HeaderText = "Order";
+            this.ComponentOrder.Name = "ComponentOrder";
+            // 
             // FunctionalGroups
             // 
             this.FunctionalGroups.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -591,6 +611,24 @@ namespace Chem4Word.UI
             this.FunctionalGroups.Name = "FunctionalGroups";
             this.FunctionalGroups.Size = new System.Drawing.Size(470, 127);
             this.FunctionalGroups.TabIndex = 0;
+            this.FunctionalGroups.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_CellClick);
+            this.FunctionalGroups.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_RowEnter);
+            // 
+            // GroupName
+            // 
+            this.GroupName.HeaderText = "Name";
+            this.GroupName.Name = "GroupName";
+            // 
+            // GroupIsFlippable
+            // 
+            this.GroupIsFlippable.HeaderText = "Flippable";
+            this.GroupIsFlippable.Name = "GroupIsFlippable";
+            // 
+            // ShowGroupAsSymbol
+            // 
+            this.ShowGroupAsSymbol.HeaderText = "Show As Symbol";
+            this.ShowGroupAsSymbol.Name = "ShowGroupAsSymbol";
+            this.ShowGroupAsSymbol.Width = 125;
             // 
             // tabMaintenance
             // 
@@ -683,42 +721,6 @@ namespace Chem4Word.UI
             this.OpenSettingsFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.OpenSettingsFolder.UseVisualStyleBackColor = true;
             this.OpenSettingsFolder.Click += new System.EventHandler(this.OnOpenSettingsFolderClick);
-            // 
-            // ComponenetType
-            // 
-            this.ComponenetType.HeaderText = "Type";
-            this.ComponenetType.Name = "ComponenetType";
-            // 
-            // ComponentName
-            // 
-            this.ComponentName.HeaderText = "Name";
-            this.ComponentName.Name = "ComponentName";
-            // 
-            // ComponentCount
-            // 
-            this.ComponentCount.HeaderText = "Count";
-            this.ComponentCount.Name = "ComponentCount";
-            // 
-            // ComponentOrder
-            // 
-            this.ComponentOrder.HeaderText = "Order";
-            this.ComponentOrder.Name = "ComponentOrder";
-            // 
-            // GroupName
-            // 
-            this.GroupName.HeaderText = "Name";
-            this.GroupName.Name = "GroupName";
-            // 
-            // GroupIsFlippable
-            // 
-            this.GroupIsFlippable.HeaderText = "Flippable";
-            this.GroupIsFlippable.Name = "GroupIsFlippable";
-            // 
-            // ShowGroupAsSymbol
-            // 
-            this.ShowGroupAsSymbol.HeaderText = "Show As Symbol";
-            this.ShowGroupAsSymbol.Name = "ShowGroupAsSymbol";
-            this.ShowGroupAsSymbol.Width = 125;
             // 
             // Settings
             // 

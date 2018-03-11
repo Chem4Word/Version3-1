@@ -659,16 +659,55 @@ namespace Chem4Word.UI
                 {
                     if (!_functionalGroupsIsDirty)
                     {
+                        FunctionalGroups.Rows.Clear();
                         Model.Model m = new Model.Model();
                         Model.FunctionalGroups.LoadFromDatabsae();
                         foreach (var fg in Model.FunctionalGroups.ShortcutList)
                         {
                             var g = fg.Value;
                             // Add to data grid
+                            FunctionalGroups.Rows.Add(g.Symbol, g.Flippable, g.ShowAsSymbol);
                         }
+
+                        ShowComponents(Model.FunctionalGroups.ShortcutList.FirstOrDefault().Value);
                     }
                 }
             }
+        }
+
+        private void ShowComponents(Model.FunctionalGroup group)
+        {
+            int i = 1;
+            foreach (var c in group.Components)
+            {
+                var type = Model.FunctionalGroups.NameParser.IsMatch(c.Component) ? "Element" : "Group";
+                GroupComponents.Rows.Add(type, c.Component, c.Count, i++.ToString());
+            }
+        }
+
+        private void ShowCurrentComponents(DataGridViewCellEventArgs e)
+        {
+            var selected = FunctionalGroups.Rows[e.RowIndex];
+            GroupComponents.Rows.Clear();
+            var cellValue = selected.Cells[0].Value;
+            if (cellValue != null)
+            {
+                Model.FunctionalGroup g = Model.FunctionalGroups.ShortcutList[cellValue.ToString()];
+                if (g != null)
+                {
+                    ShowComponents(g);
+                }
+            }
+        }
+
+        private void FunctionalGroups_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            ShowCurrentComponents(e);
+        }
+
+        private void FunctionalGroups_RowEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            ShowCurrentComponents(e);
         }
     }
 
