@@ -20,6 +20,7 @@ namespace Chem4WordTests
         }
 
         // Only run test when in Debug build
+        //  VSTS build will break if we try to do this
 #if DEBUG
         [TestMethod]
 #endif

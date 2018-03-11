@@ -68,7 +68,7 @@ namespace Chem4Word.Model
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>();
 
-            SQLiteDataReader names = GetAllGroupNames("Element");
+            SQLiteDataReader names = GetAllGroups();
             while (names.Read())
             {
                 string fgName = names["Name"] as string;
@@ -78,6 +78,7 @@ namespace Chem4Word.Model
                 fg.Flippable = flippable;
                 fg.ShowAsSymbol = showAsSymbol;
                 fg.Components = new List<Group>();
+
                 SQLiteDataReader components = GetGroupDetails(fgName);
                 while (components.Read())
                 {
@@ -85,30 +86,13 @@ namespace Chem4Word.Model
                     int count = int.Parse(components["Count"].ToString());
                     fg.Components.Add(new Group(compName, count));
                 }
+                components.Close();
+                components.Dispose();
+
                 ShortcutList.Add(fgName, fg);
                 Debug.WriteLine(fgName);
             }
 
-            names = GetAllGroupNames("Group");
-            while (names.Read())
-            {
-                string fgName = names["Name"] as string;
-                FunctionalGroup fg = new FunctionalGroup(fgName);
-                bool flippable = (bool)names["Flippable"];
-                bool showAsSymbol = (bool)names["ShowAsSymbol"];
-                fg.Flippable = flippable;
-                fg.ShowAsSymbol = showAsSymbol;
-                fg.Components = new List<Group>();
-                SQLiteDataReader components = GetGroupDetails(fgName);
-                while (components.Read())
-                {
-                    string compName = components["Name"].ToString();
-                    int count = int.Parse(components["Count"].ToString());
-                    fg.Components.Add(new Group(compName, count));
-                }
-                ShortcutList.Add(fgName, fg);
-                Debug.WriteLine(fgName);
-            }
             names.Close();
             names.Dispose();
         }
@@ -141,7 +125,7 @@ namespace Chem4Word.Model
             }
         }
 
-        private static SQLiteDataReader GetAllGroupNames(string type)
+        private static SQLiteDataReader GetAllGroups()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -153,9 +137,7 @@ namespace Chem4Word.Model
                 sb.AppendLine("Inner Join GroupComponents gc ON gc.GroupId = g.Id");
                 sb.AppendLine("Inner Join Components c ON gc.ComponentId = c.Id");
                 sb.AppendLine("Group By g.Id, g.Name");
-                // Convert to Parameterised Query later on
-                sb.AppendLine($"Having c.Type = '{type}'");
-                sb.AppendLine("Order By g.Id");
+                sb.AppendLine("Order By Max(c.Type),g.Id");
 
                 SQLiteConnection conn = DatabaseConnection;
                 SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
