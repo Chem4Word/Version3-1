@@ -19,7 +19,10 @@ namespace Chem4WordTests
             Assert.IsNotNull(fg);
         }
 
+        // Only run test when in Debug build
+#if DEBUG
         [TestMethod]
+#endif
         public void LoadFromDatabase()
         {
             FunctionalGroups.LoadFromDatabsae();
@@ -31,7 +34,8 @@ namespace Chem4WordTests
         public void TestMultipleJSONLoad()
         {
             string groupJSON = @"
-            [{
+            {
+              'Groups': [{
                 'symbol':'CH2',
                 'flippable':'false',
                 'components':
@@ -40,8 +44,8 @@ namespace Chem4WordTests
                     { 'element':'H', 'count':2}
                 ],
                 'showassymbol':false
-            },
-            {
+                },
+                {
                 'symbol':'CH2CH2OH',
                 'flippable':'true',
                 'components':
@@ -52,7 +56,7 @@ namespace Chem4WordTests
                     {'element':'H'}
                 ],
                 'showassymbol':false
-            }]";
+            }]}";
            
             FunctionalGroups.Load(groupJSON);
             Assert.IsTrue(FunctionalGroups.GetByName.Count==2);

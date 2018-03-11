@@ -182,7 +182,9 @@ namespace Chem4Word.Model
         public static void Load(string fgJson)
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>();
-            var groups = JsonConvert.DeserializeObject<List<JObject>>(fgJson, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            var gd = JObject.Parse(fgJson);
+            //var groups = JsonConvert.DeserializeObject<List<JObject>>(fgJson, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            var groups = gd.SelectToken("Groups");
             ShortcutList.Clear();
             foreach (JObject jObject in groups)
             {
