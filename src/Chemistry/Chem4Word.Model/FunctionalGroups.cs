@@ -71,43 +71,43 @@ namespace Chem4Word.Model
             SQLiteDataReader names = GetAllGroupNames("Element");
             while (names.Read())
             {
-                string name = names["Name"] as string;
-                FunctionalGroup fg = new FunctionalGroup(name);
+                string fgName = names["Name"] as string;
+                FunctionalGroup fg = new FunctionalGroup(fgName);
                 bool flippable = (bool)names["Flippable"];
                 bool showAsSymbol = (bool)names["ShowAsSymbol"];
                 fg.Flippable = flippable;
                 fg.ShowAsSymbol = showAsSymbol;
                 fg.Components = new List<Group>();
-                SQLiteDataReader components = GetGroupDetails(name);
+                SQLiteDataReader components = GetGroupDetails(fgName);
                 while (components.Read())
                 {
                     string compName = components["Name"].ToString();
-                    int count = int.Parse(components["Quantity"].ToString());
+                    int count = int.Parse(components["Count"].ToString());
                     fg.Components.Add(new Group(compName, count));
                 }
-                ShortcutList.Add(name, fg);
-                Debug.WriteLine(name);
+                ShortcutList.Add(fgName, fg);
+                Debug.WriteLine(fgName);
             }
 
             names = GetAllGroupNames("Group");
             while (names.Read())
             {
-                string name = names["Name"] as string;
-                FunctionalGroup fg = new FunctionalGroup(name);
+                string fgName = names["Name"] as string;
+                FunctionalGroup fg = new FunctionalGroup(fgName);
                 bool flippable = (bool)names["Flippable"];
                 bool showAsSymbol = (bool)names["ShowAsSymbol"];
                 fg.Flippable = flippable;
                 fg.ShowAsSymbol = showAsSymbol;
                 fg.Components = new List<Group>();
-                SQLiteDataReader components = GetGroupDetails(name);
+                SQLiteDataReader components = GetGroupDetails(fgName);
                 while (components.Read())
                 {
                     string compName = components["Name"].ToString();
-                    int count = int.Parse(components["Quantity"].ToString());
+                    int count = int.Parse(components["Count"].ToString());
                     fg.Components.Add(new Group(compName, count));
                 }
-                ShortcutList.Add(name, fg);
-                Debug.WriteLine(name);
+                ShortcutList.Add(fgName, fg);
+                Debug.WriteLine(fgName);
             }
             names.Close();
             names.Dispose();
@@ -120,7 +120,7 @@ namespace Chem4Word.Model
             try
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("Select c.Type, c.Name, gc.Quantity");
+                sb.AppendLine("Select c.Type, c.Name, gc.Count");
                 sb.AppendLine("From Groups g");
                 sb.AppendLine("Inner Join GroupComponents gc ON gc.GroupId = g.Id");
                 sb.AppendLine("Inner Join Components c ON gc.ComponentId = c.Id");
