@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using Chem4Word.Core.Helpers;
 
 namespace Chem4Word.Model
 {
@@ -50,11 +51,15 @@ namespace Chem4Word.Model
             get
             {
                 // ToDo: Figure out How to get the Folder and File below :-
-                //string path = Path.Combine(Globals.Chem4WordV3.AddInInfo.ProgramDataPath, Constants.FunctionalGroupsFileName);
-                //string path = Path.Combine(@"C:\ProgramData\Chem4Word.V3", "FunctionalGroups.db");
-                string path = @"C:\Dev\vso\chem4word\Version3-1\src\Chem4Word.V3\Data\FunctionalGroups.db";
+                string datbasepath = Path.Combine(@"C:\ProgramData\Chem4Word.V3", Constants.FunctionalGroupDatbaseFileName);
+
+                if (!File.Exists(datbasepath))
+                {
+                    ResourceHelper.WriteResource(Assembly.GetExecutingAssembly(), Constants.FunctionalGroupDatbaseFileName, datbasepath);
+                }
+
                 // Source https://www.connectionstrings.com/sqlite/
-                var conn = new SQLiteConnection($"Data Source={path};Synchronous=Full");
+                var conn = new SQLiteConnection($"Data Source={datbasepath};Synchronous=Full");
                 return conn.OpenAndReturn();
             }
         }

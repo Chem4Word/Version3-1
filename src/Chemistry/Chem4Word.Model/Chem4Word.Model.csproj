@@ -192,6 +192,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="Resources\FunctionalGroups.db" />
+    <EmbeddedResource Include="Resources\FunctionalGroups.json" />
     <None Include="Resources\PeriodicTable.xlsx" />
   </ItemGroup>
   <ItemGroup>
