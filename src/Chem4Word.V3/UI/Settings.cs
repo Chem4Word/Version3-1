@@ -33,6 +33,8 @@ namespace Chem4Word.UI
         public Options SystemOptions;
 
         private bool _dirty;
+        private bool _functionalGroupsLoaded;
+        private bool _functionalGroupsIsDirty;
 
         public System.Windows.Point TopLeft { get; set; }
 
@@ -134,8 +136,8 @@ namespace Chem4Word.UI
                 LoadSettings();
 
                 // Remove Tabs for Professional Features
-                tabControlEx1.TabPages.Remove(tabTelemetry);
-                tabControlEx1.TabPages.Remove(tabUpdates);
+                OptionsTab.TabPages.Remove(tabTelemetry);
+                OptionsTab.TabPages.Remove(tabUpdates);
                 chkUseWebServices.Visible = false;
                 lblProWebServices.Visible = false;
 
@@ -645,6 +647,27 @@ namespace Chem4Word.UI
             catch (Exception ex)
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void OptionsTab_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine(OptionsTab.SelectedTab.Text);
+            if (OptionsTab.SelectedTab.Text.Equals("Functional Groups"))
+            {
+                if (!_functionalGroupsLoaded)
+                {
+                    if (!_functionalGroupsIsDirty)
+                    {
+                        Model.Model m = new Model.Model();
+                        Model.FunctionalGroups.LoadFromDatabsae();
+                        foreach (var fg in Model.FunctionalGroups.ShortcutList)
+                        {
+                            var g = fg.Value;
+                            // Add to data grid
+                        }
+                    }
+                }
             }
         }
     }

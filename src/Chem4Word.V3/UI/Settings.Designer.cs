@@ -53,7 +53,7 @@ namespace Chem4Word.UI
             this.cboUpdateFrequency = new System.Windows.Forms.ComboBox();
             this.chkAutomaticUpdates = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
-            this.tabControlEx1 = new Chem4Word.Core.UI.Controls.TabControlEx();
+            this.OptionsTab = new Chem4Word.Core.UI.Controls.TabControlEx();
             this.tabPlugIns = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.RendererGroup = new System.Windows.Forms.GroupBox();
@@ -69,6 +69,9 @@ namespace Chem4Word.UI
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblGalleryDesc = new System.Windows.Forms.Label();
             this.importGalleryButton = new System.Windows.Forms.Button();
+            this.tabFunctionalGroups = new System.Windows.Forms.TabPage();
+            this.GroupComponents = new System.Windows.Forms.DataGridView();
+            this.FunctionalGroups = new System.Windows.Forms.DataGridView();
             this.tabMaintenance = new System.Windows.Forms.TabPage();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -77,7 +80,14 @@ namespace Chem4Word.UI
             this.OpenPlugInFolder = new System.Windows.Forms.Button();
             this.OpenLibraryFolder = new System.Windows.Forms.Button();
             this.OpenSettingsFolder = new System.Windows.Forms.Button();
-            this.tabControlEx1.SuspendLayout();
+            this.ComponenetType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ComponentName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ComponentCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ComponentOrder = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GroupName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.GroupIsFlippable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.ShowGroupAsSymbol = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.OptionsTab.SuspendLayout();
             this.tabPlugIns.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.RendererGroup.SuspendLayout();
@@ -87,6 +97,9 @@ namespace Chem4Word.UI
             this.tabUpdates.SuspendLayout();
             this.tabLibrary.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabFunctionalGroups.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.GroupComponents)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FunctionalGroups)).BeginInit();
             this.tabMaintenance.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -327,22 +340,24 @@ namespace Chem4Word.UI
             this.label11.TabIndex = 12;
             this.label11.Text = "Update check frequency";
             // 
-            // tabControlEx1
+            // OptionsTab
             // 
-            this.tabControlEx1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.OptionsTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControlEx1.Controls.Add(this.tabPlugIns);
-            this.tabControlEx1.Controls.Add(this.tabWebServices);
-            this.tabControlEx1.Controls.Add(this.tabTelemetry);
-            this.tabControlEx1.Controls.Add(this.tabUpdates);
-            this.tabControlEx1.Controls.Add(this.tabLibrary);
-            this.tabControlEx1.Controls.Add(this.tabMaintenance);
-            this.tabControlEx1.Location = new System.Drawing.Point(12, 12);
-            this.tabControlEx1.Name = "tabControlEx1";
-            this.tabControlEx1.SelectedIndex = 0;
-            this.tabControlEx1.Size = new System.Drawing.Size(612, 370);
-            this.tabControlEx1.TabIndex = 11;
+            this.OptionsTab.Controls.Add(this.tabPlugIns);
+            this.OptionsTab.Controls.Add(this.tabWebServices);
+            this.OptionsTab.Controls.Add(this.tabTelemetry);
+            this.OptionsTab.Controls.Add(this.tabUpdates);
+            this.OptionsTab.Controls.Add(this.tabLibrary);
+            this.OptionsTab.Controls.Add(this.tabFunctionalGroups);
+            this.OptionsTab.Controls.Add(this.tabMaintenance);
+            this.OptionsTab.Location = new System.Drawing.Point(12, 12);
+            this.OptionsTab.Name = "OptionsTab";
+            this.OptionsTab.SelectedIndex = 0;
+            this.OptionsTab.Size = new System.Drawing.Size(612, 370);
+            this.OptionsTab.TabIndex = 11;
+            this.OptionsTab.SelectedIndexChanged += new System.EventHandler(this.OptionsTab_SelectedIndexChanged);
             // 
             // tabPlugIns
             // 
@@ -539,6 +554,44 @@ namespace Chem4Word.UI
             this.importGalleryButton.UseVisualStyleBackColor = true;
             this.importGalleryButton.Click += new System.EventHandler(this.OnLibraryImportClick);
             // 
+            // tabFunctionalGroups
+            // 
+            this.tabFunctionalGroups.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.tabFunctionalGroups.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabFunctionalGroups.Controls.Add(this.GroupComponents);
+            this.tabFunctionalGroups.Controls.Add(this.FunctionalGroups);
+            this.tabFunctionalGroups.Location = new System.Drawing.Point(0, 23);
+            this.tabFunctionalGroups.Name = "tabFunctionalGroups";
+            this.tabFunctionalGroups.Padding = new System.Windows.Forms.Padding(3);
+            this.tabFunctionalGroups.Size = new System.Drawing.Size(612, 347);
+            this.tabFunctionalGroups.TabIndex = 6;
+            this.tabFunctionalGroups.Text = "Functional Groups";
+            // 
+            // GroupComponents
+            // 
+            this.GroupComponents.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.GroupComponents.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ComponenetType,
+            this.ComponentName,
+            this.ComponentCount,
+            this.ComponentOrder});
+            this.GroupComponents.Location = new System.Drawing.Point(16, 168);
+            this.GroupComponents.Name = "GroupComponents";
+            this.GroupComponents.Size = new System.Drawing.Size(470, 127);
+            this.GroupComponents.TabIndex = 1;
+            // 
+            // FunctionalGroups
+            // 
+            this.FunctionalGroups.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.FunctionalGroups.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.GroupName,
+            this.GroupIsFlippable,
+            this.ShowGroupAsSymbol});
+            this.FunctionalGroups.Location = new System.Drawing.Point(16, 19);
+            this.FunctionalGroups.Name = "FunctionalGroups";
+            this.FunctionalGroups.Size = new System.Drawing.Size(470, 127);
+            this.FunctionalGroups.TabIndex = 0;
+            // 
             // tabMaintenance
             // 
             this.tabMaintenance.BackColor = System.Drawing.SystemColors.ButtonFace;
@@ -559,27 +612,27 @@ namespace Chem4Word.UI
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(197, 165);
+            this.label4.Location = new System.Drawing.Point(249, 158);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(369, 25);
+            this.label4.Size = new System.Drawing.Size(277, 46);
             this.label4.TabIndex = 8;
             this.label4.Text = "This folder is where the Chem4Word Plug-Ins are installed.";
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(197, 111);
+            this.label3.Location = new System.Drawing.Point(249, 104);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(369, 25);
+            this.label3.Size = new System.Drawing.Size(277, 46);
             this.label3.TabIndex = 7;
-            this.label3.Text = "This folder is where Chem4Word stores the Library.";
+            this.label3.Text = "This folder is where Chem4Word stores system settings.";
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(197, 57);
+            this.label1.Location = new System.Drawing.Point(249, 50);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(369, 25);
+            this.label1.Size = new System.Drawing.Size(277, 46);
             this.label1.TabIndex = 6;
-            this.label1.Text = "This folder is where Chem4Word stores its settings.";
+            this.label1.Text = "This folder is where Chem4Word stores its user settings.";
             // 
             // MaintenanceInformation
             // 
@@ -595,7 +648,7 @@ namespace Chem4Word.UI
             this.OpenPlugInFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.OpenPlugInFolder.Location = new System.Drawing.Point(15, 149);
             this.OpenPlugInFolder.Name = "OpenPlugInFolder";
-            this.OpenPlugInFolder.Size = new System.Drawing.Size(176, 48);
+            this.OpenPlugInFolder.Size = new System.Drawing.Size(218, 48);
             this.OpenPlugInFolder.TabIndex = 4;
             this.OpenPlugInFolder.Text = "Open Plug-Ins Folder";
             this.OpenPlugInFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -609,9 +662,9 @@ namespace Chem4Word.UI
             this.OpenLibraryFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.OpenLibraryFolder.Location = new System.Drawing.Point(15, 95);
             this.OpenLibraryFolder.Name = "OpenLibraryFolder";
-            this.OpenLibraryFolder.Size = new System.Drawing.Size(176, 48);
+            this.OpenLibraryFolder.Size = new System.Drawing.Size(218, 48);
             this.OpenLibraryFolder.TabIndex = 2;
-            this.OpenLibraryFolder.Text = "Open Library Folder";
+            this.OpenLibraryFolder.Text = "Open System Settings Folder";
             this.OpenLibraryFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OpenLibraryFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.OpenLibraryFolder.UseVisualStyleBackColor = true;
@@ -623,20 +676,56 @@ namespace Chem4Word.UI
             this.OpenSettingsFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.OpenSettingsFolder.Location = new System.Drawing.Point(15, 41);
             this.OpenSettingsFolder.Name = "OpenSettingsFolder";
-            this.OpenSettingsFolder.Size = new System.Drawing.Size(176, 48);
+            this.OpenSettingsFolder.Size = new System.Drawing.Size(218, 48);
             this.OpenSettingsFolder.TabIndex = 0;
-            this.OpenSettingsFolder.Text = "Open Settings Folder";
+            this.OpenSettingsFolder.Text = "Open User Settings Folder";
             this.OpenSettingsFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OpenSettingsFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.OpenSettingsFolder.UseVisualStyleBackColor = true;
             this.OpenSettingsFolder.Click += new System.EventHandler(this.OnOpenSettingsFolderClick);
+            // 
+            // ComponenetType
+            // 
+            this.ComponenetType.HeaderText = "Type";
+            this.ComponenetType.Name = "ComponenetType";
+            // 
+            // ComponentName
+            // 
+            this.ComponentName.HeaderText = "Name";
+            this.ComponentName.Name = "ComponentName";
+            // 
+            // ComponentCount
+            // 
+            this.ComponentCount.HeaderText = "Count";
+            this.ComponentCount.Name = "ComponentCount";
+            // 
+            // ComponentOrder
+            // 
+            this.ComponentOrder.HeaderText = "Order";
+            this.ComponentOrder.Name = "ComponentOrder";
+            // 
+            // GroupName
+            // 
+            this.GroupName.HeaderText = "Name";
+            this.GroupName.Name = "GroupName";
+            // 
+            // GroupIsFlippable
+            // 
+            this.GroupIsFlippable.HeaderText = "Flippable";
+            this.GroupIsFlippable.Name = "GroupIsFlippable";
+            // 
+            // ShowGroupAsSymbol
+            // 
+            this.ShowGroupAsSymbol.HeaderText = "Show As Symbol";
+            this.ShowGroupAsSymbol.Name = "ShowGroupAsSymbol";
+            this.ShowGroupAsSymbol.Width = 125;
             // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(638, 432);
-            this.Controls.Add(this.tabControlEx1);
+            this.Controls.Add(this.OptionsTab);
             this.Controls.Add(this.btnSetDefaults);
             this.Controls.Add(this.btnOk);
             this.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -650,7 +739,7 @@ namespace Chem4Word.UI
             this.Text = "User Options";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormOptions_FormClosing);
             this.Load += new System.EventHandler(this.FormOptions_Load);
-            this.tabControlEx1.ResumeLayout(false);
+            this.OptionsTab.ResumeLayout(false);
             this.tabPlugIns.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.RendererGroup.ResumeLayout(false);
@@ -663,6 +752,9 @@ namespace Chem4Word.UI
             this.tabUpdates.PerformLayout();
             this.tabLibrary.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
+            this.tabFunctionalGroups.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.GroupComponents)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.FunctionalGroups)).EndInit();
             this.tabMaintenance.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -691,7 +783,7 @@ namespace Chem4Word.UI
         private System.Windows.Forms.Label lblSearcherDescription;
         private System.Windows.Forms.Button btnSearcherSettings;
         private System.Windows.Forms.ComboBox cboSearchers;
-        private TabControlEx tabControlEx1;
+        private TabControlEx OptionsTab;
         private System.Windows.Forms.TabPage tabPlugIns;
         private System.Windows.Forms.TabPage tabWebServices;
         private System.Windows.Forms.TabPage tabTelemetry;
@@ -715,5 +807,15 @@ namespace Chem4Word.UI
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabPage tabFunctionalGroups;
+        private System.Windows.Forms.DataGridView GroupComponents;
+        private System.Windows.Forms.DataGridView FunctionalGroups;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ComponenetType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ComponentName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ComponentCount;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ComponentOrder;
+        private System.Windows.Forms.DataGridViewTextBoxColumn GroupName;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn GroupIsFlippable;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn ShowGroupAsSymbol;
     }
 }
