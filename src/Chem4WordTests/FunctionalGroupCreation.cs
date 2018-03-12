@@ -15,6 +15,7 @@ namespace Chem4WordTests
         {
             FunctionalGroup fg;
             FunctionalGroups.LoadDefaults();
+            string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
             fg = FunctionalGroups.GetByName["CH3"];
             Assert.IsNotNull(fg);
         }
@@ -27,6 +28,16 @@ namespace Chem4WordTests
         public void LoadFromDatabase()
         {
             FunctionalGroups.LoadFromDatabsae();
+            string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
+            FunctionalGroup fg = FunctionalGroups.GetByName["R1"];
+            Assert.IsNotNull(fg);
+        }
+
+        [TestMethod]
+        public void LoadFromJsonV2()
+        {
+            FunctionalGroups.LoadFromJsonV2();
+            string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
             FunctionalGroup fg = FunctionalGroups.GetByName["R1"];
             Assert.IsNotNull(fg);
         }

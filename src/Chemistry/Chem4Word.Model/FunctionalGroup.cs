@@ -18,12 +18,13 @@ namespace Chem4Word.Model
     ///
     ///
 
+    [JsonObject(MemberSerialization.OptIn)]
     public class Group
     {
-        [JsonProperty("component")]
+        [JsonProperty]
         public string Component { get; set; }
 
-        [JsonProperty("count")]
+        [JsonProperty]
         public int Count { get; set; }
 
         public Group(string e, int c)
@@ -72,6 +73,7 @@ namespace Chem4Word.Model
     /// ]
     /// }
     /// </summary>
+    [JsonObject(MemberSerialization.OptIn)]
     public class FunctionalGroup : ElementBase
     {
         public const string TagSymbol = "symbol";
@@ -84,6 +86,11 @@ namespace Chem4Word.Model
 
         private string _symbol = "";
         private double _atomicWeight = 0d;
+
+        public FunctionalGroup()
+        {
+            
+        }
 
         /// <summary>
         /// Generates a new functional group to use for a superatom
@@ -131,10 +138,10 @@ namespace Chem4Word.Model
             }
         }
 
-        [JsonProperty("showassymbol")]
+        [JsonProperty]
         public bool ShowAsSymbol { get; set; }
 
-        [JsonProperty("atomicweight")]
+        //[JsonProperty]
         public sealed override double AtomicWeight
         {
             get
@@ -163,7 +170,7 @@ namespace Chem4Word.Model
         /// It is a unique key for the functional group
         /// Symbol can also be of the form CH3, CF3, C2H5 etc
         /// </summary>
-        [JsonProperty("symbol")]
+        [JsonProperty]
         public sealed override string Symbol
         {
             get
@@ -174,7 +181,7 @@ namespace Chem4Word.Model
             set { _symbol = value; }
         }
 
-        [JsonProperty("name")]
+        [JsonProperty]
         public override string Name { get; set; }
 
         /// <summary>
@@ -184,13 +191,13 @@ namespace Chem4Word.Model
         ///
         /// Ths property can be null, which means that the symbol gets rendered
         /// </summary>
-        [JsonProperty("components")]
+        [JsonProperty]
         public List<Group> Components { get; set; }
 
         /// <summary>
         /// Determines whether the functional group can be flipped about the pivot
         /// </summary>
-        [JsonProperty("flippable")]
+        [JsonProperty]
         public bool Flippable { get; set; }
     }
 }

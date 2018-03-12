@@ -64,6 +64,17 @@ namespace Chem4Word.Model
             }
         }
 
+        public static void LoadFromJsonV2()
+        {
+            ShortcutList = new Dictionary<string, FunctionalGroup>();
+
+            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(),"FunctionalGroupsV2.json");
+            if (!string.IsNullOrEmpty(json))
+            {
+                ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
+            }
+        }
+
         public static void LoadFromDatabsae()
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>();
