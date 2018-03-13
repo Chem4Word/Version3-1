@@ -203,6 +203,22 @@
     ],
     "Flippable": false
   },
+  "CH2": {
+    "ShowAsSymbol": true,
+    "Symbol": "CH2",
+    "Name": null,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 2
+      }
+    ],
+    "Flippable": false
+  },
   "Me": {
     "ShowAsSymbol": true,
     "Symbol": "Me",

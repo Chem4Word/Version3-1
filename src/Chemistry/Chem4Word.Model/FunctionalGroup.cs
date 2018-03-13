@@ -37,14 +37,22 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (FunctionalGroups.GetByName.ContainsKey(Component))
+                var pt = new PeriodicTable();
+                if (pt.HasElement(Component))
                 {
-                    return FunctionalGroups.GetByName[Component].AtomicWeight * Count;
+                    return ((Element)pt[Component]).AtomicWeight * Count;
                 }
                 else
                 {
-                    var pt = new PeriodicTable();
-                    return ((Element)pt[Component]).AtomicWeight * Count;
+                    FunctionalGroup fg = FunctionalGroups.GetByName[Component];
+                    if (fg != null)
+                    {
+                        return FunctionalGroups.GetByName[Component].AtomicWeight * Count;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 }
             }
         }

@@ -20,26 +20,18 @@ namespace Chem4WordTests
             Assert.IsNotNull(fg);
         }
 
-        // Only run test when in Debug build
-        //  VSTS build will break if we try to do this
-#if DEBUG
-        [TestMethod]
-#endif
-        public void LoadFromDatabase()
-        {
-            FunctionalGroups.LoadFromDatabsae();
-            string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
-            FunctionalGroup fg = FunctionalGroups.GetByName["R1"];
-            Assert.IsNotNull(fg);
-        }
-
         [TestMethod]
         public void LoadFromJsonV2()
         {
             FunctionalGroups.LoadFromJsonV2();
             string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
-            FunctionalGroup fg = FunctionalGroups.GetByName["R1"];
-            Assert.IsNotNull(fg);
+            FunctionalGroup fg1 = FunctionalGroups.GetByName["R1"];
+            Debug.WriteLine($"{fg1.AtomicWeight}");
+            FunctionalGroup fg2 = FunctionalGroups.GetByName["Et"];
+            Debug.WriteLine($"{fg2.AtomicWeight}");
+            FunctionalGroup fg3 = FunctionalGroups.GetByName["CH2CH2OH"];
+            Debug.WriteLine($"{fg3.AtomicWeight}");
+            Assert.IsNotNull(fg1);
         }
 
         [TestMethod]

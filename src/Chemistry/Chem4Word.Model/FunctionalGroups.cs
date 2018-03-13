@@ -46,24 +46,6 @@ namespace Chem4Word.Model
             }
         }
 
-        public static SQLiteConnection DatabaseConnection
-        {
-            get
-            {
-                // ToDo: Figure out How to get the Folder and File below :-
-                string datbasepath = Path.Combine(@"C:\ProgramData\Chem4Word.V3", Constants.FunctionalGroupDatbaseFileName);
-
-                if (!File.Exists(datbasepath))
-                {
-                    ResourceHelper.WriteResource(Assembly.GetExecutingAssembly(), Constants.FunctionalGroupDatbaseFileName, datbasepath);
-                }
-
-                // Source https://www.connectionstrings.com/sqlite/
-                var conn = new SQLiteConnection($"Data Source={datbasepath};Synchronous=Full");
-                return conn.OpenAndReturn();
-            }
-        }
-
         public static void LoadFromJsonV2()
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>();
@@ -72,94 +54,6 @@ namespace Chem4Word.Model
             if (!string.IsNullOrEmpty(json))
             {
                 ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
-            }
-        }
-
-        public static void LoadFromDatabsae()
-        {
-            ShortcutList = new Dictionary<string, FunctionalGroup>();
-
-            SQLiteDataReader names = GetAllGroups();
-            while (names.Read())
-            {
-                string fgName = names["Name"] as string;
-                FunctionalGroup fg = new FunctionalGroup(fgName);
-                bool flippable = (bool)names["Flippable"];
-                bool showAsSymbol = (bool)names["ShowAsSymbol"];
-                fg.Flippable = flippable;
-                fg.ShowAsSymbol = showAsSymbol;
-                fg.Components = new List<Group>();
-
-                SQLiteDataReader components = GetGroupDetails(fgName);
-                while (components.Read())
-                {
-                    string compName = components["Name"].ToString();
-                    int count = int.Parse(components["Count"].ToString());
-                    fg.Components.Add(new Group(compName, count));
-                }
-                components.Close();
-                components.Dispose();
-
-                ShortcutList.Add(fgName, fg);
-                Debug.WriteLine(fgName);
-            }
-
-            names.Close();
-            names.Dispose();
-        }
-
-        private static SQLiteDataReader GetGroupDetails(string name)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
-            try
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("Select c.Type, c.Name, gc.Count");
-                sb.AppendLine("From Groups g");
-                sb.AppendLine("Inner Join GroupComponents gc ON gc.GroupId = g.Id");
-                sb.AppendLine("Inner Join Components c ON gc.ComponentId = c.Id");
-                // Convert to Parameterised Query later on
-                sb.AppendLine($"Where g.Name = '{name}'");
-                sb.AppendLine("Order By gc.Ordered");
-
-                SQLiteConnection conn = DatabaseConnection;
-                SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
-                return command.ExecuteReader();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                Debugger.Break();
-                //new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                return null;
-            }
-        }
-
-        private static SQLiteDataReader GetAllGroups()
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
-            try
-            {
-                StringBuilder sb = new StringBuilder();
-                sb.AppendLine("Select g.Name, Max(c.Type) AS MaxType, g.Flippable, g.ShowAsSymbol");
-                sb.AppendLine("From Groups g");
-                sb.AppendLine("Inner Join GroupComponents gc ON gc.GroupId = g.Id");
-                sb.AppendLine("Inner Join Components c ON gc.ComponentId = c.Id");
-                sb.AppendLine("Group By g.Id, g.Name");
-                sb.AppendLine("Order By Max(c.Type),g.Id");
-
-                SQLiteConnection conn = DatabaseConnection;
-                SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
-                return command.ExecuteReader();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                Debugger.Break();
-                //new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                return null;
             }
         }
 

@@ -661,7 +661,7 @@ namespace Chem4Word.UI
                     {
                         FunctionalGroups.Rows.Clear();
                         Model.Model m = new Model.Model();
-                        Model.FunctionalGroups.LoadFromDatabsae();
+                        Model.FunctionalGroups.LoadFromJsonV2();
                         foreach (var fg in Model.FunctionalGroups.ShortcutList)
                         {
                             var g = fg.Value;
