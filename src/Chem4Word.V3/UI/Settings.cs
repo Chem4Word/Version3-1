@@ -709,6 +709,11 @@ namespace Chem4Word.UI
         {
             ShowCurrentComponents(e);
         }
+
+        private void FunctionalGroups_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
 
     public class PlugInComboItem
