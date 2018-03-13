@@ -661,7 +661,7 @@ namespace Chem4Word.UI
                     {
                         FunctionalGroups.Rows.Clear();
                         Model.Model m = new Model.Model();
-                        Model.FunctionalGroups.LoadFromDatabsae();
+                        Model.FunctionalGroups.LoadFromDatabase();
                         foreach (var fg in Model.FunctionalGroups.ShortcutList)
                         {
                             var g = fg.Value;
@@ -708,6 +708,11 @@ namespace Chem4Word.UI
         private void FunctionalGroups_RowEnter(object sender, DataGridViewCellEventArgs e)
         {
             ShowCurrentComponents(e);
+        }
+
+        private void FunctionalGroups_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 

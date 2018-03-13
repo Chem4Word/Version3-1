@@ -612,6 +612,7 @@ namespace Chem4Word.UI
             this.FunctionalGroups.Size = new System.Drawing.Size(470, 127);
             this.FunctionalGroups.TabIndex = 0;
             this.FunctionalGroups.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_CellClick);
+            this.FunctionalGroups.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_CellContentClick);
             this.FunctionalGroups.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_RowEnter);
             // 
             // GroupName

@@ -27,7 +27,7 @@ namespace Chem4WordTests
 #endif
         public void LoadFromDatabase()
         {
-            FunctionalGroups.LoadFromDatabsae();
+            FunctionalGroups.LoadFromDatabase();
             string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
             FunctionalGroup fg = FunctionalGroups.GetByName["R1"];
             Assert.IsNotNull(fg);
