@@ -17,7 +17,6 @@
                 <ResourceDictionary Source="LibraryResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <local:DefaultNameConverter x:Key="NameConverter" />
-            <controls:DoNothingConverter x:Key="DoNothingConverter" />
 
             <ControlTemplate x:Key="NameValTemplate">
                 <DockPanel>
@@ -25,7 +24,7 @@
                     <AdornedElementPlaceholder />
                 </DockPanel>
             </ControlTemplate>
-            <Style x:Key="textBoxInError" TargetType="{x:Type TextBox}">
+            <Style x:Key="TextBoxInError" TargetType="{x:Type TextBox}">
                 <Style.Triggers>
                     <Trigger Property="Validation.HasError" Value="true">
                         <Setter Property="ToolTip"
@@ -49,7 +48,7 @@
         </Grid.RowDefinitions>
         <TextBox x:Name="NameBox"
                  Validation.ErrorTemplate="{StaticResource NameValTemplate}"
-                 Style="{StaticResource textBoxInError}"
+                 Style="{StaticResource TextBoxInError}"
                  FontSize="16" Foreground="{StaticResource WordBlueBrush}"
                  TextChanged="NameBox_TextChanged"
                  Height="Auto"
@@ -78,7 +77,7 @@
                      BorderThickness="0" BorderBrush="Transparent" />
         </Expander>
         <nav:FormulaBlock FontSize="16" Foreground="{StaticResource WordBlueBrush}"
-                          Grid.Row="2" x:Name="FormulaBlock" Formula="{Binding Path=Formula, Converter={StaticResource DoNothingConverter}}" />
+                          Grid.Row="2" x:Name="FormulaBlock" Formula="{Binding Path=Formula}" />
         <controls:Display
             Name="Display"
                 Grid.Row="3"

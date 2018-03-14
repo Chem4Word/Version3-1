@@ -2,12 +2,13 @@
     x:Class="ControlTestHarness.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:Controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
+    xmlns:controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ControlTestHarness"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="clr-namespace:Chem4Word;assembly=Chem4Word.Model"
+    xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model..NETFramework,Version=v4.6.2"
     xmlns:model1="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
+
     Title="MainWindow"
     Width="525"
     Height="350"
@@ -29,7 +30,7 @@
             Grid.Column="0"
             Grid.ColumnSpan="2" />
 
-        <Controls:Display x:Name="Display1" Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="3" Chemistry="{Binding ElementName=SelectStructureCombo, Path=SelectedValue.Tag}" />
+        <controls:Display x:Name="Display1" Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="3" />
 
         <StackPanel Grid.Row="1" Grid.Column="1">
             <TextBlock Name="MolBlock">
