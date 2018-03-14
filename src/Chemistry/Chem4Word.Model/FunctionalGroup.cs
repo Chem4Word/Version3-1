@@ -63,27 +63,6 @@ namespace Chem4Word.Model
         {
         }
 
-        /// <summary>
-        /// Generates a new functional group to use for a superatom
-        /// </summary>
-        /// <param name="symbol">Actual symbol used for the atom (mandatory)</param>
-        /// <param name="components"> Key-Value list of components and how many</param>
-        /// <param name="atwt">atomic weight of the atom</param>
-        /// <param name="showAsSymbol">whether the element is rendered as its symbol or constructed from its components</param>
-        public FunctionalGroup(string symbol,
-            List<Group> components = null,
-            double atwt = 0d, bool showAsSymbol = false, bool flippable = false)
-        {
-            Symbol = symbol;
-            AtomicWeight = atwt;
-            Components = components;
-            this.ShowAsSymbol = showAsSymbol;
-            Flippable = flippable;
-        }
-
-        [JsonProperty]
-        public bool ShowAsSymbol { get; set; }
-
         public sealed override double AtomicWeight
         {
             get
@@ -123,6 +102,14 @@ namespace Chem4Word.Model
             set { _symbol = value; }
         }
 
+        [JsonProperty]
+        public bool ShowAsSymbol { get; set; }
+
+        /// <summary>
+        /// Determines whether the functional group can be flipped about the pivot
+        /// </summary>
+        [JsonProperty]
+        public bool Flippable { get; set; }
         /// <summary>
         /// Defines the constituents of the superatom
         /// The 'pivot' atom that bonds to the fragment appears FIRST in the list
@@ -132,11 +119,5 @@ namespace Chem4Word.Model
         /// </summary>
         [JsonProperty]
         public List<Group> Components { get; set; }
-
-        /// <summary>
-        /// Determines whether the functional group can be flipped about the pivot
-        /// </summary>
-        [JsonProperty]
-        public bool Flippable { get; set; }
     }
 }

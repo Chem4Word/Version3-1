@@ -193,7 +193,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <EmbeddedResource Include="Resources\FunctionalGroups.json" />
-    <EmbeddedResource Include="Resources\FunctionalGroupsV2.json" />
     <None Include="Resources\PeriodicTable.xlsx" />
   </ItemGroup>
   <ItemGroup>
