@@ -1,62 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using Chem4Word.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Chem4Word.Model;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+
 namespace Chem4WordTests
 {
     [TestClass]
     public class FunctionalGroupTests
     {
+
         [TestMethod]
-       
-        public void GetFunctionalGroups()
+        public void FgKeyEqualsSymbol()
         {
-            FunctionalGroup fg;
-            FunctionalGroups.LoadDefaults();
-            fg = FunctionalGroups.GetByName["CH3"];
-            Assert.IsNotNull(fg);
+            int i = 0;
+            foreach (var fg in FunctionalGroups.ShortcutList)
+            {
+                Assert.IsTrue(fg.Key.Equals(fg.Value.Symbol));
+                i++;
+            }
+            Debug.WriteLine($"Found {i} FunctionalGroups");
         }
 
         [TestMethod]
-        public void TestMultipleJSONLoad()
+        public void FgAutoLoad()
         {
-            string groupJSON = @"
-            [{
-                'symbol':'CH2',
-                'flippable':'false',
-                'components':
-                [
-                    { 'element':'C'},
-                    { 'element':'H', 'count':2}
-                ],
-                'showassymbol':false
-            },
-            {
-                'symbol':'CH2CH2OH',
-                'flippable':'true',
-                'components':
-                [
-                    {'group':'CH2'},
-                    {'group':'CH2'},
-                    {'element':'O'},
-                    {'element':'H'}
-                ],
-                'showassymbol':false
-            }]";
-           
-            FunctionalGroups.Load(groupJSON);
-            Assert.IsTrue(FunctionalGroups.GetByName.Count==2);
-            GetJSONString();
-        }
-        [TestMethod]
-        public void GetJSONString()
-        {
-            GetFunctionalGroups();
-            string fgJSON = FunctionalGroups.GetJSON();
-            Debug.Assert(!string.IsNullOrEmpty(fgJSON));
+            string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
+
+            FunctionalGroup fg1 = FunctionalGroups.ShortcutList["R1"];
+            Assert.IsNotNull(fg1, "FunctionalGroup 'R1' not found");
+            Assert.IsTrue(fg1.AtomicWeight == 0, $"Expected AtomicWeigt of 0; got AtomicWeight of {fg1.AtomicWeight}");
+
+            FunctionalGroup fg2 = FunctionalGroups.ShortcutList["Et"];
+            Assert.IsNotNull(fg2, "FunctionalGroup 'Et' not found");
+            Assert.IsTrue(fg2.AtomicWeight > 29 && fg2.AtomicWeight < 30, $"Expected AtomicWeigt of 29; got AtomicWeight of {fg2.AtomicWeight}");
+
+            FunctionalGroup fg3 = FunctionalGroups.ShortcutList["CH2CH2OH"];
+            Assert.IsNotNull(fg3, "FunctionalGroup 'CH2CH2OH' not found");
+            Assert.IsTrue(fg3.AtomicWeight > 45 && fg3.AtomicWeight < 46, $"Expected AtomicWeigt of 45; got AtomicWeight of {fg3.AtomicWeight}");
         }
     }
 }
