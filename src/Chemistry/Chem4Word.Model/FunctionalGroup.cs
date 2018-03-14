@@ -12,12 +12,6 @@ using System.IO;
 
 namespace Chem4Word.Model
 {
-    /// <summary>
-    /// Identifies components of atoms in FGs
-    /// </summary>
-    ///
-    ///
-
     [JsonObject(MemberSerialization.OptIn)]
     public class Group
     {
@@ -33,6 +27,9 @@ namespace Chem4Word.Model
             Count = c;
         }
 
+        /// <summary>
+        /// Calculate combined AtomicWeight
+        /// </summary>
         public double AtomicWeight
         {
             get
@@ -44,10 +41,10 @@ namespace Chem4Word.Model
                 }
                 else
                 {
-                    FunctionalGroup fg = FunctionalGroups.GetByName[Component];
+                    FunctionalGroup fg = FunctionalGroups.ShortcutList[Component];
                     if (fg != null)
                     {
-                        return FunctionalGroups.GetByName[Component].AtomicWeight * Count;
+                        return FunctionalGroups.ShortcutList[Component].AtomicWeight * Count;
                     }
                     else
                     {
@@ -58,46 +55,15 @@ namespace Chem4Word.Model
         }
     }
 
-    /// <summary>
-    /// Functional groups are serialised as JSON
-    /// {
-    /// "symbol":"CH2",
-    /// "flippable":"false"
-    /// "components":
-    /// [
-    /// {"element":"C"},
-    /// {"element":"H", "count":2},
-    /// ]
-    /// }
-    /// {
-    /// "symbol":"CH2CH2OH",
-    /// "flippable":"true"
-    /// "components":
-    /// [
-    /// {"group":"CH2"},
-    /// {"group":"CH2"},
-    /// {"element":"O"},
-    /// {"element":"H"},
-    /// ]
-    /// }
-    /// </summary>
+
     [JsonObject(MemberSerialization.OptIn)]
     public class FunctionalGroup : ElementBase
     {
-        public const string TagSymbol = "symbol";
-        public const string TagComponents = "components";
-        public const string TagFlippable = "flippable";
-        public const string TagElement = "element";
-        public const string TagCount = "count";
-        public const string TagGroup = "group";
-        public const string TagShowAsSymbol = "showassymbol";
-
         private string _symbol = "";
         private double _atomicWeight = 0d;
 
         public FunctionalGroup()
         {
-            
         }
 
         /// <summary>
@@ -118,38 +84,9 @@ namespace Chem4Word.Model
             Flippable = flippable;
         }
 
-        public FunctionalGroup(JObject groupAsJson)
-        {
-            var pt = new PeriodicTable();
-            Symbol = groupAsJson[TagSymbol].ToString();
-            Flippable = groupAsJson[TagFlippable].Value<bool?>() ?? false;
-            ShowAsSymbol = groupAsJson[TagShowAsSymbol].Value<bool?>() ?? false;
-            Components = new List<Group>();
-            var complist = groupAsJson[TagComponents];
-
-            foreach (JToken c in complist)
-            {
-                Group g;
-                if (c.Value<string>(TagElement) != null)
-                {
-                    g = new Group(c.Value<string>(TagElement), c.Value<int?>("count") ?? 1);
-                }
-                else if (c.Value<string>(TagGroup) != null)
-                {
-                    g = new Group(c.Value<string>(TagGroup).ToString(), c.Value<int?>("count") ?? 1);
-                }
-                else
-                {
-                    throw new InvalidDataException("Element/group tag missing");
-                }
-                Components.Add(g);
-            }
-        }
-
         [JsonProperty]
         public bool ShowAsSymbol { get; set; }
 
-        //[JsonProperty]
         public sealed override double AtomicWeight
         {
             get
@@ -159,7 +96,7 @@ namespace Chem4Word.Model
                     double atwt = 0.0d;
                     if (Components != null)
                     {
-                        //add up the atoms' atomicv weights times their multiplicity
+                        //add up the atoms' atomic weights times their multiplicity
                         foreach (Group component in Components)
                         {
                             atwt += component.AtomicWeight;
@@ -188,9 +125,6 @@ namespace Chem4Word.Model
 
             set { _symbol = value; }
         }
-
-        [JsonProperty]
-        public override string Name { get; set; }
 
         /// <summary>
         /// Defines the constituents of the superatom

@@ -661,7 +661,7 @@ namespace Chem4Word.UI
                     {
                         FunctionalGroups.Rows.Clear();
                         Model.Model m = new Model.Model();
-                        Model.FunctionalGroups.LoadFromJsonV2();
+                        //Model.FunctionalGroups.LoadFromJsonV2();
                         foreach (var fg in Model.FunctionalGroups.ShortcutList)
                         {
                             var g = fg.Value;
@@ -680,8 +680,8 @@ namespace Chem4Word.UI
             int i = 1;
             foreach (var c in group.Components)
             {
-                var type = Model.FunctionalGroups.NameParser.IsMatch(c.Component) ? "Element" : "Group";
-                GroupComponents.Rows.Add(type, c.Component, c.Count, i++.ToString());
+                //var type = Model.FunctionalGroups.NameParser.IsMatch(c.Component) ? "Element" : "Group";
+                GroupComponents.Rows.Add(c.Component, c.Count, i++.ToString());
             }
         }
 
