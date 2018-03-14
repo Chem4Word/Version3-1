@@ -6,9 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Chem4Word.Model
 {
@@ -28,7 +26,7 @@ namespace Chem4Word.Model
         }
 
         /// <summary>
-        /// Calculate combined AtomicWeight
+        /// Calculated combined AtomicWeight
         /// </summary>
         public double AtomicWeight
         {
@@ -54,7 +52,6 @@ namespace Chem4Word.Model
             }
         }
     }
-
 
     [JsonObject(MemberSerialization.OptIn)]
     public class FunctionalGroup : ElementBase
