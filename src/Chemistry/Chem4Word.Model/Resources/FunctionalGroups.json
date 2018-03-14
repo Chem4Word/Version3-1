@@ -232,7 +232,7 @@
     ]
   },
   "C2H5": {
-    "Symbol": "CH2",
+    "Symbol": "C2H5",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -412,7 +412,7 @@
     ]
   },
   "CCl3": {
-    "Symbol": "CF3",
+    "Symbol": "CCl3",
     "ShowAsSymbol": false,
     "Flippable": true,
     "Components": [

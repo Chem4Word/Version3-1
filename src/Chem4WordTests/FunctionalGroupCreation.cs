@@ -8,6 +8,19 @@ namespace Chem4WordTests
     [TestClass]
     public class FunctionalGroupTests
     {
+
+        [TestMethod]
+        public void FgKeyEqualsSymbol()
+        {
+            int i = 0;
+            foreach (var fg in FunctionalGroups.ShortcutList)
+            {
+                Assert.IsTrue(fg.Key.Equals(fg.Value.Symbol));
+                i++;
+            }
+            Debug.WriteLine($"Found {i} FunctionalGroups");
+        }
+
         [TestMethod]
         public void FgAutoLoad()
         {
