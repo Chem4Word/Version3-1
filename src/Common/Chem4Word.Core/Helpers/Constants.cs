@@ -16,7 +16,6 @@ namespace Chem4Word.Core.Helpers
         public static double TopLeftOffset = 24;
 
         public const string LibraryFileName = "Library.db";
-        public const string FunctionalGroupDatbaseFileName = "FunctionalGroups.db";
 
         public static string DefaultChemSpiderWebServiceUri = "https://www.chemspider.com/";
         public static string DefaultChemSpiderRdfServiceUri = "https://rdf.chemspider.com/";
