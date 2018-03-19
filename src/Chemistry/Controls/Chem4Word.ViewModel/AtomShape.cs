@@ -478,7 +478,9 @@ namespace Chem4Word.View
         public static readonly DependencyProperty AtomSymbolProperty =
             DependencyProperty.Register("AtomSymbol", typeof(string), typeof(AtomShape),
                 new FrameworkPropertyMetadata("",
-                    FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                    FrameworkPropertyMetadataOptions.AffectsArrange 
+                    | FrameworkPropertyMetadataOptions.AffectsMeasure
+                    | FrameworkPropertyMetadataOptions.AffectsRender,
                     AtomSymbolChangedCallback));
 
         private static void AtomSymbolChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)

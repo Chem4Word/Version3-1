@@ -244,8 +244,11 @@ namespace Chem4Word.Model
         /// </summary>
         public void Refresh()
         {
-            Atom start = this.Atoms[0];
-            Refresh(start);
+            if (Atoms.Any())
+            {
+                Atom start = this.Atoms[0];
+                Refresh(start);
+            }
         }
 
         #region Properties
@@ -574,8 +577,8 @@ namespace Chem4Word.Model
         public List<Ring> SortRingsForDBPlacement()
         {
             //
-            Debug.Assert(HasRings); //no bloody point in running this unless it has rings
-            Debug.Assert(RingsCalculated); //make sure that if the molecule contains rings that we have calculated them
+            //Debug.Assert(HasRings); //no bloody point in running this unless it has rings
+            //Debug.Assert(RingsCalculated); //make sure that if the molecule contains rings that we have calculated them
             //1) All rings of sizes 6, 5, 7, 4 and 3 are discovered, in that order, and added to a list R.
             var prioritisedRings = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
 
