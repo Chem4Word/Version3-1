@@ -25,7 +25,7 @@ namespace Chem4Word.Model
         {
             public Atom RootAtom { get; set; }
 
-            public static bool operator <(CipData a, CipData b)
+            public static bool operator < (CipData a, CipData b)
             {
                 if ((a.CurrentAtom.Element as Element).AtomicNumber < (b.CurrentAtom.Element as Element).AtomicNumber)
                 {
@@ -46,7 +46,7 @@ namespace Chem4Word.Model
                 return false;
             }
 
-            public static bool operator >(CipData a, CipData b)
+            public static bool operator > (CipData a, CipData b)
             {
                 if ((a.CurrentAtom.Element as Element).AtomicNumber > (b.CurrentAtom.Element as Element).AtomicNumber)
                 {

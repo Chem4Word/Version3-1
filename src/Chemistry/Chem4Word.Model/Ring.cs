@@ -24,7 +24,10 @@ namespace Chem4Word.Model
     public class Ring : IComparer<Ring>
     {
       
-
+        /// <summary>
+        /// Indicates which rings of a set of fused rings 
+        /// should host a double bond in preference
+        /// </summary>
         public int Priority
         {
             get
@@ -137,22 +140,6 @@ namespace Chem4Word.Model
         /// <remarks>Do NOT set explicitly.  Add or remove the ring from a Molecule</remarks>
         public Molecule Parent { get; set; }
 
-        /// <summary>
-        /// Obtains the centroid of the ring.
-        ///  </summary>
-        /*public System.Windows.Point? Centroid
-        {
-            get
-            {
-                if (_centroid == null)
-                {
-                    _centroid = Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
-                }
-                return _centroid;
-            }
-        }
-        */
-
        
         private Point? _centroid;
         /// <summary>
@@ -230,14 +217,7 @@ namespace Chem4Word.Model
             //multiply the angle by the direction to choose the correct atom
             double angle = (int)direction * Vector.AngleBetween(v1, v2);
 
-            if (angle > 0)
-            {
-                next = nextatoms[0];
-            }
-            else
-            {
-                next = nextatoms[1];
-            }
+            next = angle > 0 ? nextatoms[0] : nextatoms[1];
             //circle the ring, making sure we ignore atoms we've visited already
             while (next != null)
             {
