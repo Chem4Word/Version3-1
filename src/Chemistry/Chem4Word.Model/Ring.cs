@@ -23,7 +23,7 @@ namespace Chem4Word.Model
     [DebuggerDisplay("Atoms: {Atoms.Count} Priority: {Priority}")]
     public class Ring : IComparer<Ring>
     {
-        private Point? _centroid;
+      
 
         public int Priority
         {
@@ -153,6 +153,11 @@ namespace Chem4Word.Model
         }
         */
 
+       
+        private Point? _centroid;
+        /// <summary>
+        /// The center of the ring
+        /// </summary>
         public System.Windows.Point? Centroid
         {
             get
@@ -164,17 +169,23 @@ namespace Chem4Word.Model
                 return _centroid;
             }
         }
-
+        
         public List<Atom> ConvexHull
         {
             get
             {
-                var atomList = from Atom a in this.Atoms
-                               orderby a.Position.X ascending, a.Position.Y descending
-                               select a;
+                var atomList = AtomsSortedForHull();
 
                 return Geometry<Atom>.GetHull(atomList, atom => atom.Position);
             }
+        }
+
+        private IOrderedEnumerable<Atom> AtomsSortedForHull()
+        {
+            var atomList = from Atom a in this.Atoms
+                orderby a.Position.X ascending, a.Position.Y descending
+                select a;
+            return atomList;
         }
 
         public List<Bond> DoubleBonds => Bonds.Where(b => (b.Order == Bond.OrderSingle | b.Order == Bond.OrderAromatic)).ToList();
