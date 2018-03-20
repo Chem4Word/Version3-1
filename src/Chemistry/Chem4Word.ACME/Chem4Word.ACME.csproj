@@ -61,6 +61,7 @@
     <Compile Include="CmlEditor.xaml.cs">
       <DependentUpon>CmlEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Converters\DoNothingConverter.cs" />
     <Compile Include="Converters\ElementConverter.cs" />
     <Compile Include="Editor.xaml.cs">
