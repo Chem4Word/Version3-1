@@ -23,7 +23,7 @@ namespace WinFormsTestHarness
             InitializeComponent();
             this.MinimumSize = new Size(300, 200);
 
-            Editor ec = new Editor(cml);
+            Editor ec = new Editor();
             ec.InitializeComponent();
             elementHost1.Child = ec;
             ec.OnOkButtonClick += OnWpfOkButtonClick;

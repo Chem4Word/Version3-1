@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -22,15 +23,44 @@ namespace Chem4Word.ACME
 
         public event EventHandler OnOkButtonClick;
 
+        /// <summary>
+        /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
+        /// </summary>
         public Editor()
         {
+            EnsureApplicationResources();
             InitializeComponent();
         }
 
-        public Editor(string cml)
+        private void EnsureApplicationResources()
         {
-            InitializeComponent();
-        
+            if (Application.Current == null)
+            {
+                // create the Application object
+                new Application();
+
+                // merge in your application resources
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/AdornerBrushes.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/BondBrushes.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
+            }
         }
 
         public BondOption SelectedBondOption
@@ -86,6 +116,16 @@ namespace Chem4Word.ACME
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
           
+        }
+
+        private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void DrawingArea_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

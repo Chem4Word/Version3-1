@@ -30,15 +30,15 @@ namespace Chem4Word.ACME
 
 
 
-        public BondStereo Stereo
+        public BondStereo? Stereo
         {
-            get { return (BondStereo)GetValue(BondStereoEnumsProperty); }
+            get { return (BondStereo?)GetValue(BondStereoEnumsProperty); }
             set { SetValue(BondStereoEnumsProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for BondStereoEnums.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BondStereoEnumsProperty =
-            DependencyProperty.Register("Stereo", typeof(BondStereo), typeof(BondOption), new PropertyMetadata(BondStereo.None));
+            DependencyProperty.Register("Stereo", typeof(BondStereo?), typeof(BondOption), new PropertyMetadata(BondStereo.None));
 
 
 

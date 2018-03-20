@@ -22,7 +22,7 @@
         <!-- Atom Colours -->
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True" >
 
         <ToolBarTray DockPanel.Dock="Top" >
             <ToolBarTray.Resources>
@@ -51,11 +51,12 @@
                 <ComboBox
 					x:Name="AtomCombo"
 					Width="48"
+                    FontFamily="Arial"
 					FontWeight="DemiBold" FontSize="16"
                     ToolTip="Current atom type"
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=SelectedAtomOption}">
+                    SelectedValue="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=SelectedAtomOption}" SelectionChanged="AtomCombo_SelectionChanged">
                 </ComboBox>
                 <ComboBox
 					x:Name="BondCombo"
@@ -63,7 +64,6 @@
                     ToolTip="Current bond type"
                     ItemsSource="{StaticResource BondItems}"
                     SelectedIndex="0"
-                   
                     SelectedValue="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}} , Path=SelectedBondOption}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -122,8 +122,6 @@
                         </WrapPanel>
                     </Border>
                 </Popup>
-
-
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="ChainButton">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
@@ -135,18 +133,18 @@
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="ReactionButton">
                     <Viewbox Stretch="Uniform">
                         <StackPanel>
-                            <TextBlock HorizontalAlignment="Center">X</TextBlock>
+                            <TextBlock FontFamily="Arial"  HorizontalAlignment="Center">NH<Run BaselineAlignment="Subscript" FontSize="12">3</Run></TextBlock>
 
                             <graphics:ArrowBase
                                 StartPoint="0,5" 
-                                EndPoint="30,5" 
+                                EndPoint="45,5" 
                                 Stroke="Black" 
                                 Fill="Black" 
                                 IsArrowClosed="True" 
                                 ArrowHeadLength="10" 
                                 HeadAngle="35"/>
 
-                            <TextBlock HorizontalAlignment="Center">AB</TextBlock>
+                            <TextBlock FontFamily="Arial"  HorizontalAlignment="Center">H<Run BaselineAlignment="Subscript" FontSize="12">2</Run>O</TextBlock>
                         </StackPanel>
                     </Viewbox>
                 </RadioButton>
@@ -166,8 +164,7 @@
                         <TranslateTransform Y="0.983"/>
                     </TransformGroup>
                 </ToolBar.RenderTransform>
-
-
+                
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="CutButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="25">
                         <Path   Stretch="UniformToFill" Fill="#FF000000" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L 33.538,38.5699L 36.9626,42.1932L 32.4905,46.6858C 32.8191,47.5548 33,48.5048 33,49.5C 33,53.6421 29.866,57 26,57C 22.134,57 19,53.6421 19,49.5C 19,45.3579 22.134,42 26,42 Z M 26,45C 23.7908,45 22,47.0147 22,49.5C 22,51.9853 23.7908,54 26,54C 28.2091,54 30,51.9853 30,49.5C 30,47.0147 28.2091,45 26,45 Z M 50,42C 53.866,42 57,45.3579 57,49.5C 57,53.6421 53.866,57 50,57C 46.134,57 43,53.6421 43,49.5C 43,48.5055 43.1807,47.5562 43.5087,46.6877C 37.4037,40.5816 31.3813,34.5251 28.1357,30.1361C 24.7905,25.6125 24.3953,22.8602 24,20.1079L 46.7486,42.8564C 47.7201,42.3095 48.8263,42 50,42 Z M 50,45C 47.7908,45 46,47.0147 46,49.5C 46,51.9853 47.7908,54 50,54C 52.2091,54 54,51.9853 54,49.5C 54,47.0147 52.2091,45 50,45 Z M 47.8643,30.1361C 46.4839,32.0028 44.6012,34.1712 42.4235,36.5166L 41.9416,36.0347C 43.8801,33.9052 45.5581,31.9333 46.8205,30.213C 49.9109,26.0015 50.51,23.7154 50.8952,21.2126L 52,20.1079C 51.6047,22.8602 51.2095,25.6125 47.8643,30.1361 Z M 39.0074,33.1005L 50.2564,21.8515C 49.8163,23.9301 48.9562,26.0005 46.4256,29.4492C 45.0997,31.2561 43.5411,33.3404 41.5003,35.5935L 39.0074,33.1005 Z M 35.8034,42.4922L 35.3653,42.0251L 31.9263,45.5067C 32.0391,45.6984 32.1441,45.8961 32.2406,46.099L 35.8034,42.4922 Z "/>
@@ -181,14 +178,14 @@
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="PasteButton">
                     <Viewbox Stretch="UniformToFill" Width="22" Height="26" >
 
-                            <Path Stretch="UniformToFill" Fill="#FF000000" 
+                        <Path Stretch="UniformToFill" Fill="#FF000000" 
                                   Data="F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001 
                                   20,52.6569 20,51.0001L 20,24.0001C 20,22.3432 21.3431,21.0001 23,21.0001L 26.5001,20.9999C 26.5001,20.9999 
                                   27.4999,20.8807 27.4999,19.5C 27.4999,18.1193 29.1191,17 30.4999,17L 38.4998,17.0001C 39.8798,17.0001 41.4988,18.6176 41.5,19.9979L 
                                   41.4998,19.5024C 41.5009,20.881 42.5,21 42.5,21L 46,21.0001C 47.6569,21.0001 49,22.3432 49,24.0001L 49,31L 56,38L 56.0001,57C 
                                   56.0001,58.6569 54.657,60 53.0001,60L 34.0001,60 Z M 33.9999,31.0001L 33.9999,57.0001L 53.0001,57L 53.0001,43L 42.0002,43L 42.0001,31L 33.9999,31.0001 Z
-                                  M 53,40.0001L 45,32.0001L 45.0001,40L 53,40.0001 Z M 28.5,25L 40.5,25C 40.5,25 39.4998,23.8809 39.4998,22.5002C 39.4998,21.1194 38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z "/>
-                        
+                                  M 53,40.0001L 45,32.0001L 45.0001,40L 53,40.0001 Z M 28.5,25L 40.5,25C 40.5,25 39.4998,23.8809 39.4998,22.5002C 39.4998,21.1194 
+                                  38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z "/>
                     </Viewbox>
                 </RadioButton>
             </ToolBar>
@@ -203,19 +200,15 @@
             <ScrollViewer
 				HorizontalScrollBarVisibility="Auto"
 				VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.ColumnSpan="3">
-                <acme:Display x:Name="DrawingArea" Width="2400" Height="1800"   Background="White">
+                <acme:Display x:Name="DrawingArea" Width="2400" Height="1800"   Background="White" Loaded="DrawingArea_Loaded">
                     <acme:Display.LayoutTransform>
                         <ScaleTransform
 							ScaleX="{Binding Value, ElementName=ScaleSlider}"
 							ScaleY="{Binding Value, ElementName=ScaleSlider}" />
-
                     </acme:Display.LayoutTransform>
-
                 </acme:Display>
             </ScrollViewer>
             <Slider x:Name="ScaleSlider" Grid.Column="3" Orientation="Vertical" Visibility="{Binding ElementName=AcmeControl, Path=SliderVisibility}"/>
         </Grid>
-
     </DockPanel>
-
 </UserControl>

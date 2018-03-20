@@ -121,10 +121,11 @@
     <acme:BondOption Order="Triple" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}"/>
     <acme:BondOption Order="Single" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}"/>
     <acme:BondOption Order="Single" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}"/>
-  </x:Array>
+    <acme:BondOption Order="{x:Null}" Stereo="{x:Null}"/>
+ </x:Array>
 
 
-  <x:Array x:Key="AtomItems" Type="{x:Type acme:AtomOption}">
+<x:Array x:Key="AtomItems" Type="{x:Type acme:AtomOption}">
     <acme:AtomOption Element="C" Foreground="{StaticResource CBrush}">C</acme:AtomOption>
     <acme:AtomOption Element="H" Foreground="{StaticResource HBrush}">H</acme:AtomOption>
     <acme:AtomOption Element="N" Foreground="{StaticResource NBrush}">N</acme:AtomOption>
@@ -134,8 +135,8 @@
     <acme:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">Cl</acme:AtomOption>
     <acme:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">Br</acme:AtomOption>
     <acme:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</acme:AtomOption>
-
-    <acme:AtomOption Element="R"  Foreground="Black">
+      <acme:AtomOption Element="{x:Null}" Foreground="{x:Null}"/>
+        <acme:AtomOption Element="R"  Foreground="Black">
       <TextBlock>
         R<Run FontSize="8" BaselineAlignment="Subscript">1</Run>
       </TextBlock>
