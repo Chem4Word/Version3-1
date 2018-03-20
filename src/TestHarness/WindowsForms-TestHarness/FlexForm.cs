@@ -9,7 +9,6 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -74,6 +73,31 @@ namespace WinFormsTestHarness
             }
         }
 
+        private void ChangeBackground_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = colorDialog1.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                elementHost1.BackColor = colorDialog1.Color;
+                display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+            }
+        }
+
+        private void EditStructure_Click(object sender, EventArgs e)
+        {
+            if (model != null)
+            {
+                CMLConverter cc = new CMLConverter();
+                EditorHost editorHost = new EditorHost(cc.Export(model));
+                editorHost.ShowDialog();
+                if (editorHost.Result == DialogResult.OK)
+                {
+                    Model m = cc.Import(editorHost.OutputValue);
+                    ShowChemistry("Edited", m);
+                }
+            }
+        }
+
         private void ShowChemistry(string filename, Model mod)
         {
             if (mod != null)
@@ -98,33 +122,39 @@ namespace WinFormsTestHarness
                 else
                 {
                     model = mod;
-                    this.Text = filename;
-                    this.display1.Chemistry = model;
-                    display1.ShowCarbonLabels = true;
-                    display1.Background = new SolidColorBrush(System.Windows.Media.Colors.Gray);
+                    if (!string.IsNullOrEmpty(filename))
+                    {
+                        Text = filename;
+                    }
+                    display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+                    display1.Chemistry = model;
+                    ShowCarbons.Checked = false;
                     EditStructure.Enabled = true;
+                    ShowCarbons.Enabled = true;
                 }
             }
         }
 
-        private void EditStructure_Click(object sender, EventArgs e)
+        private Brush ColorToBrush(System.Drawing.Color colour)
         {
+            string hex = $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";
+            var converter = new BrushConverter();
+            return (Brush)converter.ConvertFromString(hex);
+        }
+
+        private void ShowCarbons_CheckedChanged(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
             if (model != null)
             {
-                CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(model));
-                editorHost.ShowDialog();
-                if (editorHost.Result == DialogResult.OK)
+                foreach (var atom in model.AllAtoms)
                 {
-                    Model m = cc.Import(editorHost.OutputValue);
-                    ShowChemistry("Edited", m);
+                    if (atom.Element.Symbol.Equals("C"))
+                    {
+                        atom.ShowSymbol = ShowCarbons.Checked;
+                    }
                 }
             }
-        }
-
-        private void FlexForm_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }
