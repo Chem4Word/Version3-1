@@ -66,6 +66,7 @@
                 <ComboBox
 					x:Name="AtomCombo"
 					Width="48"
+                    Height="25"
                     FontFamily="Arial"
 					FontWeight="DemiBold" FontSize="16"
                     ToolTip="Current atom type"
