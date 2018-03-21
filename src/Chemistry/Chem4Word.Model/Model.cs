@@ -294,6 +294,17 @@ namespace Chem4Word.Model
             AddNewMols();
         }
 
+        public Model Clone()
+        {
+            Model clone = new Model();
+            foreach (var mol in Molecules)
+            {
+                clone.Molecules.Add(mol);
+            }
+
+            return clone;
+        }
+
         #region Layout
 
      
