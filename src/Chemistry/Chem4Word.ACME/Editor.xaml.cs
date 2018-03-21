@@ -37,6 +37,17 @@ namespace Chem4Word.ACME
             InitializeComponent();
         }
 
+        public bool ShowSave
+        {
+            get { return (bool)GetValue(ShowSaveProperty); }
+            set { SetValue(ShowSaveProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ShowSave.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ShowSaveProperty =
+            DependencyProperty.Register("ShowSave", typeof(bool), typeof(Editor), new PropertyMetadata(false));
+
+
         private void EnsureApplicationResources()
         {
             if (Application.Current == null)

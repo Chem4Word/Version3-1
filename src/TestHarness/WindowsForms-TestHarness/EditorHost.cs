@@ -28,6 +28,7 @@ namespace WinFormsTestHarness
                 Editor ec = new Editor(cml);
                 ec.InitializeComponent();
                 elementHost1.Child = ec;
+                ec.ShowSave = true;
                 ec.OnOkButtonClick += OnWpfOkButtonClick;
             }
             else

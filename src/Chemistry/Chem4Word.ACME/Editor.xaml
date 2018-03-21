@@ -20,6 +20,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
+        <DockPanel.Resources>
+            <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed"></acme:BoolToVisibilityConverter>
+        </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
@@ -265,8 +268,8 @@
                               27.3686,22.4932C 26.5439,22.8165 25.7852,23.198 25.0925,23.6378C 24.3998,24.0777 23.7852,24.5571 23.2486,25.076 Z " />
                     </Viewbox>
                 </Button>
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick">
-                    <Viewbox Stretch="UniformToFill" Width="24" Height="24">
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick" Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
+                    <Viewbox Stretch="UniformToFill" Width="24" Height="24" >
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Data="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
                               23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334

@@ -5,19 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.Helpers;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using Chem4Word.Core.Helpers;
 
 namespace Chem4Word.Model
 {
@@ -32,8 +26,10 @@ namespace Chem4Word.Model
         /// ShortcutList represent text as a user might type in a superatom,
         /// actual values control how they are rendered
         /// </summary>
-        public static Dictionary<string, FunctionalGroup> ShortcutList {
-            get {
+        public static Dictionary<string, FunctionalGroup> ShortcutList
+        {
+            get
+            {
                 if (_shortcutList == null)
                 {
                     LoadFromResource();
@@ -41,7 +37,7 @@ namespace Chem4Word.Model
                 return _shortcutList;
             }
             private set { _shortcutList = value; }
-        } 
+        }
 
         public static bool TryParse(string desc, out FunctionalGroup fg)
         {
@@ -61,7 +57,7 @@ namespace Chem4Word.Model
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>();
 
-            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(),"FunctionalGroups.json");
+            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
             if (!string.IsNullOrEmpty(json))
             {
                 ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);

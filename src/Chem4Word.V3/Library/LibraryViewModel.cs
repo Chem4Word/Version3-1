@@ -5,7 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Controls.Annotations;
+using Chem4Word.ACME.Annotations;
 using Chem4Word.Core.UI.Forms;
 using System;
 using System.Collections;

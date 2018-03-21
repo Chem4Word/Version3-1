@@ -69,12 +69,6 @@ namespace Chem4Word.UI
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblGalleryDesc = new System.Windows.Forms.Label();
             this.importGalleryButton = new System.Windows.Forms.Button();
-            this.tabFunctionalGroups = new System.Windows.Forms.TabPage();
-            this.GroupComponents = new System.Windows.Forms.DataGridView();
-            this.FunctionalGroups = new System.Windows.Forms.DataGridView();
-            this.GroupName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.GroupIsFlippable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.ShowGroupAsSymbol = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.tabMaintenance = new System.Windows.Forms.TabPage();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -83,9 +77,6 @@ namespace Chem4Word.UI
             this.OpenPlugInFolder = new System.Windows.Forms.Button();
             this.OpenLibraryFolder = new System.Windows.Forms.Button();
             this.OpenSettingsFolder = new System.Windows.Forms.Button();
-            this.ComponentName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ComponentCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ComponentOrder = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.OptionsTab.SuspendLayout();
             this.tabPlugIns.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -96,9 +87,6 @@ namespace Chem4Word.UI
             this.tabUpdates.SuspendLayout();
             this.tabLibrary.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.tabFunctionalGroups.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.GroupComponents)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.FunctionalGroups)).BeginInit();
             this.tabMaintenance.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -349,14 +337,12 @@ namespace Chem4Word.UI
             this.OptionsTab.Controls.Add(this.tabTelemetry);
             this.OptionsTab.Controls.Add(this.tabUpdates);
             this.OptionsTab.Controls.Add(this.tabLibrary);
-            this.OptionsTab.Controls.Add(this.tabFunctionalGroups);
             this.OptionsTab.Controls.Add(this.tabMaintenance);
             this.OptionsTab.Location = new System.Drawing.Point(12, 12);
             this.OptionsTab.Name = "OptionsTab";
             this.OptionsTab.SelectedIndex = 0;
             this.OptionsTab.Size = new System.Drawing.Size(612, 370);
             this.OptionsTab.TabIndex = 11;
-            this.OptionsTab.SelectedIndexChanged += new System.EventHandler(this.OptionsTab_SelectedIndexChanged);
             // 
             // tabPlugIns
             // 
@@ -553,62 +539,6 @@ namespace Chem4Word.UI
             this.importGalleryButton.UseVisualStyleBackColor = true;
             this.importGalleryButton.Click += new System.EventHandler(this.OnLibraryImportClick);
             // 
-            // tabFunctionalGroups
-            // 
-            this.tabFunctionalGroups.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.tabFunctionalGroups.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabFunctionalGroups.Controls.Add(this.GroupComponents);
-            this.tabFunctionalGroups.Controls.Add(this.FunctionalGroups);
-            this.tabFunctionalGroups.Location = new System.Drawing.Point(0, 23);
-            this.tabFunctionalGroups.Name = "tabFunctionalGroups";
-            this.tabFunctionalGroups.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFunctionalGroups.Size = new System.Drawing.Size(612, 347);
-            this.tabFunctionalGroups.TabIndex = 6;
-            this.tabFunctionalGroups.Text = "Functional Groups";
-            // 
-            // GroupComponents
-            // 
-            this.GroupComponents.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.GroupComponents.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ComponentName,
-            this.ComponentCount,
-            this.ComponentOrder});
-            this.GroupComponents.Location = new System.Drawing.Point(16, 168);
-            this.GroupComponents.Name = "GroupComponents";
-            this.GroupComponents.Size = new System.Drawing.Size(470, 127);
-            this.GroupComponents.TabIndex = 1;
-            // 
-            // FunctionalGroups
-            // 
-            this.FunctionalGroups.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.FunctionalGroups.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.GroupName,
-            this.GroupIsFlippable,
-            this.ShowGroupAsSymbol});
-            this.FunctionalGroups.Location = new System.Drawing.Point(16, 19);
-            this.FunctionalGroups.Name = "FunctionalGroups";
-            this.FunctionalGroups.Size = new System.Drawing.Size(470, 127);
-            this.FunctionalGroups.TabIndex = 0;
-            this.FunctionalGroups.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_CellClick);
-            this.FunctionalGroups.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_CellContentClick);
-            this.FunctionalGroups.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.FunctionalGroups_RowEnter);
-            // 
-            // GroupName
-            // 
-            this.GroupName.HeaderText = "Name";
-            this.GroupName.Name = "GroupName";
-            // 
-            // GroupIsFlippable
-            // 
-            this.GroupIsFlippable.HeaderText = "Flippable";
-            this.GroupIsFlippable.Name = "GroupIsFlippable";
-            // 
-            // ShowGroupAsSymbol
-            // 
-            this.ShowGroupAsSymbol.HeaderText = "Show As Symbol";
-            this.ShowGroupAsSymbol.Name = "ShowGroupAsSymbol";
-            this.ShowGroupAsSymbol.Width = 125;
-            // 
             // tabMaintenance
             // 
             this.tabMaintenance.BackColor = System.Drawing.SystemColors.ButtonFace;
@@ -701,21 +631,6 @@ namespace Chem4Word.UI
             this.OpenSettingsFolder.UseVisualStyleBackColor = true;
             this.OpenSettingsFolder.Click += new System.EventHandler(this.OnOpenSettingsFolderClick);
             // 
-            // ComponentName
-            // 
-            this.ComponentName.HeaderText = "Name";
-            this.ComponentName.Name = "ComponentName";
-            // 
-            // ComponentCount
-            // 
-            this.ComponentCount.HeaderText = "Count";
-            this.ComponentCount.Name = "ComponentCount";
-            // 
-            // ComponentOrder
-            // 
-            this.ComponentOrder.HeaderText = "Order";
-            this.ComponentOrder.Name = "ComponentOrder";
-            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
@@ -748,9 +663,6 @@ namespace Chem4Word.UI
             this.tabUpdates.PerformLayout();
             this.tabLibrary.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            this.tabFunctionalGroups.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.GroupComponents)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.FunctionalGroups)).EndInit();
             this.tabMaintenance.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -803,14 +715,5 @@ namespace Chem4Word.UI
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TabPage tabFunctionalGroups;
-        private System.Windows.Forms.DataGridView GroupComponents;
-        private System.Windows.Forms.DataGridView FunctionalGroups;
-        private System.Windows.Forms.DataGridViewTextBoxColumn GroupName;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn GroupIsFlippable;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn ShowGroupAsSymbol;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ComponentName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ComponentCount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ComponentOrder;
     }
 }
