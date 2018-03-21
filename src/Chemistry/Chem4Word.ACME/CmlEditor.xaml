@@ -9,7 +9,7 @@
     <Grid ShowGridLines="False" RenderTransformOrigin="0.502,0.685">
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height="47"></RowDefinition>
+            <RowDefinition Height="45"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBox x:Name="cmlText" HorizontalAlignment="Stretch"
                  Margin="0,0,0,0"
