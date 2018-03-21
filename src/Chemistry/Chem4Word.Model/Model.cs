@@ -19,14 +19,9 @@ namespace Chem4Word.Model
 {
     /// <summary>
     /// Overall container for Atoms, Bonds and other objects.
-    /// PLEASE NOTE: anybody found implementing ANY
-    /// rendering specific code in this library will
-    /// be subject to a severe thumping.  It is for CONNECTIVITY
-    /// ONLY!
-    /// You have been warned.
+    /// Please limit rendering-specific code in these classes.  
+    /// Sometimes it will be unavoidable, but the less, the better
     /// </summary>
-    ///
-    ///
     ///
 
     public class Model : ChemistryContainer, INotifyPropertyChanged
@@ -299,13 +294,20 @@ namespace Chem4Word.Model
             AddNewMols();
         }
 
-        #region Layout
-
-        public double DesiredWidth
+        public Model Clone()
         {
-            get { return BoundingBox.Width; }
+            Model clone = new Model();
+            foreach (var mol in Molecules)
+            {
+                clone.Molecules.Add(mol);
+            }
+
+            return clone;
         }
 
+        #region Layout
+
+     
         public double ActualWidth
         {
             get { return BoundingBox.Width; }
@@ -316,10 +318,6 @@ namespace Chem4Word.Model
             get { return BoundingBox.Height; }
         }
 
-        public double DesiredHeight
-        {
-            get { return BoundingBox.Height; }
-        }
 
         //used to calculate the bounds of the atom
         public double FontSize { get; set; }

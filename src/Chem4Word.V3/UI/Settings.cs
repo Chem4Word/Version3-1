@@ -33,6 +33,8 @@ namespace Chem4Word.UI
         public Options SystemOptions;
 
         private bool _dirty;
+        private bool _functionalGroupsLoaded;
+        private bool _functionalGroupsIsDirty;
 
         public System.Windows.Point TopLeft { get; set; }
 
@@ -134,8 +136,8 @@ namespace Chem4Word.UI
                 LoadSettings();
 
                 // Remove Tabs for Professional Features
-                tabControlEx1.TabPages.Remove(tabTelemetry);
-                tabControlEx1.TabPages.Remove(tabUpdates);
+                OptionsTab.TabPages.Remove(tabTelemetry);
+                OptionsTab.TabPages.Remove(tabUpdates);
                 chkUseWebServices.Visible = false;
                 lblProWebServices.Visible = false;
 

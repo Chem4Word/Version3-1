@@ -121,13 +121,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Chem4Word.V3\Chem4Word.V3.csproj">
+      <Project>{578789AB-84C4-4EA5-831D-BDCF20BA465F}</Project>
+      <Name>Chem4Word.V3</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj">
       <Project>{1e3fc1f1-06cc-44bd-8004-3ef0ce7eeaa7}</Project>
       <Name>Chem4Word.ACME</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Chemistry\Controls\Chem4Word.Controls\Chem4Word.Controls.csproj">
-      <Project>{2029399E-696B-46F4-822D-BE3DF61C8256}</Project>
-      <Name>Chem4Word.Controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Chemistry\Chem4Word.Model\Chem4Word.Model.csproj">
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>

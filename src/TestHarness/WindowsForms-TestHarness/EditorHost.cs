@@ -18,15 +18,26 @@ namespace WinFormsTestHarness
 
         public string OutputValue { get; set; }
 
-        public EditorHost(string cml)
+        public EditorHost(string cml, string type)
         {
             InitializeComponent();
             this.MinimumSize = new Size(300, 200);
 
-            Editor ec = new Editor(cml);
-            ec.InitializeComponent();
-            elementHost1.Child = ec;
-            ec.OnOkButtonClick += OnWpfOkButtonClick;
+            if (type.Equals("ACME"))
+            {
+                Editor ec = new Editor(cml);
+                ec.InitializeComponent();
+                elementHost1.Child = ec;
+                ec.ShowSave = true;
+                ec.OnOkButtonClick += OnWpfOkButtonClick;
+            }
+            else
+            {
+                CmlEditor ec = new CmlEditor(cml);
+                ec.InitializeComponent();
+                elementHost1.Child = ec;
+                ec.OnOkButtonClick += OnWpfOkButtonClick;
+            }
         }
 
         private void EditorHost_Load(object sender, EventArgs e)
@@ -37,7 +48,7 @@ namespace WinFormsTestHarness
         private void OnWpfOkButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
-            if (args.Button.Equals("OK"))
+            if (args.Button.Equals("OK") || args.Button.Equals("SAVE"))
             {
                 Result = DialogResult.OK;
                 OutputValue = args.OutputValue;

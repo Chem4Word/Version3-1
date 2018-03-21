@@ -9,6 +9,7 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -33,8 +34,8 @@ namespace WinFormsTestHarness
             sb.Append("|CML molecule files (*.cml)|*.cml");
             sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
-            openFileDialog1.FileName = "*.*";
             openFileDialog1.Filter = sb.ToString();
+            openFileDialog1.FileName = "";
 
             DialogResult dr = openFileDialog1.ShowDialog();
 
@@ -88,7 +89,7 @@ namespace WinFormsTestHarness
             if (model != null)
             {
                 CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(model));
+                EditorHost editorHost = new EditorHost(cc.Export(model), EditorType.Text);
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
@@ -128,7 +129,23 @@ namespace WinFormsTestHarness
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;
+                    ShowCarbons.Checked = false;
                     EditStructure.Enabled = true;
+                    ShowCarbons.Enabled = true;
+                    RemoveAtom.Enabled = true;
+                    RandomElement.Enabled = true;
+                    EditorType.Enabled = true;
+                }
+            }
+        }
+
+        private void SetCarbons(Model model, bool state)
+        {
+            foreach (var atom in model.AllAtoms)
+            {
+                if (atom.Element.Symbol.Equals("C"))
+                {
+                    atom.ShowSymbol = state;
                 }
             }
         }
@@ -138,6 +155,77 @@ namespace WinFormsTestHarness
             string hex = $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";
             var converter = new BrushConverter();
             return (Brush)converter.ConvertFromString(hex);
+        }
+
+        private void ShowCarbons_CheckedChanged(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                Model newModel = model.Clone();
+                SetCarbons(newModel, ShowCarbons.Checked);
+                display1.Chemistry = newModel;
+            }
+        }
+
+        private void RemoveAtom_Click(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                if (model.AllAtoms.Any())
+                {
+                    Molecule modelMolecule = model.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
+                    var atom = modelMolecule.Atoms[0];
+                    foreach (var neighbouringBond in atom.Bonds)
+                    {
+                        neighbouringBond.OtherAtom(atom).Bonds.Remove(neighbouringBond);
+                        modelMolecule.Bonds.Remove(neighbouringBond);
+                    }
+
+                    modelMolecule.Atoms.Remove(atom);
+                }
+
+                model.RefreshMolecules();
+            }
+        }
+
+        private void RandomElement_Click(object sender, EventArgs e)
+        {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                if (model.AllAtoms.Any())
+                {
+                    var rnd = new Random(DateTime.Now.Millisecond);
+
+                    var maxAtoms = model.AllAtoms.Count;
+                    int targetAtom = rnd.Next(0, maxAtoms);
+
+                    var elements = Globals.PeriodicTable.Elements;
+                    int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
+                    var x = elements.Values.Where(v => v.AtomicNumber == newElement).FirstOrDefault();
+
+                    if (x == null)
+                    {
+                        Debugger.Break();
+                    }
+                    model.AllAtoms[targetAtom].Element = x as ElementBase;
+                    if (x.Symbol.Equals("C"))
+                    {
+                        model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                    }
+                    model.RefreshMolecules();
+                }
+            }
+        }
+
+        private void FlexForm_Load(object sender, EventArgs e)
+        {
+            EditorType.Items.Clear();
+            EditorType.Items.Add("ACME");
+            EditorType.Items.Add("CML");
+            EditorType.SelectedIndex = 0;
         }
     }
 }

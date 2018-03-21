@@ -781,5 +781,9 @@ namespace Chem4Word.Model
 
         //bonds go under atoms on a visual display
         //public int ZIndex => 1;
+        public void NotifyPlacementChanged()
+        {
+            OnPropertyChanged("Placement");
+        }
     }
 }

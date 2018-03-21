@@ -30,7 +30,7 @@
         {
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.editor1 = new Chem4Word.ACME.Editor();
+            this.navigatorView1 = new Chem4Word.Navigator.NavigatorView();
             this.SuspendLayout();
             // 
             // openFileDialog1
@@ -46,7 +46,7 @@
             this.elementHost1.Size = new System.Drawing.Size(952, 536);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.editor1;
+            this.elementHost1.Child = this.navigatorView1;
             // 
             // EditorHost
             // 
@@ -64,7 +64,7 @@
         #endregion
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Chem4Word.ACME.Editor editor1;
+        private Chem4Word.Navigator.NavigatorView navigatorView1;
     }
 }
 

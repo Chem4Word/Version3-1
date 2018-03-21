@@ -53,7 +53,7 @@ namespace Chem4Word.UI
             this.cboUpdateFrequency = new System.Windows.Forms.ComboBox();
             this.chkAutomaticUpdates = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
-            this.tabControlEx1 = new Chem4Word.Core.UI.Controls.TabControlEx();
+            this.OptionsTab = new Chem4Word.Core.UI.Controls.TabControlEx();
             this.tabPlugIns = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.RendererGroup = new System.Windows.Forms.GroupBox();
@@ -77,7 +77,7 @@ namespace Chem4Word.UI
             this.OpenPlugInFolder = new System.Windows.Forms.Button();
             this.OpenLibraryFolder = new System.Windows.Forms.Button();
             this.OpenSettingsFolder = new System.Windows.Forms.Button();
-            this.tabControlEx1.SuspendLayout();
+            this.OptionsTab.SuspendLayout();
             this.tabPlugIns.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.RendererGroup.SuspendLayout();
@@ -327,22 +327,22 @@ namespace Chem4Word.UI
             this.label11.TabIndex = 12;
             this.label11.Text = "Update check frequency";
             // 
-            // tabControlEx1
+            // OptionsTab
             // 
-            this.tabControlEx1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.OptionsTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControlEx1.Controls.Add(this.tabPlugIns);
-            this.tabControlEx1.Controls.Add(this.tabWebServices);
-            this.tabControlEx1.Controls.Add(this.tabTelemetry);
-            this.tabControlEx1.Controls.Add(this.tabUpdates);
-            this.tabControlEx1.Controls.Add(this.tabLibrary);
-            this.tabControlEx1.Controls.Add(this.tabMaintenance);
-            this.tabControlEx1.Location = new System.Drawing.Point(12, 12);
-            this.tabControlEx1.Name = "tabControlEx1";
-            this.tabControlEx1.SelectedIndex = 0;
-            this.tabControlEx1.Size = new System.Drawing.Size(612, 370);
-            this.tabControlEx1.TabIndex = 11;
+            this.OptionsTab.Controls.Add(this.tabPlugIns);
+            this.OptionsTab.Controls.Add(this.tabWebServices);
+            this.OptionsTab.Controls.Add(this.tabTelemetry);
+            this.OptionsTab.Controls.Add(this.tabUpdates);
+            this.OptionsTab.Controls.Add(this.tabLibrary);
+            this.OptionsTab.Controls.Add(this.tabMaintenance);
+            this.OptionsTab.Location = new System.Drawing.Point(12, 12);
+            this.OptionsTab.Name = "OptionsTab";
+            this.OptionsTab.SelectedIndex = 0;
+            this.OptionsTab.Size = new System.Drawing.Size(612, 370);
+            this.OptionsTab.TabIndex = 11;
             // 
             // tabPlugIns
             // 
@@ -559,27 +559,27 @@ namespace Chem4Word.UI
             // 
             // label4
             // 
-            this.label4.Location = new System.Drawing.Point(197, 165);
+            this.label4.Location = new System.Drawing.Point(249, 158);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(369, 25);
+            this.label4.Size = new System.Drawing.Size(277, 46);
             this.label4.TabIndex = 8;
             this.label4.Text = "This folder is where the Chem4Word Plug-Ins are installed.";
             // 
             // label3
             // 
-            this.label3.Location = new System.Drawing.Point(197, 111);
+            this.label3.Location = new System.Drawing.Point(249, 104);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(369, 25);
+            this.label3.Size = new System.Drawing.Size(277, 46);
             this.label3.TabIndex = 7;
-            this.label3.Text = "This folder is where Chem4Word stores the Library.";
+            this.label3.Text = "This folder is where Chem4Word stores system settings.";
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(197, 57);
+            this.label1.Location = new System.Drawing.Point(249, 50);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(369, 25);
+            this.label1.Size = new System.Drawing.Size(277, 46);
             this.label1.TabIndex = 6;
-            this.label1.Text = "This folder is where Chem4Word stores its settings.";
+            this.label1.Text = "This folder is where Chem4Word stores its user settings.";
             // 
             // MaintenanceInformation
             // 
@@ -595,7 +595,7 @@ namespace Chem4Word.UI
             this.OpenPlugInFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.OpenPlugInFolder.Location = new System.Drawing.Point(15, 149);
             this.OpenPlugInFolder.Name = "OpenPlugInFolder";
-            this.OpenPlugInFolder.Size = new System.Drawing.Size(176, 48);
+            this.OpenPlugInFolder.Size = new System.Drawing.Size(218, 48);
             this.OpenPlugInFolder.TabIndex = 4;
             this.OpenPlugInFolder.Text = "Open Plug-Ins Folder";
             this.OpenPlugInFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -609,9 +609,9 @@ namespace Chem4Word.UI
             this.OpenLibraryFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.OpenLibraryFolder.Location = new System.Drawing.Point(15, 95);
             this.OpenLibraryFolder.Name = "OpenLibraryFolder";
-            this.OpenLibraryFolder.Size = new System.Drawing.Size(176, 48);
+            this.OpenLibraryFolder.Size = new System.Drawing.Size(218, 48);
             this.OpenLibraryFolder.TabIndex = 2;
-            this.OpenLibraryFolder.Text = "Open Library Folder";
+            this.OpenLibraryFolder.Text = "Open System Settings Folder";
             this.OpenLibraryFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OpenLibraryFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.OpenLibraryFolder.UseVisualStyleBackColor = true;
@@ -623,9 +623,9 @@ namespace Chem4Word.UI
             this.OpenSettingsFolder.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.OpenSettingsFolder.Location = new System.Drawing.Point(15, 41);
             this.OpenSettingsFolder.Name = "OpenSettingsFolder";
-            this.OpenSettingsFolder.Size = new System.Drawing.Size(176, 48);
+            this.OpenSettingsFolder.Size = new System.Drawing.Size(218, 48);
             this.OpenSettingsFolder.TabIndex = 0;
-            this.OpenSettingsFolder.Text = "Open Settings Folder";
+            this.OpenSettingsFolder.Text = "Open User Settings Folder";
             this.OpenSettingsFolder.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.OpenSettingsFolder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.OpenSettingsFolder.UseVisualStyleBackColor = true;
@@ -636,7 +636,7 @@ namespace Chem4Word.UI
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(638, 432);
-            this.Controls.Add(this.tabControlEx1);
+            this.Controls.Add(this.OptionsTab);
             this.Controls.Add(this.btnSetDefaults);
             this.Controls.Add(this.btnOk);
             this.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -650,7 +650,7 @@ namespace Chem4Word.UI
             this.Text = "User Options";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormOptions_FormClosing);
             this.Load += new System.EventHandler(this.FormOptions_Load);
-            this.tabControlEx1.ResumeLayout(false);
+            this.OptionsTab.ResumeLayout(false);
             this.tabPlugIns.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.RendererGroup.ResumeLayout(false);
@@ -691,7 +691,7 @@ namespace Chem4Word.UI
         private System.Windows.Forms.Label lblSearcherDescription;
         private System.Windows.Forms.Button btnSearcherSettings;
         private System.Windows.Forms.ComboBox cboSearchers;
-        private TabControlEx tabControlEx1;
+        private TabControlEx OptionsTab;
         private System.Windows.Forms.TabPage tabPlugIns;
         private System.Windows.Forms.TabPage tabWebServices;
         private System.Windows.Forms.TabPage tabTelemetry;

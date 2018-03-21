@@ -35,12 +35,16 @@
             this.display1 = new Chem4Word.ACME.Display();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.ChangeBackground = new System.Windows.Forms.Button();
+            this.ShowCarbons = new System.Windows.Forms.CheckBox();
+            this.RemoveAtom = new System.Windows.Forms.Button();
+            this.RandomElement = new System.Windows.Forms.Button();
+            this.EditorType = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // LoadStructure
             // 
             this.LoadStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LoadStructure.Location = new System.Drawing.Point(12, 438);
+            this.LoadStructure.Location = new System.Drawing.Point(12, 482);
             this.LoadStructure.Name = "LoadStructure";
             this.LoadStructure.Size = new System.Drawing.Size(75, 23);
             this.LoadStructure.TabIndex = 0;
@@ -56,7 +60,7 @@
             // 
             this.EditStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EditStructure.Enabled = false;
-            this.EditStructure.Location = new System.Drawing.Point(519, 438);
+            this.EditStructure.Location = new System.Drawing.Point(527, 481);
             this.EditStructure.Name = "EditStructure";
             this.EditStructure.Size = new System.Drawing.Size(75, 23);
             this.EditStructure.TabIndex = 2;
@@ -72,7 +76,7 @@
             this.elementHost1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.elementHost1.Location = new System.Drawing.Point(12, 12);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(582, 420);
+            this.elementHost1.Size = new System.Drawing.Size(671, 463);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = this.display1;
@@ -80,7 +84,7 @@
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(110, 438);
+            this.ChangeBackground.Location = new System.Drawing.Point(88, 482);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -88,18 +92,70 @@
             this.ChangeBackground.UseVisualStyleBackColor = true;
             this.ChangeBackground.Click += new System.EventHandler(this.ChangeBackground_Click);
             // 
+            // ShowCarbons
+            // 
+            this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ShowCarbons.AutoSize = true;
+            this.ShowCarbons.Enabled = false;
+            this.ShowCarbons.Location = new System.Drawing.Point(169, 485);
+            this.ShowCarbons.Name = "ShowCarbons";
+            this.ShowCarbons.Size = new System.Drawing.Size(95, 17);
+            this.ShowCarbons.TabIndex = 4;
+            this.ShowCarbons.Text = "Show Carbons";
+            this.ShowCarbons.UseVisualStyleBackColor = true;
+            this.ShowCarbons.CheckedChanged += new System.EventHandler(this.ShowCarbons_CheckedChanged);
+            // 
+            // RemoveAtom
+            // 
+            this.RemoveAtom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.RemoveAtom.Enabled = false;
+            this.RemoveAtom.Location = new System.Drawing.Point(270, 482);
+            this.RemoveAtom.Name = "RemoveAtom";
+            this.RemoveAtom.Size = new System.Drawing.Size(97, 23);
+            this.RemoveAtom.TabIndex = 5;
+            this.RemoveAtom.Text = "Remove Atom";
+            this.RemoveAtom.UseVisualStyleBackColor = true;
+            this.RemoveAtom.Click += new System.EventHandler(this.RemoveAtom_Click);
+            // 
+            // RandomElement
+            // 
+            this.RandomElement.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.RandomElement.Enabled = false;
+            this.RandomElement.Location = new System.Drawing.Point(373, 482);
+            this.RandomElement.Name = "RandomElement";
+            this.RandomElement.Size = new System.Drawing.Size(97, 23);
+            this.RandomElement.TabIndex = 6;
+            this.RandomElement.Text = "Random Element";
+            this.RandomElement.UseVisualStyleBackColor = true;
+            this.RandomElement.Click += new System.EventHandler(this.RandomElement_Click);
+            // 
+            // EditorType
+            // 
+            this.EditorType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.EditorType.Enabled = false;
+            this.EditorType.Location = new System.Drawing.Point(608, 482);
+            this.EditorType.Name = "EditorType";
+            this.EditorType.Size = new System.Drawing.Size(75, 21);
+            this.EditorType.TabIndex = 0;
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(606, 473);
+            this.ClientSize = new System.Drawing.Size(695, 514);
+            this.Controls.Add(this.EditorType);
+            this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.EditStructure);
             this.Controls.Add(this.elementHost1);
+            this.Controls.Add(this.RandomElement);
+            this.Controls.Add(this.RemoveAtom);
             this.Controls.Add(this.LoadStructure);
             this.Name = "FlexForm";
             this.Text = "Flexible Display";
+            this.Load += new System.EventHandler(this.FlexForm_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -112,6 +168,10 @@
         private Chem4Word.ACME.Display display1;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Button ChangeBackground;
+        private System.Windows.Forms.CheckBox ShowCarbons;
+        private System.Windows.Forms.ComboBox EditorType;
+        private System.Windows.Forms.Button RemoveAtom;
+        private System.Windows.Forms.Button RandomElement;
     }
 }
 

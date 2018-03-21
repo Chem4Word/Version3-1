@@ -241,9 +241,27 @@ namespace Chem4Word.Model
                     {
                         if (Element.Symbol == "C")
                         {
-                            if (ShowSymbol | Degree <= 1)
+                            if (ShowSymbol)
                             {
                                 return "C";
+                            }
+
+                            if (Degree <= 1)
+                            {
+                                return "C";
+                            }
+
+                            if (Degree == 2)
+                            {
+                                Point p1 = this.Bonds[0].OtherAtom(this).Position;
+                                Point p2 = this.Bonds[1].OtherAtom(this).Position;
+
+                                double angle1 = Vector.AngleBetween(-(this.Position - p1), this.Position - p2);
+
+                                if (Math.Abs(angle1) < 8)
+                                {
+                                    return "C";
+                                }
                             }
 
                             return "";
@@ -513,6 +531,13 @@ namespace Chem4Word.Model
             OnPropertyChanged("Degree");
             OnPropertyChanged("ImplicitHydrogenCount");
             OnPropertyChanged("BalancingVector");
+            OnPropertyChanged("ShowSymbol");
+            OnPropertyChanged("SymbolText");
+
+            foreach (Bond bond in Bonds.Where(b=>b.OrderValue==2))
+            {
+                bond.NotifyPlacementChanged();
+            }
         }
 
         private void Rings_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
