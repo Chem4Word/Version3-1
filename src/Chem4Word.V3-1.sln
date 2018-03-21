@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{D4427174-46F5-4058-8934-4CEAFDBAF60D}"
 	ProjectSection(SolutionItems) = preProject
@@ -103,7 +103,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Editor.ChemDoodle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.ACME", "Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj", "{1E3FC1F1-06CC-44BD-8004-3EF0CE7EEAA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGEditorMockup", "FGEditorMockup\FGEditorMockup.csproj", "{BB442368-C3F9-4FD9-8A9A-8AF1B3AE713B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGEditorMockup", "TestHarness\FGEditorMockup\FGEditorMockup.csproj", "{BB442368-C3F9-4FD9-8A9A-8AF1B3AE713B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

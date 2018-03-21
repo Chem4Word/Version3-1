@@ -151,6 +151,7 @@
     <Compile Include="Converters\MDL\SdfState.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="ElementBase.cs" />
+    <Compile Include="ElementConverter.cs" />
     <Compile Include="Enums\Enums.cs" />
     <Compile Include="Formula.cs" />
     <Compile Include="FunctionalGroup.cs" />

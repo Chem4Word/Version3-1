@@ -5,8 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.ComponentModel;
+
 namespace Chem4Word.Model
 {
+    [TypeConverter(typeof(ElementConverter))]
     public abstract class ElementBase
     {
         public virtual double AtomicWeight { get; set; }

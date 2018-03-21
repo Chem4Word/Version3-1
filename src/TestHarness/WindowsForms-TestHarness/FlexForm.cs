@@ -34,8 +34,8 @@ namespace WinFormsTestHarness
             sb.Append("|CML molecule files (*.cml)|*.cml");
             sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
-            openFileDialog1.FileName = "*.*";
             openFileDialog1.Filter = sb.ToString();
+            openFileDialog1.FileName = "";
 
             DialogResult dr = openFileDialog1.ShowDialog();
 
@@ -89,7 +89,7 @@ namespace WinFormsTestHarness
             if (model != null)
             {
                 CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(model));
+                EditorHost editorHost = new EditorHost(cc.Export(model), EditorType.Text);
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
@@ -128,20 +128,13 @@ namespace WinFormsTestHarness
                         Text = filename;
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
-                    model.ScaleToAverageBondLength(40);
-                    // -------------------------------------------------------------------------
-                    // Cheat by setting Carbons, Displaying structure, then turning Carbons off.
-                    // -------------------------------------------------------------------------
-                    SetCarbons(model, true); // <-- Cheat
                     display1.Chemistry = model;
-                    SetCarbons(model, false); // <-- Cheat
-
                     ShowCarbons.Checked = false;
-                    ShowCarbons.Enabled = true;
                     EditStructure.Enabled = true;
                     ShowCarbons.Enabled = true;
                     RemoveAtom.Enabled = true;
                     RandomElement.Enabled = true;
+                    EditorType.Enabled = true;
                 }
             }
         }
@@ -169,7 +162,9 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
-                SetCarbons(model, ShowCarbons.Checked);
+                Model newModel = model.Clone();
+                SetCarbons(newModel, ShowCarbons.Checked);
+                display1.Chemistry = newModel;
             }
         }
 
@@ -223,6 +218,14 @@ namespace WinFormsTestHarness
                     model.RefreshMolecules();
                 }
             }
+        }
+
+        private void FlexForm_Load(object sender, EventArgs e)
+        {
+            EditorType.Items.Clear();
+            EditorType.Items.Add("ACME");
+            EditorType.Items.Add("CML");
+            EditorType.SelectedIndex = 0;
         }
     }
 }
