@@ -223,8 +223,8 @@ namespace WinFormsTestHarness
         private void FlexForm_Load(object sender, EventArgs e)
         {
             EditorType.Items.Clear();
-            EditorType.Items.Add("CML");
             EditorType.Items.Add("ACME");
+            EditorType.Items.Add("CML");
             EditorType.SelectedIndex = 0;
         }
     }

@@ -47,7 +47,7 @@ namespace WinFormsTestHarness
         private void OnWpfOkButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
-            if (args.Button.Equals("OK"))
+            if (args.Button.Equals("OK") || args.Button.Equals("SAVE"))
             {
                 Result = DialogResult.OK;
                 OutputValue = args.OutputValue;

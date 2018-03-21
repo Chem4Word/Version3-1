@@ -8,6 +8,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Model.Converters;
 
 namespace Chem4Word.ACME
 {
@@ -97,11 +98,7 @@ namespace Chem4Word.ACME
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            //WpfEventArgs args = new WpfEventArgs();
-            //args.OutputValue = _cml;
-            //args.Button = "OK";
 
-            //OnOkButtonClick?.Invoke(this, args);
         }
 
         private void EventSetter_OnHandler(object sender, RoutedEventArgs e)
@@ -121,7 +118,8 @@ namespace Chem4Word.ACME
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
-          
+            CMLConverter cc = new CMLConverter();
+            DrawingArea.Chemistry = cc.Import(_cml);
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -131,7 +129,15 @@ namespace Chem4Word.ACME
 
         private void DrawingArea_Loaded(object sender, RoutedEventArgs e)
         {
+        }
 
+        private void SaveButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            WpfEventArgs args = new WpfEventArgs();
+            args.OutputValue = _cml;
+            args.Button = "SAVE";
+
+            OnOkButtonClick?.Invoke(this, args);
         }
     }
 }
