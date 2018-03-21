@@ -33,7 +33,7 @@ namespace WinFormsTestHarness
             sb.Append("|CML molecule files (*.cml)|*.cml");
             sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
-            openFileDialog1.FileName = "*.*";
+            openFileDialog1.FileName = "*.cml";
             openFileDialog1.Filter = sb.ToString();
 
             DialogResult dr = openFileDialog1.ShowDialog();
@@ -88,7 +88,7 @@ namespace WinFormsTestHarness
             if (model != null)
             {
                 CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(model));
+                EditorHost editorHost = new EditorHost(cc.Export(model), EditorType.Text);
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
@@ -131,6 +131,7 @@ namespace WinFormsTestHarness
                     ShowCarbons.Checked = false;
                     EditStructure.Enabled = true;
                     ShowCarbons.Enabled = true;
+                    EditorType.Enabled = true;
                 }
             }
         }
@@ -155,6 +156,14 @@ namespace WinFormsTestHarness
                     }
                 }
             }
+        }
+
+        private void FlexForm_Load(object sender, EventArgs e)
+        {
+            EditorType.Items.Clear();
+            EditorType.Items.Add("CML");
+            EditorType.Items.Add("ACME");
+            EditorType.SelectedIndex = 0;
         }
     }
 }

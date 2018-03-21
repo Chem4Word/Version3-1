@@ -22,12 +22,17 @@ namespace Chem4Word.ACME
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
         public event EventHandler OnOkButtonClick;
+        // ToDo: Remove this
+        private string _cml;
 
         /// <summary>
         /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         /// </summary>
-        public Editor()
+        public Editor(string cml)
         {
+            // ToDo: Load into initial model
+            _cml = cml;
+
             EnsureApplicationResources();
             InitializeComponent();
         }
@@ -77,6 +82,7 @@ namespace Chem4Word.ACME
         {
 
         }
+
         public AtomOption SelectedAtomOption
         {
             get { return (AtomOption) GetValue(SelectedAtomOptionProperty); }
@@ -92,7 +98,7 @@ namespace Chem4Word.ACME
         private void button_Click(object sender, RoutedEventArgs e)
         {
             //WpfEventArgs args = new WpfEventArgs();
-            //args.OutputValue = cmlText.Text;
+            //args.OutputValue = _cml;
             //args.Button = "OK";
 
             //OnOkButtonClick?.Invoke(this, args);

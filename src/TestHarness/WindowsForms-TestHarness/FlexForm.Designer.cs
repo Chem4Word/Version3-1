@@ -36,6 +36,7 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.ChangeBackground = new System.Windows.Forms.Button();
             this.ShowCarbons = new System.Windows.Forms.CheckBox();
+            this.EditorType = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -57,7 +58,7 @@
             // 
             this.EditStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EditStructure.Enabled = false;
-            this.EditStructure.Location = new System.Drawing.Point(519, 438);
+            this.EditStructure.Location = new System.Drawing.Point(451, 438);
             this.EditStructure.Name = "EditStructure";
             this.EditStructure.Size = new System.Drawing.Size(75, 23);
             this.EditStructure.TabIndex = 2;
@@ -81,7 +82,7 @@
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(118, 438);
+            this.ChangeBackground.Location = new System.Drawing.Point(93, 438);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -94,7 +95,7 @@
             this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCarbons.AutoSize = true;
             this.ShowCarbons.Enabled = false;
-            this.ShowCarbons.Location = new System.Drawing.Point(211, 442);
+            this.ShowCarbons.Location = new System.Drawing.Point(174, 442);
             this.ShowCarbons.Name = "ShowCarbons";
             this.ShowCarbons.Size = new System.Drawing.Size(124, 17);
             this.ShowCarbons.TabIndex = 4;
@@ -102,11 +103,22 @@
             this.ShowCarbons.UseVisualStyleBackColor = true;
             this.ShowCarbons.CheckedChanged += new System.EventHandler(this.ShowCarbons_CheckedChanged);
             // 
+            // EditorType
+            // 
+            this.EditorType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.EditorType.Enabled = false;
+            this.EditorType.FormattingEnabled = true;
+            this.EditorType.Location = new System.Drawing.Point(532, 440);
+            this.EditorType.Name = "EditorType";
+            this.EditorType.Size = new System.Drawing.Size(62, 21);
+            this.EditorType.TabIndex = 5;
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(606, 473);
+            this.Controls.Add(this.EditorType);
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.EditStructure);
@@ -114,6 +126,7 @@
             this.Controls.Add(this.LoadStructure);
             this.Name = "FlexForm";
             this.Text = "Flexible Display";
+            this.Load += new System.EventHandler(this.FlexForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -129,6 +142,7 @@
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Button ChangeBackground;
         private System.Windows.Forms.CheckBox ShowCarbons;
+        private System.Windows.Forms.ComboBox EditorType;
     }
 }
 
