@@ -8,6 +8,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Chem4Word.ACME;
 
 namespace Chem4Word.Editor.SimpleWpfEditor
 {
@@ -27,9 +28,8 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
             this.MinimumSize = new Size(300, 200);
 
-            EditorControl ec = new EditorControl();
+            CmlEditor ec = new CmlEditor(cml);
             ec.InitializeComponent();
-            ec.textBox.Text = cml;
             elementHost1.Child = ec;
             ec.OnOkButtonClick += OnWpfOkButtonClick;
         }
@@ -61,15 +61,9 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
-            EditorControl ec = elementHost1.Child as EditorControl;
+            CmlEditor ec = elementHost1.Child as CmlEditor;
             ec.OnOkButtonClick -= OnWpfOkButtonClick;
             ec = null;
         }
-    }
-
-    public class WpfEventArgs : EventArgs
-    {
-        public string Button { get; set; }
-        public string OutputValue { get; set; }
     }
 }
