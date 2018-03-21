@@ -23,8 +23,11 @@ namespace Chem4Word.Model
     [DebuggerDisplay("Atoms: {Atoms.Count} Priority: {Priority}")]
     public class Ring : IComparer<Ring>
     {
-        //private Point? _centroid;
-
+      
+        /// <summary>
+        /// Indicates which rings of a set of fused rings 
+        /// should host a double bond in preference
+        /// </summary>
         public int Priority
         {
             get
@@ -137,10 +140,12 @@ namespace Chem4Word.Model
         /// <remarks>Do NOT set explicitly.  Add or remove the ring from a Molecule</remarks>
         public Molecule Parent { get; set; }
 
+       
+        private Point? _centroid;
         /// <summary>
-        /// Obtains the centroid of the ring.
-        ///  </summary>
-        /*public System.Windows.Point? Centroid
+        /// The center of the ring
+        /// </summary>
+        public System.Windows.Point? Centroid
         {
             get
             {
@@ -151,26 +156,23 @@ namespace Chem4Word.Model
                 return _centroid;
             }
         }
-        */
-
-        public System.Windows.Point? Centroid
-        {
-            get
-            {
-                return Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
-            }
-        }
-
+        
         public List<Atom> ConvexHull
         {
             get
             {
-                var atomList = from Atom a in this.Atoms
-                               orderby a.Position.X ascending, a.Position.Y descending
-                               select a;
+                var atomList = AtomsSortedForHull();
 
                 return Geometry<Atom>.GetHull(atomList, atom => atom.Position);
             }
+        }
+
+        private IOrderedEnumerable<Atom> AtomsSortedForHull()
+        {
+            var atomList = from Atom a in this.Atoms
+                orderby a.Position.X ascending, a.Position.Y descending
+                select a;
+            return atomList;
         }
 
         public List<Bond> DoubleBonds => Bonds.Where(b => (b.Order == Bond.OrderSingle | b.Order == Bond.OrderAromatic)).ToList();
@@ -205,7 +207,7 @@ namespace Chem4Word.Model
                       select n;
             var nextatoms = adj.ToArray();
 
-            Debug.Assert(nextatoms.Count() == 2);
+            //Debug.Assert(nextatoms.Count() == 2);
 
             Vector v1 = nextatoms[0].Position - start.Position;
 
@@ -215,14 +217,7 @@ namespace Chem4Word.Model
             //multiply the angle by the direction to choose the correct atom
             double angle = (int)direction * Vector.AngleBetween(v1, v2);
 
-            if (angle > 0)
-            {
-                next = nextatoms[0];
-            }
-            else
-            {
-                next = nextatoms[1];
-            }
+            next = angle > 0 ? nextatoms[0] : nextatoms[1];
             //circle the ring, making sure we ignore atoms we've visited already
             while (next != null)
             {

@@ -1,0 +1,584 @@
+{
+  "R#": {
+    "Symbol": "R#",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R1": {
+    "Symbol": "R1",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R2": {
+    "Symbol": "R2",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R3": {
+    "Symbol": "R3",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R4": {
+    "Symbol": "R4",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R5": {
+    "Symbol": "R5",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R6": {
+    "Symbol": "R6",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R7": {
+    "Symbol": "R7",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R8": {
+    "Symbol": "R8",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R9": {
+    "Symbol": "R9",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R10": {
+    "Symbol": "R10",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R11": {
+    "Symbol": "R11",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R12": {
+    "Symbol": "R12",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R13": {
+    "Symbol": "R13",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R14": {
+    "Symbol": "R14",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R15": {
+    "Symbol": "R15",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "R16": {
+    "Symbol": "R16",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
+  "OH": {
+    "Symbol": "OH",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 1
+      }
+    ]
+  },
+  "CH2": {
+    "Symbol": "CH2",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 2
+      }
+    ]
+  },
+  "CH3": {
+    "Symbol": "CH3",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 3
+      }
+    ]
+  },
+  "C2H5": {
+    "Symbol": "C2H5",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 2
+      },
+      {
+        "Component": "H",
+        "Count": 5
+      }
+    ]
+  },
+  "Me": {
+    "Symbol": "Me",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 2
+      }
+    ]
+  },
+  "Et": {
+    "Symbol": "Et",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 2
+      },
+      {
+        "Component": "H",
+        "Count": 5
+      }
+    ]
+  },
+  "Pr": {
+    "Symbol": "Pr",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 3
+      },
+      {
+        "Component": "H",
+        "Count": 7
+      }
+    ]
+  },
+  "i-Pr": {
+    "Symbol": "i-Pr",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 3
+      },
+      {
+        "Component": "H",
+        "Count": 7
+      }
+    ]
+  },
+  "iPr": {
+    "Symbol": "iPr",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 3
+      },
+      {
+        "Component": "H",
+        "Count": 7
+      }
+    ]
+  },
+  "nBu": {
+    "Symbol": "nBu",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 4
+      },
+      {
+        "Component": "H",
+        "Count": 9
+      }
+    ]
+  },
+  "n-Bu": {
+    "Symbol": "n-Bu",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 4
+      },
+      {
+        "Component": "H",
+        "Count": 9
+      }
+    ]
+  },
+  "tBu": {
+    "Symbol": "tBu",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 4
+      },
+      {
+        "Component": "H",
+        "Count": 9
+      }
+    ]
+  },
+  "t-Bu": {
+    "Symbol": "t-Bu",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 4
+      },
+      {
+        "Component": "H",
+        "Count": 9
+      }
+    ]
+  },
+  "Ph": {
+    "Symbol": "Ph",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 6
+      },
+      {
+        "Component": "H",
+        "Count": 9
+      }
+    ]
+  },
+  "CF3": {
+    "Symbol": "CF3",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "F",
+        "Count": 3
+      }
+    ]
+  },
+  "CCl3": {
+    "Symbol": "CCl3",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "Cl",
+        "Count": 3
+      }
+    ]
+  },
+  "C2F5": {
+    "Symbol": "C2F5",
+    "ShowAsSymbol": false,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 2
+      },
+      {
+        "Component": "F",
+        "Count": 5
+      }
+    ]
+  },
+  "TMS": {
+    "Symbol": "TMS",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 3
+      },
+      {
+        "Component": "Si",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 9
+      }
+    ]
+  },
+  "COOH": {
+    "Symbol": "COOH",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 1
+      }
+    ]
+  },
+  "CO2H": {
+    "Symbol": "CO2H",
+    "ShowAsSymbol": false,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "C",
+        "Count": 1
+      },
+      {
+        "Component": "O",
+        "Count": 2
+      },
+      {
+        "Component": "H",
+        "Count": 1
+      }
+    ]
+  },
+  "NO2": {
+    "Symbol": "NO2",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "N",
+        "Count": 1
+      },
+      {
+        "Component": "O",
+        "Count": 2
+      }
+    ]
+  },
+  "NH2": {
+    "Symbol": "NH2",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "N",
+        "Count": 1
+      },
+      {
+        "Component": "H",
+        "Count": 2
+      }
+    ]
+  },
+  "CH2OH": {
+    "Symbol": "CH2OH",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "CH2",
+        "Count": 1
+      },
+      {
+        "Component": "OH",
+        "Count": 1
+      }
+    ]
+  },
+  "CH2CH2OH": {
+    "Symbol": "CH2CH2OH",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "CH2",
+        "Count": 1
+      },
+      {
+        "Component": "CH2",
+        "Count": 1
+      },
+      {
+        "Component": "OH",
+        "Count": 1
+      }
+    ]
+  },
+  "Bz": {
+    "Symbol": "Bz",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "Ph",
+        "Count": 1
+      },
+      {
+        "Component": "CH2",
+        "Count": 1
+      }
+    ]
+  }
+}
