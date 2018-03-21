@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
+using System;
+using System.Windows;
 
 namespace Chem4Word.ACME
 {
@@ -14,11 +17,7 @@ namespace Chem4Word.ACME
     /// </summary>
     public class BondOption : DependencyObject
     {
-
-
-
-
-        public String  Order
+        public String Order
         {
             get { return (string)GetValue(OrderProperty); }
             set { SetValue(OrderProperty, value); }
@@ -27,8 +26,6 @@ namespace Chem4Word.ACME
         // Using a DependencyProperty as the backing store for Order.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderProperty =
             DependencyProperty.Register("Order", typeof(string), typeof(BondOption), new PropertyMetadata(Bond.OrderPartial01));
-
-
 
         public BondStereo? Stereo
         {
@@ -39,8 +36,6 @@ namespace Chem4Word.ACME
         // Using a DependencyProperty as the backing store for BondStereoEnums.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BondStereoEnumsProperty =
             DependencyProperty.Register("Stereo", typeof(BondStereo?), typeof(BondOption), new PropertyMetadata(BondStereo.None));
-
-
 
         public Style DisplayStyle
         {

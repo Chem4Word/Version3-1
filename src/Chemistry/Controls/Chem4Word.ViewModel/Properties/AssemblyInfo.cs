@@ -11,11 +11,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Chem4Word.ViewModel")]
+[assembly: AssemblyTitle("Chem4Word.View")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Chem4Word")]
-[assembly: AssemblyProduct("Chem4Word.ViewModel")]
+[assembly: AssemblyProduct("Chem4Word.View")]
 [assembly: AssemblyCopyright("© Chem4Word 2018. All rights reserved.")]
 [assembly: AssemblyTrademark("Chem4Word")]
 [assembly: AssemblyCulture("")]

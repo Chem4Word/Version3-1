@@ -142,29 +142,29 @@
         <File Id="Chem4WordUpdater.exe" Source="..\Chem4WordUpdater\bin\$(var.Configuration)\Chem4WordUpdater.exe" />
       </Component>
       <!-- Our Other Assemblies -->
-      <Component Id="Chem4Word.Controls">
-        <File Id="Chem4Word.Controls.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Controls.dll" />
-        <File Id="Chem4Word.Controls.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Controls.pdb" />
+      <Component Id="IChem4Word.Contracts">
+        <File Id="IChem4Word.Contracts.dll" Source="$(var.Chem4Word.V3.TargetDir)IChem4Word.Contracts.dll" />
+        <File Id="IChem4Word.Contracts.pdb" Source="$(var.Chem4Word.V3.TargetDir)IChem4Word.Contracts.pdb" />
       </Component>
-      <Component Id="Chem4Word.Core">
-        <File Id="Chem4Word.Core.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.dll" />
-        <File Id="Chem4Word.Core.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.pdb" />
+      <Component Id="Chem4Word.ACME">
+        <File Id="Chem4Word.ACME.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ACME.dll" />
+        <File Id="Chem4Word.ACME.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ACME.pdb" />
       </Component>
       <Component Id="Chem4Word.Model">
         <File Id="Chem4Word.Model.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Model.dll" />
         <File Id="Chem4Word.Model.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Model.pdb" />
       </Component>
+      <Component Id="Chem4Word.View">
+        <File Id="Chem4Word.View.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.View.dll" />
+        <File Id="Chem4Word.View.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.View.pdb" />
+      </Component>
+      <Component Id="Chem4Word.Core">
+        <File Id="Chem4Word.Core.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.dll" />
+        <File Id="Chem4Word.Core.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.pdb" />
+      </Component>
       <Component Id="Chem4Word.Telemetry">
         <File Id="Chem4Word.Telemetry.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Telemetry.dll" />
         <File Id="Chem4Word.Telemetry.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Telemetry.pdb" />
-      </Component>
-      <Component Id="Chem4Word.ViewModel">
-        <File Id="Chem4Word.ViewModel.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ViewModel.dll" />
-        <File Id="Chem4Word.ViewModel.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ViewModel.pdb" />
-      </Component>
-      <Component Id="IChem4Word.Contracts">
-        <File Id="IChem4Word.Contracts.dll" Source="$(var.Chem4Word.V3.TargetDir)IChem4Word.Contracts.dll" />
-        <File Id="IChem4Word.Contracts.pdb" Source="$(var.Chem4Word.V3.TargetDir)IChem4Word.Contracts.pdb" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -258,11 +258,6 @@
       </Component>
       <Component Id="System.Data.SQLite.Linq">
         <File Id="System.Data.SQLite.Linq.dll" Source="$(var.Chem4Word.V3.TargetDir)System.Data.SQLite.Linq.dll" />
-      </Component>
-      <!-- WPF ToolKit -->
-      <Component Id="DotNetProjects.Input.Toolkit">
-        <File Id="DotNetProjects.Input.Toolkit.dll" Source="$(var.Chem4Word.V3.TargetDir)DotNetProjects.Input.Toolkit.dll" />
-        <File Id="DotNetProjects.Input.Toolkit.pdb" Source="$(var.Chem4Word.V3.TargetDir)DotNetProjects.Input.Toolkit.pdb" />
       </Component>
       <Component Id="System.Spatial">
         <File Id="System.Spatial.dll" Source="$(var.Chem4Word.V3.TargetDir)System.Spatial.dll" />

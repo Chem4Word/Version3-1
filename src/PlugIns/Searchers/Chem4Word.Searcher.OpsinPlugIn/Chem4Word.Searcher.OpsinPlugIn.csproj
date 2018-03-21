@@ -102,10 +102,6 @@
       <Project>{1e3fc1f1-06cc-44bd-8004-3ef0ce7eeaa7}</Project>
       <Name>Chem4Word.ACME</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Chemistry\Controls\Chem4Word.Controls\Chem4Word.Controls.csproj">
-      <Project>{2029399E-696B-46F4-822D-BE3DF61C8256}</Project>
-      <Name>Chem4Word.Controls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Chem4Word.Core\Chem4Word.Core.csproj">
       <Project>{2e7b1308-8149-4b03-9cb9-48e0b7151560}</Project>
       <Name>Chem4Word.Core</Name>
