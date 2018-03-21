@@ -9,13 +9,14 @@
     xmlns:local="clr-namespace:Chem4Word.ACME"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
-    xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.ViewModel"
+    xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
     d:DesignHeight="300"
     d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance model:Model}"
     mc:Ignorable="d debug release"
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
-    xmlns:viewModel="clr-namespace:Chem4Word.View;assembly=Chem4Word.ViewModel"
+    xmlns:viewModel="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
     x:Name="ACMEDisplay">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />
