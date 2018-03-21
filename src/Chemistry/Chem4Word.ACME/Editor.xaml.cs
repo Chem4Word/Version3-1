@@ -31,7 +31,6 @@ namespace Chem4Word.ACME
         /// </summary>
         public Editor(string cml)
         {
-            // ToDo: Load into initial model
             _cml = cml;
 
             EnsureApplicationResources();
@@ -81,7 +80,6 @@ namespace Chem4Word.ACME
 
         private static void BondOptionChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
-
         }
 
         public AtomOption SelectedAtomOption
@@ -96,35 +94,28 @@ namespace Chem4Word.ACME
             set { SetValue(SliderVisibilityProperty, value); }
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void EventSetter_OnHandler(object sender, RoutedEventArgs e)
         {
-           
         }
 
         private void RingDropdown_OnClick(object sender, RoutedEventArgs e)
         {
-           
         }
 
         private void RingSelButton_OnClick(object sender, RoutedEventArgs e)
         {
-           
         }
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
+            // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
             DrawingArea.Chemistry = cc.Import(_cml);
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
         }
 
         private void DrawingArea_Loaded(object sender, RoutedEventArgs e)
