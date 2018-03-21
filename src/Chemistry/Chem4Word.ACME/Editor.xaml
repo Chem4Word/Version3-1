@@ -42,6 +42,17 @@
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
+                <Style TargetType="{x:Type Button}" x:Key="CommandButtonStyle">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="Width" Value="30" />
+                    <Setter Property="FontSize" Value="20" />
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Padding" Value="0" />
+                </Style>
                 <Style TargetType="{x:Type Path}" x:Key="ToolbarPathStyle">
                     <Setter Property="Fill" Value="Black" />
                     <Setter Property="Effect">
@@ -60,7 +71,8 @@
                     ToolTip="Current atom type"
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=SelectedAtomOption}" SelectionChanged="AtomCombo_SelectionChanged">
+                    SelectedValue="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, 
+                                    Path=SelectedAtomOption}" SelectionChanged="AtomCombo_SelectionChanged">
                 </ComboBox>
                 <ComboBox
 					x:Name="BondCombo"
@@ -68,7 +80,8 @@
                     ToolTip="Current bond type"
                     ItemsSource="{StaticResource BondItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding  RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}} , Path=SelectedBondOption}">
+                    SelectedValue="{Binding  RelativeSource={RelativeSource FindAncestor, 
+                            AncestorType={x:Type UserControl}} , Path=SelectedBondOption}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />
@@ -133,10 +146,11 @@
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="ChainButton">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
-                            <RotateTransform Angle="180"></RotateTransform>
+                            <RotateTransform Angle="180"/>
                         </Path.LayoutTransform>
                         <Path.Effect>
-                            <DropShadowEffect Color="LightGray" />
+                            <DropShadowEffect Color="LightGray" Direction="120" ShadowDepth="3"/>
+                            
                         </Path.Effect>
                     </Path>
                 </RadioButton>
@@ -168,15 +182,14 @@
                 </RadioButton>
             </ToolBar>
             <ToolBar x:Name="EditToolbar" Height="40" BandIndex="2">
-
-                <RadioButton ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}"  FontSize="18"  x:Name="DeleteButton">
+                <Button ToolTip="Delete" Style="{StaticResource CommandButtonStyle}"  FontSize="18"  x:Name="DeleteButton">
                     <Viewbox Stretch="UniformToFill" Height="24"  Width="24">
                         <Path Style="{StaticResource ToolbarPathStyle}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09
                               6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9
                               10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" />
                     </Viewbox>
-                </RadioButton>
-                <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="CutButton">
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="25">
                         <Path   Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
                                 33.538,38.5699L 36.9626,42.1932L 32.4905,46.6858C 32.8191,47.5548 33,48.5048 33,49.5C 33,53.6421 29.866,57 26,57C 22.134,57 19,53.6421
@@ -189,15 +202,15 @@
                                 M 39.0074,33.1005L 50.2564,21.8515C 49.8163,23.9301 48.9562,26.0005 46.4256,29.4492C 45.0997,31.2561 43.5411,33.3404 41.5003,35.5935L 39.0074,33.1005 Z
                                 M 35.8034,42.4922L 35.3653,42.0251L 31.9263,45.5067C 32.0391,45.6984 32.1441,45.8961 32.2406,46.099L 35.8034,42.4922 Z " />
                     </Viewbox>
-                </RadioButton>
-                <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="CopyButton">
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="22">
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
                               59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L
                               46,25.25 Z " />
                     </Viewbox>
-                </RadioButton>
-                <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="PasteButton">
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="PasteButton">
                     <Viewbox Stretch="UniformToFill" Width="22" Height="26">
 
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
@@ -209,8 +222,8 @@
                                   M 53,40.0001L 45,32.0001L 45.0001,40L 53,40.0001 Z M 28.5,25L 40.5,25C 40.5,25 39.4998,23.8809 39.4998,22.5002C 39.4998,21.1194
                                   38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z " />
                     </Viewbox>
-                </RadioButton>
-                <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="UndoButton">
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
                               27.296C 55.1649,28.0987 55.6564,28.9607 56.0698,29.8821C 56.4832,30.8035 56.8065,31.7766 57.0396,32.8014C 57.2727,33.8262 57.3892,
@@ -229,8 +242,8 @@
                               21.6785C 41.0919,21.5421 42.1079,21.474 43.0799,21.474C 44.087,21.474 45.0579,21.563 45.9925,21.7411C 46.9271,21.9193 47.8068,22.17
                               48.6314,22.4932C 49.4561,22.8165 50.2148,23.198 50.9075,23.6378C 51.6002,24.0777 52.2148,24.5571 52.7514,25.076 Z " />
                     </Viewbox>
-                </RadioButton>
-                <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="RedoButton">
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Data="F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
@@ -250,8 +263,8 @@
                               35.968,21.6785C 34.9081,21.5421 33.8921,21.474 32.9201,21.474C 31.9129,21.474 30.942,21.563 30.0074,21.7411C 29.0728,21.9193 28.1932,22.17
                               27.3686,22.4932C 26.5439,22.8165 25.7852,23.198 25.0925,23.6378C 24.3998,24.0777 23.7852,24.5571 23.2486,25.076 Z " />
                     </Viewbox>
-                </RadioButton>
-                <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick">
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Data="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
@@ -262,7 +275,7 @@
                               M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
                               5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z" />
                     </Viewbox>
-                </RadioButton>
+                </Button>
             </ToolBar>
         </ToolBarTray>
         <Grid DockPanel.Dock="Top">
