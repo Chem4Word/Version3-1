@@ -94,7 +94,7 @@
                 <!-- see https://dvoituron.com/2011/01/06/toolbar-dropdownbutton-in-wpf/
                 also https://materialdesignicons.com/ for icon paths -->
 
-                <RadioButton ToolTip="Select" Style="{StaticResource ToolbarButtonStyle}"  x:Name="SelectionButton">
+                <RadioButton ToolTip="Select" Style="{StaticResource ToolbarButtonStyle}" IsChecked="True" x:Name="SelectionButton">
                     <Viewbox Stretch="Uniform" Height="25" Width="25">
                         <Path Width="12.3333" Height="20"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}" Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L
                               49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z " />
