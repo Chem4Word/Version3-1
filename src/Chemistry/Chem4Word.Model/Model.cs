@@ -165,6 +165,7 @@ namespace Chem4Word.Model
                     }
                     break;
             }
+            OnPropertyChanged("BoundingBox");
         }
 
         public void Relabel(bool includeNames)
@@ -273,6 +274,7 @@ namespace Chem4Word.Model
                 Molecule m = new Molecule(seed);
                 Molecules.Add(m);
             }
+            OnPropertyChanged("BoundingBox");
         }
 
         /// <summary>
@@ -409,10 +411,7 @@ namespace Chem4Word.Model
         {
             ScaleToAverageBondLength(preferredLength);
             RepositionAll(MinX, MinY);
-            OnPropertyChanged("ActualWidth");
-            OnPropertyChanged("ActualHeight");
-            OnPropertyChanged("DesiredWidth");
-            OnPropertyChanged("DesiredHeight");
+            OnPropertyChanged("BoundingBox");
         }
 
         #endregion Layout

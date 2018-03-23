@@ -7,7 +7,10 @@
 
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model
 {
@@ -16,7 +19,7 @@ namespace Chem4Word.Model
     /// This allows changes in the atoms and bonds membership to bubble up
     /// the molecule hierarchy
     /// </summary>
-    public abstract class ChemistryContainer
+    public abstract class ChemistryContainer : INotifyPropertyChanged
     {
         public ObservableCollection<Bond> AllBonds { get; protected set; }
         public ObservableCollection<Atom> AllAtoms { get; protected set; }
@@ -180,6 +183,14 @@ namespace Chem4Word.Model
                         break;
                 }
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
