@@ -1,23 +1,16 @@
-﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2018, The .NET Foundation.
-//  This software is released under the Apache License, Version 2.0.
-//  The license and further copyright text can be found in the file LICENSE.md
-//  at the root directory of the distribution.
-// ---------------------------------------------------------------------------
-
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Chem4Word.ACME")]
+[assembly: AssemblyTitle("ACME.ViewModel")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft Corporation")]
-[assembly: AssemblyProduct("Chem4Word.ACME")]
-[assembly: AssemblyCopyright("Copyright © Microsoft Corporation 2018")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("ACME.ViewModel")]
+[assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -27,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1e3fc1f1-06cc-44bd-8004-3ef0ce7eeaa7")]
+[assembly: Guid("1de9f0ca-2291-49b9-a3ef-7be2222d81e2")]
 
 // Version information for an assembly consists of the following four values:
 //
