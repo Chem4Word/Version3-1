@@ -17,6 +17,8 @@ namespace ACME.ViewModel
 
 
         public abstract void Execute(object parameter);
+
+        public abstract void DoCommand(object parameter);
       
 
         public abstract event EventHandler CanExecuteChanged;

@@ -22,11 +22,17 @@ namespace ACME.ViewModel
             throw new NotImplementedException();
         }
 
+        public override void DoCommand(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
         public override event EventHandler CanExecuteChanged;
 
         #endregion
         #region Constructors
 
+        
         public AddAtomCommand(ViewModel vm) :base(vm)
         {
            

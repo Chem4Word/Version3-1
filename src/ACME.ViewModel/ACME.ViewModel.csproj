@@ -45,6 +45,7 @@
     <Compile Include="AddAtomCommand.cs" />
     <Compile Include="BaseCommand.cs" />
     <Compile Include="DeleteCommand.cs" />
+    <Compile Include="UndoManager.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
