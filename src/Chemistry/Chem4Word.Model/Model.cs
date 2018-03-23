@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -294,20 +295,37 @@ namespace Chem4Word.Model
             AddNewMols();
         }
 
+        //public Model Clone()
+        //{
+        //    Model clone = new Model();
+        //    foreach (var mol in Molecules)
+        //    {
+        //        clone.Molecules.Add(mol);
+        //    }
+
+        //    return clone;
+        //}
+
+
         public Model Clone()
         {
-            Model clone = new Model();
+
+            this.Relabel();
+
+            Model clone = (Model) this.MemberwiseClone();
+            clone.ResetCollections();
             foreach (var mol in Molecules)
             {
-                clone.Molecules.Add(mol);
+                clone.Molecules.Add(mol.Clone());
             }
-
             return clone;
         }
 
+     
+
         #region Layout
 
-     
+
         public double ActualWidth
         {
             get { return BoundingBox.Width; }

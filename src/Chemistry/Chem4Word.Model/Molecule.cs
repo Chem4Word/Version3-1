@@ -15,6 +15,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
+
+
 namespace Chem4Word.Model
 {
     public partial class Molecule : ChemistryContainer
@@ -83,8 +85,8 @@ namespace Chem4Word.Model
             Formulas = new ObservableCollection<Formula>();
 
             Atoms.CollectionChanged += Atoms_CollectionChanged;
-            Bonds.CollectionChanged += BondsOnCollectionChanged;
-            Rings.CollectionChanged += RingsOnCollectionChanged;
+            Bonds.CollectionChanged += Bonds_CollectionChanged;
+            Rings.CollectionChanged += Rings_CollectionChanged;
 
             Warnings = new List<string>();
             Errors = new List<string>();
@@ -253,13 +255,13 @@ namespace Chem4Word.Model
 
         #region Properties
 
-        public ObservableCollection<ChemicalName> ChemicalNames { get; }
+        public ObservableCollection<ChemicalName> ChemicalNames { get; private set; }
 
-        public ObservableCollection<Bond> Bonds { get; }
+        public ObservableCollection<Bond> Bonds { get; private set; }
 
-        public ObservableCollection<Ring> Rings { get; }
+        public ObservableCollection<Ring> Rings { get; private set; }
 
-        public ObservableCollection<Atom> Atoms { get; }
+        public ObservableCollection<Atom> Atoms { get; private set; }
 
         //aggregating collections:
         //metadata
@@ -716,7 +718,7 @@ namespace Chem4Word.Model
 
         #endregion Methods
 
-        private void RingsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Rings_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -753,7 +755,7 @@ namespace Chem4Word.Model
             }
         }
 
-        private void BondsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -926,5 +928,61 @@ namespace Chem4Word.Model
         }
 
         #endregion helpers
+
+        protected override void ResetCollections() 
+        {
+            base.ResetCollections();
+            Atoms = new ObservableCollection<Atom>();
+            Atoms.CollectionChanged += Atoms_CollectionChanged;
+            Bonds = new ObservableCollection<Bond>();
+            Bonds.CollectionChanged += Bonds_CollectionChanged;
+            Rings = new ObservableCollection<Ring>();
+            Rings.CollectionChanged += Rings_CollectionChanged;
+            ChemicalNames = new ObservableCollection<ChemicalName>();
+            ChemicalNames.CollectionChanged += ChemicalNames_CollectionChanged;
+        }
+
+        private void ChemicalNames_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+           
+        }
+
+        public Molecule Clone()
+        {
+            Molecule myClone = (Molecule)this.MemberwiseClone();
+            myClone.ResetCollections();
+            
+          
+
+            Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
+            foreach (Molecule mol in Molecules)
+            {
+                myClone.Molecules.Add(mol.Clone());
+            }
+
+            foreach (Atom atom in Atoms)
+            {
+                Atom newAtom = atom.Clone();
+                newAtom.Bonds.Clear();
+                myClone.Atoms.Add(newAtom);
+                clonedAtoms[atom.Id] = newAtom;
+            }
+
+            foreach (Bond bond in Bonds)
+            {
+                Bond newBond = bond.Clone();
+                newBond.StartAtom = clonedAtoms[bond.StartAtom.Id];
+                newBond.EndAtom = clonedAtoms[bond.EndAtom.Id];
+                myClone.Bonds.Add(newBond);
+            }
+
+            foreach (ChemicalName cn in ChemicalNames)
+            {
+                myClone.ChemicalNames.Add(cn.Clone());
+            }
+
+            myClone.RebuildRings();
+            return myClone;
+        }
     }
 }

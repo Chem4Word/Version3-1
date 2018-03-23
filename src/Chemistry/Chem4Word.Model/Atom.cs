@@ -61,7 +61,7 @@ namespace Chem4Word.Model
         /// <summary>
         /// The rings this atom belongs to
         /// </summary>
-        public ObservableCollection<Ring> Rings { get; }
+        public ObservableCollection<Ring> Rings { get; private set; }
 
         /// <summary>
         /// Parent molecule of the atom - readonly outside the model
@@ -71,7 +71,7 @@ namespace Chem4Word.Model
         /// <summary>
         /// Collection of bonds for the atom
         /// </summary>
-        public readonly ObservableCollection<Bond> Bonds;
+        public ObservableCollection<Bond> Bonds { get; private set; }
 
         /// <summary>
         /// How many atoms are bonded to this atom
@@ -515,14 +515,19 @@ namespace Chem4Word.Model
 
         public Atom()
         {
-            //set up the collections for the atom itself
+            SetupCollections();
+            //Default values
+            FormalCharge = null;
+            DoubletRadical = false;
+        }
+
+        private void SetupCollections()
+        {
+//set up the collections for the atom itself
             Bonds = new ObservableCollection<Bond>();
             Bonds.CollectionChanged += Bonds_CollectionChanged;
             Rings = new ObservableCollection<Ring>();
             Rings.CollectionChanged += Rings_CollectionChanged;
-            //Default values
-            FormalCharge = null;
-            DoubletRadical = false;
         }
 
         private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -653,5 +658,12 @@ namespace Chem4Word.Model
         }
 
         #endregion Methods
+
+        public Atom Clone()
+        {
+            Atom clone = (Atom) this.MemberwiseClone();
+            clone.SetupCollections();
+            return clone;
+        }
     }
 }

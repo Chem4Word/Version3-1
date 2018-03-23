@@ -79,6 +79,10 @@ namespace Chem4Word.View
 
         }
 
+        public double FirstBearing(GlyphRun gr)
+        {
+            return _glyphTypeface.LeftSideBearings[gr.GlyphIndices.First()] * TypeSize;
+        }
         public double LeadingBearing
         {
             get
@@ -118,15 +122,15 @@ namespace Chem4Word.View
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
-            Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) ;
+            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0) ;
             
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
-                BoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
+                BoundingBox = groupGlyphRun.GetBoundingBox(center + mainOffset),
                 Geocenter = center,
-                TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
-                OffsetVector = mainHOffset
+                TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainOffset),
+                OffsetVector = mainOffset
                
             };
 

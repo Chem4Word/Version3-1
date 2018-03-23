@@ -18,14 +18,20 @@ namespace Chem4Word.Model
     /// </summary>
     public abstract class ChemistryContainer
     {
-        public ObservableCollection<Bond> AllBonds { get; }
-        public ObservableCollection<Atom> AllAtoms { get; }
+        public ObservableCollection<Bond> AllBonds { get; protected set; }
+        public ObservableCollection<Atom> AllAtoms { get; protected set; }
 
-        public ObservableCollection<Molecule> Molecules { get; }
+        public ObservableCollection<Molecule> Molecules { get; protected set; }
 
         public ChemistryContainer Parent { get; set; }
 
         protected ChemistryContainer()
+        {
+           ResetCollections();
+        }
+
+
+        protected virtual void ResetCollections()
         {
             AllAtoms = new ObservableCollection<Atom>();
 
@@ -35,7 +41,6 @@ namespace Chem4Word.Model
             Molecules = new ObservableCollection<Molecule>();
             Molecules.CollectionChanged += Molecules_CollectionChanged;
         }
-
         private void Molecules_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)

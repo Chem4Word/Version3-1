@@ -785,5 +785,11 @@ namespace Chem4Word.Model
         {
             OnPropertyChanged("Placement");
         }
+
+        public Bond Clone()
+        {
+            Bond clone = (Bond)this.MemberwiseClone();
+            return clone;
+        }
     }
 }

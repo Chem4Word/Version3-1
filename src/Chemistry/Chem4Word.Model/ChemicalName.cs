@@ -20,5 +20,10 @@ namespace Chem4Word.Model
         public ChemicalName()
         {
         }
+
+        public ChemicalName Clone()
+        {
+            return (this.MemberwiseClone() as ChemicalName);
+        }
     }
 }
