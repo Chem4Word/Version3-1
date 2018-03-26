@@ -43,11 +43,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddAtomCommand.cs" />
-    <Compile Include="BaseCommand.cs" />
-    <Compile Include="DeleteCommand.cs" />
-    <Compile Include="RedoCommand.cs" />
-    <Compile Include="UndoCommand.cs" />
+    <Compile Include="Commands\AddAtomCommand.cs" />
+    <Compile Include="Commands\BaseCommand.cs" />
+    <Compile Include="Commands\DeleteCommand.cs" />
+    <Compile Include="Commands\RedoCommand.cs" />
+    <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="UndoManager.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

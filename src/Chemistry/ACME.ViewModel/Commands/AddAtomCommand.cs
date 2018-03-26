@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
-namespace ACME.ViewModel
+namespace ACME.ViewModel.Commands
 {
     public class AddAtomCommand : BaseCommand
     {
@@ -22,10 +17,7 @@ namespace ACME.ViewModel
             throw new NotImplementedException();
         }
 
-        public override void DoCommand(object parameter)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public override event EventHandler CanExecuteChanged;
 
