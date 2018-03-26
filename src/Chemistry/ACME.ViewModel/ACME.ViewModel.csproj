@@ -53,7 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chemistry\Chem4Word.Model\Chem4Word.Model.csproj">
+    <ProjectReference Include="..\Chem4Word.Model\Chem4Word.Model.csproj">
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>
