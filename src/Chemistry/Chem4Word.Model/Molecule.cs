@@ -19,6 +19,12 @@ using System.Windows;
 
 namespace Chem4Word.Model
 {
+    /// <summary>
+    /// Represents a single molecule.
+    /// *Please* do not persist moclecule references
+    /// between editing operations.  We cannot promise
+    /// that the references will stay current
+    /// </summary>
     public partial class Molecule : ChemistryContainer
     {
         #region Fields
@@ -947,13 +953,15 @@ namespace Chem4Word.Model
            
         }
 
+        /// <summary>
+        /// Does a deep clone of the molecule
+        /// </summary>
+        /// <returns></returns>
         public Molecule Clone()
         {
             Molecule myClone = (Molecule)this.MemberwiseClone();
             myClone.ResetCollections();
             
-          
-
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
             foreach (Molecule mol in Molecules)
             {

@@ -296,22 +296,17 @@ namespace Chem4Word.Model
             }
             AddNewMols();
         }
+        
 
-        //public Model Clone()
-        //{
-        //    Model clone = new Model();
-        //    foreach (var mol in Molecules)
-        //    {
-        //        clone.Molecules.Add(mol);
-        //    }
-
-        //    return clone;
-        //}
-
-
+        /// <summary>
+        /// Deep clones the molecule
+        /// all the way down to the atoms
+        /// </summary>
+        /// <returns></returns>
         public Model Clone()
         {
-
+            //v important:  the labels are used to match up
+            //old and new objects
             this.Relabel();
 
             Model clone = (Model) this.MemberwiseClone();

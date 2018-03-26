@@ -20,6 +20,10 @@ namespace ACME.ViewModel
             _viewModel = vm;
         }
 
+        public bool CanRedo => _redoStack.Any();
+
+        public bool CanUndo => _undoStack.Any();
+
         public void Initialize(Chem4Word.Model.Model model)
         {
             _undoStack = new Stack<Model>();
@@ -38,7 +42,8 @@ namespace ACME.ViewModel
 
         public void Redo()
         {
-            
+            _viewModel.Model = _redoStack.Pop();
+            _undoStack.Push(_viewModel.Model.Clone());
         }
 
     }

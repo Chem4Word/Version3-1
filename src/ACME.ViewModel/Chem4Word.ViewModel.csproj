@@ -46,8 +46,7 @@
     <Compile Include="AddAtomCommand.cs" />
     <Compile Include="BaseCommand.cs" />
     <Compile Include="DeleteCommand.cs" />
-    <Compile Include="RedoCommand.cs" />
-    <Compile Include="UndoCommand.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="UndoManager.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
