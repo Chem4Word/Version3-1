@@ -324,9 +324,7 @@ namespace Chem4Word.Model
         }
 
      
-
         #region Layout
-
 
         public double ActualWidth
         {
@@ -346,17 +344,13 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (_boundingBox == null)
+                var modelRect = AllAtoms[0].BoundingBox;
+                for (int i = 1; i < AllAtoms.Count; i++)
                 {
-                    var modelRect = AllAtoms[0].BoundingBox;
-                    for (int i = 1; i < AllAtoms.Count; i++)
-                    {
-                        var atom = AllAtoms[i];
-                        modelRect.Union(atom.BoundingBox);
-                    }
-                    _boundingBox = modelRect;
+                    var atom = AllAtoms[i];
+                    modelRect.Union(atom.BoundingBox);
                 }
-                return _boundingBox.Value;
+                return  modelRect;
             }
         }
 
