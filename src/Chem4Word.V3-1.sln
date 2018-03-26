@@ -97,7 +97,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Editor.ChemDoodle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.ACME", "Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj", "{1E3FC1F1-06CC-44BD-8004-3EF0CE7EEAA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACME.ViewModel", "ACME.ViewModel\ACME.ViewModel.csproj", "{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACME.ViewModel", "Chemistry\ACME.ViewModel\ACME.ViewModel.csproj", "{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

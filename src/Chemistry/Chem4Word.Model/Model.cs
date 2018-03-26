@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -20,7 +19,7 @@ namespace Chem4Word.Model
 {
     /// <summary>
     /// Overall container for Atoms, Bonds and other objects.
-    /// Please limit rendering-specific code in these classes.  
+    /// Please limit rendering-specific code in these classes.
     /// Sometimes it will be unavoidable, but the less, the better
     /// </summary>
     ///
@@ -297,24 +296,11 @@ namespace Chem4Word.Model
             AddNewMols();
         }
 
-        //public Model Clone()
-        //{
-        //    Model clone = new Model();
-        //    foreach (var mol in Molecules)
-        //    {
-        //        clone.Molecules.Add(mol);
-        //    }
-
-        //    return clone;
-        //}
-
-
         public Model Clone()
         {
-
             this.Relabel();
 
-            Model clone = (Model) this.MemberwiseClone();
+            Model clone = (Model)this.MemberwiseClone();
             clone.ResetCollections();
             foreach (var mol in Molecules)
             {
@@ -323,7 +309,6 @@ namespace Chem4Word.Model
             return clone;
         }
 
-     
         #region Layout
 
         public double ActualWidth
@@ -335,7 +320,6 @@ namespace Chem4Word.Model
         {
             get { return BoundingBox.Height; }
         }
-
 
         //used to calculate the bounds of the atom
         public double FontSize { get; set; }
@@ -350,7 +334,7 @@ namespace Chem4Word.Model
                     var atom = AllAtoms[i];
                     modelRect.Union(atom.BoundingBox);
                 }
-                return  modelRect;
+                return modelRect;
             }
         }
 
