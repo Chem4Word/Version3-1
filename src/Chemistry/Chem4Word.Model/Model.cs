@@ -27,7 +27,6 @@ namespace Chem4Word.Model
 
     public class Model : ChemistryContainer, INotifyPropertyChanged
     {
-        private Rect? _boundingBox;
         private const int Padding = 25;
 
         public string CustomXmlPartGuid { get; set; }
@@ -409,7 +408,7 @@ namespace Chem4Word.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

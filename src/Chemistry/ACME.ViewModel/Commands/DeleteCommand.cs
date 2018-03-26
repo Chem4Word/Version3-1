@@ -16,7 +16,6 @@ namespace ACME.ViewModel.Commands
         public override void Execute(object parameter)
         {
             
-            DoCommand(parameter);
             MyViewModel.UndoManager.Commit();
             
         }
