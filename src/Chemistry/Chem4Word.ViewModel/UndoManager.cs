@@ -1,19 +1,21 @@
-﻿using System;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Management.Instrumentation;
-using System.Text;
-using System.Threading.Tasks;
-using Chem4Word.Model;
 
-namespace ACME.ViewModel
+namespace Chem4Word.ViewModel
 {
     public class UndoManager
     {
         private ViewModel _viewModel;
 
-        private Stack<Model> _undoStack;
-        private Stack<Model> _redoStack;
+        private Stack<Model.Model> _undoStack;
+        private Stack<Model.Model> _redoStack;
 
         public UndoManager(ViewModel vm)
         {
@@ -26,9 +28,10 @@ namespace ACME.ViewModel
 
         public void Initialize(Chem4Word.Model.Model model)
         {
-            _undoStack = new Stack<Model>();
-            _redoStack = new Stack<Model>();
+            _undoStack = new Stack<Model.Model>();
+            _redoStack = new Stack<Model.Model>();
         }
+
         public void Commit()
         {
             _undoStack.Push(_viewModel.Model.Clone());
@@ -45,6 +48,5 @@ namespace ACME.ViewModel
             _viewModel.Model = _redoStack.Pop();
             _undoStack.Push(_viewModel.Model.Clone());
         }
-
     }
 }

@@ -1,11 +1,17 @@
-﻿using System;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System;
 using System.Linq;
 
-namespace ACME.ViewModel.Commands
+namespace Chem4Word.ViewModel.Commands
 {
     public class DeleteCommand : BaseCommand
     {
-        
         #region ICommand Implementation
 
         public override bool CanExecute(object parameter)
@@ -15,24 +21,15 @@ namespace ACME.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            
             MyViewModel.UndoManager.Commit();
-            
         }
 
         public override event EventHandler CanExecuteChanged;
-
-      
 
         public DeleteCommand(ViewModel vm) : base(vm)
         {
         }
 
-
-        #endregion
-
-        #region Constructors
-
-        #endregion
+        #endregion ICommand Implementation
     }
 }

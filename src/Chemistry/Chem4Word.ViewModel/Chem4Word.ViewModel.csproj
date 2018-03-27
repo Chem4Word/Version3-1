@@ -7,8 +7,8 @@
     <ProjectGuid>{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ACME.ViewModel</RootNamespace>
-    <AssemblyName>ACME.ViewModel</AssemblyName>
+    <RootNamespace>Chem4Word.ViewModel</RootNamespace>
+    <AssemblyName>Chem4Word.ViewModel</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -43,16 +43,18 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddAtomCommand.cs" />
-    <Compile Include="BaseCommand.cs" />
-    <Compile Include="DeleteCommand.cs" />
+    <Compile Include="Commands\AddAtomCommand.cs" />
+    <Compile Include="Commands\BaseCommand.cs" />
+    <Compile Include="Commands\DeleteCommand.cs" />
+    <Compile Include="Commands\RedoCommand.cs" />
+    <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="UndoManager.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chemistry\Chem4Word.Model\Chem4Word.Model.csproj">
+    <ProjectReference Include="..\Chem4Word.Model\Chem4Word.Model.csproj">
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>

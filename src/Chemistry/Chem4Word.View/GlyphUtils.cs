@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -32,15 +31,16 @@ namespace Chem4Word.View
                 return _glyphTypeface;
             }
         }
+
         public static double SymbolSize = 23;
         public static double ScriptSize = SymbolSize * 0.6;
         public static double IsotopeSize = ScriptSize * 0.8;
-
 
         public static Typeface SymbolTypeface = new Typeface(new FontFamily("Arial"),
             FontStyles.Normal,
             FontWeights.Bold,
             FontStretches.Normal);
+
         static GlyphUtils()
         {
             if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
@@ -58,7 +58,6 @@ namespace Chem4Word.View
         //    public double[] AdvanceWidths;
 
         //}
-       
 
         /// <summary>
         /// Gets the vector that must be added to the atom position to center the glyph
@@ -86,9 +85,6 @@ namespace Chem4Word.View
             GlyphInfo
             GetGlyphs(string symbolText, GlyphTypeface glyphTypeFace, double size)
         {
-
-
-
             ushort[] glyphIndexes = new ushort[symbolText.Length];
             double[] advanceWidths = new double[symbolText.Length];
             double[] uprightBaselineOffsets = new double[symbolText.Length];
@@ -107,10 +103,9 @@ namespace Chem4Word.View
                 totalWidth += width;
             }
 #if DEBUG
-            
-#endif
-            return new GlyphInfo {AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth, UprightBaselineOffsets = uprightBaselineOffsets};
 
+#endif
+            return new GlyphInfo { AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth, UprightBaselineOffsets = uprightBaselineOffsets };
         }
 
         public static GlyphUtils.GlyphInfo GetGlyphsAndInfo(string symbolText, float pixelsPerDip, out GlyphRun hydrogenGlyphRun, Point point, GlyphTypeface glyphTypeFace, double symbolSize)
@@ -137,7 +132,6 @@ namespace Chem4Word.View
                 var geo = glyphRun.BuildGeometry();
                 var pg = geo.GetFlattenedPathGeometry(0.2, ToleranceType.Relative);
 
-               
                 foreach (var f in pg.Figures)
                 {
                     foreach (var s in f.Segments)
@@ -154,6 +148,7 @@ namespace Chem4Word.View
             }
             return retval;
         }
+
         /// <summary>
         /// Generates a subscript for a glyph run
         /// </summary>
@@ -162,7 +157,6 @@ namespace Chem4Word.View
         /// <param name="subscriptSize">size of scubscript (generally 60% of main text)</param>
         /// <param name="bottomLeft">starting point for placing the subscript</param>
         /// <returns></returns>
-      
 
         /// <summary>
         /// gets a bounding box holding the overall glyph run
@@ -170,8 +164,8 @@ namespace Chem4Word.View
         /// <param name="glyphRun"></param>
         /// <param name="origin">where the run will be centered</param>
         /// <returns></returns>
-        /// 
-    
+        ///
+
         public static Rect GetBoundingBox(this GlyphRun glyphRun, Point origin)
         {
             Rect rect = glyphRun.ComputeInkBoundingBox();
@@ -194,13 +188,10 @@ namespace Chem4Word.View
         /// <returns></returns>
         public static GlyphRun GetGlyphRun(GlyphInfo info, GlyphTypeface glyphTypeface, double symbolSize, float pixelsPerDip, Point point)
         {
-            
             var run = new GlyphRun(glyphTypeface, 0, false, symbolSize, pixelsPerDip, info.Indexes, point, info.AdvanceWidths,
-                null,null,null,null,null,null);
+                null, null, null, null, null, null);
 
             return run;
         }
-
-
     }
 }

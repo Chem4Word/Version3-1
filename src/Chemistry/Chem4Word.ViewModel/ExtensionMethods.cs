@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
+using System.Windows;
 
 namespace Chem4Word.ViewModel
 {
     public static class ExtensionMethods
     {
-        
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
-            
             if (atom.SymbolText != "")
             {
                 double halfSize = ViewModel.FontSize / 2;
@@ -59,7 +59,6 @@ namespace Chem4Word.ViewModel
             {
                 return new Rect(atom.Position, atom.Position);//empty rect
             }
-            
         }
     }
 }
