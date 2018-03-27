@@ -31,8 +31,8 @@
                 <ItemsPanelTemplate>
                     <Canvas
                         x:Name="ChemCanvas"
-                        Width="{Binding ElementName=Placeholder, Path=DataContext.ActualWidth}"
-                        Height="{Binding ElementName=Placeholder, Path=DataContext.ActualHeight}"
+                        Width="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Width}"
+                        Height="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Height}"
                         Margin="8" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
@@ -160,7 +160,6 @@
                                         <SolidColorBrush Color="{Binding Element.Colour}" />
                                     </Setter.Value>
                                 </Setter>
-
                                 <debug:Setter Property="ToolTip">
                                     <debug:Setter.Value>
                                         <StackPanel>
@@ -173,7 +172,6 @@
                                         </StackPanel>
                                     </debug:Setter.Value>
                                 </debug:Setter>
-
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Path=SymbolText}" Value="">
                                         <Setter Property="Fill">

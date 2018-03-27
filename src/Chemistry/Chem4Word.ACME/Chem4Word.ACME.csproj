@@ -62,7 +62,6 @@
     <Compile Include="CmlEditor.xaml.cs">
       <DependentUpon>CmlEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Converters\DoNothingConverter.cs" />
     <Compile Include="Converters\ElementConverter.cs" />
     <Compile Include="Editor.xaml.cs">
@@ -121,7 +120,7 @@
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Controls\Chem4Word.ViewModel\Chem4Word.View.csproj">
+    <ProjectReference Include="..\Chem4Word.View\Chem4Word.View.csproj">
       <Project>{352c0710-fe0d-41ce-ac98-a1af992f9eff}</Project>
       <Name>Chem4Word.View</Name>
     </ProjectReference>
@@ -134,6 +133,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Commands\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\xcc.1.0.9\build\Xcc.targets" Condition="Exists('..\..\packages\xcc.1.0.9\build\Xcc.targets')" />

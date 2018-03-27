@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -26,7 +27,6 @@ namespace Chem4Word.Model
 
     public class Model : ChemistryContainer, INotifyPropertyChanged
     {
-        private Rect? _boundingBox;
         private const int Padding = 25;
 
         public string CustomXmlPartGuid { get; set; }
@@ -164,6 +164,7 @@ namespace Chem4Word.Model
                     }
                     break;
             }
+            OnPropertyChanged("BoundingBox");
         }
 
         public void Relabel(bool includeNames)
@@ -272,6 +273,7 @@ namespace Chem4Word.Model
                 Molecule m = new Molecule(seed);
                 Molecules.Add(m);
             }
+            OnPropertyChanged("BoundingBox");
         }
 
         /// <summary>
@@ -293,21 +295,31 @@ namespace Chem4Word.Model
             }
             AddNewMols();
         }
+        
 
+        /// <summary>
+        /// Deep clones the molecule
+        /// all the way down to the atoms
+        /// </summary>
+        /// <returns></returns>
         public Model Clone()
         {
-            Model clone = new Model();
+            //v important:  the labels are used to match up
+            //old and new objects
+            this.Relabel();
+
+            Model clone = (Model) this.MemberwiseClone();
+            clone.ResetCollections();
             foreach (var mol in Molecules)
             {
-                clone.Molecules.Add(mol);
+                clone.Molecules.Add(mol.Clone());
             }
-
             return clone;
         }
 
+     
         #region Layout
 
-     
         public double ActualWidth
         {
             get { return BoundingBox.Width; }
@@ -326,17 +338,13 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (_boundingBox == null)
+                var modelRect = AllAtoms[0].BoundingBox;
+                for (int i = 1; i < AllAtoms.Count; i++)
                 {
-                    var modelRect = AllAtoms[0].BoundingBox;
-                    for (int i = 1; i < AllAtoms.Count; i++)
-                    {
-                        var atom = AllAtoms[i];
-                        modelRect.Union(atom.BoundingBox);
-                    }
-                    _boundingBox = modelRect;
+                    var atom = AllAtoms[i];
+                    modelRect.Union(atom.BoundingBox);
                 }
-                return _boundingBox.Value;
+                return  modelRect;
             }
         }
 
@@ -391,10 +399,7 @@ namespace Chem4Word.Model
         {
             ScaleToAverageBondLength(preferredLength);
             RepositionAll(MinX, MinY);
-            OnPropertyChanged("ActualWidth");
-            OnPropertyChanged("ActualHeight");
-            OnPropertyChanged("DesiredWidth");
-            OnPropertyChanged("DesiredHeight");
+            OnPropertyChanged("BoundingBox");
         }
 
         #endregion Layout
@@ -403,7 +408,7 @@ namespace Chem4Word.Model
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

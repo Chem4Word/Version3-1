@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,21 +13,19 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model.Geometry;
-using Chem4Word.View;
 
 namespace Chem4Word.View
 {
     /// <summary>
-    /// wraps up some of the glyph handling into a handy class 
+    /// wraps up some of the glyph handling into a handy class
     /// Mostly stateful and uses properties to simplify the client code
     /// </summary>
-    /// 
-    /// 
+    ///
+    ///
     public class GlyphText
     {
-        public string Text { get;  }
-        public Typeface CurrentTypeface { get;  }
+        public string Text { get; }
+        public Typeface CurrentTypeface { get; }
 
         public double TypeSize { get; }
 
@@ -39,6 +38,7 @@ namespace Chem4Word.View
 
         public GlyphRun TextRun { get; protected set; }
         public Brush Fill { get; set; }
+
         public Path Outline
         {
             get
@@ -46,7 +46,6 @@ namespace Chem4Word.View
                 var hull = Hull;
                 return BasicGeometry.BuildPath(hull);
             }
-
         }
 
         public List<Point> Hull
@@ -56,8 +55,8 @@ namespace Chem4Word.View
                 var outline = GlyphUtils.GetOutline(TextRun);
 
                 var sortedHull = (from Point p in outline
-                    orderby p.X ascending, p.Y descending
-                    select p).ToList();
+                                  orderby p.X ascending, p.Y descending
+                                  select p).ToList();
 
                 List<Point> hull = Geometry<Point>.GetHull(sortedHull, p => p);
                 return hull;
@@ -76,7 +75,11 @@ namespace Chem4Word.View
             PixelsPerDip = pixelsPerDip;
 
             TextMetrics = null;
+        }
 
+        public double FirstBearing(GlyphRun gr)
+        {
+            return _glyphTypeface.LeftSideBearings[gr.GlyphIndices.First()] * TypeSize;
         }
 
         public double LeadingBearing
@@ -103,7 +106,6 @@ namespace Chem4Word.View
             }
         }
 
-
         public List<Point> FlattenedPath
         {
             get
@@ -111,36 +113,33 @@ namespace Chem4Word.View
                 Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector;
                 return TextRun.GetOutline().Select(p => p + offset).ToList();
             }
-            
         }
 
         public void MeasureAtCenter(Point center)
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
-            Vector mainHOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) ;
-            
+            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
+
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
-                BoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
+                BoundingBox = groupGlyphRun.GetBoundingBox(center + mainOffset),
                 Geocenter = center,
-                TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainHOffset),
-                OffsetVector = mainHOffset
-               
+                TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainOffset),
+                OffsetVector = mainOffset
             };
-
         }
 
         public void Premeasure()
         {
-            MeasureAtCenter(new Point(0d,0d));
+            MeasureAtCenter(new Point(0d, 0d));
         }
 
         public void MeasureAtBottomLeft(Point bottomLeft, float PixelsPerDip)
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
-            TextRun=groupGlyphRun;
+            TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
                 BoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
@@ -151,11 +150,8 @@ namespace Chem4Word.View
             };
         }
 
-      
-
         public void DrawAtBottomLeft(Point bottomLeft, DrawingContext dc)
         {
-
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
@@ -187,17 +183,14 @@ namespace Chem4Word.View
 
     public class MainLabelText : GlyphText
     {
-        public MainLabelText(string text, float pixelsPerDip): base(text, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, pixelsPerDip)
+        public MainLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, pixelsPerDip)
         { }
     }
-
 
     public class SubLabelText : GlyphText
     {
         public SubLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
         { }
-
-      
     }
 
     public class IsotopeLabelText : GlyphText
@@ -216,14 +209,13 @@ namespace Chem4Word.View
     /// <summary>
     /// Facilitates layout and positioning of text
     /// </summary>
-    public class AtomTextMetrics: LabelMetrics
+    public class AtomTextMetrics : LabelMetrics
     {
-       
         public Rect TotalBoundingBox; //surrounds ALL the text
 
         public AtomTextMetrics()
         {
-            TotalBoundingBox = new Rect(0d,0d,0d,0d);
+            TotalBoundingBox = new Rect(0d, 0d, 0d, 0d);
         }
 
         public override List<Point> Corners
@@ -250,9 +242,10 @@ namespace Chem4Word.View
 
         public LabelMetrics()
         {
-            Geocenter = new Point(0d,0d);
-            BoundingBox = new Rect(0d,0d,0d,0d);
+            Geocenter = new Point(0d, 0d);
+            BoundingBox = new Rect(0d, 0d, 0d, 0d);
         }
+
         public virtual List<Point> Corners
         {
             get

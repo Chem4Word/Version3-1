@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Searchers", "Searchers", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4WordTests", "Chem4WordTests\Chem4WordTests.csproj", "{6C85CD96-6C59-4172-9C9E-62D216D40ED1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.View", "Chemistry\Controls\Chem4Word.ViewModel\Chem4Word.View.csproj", "{352C0710-FE0D-41CE-AC98-A1AF992F9EFF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.View", "Chemistry\Chem4Word.View\Chem4Word.View.csproj", "{352C0710-FE0D-41CE-AC98-A1AF992F9EFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsTestHarness", "TestHarness\WindowsForms-TestHarness\WinFormsTestHarness.csproj", "{C5F54FA8-376E-442F-AE3C-DCFDC112B190}"
 EndProject
@@ -97,7 +97,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Editor.ChemDoodle
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.ACME", "Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj", "{1E3FC1F1-06CC-44BD-8004-3EF0CE7EEAA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ACME.ViewModel", "ACME.ViewModel\ACME.ViewModel.csproj", "{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.ViewModel", "Chemistry\Chem4Word.ViewModel\Chem4Word.ViewModel.csproj", "{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
