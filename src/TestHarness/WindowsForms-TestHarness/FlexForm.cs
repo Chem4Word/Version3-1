@@ -167,7 +167,7 @@ namespace WinFormsTestHarness
                 SetCarbons(newModel, ShowCarbons.Checked);
                 Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
                 Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");
-                newModel.RebuildMolecules();
+                //newModel.RebuildMolecules();
                 display1.Chemistry = newModel;
             }
         }
