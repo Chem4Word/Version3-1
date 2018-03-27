@@ -11,13 +11,13 @@ namespace Chem4Word.ViewModel.Commands
 {
     public class UndoCommand : BaseCommand
     {
-        public UndoCommand(ViewModel vm) : base(vm)
+        public UndoCommand(EditViewModel vm) : base(vm)
         {
         }
 
         public override bool CanExecute(object parameter)
         {
-            return MyViewModel.UndoManager.CanUndo;
+            return MyEditViewModel.UndoManager.CanUndo;
         }
 
         public override void Execute(object parameter)

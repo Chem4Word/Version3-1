@@ -122,7 +122,7 @@
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Chemistry\Controls\Chem4Word.ViewModel\Chem4Word.View.csproj">
+    <ProjectReference Include="..\..\..\Chemistry\Chem4Word.View\Chem4Word.View.csproj">
       <Project>{352c0710-fe0d-41ce-ac98-a1af992f9eff}</Project>
       <Name>Chem4Word.View</Name>
     </ProjectReference>

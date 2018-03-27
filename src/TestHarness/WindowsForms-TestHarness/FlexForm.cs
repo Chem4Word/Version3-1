@@ -164,6 +164,7 @@ namespace WinFormsTestHarness
             if (model != null)
             {
                 Model newModel = model.Clone();
+                newModel.FontSize = 23;
                 SetCarbons(newModel, ShowCarbons.Checked);
                 Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
                 Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");

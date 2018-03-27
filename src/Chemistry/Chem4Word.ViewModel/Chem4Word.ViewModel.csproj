@@ -48,9 +48,10 @@
     <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\RedoCommand.cs" />
     <Compile Include="Commands\UndoCommand.cs" />
+    <Compile Include="DisplayViewModel.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="UndoManager.cs" />
-    <Compile Include="ViewModel.cs" />
+    <Compile Include="EditViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
