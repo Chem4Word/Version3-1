@@ -271,7 +271,7 @@ namespace Chem4Word.Model
 
         //aggregating collections:
         //metadata
-        public ObservableCollection<Formula> Formulas { get; }
+        public ObservableCollection<Formula> Formulas { get; private set; }
 
         /// <summary>
         /// Returns a snapshot of operations performed on each atom
@@ -946,11 +946,16 @@ namespace Chem4Word.Model
             Rings.CollectionChanged += Rings_CollectionChanged;
             ChemicalNames = new ObservableCollection<ChemicalName>();
             ChemicalNames.CollectionChanged += ChemicalNames_CollectionChanged;
+            Formulas = new ObservableCollection<Formula>();
+            Formulas.CollectionChanged += Formulas_CollectionChanged;
+        }
+
+        private void Formulas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
         }
 
         private void ChemicalNames_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-           
         }
 
         /// <summary>
@@ -961,7 +966,7 @@ namespace Chem4Word.Model
         {
             Molecule myClone = (Molecule)this.MemberwiseClone();
             myClone.ResetCollections();
-            
+
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
             foreach (Molecule mol in Molecules)
             {
@@ -987,6 +992,11 @@ namespace Chem4Word.Model
             foreach (ChemicalName cn in ChemicalNames)
             {
                 myClone.ChemicalNames.Add(cn.Clone());
+            }
+
+            foreach (Formula f in Formulas)
+            {
+                myClone.Formulas.Add(f);
             }
 
             myClone.RebuildRings();

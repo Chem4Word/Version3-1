@@ -767,6 +767,7 @@ namespace Chem4Word
                         Ribbon.WebSearchMenu.Enabled = false;
                         Ribbon.SaveToLibrary.Enabled = false;
                         Ribbon.ArrangeMolecules.Enabled = false;
+                        Ribbon.ButtonsDisabled.Enabled = true;
                         break;
 
                     case ButtonState.CanEdit:
@@ -782,6 +783,7 @@ namespace Chem4Word
                         Ribbon.WebSearchMenu.Enabled = false;
                         Ribbon.SaveToLibrary.Enabled = true;
                         Ribbon.ArrangeMolecules.Enabled = true;
+                        Ribbon.ButtonsDisabled.Enabled = false;
                         break;
 
                     case ButtonState.CanInsert:
@@ -797,6 +799,7 @@ namespace Chem4Word
                         Ribbon.WebSearchMenu.Enabled = true;
                         Ribbon.SaveToLibrary.Enabled = false;
                         Ribbon.ArrangeMolecules.Enabled = false;
+                        Ribbon.ButtonsDisabled.Enabled = false;
                         break;
                 }
 
@@ -1687,13 +1690,26 @@ namespace Chem4Word
                         if (doc.CompatibilityMode < (int) Word.WdCompatibilityMode.wdWord2010)
                         {
                             allowed = false;
-                            ChemistryProhibitedReason = "document is in compatability mode.";
+                            ChemistryProhibitedReason = "document is in compatibility mode.";
+                        }
+
+                        try
+                        {
+                            if (doc.CoAuthoring.Conflicts.Count > 0)
+                            {
+                                allowed = false;
+                                ChemistryProhibitedReason = "document has conflicts which require resolving.";
+                            }
+                        }
+                        catch
+                        {
+                            // CoAuthoring or Conflicts may not be initialised!
                         }
 
                         Word.Selection sel = Application.Selection;
                         if (sel.OMaths.Count > 0)
                         {
-                            ChemistryProhibitedReason = "selection is in Equation";
+                            ChemistryProhibitedReason = "selection is in an Equation.";
                             allowed = false;
                         }
 
@@ -1703,7 +1719,7 @@ namespace Chem4Word
                             {
                                 if (sel.Cells.Count > 1)
                                 {
-                                    ChemistryProhibitedReason = "selection contains more than one cell of a table";
+                                    ChemistryProhibitedReason = "selection contains more than one cell of a table.";
                                     allowed = false;
                                 }
                             }
@@ -1715,9 +1731,19 @@ namespace Chem4Word
 
                         if (allowed)
                         {
-                            if (sel.StoryType != Word.WdStoryType.wdMainTextStory)
+                            try
                             {
-                                ChemistryProhibitedReason = $"selection is in {DecodeStoryType(sel.StoryType)} Story";
+                                Word.WdStoryType story = sel.StoryType;
+                                if (story != Word.WdStoryType.wdMainTextStory)
+                                {
+                                    ChemistryProhibitedReason = $"selection is in a '{DecodeStoryType(story)}' story.";
+                                    allowed = false;
+                                }
+                            }
+                            catch
+                            {
+                                // ComException 0x80004005
+                                ChemistryProhibitedReason = $"can't determine which part of the story the selection point is.";
                                 allowed = false;
                             }
                         }
@@ -1745,7 +1771,7 @@ namespace Chem4Word
                                     {
                                         allowed = false;
                                         ChemistryProhibitedReason =
-                                            $"selection is in {DecodeContentControlType(contentControlType)} Content Control";
+                                            $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control.";
                                     }
                                 }
                                 else
@@ -1754,7 +1780,7 @@ namespace Chem4Word
                                     {
                                         allowed = false;
                                         ChemistryProhibitedReason =
-                                            $"selection is in {DecodeContentControlType(contentControlType)} Content Control";
+                                            $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control";
                                     }
 
                                     // Test for Shape inside CC which is not ours
@@ -1765,7 +1791,7 @@ namespace Chem4Word
                                             if (sel.ShapeRange.Count > 0)
                                             {
                                                 ChemistryProhibitedReason =
-                                                    "selection contains shape(s) inside Content Control";
+                                                    "selection contains shape(s) inside Content Control.";
                                                 allowed = false;
                                             }
                                         }
@@ -1785,7 +1811,7 @@ namespace Chem4Word
                                     {
                                         if (sel.ShapeRange.Count > 0)
                                         {
-                                            ChemistryProhibitedReason = "selection contains shape(s)";
+                                            ChemistryProhibitedReason = "selection contains shape(s).";
                                             allowed = false;
                                         }
                                     }
@@ -1811,15 +1837,15 @@ namespace Chem4Word
                 {
                     case "0x80004005":
                         ChemistryAllowed = false;
-                        ChemistryProhibitedReason = "can't determine where the current selection is";
+                        ChemistryProhibitedReason = "can't determine where the current selection is.";
                         break;
                     case "0x800A11FD":
                         ChemistryAllowed = false;
-                        ChemistryProhibitedReason = "formatting changes are not permitted in the current selection";
+                        ChemistryProhibitedReason = "changes are not permitted in the current selection.";
                         break;
                     case "0x800A1759":
                         ChemistryAllowed = false;
-                        ChemistryProhibitedReason = "can't create a selection when a dialogue is active";
+                        ChemistryProhibitedReason = "can't create a selection when a dialogue is active.";
                         break;
                     default:
                         // Keep exception hidden from end user.
