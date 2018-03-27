@@ -93,7 +93,7 @@ namespace Chem4Word.ViewModel
         }
         private void AllAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Atom.BoundingBox))
+            if (e.PropertyName == nameof(Atom.SymbolText))
             {
                 OnPropertyChanged(nameof(BoundingBox));
             }
