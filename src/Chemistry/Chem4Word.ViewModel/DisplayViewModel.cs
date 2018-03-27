@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using Chem4Word.Model;
+using Chem4Word.Model.Annotations;
 using Chem4Word.ViewModel.Commands;
 
 namespace Chem4Word.ViewModel
 {
-    public class DisplayViewModel
+    public class DisplayViewModel : INotifyPropertyChanged
     {
 
 
@@ -44,8 +47,8 @@ namespace Chem4Word.ViewModel
                 return modelRect;
             }
         }
+        #endregion Layout
 
-     
         #endregion Properties
 
 
@@ -58,7 +61,7 @@ namespace Chem4Word.ViewModel
         }
 
 
-        public DisplayViewModel(Model.Model model)
+        public DisplayViewModel(Model.Model model):this()
         {
             
 
@@ -67,30 +70,64 @@ namespace Chem4Word.ViewModel
             AllAtoms = model.AllAtoms;
             AllAtoms.CollectionChanged += AllAtoms_CollectionChanged;
 
+            BindAtomChanges();
+
             AllBonds = model.AllBonds;
             AllBonds.CollectionChanged += AllBonds_CollectionChanged;
-
+            OnPropertyChanged(nameof(BoundingBox));
         }
 
+        private void BindAtomChanges()
+        {
+            foreach (Atom allAtom in AllAtoms)
+            {
+                allAtom.PropertyChanged += AllAtom_PropertyChanged;
+            }
+        }
+        private void UnbindAtomChanges()
+        {
+            foreach (Atom allAtom in AllAtoms)
+            {
+                allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+            }
+        }
+        private void AllAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Atom.BoundingBox))
+            {
+                OnPropertyChanged(nameof(BoundingBox));
+            }
+        }
 
         ~DisplayViewModel()
         {
+            UnbindAtomChanges();
             AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
             AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
         }
-#endregion
+
+    
+
+        #endregion
 
         private void AllBonds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            OnPropertyChanged(nameof(BoundingBox));
         }
 
         private void AllAtoms_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+           OnPropertyChanged(nameof(BoundingBox));
         }
 
 
-        #endregion constructors
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
