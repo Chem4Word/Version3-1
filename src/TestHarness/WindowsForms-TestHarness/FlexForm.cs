@@ -20,7 +20,7 @@ namespace WinFormsTestHarness
 {
     public partial class FlexForm : Form
     {
-        private Model model = null;
+        private Model _model = null;
 
         public FlexForm()
         {
@@ -53,24 +53,24 @@ namespace WinFormsTestHarness
                 {
                     case ".mol":
                     case ".sdf":
-                        model = sdFileConverter.Import(mol);
-                        model.RefreshMolecules();
-                        model.Relabel();
-                        cml = cmlConvertor.Export(model);
+                        _model = sdFileConverter.Import(mol);
+                        _model.RefreshMolecules();
+                        _model.Relabel();
+                        cml = cmlConvertor.Export(_model);
                         //model.DumpModel("After Import");
 
                         break;
 
                     case ".cml":
                     case ".xml":
-                        model = cmlConvertor.Import(mol);
-                        model.RefreshMolecules();
-                        model.Relabel();
-                        cml = cmlConvertor.Export(model);
+                        _model = cmlConvertor.Import(mol);
+                        _model.RefreshMolecules();
+                        _model.Relabel();
+                        cml = cmlConvertor.Export(_model);
                         break;
                 }
 
-                ShowChemistry(filename, model);
+                ShowChemistry(filename, _model);
             }
         }
 
@@ -86,6 +86,7 @@ namespace WinFormsTestHarness
 
         private void EditStructure_Click(object sender, EventArgs e)
         {
+            Model model = display1.Chemistry as Model;
             if (model != null)
             {
                 CMLConverter cc = new CMLConverter();
@@ -122,13 +123,13 @@ namespace WinFormsTestHarness
                 }
                 else
                 {
-                    model = mod;
+                    _model = mod;
                     if (!string.IsNullOrEmpty(filename))
                     {
                         Text = filename;
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
-                    display1.Chemistry = model;
+                    display1.Chemistry = _model;
                     ShowCarbons.Checked = false;
                     EditStructure.Enabled = true;
                     ShowCarbons.Enabled = true;
@@ -164,6 +165,9 @@ namespace WinFormsTestHarness
             {
                 Model newModel = model.Clone();
                 SetCarbons(newModel, ShowCarbons.Checked);
+                Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
+                Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");
+                newModel.RebuildMolecules();
                 display1.Chemistry = newModel;
             }
         }

@@ -56,6 +56,7 @@ namespace Chem4Word.ACME
                 new Application();
 
                 // merge in your application resources
+                //need to do this for controls hosted in Winforms
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",

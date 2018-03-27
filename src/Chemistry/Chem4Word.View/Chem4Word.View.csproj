@@ -85,13 +85,13 @@
     <Compile Include="VisualTreeHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Chem4Word.Model\Chem4Word.Model.csproj">
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Chem4Word.Model\Chem4Word.Model.csproj">
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

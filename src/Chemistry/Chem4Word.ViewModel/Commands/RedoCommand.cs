@@ -5,25 +5,26 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model
+using System;
+
+namespace Chem4Word.ViewModel.Commands
 {
-    public class ChemicalName
+    public class RedoCommand : BaseCommand
     {
-        public string Id { get; set; }
-
-        public string DictRef { get; set; }
-
-        public string Name { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public ChemicalName()
+        public RedoCommand(ViewModel vm) : base(vm)
         {
         }
 
-        public ChemicalName Clone()
+        public override bool CanExecute(object parameter)
         {
-            return (this.MemberwiseClone() as ChemicalName);
+            throw new NotImplementedException();
         }
+
+        public override void Execute(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override event EventHandler CanExecuteChanged;
     }
 }
