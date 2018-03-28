@@ -183,12 +183,17 @@ namespace Chem4Word.ACME
         private void ScrollIntoView()
         {
             var chemCanvas = LocateCanvas();
-            double hOffset = (_activeViewModel.BoundingBox.Right - _activeViewModel.BoundingBox.Left) / 2;
 
-            double vOffset = (_activeViewModel.BoundingBox.Bottom - _activeViewModel.BoundingBox.Top) / 2;
+            var boundingBox = _activeViewModel.BoundingBox;
+            double hOffset = (boundingBox.Right - boundingBox.Left) / 2;
+
+            double vOffset = (boundingBox.Bottom - boundingBox.Top) / 2;
 
             DrawingArea.ScrollToHorizontalOffset(hOffset);
             DrawingArea.ScrollToVerticalOffset(vOffset);
+
+            //DrawingArea.ScrollToHorizontalOffset(boundingBox.Left);
+            //DrawingArea.ScrollToVerticalOffset(boundingBox.Top);
         }
 
         private Canvas LocateCanvas()

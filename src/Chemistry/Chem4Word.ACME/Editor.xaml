@@ -79,7 +79,7 @@
                     Height="25"
                     FontFamily="Arial"
 					FontWeight="DemiBold" FontSize="16"
-                    ToolTip="Current atom type"
+                    ToolTip="Current Atom Type"
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedIndex="0"
                     SelectedItem="{Binding ElementName=DrawingArea, Path=DataContext.SelectedAtomOption}"
@@ -88,7 +88,7 @@
                 <ComboBox
 					x:Name="BondCombo"
 					Width="48" Height="25"
-                    ToolTip="Current bond type"
+                    ToolTip="Current Bond Type"
                     ItemsSource="{StaticResource BondItems}"
                     SelectedIndex="0"
                     SelectedValue="{Binding ElementName=DrawingArea, Path=DataContext.SelectedBondOption}">
@@ -295,15 +295,15 @@
                 Height="Auto" 
 				VerticalScrollBarVisibility="Auto" 
                 Name="DrawingArea">
-
+        
             <ItemsControl Name="ChemicalObjects" HorizontalAlignment="Center" VerticalAlignment="Center" ItemsSource="{Binding AllObjects}"
-                        Width="2031" Height="1470" Background="White"  >
+                        Width="{Binding BoundingBox.Width}" Height="{Binding BoundingBox.Height}" Background="White"  >
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas
                         Name="ChemCanvas"
-                        Width="1200"
-                        Height="800"
+                        Width="{Binding ElementName=ChemicalObjects, Path=Width}"
+                        Height="{Binding ElementName=ChemicalObjects, Path=Height}"
                         Margin="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
