@@ -61,15 +61,9 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //EditorControl ec = elementHost1.Child as EditorControl;
-            //ec.OnOkButtonClick -= OnWpfOkButtonClick;
-            //ec = null;
+            CmlEditor ec = elementHost1.Child as CmlEditor;
+            ec.OnOkButtonClick -= OnWpfOkButtonClick;
+            ec = null;
         }
-    }
-
-    public class WpfEventArgs : EventArgs
-    {
-        public string Button { get; set; }
-        public string OutputValue { get; set; }
     }
 }
