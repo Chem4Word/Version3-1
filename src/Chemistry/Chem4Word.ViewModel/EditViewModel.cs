@@ -98,6 +98,8 @@ namespace Chem4Word.ViewModel
             //    case NotifyCollectionChangedAction.Replace:
             //        break;
             //}
+            OnPropertyChanged(nameof(SelectedAtomOption));
+            OnPropertyChanged(nameof(SelectedBondOption));
         }
 
     
