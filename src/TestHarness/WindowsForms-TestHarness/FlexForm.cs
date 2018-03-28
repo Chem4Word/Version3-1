@@ -164,6 +164,7 @@ namespace WinFormsTestHarness
             if (model != null)
             {
                 Model newModel = model.Clone();
+                newModel.FontSize = display1.FontSize;
                 SetCarbons(newModel, ShowCarbons.Checked);
                 Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
                 Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");
@@ -230,6 +231,11 @@ namespace WinFormsTestHarness
             EditorType.Items.Add("ACME");
             EditorType.Items.Add("CML");
             EditorType.SelectedIndex = 0;
+        }
+
+        private void elementHost1_ChildChanged(object sender, System.Windows.Forms.Integration.ChildChangedEventArgs e)
+        {
+
         }
     }
 }

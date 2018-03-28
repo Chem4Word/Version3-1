@@ -12,14 +12,14 @@ namespace Chem4Word.ViewModel
 {
     public class UndoManager
     {
-        private ViewModel _viewModel;
+        private EditViewModel _editViewModel;
 
         private Stack<Model.Model> _undoStack;
         private Stack<Model.Model> _redoStack;
 
-        public UndoManager(ViewModel vm)
+        public UndoManager(EditViewModel vm)
         {
-            _viewModel = vm;
+            _editViewModel = vm;
         }
 
         public bool CanRedo => _redoStack.Any();
@@ -34,19 +34,19 @@ namespace Chem4Word.ViewModel
 
         public void Commit()
         {
-            _undoStack.Push(_viewModel.Model.Clone());
+            _undoStack.Push(_editViewModel.Model.Clone());
         }
 
         public void Undo()
         {
-            _viewModel.Model = _undoStack.Pop();
-            _redoStack.Push(_viewModel.Model.Clone());
+            _editViewModel.Model = _undoStack.Pop();
+            _redoStack.Push(_editViewModel.Model.Clone());
         }
 
         public void Redo()
         {
-            _viewModel.Model = _redoStack.Pop();
-            _undoStack.Push(_viewModel.Model.Clone());
+            _editViewModel.Model = _redoStack.Pop();
+            _undoStack.Push(_editViewModel.Model.Clone());
         }
     }
 }

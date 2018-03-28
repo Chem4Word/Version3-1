@@ -8,7 +8,11 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model.Converters;
+using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME
 {
@@ -17,7 +21,8 @@ namespace Chem4Word.ACME
     /// </summary>
     public partial class Editor : UserControl
     {
-        public static readonly DependencyProperty SelectedAtomOptionProperty = DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
+        private EditViewModel _activeViewModel;
+        
         public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
 
         public delegate void EventHandler(object sender, WpfEventArgs args);
@@ -94,11 +99,19 @@ namespace Chem4Word.ACME
         {
         }
 
+
+
         public AtomOption SelectedAtomOption
         {
-            get { return (AtomOption) GetValue(SelectedAtomOptionProperty); }
+            get { return (AtomOption)GetValue(SelectedAtomOptionProperty); }
             set { SetValue(SelectedAtomOptionProperty, value); }
         }
+
+        // Using a DependencyProperty as the backing store for SelectedAtomOption.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedAtomOptionProperty =
+            DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
+
+
 
         public Visibility SliderVisibility
         {
@@ -123,7 +136,88 @@ namespace Chem4Word.ACME
         {
             // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
-            DrawingArea.Chemistry = cc.Import(_cml);
+            Model.Model tempModel = cc.Import(_cml);
+
+            tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
+            var vm = new ViewModel.EditViewModel(tempModel);
+            _activeViewModel = vm;
+            DrawingArea.DataContext = vm;
+            ScrollIntoView();
+            //BindControls(vm);
+        }
+
+        public static T FindChild<T>(DependencyObject parent)
+            where T : DependencyObject
+        {
+            // Confirm parent is valid.
+            if (parent == null) return null;
+
+            T foundChild = null;
+
+            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childrenCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                // If the child is not of the request child type child
+                T childType = child as T;
+                if (childType == null)
+                {
+                    // recursively drill down the tree
+                    foundChild = FindChild<T>(child);
+
+                    // If the child is found, break so we do not overwrite the found child.
+                    if (foundChild != null) break;
+                }
+                else
+                {
+                    // child element found.
+                    foundChild = (T)child;
+                    break;
+                }
+            }
+            return foundChild;
+        }
+        /// <summary>
+        /// Centers any chemistry on the drawing area
+        /// </summary>
+        private void ScrollIntoView()
+        {
+            var chemCanvas = LocateCanvas();
+
+            var boundingBox = _activeViewModel.BoundingBox;
+            double hOffset = (boundingBox.Right - boundingBox.Left) / 2;
+
+            double vOffset = (boundingBox.Bottom - boundingBox.Top) / 2;
+
+            DrawingArea.ScrollToHorizontalOffset(hOffset);
+            DrawingArea.ScrollToVerticalOffset(vOffset);
+
+            //DrawingArea.ScrollToHorizontalOffset(boundingBox.Left);
+            //DrawingArea.ScrollToVerticalOffset(boundingBox.Top);
+        }
+
+        private Canvas LocateCanvas()
+        {
+            Canvas res = FindChild<Canvas>(DrawingArea);
+            return res;
+        }
+
+
+        /// <summary>
+        /// Sets up data bindings btween the dropdowns
+        /// and the view model
+        /// </summary>
+        /// <param name="vm">EditViewModel for ACME</param>
+        private void BindControls(ViewModel.EditViewModel vm)
+        {
+            Binding atomBinding = new Binding("SelectedAtomOption");
+            atomBinding.Source = vm;
+            AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
+
+            Binding bondBinding = new Binding("SelectedBondOption");
+            bondBinding.Source = vm;
+
+            BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

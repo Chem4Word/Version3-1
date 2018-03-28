@@ -79,6 +79,7 @@
             this.elementHost1.Size = new System.Drawing.Size(671, 463);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
+            this.elementHost1.ChildChanged += new System.EventHandler<System.Windows.Forms.Integration.ChildChangedEventArgs>(this.elementHost1_ChildChanged);
             this.elementHost1.Child = this.display1;
             // 
             // ChangeBackground
