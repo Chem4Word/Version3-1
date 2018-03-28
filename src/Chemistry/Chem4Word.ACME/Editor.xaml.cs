@@ -9,6 +9,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model.Converters;
 using Chem4Word.ViewModel;
 
@@ -133,11 +134,20 @@ namespace Chem4Word.ACME
         {
             // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
-
-            var vm = new ViewModel.EditViewModel(cc.Import(_cml));
+            Model.Model tempModel = cc.Import(_cml);
+            tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
+            var vm = new ViewModel.EditViewModel(tempModel);
             DrawingArea.DataContext = vm;
-        
-            BindControls(vm);
+            ScrollIntoView();
+            //BindControls(vm);
+        }
+
+        /// <summary>
+        /// Centers any chemistry on the drawing area
+        /// </summary>
+        private void ScrollIntoView()
+        {
+            
         }
 
 

@@ -10,7 +10,7 @@
     x:Class="Chem4Word.ACME.Editor"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance viewModel:DisplayViewModel}"
+    d:DataContext="{d:DesignInstance viewModel:EditViewModel}"
     mc:Ignorable="d"
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
@@ -82,8 +82,7 @@
                     ToolTip="Current atom type"
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, 
-                                    Path=SelectedAtomOption}" SelectionChanged="AtomCombo_SelectionChanged"
+                    SelectedItem="{Binding ElementName=DrawingArea, Path=DataContext.SelectedAtomOption}"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}">
                 </ComboBox>
                 <ComboBox
@@ -92,8 +91,7 @@
                     ToolTip="Current bond type"
                     ItemsSource="{StaticResource BondItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding  RelativeSource={RelativeSource FindAncestor, 
-                            AncestorType={x:Type UserControl}} , Path=SelectedBondOption}">
+                    SelectedValue="{Binding ElementName=DrawingArea, Path=DataContext.SelectedBondOption}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />
@@ -304,8 +302,8 @@
                     <ItemsPanelTemplate>
                         <Canvas
                         x:Name="ChemCanvas"
-                        Width="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Width}"
-                        Height="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Height}"
+                        Width="1200"
+                        Height="800"
                         Margin="8" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
@@ -407,15 +405,15 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type model:Atom}">
                         <view:AtomShape
-                        Name="AtomShape"
-                        Charge="{Binding Path=FormalCharge}"
-                        Isotope="{Binding Path=IsotopeNumber}"
-                        ParentAtom="{Binding Path=SelfRef}"
-                        Position="{Binding Path=Position}"
-                        AtomSymbol="{Binding Path=SymbolText}"
-                        BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
-                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
-                        FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                            Name="AtomShape"
+                            Charge="{Binding Path=FormalCharge}"
+                            Isotope="{Binding Path=IsotopeNumber}"
+                            ParentAtom="{Binding Path=SelfRef}"
+                            Position="{Binding Path=Position}"
+                            AtomSymbol="{Binding Path=SymbolText}"
+                            BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
+                            ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
+                            FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
                             <view:AtomShape.Style>
                                 <Style TargetType="{x:Type view:AtomShape}">
                                     <Setter Property="Fill">

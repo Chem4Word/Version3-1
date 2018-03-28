@@ -27,7 +27,6 @@ namespace Chem4Word.ViewModel
             Molecule = 4
         }
 
-
         
         #region Properties
 
@@ -71,12 +70,20 @@ namespace Chem4Word.ViewModel
 
         public AddAtomCommand AddAtomCommand { get; }
 
+        public  UndoCommand UndoCommand { get; }
+
+        public RedoCommand RedoCommand { get; }
+
+
         #endregion Commands
 
         #region constructors
 
         public EditViewModel(Model.Model model):base(model)
         {
+            RedoCommand = new RedoCommand(this);
+            UndoCommand = new UndoCommand(this);
+
             SelectedItems = new ObservableCollection<object>();
             SelectedItems.CollectionChanged += SelectedItemsOnCollectionChanged;
 
