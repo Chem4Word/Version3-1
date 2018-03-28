@@ -39,12 +39,13 @@
             this.RemoveAtom = new System.Windows.Forms.Button();
             this.RandomElement = new System.Windows.Forms.Button();
             this.EditorType = new System.Windows.Forms.ComboBox();
+            this.Serialize = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadStructure
             // 
             this.LoadStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.LoadStructure.Location = new System.Drawing.Point(12, 482);
+            this.LoadStructure.Location = new System.Drawing.Point(12, 486);
             this.LoadStructure.Name = "LoadStructure";
             this.LoadStructure.Size = new System.Drawing.Size(75, 23);
             this.LoadStructure.TabIndex = 0;
@@ -60,7 +61,7 @@
             // 
             this.EditStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EditStructure.Enabled = false;
-            this.EditStructure.Location = new System.Drawing.Point(527, 481);
+            this.EditStructure.Location = new System.Drawing.Point(608, 486);
             this.EditStructure.Name = "EditStructure";
             this.EditStructure.Size = new System.Drawing.Size(75, 23);
             this.EditStructure.TabIndex = 2;
@@ -76,16 +77,15 @@
             this.elementHost1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.elementHost1.Location = new System.Drawing.Point(12, 12);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(671, 463);
+            this.elementHost1.Size = new System.Drawing.Size(671, 465);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.ChildChanged += new System.EventHandler<System.Windows.Forms.Integration.ChildChangedEventArgs>(this.elementHost1_ChildChanged);
             this.elementHost1.Child = this.display1;
             // 
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(88, 482);
+            this.ChangeBackground.Location = new System.Drawing.Point(93, 486);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -98,7 +98,7 @@
             this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCarbons.AutoSize = true;
             this.ShowCarbons.Enabled = false;
-            this.ShowCarbons.Location = new System.Drawing.Point(169, 485);
+            this.ShowCarbons.Location = new System.Drawing.Point(93, 521);
             this.ShowCarbons.Name = "ShowCarbons";
             this.ShowCarbons.Size = new System.Drawing.Size(95, 17);
             this.ShowCarbons.TabIndex = 4;
@@ -110,7 +110,7 @@
             // 
             this.RemoveAtom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.RemoveAtom.Enabled = false;
-            this.RemoveAtom.Location = new System.Drawing.Point(270, 482);
+            this.RemoveAtom.Location = new System.Drawing.Point(496, 486);
             this.RemoveAtom.Name = "RemoveAtom";
             this.RemoveAtom.Size = new System.Drawing.Size(97, 23);
             this.RemoveAtom.TabIndex = 5;
@@ -122,7 +122,7 @@
             // 
             this.RandomElement.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.RandomElement.Enabled = false;
-            this.RandomElement.Location = new System.Drawing.Point(373, 482);
+            this.RandomElement.Location = new System.Drawing.Point(496, 517);
             this.RandomElement.Name = "RandomElement";
             this.RandomElement.Size = new System.Drawing.Size(97, 23);
             this.RandomElement.TabIndex = 6;
@@ -135,16 +135,28 @@
             this.EditorType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EditorType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.EditorType.Enabled = false;
-            this.EditorType.Location = new System.Drawing.Point(608, 482);
+            this.EditorType.Location = new System.Drawing.Point(608, 519);
             this.EditorType.Name = "EditorType";
             this.EditorType.Size = new System.Drawing.Size(75, 21);
             this.EditorType.TabIndex = 0;
+            // 
+            // Serialize
+            // 
+            this.Serialize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Serialize.Location = new System.Drawing.Point(12, 517);
+            this.Serialize.Name = "Serialize";
+            this.Serialize.Size = new System.Drawing.Size(75, 23);
+            this.Serialize.TabIndex = 7;
+            this.Serialize.Text = "Serialize";
+            this.Serialize.UseVisualStyleBackColor = true;
+            this.Serialize.Click += new System.EventHandler(this.Serialize_Click);
             // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(695, 514);
+            this.ClientSize = new System.Drawing.Size(695, 544);
+            this.Controls.Add(this.Serialize);
             this.Controls.Add(this.EditorType);
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
@@ -174,6 +186,7 @@
         private System.Windows.Forms.ComboBox EditorType;
         private System.Windows.Forms.Button RemoveAtom;
         private System.Windows.Forms.Button RandomElement;
+        private System.Windows.Forms.Button Serialize;
     }
 }
 

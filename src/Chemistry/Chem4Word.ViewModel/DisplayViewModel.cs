@@ -136,7 +136,7 @@ namespace Chem4Word.ViewModel
         }
 
 
-
+        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

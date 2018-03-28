@@ -19,6 +19,7 @@ using System.Windows;
 namespace Chem4Word.Model
 {
     [DebuggerDisplay("Id: {Id} From: {StartAtom.Id} To: {EndAtom.Id}")]
+    [Serializable]
     public class Bond : INotifyPropertyChanged
     {
         private Atom _startAtom, _endAtom;
@@ -292,6 +293,7 @@ namespace Chem4Word.Model
             get { return Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector); }
         }
 
+        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -233,9 +234,41 @@ namespace WinFormsTestHarness
             EditorType.SelectedIndex = 0;
         }
 
-        private void elementHost1_ChildChanged(object sender, System.Windows.Forms.Integration.ChildChangedEventArgs e)
+        private void Serialize_Click(object sender, EventArgs e)
         {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                MemoryStream ms1 = new MemoryStream();
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(ms1, model);
+                //Debug.WriteLine(ms1.Length);
 
+                string filename = $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.bin";
+                string targetFile = Path.Combine(@"C:\Temp", filename);
+
+                ms1.Position = 0;
+                using (FileStream file = new FileStream(targetFile, FileMode.Create, FileAccess.Write))
+                {
+                    byte[] bytes = new byte[ms1.Length];
+                    ms1.Read(bytes, 0, (int)ms1.Length);
+                    file.Write(bytes, 0, bytes.Length);
+                    ms1.Close();
+                }
+
+                MemoryStream ms2 = new MemoryStream();
+                using (FileStream file = new FileStream(targetFile, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] bytes = new byte[file.Length];
+                    file.Read(bytes, 0, (int)file.Length);
+                    ms2.Write(bytes, 0, (int)file.Length);
+                }
+
+                ms2.Position = 0;
+                Model x = new BinaryFormatter().Deserialize(ms2) as Model;
+                x.RebuildMolecules();
+                display1.Chemistry = x;
+            }
         }
     }
 }

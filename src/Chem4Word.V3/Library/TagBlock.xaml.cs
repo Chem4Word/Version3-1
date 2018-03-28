@@ -43,6 +43,7 @@ namespace Chem4Word.Library
         public static readonly DependencyProperty TagNameProperty =
             DependencyProperty.Register("TagName", typeof(string), typeof(TagBlock), new PropertyMetadata(""));
 
+        [field: NonSerialized()]
         public event EventHandler DelClicked;
 
         public TagBlock()

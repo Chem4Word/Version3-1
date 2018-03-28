@@ -5,8 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+
 namespace Chem4Word.Model
 {
+    [Serializable]
     public class Formula
     {
         public string Id { get; set; }
