@@ -123,7 +123,7 @@ namespace Chem4Word.ACME
         {
             // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
-            DrawingArea.Chemistry = cc.Import(_cml);
+            DrawingArea.DataContext = cc.Import(_cml);
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
