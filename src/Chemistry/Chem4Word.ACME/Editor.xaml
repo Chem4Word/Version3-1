@@ -34,7 +34,7 @@
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
-                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler"></EventSetter>
+                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler"/>
                 </Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBrushKey}}" />
@@ -301,7 +301,7 @@
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas
-                        x:Name="ChemCanvas"
+                        Name="ChemCanvas"
                         Width="1200"
                         Height="800"
                         Margin="8" />

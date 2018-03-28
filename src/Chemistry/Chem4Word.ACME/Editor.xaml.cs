@@ -9,6 +9,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model.Converters;
 using Chem4Word.ViewModel;
@@ -20,6 +21,7 @@ namespace Chem4Word.ACME
     /// </summary>
     public partial class Editor : UserControl
     {
+        private EditViewModel _activeViewModel;
         
         public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
 
@@ -135,19 +137,64 @@ namespace Chem4Word.ACME
             // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
+
             tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
             var vm = new ViewModel.EditViewModel(tempModel);
+            _activeViewModel = vm;
             DrawingArea.DataContext = vm;
             ScrollIntoView();
             //BindControls(vm);
         }
 
+        public static T FindChild<T>(DependencyObject parent)
+            where T : DependencyObject
+        {
+            // Confirm parent is valid.
+            if (parent == null) return null;
+
+            T foundChild = null;
+
+            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childrenCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                // If the child is not of the request child type child
+                T childType = child as T;
+                if (childType == null)
+                {
+                    // recursively drill down the tree
+                    foundChild = FindChild<T>(child);
+
+                    // If the child is found, break so we do not overwrite the found child.
+                    if (foundChild != null) break;
+                }
+                else
+                {
+                    // child element found.
+                    foundChild = (T)child;
+                    break;
+                }
+            }
+            return foundChild;
+        }
         /// <summary>
         /// Centers any chemistry on the drawing area
         /// </summary>
         private void ScrollIntoView()
         {
-            
+            var chemCanvas = LocateCanvas();
+            double hOffset = (_activeViewModel.BoundingBox.Right - _activeViewModel.BoundingBox.Left) / 2;
+
+            double vOffset = (_activeViewModel.BoundingBox.Bottom - _activeViewModel.BoundingBox.Top) / 2;
+
+            DrawingArea.ScrollToHorizontalOffset(hOffset);
+            DrawingArea.ScrollToVerticalOffset(vOffset);
+        }
+
+        private Canvas LocateCanvas()
+        {
+            Canvas res = FindChild<Canvas>(DrawingArea);
+            return res;
         }
 
 
