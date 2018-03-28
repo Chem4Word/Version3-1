@@ -247,6 +247,8 @@ namespace WinFormsTestHarness
                 string filename = $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.bin";
                 string targetFile = Path.Combine(@"C:\Temp", filename);
 
+                CMLConverter cc = new CMLConverter();
+                File.WriteAllText(targetFile.Replace(".bin", ".cml"), cc.Export(model));
                 ms1.Position = 0;
                 using (FileStream file = new FileStream(targetFile, FileMode.Create, FileAccess.Write))
                 {
