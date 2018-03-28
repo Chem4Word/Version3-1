@@ -9,14 +9,15 @@
     xmlns:local="clr-namespace:Chem4Word.ACME"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
-    xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
+    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     d:DesignHeight="300"
     d:DesignWidth="300"
-    d:DataContext="{d:DesignInstance model:Model}"
+    d:DataContext="{d:DesignInstance viewModel:DisplayViewModel}"
     mc:Ignorable="d debug release"
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
-    xmlns:viewModel="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
+    xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
+    FontSize="23.0"
     x:Name="ACMEDisplay">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />
@@ -64,7 +65,8 @@
                         Placement="{Binding Path=Placement, Mode=OneWay}"
                         Stereo="{Binding Path=Stereo, Mode=OneWay}"
                         StartPoint="{Binding Path=StartAtom.Position, Mode=OneWay}"
-                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
+                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}"
+                        >
                         <view:BondShape.Style>
                             <Style TargetType="{x:Type view:BondShape}">
                                 <Setter Property="StrokeThickness" Value="2.5" />
@@ -144,7 +146,7 @@
                     </view:BondShape>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type model:Atom}">
-                    <viewModel:AtomShape
+                    <view:AtomShape
                         Name="AtomShape"
                         Charge="{Binding Path=FormalCharge}"
                         Isotope="{Binding Path=IsotopeNumber}"
@@ -152,9 +154,10 @@
                         Position="{Binding Path=Position}"
                         AtomSymbol="{Binding Path=SymbolText}"
                         BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
-                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
-                        <viewModel:AtomShape.Style>
-                            <Style TargetType="{x:Type viewModel:AtomShape}">
+                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
+                        FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                        <view:AtomShape.Style>
+                            <Style TargetType="{x:Type view:AtomShape}">
                                 <Setter Property="Fill">
                                     <Setter.Value>
                                         <SolidColorBrush Color="{Binding Element.Colour}" />
@@ -189,8 +192,8 @@
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
-                        </viewModel:AtomShape.Style>
-                    </viewModel:AtomShape>
+                        </view:AtomShape.Style>
+                    </view:AtomShape>
                 </DataTemplate>
             </ItemsControl.Resources>
         </ItemsControl>

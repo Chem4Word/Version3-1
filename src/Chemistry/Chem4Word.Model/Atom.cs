@@ -450,23 +450,20 @@ namespace Chem4Word.Model
         //    }
         //}
 
-        public const double FontSize = 23;
-
+        
         //tries to get a bounding box for each atom symbol
-        public Rect BoundingBox
+        public Rect BoundingBox( double fontSize)
         {
-            get
-            {
-                if (SymbolText != "")
+              if (SymbolText != "")
                 {
-                    double halfSize = FontSize / 2;
+                    double halfSize = fontSize / 2;
                     Point position = Position;
                     Rect baseAtomBox = new Rect(
                         new Point(position.X - halfSize, position.Y - halfSize),
                         new Point(position.X + halfSize, position.Y + halfSize));
-                    double symbolWidth = SymbolText.Length * FontSize * 0.8;
+                    double symbolWidth = SymbolText.Length * fontSize * 0.8;
                     Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
-                        new Size(symbolWidth, FontSize));
+                        new Size(symbolWidth, fontSize));
 
                     if (ImplicitHydrogenCount > 0)
 
@@ -476,19 +473,19 @@ namespace Chem4Word.Model
                         switch (GetDefaultHOrientation())
                         {
                             case CompassPoints.East:
-                                shift = BasicGeometry.ScreenEast * FontSize;
+                                shift = BasicGeometry.ScreenEast * fontSize;
                                 break;
 
                             case CompassPoints.North:
-                                shift = BasicGeometry.ScreenNorth * FontSize;
+                                shift = BasicGeometry.ScreenNorth * fontSize;
                                 break;
 
                             case CompassPoints.South:
-                                shift = BasicGeometry.ScreenSouth * FontSize;
+                                shift = BasicGeometry.ScreenSouth * fontSize;
                                 break;
 
                             case CompassPoints.West:
-                                shift = BasicGeometry.ScreenWest * FontSize;
+                                shift = BasicGeometry.ScreenWest * fontSize;
                                 break;
                         }
                         hydrogenBox.Offset(shift);
@@ -500,9 +497,8 @@ namespace Chem4Word.Model
                 {
                     return new Rect(Position, Position);//empty rect
                 }
-            }
         }
-
+       
         private Rect CenterRectOn(Point position, double fontSize, Point topleft, Point bottomRight)
         {
             return new Rect(topleft,

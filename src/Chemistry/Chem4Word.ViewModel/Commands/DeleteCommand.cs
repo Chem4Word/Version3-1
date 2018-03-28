@@ -16,17 +16,17 @@ namespace Chem4Word.ViewModel.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return MyViewModel.SelectedItems.Any();
+            return MyEditViewModel.SelectedItems.Any();
         }
 
         public override void Execute(object parameter)
         {
-            MyViewModel.UndoManager.Commit();
+            MyEditViewModel.UndoManager.Commit();
         }
 
         public override event EventHandler CanExecuteChanged;
 
-        public DeleteCommand(ViewModel vm) : base(vm)
+        public DeleteCommand(EditViewModel vm) : base(vm)
         {
         }
 

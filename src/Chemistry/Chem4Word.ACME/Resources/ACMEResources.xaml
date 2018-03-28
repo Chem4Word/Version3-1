@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:conv="clr-namespace:Chem4Word.ACME.Converters"
     xmlns:model ="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
+    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     xmlns:acme="clr-namespace:Chem4Word.ACME">
   <!-- Simple shapes for use in menus, buttons etc -->
   <ResourceDictionary.MergedDictionaries>
@@ -115,32 +116,30 @@
 
 
   <!-- used to populate the bond dropdown combo -->
-  <x:Array x:Key="BondItems" Type="{x:Type acme:BondOption}">
-    <acme:BondOption Order="Single" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}"/>
-    <acme:BondOption Order="Double" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}"/>
-    <acme:BondOption Order="Triple" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}"/>
-    <acme:BondOption Order="Single" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}"/>
-    <acme:BondOption Order="Single" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}"/>
-    <acme:BondOption Order="{x:Null}" Stereo="{x:Null}"/>
- </x:Array>
+  <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
+    <viewModel:BondOption Order="Single" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}"/>
+    <viewModel:BondOption Order="Double" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}"/>
+    <viewModel:BondOption Order="Triple" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}"/>
+    <viewModel:BondOption Order="Single" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}"/>
+     <viewModel:BondOption Order="Single" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}"/>
+    </x:Array>
 
 
-<x:Array x:Key="AtomItems" Type="{x:Type acme:AtomOption}">
-    <acme:AtomOption Element="C" Foreground="{StaticResource CBrush}">C</acme:AtomOption>
-    <acme:AtomOption Element="H" Foreground="{StaticResource HBrush}">H</acme:AtomOption>
-    <acme:AtomOption Element="N" Foreground="{StaticResource NBrush}">N</acme:AtomOption>
-    <acme:AtomOption Element="O" Foreground="{StaticResource OBrush}">O</acme:AtomOption>
-    <acme:AtomOption Element="P" Foreground="{StaticResource PBrush}">P</acme:AtomOption>
-    <acme:AtomOption Element="S" Foreground="{StaticResource SBrush}">S</acme:AtomOption>
-    <acme:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">Cl</acme:AtomOption>
-    <acme:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">Br</acme:AtomOption>
-    <acme:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</acme:AtomOption>
-      <acme:AtomOption Element="{x:Null}" Foreground="{x:Null}"/>
-        <acme:AtomOption Element="R"  Foreground="Black">
-      <TextBlock>
+<x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
+    <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">C</viewModel:AtomOption>
+    <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">H</viewModel:AtomOption>
+    <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">N</viewModel:AtomOption>
+    <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">O</viewModel:AtomOption>
+    <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">P</viewModel:AtomOption>
+    <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">S</viewModel:AtomOption>
+    <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">Cl</viewModel:AtomOption>
+    <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">Br</viewModel:AtomOption>
+    <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</viewModel:AtomOption>
+    <viewModel:AtomOption Element="R"  Foreground="Black">
+    <TextBlock>
         R<Run FontSize="8" BaselineAlignment="Subscript">1</Run>
       </TextBlock>
-    </acme:AtomOption>
+    </viewModel:AtomOption>
       <!--
     <acme:AtomOption Element="R2" Foreground="Black">
       <TextBlock>
@@ -164,3 +163,10 @@
   </x:Array>
 
 </ResourceDictionary>
+
+
+
+
+
+
+

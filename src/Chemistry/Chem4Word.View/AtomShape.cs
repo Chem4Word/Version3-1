@@ -5,8 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,7 +12,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using static Chem4Word.Model.Geometry.AngleMethods;
+using Chem4Word.Model;
+using Chem4Word.Model.Geometry;
 using static Chem4Word.View.GlyphUtils;
 
 namespace Chem4Word.View
@@ -37,9 +36,6 @@ namespace Chem4Word.View
         #region constructors
 
         //needs a default constructor to be used in XAML
-        public AtomShape()
-        {
-        }
 
         #endregion constructors
 
@@ -79,7 +75,7 @@ namespace Chem4Word.View
 
                 List<Point> mainOutline;
                 //first, get some initial size measurements
-                _mainText = new GlyphText(Text, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, pixelsPerDip);
+                _mainText = new GlyphText(Text, SymbolTypeface, SymbolSize, pixelsPerDip);
                 _mainText.Premeasure();
 
                 //measure up the subscript (if we have one)
@@ -152,7 +148,7 @@ namespace Chem4Word.View
                 GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo = null)
             {
                 Point adjunctCenter;
-                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * GlyphUtils.SymbolSize);
+                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * SymbolSize);
                 double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width) / 2;
                 switch (direction)
                 {
@@ -230,7 +226,7 @@ namespace Chem4Word.View
             if (AtomSymbol != "")
             {
                 var symbolText = new GlyphText(AtomSymbol,
-                    GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, PixelsPerDip());
+                    SymbolTypeface, SymbolSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
                 //grab the hull for later
                 if (symbolText.FlattenedPath != null)
@@ -262,7 +258,7 @@ namespace Chem4Word.View
             {
                 //sort the points properly before doing a hull calculation
                 var sortedHull = (from Point p in _shapeHull
-                                  orderby p.X ascending, p.Y descending
+                                  orderby p.X, p.Y descending
                                   select p).ToList();
 
                 _shapeHull = Geometry<Point>.GetHull(sortedHull, p => p);
@@ -343,7 +339,7 @@ namespace Chem4Word.View
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize * 0.9;
+            Vector chargeOffset = BasicGeometry.ScreenNorth * SymbolSize * 0.9;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter, defaultHOrientation);
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
@@ -402,7 +398,7 @@ namespace Chem4Word.View
             string isoLabel = Isotope.ToString();
             var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
 
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphUtils.SymbolSize;
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * SymbolSize;
             Matrix rotator = new Matrix();
             rotator.Rotate(ClockDirections.Ten.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;
@@ -425,7 +421,7 @@ namespace Chem4Word.View
                 }
                 Rect boundingBox = new Rect(new Point(Position.X - radiusX, Position.Y - radiusX),
                     new Point(Position.X + radiusX, Position.Y + radiusX));
-                return new AtomTextMetrics()
+                return new AtomTextMetrics
                 {
                     BoundingBox = boundingBox,
                     Geocenter = Position,
@@ -435,7 +431,7 @@ namespace Chem4Word.View
             }
             else
             {
-                var symbolText = new GlyphText(AtomSymbol, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, PixelsPerDip());
+                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, SymbolSize, PixelsPerDip());
                 symbolText.Fill = Fill;
                 symbolText.MeasureAtCenter(Position);
                 if (!measureOnly)
@@ -466,6 +462,21 @@ namespace Chem4Word.View
 
         #endregion Positioning DPs
 
+        #region layout DPs
+
+
+        public double FontSize
+        {
+            get { return (double)GetValue(FontSizeProperty); }
+            set { SetValue(FontSizeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty FontSizeProperty =
+            DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+
+
+        #endregion layout DPs
         #region Atom DPs
 
         public string AtomSymbol

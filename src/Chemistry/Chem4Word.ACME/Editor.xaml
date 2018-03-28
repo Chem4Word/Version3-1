@@ -5,10 +5,17 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
     xmlns:acme="clr-namespace:Chem4Word.ACME"
+    xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
+    xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
     x:Class="Chem4Word.ACME.Editor"
     d:DesignHeight="300"
+    d:DesignWidth="300"
+    d:DataContext="{d:DesignInstance viewModel:EditViewModel}"
     mc:Ignorable="d"
-    x:Name="AcmeControl" Loaded="ACMEControl_Loaded">
+    xmlns:debug="condition:DEBUG"
+    xmlns:release="condition:!DEBUG"
+    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
+    x:Name="AcmeControl" Loaded="ACMEControl_Loaded" Height="774" Width="1013">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -27,7 +34,7 @@
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
-                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler"></EventSetter>
+                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler"/>
                 </Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBrushKey}}" />
@@ -72,21 +79,19 @@
                     Height="25"
                     FontFamily="Arial"
 					FontWeight="DemiBold" FontSize="16"
-                    ToolTip="Current atom type"
+                    ToolTip="Current Atom Type"
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, 
-                                    Path=SelectedAtomOption}" SelectionChanged="AtomCombo_SelectionChanged"
+                    SelectedItem="{Binding ElementName=DrawingArea, Path=DataContext.SelectedAtomOption}"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}">
                 </ComboBox>
                 <ComboBox
 					x:Name="BondCombo"
 					Width="48" Height="25"
-                    ToolTip="Current bond type"
+                    ToolTip="Current Bond Type"
                     ItemsSource="{StaticResource BondItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding  RelativeSource={RelativeSource FindAncestor, 
-                            AncestorType={x:Type UserControl}} , Path=SelectedBondOption}">
+                    SelectedValue="{Binding ElementName=DrawingArea, Path=DataContext.SelectedBondOption}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />
@@ -155,7 +160,7 @@
                         </Path.LayoutTransform>
                         <Path.Effect>
                             <DropShadowEffect Color="LightGray" Direction="120" ShadowDepth="3"/>
-                            
+
                         </Path.Effect>
                     </Path>
                 </RadioButton>
@@ -194,7 +199,7 @@
                 </RadioButton>
             </ToolBar>
             <ToolBar x:Name="EditToolbar" Height="40" BandIndex="2">
-               
+
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="25">
                         <Path   Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
@@ -284,25 +289,161 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        <Grid DockPanel.Dock="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="207*" />
-                <ColumnDefinition Width="13*" />
-                <ColumnDefinition Width="215*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <ScrollViewer
-				HorizontalScrollBarVisibility="Auto"
-				VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.ColumnSpan="3">
-                <acme:Display x:Name="DrawingArea" Width="2400" Height="1800"   Background="White" Loaded="DrawingArea_Loaded">
-                    <acme:Display.LayoutTransform>
-                        <ScaleTransform
-							ScaleX="{Binding Value, ElementName=ScaleSlider}"
-							ScaleY="{Binding Value, ElementName=ScaleSlider}" />
-                    </acme:Display.LayoutTransform>
-                </acme:Display>
-            </ScrollViewer>
-            <Slider x:Name="ScaleSlider" Grid.Column="3" Orientation="Vertical" Visibility="{Binding ElementName=AcmeControl, Path=SliderVisibility}" />
-        </Grid>
+
+        <ScrollViewer
+            HorizontalScrollBarVisibility="Auto"
+                Height="Auto" 
+				VerticalScrollBarVisibility="Auto" 
+                Name="DrawingArea">
+        
+            <ItemsControl Name="ChemicalObjects" HorizontalAlignment="Center" VerticalAlignment="Center" ItemsSource="{Binding AllObjects}"
+                        Width="{Binding BoundingBox.Width}" Height="{Binding BoundingBox.Height}" Background="White"  >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas
+                        Name="ChemCanvas"
+                        Width="{Binding ElementName=ChemicalObjects, Path=Width}"
+                        Height="{Binding ElementName=ChemicalObjects, Path=Height}"
+                        Margin="8" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Resources>
+                    <!--<local:DoNothingConverter x:Key="DoNothingConverter" />-->
+                    <LinearGradientBrush x:Key="HatchBrush"  MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+                        <GradientStop Offset="0.00" Color="Black" />
+                        <GradientStop Offset="0.25" Color="Black" />
+                        <GradientStop Offset="0.25" Color="Transparent" />
+                        <GradientStop Offset="0.30" Color="Transparent" />
+                        <LinearGradientBrush.Transform>
+                            <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
+                        </LinearGradientBrush.Transform>
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="HighlightHatchBrush"  MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+                        <GradientStop Offset="0.00" Color="DarkOrange" />
+                        <GradientStop Offset="0.25" Color="DarkOrange" />
+                        <GradientStop Offset="0.25" Color="Transparent" />
+                        <GradientStop Offset="0.30" Color="Transparent" />
+                        <LinearGradientBrush.Transform>
+                            <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
+                        </LinearGradientBrush.Transform>
+                    </LinearGradientBrush>
+                    <DataTemplate DataType="{x:Type model:Bond}">
+                        <view:BondShape
+                        Name="BondShape"
+                        DrawingCanvas="{Binding ElementName=ChemCanvas, Mode=OneTime}"
+                        ParentBond="{Binding Path=SelfRef, Mode=OneTime}"
+                        Placement="{Binding Path=Placement, Mode=OneWay}"
+                        Stereo="{Binding Path=Stereo, Mode=OneWay}"
+                        StartPoint="{Binding Path=StartAtom.Position, Mode=OneWay}"
+                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
+                            <view:BondShape.Style>
+                                <Style TargetType="{x:Type view:BondShape}">
+                                    <Setter Property="StrokeThickness" Value="2.5" />
+                                    <Setter Property="StrokeEndLineCap" Value="Round" />
+                                    <Setter Property="StrokeStartLineCap" Value="Round" />
+                                    <Setter Property="Fill" Value="Black" />
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="hbond">
+                                            <Setter Property="StrokeDashArray" Value="1,1" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="partial01">
+                                            <Setter Property="StrokeDashArray" Value="2,1" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="None">
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Trans">
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Cis">
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Indeterminate">
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeThickness" Value="1.5" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Hatch">
+                                            <Setter Property="Fill" Value="{StaticResource HatchBrush}" />
+                                            <Setter Property="Stroke" Value="Transparent" />
+                                        </DataTrigger>
+                                        <!-- highlights the bonds on mouseover -->
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Fill">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="DarkOrange" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="Stereo" Value="None" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Stroke">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="DarkOrange" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </MultiTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="Stereo" Value="Hatch" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Fill" Value="{StaticResource HighlightHatchBrush}" />
+                                        </MultiTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </view:BondShape.Style>
+                        </view:BondShape>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type model:Atom}">
+                        <view:AtomShape
+                            Name="AtomShape"
+                            Charge="{Binding Path=FormalCharge}"
+                            Isotope="{Binding Path=IsotopeNumber}"
+                            ParentAtom="{Binding Path=SelfRef}"
+                            Position="{Binding Path=Position}"
+                            AtomSymbol="{Binding Path=SymbolText}"
+                            BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
+                            ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
+                            FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                            <view:AtomShape.Style>
+                                <Style TargetType="{x:Type view:AtomShape}">
+                                    <Setter Property="Fill">
+                                        <Setter.Value>
+                                            <SolidColorBrush Color="{Binding Element.Colour}" />
+                                        </Setter.Value>
+                                    </Setter>
+
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=SymbolText}" Value="">
+                                            <Setter Property="Fill">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="Transparent" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Fill">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="DarkOrange" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </view:AtomShape.Style>
+                        </view:AtomShape>
+                    </DataTemplate>
+                </ItemsControl.Resources>
+            </ItemsControl>
+        </ScrollViewer>
     </DockPanel>
 </UserControl>

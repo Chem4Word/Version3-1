@@ -11,7 +11,7 @@ namespace Chem4Word.ViewModel.Commands
 {
     public class RedoCommand : BaseCommand
     {
-        public RedoCommand(ViewModel vm) : base(vm)
+        public RedoCommand(EditViewModel vm) : base(vm)
         {
         }
 

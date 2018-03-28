@@ -29,7 +29,7 @@ namespace Chem4Word.ViewModel.Commands
 
         #region Constructors
 
-        public AddAtomCommand(ViewModel vm) : base(vm)
+        public AddAtomCommand(EditViewModel vm) : base(vm)
         {
         }
 

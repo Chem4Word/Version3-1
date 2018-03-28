@@ -338,11 +338,11 @@ namespace Chem4Word.Model
         {
             get
             {
-                var modelRect = AllAtoms[0].BoundingBox;
+                var modelRect = AllAtoms[0].BoundingBox(FontSize);
                 for (int i = 1; i < AllAtoms.Count; i++)
                 {
                     var atom = AllAtoms[i];
-                    modelRect.Union(atom.BoundingBox);
+                    modelRect.Union(atom.BoundingBox(FontSize));
                 }
                 return  modelRect;
             }

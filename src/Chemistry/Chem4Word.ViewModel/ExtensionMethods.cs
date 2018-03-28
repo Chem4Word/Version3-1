@@ -5,9 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Windows;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
-using System.Windows;
+using static Chem4Word.ViewModel.DisplayViewModel;
 
 namespace Chem4Word.ViewModel
 {
@@ -18,14 +19,14 @@ namespace Chem4Word.ViewModel
         {
             if (atom.SymbolText != "")
             {
-                double halfSize = ViewModel.FontSize / 2;
+                double halfSize = FontSize / 2;
                 Point position = atom.Position;
                 Rect baseAtomBox = new Rect(
                     new Point(position.X - halfSize, position.Y - halfSize),
                     new Point(position.X + halfSize, position.Y + halfSize));
-                double symbolWidth = atom.SymbolText.Length * ViewModel.FontSize * 0.8;
+                double symbolWidth = atom.SymbolText.Length * FontSize * 0.8;
                 Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
-                    new Size(symbolWidth, ViewModel.FontSize));
+                    new Size(symbolWidth, FontSize));
 
                 if (atom.ImplicitHydrogenCount > 0)
 
@@ -35,19 +36,19 @@ namespace Chem4Word.ViewModel
                     switch (atom.GetDefaultHOrientation())
                     {
                         case CompassPoints.East:
-                            shift = BasicGeometry.ScreenEast * ViewModel.FontSize;
+                            shift = BasicGeometry.ScreenEast * FontSize;
                             break;
 
                         case CompassPoints.North:
-                            shift = BasicGeometry.ScreenNorth * ViewModel.FontSize;
+                            shift = BasicGeometry.ScreenNorth * FontSize;
                             break;
 
                         case CompassPoints.South:
-                            shift = BasicGeometry.ScreenSouth * ViewModel.FontSize;
+                            shift = BasicGeometry.ScreenSouth * FontSize;
                             break;
 
                         case CompassPoints.West:
-                            shift = BasicGeometry.ScreenWest * ViewModel.FontSize;
+                            shift = BasicGeometry.ScreenWest * FontSize;
                             break;
                     }
                     hydrogenBox.Offset(shift);

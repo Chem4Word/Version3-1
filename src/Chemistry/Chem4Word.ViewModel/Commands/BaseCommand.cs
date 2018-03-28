@@ -12,7 +12,7 @@ namespace Chem4Word.ViewModel.Commands
 {
     public abstract class BaseCommand : ICommand
     {
-        public ViewModel MyViewModel { get; set; }
+        public EditViewModel MyEditViewModel { get; set; }
 
         #region ICommand Implementation
 
@@ -26,9 +26,9 @@ namespace Chem4Word.ViewModel.Commands
 
         #region Constructors
 
-        protected BaseCommand(ViewModel vm)
+        protected BaseCommand(EditViewModel vm)
         {
-            MyViewModel = vm;
+            MyEditViewModel = vm;
         }
 
         #endregion Constructors
