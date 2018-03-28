@@ -5,15 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
-using Chem4Word.Model.Enums;
 using System;
 using System.Windows;
+using Chem4Word.Model;
+using Chem4Word.Model.Enums;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ViewModel
 {
     /// <summary>
-    /// Rolls up Bond Stereo and Order into a single class to facilitate binding
+    /// Rolls up Bond Stereo and Order into a single class to facilitate binding.
+    /// Deals with combinations of Orders and Stereo
     /// </summary>
     public class BondOption : DependencyObject
     {
@@ -25,7 +26,7 @@ namespace Chem4Word.ACME
 
         // Using a DependencyProperty as the backing store for Order.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderProperty =
-            DependencyProperty.Register("Order", typeof(string), typeof(BondOption), new PropertyMetadata(Bond.OrderPartial01));
+            DependencyProperty.Register("Order", typeof(string), typeof(BondOption), new PropertyMetadata(Bond.OrderSingle));
 
         public BondStereo? Stereo
         {
@@ -35,7 +36,7 @@ namespace Chem4Word.ACME
 
         // Using a DependencyProperty as the backing store for BondStereoEnums.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BondStereoEnumsProperty =
-            DependencyProperty.Register("Stereo", typeof(BondStereo?), typeof(BondOption), new PropertyMetadata(BondStereo.None));
+            DependencyProperty.Register("Stereo", typeof(BondStereo?), typeof(BondOption), new PropertyMetadata(null));
 
         public Style DisplayStyle
         {

@@ -6,11 +6,14 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using Chem4Word.ViewModel.Commands;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel 
 {
@@ -33,6 +36,33 @@ namespace Chem4Word.ViewModel
 
         public UndoManager UndoManager { get; }
 
+        private BondOption _selectedBondOption;
+        public BondOption SelectedBondOption
+        {
+            get { return _selectedBondOption; }
+            set { _selectedBondOption = value; }
+        }
+
+        private AtomOption _selectedAtomOption;
+        public AtomOption SelectedAtomOption
+        {
+            get { return _selectedAtomOption; }
+
+            set { _selectedAtomOption = value; } 
+        }
+        /// <summary>
+        /// returns a distinct list of selected elements
+        /// </summary>
+        public List<ElementBase> SelectedElementType
+        {
+            get { return SelectedItems.OfType<ElementBase>().Distinct().ToList(); }
+        }
+
+
+        public List<Bond> SelectedBondType
+        {
+            get { return SelectedItems.OfType<Bond>().Distinct().ToList(); }
+        }
         #endregion Properties
 
         #region Commands
@@ -60,11 +90,18 @@ namespace Chem4Word.ViewModel
         #endregion constructors
         private void SelectedItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            
+            //switch (e.Action)
+            //{
+            //    case NotifyCollectionChangedAction.Add:
+            //    case NotifyCollectionChangedAction.Move:
+            //    case NotifyCollectionChangedAction.Remove:
+            //    case NotifyCollectionChangedAction.Replace:
+            //        break;
+            //}
         }
 
+    
 
-     
 
     }
 }

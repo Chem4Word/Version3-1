@@ -8,7 +8,9 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Chem4Word.Model.Converters;
+using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME
 {
@@ -17,7 +19,7 @@ namespace Chem4Word.ACME
     /// </summary>
     public partial class Editor : UserControl
     {
-        public static readonly DependencyProperty SelectedAtomOptionProperty = DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
+        
         public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
 
         public delegate void EventHandler(object sender, WpfEventArgs args);
@@ -94,11 +96,19 @@ namespace Chem4Word.ACME
         {
         }
 
+
+
         public AtomOption SelectedAtomOption
         {
-            get { return (AtomOption) GetValue(SelectedAtomOptionProperty); }
+            get { return (AtomOption)GetValue(SelectedAtomOptionProperty); }
             set { SetValue(SelectedAtomOptionProperty, value); }
         }
+
+        // Using a DependencyProperty as the backing store for SelectedAtomOption.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedAtomOptionProperty =
+            DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
+
+
 
         public Visibility SliderVisibility
         {
@@ -123,7 +133,29 @@ namespace Chem4Word.ACME
         {
             // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
-            DrawingArea.DataContext = cc.Import(_cml);
+
+            var vm = new ViewModel.EditViewModel(cc.Import(_cml));
+            DrawingArea.DataContext = vm;
+        
+            BindControls(vm);
+        }
+
+
+        /// <summary>
+        /// Sets up data bindings btween the dropdowns
+        /// and the view model
+        /// </summary>
+        /// <param name="vm">EditViewModel for ACME</param>
+        private void BindControls(ViewModel.EditViewModel vm)
+        {
+            Binding atomBinding = new Binding("SelectedAtomOption");
+            atomBinding.Source = vm;
+            AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
+
+            Binding bondBinding = new Binding("SelectedBondOption");
+            bondBinding.Source = vm;
+
+            BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
