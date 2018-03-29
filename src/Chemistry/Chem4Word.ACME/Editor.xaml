@@ -28,7 +28,7 @@
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
-            <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed"></acme:BoolToVisibilityConverter>
+            <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed"/>
         </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBarTray.Resources>
@@ -234,7 +234,7 @@
                                   38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z " />
                     </Viewbox>
                 </Button>
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton">
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton" Command="{Binding UndoCommand}" >
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
                               27.296C 55.1649,28.0987 55.6564,28.9607 56.0698,29.8821C 56.4832,30.8035 56.8065,31.7766 57.0396,32.8014C 57.2727,33.8262 57.3892,
@@ -254,7 +254,7 @@
                               48.6314,22.4932C 49.4561,22.8165 50.2148,23.198 50.9075,23.6378C 51.6002,24.0777 52.2148,24.5571 52.7514,25.076 Z " />
                     </Viewbox>
                 </Button>
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton">
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton" Command="{Binding RedoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Data="F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
