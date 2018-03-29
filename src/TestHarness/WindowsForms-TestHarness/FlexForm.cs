@@ -267,6 +267,7 @@ namespace WinFormsTestHarness
                 sw.Reset();
                 sw.Start();
                 CMLConverter cc = new CMLConverter();
+                cc.Compressed = true;
                 File.WriteAllText(targetFile.Replace(".bin", ".cml"), cc.Export(model));
                 sw.Stop();
                 Debug.WriteLine($" Writing CML file took {sw.ElapsedMilliseconds} milliseconds.");
