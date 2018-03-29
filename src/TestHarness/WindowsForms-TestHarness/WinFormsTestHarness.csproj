@@ -62,6 +62,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -96,6 +97,12 @@
     <Compile Include="FlexForm.Designer.cs">
       <DependentUpon>FlexForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="HexViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="HexViewer.Designer.cs">
+      <DependentUpon>HexViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Dumper.resx">
@@ -106,6 +113,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FlexForm.resx">
       <DependentUpon>FlexForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HexViewer.resx">
+      <DependentUpon>HexViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

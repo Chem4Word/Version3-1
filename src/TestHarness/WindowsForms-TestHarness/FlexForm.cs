@@ -9,6 +9,7 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -304,6 +305,13 @@ namespace WinFormsTestHarness
 
             Dumper dumper = new Dumper(analyzer.Analyze());
             dumper.ShowDialog();
+        }
+
+        private void Hex_Click(object sender, EventArgs e)
+        {
+            string[] files = Directory.GetFiles(@"C:\Temp", "*.bin");
+            HexViewer hexViewer = new HexViewer(files.Last());
+            hexViewer.ShowDialog();
         }
     }
 }

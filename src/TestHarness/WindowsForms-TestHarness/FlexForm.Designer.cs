@@ -41,6 +41,7 @@
             this.EditorType = new System.Windows.Forms.ComboBox();
             this.Serialize = new System.Windows.Forms.Button();
             this.Examine = new System.Windows.Forms.Button();
+            this.Hex = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -86,7 +87,7 @@
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(93, 486);
+            this.ChangeBackground.Location = new System.Drawing.Point(134, 486);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -99,7 +100,7 @@
             this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCarbons.AutoSize = true;
             this.ShowCarbons.Enabled = false;
-            this.ShowCarbons.Location = new System.Drawing.Point(174, 490);
+            this.ShowCarbons.Location = new System.Drawing.Point(215, 490);
             this.ShowCarbons.Name = "ShowCarbons";
             this.ShowCarbons.Size = new System.Drawing.Size(95, 17);
             this.ShowCarbons.TabIndex = 4;
@@ -146,7 +147,7 @@
             this.Serialize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Serialize.Location = new System.Drawing.Point(12, 517);
             this.Serialize.Name = "Serialize";
-            this.Serialize.Size = new System.Drawing.Size(75, 23);
+            this.Serialize.Size = new System.Drawing.Size(55, 23);
             this.Serialize.TabIndex = 7;
             this.Serialize.Text = "Serialize";
             this.Serialize.UseVisualStyleBackColor = true;
@@ -155,19 +156,31 @@
             // Examine
             // 
             this.Examine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Examine.Location = new System.Drawing.Point(93, 517);
+            this.Examine.Location = new System.Drawing.Point(73, 517);
             this.Examine.Name = "Examine";
-            this.Examine.Size = new System.Drawing.Size(75, 23);
+            this.Examine.Size = new System.Drawing.Size(55, 23);
             this.Examine.TabIndex = 8;
-            this.Examine.Text = "Examine";
+            this.Examine.Text = "Analyse";
             this.Examine.UseVisualStyleBackColor = true;
             this.Examine.Click += new System.EventHandler(this.Examine_Click);
+            // 
+            // Hex
+            // 
+            this.Hex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Hex.Location = new System.Drawing.Point(134, 517);
+            this.Hex.Name = "Hex";
+            this.Hex.Size = new System.Drawing.Size(55, 23);
+            this.Hex.TabIndex = 9;
+            this.Hex.Text = "Hex";
+            this.Hex.UseVisualStyleBackColor = true;
+            this.Hex.Click += new System.EventHandler(this.Hex_Click);
             // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 544);
+            this.Controls.Add(this.Hex);
             this.Controls.Add(this.Examine);
             this.Controls.Add(this.Serialize);
             this.Controls.Add(this.EditorType);
@@ -201,6 +214,7 @@
         private System.Windows.Forms.Button RandomElement;
         private System.Windows.Forms.Button Serialize;
         private System.Windows.Forms.Button Examine;
+        private System.Windows.Forms.Button Hex;
     }
 }
 

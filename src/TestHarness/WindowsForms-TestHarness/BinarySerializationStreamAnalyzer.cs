@@ -218,7 +218,7 @@ namespace WinFormsTestHarness
                         break;
                     case RecordTypeEnumeration.MemberPrimitiveTyped:
                         //Don't know how this can happen - I think it's for messages/remoting only
-                        throw new NotImplementedException();
+                        //throw new NotImplementedException();
                         break;
 
                     case RecordTypeEnumeration.MemberReference:
@@ -306,7 +306,7 @@ namespace WinFormsTestHarness
                         throw new NotImplementedException();
                         break;
                     default:
-                        throw new Exception("Parsing appears to have failed dramatically. Unknown record type, we must be lost in the bytestream!");
+                        //throw new Exception("Parsing appears to have failed dramatically. Unknown record type, we must be lost in the bytestream!");
                         break;
 
                 }
