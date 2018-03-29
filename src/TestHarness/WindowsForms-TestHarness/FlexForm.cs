@@ -239,14 +239,23 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
+                Debug.WriteLine("Serialising model as binary.");
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 MemoryStream ms1 = new MemoryStream();
                 BinaryFormatter bf = new BinaryFormatter();
                 bf.Serialize(ms1, model);
+                sw.Stop();
+
+                Debug.WriteLine($" Binary serialisation took {sw.ElapsedMilliseconds} milliseconds.");
                 //Debug.WriteLine(ms1.Length);
 
                 string filename = $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.bin";
                 string targetFile = Path.Combine(@"C:\Temp", filename);
 
+                Debug.WriteLine("Serialising model as CML to file.");
+                sw.Reset();
+                sw.Start();
                 CMLConverter cc = new CMLConverter();
                 File.WriteAllText(targetFile.Replace(".bin", ".cml"), cc.Export(model));
                 ms1.Position = 0;
@@ -257,7 +266,8 @@ namespace WinFormsTestHarness
                     file.Write(bytes, 0, bytes.Length);
                     ms1.Close();
                 }
-
+                sw.Stop();
+                Debug.WriteLine($" Writing CML file took {sw.ElapsedMilliseconds} milliseconds.");
                 MemoryStream ms2 = new MemoryStream();
                 using (FileStream file = new FileStream(targetFile, FileMode.Open, FileAccess.Read))
                 {
