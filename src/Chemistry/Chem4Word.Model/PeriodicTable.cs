@@ -12,7 +12,6 @@ using System.Linq;
 using System.Reflection;
 
 namespace Chem4Word.Model
-
 {
     public class PeriodicTable
     {

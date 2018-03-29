@@ -69,6 +69,7 @@ namespace Chem4Word.Navigator
             get { return _xmlPart; }
         }
 
+        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

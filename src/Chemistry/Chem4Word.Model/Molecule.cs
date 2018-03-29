@@ -25,6 +25,7 @@ namespace Chem4Word.Model
     /// between editing operations.  We cannot promise
     /// that the references will stay current
     /// </summary>
+    [Serializable]
     public partial class Molecule : ChemistryContainer
     {
         #region Fields
@@ -243,7 +244,10 @@ namespace Chem4Word.Model
                    isntProcessed: atom => atom.Parent == null);
                 //only if the molecule has rings do we rebuild it
                 addnlMol.RebuildRings();
-                this.Parent.Molecules.Add(addnlMol);
+                if (Parent != null)
+                {
+                    Parent.Molecules.Add(addnlMol);
+                }
             }
         }
 

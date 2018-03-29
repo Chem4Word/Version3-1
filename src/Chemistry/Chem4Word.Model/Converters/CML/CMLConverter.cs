@@ -28,6 +28,7 @@ namespace Chem4Word.Model.Converters
         };
 
         #region Model->CML
+        public bool Compressed { get; set; }
 
         public string Export(Chem4Word.Model.Model model)
         {
@@ -89,7 +90,17 @@ namespace Chem4Word.Model.Converters
             }
             xd.Add(root);
 
-            return xd.ToString();
+            string cml = string.Empty;
+            if (Compressed)
+            {
+                cml = xd.ToString(SaveOptions.DisableFormatting);
+            }
+            else
+            {
+                cml = xd.ToString();
+            }
+
+            return cml;
         }
 
         public bool CanExport => true;
