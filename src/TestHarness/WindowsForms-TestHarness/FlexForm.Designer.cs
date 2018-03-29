@@ -40,6 +40,7 @@
             this.RandomElement = new System.Windows.Forms.Button();
             this.EditorType = new System.Windows.Forms.ComboBox();
             this.Serialize = new System.Windows.Forms.Button();
+            this.Examine = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -98,7 +99,7 @@
             this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCarbons.AutoSize = true;
             this.ShowCarbons.Enabled = false;
-            this.ShowCarbons.Location = new System.Drawing.Point(93, 521);
+            this.ShowCarbons.Location = new System.Drawing.Point(174, 490);
             this.ShowCarbons.Name = "ShowCarbons";
             this.ShowCarbons.Size = new System.Drawing.Size(95, 17);
             this.ShowCarbons.TabIndex = 4;
@@ -151,11 +152,23 @@
             this.Serialize.UseVisualStyleBackColor = true;
             this.Serialize.Click += new System.EventHandler(this.Serialize_Click);
             // 
+            // Examine
+            // 
+            this.Examine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Examine.Location = new System.Drawing.Point(93, 517);
+            this.Examine.Name = "Examine";
+            this.Examine.Size = new System.Drawing.Size(75, 23);
+            this.Examine.TabIndex = 8;
+            this.Examine.Text = "Examine";
+            this.Examine.UseVisualStyleBackColor = true;
+            this.Examine.Click += new System.EventHandler(this.Examine_Click);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 544);
+            this.Controls.Add(this.Examine);
             this.Controls.Add(this.Serialize);
             this.Controls.Add(this.EditorType);
             this.Controls.Add(this.ShowCarbons);
@@ -187,6 +200,7 @@
         private System.Windows.Forms.Button RemoveAtom;
         private System.Windows.Forms.Button RandomElement;
         private System.Windows.Forms.Button Serialize;
+        private System.Windows.Forms.Button Examine;
     }
 }
 

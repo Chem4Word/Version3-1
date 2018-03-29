@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
@@ -283,6 +284,25 @@ namespace WinFormsTestHarness
                 x.RebuildMolecules();
                 display1.Chemistry = x;
             }
+        }
+
+        private void Examine_Click(object sender, EventArgs e)
+        {
+            string[] files = Directory.GetFiles(@"C:\Temp", "*.bin");
+            MemoryStream memoryStream = new MemoryStream();
+            using (FileStream file = new FileStream(files.Last(), FileMode.Open, FileAccess.Read))
+            {
+                byte[] bytes = new byte[file.Length];
+                file.Read(bytes, 0, (int)file.Length);
+                memoryStream.Write(bytes, 0, (int)file.Length);
+            }
+
+            memoryStream.Position = 0;
+            BinarySerializationStreamAnalyzer analyzer = new BinarySerializationStreamAnalyzer();
+            analyzer.Read(memoryStream);
+
+            Dumper dumper = new Dumper(analyzer.Analyze());
+            dumper.ShowDialog();
         }
     }
 }

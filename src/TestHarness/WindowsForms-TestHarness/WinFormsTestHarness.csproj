@@ -77,6 +77,13 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinarySerializationStreamAnalyzer.cs" />
+    <Compile Include="Dumper.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dumper.Designer.cs">
+      <DependentUpon>Dumper.cs</DependentUpon>
+    </Compile>
     <Compile Include="EditorHost.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,6 +98,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Dumper.resx">
+      <DependentUpon>Dumper.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="EditorHost.resx">
       <DependentUpon>EditorHost.cs</DependentUpon>
     </EmbeddedResource>
