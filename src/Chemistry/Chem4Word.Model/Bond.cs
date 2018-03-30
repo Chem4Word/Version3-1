@@ -768,14 +768,15 @@ namespace Chem4Word.Model
 
             Vector? vector = null;
 
-            Ring theRing = PrimaryRing;
-
-            List<Ring> ringList = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
-
-            if (ringList.Any()) //no rings
+            if (PrimaryRing != null)
             {
-                Point? ringCentroid = theRing.Centroid;
-                vector = ringCentroid - MidPoint;
+                List<Ring> ringList = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
+
+                if (ringList.Any()) //no rings
+                {
+                    Point? ringCentroid = PrimaryRing.Centroid;
+                    vector = ringCentroid - MidPoint;
+                }
             }
 
             return vector;
