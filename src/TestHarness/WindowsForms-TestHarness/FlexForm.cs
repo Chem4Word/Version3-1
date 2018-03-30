@@ -323,52 +323,56 @@ namespace WinFormsTestHarness
 
         private void Timing_Click(object sender, EventArgs e)
         {
-            int max = 100;
-            Stopwatch sw = new Stopwatch();
-            CMLConverter cc = new CMLConverter();
-            string type = "model";
-
-            switch (type)
+            Model x = display1.Chemistry as Model;
+            if (x != null)
             {
-                case "model":
-                    Stack<Model> models = new Stack<Model>();
+                int max = 100;
+                Stopwatch sw = new Stopwatch();
+                CMLConverter cc = new CMLConverter();
+                string type = "model";
 
-                    sw.Start();
+                switch (type)
+                {
+                    case "model":
+                        Stack<Model> models = new Stack<Model>();
 
-                    for (int i = 0; i < max; i++)
-                    {
-                        Model model = display1.Chemistry as Model;
-                        models.Push(model);
-                    }
-                    for (int i = 0; i < max; i++)
-                    {
-                        Model model = models.Pop();
-                        display1.Chemistry = model;
-                    }
+                        sw.Start();
 
-                    sw.Stop();
-                    break;
+                        for (int i = 0; i < max; i++)
+                        {
+                            Model model = display1.Chemistry as Model;
+                            models.Push(model);
+                        }
+                        for (int i = 0; i < max; i++)
+                        {
+                            Model model = models.Pop();
+                            display1.Chemistry = model;
+                        }
 
-                case "cml":
-                    Stack<string> cmlModels = new Stack<string>();
+                        sw.Stop();
+                        break;
 
-                    sw.Start();
+                    case "cml":
+                        Stack<string> cmlModels = new Stack<string>();
 
-                    for (int i = 0; i < max; i++)
-                    {
-                        Model model = display1.Chemistry as Model;
-                        cmlModels.Push(cc.Export(model));
-                    }
-                    for (int i = 0; i < max; i++)
-                    {
-                        Model model = cc.Import(cmlModels.Pop());
-                        display1.Chemistry = model;
-                    }
+                        sw.Start();
 
-                    sw.Stop();
-                    break;
+                        for (int i = 0; i < max; i++)
+                        {
+                            Model model = display1.Chemistry as Model;
+                            cmlModels.Push(cc.Export(model));
+                        }
+                        for (int i = 0; i < max; i++)
+                        {
+                            Model model = cc.Import(cmlModels.Pop());
+                            display1.Chemistry = model;
+                        }
+
+                        sw.Stop();
+                        break;
+                }
+                Debug.WriteLine($"Push/Pop {max} operations took {sw.ElapsedMilliseconds} milliseconds.");
             }
-            Debug.WriteLine($"Push/Pop {max} operations took {sw.ElapsedMilliseconds} milliseconds.");
         }
     }
 }
