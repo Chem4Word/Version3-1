@@ -23,8 +23,7 @@ namespace Chem4Word.Model
     /// Please limit rendering-specific code in these classes.  
     /// Sometimes it will be unavoidable, but the less, the better
     /// </summary>
-    ///
-
+    [Serializable]
     public class Model : ChemistryContainer, INotifyPropertyChanged
     {
         private const int Padding = 25;
@@ -405,7 +404,7 @@ namespace Chem4Word.Model
         #endregion Layout
 
         #region Interface implementations
-
+        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)

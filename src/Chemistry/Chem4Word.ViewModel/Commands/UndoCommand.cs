@@ -25,5 +25,12 @@ namespace Chem4Word.ViewModel.Commands
         }
 
         public override event EventHandler CanExecuteChanged;
+
+        public void RaiseCanExecChanged()
+        {
+            var args = new EventArgs();
+
+            CanExecuteChanged.Invoke(this, args);
+        }
     }
 }

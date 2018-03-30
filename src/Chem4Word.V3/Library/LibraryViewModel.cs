@@ -97,6 +97,7 @@ namespace Chem4Word.Library
                 }
             }
 
+            [field: NonSerialized()]
             public event PropertyChangedEventHandler PropertyChanged;
 
             [NotifyPropertyChangedInvocator]
@@ -167,6 +168,7 @@ namespace Chem4Word.Library
 
         public class UserTag : INotifyPropertyChanged
         {
+            [field: NonSerialized()]
             public event PropertyChangedEventHandler PropertyChanged;
 
             private long _id;
@@ -240,6 +242,7 @@ namespace Chem4Word.Library
                 }
             }
 
+            [field: NonSerialized()]
             public event PropertyChangedEventHandler PropertyChanged;
         }
 

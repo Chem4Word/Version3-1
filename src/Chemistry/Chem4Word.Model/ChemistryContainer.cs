@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -19,6 +20,7 @@ namespace Chem4Word.Model
     /// This allows changes in the atoms and bonds membership to bubble up
     /// the molecule hierarchy
     /// </summary>
+    [Serializable]
     public abstract class ChemistryContainer : INotifyPropertyChanged
     {
         public ObservableCollection<Bond> AllBonds { get; protected set; }
@@ -33,7 +35,6 @@ namespace Chem4Word.Model
            ResetCollections();
         }
 
-
         protected virtual void ResetCollections()
         {
             AllAtoms = new ObservableCollection<Atom>();
@@ -44,6 +45,7 @@ namespace Chem4Word.Model
             Molecules = new ObservableCollection<Molecule>();
             Molecules.CollectionChanged += Molecules_CollectionChanged;
         }
+
         private void Molecules_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -185,6 +187,7 @@ namespace Chem4Word.Model
             }
         }
 
+        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

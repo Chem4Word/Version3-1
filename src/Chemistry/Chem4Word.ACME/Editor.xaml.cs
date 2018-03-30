@@ -141,7 +141,7 @@ namespace Chem4Word.ACME
             tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
             var vm = new ViewModel.EditViewModel(tempModel);
             _activeViewModel = vm;
-            DrawingArea.DataContext = vm;
+            this.DataContext = vm;
             ScrollIntoView();
             //BindControls(vm);
         }

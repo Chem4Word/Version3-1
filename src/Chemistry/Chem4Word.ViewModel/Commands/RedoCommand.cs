@@ -11,20 +11,28 @@ namespace Chem4Word.ViewModel.Commands
 {
     public class RedoCommand : BaseCommand
     {
+        private ViewModel.EditViewModel _currentVM;
         public RedoCommand(EditViewModel vm) : base(vm)
         {
+            _currentVM = vm;
         }
 
         public override bool CanExecute(object parameter)
         {
-            throw new NotImplementedException();
+            return _currentVM.UndoManager.CanRedo;
         }
 
         public override void Execute(object parameter)
         {
-            throw new NotImplementedException();
+            _currentVM.UndoManager.Redo();
         }
 
+        public void RaiseCanExecChanged()
+        {
+            var args = new EventArgs();
+
+            CanExecuteChanged.Invoke(this, args);
+        }
         public override event EventHandler CanExecuteChanged;
     }
 }

@@ -67,6 +67,7 @@ namespace Chem4Word.Library
             }
         }
 
+        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

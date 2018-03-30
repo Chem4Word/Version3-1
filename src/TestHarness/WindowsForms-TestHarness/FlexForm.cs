@@ -9,9 +9,12 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -233,9 +236,89 @@ namespace WinFormsTestHarness
             EditorType.SelectedIndex = 0;
         }
 
-        private void elementHost1_ChildChanged(object sender, System.Windows.Forms.Integration.ChildChangedEventArgs e)
+        private void Serialize_Click(object sender, EventArgs e)
         {
+            Model model = display1.Chemistry as Model;
+            if (model != null)
+            {
+                string filename = $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.bin";
+                string targetFile = Path.Combine(@"C:\Temp", filename);
 
+                Debug.WriteLine("Serialising model as binary.");
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                MemoryStream ms1 = new MemoryStream();
+                BinaryFormatter bf = new BinaryFormatter();
+                bf.Serialize(ms1, model);
+
+                ms1.Position = 0;
+                using (FileStream file = new FileStream(targetFile, FileMode.Create, FileAccess.Write))
+                {
+                    byte[] bytes = new byte[ms1.Length];
+                    ms1.Read(bytes, 0, (int)ms1.Length);
+                    file.Write(bytes, 0, bytes.Length);
+                    ms1.Close();
+                }
+                sw.Stop();
+
+                Debug.WriteLine($" Binary serialisation took {sw.ElapsedMilliseconds} milliseconds.");
+
+                Debug.WriteLine("Serialising model as CML to file.");
+                sw.Reset();
+                sw.Start();
+                CMLConverter cc = new CMLConverter();
+                cc.Compressed = true;
+                File.WriteAllText(targetFile.Replace(".bin", ".cml"), cc.Export(model));
+                sw.Stop();
+                Debug.WriteLine($" Writing CML file took {sw.ElapsedMilliseconds} milliseconds.");
+
+                MemoryStream ms2 = new MemoryStream();
+                using (FileStream file = new FileStream(targetFile, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] bytes = new byte[file.Length];
+                    file.Read(bytes, 0, (int)file.Length);
+                    ms2.Write(bytes, 0, (int)file.Length);
+                }
+
+                ms2.Position = 0;
+                Model x = new BinaryFormatter().Deserialize(ms2) as Model;
+                x.RebuildMolecules();
+                display1.Chemistry = x;
+            }
+        }
+
+        private void Examine_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string[] files = Directory.GetFiles(@"C:\Temp", "*.bin");
+                MemoryStream memoryStream = new MemoryStream();
+                using (FileStream file = new FileStream(files.Last(), FileMode.Open, FileAccess.Read))
+                {
+                    byte[] bytes = new byte[file.Length];
+                    file.Read(bytes, 0, (int)file.Length);
+                    memoryStream.Write(bytes, 0, (int)file.Length);
+                }
+
+                memoryStream.Position = 0;
+                BinarySerializationStreamAnalyzer analyzer = new BinarySerializationStreamAnalyzer();
+                analyzer.Read(memoryStream);
+
+                Dumper dumper = new Dumper(analyzer.Analyze());
+                dumper.ShowDialog();
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception);
+            }
+        }
+
+        private void Hex_Click(object sender, EventArgs e)
+        {
+            string[] files = Directory.GetFiles(@"C:\Temp", "*.bin");
+            HexViewer hexViewer = new HexViewer(files.Last());
+            hexViewer.ShowDialog();
         }
     }
 }
