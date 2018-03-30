@@ -207,7 +207,25 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
+                int beforeAtoms = model.AllAtoms.Count;
+                int beforeBonds = model.AllBonds.Count;
+                Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+
                 Model clone = model.Clone();
+                int afterAtoms = model.AllAtoms.Count;
+                int afterBonds = model.AllBonds.Count;
+
+                if (beforeAtoms != afterAtoms
+                    || beforeBonds != afterBonds
+                    || clone.AllAtoms.Count != model.AllAtoms.Count
+                    || clone.AllBonds.Count != model.AllBonds.Count)
+                {
+                    Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+                    Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
+                    int cloneAtoms = clone.AllAtoms.Count;
+                    int cloneBonds = clone.AllBonds.Count;
+                    Debugger.Break();
+                }
                 _undoStack.Push(clone);
                 EnableUndoRedoButtons();
 
@@ -248,7 +266,10 @@ namespace WinFormsTestHarness
                 int afterAtoms = model.AllAtoms.Count;
                 int afterBonds = model.AllBonds.Count;
 
-                if (beforeAtoms != afterAtoms || beforeBonds != afterBonds || clone.AllAtoms.Count != model.AllAtoms.Count || clone.AllBonds.Count != model.AllBonds.Count)
+                if (beforeAtoms != afterAtoms
+                    || beforeBonds != afterBonds
+                    || clone.AllAtoms.Count != model.AllAtoms.Count
+                    || clone.AllBonds.Count != model.AllBonds.Count)
                 {
                     Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
                     Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
