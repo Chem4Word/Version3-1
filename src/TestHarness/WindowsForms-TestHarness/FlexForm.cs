@@ -25,6 +25,9 @@ namespace WinFormsTestHarness
     {
         private Model _model = null;
 
+        Stack<Model> _undoStack = new Stack<Model>();
+        Stack<Model> _redoStack = new Stack<Model>();
+
         public FlexForm()
         {
             InitializeComponent();
@@ -73,6 +76,11 @@ namespace WinFormsTestHarness
                         break;
                 }
 
+                Model model = display1.Chemistry as Model;
+                if (model != null)
+                {
+                    _undoStack.Push(model);
+                }
                 ShowChemistry(filename, _model);
             }
         }
@@ -97,8 +105,9 @@ namespace WinFormsTestHarness
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
+                    _undoStack.Push(model);
                     Model m = cc.Import(editorHost.OutputValue);
-                    ShowChemistry("Edited", m);
+                    ShowChemistry($"Edited {m.ConciseFormula}", m);
                 }
             }
         }
@@ -133,14 +142,28 @@ namespace WinFormsTestHarness
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = _model;
-                    ShowCarbons.Checked = false;
-                    EditStructure.Enabled = true;
-                    ShowCarbons.Enabled = true;
-                    RemoveAtom.Enabled = true;
-                    RandomElement.Enabled = true;
-                    EditorType.Enabled = true;
+
+                    EnableNormalButtons();
+                    EnableUndoRedoButtons();
+                    ListStacks();
                 }
             }
+        }
+
+        private void EnableNormalButtons()
+        {
+            ShowCarbons.Checked = false;
+            EditStructure.Enabled = true;
+            ShowCarbons.Enabled = true;
+            RemoveAtom.Enabled = true;
+            RandomElement.Enabled = true;
+            EditorType.Enabled = true;
+        }
+
+        private void EnableUndoRedoButtons()
+        {
+            Redo.Enabled = _redoStack.Count > 0;
+            Undo.Enabled = _undoStack.Count > 0;
         }
 
         private void SetCarbons(Model model, bool state)
@@ -372,6 +395,44 @@ namespace WinFormsTestHarness
                         break;
                 }
                 Debug.WriteLine($"Push/Pop {max} operations took {sw.ElapsedMilliseconds} milliseconds.");
+            }
+        }
+
+        private void Undo_Click(object sender, EventArgs e)
+        {
+            Model m = _undoStack.Pop();
+            Model c = display1.Chemistry as Model;
+            _redoStack.Push(c.Clone());
+            ShowChemistry($"Undo -> {m.ConciseFormula}", m);
+            ListStacks();
+        }
+
+        private void Redo_Click(object sender, EventArgs e)
+        {
+            Model m = _redoStack.Pop();
+            Model c = display1.Chemistry as Model;
+            _undoStack.Push(c.Clone());
+            ShowChemistry($"Redo -> {m.ConciseFormula}", m);
+            ListStacks();
+        }
+
+        private void ListStacks()
+        {
+            if (_undoStack.Any())
+            {
+                Debug.WriteLine("Undo Stack");
+                foreach (var model in _undoStack)
+                {
+                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
+                }
+            }
+            if (_redoStack.Any())
+            {
+                Debug.WriteLine("Redo Stack");
+                foreach (var model in _redoStack)
+                {
+                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
+                }
             }
         }
     }

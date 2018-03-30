@@ -428,8 +428,8 @@ namespace Chem4Word.Model
         public void RebuildRings()
         {
 #if DEBUG
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 #endif
             if (HasRings)
             {
@@ -471,9 +471,9 @@ namespace Chem4Word.Model
                 }
             }
 #if DEBUG
-            Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
-            sw.Stop();
-            Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+            //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
+            //sw.Stop();
+            //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
         }
 
