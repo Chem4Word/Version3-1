@@ -42,6 +42,7 @@
             this.Serialize = new System.Windows.Forms.Button();
             this.Examine = new System.Windows.Forms.Button();
             this.Hex = new System.Windows.Forms.Button();
+            this.Timing = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -175,11 +176,23 @@
             this.Hex.UseVisualStyleBackColor = true;
             this.Hex.Click += new System.EventHandler(this.Hex_Click);
             // 
+            // Timing
+            // 
+            this.Timing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Timing.Location = new System.Drawing.Point(195, 517);
+            this.Timing.Name = "Timing";
+            this.Timing.Size = new System.Drawing.Size(55, 23);
+            this.Timing.TabIndex = 10;
+            this.Timing.Text = "Timing";
+            this.Timing.UseVisualStyleBackColor = true;
+            this.Timing.Click += new System.EventHandler(this.Timing_Click);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 544);
+            this.Controls.Add(this.Timing);
             this.Controls.Add(this.Hex);
             this.Controls.Add(this.Examine);
             this.Controls.Add(this.Serialize);
@@ -215,6 +228,7 @@
         private System.Windows.Forms.Button Serialize;
         private System.Windows.Forms.Button Examine;
         private System.Windows.Forms.Button Hex;
+        private System.Windows.Forms.Button Timing;
     }
 }
 

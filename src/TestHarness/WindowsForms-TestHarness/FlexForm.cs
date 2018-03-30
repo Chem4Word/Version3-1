@@ -320,5 +320,55 @@ namespace WinFormsTestHarness
             HexViewer hexViewer = new HexViewer(files.Last());
             hexViewer.ShowDialog();
         }
+
+        private void Timing_Click(object sender, EventArgs e)
+        {
+            int max = 100;
+            Stopwatch sw = new Stopwatch();
+            CMLConverter cc = new CMLConverter();
+            string type = "model";
+
+            switch (type)
+            {
+                case "model":
+                    Stack<Model> models = new Stack<Model>();
+
+                    sw.Start();
+
+                    for (int i = 0; i < max; i++)
+                    {
+                        Model model = display1.Chemistry as Model;
+                        models.Push(model);
+                    }
+                    for (int i = 0; i < max; i++)
+                    {
+                        Model model = models.Pop();
+                        display1.Chemistry = model;
+                    }
+
+                    sw.Stop();
+                    break;
+
+                case "cml":
+                    Stack<string> cmlModels = new Stack<string>();
+
+                    sw.Start();
+
+                    for (int i = 0; i < max; i++)
+                    {
+                        Model model = display1.Chemistry as Model;
+                        cmlModels.Push(cc.Export(model));
+                    }
+                    for (int i = 0; i < max; i++)
+                    {
+                        Model model = cc.Import(cmlModels.Pop());
+                        display1.Chemistry = model;
+                    }
+
+                    sw.Stop();
+                    break;
+            }
+            Debug.WriteLine($"Push/Pop {max} operations took {sw.ElapsedMilliseconds} milliseconds.");
+        }
     }
 }
