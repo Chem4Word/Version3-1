@@ -1004,6 +1004,9 @@ namespace Chem4Word.Model
             }
 
             myClone.RebuildRings();
+
+            Debug.Assert(myClone.Atoms.Count == this.Atoms.Count);
+            Debug.Assert(myClone.Bonds.Count ==this.Bonds.Count);
             return myClone;
         }
     }

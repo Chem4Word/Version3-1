@@ -11,8 +11,10 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Data;
 
@@ -301,7 +303,7 @@ namespace Chem4Word.Model
         /// all the way down to the atoms
         /// </summary>
         /// <returns></returns>
-        public Model Clone()
+        public Model Clone2()
         {
             //v important:  the labels are used to match up
             //old and new objects
@@ -316,6 +318,18 @@ namespace Chem4Word.Model
             return clone;
         }
 
+        public Model Clone()
+        {
+             BinaryFormatter deserializer = new BinaryFormatter();
+             MemoryStream ms = new MemoryStream();
+            deserializer.Serialize(ms, this);
+            ms.Seek(0, 0);
+            var clone = (Model)deserializer.Deserialize(ms);
+            //clone.RefreshMolecules();
+            return clone;
+
+
+        }
      
         #region Layout
 
