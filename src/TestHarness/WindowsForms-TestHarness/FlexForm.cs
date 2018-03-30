@@ -23,7 +23,7 @@ namespace WinFormsTestHarness
 {
     public partial class FlexForm : Form
     {
-        private Model _model = null;
+        //private Model _model = null;
 
         Stack<Model> _undoStack = new Stack<Model>();
         Stack<Model> _redoStack = new Stack<Model>();
@@ -35,6 +35,8 @@ namespace WinFormsTestHarness
 
         private void LoadStructure_Click(object sender, EventArgs e)
         {
+            Model model = null;
+
             StringBuilder sb = new StringBuilder();
             sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
             sb.Append("|CML molecule files (*.cml)|*.cml");
@@ -59,29 +61,30 @@ namespace WinFormsTestHarness
                 {
                     case ".mol":
                     case ".sdf":
-                        _model = sdFileConverter.Import(mol);
-                        _model.RefreshMolecules();
-                        _model.Relabel();
-                        cml = cmlConvertor.Export(_model);
-                        //model.DumpModel("After Import");
-
+                        model = sdFileConverter.Import(mol);
+                        model.RefreshMolecules();
+                        model.Relabel();
+                        cml = cmlConvertor.Export(model);
                         break;
 
                     case ".cml":
                     case ".xml":
-                        _model = cmlConvertor.Import(mol);
-                        _model.RefreshMolecules();
-                        _model.Relabel();
-                        cml = cmlConvertor.Export(_model);
+                        model = cmlConvertor.Import(mol);
+                        model.RefreshMolecules();
+                        model.Relabel();
+                        cml = cmlConvertor.Export(model);
                         break;
                 }
 
-                Model model = display1.Chemistry as Model;
                 if (model != null)
                 {
-                    _undoStack.Push(model);
+                    Model existing = display1.Chemistry as Model;
+                    if (existing != null)
+                    {
+                        _undoStack.Push(existing);
+                    }
+                    ShowChemistry(filename, model);
                 }
-                ShowChemistry(filename, _model);
             }
         }
 
@@ -112,40 +115,39 @@ namespace WinFormsTestHarness
             }
         }
 
-        private void ShowChemistry(string filename, Model mod)
+        private void ShowChemistry(string filename, Model model)
         {
-            if (mod != null)
+            if (model != null)
             {
-                if (mod.AllErrors.Any() || mod.AllWarnings.Any())
+                if (model.AllErrors.Any() || model.AllWarnings.Any())
                 {
                     List<string> lines = new List<string>();
-                    if (mod.AllErrors.Any())
+                    if (model.AllErrors.Any())
                     {
                         lines.Add("Error(s)");
-                        lines.AddRange(mod.AllErrors);
+                        lines.AddRange(model.AllErrors);
                     }
 
-                    if (mod.AllWarnings.Any())
+                    if (model.AllWarnings.Any())
                     {
                         lines.Add("Warnings(s)");
-                        lines.AddRange(mod.AllWarnings);
+                        lines.AddRange(model.AllWarnings);
                     }
 
                     MessageBox.Show(string.Join(Environment.NewLine, lines));
                 }
                 else
                 {
-                    _model = mod;
                     if (!string.IsNullOrEmpty(filename))
                     {
                         Text = filename;
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
-                    display1.Chemistry = _model;
+                    display1.Chemistry = model;
+                    Debug.WriteLine($"Displaying {model.ConciseFormula}");
 
                     EnableNormalButtons();
                     EnableUndoRedoButtons();
-                    ListStacks();
                 }
             }
         }
@@ -164,6 +166,7 @@ namespace WinFormsTestHarness
         {
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
+            ListStacks();
         }
 
         private void SetCarbons(Model model, bool state)
@@ -204,6 +207,9 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
+                _undoStack.Push(model.Clone());
+                EnableUndoRedoButtons();
+
                 if (model.AllAtoms.Any())
                 {
                     Molecule modelMolecule = model.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
@@ -217,7 +223,14 @@ namespace WinFormsTestHarness
                     modelMolecule.Atoms.Remove(atom);
                 }
 
+                foreach (var mol in model.Molecules)
+                {
+                    mol.ConciseFormula = "";
+                }
+
                 model.RefreshMolecules();
+                //display1.Chemistry = model;
+                ShowChemistry("Remove", model);
             }
         }
 
@@ -226,6 +239,9 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
+                _undoStack.Push(model.Clone());
+                EnableUndoRedoButtons();
+
                 if (model.AllAtoms.Any())
                 {
                     var rnd = new Random(DateTime.Now.Millisecond);
@@ -246,8 +262,16 @@ namespace WinFormsTestHarness
                     {
                         model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
                     }
+
+                    foreach (var mol in model.Molecules)
+                    {
+                        mol.ConciseFormula = "";
+                    }
                     model.RefreshMolecules();
                 }
+
+                //display1.Chemistry = model;
+                ShowChemistry("Random", model);
             }
         }
 
@@ -401,19 +425,21 @@ namespace WinFormsTestHarness
         private void Undo_Click(object sender, EventArgs e)
         {
             Model m = _undoStack.Pop();
+            Debug.WriteLine($"Popped {m.ConciseFormula}");
             Model c = display1.Chemistry as Model;
+            Debug.WriteLine($"Pushing {c.ConciseFormula}");
             _redoStack.Push(c.Clone());
             ShowChemistry($"Undo -> {m.ConciseFormula}", m);
-            ListStacks();
         }
 
         private void Redo_Click(object sender, EventArgs e)
         {
             Model m = _redoStack.Pop();
+            Debug.WriteLine($"Popped {m.ConciseFormula}");
             Model c = display1.Chemistry as Model;
+            Debug.WriteLine($"Pushing {c.ConciseFormula}");
             _undoStack.Push(c.Clone());
             ShowChemistry($"Redo -> {m.ConciseFormula}", m);
-            ListStacks();
         }
 
         private void ListStacks()
