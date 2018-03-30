@@ -207,12 +207,13 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
-                _undoStack.Push(model.Clone());
+                Model clone = model.Clone();
+                _undoStack.Push(clone);
                 EnableUndoRedoButtons();
 
-                if (model.AllAtoms.Any())
+                if (clone.AllAtoms.Any())
                 {
-                    Molecule modelMolecule = model.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
+                    Molecule modelMolecule = clone.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
                     var atom = modelMolecule.Atoms[0];
                     foreach (var neighbouringBond in atom.Bonds)
                     {
@@ -223,14 +224,14 @@ namespace WinFormsTestHarness
                     modelMolecule.Atoms.Remove(atom);
                 }
 
-                foreach (var mol in model.Molecules)
+                foreach (var mol in clone.Molecules)
                 {
                     mol.ConciseFormula = "";
                 }
 
-                model.RefreshMolecules();
+                clone.RefreshMolecules();
                 //display1.Chemistry = model;
-                ShowChemistry("Remove", model);
+                ShowChemistry("Remove", clone);
             }
         }
 
@@ -239,14 +240,28 @@ namespace WinFormsTestHarness
             Model model = display1.Chemistry as Model;
             if (model != null)
             {
-                _undoStack.Push(model.Clone());
+                int beforeAtoms = model.AllAtoms.Count;
+                int beforeBonds = model.AllBonds.Count;
+                Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+
+                Model clone = model.Clone();
+                int afterAtoms = model.AllAtoms.Count;
+                int afterBonds = model.AllBonds.Count;
+
+                if (beforeAtoms != afterAtoms || beforeBonds != afterBonds || clone.AllAtoms.Count != model.AllAtoms.Count || clone.AllBonds.Count != model.AllBonds.Count)
+                {
+                    Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+                    Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
+                    Debugger.Break();
+                }
+                _undoStack.Push(clone);
                 EnableUndoRedoButtons();
 
-                if (model.AllAtoms.Any())
+                if (clone.AllAtoms.Any())
                 {
                     var rnd = new Random(DateTime.Now.Millisecond);
 
-                    var maxAtoms = model.AllAtoms.Count;
+                    var maxAtoms = clone.AllAtoms.Count;
                     int targetAtom = rnd.Next(0, maxAtoms);
 
                     var elements = Globals.PeriodicTable.Elements;
@@ -257,21 +272,21 @@ namespace WinFormsTestHarness
                     {
                         Debugger.Break();
                     }
-                    model.AllAtoms[targetAtom].Element = x as ElementBase;
+                    clone.AllAtoms[targetAtom].Element = x as ElementBase;
                     if (x.Symbol.Equals("C"))
                     {
-                        model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                        clone.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
                     }
 
-                    foreach (var mol in model.Molecules)
+                    foreach (var mol in clone.Molecules)
                     {
                         mol.ConciseFormula = "";
                     }
-                    model.RefreshMolecules();
+                    clone.RefreshMolecules();
                 }
 
                 //display1.Chemistry = model;
-                ShowChemistry("Random", model);
+                ShowChemistry("Random", clone);
             }
         }
 
