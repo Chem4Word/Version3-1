@@ -252,6 +252,8 @@ namespace WinFormsTestHarness
                 {
                     Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
                     Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
+                    int cloneAtoms = clone.AllAtoms.Count;
+                    int cloneBonds = clone.AllBonds.Count;
                     Debugger.Break();
                 }
                 _undoStack.Push(clone);
