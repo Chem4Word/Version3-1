@@ -333,6 +333,7 @@ namespace Chem4Word.Model
 
             return clone;
         }
+
         public Model Clone2()
         {
             BinaryFormatter deserializer = new BinaryFormatter();
