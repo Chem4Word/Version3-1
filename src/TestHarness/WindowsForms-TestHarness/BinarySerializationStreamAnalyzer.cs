@@ -2,38 +2,39 @@
 // Source https://github.com/TaoK/BinarySerializationAnalysis
 
 /*
- * BinarySerializationStreamAnalysis - a simple demo class for parsing the 
- *  output of the BinaryFormatter class' "Serialize" method, eg counting objects and 
+ * BinarySerializationStreamAnalysis - a simple demo class for parsing the
+ *  output of the BinaryFormatter class' "Serialize" method, eg counting objects and
  *  values.
- * 
+ *
  * Copyright Tao Klerks, 2010-2011, tao@klerks.biz
  * Licensed under the modified BSD license:
- * 
-Redistribution and use in source and binary forms, with or without modification, are 
+ *
+Redistribution and use in source and binary forms, with or without modification, are
 permitted provided that the following conditions are met:
- - Redistributions of source code must retain the above copyright notice, this list of 
+ - Redistributions of source code must retain the above copyright notice, this list of
 conditions and the following disclaimer.
- - Redistributions in binary form must reproduce the above copyright notice, this list 
+ - Redistributions in binary form must reproduce the above copyright notice, this list
 of conditions and the following disclaimer in the documentation and/or other materials
 provided with the distribution.
- - The name of the author may not be used to endorse or promote products derived from 
+ - The name of the author may not be used to endorse or promote products derived from
 this software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, 
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY 
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
-BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
-PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 OF SUCH DAMAGE.
- * 
+ *
  */
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace WinFormsTestHarness
 {
@@ -45,6 +46,7 @@ namespace WinFormsTestHarness
     {
         //yeah, I know, these could be better protected...
         public Dictionary<int, SerialObject> SerialObjectsFound = null;
+
         public Dictionary<int, BinaryLibrary> LibrariesFound = null;
 
         //available to the other objects, used to read from the stream
@@ -56,7 +58,9 @@ namespace WinFormsTestHarness
         //used for returning an arbitrary number of nulls as defined by certain record types
         private int PendingNullCounter = 0;
 
-        public BinarySerializationStreamAnalyzer() { }
+        public BinarySerializationStreamAnalyzer()
+        {
+        }
 
         public void Read(Stream inputStream)
         {
@@ -163,6 +167,7 @@ namespace WinFormsTestHarness
                         //header is 4 values that I wouldn't know what to do with (what type of message, what version, etc) - trash.
                         reader.ReadBytes(16);
                         break;
+
                     case RecordTypeEnumeration.ClassWithID:
                         //just two ints, read directly
                         si = new ClassInfo();
@@ -172,12 +177,14 @@ namespace WinFormsTestHarness
                         // -> this will overwrite the original values in the referenced object, but who cares - the values are trash anyway (for now).
                         ((ClassInfo)SerialObjectsFound[((ClassInfo)si).ReferencedObject.Value]).ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.SystemClassWithMembers:
                         //single structure, read in constructor
                         si = new ClassInfo(this);
                         //also values.
                         si.ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.ClassWithMembers:
                         //single structure, read in constructor
                         si = new ClassInfo(this);
@@ -186,6 +193,7 @@ namespace WinFormsTestHarness
                         //also values.
                         si.ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.SystemClassWithMembersAndTypes:
                         //single structure, read in constructor
                         si = new ClassInfo(this);
@@ -194,6 +202,7 @@ namespace WinFormsTestHarness
                         //also values.
                         si.ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.ClassWithMembersAndTypes:
                         //single structure, read in constructor
                         si = new ClassInfo(this);
@@ -204,18 +213,21 @@ namespace WinFormsTestHarness
                         //also values.
                         si.ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.BinaryObjectString:
                         //simple structure, just an ID and a string
                         si = new ObjectString();
                         si.ObjectID = reader.ReadInt32();
                         ((ObjectString)si).String = reader.ReadString();
                         break;
+
                     case RecordTypeEnumeration.BinaryArray:
                         //complex process, read in constructor.
                         si = new BinaryArray(this);
                         //also values.
                         si.ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.MemberPrimitiveTyped:
                         //Don't know how this can happen - I think it's for messages/remoting only
                         //throw new NotImplementedException();
@@ -225,13 +237,16 @@ namespace WinFormsTestHarness
                         //just return the ID that was referenced.
                         serialObjectReferenceID = reader.ReadInt32();
                         break;
+
                     case RecordTypeEnumeration.ObjectNull:
                         //a single null; do nothing, as null is the default return value.
                         break;
+
                     case RecordTypeEnumeration.MessageEnd:
                         //do nothing, quit. Wasn't that fun?
                         endRecordReached = true;
                         break;
+
                     case RecordTypeEnumeration.BinaryLibrary:
                         int newLibraryID = reader.ReadInt32();
                         LibrariesFound.Add(newLibraryID, new BinaryLibrary());
@@ -239,6 +254,7 @@ namespace WinFormsTestHarness
                         LibrariesFound[newLibraryID].Name = reader.ReadString();
                         LibrariesFound[newLibraryID].recordLength = reader.BaseStream.Position - startPosition;
                         break;
+
                     case RecordTypeEnumeration.ObjectNullMultiple256:
                         //a sequence of nulls; return null, and start a counter to continue returning N nulls over the next calls.
                         PendingNullCounter = reader.ReadByte() - 1;
@@ -249,9 +265,10 @@ namespace WinFormsTestHarness
                         PendingNullCounter = reader.ReadInt32() - 1;
 #if (DEBUG)
                         //not yet tested: if it happens, take a look around.
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
 #endif
                         break;
+
                     case RecordTypeEnumeration.ArraySinglePrimitive:
                         //This one's pretty easy to build, do locally.
                         si = new BinaryArray();
@@ -265,6 +282,7 @@ namespace WinFormsTestHarness
                         //and then read the values.
                         si.ReadValueInfo(this);
                         break;
+
                     case RecordTypeEnumeration.ArraySingleObject:
                         //This should be pretty easy to build, do locally.
                         si = new BinaryArray();
@@ -278,9 +296,10 @@ namespace WinFormsTestHarness
                         si.ReadValueInfo(this);
 #if (DEBUG)
                         //not yet tested: if it happens, take a look around.
-                        System.Diagnostics.Debugger.Break();
+                        Debugger.Break();
 #endif
                         break;
+
                     case RecordTypeEnumeration.ArraySingleString:
                         //This should be pretty easy to build, do locally.
                         si = new BinaryArray();
@@ -294,21 +313,25 @@ namespace WinFormsTestHarness
                         si.ReadValueInfo(this);
 #if (DEBUG)
                         //not yet tested: if it happens, take a look around.
-                        //System.Diagnostics.Debugger.Break();
+                        //Debugger.Break();
 #endif
                         break;
+
                     case RecordTypeEnumeration.MethodCall:
                         //messages/remoting functionality not implemented
-                        throw new NotImplementedException();
+                        //throw new NotImplementedException();
+                        Debugger.Break();
                         break;
+
                     case RecordTypeEnumeration.MethodReturn:
                         //messages/remoting functionality not implemented
-                        throw new NotImplementedException();
+                        //throw new NotImplementedException();
+                        Debugger.Break();
                         break;
+
                     default:
                         //throw new Exception("Parsing appears to have failed dramatically. Unknown record type, we must be lost in the bytestream!");
                         break;
-
                 }
 
                 //standard: if this was a serial object, add to list and record its length.
@@ -338,6 +361,7 @@ namespace WinFormsTestHarness
         int ObjectID { get; set; }
         long? ParentObjectID { get; set; }
         long recordLength { get; set; }
+
         void ReadValueInfo(BinarySerializationStreamAnalyzer analyzer);
     }
 
@@ -357,7 +381,9 @@ namespace WinFormsTestHarness
 
     public class ClassInfo : SerialObject
     {
-        internal ClassInfo() { }
+        internal ClassInfo()
+        {
+        }
 
         internal ClassInfo(BinarySerializationStreamAnalyzer analyzer)
         {
@@ -439,7 +465,9 @@ namespace WinFormsTestHarness
 
     public class BinaryArray : SerialObject, TypeHoldingThing
     {
-        internal BinaryArray() { }
+        internal BinaryArray()
+        {
+        }
 
         internal BinaryArray(BinarySerializationStreamAnalyzer analyzer)
         {
@@ -496,7 +524,6 @@ namespace WinFormsTestHarness
         }
 
         public long recordLength { get; set; }
-
     }
 
     internal static class TypeHelper
@@ -508,23 +535,30 @@ namespace WinFormsTestHarness
                 case BinaryTypeEnumeration.Primitive:
                     typeHolder.PrimitiveType = (PrimitiveTypeEnumeration)analyzer.reader.ReadByte();
                     break;
+
                 case BinaryTypeEnumeration.String:
                     break;
+
                 case BinaryTypeEnumeration.Object:
                     break;
+
                 case BinaryTypeEnumeration.SystemClass:
                     typeHolder.TypeInfo = new ClassTypeInfo();
                     typeHolder.TypeInfo.TypeName = analyzer.reader.ReadString();
                     break;
+
                 case BinaryTypeEnumeration.Class:
                     typeHolder.TypeInfo = new ClassTypeInfo();
                     typeHolder.TypeInfo.TypeName = analyzer.reader.ReadString();
                     typeHolder.TypeInfo.LibraryID = analyzer.reader.ReadInt32();
                     break;
+
                 case BinaryTypeEnumeration.ObjectArray:
                     break;
+
                 case BinaryTypeEnumeration.StringArray:
                     break;
+
                 case BinaryTypeEnumeration.PrimitiveArray:
                     typeHolder.PrimitiveType = (PrimitiveTypeEnumeration)analyzer.reader.ReadByte();
                     break;
@@ -541,83 +575,105 @@ namespace WinFormsTestHarness
                         case PrimitiveTypeEnumeration.Boolean:
                             valueHolder.Value = analyzer.reader.ReadBoolean();
                             break;
+
                         case PrimitiveTypeEnumeration.Byte:
                             valueHolder.Value = analyzer.reader.ReadByte();
                             break;
+
                         case PrimitiveTypeEnumeration.Char:
                             valueHolder.Value = analyzer.reader.ReadChar();
                             break;
+
                         case PrimitiveTypeEnumeration.DateTime:
                             valueHolder.Value = DateTime.FromBinary(analyzer.reader.ReadInt64());
                             break;
+
                         case PrimitiveTypeEnumeration.Decimal:
                             string decimalValue = analyzer.reader.ReadString();
                             valueHolder.Value = decimal.Parse(decimalValue);
                             valueHolder.Value = analyzer.reader.ReadDecimal();
                             break;
+
                         case PrimitiveTypeEnumeration.Double:
                             valueHolder.Value = analyzer.reader.ReadDouble();
                             break;
+
                         case PrimitiveTypeEnumeration.Int16:
                             valueHolder.Value = analyzer.reader.ReadInt16();
                             break;
+
                         case PrimitiveTypeEnumeration.Int32:
                             valueHolder.Value = analyzer.reader.ReadInt32();
                             break;
+
                         case PrimitiveTypeEnumeration.Int64:
                             valueHolder.Value = analyzer.reader.ReadInt64();
                             break;
+
                         case PrimitiveTypeEnumeration.Null:
                             valueHolder.Value = null;
                             break;
+
                         case PrimitiveTypeEnumeration.SByte:
                             valueHolder.Value = analyzer.reader.ReadSByte();
                             break;
+
                         case PrimitiveTypeEnumeration.Single:
                             valueHolder.Value = analyzer.reader.ReadSingle();
                             break;
+
                         case PrimitiveTypeEnumeration.String:
                             valueHolder.Value = analyzer.reader.ReadString();
                             break;
+
                         case PrimitiveTypeEnumeration.TimeSpan:
                             valueHolder.Value = TimeSpan.FromTicks(analyzer.reader.ReadInt64());
                             break;
+
                         case PrimitiveTypeEnumeration.UInt16:
                             valueHolder.Value = analyzer.reader.ReadUInt16();
                             break;
+
                         case PrimitiveTypeEnumeration.UInt32:
                             valueHolder.Value = analyzer.reader.ReadUInt32();
                             break;
+
                         case PrimitiveTypeEnumeration.UInt64:
                             valueHolder.Value = analyzer.reader.ReadUInt64();
                             break;
                     }
                     break;
+
                 case BinaryTypeEnumeration.String:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
+
                 case BinaryTypeEnumeration.Object:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
+
                 case BinaryTypeEnumeration.SystemClass:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
+
                 case BinaryTypeEnumeration.Class:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
+
                 case BinaryTypeEnumeration.ObjectArray:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
+
                 case BinaryTypeEnumeration.StringArray:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
+
                 case BinaryTypeEnumeration.PrimitiveArray:
                     valueHolder.ValueRefID = analyzer.ParseRecord(typeHolder.RelevantObject);
                     break;
             }
         }
     }
-
 
     public enum RecordTypeEnumeration
     {
@@ -639,10 +695,12 @@ namespace WinFormsTestHarness
         ArraySinglePrimitive = 15,
         ArraySingleObject = 16,
         ArraySingleString = 17,
+
         //CrossAppDomainMap,
         //CrossAppDomainString,
         //CrossAppDomainAssembly,
         MethodCall = 21,
+
         MethodReturn = 22
     }
 
@@ -663,8 +721,10 @@ namespace WinFormsTestHarness
         Boolean = 1,
         Byte = 2,
         Char = 3,
+
         //unused
         Decimal = 5,
+
         Double = 6,
         Int16 = 7,
         Int32 = 8,

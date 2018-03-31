@@ -998,9 +998,12 @@ namespace Chem4Word.Model
             {
                 Atom a = new Atom();
                 a.Id = atom.Id;
+
                 a.Position = atom.Position;
                 a.Element = atom.Element;
+
                 a.IsotopeNumber = atom.IsotopeNumber;
+                a.FormalCharge = atom.FormalCharge;
 
                 clonedAtoms[atom.Id] = a;
                 clone.Atoms.Add(a);
@@ -1010,10 +1013,13 @@ namespace Chem4Word.Model
             {
                 Bond b = new Bond();
                 b.Id = bond.Id;
+
                 b.StartAtom = clonedAtoms[bond.StartAtom.Id];
                 b.EndAtom = clonedAtoms[bond.EndAtom.Id];
+
                 b.Order = bond.Order;
                 b.Stereo = bond.Stereo;
+                b.Placement = bond.Placement;
                 b.ExplicitPlacement = bond.ExplicitPlacement;
 
                 clone.Bonds.Add(b);

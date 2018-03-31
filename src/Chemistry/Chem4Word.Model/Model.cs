@@ -320,6 +320,8 @@ namespace Chem4Word.Model
         {
             Model clone = new Model();
 
+            // Strictly speaking this is modifiing the original object.
+            //  but it is required to allow re-connecting of atoms with the correct bonds.
             Relabel();
 
             clone.CustomXmlPartGuid = CustomXmlPartGuid;
@@ -331,6 +333,8 @@ namespace Chem4Word.Model
                 m.RebuildRings();
                 clone.Molecules.Add(m);
             }
+
+            clone.Relabel();
             clone.RefreshMolecules();
 
             return clone;

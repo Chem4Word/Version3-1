@@ -431,7 +431,7 @@ namespace WinFormsTestHarness
             Model x = display1.Chemistry as Model;
             if (x != null)
             {
-                int max = 100;
+                int max = 1000;
                 Stopwatch sw = new Stopwatch();
                 CMLConverter cc = new CMLConverter();
                 string type = "model";
@@ -446,7 +446,7 @@ namespace WinFormsTestHarness
                         for (int i = 0; i < max; i++)
                         {
                             Model model = display1.Chemistry as Model;
-                            models.Push(model);
+                            models.Push(model.Clone());
                         }
                         for (int i = 0; i < max; i++)
                         {
