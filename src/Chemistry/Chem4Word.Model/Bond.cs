@@ -736,7 +736,7 @@ namespace Chem4Word.Model
         {
             get
             {
-                Debug.Assert(Parent.RingsCalculated);
+                //Debug.Assert(Parent.RingsCalculated);
 
                 if (!Rings.Any()) //no rings
                 {

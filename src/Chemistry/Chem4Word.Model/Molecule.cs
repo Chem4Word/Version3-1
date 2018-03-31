@@ -17,8 +17,6 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 
-
-
 namespace Chem4Word.Model
 {
     /// <summary>
@@ -353,7 +351,6 @@ namespace Chem4Word.Model
             }
         }
 
-
         /// <summary>
         /// Traverses a molecular graph applying an operation to each and every atom.
         /// Does not require that the atoms be already part of a Molecule.
@@ -378,9 +375,8 @@ namespace Chem4Word.Model
                     toDo.Enqueue(neighbour);
                 }
             }
-
-          
         }
+
         /// <summary>
         /// Cleaves off a degree 1 atom from the working set.
         /// Reduces the adjacent atoms' degree by one
@@ -895,7 +891,7 @@ namespace Chem4Word.Model
 
         /*makes extensive use of the Andrew montone algorithm for determining the convex
        hulls of molecules with or without side chains.
-       Assumes all rings have been calculated  first*/
+       Assumes all rings have been calculated first*/
 
         public IEnumerable<Atom> AtomsSortedForHull()
         {
@@ -907,7 +903,7 @@ namespace Chem4Word.Model
             return atomList;
         }
 
-        #region helpers
+        #region Helpers
 
         public double MeanBondLength
         {
@@ -968,9 +964,9 @@ namespace Chem4Word.Model
             _boundingBox = Rect.Empty;
         }
 
-        #endregion helpers
+        #endregion Helpers
 
-        protected override void ResetCollections() 
+        protected override void ResetCollections()
         {
             base.ResetCollections();
             Atoms = new ObservableCollection<Atom>();
@@ -999,7 +995,7 @@ namespace Chem4Word.Model
             MemoryStream ms = new MemoryStream();
             deserializer.Serialize(ms, this);
             ms.Seek(0, 0);
-            var clone = (Molecule) deserializer.Deserialize(ms);
+            var clone = (Molecule)deserializer.Deserialize(ms);
             //clone.RefreshMolecules();
             return clone;
         }
@@ -1008,7 +1004,7 @@ namespace Chem4Word.Model
         /// Does a deep clone of the molecule
         /// </summary>
         /// <returns></returns>
-        public Molecule Clone2()
+        public Molecule Clone1()
         {
             Molecule myClone = (Molecule)this.MemberwiseClone();
             myClone.ResetCollections();
@@ -1048,7 +1044,7 @@ namespace Chem4Word.Model
             myClone.RebuildRings();
 
             Debug.Assert(myClone.Atoms.Count == this.Atoms.Count);
-            Debug.Assert(myClone.Bonds.Count ==this.Bonds.Count);
+            Debug.Assert(myClone.Bonds.Count == this.Bonds.Count);
             Debug.Assert(myClone.Rings.Count == this.Rings.Count);
             Debug.Assert(myClone.ChemicalNames.Count == this.ChemicalNames.Count);
             Debug.Assert(myClone.Formulas.Count == this.Formulas.Count);
