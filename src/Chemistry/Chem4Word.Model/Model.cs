@@ -320,6 +320,8 @@ namespace Chem4Word.Model
         {
             Model clone = new Model();
 
+            Relabel();
+
             clone.CustomXmlPartGuid = CustomXmlPartGuid;
 
             foreach (var molecule in Molecules)
