@@ -703,16 +703,21 @@ namespace Chem4Word.Model
             Point posEndPoint = endAtom.Position + posDisplacementVector;
             Point negEndPoint = endAtom.Position + negDisplacementVector;
 
-            Atom nonHAtom = startAtom.Neighbours.First(n => n != endAtom && (Element)n.Element != Globals.PeriodicTable.H);
-            Point nonHAtomLoc = nonHAtom.Position;
+            Atom nonHAtom = startAtom.Neighbours.FirstOrDefault(n => n != endAtom && (Element)n.Element != Globals.PeriodicTable.H);
+            if (nonHAtom != null)
+            {
+                Point nonHAtomLoc = nonHAtom.Position;
 
-            double posDist = (nonHAtomLoc - posEndPoint).Length;
-            double negDist = (nonHAtomLoc - negEndPoint).Length;
+                double posDist = (nonHAtomLoc - posEndPoint).Length;
+                double negDist = (nonHAtomLoc - negEndPoint).Length;
 
-            bool posDisplacement = posDist < negDist;
-            Vector displacementVector = posDisplacement ? posDisplacementVector : negDisplacementVector;
+                bool posDisplacement = posDist < negDist;
+                Vector displacementVector = posDisplacement ? posDisplacementVector : negDisplacementVector;
 
-            return displacementVector;
+                return displacementVector;
+            }
+
+            return null;
         }
 
         /// <summary>
