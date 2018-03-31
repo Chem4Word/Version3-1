@@ -12,7 +12,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 
 
@@ -207,10 +209,11 @@ namespace Chem4Word.Model
                 operation: atom =>
                     {
                         Atoms.Add(atom);
-
+                        atom.Parent = this;
                         foreach (Bond b in atom.Bonds.Where(b => b.Parent == null))
                         {
                             Bonds.Add(b);
+                            b.Parent = this;
                         }
                         if (checklist.Contains(atom))
                         {
@@ -350,6 +353,34 @@ namespace Chem4Word.Model
             }
         }
 
+
+        /// <summary>
+        /// Traverses a molecular graph applying an operation to each and every atom.
+        /// Does not require that the atoms be already part of a Molecule.
+        /// </summary>
+        /// <param name="startAtom">start atom</param>
+        /// <param name="operation">delegate pointing to operation to perform</param>
+        /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
+        private void BreadthFirstTraversal(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed)
+        {
+            operation(startAtom);
+
+            Queue<Atom> toDo = new Queue<Atom>();
+
+            toDo.Enqueue(startAtom);
+
+            while (toDo.Count > 0)
+            {
+                var nextAtom = toDo.Dequeue();
+                operation(nextAtom);
+                foreach (Atom neighbour in nextAtom.UnprocessedNeighbours(isntProcessed))
+                {
+                    toDo.Enqueue(neighbour);
+                }
+            }
+
+          
+        }
         /// <summary>
         /// Cleaves off a degree 1 atom from the working set.
         /// Reduces the adjacent atoms' degree by one
@@ -962,11 +993,22 @@ namespace Chem4Word.Model
         {
         }
 
+        public Molecule Clone()
+        {
+            BinaryFormatter deserializer = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            deserializer.Serialize(ms, this);
+            ms.Seek(0, 0);
+            var clone = (Molecule) deserializer.Deserialize(ms);
+            //clone.RefreshMolecules();
+            return clone;
+        }
+
         /// <summary>
         /// Does a deep clone of the molecule
         /// </summary>
         /// <returns></returns>
-        public Molecule Clone()
+        public Molecule Clone2()
         {
             Molecule myClone = (Molecule)this.MemberwiseClone();
             myClone.ResetCollections();
@@ -1007,6 +1049,9 @@ namespace Chem4Word.Model
 
             Debug.Assert(myClone.Atoms.Count == this.Atoms.Count);
             Debug.Assert(myClone.Bonds.Count ==this.Bonds.Count);
+            Debug.Assert(myClone.Rings.Count == this.Rings.Count);
+            Debug.Assert(myClone.ChemicalNames.Count == this.ChemicalNames.Count);
+            Debug.Assert(myClone.Formulas.Count == this.Formulas.Count);
             return myClone;
         }
     }

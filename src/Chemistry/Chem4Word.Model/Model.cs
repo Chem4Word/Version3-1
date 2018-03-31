@@ -325,8 +325,19 @@ namespace Chem4Word.Model
             deserializer.Serialize(ms, this);
             ms.Seek(0, 0);
             var clone = (Model)deserializer.Deserialize(ms);
-            //clone.RefreshMolecules();
+            clone.RefreshMolecules();
+            foreach (Molecule toRefresh in Molecules)
+            {
+                toRefresh.RebuildRings();
+            }
+            Debug.Assert(clone.Molecules.Count == this.Molecules.Count);
+            Debug.Assert(clone.Molecules.SelectMany(m=>m.Bonds).ToList().Count == this.Molecules.SelectMany(m => m.Bonds).ToList().Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.Rings).ToList().Count == this.Molecules.SelectMany(m => m.Rings).ToList().Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count == this.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.Formulas).ToList().Count == this.Molecules.SelectMany(m => m.Formulas).ToList().Count);
             return clone;
+
+
 
 
         }
