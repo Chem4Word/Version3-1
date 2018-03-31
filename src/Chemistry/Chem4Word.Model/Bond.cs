@@ -346,8 +346,7 @@ namespace Chem4Word.Model
         public bool AtomsAreCis(Atom atomA, Atom atomB)
         {
             //do an assert to make sure that we're not calling this routine with atoms detached from the bond atoms
-            Debug.Assert(StartAtom.Neighbours.Contains(atomA) & EndAtom.Neighbours.Contains(atomB)
-                || StartAtom.Neighbours.Contains(atomB) & EndAtom.Neighbours.Contains(atomA));
+            //Debug.Assert(StartAtom.Neighbours.Contains(atomA) & EndAtom.Neighbours.Contains(atomB)|| StartAtom.Neighbours.Contains(atomB) & EndAtom.Neighbours.Contains(atomA));
 
             // Note: Add null checks as this has been found to be blowing up
             if (atomA != null && atomB != null
