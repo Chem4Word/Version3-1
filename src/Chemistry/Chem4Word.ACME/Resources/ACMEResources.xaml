@@ -5,142 +5,140 @@
     xmlns:model ="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     xmlns:acme="clr-namespace:Chem4Word.ACME">
-  <!-- Simple shapes for use in menus, buttons etc -->
-  <ResourceDictionary.MergedDictionaries>
-    <ResourceDictionary Source="Brushes.xaml"/>
-    
-  </ResourceDictionary.MergedDictionaries>
+    <!-- Simple shapes for use in menus, buttons etc -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Brushes.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-    <model:ElementConverter x:Key="ElementConverter"/>
+    <SolidColorBrush x:Key="StandardSolidColorBrush" Color="#2A579A" />
+
+    <model:ElementConverter x:Key="ElementConverter" />
 
     <Style x:Key="TripleBondStyle" TargetType="Path">
-    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Height" Value="14"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 0,10 h 25 M 0,4 h 25 M 0,7 h 25 Z"/>
-  </Style>
+        <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 0,10 h 25 M 0,4 h 25 M 0,7 h 25 Z" />
+    </Style>
 
-  <Style x:Key="DoubleBondStyle" TargetType="Path">
-    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Height" Value="14"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 0,9 h 25 M 0,5 h 25 Z"/>
-  </Style>
+    <Style x:Key="DoubleBondStyle" TargetType="Path">
+        <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 0,9 h 25 M 0,5 h 25 Z" />
+    </Style>
 
+    <Style x:Key="SingleBondStyle" TargetType="Path">
+        <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 0,7 h 25 Z" />
+    </Style>
 
-  <Style x:Key="SingleBondStyle" TargetType="Path">
-    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Height" Value="14"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 0,7 h 25 Z"/>
-  </Style>
+    <Style x:Key="WedgeBondStyle" TargetType="Path">
+        <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 0,7 L 25,10 l 0 -7 Z" />
+    </Style>
 
-  <Style x:Key="WedgeBondStyle" TargetType="Path">
-    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Height" Value="14"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 0,7 L 25,10 l 0 -7 Z"/>
-  </Style>
-
-  <LinearGradientBrush x:Key="HatchBondBrush" EndPoint="50,5"
+    <LinearGradientBrush x:Key="HatchBondBrush" EndPoint="50,5"
                   MappingMode="Absolute"
                   SpreadMethod="Repeat"
                   StartPoint="50,0">
-    <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Offset="0" />
-    <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Offset="0.1" />
-    <GradientStop Color="Transparent" Offset="0.1" />
-    <GradientStop Color="Transparent" Offset="0.2" />
-  </LinearGradientBrush>
-  <Style x:Key="HatchBondStyle" TargetType="Path" BasedOn="{StaticResource WedgeBondStyle}">
-    <Setter Property="Fill">
-      <Setter.Value>
-        <LinearGradientBrush EndPoint="50,5"
+        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Offset="0" />
+        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Offset="0.1" />
+        <GradientStop Color="Transparent" Offset="0.1" />
+        <GradientStop Color="Transparent" Offset="0.2" />
+    </LinearGradientBrush>
+    <Style x:Key="HatchBondStyle" TargetType="Path" BasedOn="{StaticResource WedgeBondStyle}">
+        <Setter Property="Fill">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="50,5"
             MappingMode="Absolute"
             SpreadMethod="Repeat"
             StartPoint="50,0">
-          <GradientStop Color="{x:Static SystemColors.WindowTextColor}" Offset="0" />
-          <GradientStop Color="{x:Static SystemColors.WindowTextColor}" Offset="0.2" />
-          <GradientStop Color="Transparent" Offset="0.2" />
-          <GradientStop Color="Transparent" Offset="0.4" />
-          <LinearGradientBrush.Transform>
-            <RotateTransform Angle="90"/>
-          </LinearGradientBrush.Transform>
-        </LinearGradientBrush>
-      </Setter.Value>
-    </Setter>
-    <Setter Property="Stroke" Value="{x:Null}"></Setter>
-  </Style>
+                    <GradientStop Color="{x:Static SystemColors.WindowTextColor}" Offset="0" />
+                    <GradientStop Color="{x:Static SystemColors.WindowTextColor}" Offset="0.2" />
+                    <GradientStop Color="Transparent" Offset="0.2" />
+                    <GradientStop Color="Transparent" Offset="0.4" />
+                    <LinearGradientBrush.Transform>
+                        <RotateTransform Angle="90" />
+                    </LinearGradientBrush.Transform>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Stroke" Value="{x:Null}"></Setter>
+    </Style>
 
-  <Style x:Key="BenzeneStyle" TargetType="Path">
-    <Setter Property="Tag" Value="Benzene" />
-    <Setter Property="Height" Value="25"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z M 5.50480947161671,8.25 L 12,4.5 M 18.4951905283833,8.25 L 18.4951905283833,15.75 M 12,19.5 L 5.50480947161671, 15.75"/>
-  </Style>
+    <Style x:Key="BenzeneStyle" TargetType="Path">
+        <Setter Property="Tag" Value="Benzene" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=StandardSolidColorBrush}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z M 5.50480947161671,8.25 L 12,4.5 M 18.4951905283833,8.25 L 18.4951905283833,15.75 M 12,19.5 L 5.50480947161671, 15.75" />
+    </Style>
 
-  <Style x:Key="CyclohexStyle" TargetType="Path">
-    <Setter Property="Tag" Value="Cyclohexane" />
-    <Setter Property="Height" Value="25"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z"/>
-  </Style>
+    <Style x:Key="CyclohexStyle" TargetType="Path">
+        <Setter Property="Tag" Value="Cyclohexane" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=StandardSolidColorBrush}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z" />
+    </Style>
 
-  <Style x:Key="CyclopentStyle" TargetType="Path">
-    <Setter Property="Tag" Value="Cyclopentane" />
-    <Setter Property="Height" Value="25"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z"/>
-  </Style>
+    <Style x:Key="CyclopentStyle" TargetType="Path">
+        <Setter Property="Tag" Value="Cyclopentane" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=StandardSolidColorBrush}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z" />
+    </Style>
 
-  <Style x:Key="CyclopentadieneStyle" TargetType="Path">
-    <Setter Property="Tag" Value="Cyclopentadiene" />
-    <Setter Property="Height" Value="25"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z M 12,20.5 M 5.52786404500042,15.7977179816602 L 8,8.18926585129899 M 16,8.18926585129899 L 18.4721359549996,15.7977179816602"/>
-  </Style>
+    <Style x:Key="CyclopentadieneStyle" TargetType="Path">
+        <Setter Property="Tag" Value="Cyclopentadiene" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=StandardSolidColorBrush}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z M 12,20.5 M 5.52786404500042,15.7977179816602 L 8,8.18926585129899 M 16,8.18926585129899 L 18.4721359549996,15.7977179816602" />
+    </Style>
 
-  <Style x:Key="ChainStyle" TargetType="Path">
-    <Setter Property="Height" Value="25"/>
-    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
-    <Setter Property="Width" Value="25"/>
-    <Setter Property="Data" Value="M 0, 12 L 8.66025403784439, 18 L 17.3205080756888, 12 L 25.9807621135332, 18"/>
-  </Style>
+    <Style x:Key="ChainStyle" TargetType="Path">
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=StandardSolidColorBrush}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M 0, 12 L 8.66025403784439, 18 L 17.3205080756888, 12 L 25.9807621135332, 18" />
+    </Style>
 
-
-  <!-- used to populate the bond dropdown combo -->
-  <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
-    <viewModel:BondOption Order="Single" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}"/>
-    <viewModel:BondOption Order="Double" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}"/>
-    <viewModel:BondOption Order="Triple" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}"/>
-    <viewModel:BondOption Order="Single" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}"/>
-     <viewModel:BondOption Order="Single" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}"/>
+    <!-- used to populate the bond dropdown combo -->
+    <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
+        <viewModel:BondOption Order="Single" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
+        <viewModel:BondOption Order="Double" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
+        <viewModel:BondOption Order="Triple" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
+        <viewModel:BondOption Order="Single" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}" />
+        <viewModel:BondOption Order="Single" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}" />
     </x:Array>
 
-
-<x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
-    <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">C</viewModel:AtomOption>
-    <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">H</viewModel:AtomOption>
-    <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">N</viewModel:AtomOption>
-    <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">O</viewModel:AtomOption>
-    <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">P</viewModel:AtomOption>
-    <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">S</viewModel:AtomOption>
-    <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">Cl</viewModel:AtomOption>
-    <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">Br</viewModel:AtomOption>
-    <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</viewModel:AtomOption>
-    <viewModel:AtomOption Element="R"  Foreground="Black">
-    <TextBlock>
+    <x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
+        <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">C</viewModel:AtomOption>
+        <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">H</viewModel:AtomOption>
+        <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">N</viewModel:AtomOption>
+        <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">O</viewModel:AtomOption>
+        <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">P</viewModel:AtomOption>
+        <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">S</viewModel:AtomOption>
+        <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">Cl</viewModel:AtomOption>
+        <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">Br</viewModel:AtomOption>
+        <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</viewModel:AtomOption>
+        <viewModel:AtomOption Element="R"  Foreground="Black">
+            <TextBlock>
         R<Run FontSize="8" BaselineAlignment="Subscript">1</Run>
-      </TextBlock>
-    </viewModel:AtomOption>
-      <!--
+            </TextBlock>
+        </viewModel:AtomOption>
+        <!--
     <acme:AtomOption Element="R2" Foreground="Black">
       <TextBlock>
         R<Run FontSize="8" BaselineAlignment="Subscript">2</Run>
@@ -160,13 +158,5 @@
       <TextBlock>X</TextBlock>
     </acme:AtomOption>
       -->
-  </x:Array>
-
+    </x:Array>
 </ResourceDictionary>
-
-
-
-
-
-
-
