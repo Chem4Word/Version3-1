@@ -991,6 +991,62 @@ namespace Chem4Word.Model
 
         public Molecule Clone()
         {
+            Molecule clone = new Molecule();
+            Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
+
+            foreach (var atom in Atoms)
+            {
+                Atom a = new Atom();
+                a.Id = atom.Id;
+                a.Position = atom.Position;
+                a.Element = atom.Element;
+                a.IsotopeNumber = atom.IsotopeNumber;
+
+                clonedAtoms[atom.Id] = a;
+                clone.Atoms.Add(a);
+            }
+
+            foreach (Bond bond in Bonds)
+            {
+                Bond b = new Bond();
+                b.Id = bond.Id;
+                b.StartAtom = clonedAtoms[bond.StartAtom.Id];
+                b.EndAtom = clonedAtoms[bond.EndAtom.Id];
+                b.Order = bond.Order;
+                b.Stereo = bond.Stereo;
+                b.ExplicitPlacement = bond.ExplicitPlacement;
+
+                clone.Bonds.Add(b);
+            }
+
+            foreach (ChemicalName cn in ChemicalNames)
+            {
+                ChemicalName n = new ChemicalName();
+                n.Id = cn.Id;
+                n.DictRef = cn.DictRef;
+                n.Name = cn.Name;
+                clone.ChemicalNames.Add(n);
+            }
+
+            foreach (Formula f in Formulas)
+            {
+                Formula ff = new Formula();
+                ff.Id = f.Id;
+                ff.Convention = f.Convention;
+                ff.Inline = f.Inline;
+                clone.Formulas.Add(f);
+            }
+
+            foreach (var molecule in Molecules)
+            {
+                clone.Molecules.Add(molecule.Clone());
+            }
+
+            return clone;
+        }
+
+        public Molecule Clone2()
+        {
             BinaryFormatter deserializer = new BinaryFormatter();
             MemoryStream ms = new MemoryStream();
             deserializer.Serialize(ms, this);

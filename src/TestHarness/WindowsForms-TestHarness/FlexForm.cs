@@ -24,7 +24,7 @@ namespace WinFormsTestHarness
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
 
-        private bool _cloneViaCml = true;
+        private bool _cloneViaCml = false;
 
         public FlexForm()
         {

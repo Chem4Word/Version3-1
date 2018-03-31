@@ -318,6 +318,23 @@ namespace Chem4Word.Model
 
         public Model Clone()
         {
+            Model clone = new Model();
+
+            clone.CustomXmlPartGuid = CustomXmlPartGuid;
+
+            foreach (var molecule in Molecules)
+            {
+                Molecule m = molecule.Clone();
+                m.ConciseFormula = m.CalculatedFormula();
+                m.RebuildRings();
+                clone.Molecules.Add(m);
+            }
+            clone.RefreshMolecules();
+
+            return clone;
+        }
+        public Model Clone2()
+        {
             BinaryFormatter deserializer = new BinaryFormatter();
             MemoryStream ms = new MemoryStream();
             deserializer.Serialize(ms, this);
