@@ -12,6 +12,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using Chem4Word.Model;
 
@@ -62,6 +63,8 @@ namespace Chem4Word.ViewModel
         {
             get { return SelectedItems.OfType<Bond>().Distinct().ToList(); }
         }
+
+        public Canvas DrawingSurface { get; set; }
         #endregion Properties
 
         #region Commands
@@ -73,6 +76,7 @@ namespace Chem4Word.ViewModel
         public  UndoCommand UndoCommand { get; }
 
         public RedoCommand RedoCommand { get; }
+
 
 
         #endregion Commands

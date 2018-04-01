@@ -7,6 +7,7 @@
     xmlns:acme="clr-namespace:Chem4Word.ACME"
     xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
+    xmlns:controls="clr-namespace:Chem4Word.ACME.Controls"
     x:Class="Chem4Word.ACME.Editor"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -107,15 +108,16 @@
                     <Viewbox Stretch="Uniform" Height="25" Width="25">
                         <Path Width="12.3333" Height="20"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource SelectPath}" />
+                              Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z " />
                     </Viewbox>
+                    <RadioButton.Tag>abc</RadioButton.Tag>
                 </RadioButton>
 
                 <RadioButton ToolTip="Draw" Style="{StaticResource ToolbarButtonStyle}" x:Name="DrawButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="24">
                         <Path Width="50.4259" Height="50.4259" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource DrawPath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
+                              63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z"/>
                     </Viewbox>
                 </RadioButton>
 
@@ -195,8 +197,8 @@
                 <RadioButton ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}"  FontSize="18"  x:Name="DeleteButton">
                     <Viewbox Stretch="UniformToFill" Height="24"  Width="24">
                         <Path Style="{StaticResource ToolbarPathStyle}" 
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource DeletePath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
+                              2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"/>
                     </Viewbox>
                 </RadioButton>
             </ToolBar>
@@ -205,44 +207,97 @@
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="25">
                         <Path   Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
-                                Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                                Data="{StaticResource CutPath}" />
+                                Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
+                                33.538,38.5699L 36.9626,42.1932L 32.4905,46.6858C 32.8191,47.5548 33,48.5048 33,49.5C 33,53.6421 29.866,57 26,57C 22.134,57 19,53.6421
+                                19,49.5C 19,45.3579 22.134,42 26,42 Z M 26,45C 23.7908,45 22,47.0147 22,49.5C 22,51.9853 23.7908,54 26,54C 28.2091,54 30,51.9853
+                                30,49.5C 30,47.0147 28.2091,45 26,45 Z M 50,42C 53.866,42 57,45.3579 57,49.5C 57,53.6421 53.866,57 50,57C 46.134,57 43,53.6421 43,49.5C
+                                43,48.5055 43.1807,47.5562 43.5087,46.6877C 37.4037,40.5816 31.3813,34.5251 28.1357,30.1361C 24.7905,25.6125 24.3953,22.8602 24,20.1079L
+                                46.7486,42.8564C 47.7201,42.3095 48.8263,42 50,42 Z M 50,45C 47.7908,45 46,47.0147 46,49.5C 46,51.9853 47.7908,54 50,54C 52.2091,54 54,51.9853
+                                54,49.5C 54,47.0147 52.2091,45 50,45 Z M 47.8643,30.1361C 46.4839,32.0028 44.6012,34.1712 42.4235,36.5166L 41.9416,36.0347C 43.8801,33.9052
+                                45.5581,31.9333 46.8205,30.213C 49.9109,26.0015 50.51,23.7154 50.8952,21.2126L 52,20.1079C 51.6047,22.8602 51.2095,25.6125 47.8643,30.1361 Z
+                                M 39.0074,33.1005L 50.2564,21.8515C 49.8163,23.9301 48.9562,26.0005 46.4256,29.4492C 45.0997,31.2561 43.5411,33.3404 41.5003,35.5935L 39.0074,33.1005 Z
+                                M 35.8034,42.4922L 35.3653,42.0251L 31.9263,45.5067C 32.0391,45.6984 32.1441,45.8961 32.2406,46.099L 35.8034,42.4922 Z">
+                                
+                            
+                        </Path>
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="22">
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource CopyPath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
+                              59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L
+                              46,25.25 Z">
+
+                        </Path>
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="PasteButton">
                     <Viewbox Stretch="UniformToFill" Width="22" Height="26">
 
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource PastePath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001
+                                20,52.6569 20,51.0001L 20,24.0001C 20,22.3432 21.3431,21.0001 23,21.0001L 26.5001,20.9999C 26.5001,20.9999
+                                27.4999,20.8807 27.4999,19.5C 27.4999,18.1193 29.1191,17 30.4999,17L 38.4998,17.0001C 39.8798,17.0001 41.4988,18.6176 41.5,19.9979L
+                                41.4998,19.5024C 41.5009,20.881 42.5,21 42.5,21L 46,21.0001C 47.6569,21.0001 49,22.3432 49,24.0001L 49,31L 56,38L 56.0001,57C
+                                56.0001,58.6569 54.657,60 53.0001,60L 34.0001,60 Z M 33.9999,31.0001L 33.9999,57.0001L 53.0001,57L 53.0001,43L 42.0002,43L 42.0001,31L 33.9999,31.0001 Z
+                                M 53,40.0001L 45,32.0001L 45.0001,40L 53,40.0001 Z M 28.5,25L 40.5,25C 40.5,25 39.4998,23.8809 39.4998,22.5002C 39.4998,21.1194
+                                38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z"/>
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton" Command="{Binding UndoCommand}" >
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource UndoPath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
+                              27.296C 55.1649,28.0987 55.6564,28.9607 56.0698,29.8821C 56.4832,30.8035 56.8065,31.7766 57.0396,32.8014C 57.2727,33.8262 57.3892,
+                              34.8883 57.3892,35.9878C 57.3892,37.0566 57.276,38.1517 57.0495,39.2733C 56.823,40.3948 56.4491,41.5394 55.928,42.7071C 55.4068,
+                              43.8748 54.713,45.07 53.8465,46.2927C 52.9801,47.5154 51.9069,48.7601 50.6271,50.0267C 50.2137,50.4358 49.7431,50.902 49.2153,
+                              51.4253C 48.6875,51.9487 48.1278,52.5029 47.5363,53.0878C 46.9447,53.6728 46.34,54.2742 45.722,54.8922C 45.1041,55.5101 44.4983,
+                              56.1072 43.9045,56.6833C 42.5323,58.0424 41.1029,59.4586 39.6163,60.9319L 35.3545,56.6239C 36.8235,55.1638 38.2441,53.7542 39.6163,
+                              52.3951C 40.1969,51.819 40.7994,51.2252 41.424,50.6139C 42.0485,50.0025 42.6565,49.4011 43.2481,48.8095C 43.8396,48.218 44.3993,
+                              47.6605 44.9271,47.1371C 45.4549,46.6138 45.9255,46.1476 46.3389,45.7385C 48.0146,44.0584 49.2758,42.3904 50.1224,40.7345C 50.969,
+                              39.0786 51.3924,37.4678 51.3924,35.9021C 51.3924,34.719 51.1516,33.5777 50.67,32.4781C 50.1884,31.3786 49.4528,30.3406 48.4632,
+                              29.3642C 48.2169,29.1179 47.9112,28.8848 47.5462,28.6649C 47.1811,28.445 46.7688,28.2526 46.3092,28.0877C 45.8496,27.9227 45.3482,
+                              27.7886 44.805,27.6852C 44.2619,27.5819 43.6868,27.5302 43.0799,27.5302C 42.4641,27.5302 41.8198,27.5929 41.1469,27.7182C 40.474,
+                              27.8436 39.7933,28.0503 39.105,28.3384C 38.4167,28.6264 37.7218,29.0036 37.0203,29.4698C 36.3188,29.936 35.6316,30.5056 34.9587,
+                              31.1785L 30.466,35.6976L 37.4986,42.75L 19,42.75L 19,24.5417L 25.9931,31.4094L 30.5056,26.8705C 31.5083,25.7446 32.5463,
+                              24.8275 33.6194,24.1194C 34.6926,23.4113 35.7646,22.8616 36.8356,22.4701C 37.9065,22.0787 38.972,21.8148 40.0319,
+                              21.6785C 41.0919,21.5421 42.1079,21.474 43.0799,21.474C 44.087,21.474 45.0579,21.563 45.9925,21.7411C 46.9271,21.9193 47.8068,22.17
+                              48.6314,22.4932C 49.4561,22.8165 50.2148,23.198 50.9075,23.6378C 51.6002,24.0777 52.2148,24.5571 52.7514,25.076 Z"/>
+
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton" Command="{Binding RedoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource RedoPath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
+                              29.8821C 19.5168,30.8035 19.1935,31.7766 18.9604,32.8014C 18.7273,33.8262 18.6107,34.8883 18.6107,35.9878C 18.6107,
+                              37.0566 18.724,38.1517 18.9505,39.2733C 19.177,40.3948 19.5508,41.5394 20.072,42.7071C 20.5932,43.8748 21.287,
+                              45.07 22.1535,46.2927C 23.0199,47.5154 24.093,48.7601 25.3729,50.0267C 25.7863,50.4358 26.2569,50.902 26.7847,51.4253C
+                              27.3125,51.9487 27.8721,52.5029 28.4637,53.0878C 29.0552,53.6728 29.66,54.2742 30.2779,54.8922C 30.8959,55.5101 31.5017,
+                              56.1072 32.0955,56.6833C 33.4677,58.0424 34.8971,59.4586 36.3837,60.9319L 40.6455,56.6239C 39.1765,55.1638 37.7559,53.7542
+                              36.3837,52.3951C 35.8031,51.819 35.2006,51.2252 34.576,50.6139C 33.9515,50.0025 33.3434,49.4011 32.7519,48.8095C 32.1603,
+                              48.218 31.6007,47.6605 31.0729,47.1371C 30.5451,46.6138 30.0745,46.1476 29.6611,45.7385C 27.9854,44.0584 26.7242,42.3904
+                              25.8776,40.7345C 25.0309,39.0786 24.6076,37.4678 24.6076,35.9021C 24.6076,34.719 24.8484,33.5777 25.33,32.4781C 25.8116,
+                              31.3786 26.5472,30.3406 27.5368,29.3642C 27.7831,29.1179 28.0887,28.8848 28.4538,28.6649C 28.8188,28.445 29.2312,28.2526
+                              29.6908,28.0877C 30.1504,27.9227 30.6518,27.7886 31.1949,27.6852C 31.7381,27.5819 32.3132,27.5302 32.9201,27.5302C 33.5359,27.5302
+                              34.1802,27.5929 34.8531,27.7182C 35.526,27.8436 36.2066,28.0503 36.8949,28.3384C 37.5833,28.6264 38.2782,29.0036 38.9797,29.4698C
+                              39.6812,29.936 40.3684,30.5056 41.0413,31.1785L 45.534,35.6976L 38.5014,42.75L 57,42.75L 57,24.5417L 50.0069,31.4094L 45.4944,26.8705C
+                              44.4916,25.7446 43.4537,24.8275 42.3805,24.1194C 41.3074,23.4113 40.2353,22.8616 39.1644,22.4701C 38.0934,22.0787 37.028,21.8148
+                              35.968,21.6785C 34.9081,21.5421 33.8921,21.474 32.9201,21.474C 31.9129,21.474 30.942,21.563 30.0074,21.7411C 29.0728,21.9193 28.1932,22.17
+                              27.3686,22.4932C 26.5439,22.8165 25.7852,23.198 25.0925,23.6378C 24.3998,24.0777 23.7852,24.5571 23.2486,25.076 Z"/>
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick" Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24" >
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                              Data="{StaticResource SavePath}" />
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data ="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
+                              23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334
+                              18.999978,2.0000334z M2.5,2C2.224,2,2,2.2249994,2,2.5L2,29.5C2,29.775,2.224,30,2.5,30L5.9999927,30
+                              5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
+                              25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z
+                              M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
+                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z"/>
                     </Viewbox>
                 </Button>
             </ToolBar>
