@@ -107,7 +107,7 @@
                 <RadioButton ToolTip="Select" Style="{StaticResource ToolbarButtonStyle}" IsChecked="True" x:Name="SelectionButton">
                     <Viewbox Stretch="Uniform" Height="25" Width="25">
                         <Path Width="12.3333" Height="20"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}"
                               Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z " />
                     </Viewbox>
                     <RadioButton.Tag>abc</RadioButton.Tag>
@@ -116,7 +116,7 @@
                 <RadioButton ToolTip="Draw" Style="{StaticResource ToolbarButtonStyle}" x:Name="DrawButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="24">
                         <Path Width="50.4259" Height="50.4259" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z" />
                     </Viewbox>
                 </RadioButton>
@@ -133,7 +133,7 @@
                 <Button Name="RingDropdownButton" Width="10"  Click="RingDropdown_OnClick" ToolTip="Select Ring">
                     <Viewbox Stretch="Uniform">
                         <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" />
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                 </Button>
                 <!-- Print Toggle Button Popup -->
@@ -170,15 +170,15 @@
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="ReactionButton">
                     <Viewbox Stretch="Uniform">
                         <StackPanel>
-                            <TextBlock FontFamily="Arial"  HorizontalAlignment="Center" Foreground="{StaticResource ResourceKey=StandardSolidColorBrush}">
+                            <TextBlock FontFamily="Arial"  HorizontalAlignment="Center" Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>NH<Run BaselineAlignment="Subscript" FontSize="12">3</Run></TextBlock>
                             <graphics:ArrowBase
                                 StartPoint="0,5"
                                 EndPoint="45,5"
-                                Stroke="{StaticResource ResourceKey=StandardSolidColorBrush}"
-                                Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"
+                                Stroke="{StaticResource ResourceKey=Chem4WordBrush}"
+                                Fill="{StaticResource ResourceKey=Chem4WordBrush}"
                                 IsArrowClosed="True"
                                 ArrowHeadLength="10"
                                 HeadAngle="35">
@@ -186,7 +186,7 @@
                                     <DropShadowEffect Color="LightGray" />
                                 </graphics:ArrowBase.Effect>
                             </graphics:ArrowBase>
-                            <TextBlock FontFamily="Arial"  HorizontalAlignment="Center" Foreground="{StaticResource ResourceKey=StandardSolidColorBrush}">
+                            <TextBlock FontFamily="Arial"  HorizontalAlignment="Center" Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>H<Run BaselineAlignment="Subscript" FontSize="12">2</Run>O</TextBlock>
@@ -196,7 +196,7 @@
                 <RadioButton ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}"  FontSize="18"  x:Name="DeleteButton">
                     <Viewbox Stretch="UniformToFill" Height="24"  Width="24">
                         <Path Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
                               2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" />
                     </Viewbox>
                 </RadioButton>
@@ -206,7 +206,7 @@
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="25">
                         <Path   Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
-                                Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
+                                Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
                                 33.538,38.5699L 36.9626,42.1932L 32.4905,46.6858C 32.8191,47.5548 33,48.5048 33,49.5C 33,53.6421 29.866,57 26,57C 22.134,57 19,53.6421
                                 19,49.5C 19,45.3579 22.134,42 26,42 Z M 26,45C 23.7908,45 22,47.0147 22,49.5C 22,51.9853 23.7908,54 26,54C 28.2091,54 30,51.9853
                                 30,49.5C 30,47.0147 28.2091,45 26,45 Z M 50,42C 53.866,42 57,45.3579 57,49.5C 57,53.6421 53.866,57 50,57C 46.134,57 43,53.6421 43,49.5C
@@ -222,7 +222,7 @@
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="22">
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
                               59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L
                               46,25.25 Z">
                         </Path>
@@ -232,7 +232,7 @@
                     <Viewbox Stretch="UniformToFill" Width="22" Height="26">
 
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001
                                 20,52.6569 20,51.0001L 20,24.0001C 20,22.3432 21.3431,21.0001 23,21.0001L 26.5001,20.9999C 26.5001,20.9999
                                 27.4999,20.8807 27.4999,19.5C 27.4999,18.1193 29.1191,17 30.4999,17L 38.4998,17.0001C 39.8798,17.0001 41.4988,18.6176 41.5,19.9979L
                                 41.4998,19.5024C 41.5009,20.881 42.5,21 42.5,21L 46,21.0001C 47.6569,21.0001 49,22.3432 49,24.0001L 49,31L 56,38L 56.0001,57C
@@ -244,7 +244,7 @@
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton" Command="{Binding UndoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
                               27.296C 55.1649,28.0987 55.6564,28.9607 56.0698,29.8821C 56.4832,30.8035 56.8065,31.7766 57.0396,32.8014C 57.2727,33.8262 57.3892,
                               34.8883 57.3892,35.9878C 57.3892,37.0566 57.276,38.1517 57.0495,39.2733C 56.823,40.3948 56.4491,41.5394 55.928,42.7071C 55.4068,
                               43.8748 54.713,45.07 53.8465,46.2927C 52.9801,47.5154 51.9069,48.7601 50.6271,50.0267C 50.2137,50.4358 49.7431,50.902 49.2153,
@@ -265,7 +265,7 @@
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton" Command="{Binding RedoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
                               29.8821C 19.5168,30.8035 19.1935,31.7766 18.9604,32.8014C 18.7273,33.8262 18.6107,34.8883 18.6107,35.9878C 18.6107,
                               37.0566 18.724,38.1517 18.9505,39.2733C 19.177,40.3948 19.5508,41.5394 20.072,42.7071C 20.5932,43.8748 21.287,
                               45.07 22.1535,46.2927C 23.0199,47.5154 24.093,48.7601 25.3729,50.0267C 25.7863,50.4358 26.2569,50.902 26.7847,51.4253C
@@ -286,7 +286,7 @@
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick" Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data ="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
+                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data ="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
                               23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334
                               18.999978,2.0000334z M2.5,2C2.224,2,2,2.2249994,2,2.5L2,29.5C2,29.775,2.224,30,2.5,30L5.9999927,30
                               5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
