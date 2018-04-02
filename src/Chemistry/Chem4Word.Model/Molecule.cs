@@ -997,6 +997,8 @@ namespace Chem4Word.Model
             foreach (var atom in Atoms)
             {
                 Atom a = new Atom();
+
+                // Add properties which would have been serialized to CML
                 a.Id = atom.Id;
 
                 a.Position = atom.Position;
@@ -1005,41 +1007,53 @@ namespace Chem4Word.Model
                 a.IsotopeNumber = atom.IsotopeNumber;
                 a.FormalCharge = atom.FormalCharge;
 
+                // Save for joining up bonds
                 clonedAtoms[atom.Id] = a;
+
+                // Add to clone
                 clone.Atoms.Add(a);
             }
 
             foreach (Bond bond in Bonds)
             {
                 Bond b = new Bond();
-                b.Id = bond.Id;
 
+                // Add properties which would have been serialized to CML
+                b.Id = bond.Id;
                 b.StartAtom = clonedAtoms[bond.StartAtom.Id];
                 b.EndAtom = clonedAtoms[bond.EndAtom.Id];
 
                 b.Order = bond.Order;
                 b.Stereo = bond.Stereo;
-                b.Placement = bond.Placement;
                 b.ExplicitPlacement = bond.ExplicitPlacement;
 
+                // Add to clone
                 clone.Bonds.Add(b);
             }
 
             foreach (ChemicalName cn in ChemicalNames)
             {
                 ChemicalName n = new ChemicalName();
+
+                // Add properties which would have been serialized to CML
                 n.Id = cn.Id;
                 n.DictRef = cn.DictRef;
                 n.Name = cn.Name;
+
+                // Add to clone
                 clone.ChemicalNames.Add(n);
             }
 
             foreach (Formula f in Formulas)
             {
                 Formula ff = new Formula();
+
+                // Add properties which would have been serialized to CML
                 ff.Id = f.Id;
                 ff.Convention = f.Convention;
                 ff.Inline = f.Inline;
+
+                // Add to clone
                 clone.Formulas.Add(f);
             }
 
