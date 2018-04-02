@@ -29,13 +29,13 @@
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
-            <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed"/>
+            <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed" />
         </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
-                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler"/>
+                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler" />
                 </Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBrushKey}}" />
@@ -117,13 +117,13 @@
                     <Viewbox Stretch="UniformToFill" Height="24" Width="24">
                         <Path Width="50.4259" Height="50.4259" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
-                              63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z"/>
+                              63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z" />
                     </Viewbox>
                 </RadioButton>
 
                 <RadioButton Name="RingButton"  ToolTip="Insert a ring">
                     <StackPanel Orientation="Horizontal">
-                        <Path Style="{StaticResource BenzeneStyle}" Name="RingButtonPath" >
+                        <Path Style="{StaticResource BenzeneStyle}" Name="RingButtonPath">
                             <Path.Effect>
                                 <DropShadowEffect Color="LightGray" />
                             </Path.Effect>
@@ -133,7 +133,7 @@
                 <Button Name="RingDropdownButton" Width="10"  Click="RingDropdown_OnClick" ToolTip="Select Ring">
                     <Viewbox Stretch="Uniform">
                         <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}"/>
+                              Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" />
                     </Viewbox>
                 </Button>
                 <!-- Print Toggle Button Popup -->
@@ -160,11 +160,10 @@
                 <RadioButton Style="{StaticResource ToolbarButtonStyle}" x:Name="ChainButton">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
-                            <RotateTransform Angle="180"/>
+                            <RotateTransform Angle="180" />
                         </Path.LayoutTransform>
                         <Path.Effect>
-                            <DropShadowEffect Color="LightGray" Direction="120" ShadowDepth="3"/>
-
+                            <DropShadowEffect Color="LightGray" Direction="120" ShadowDepth="3" />
                         </Path.Effect>
                     </Path>
                 </RadioButton>
@@ -196,9 +195,9 @@
                 </RadioButton>
                 <RadioButton ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}"  FontSize="18"  x:Name="DeleteButton">
                     <Viewbox Stretch="UniformToFill" Height="24"  Width="24">
-                        <Path Style="{StaticResource ToolbarPathStyle}" 
+                        <Path Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
-                              2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"/>
+                              2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" />
                     </Viewbox>
                 </RadioButton>
             </ToolBar>
@@ -217,8 +216,6 @@
                                 45.5581,31.9333 46.8205,30.213C 49.9109,26.0015 50.51,23.7154 50.8952,21.2126L 52,20.1079C 51.6047,22.8602 51.2095,25.6125 47.8643,30.1361 Z
                                 M 39.0074,33.1005L 50.2564,21.8515C 49.8163,23.9301 48.9562,26.0005 46.4256,29.4492C 45.0997,31.2561 43.5411,33.3404 41.5003,35.5935L 39.0074,33.1005 Z
                                 M 35.8034,42.4922L 35.3653,42.0251L 31.9263,45.5067C 32.0391,45.6984 32.1441,45.8961 32.2406,46.099L 35.8034,42.4922 Z">
-                                
-                            
                         </Path>
                     </Viewbox>
                 </Button>
@@ -228,7 +225,6 @@
                               Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
                               59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L
                               46,25.25 Z">
-
                         </Path>
                     </Viewbox>
                 </Button>
@@ -242,10 +238,10 @@
                                 41.4998,19.5024C 41.5009,20.881 42.5,21 42.5,21L 46,21.0001C 47.6569,21.0001 49,22.3432 49,24.0001L 49,31L 56,38L 56.0001,57C
                                 56.0001,58.6569 54.657,60 53.0001,60L 34.0001,60 Z M 33.9999,31.0001L 33.9999,57.0001L 53.0001,57L 53.0001,43L 42.0002,43L 42.0001,31L 33.9999,31.0001 Z
                                 M 53,40.0001L 45,32.0001L 45.0001,40L 53,40.0001 Z M 28.5,25L 40.5,25C 40.5,25 39.4998,23.8809 39.4998,22.5002C 39.4998,21.1194
-                                38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z"/>
+                                38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z" />
                     </Viewbox>
                 </Button>
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton" Command="{Binding UndoCommand}" >
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton" Command="{Binding UndoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
@@ -263,8 +259,7 @@
                               31.1785L 30.466,35.6976L 37.4986,42.75L 19,42.75L 19,24.5417L 25.9931,31.4094L 30.5056,26.8705C 31.5083,25.7446 32.5463,
                               24.8275 33.6194,24.1194C 34.6926,23.4113 35.7646,22.8616 36.8356,22.4701C 37.9065,22.0787 38.972,21.8148 40.0319,
                               21.6785C 41.0919,21.5421 42.1079,21.474 43.0799,21.474C 44.087,21.474 45.0579,21.563 45.9925,21.7411C 46.9271,21.9193 47.8068,22.17
-                              48.6314,22.4932C 49.4561,22.8165 50.2148,23.198 50.9075,23.6378C 51.6002,24.0777 52.2148,24.5571 52.7514,25.076 Z"/>
-
+                              48.6314,22.4932C 49.4561,22.8165 50.2148,23.198 50.9075,23.6378C 51.6002,24.0777 52.2148,24.5571 52.7514,25.076 Z" />
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton" Command="{Binding RedoCommand}">
@@ -285,11 +280,11 @@
                               39.6812,29.936 40.3684,30.5056 41.0413,31.1785L 45.534,35.6976L 38.5014,42.75L 57,42.75L 57,24.5417L 50.0069,31.4094L 45.4944,26.8705C
                               44.4916,25.7446 43.4537,24.8275 42.3805,24.1194C 41.3074,23.4113 40.2353,22.8616 39.1644,22.4701C 38.0934,22.0787 37.028,21.8148
                               35.968,21.6785C 34.9081,21.5421 33.8921,21.474 32.9201,21.474C 31.9129,21.474 30.942,21.563 30.0074,21.7411C 29.0728,21.9193 28.1932,22.17
-                              27.3686,22.4932C 26.5439,22.8165 25.7852,23.198 25.0925,23.6378C 24.3998,24.0777 23.7852,24.5571 23.2486,25.076 Z"/>
+                              27.3686,22.4932C 26.5439,22.8165 25.7852,23.198 25.0925,23.6378C 24.3998,24.0777 23.7852,24.5571 23.2486,25.076 Z" />
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick" Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
-                    <Viewbox Stretch="UniformToFill" Width="24" Height="24" >
+                    <Viewbox Stretch="UniformToFill" Width="24" Height="24">
                         <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=StandardSolidColorBrush}" Data ="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
                               23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334
@@ -297,7 +292,7 @@
                               5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
                               25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z
                               M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
-                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z"/>
+                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z" />
                     </Viewbox>
                 </Button>
             </ToolBar>
@@ -305,12 +300,12 @@
 
         <ScrollViewer
             HorizontalScrollBarVisibility="Auto"
-                Height="Auto" 
-				VerticalScrollBarVisibility="Auto" 
+                Height="Auto"
+				VerticalScrollBarVisibility="Auto"
                 Name="DrawingArea">
-        
+
             <ItemsControl Name="ChemicalObjects" HorizontalAlignment="Center" VerticalAlignment="Center" ItemsSource="{Binding AllObjects}"
-                        Width="{Binding BoundingBox.Width}" Height="{Binding BoundingBox.Height}" Background="White"  >
+                        Width="{Binding BoundingBox.Width}" Height="{Binding BoundingBox.Height}" Background="White">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas
