@@ -16,7 +16,7 @@ using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class DrawBehaviour: Behavior<FrameworkElement>
+    public class DrawBehaviour: BaseEditBehavior
     {
 
         private TranslateTransform transform = new TranslateTransform();
@@ -40,6 +40,7 @@ namespace Chem4Word.ACME.Behaviors
 
         protected override void OnDetaching()
         {
+            base.OnDetaching();
             AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
         }
     }

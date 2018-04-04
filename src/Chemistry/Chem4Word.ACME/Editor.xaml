@@ -117,18 +117,18 @@
                               Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z " />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:SelectorBehaviour/>
+                        <behaviors:SelectorBehaviour ViewModel="{Binding}"/>
                     </RadioButton.Tag>
                 </RadioButton>
 
-                <RadioButton GroupName="Actions" ToolTip="Draw" Style="{StaticResource ToolbarButtonStyle}" Click="SelectionButton_OnClick" x:Name="DrawButton">
+                <RadioButton GroupName="Actions" ToolTip="Draw" Style="{StaticResource ToolbarButtonStyle}" Click="SelectionButton_OnChecked" x:Name="DrawButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="24">
                         <Path Width="50.4259" Height="50.4259" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DrawBehaviour/>
+                        <behaviors:DrawBehaviour ViewModel="{Binding}"/>
                     </RadioButton.Tag>
                 </RadioButton>
 
@@ -148,7 +148,7 @@
                     </Viewbox>
                 </Button>
                 <!-- Print Toggle Button Popup -->
-                <Popup x:Name="RingPopup" PlacementTarget="{Binding ElementName=RingButton}">
+                <Popup x:Name="RingPopup" PlacementTarget="{Binding ElementName=RingButton}" StaysOpen="False">
                     <Border>
                         <WrapPanel Width="70">
                             <!-- Print to local -->

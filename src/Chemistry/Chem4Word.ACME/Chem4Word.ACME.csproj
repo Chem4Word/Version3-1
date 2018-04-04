@@ -57,6 +57,7 @@
       <DependentUpon>AtomPicker.xaml</DependentUpon>
     </Compile>
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
+    <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\SelectorBehaviour.cs" />
     <Compile Include="BoolToVisibilityConverter.cs" />

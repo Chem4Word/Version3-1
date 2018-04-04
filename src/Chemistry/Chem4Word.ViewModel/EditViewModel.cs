@@ -146,12 +146,12 @@ namespace Chem4Word.ViewModel
 
         private void RemoveSelectionAdorners(IList oldObject)
         {
-            throw new NotImplementedException();
+            
         }
 
         private void AddSelectionAdorners(IList newObjects)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

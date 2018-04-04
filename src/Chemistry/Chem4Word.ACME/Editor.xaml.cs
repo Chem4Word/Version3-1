@@ -140,6 +140,7 @@ namespace Chem4Word.ACME
         {
             Button selButton = sender as Button;
             RingButtonPath.Style = (selButton.Content as Path).Style;
+            RingPopup.IsOpen = false;
         }
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
@@ -152,9 +153,10 @@ namespace Chem4Word.ACME
             var vm = new ViewModel.EditViewModel(tempModel);
             _activeViewModel = vm;
             this.DataContext = vm;
-            SelectionButton_OnChecked(SelectionButton, new RoutedEventArgs());
+            
             ScrollIntoView();
-            //BindControls(vm);
+            BindControls(vm);
+            SelectionButton_OnChecked(SelectionButton, new RoutedEventArgs());
         }
 
         public static T FindChild<T>(DependencyObject parent)
@@ -229,6 +231,9 @@ namespace Chem4Word.ACME
             bondBinding.Source = vm;
 
             BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
+
+            vm.DrawingSurface = LocateCanvas();
+
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -248,10 +253,6 @@ namespace Chem4Word.ACME
             OnOkButtonClick?.Invoke(this, args);
         }
 
-        private void SelectionButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            
-        }
 
         private void SelectionButton_OnChecked(object sender, RoutedEventArgs e)
         {
