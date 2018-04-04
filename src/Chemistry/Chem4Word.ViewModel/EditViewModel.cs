@@ -62,7 +62,14 @@ namespace Chem4Word.ViewModel
                 return null;
             }
 
-            set { _selectedElement = value; } 
+            set
+            {
+                _selectedElement = value;
+                foreach (Atom selectedAtom in SelectedItems.OfType<Atom>())
+                {
+                    selectedAtom.Element = value;
+                }
+            } 
         }
         /// <summary>
         /// returns a distinct list of selected elements
