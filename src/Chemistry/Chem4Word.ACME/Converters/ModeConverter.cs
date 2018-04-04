@@ -6,25 +6,21 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Globalization;
+using System.Windows.Data;
 
-namespace WinFormsTestHarness
+namespace Chem4Word.ACME.Converters
 {
-    public partial class Dumper : Form
+    public class ModeConverter : IValueConverter
     {
-        public Dumper(string data)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            InitializeComponent();
-            Dump.Text = data;
-            Dump.SelectionStart = 0;
-            Dump.SelectionLength = 0;
+            return value == parameter;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
         }
     }
 }

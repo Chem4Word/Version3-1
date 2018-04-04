@@ -5,9 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model;
 using System.Windows;
 using System.Windows.Controls;
-using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel
 {

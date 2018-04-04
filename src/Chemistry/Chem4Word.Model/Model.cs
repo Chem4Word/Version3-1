@@ -7,12 +7,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Data;
 
@@ -20,7 +21,7 @@ namespace Chem4Word.Model
 {
     /// <summary>
     /// Overall container for Atoms, Bonds and other objects.
-    /// Please limit rendering-specific code in these classes.  
+    /// Please limit rendering-specific code in these classes.
     /// Sometimes it will be unavoidable, but the less, the better
     /// </summary>
     [Serializable]
@@ -294,20 +295,19 @@ namespace Chem4Word.Model
             }
             AddNewMols();
         }
-        
 
         /// <summary>
         /// Deep clones the molecule
         /// all the way down to the atoms
         /// </summary>
         /// <returns></returns>
-        public Model Clone()
+        public Model Clone1()
         {
             //v important:  the labels are used to match up
             //old and new objects
             this.Relabel();
 
-            Model clone = (Model) this.MemberwiseClone();
+            Model clone = (Model)this.MemberwiseClone();
             clone.ResetCollections();
             foreach (var mol in Molecules)
             {
@@ -316,7 +316,50 @@ namespace Chem4Word.Model
             return clone;
         }
 
-     
+        public Model Clone()
+        {
+            Model clone = new Model();
+
+            // Strictly speaking this is modifiing the original object.
+            //  but it is required to allow re-connecting of atoms with the correct bonds.
+            Relabel();
+
+            clone.CustomXmlPartGuid = CustomXmlPartGuid;
+
+            foreach (var molecule in Molecules)
+            {
+                Molecule m = molecule.Clone();
+                m.ConciseFormula = m.CalculatedFormula();
+                m.RebuildRings();
+                clone.Molecules.Add(m);
+            }
+
+            clone.Relabel();
+            clone.RefreshMolecules();
+
+            return clone;
+        }
+
+        public Model Clone2()
+        {
+            BinaryFormatter deserializer = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            deserializer.Serialize(ms, this);
+            ms.Seek(0, 0);
+            var clone = (Model)deserializer.Deserialize(ms);
+            clone.RefreshMolecules();
+            foreach (Molecule toRefresh in Molecules)
+            {
+                toRefresh.RebuildRings();
+            }
+            Debug.Assert(clone.Molecules.Count == this.Molecules.Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.Bonds).ToList().Count == this.Molecules.SelectMany(m => m.Bonds).ToList().Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.Rings).ToList().Count == this.Molecules.SelectMany(m => m.Rings).ToList().Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count == this.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count);
+            Debug.Assert(clone.Molecules.SelectMany(m => m.Formulas).ToList().Count == this.Molecules.SelectMany(m => m.Formulas).ToList().Count);
+            return clone;
+        }
+
         #region Layout
 
         public double ActualWidth
@@ -328,7 +371,6 @@ namespace Chem4Word.Model
         {
             get { return BoundingBox.Height; }
         }
-
 
         //used to calculate the bounds of the atom
         public double FontSize { get; set; }
@@ -343,7 +385,7 @@ namespace Chem4Word.Model
                     var atom = AllAtoms[i];
                     modelRect.Union(atom.BoundingBox(FontSize));
                 }
-                return  modelRect;
+                return modelRect;
             }
         }
 
@@ -404,6 +446,7 @@ namespace Chem4Word.Model
         #endregion Layout
 
         #region Interface implementations
+
         [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 

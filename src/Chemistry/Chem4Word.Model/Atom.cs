@@ -34,7 +34,11 @@ namespace Chem4Word.Model
             {
                 _element = value;
                 OnPropertyChanged();
-                OnPropertyChanged("SymbolText");
+                OnPropertyChanged(nameof(SymbolText));
+                OnPropertyChanged(nameof(ImplicitHydrogenCount));
+                OnPropertyChanged(nameof(BoundingBox));
+                
+
             }
         }
 

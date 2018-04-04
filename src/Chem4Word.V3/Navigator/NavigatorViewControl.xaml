@@ -14,7 +14,7 @@
     Background="{x:Static SystemColors.WindowBrush}"
     x:Name="NavViewControl">
     <UserControl.Resources>
-        <SolidColorBrush x:Key="BlueBrush">
+        <SolidColorBrush x:Key="Chem4WordBlue">
             <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
         </SolidColorBrush>
     </UserControl.Resources>
@@ -31,7 +31,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border
-                        BorderBrush="{StaticResource BlueBrush}"
+                        BorderBrush="{StaticResource Chem4WordBlue}"
                         BorderThickness="2"
                         HorizontalAlignment="Stretch"
                         CornerRadius="2">

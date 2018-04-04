@@ -346,8 +346,7 @@ namespace Chem4Word.Model
         public bool AtomsAreCis(Atom atomA, Atom atomB)
         {
             //do an assert to make sure that we're not calling this routine with atoms detached from the bond atoms
-            Debug.Assert(StartAtom.Neighbours.Contains(atomA) & EndAtom.Neighbours.Contains(atomB)
-                || StartAtom.Neighbours.Contains(atomB) & EndAtom.Neighbours.Contains(atomA));
+            //Debug.Assert(StartAtom.Neighbours.Contains(atomA) & EndAtom.Neighbours.Contains(atomB)|| StartAtom.Neighbours.Contains(atomB) & EndAtom.Neighbours.Contains(atomA));
 
             // Note: Add null checks as this has been found to be blowing up
             if (atomA != null && atomB != null
@@ -704,16 +703,21 @@ namespace Chem4Word.Model
             Point posEndPoint = endAtom.Position + posDisplacementVector;
             Point negEndPoint = endAtom.Position + negDisplacementVector;
 
-            Atom nonHAtom = startAtom.Neighbours.First(n => n != endAtom && (Element)n.Element != Globals.PeriodicTable.H);
-            Point nonHAtomLoc = nonHAtom.Position;
+            Atom nonHAtom = startAtom.Neighbours.FirstOrDefault(n => n != endAtom && (Element)n.Element != Globals.PeriodicTable.H);
+            if (nonHAtom != null)
+            {
+                Point nonHAtomLoc = nonHAtom.Position;
 
-            double posDist = (nonHAtomLoc - posEndPoint).Length;
-            double negDist = (nonHAtomLoc - negEndPoint).Length;
+                double posDist = (nonHAtomLoc - posEndPoint).Length;
+                double negDist = (nonHAtomLoc - negEndPoint).Length;
 
-            bool posDisplacement = posDist < negDist;
-            Vector displacementVector = posDisplacement ? posDisplacementVector : negDisplacementVector;
+                bool posDisplacement = posDist < negDist;
+                Vector displacementVector = posDisplacement ? posDisplacementVector : negDisplacementVector;
 
-            return displacementVector;
+                return displacementVector;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -732,7 +736,7 @@ namespace Chem4Word.Model
         {
             get
             {
-                Debug.Assert(Parent.RingsCalculated);
+                //Debug.Assert(Parent.RingsCalculated);
 
                 if (!Rings.Any()) //no rings
                 {
@@ -768,14 +772,15 @@ namespace Chem4Word.Model
 
             Vector? vector = null;
 
-            Ring theRing = PrimaryRing;
-
-            List<Ring> ringList = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
-
-            if (ringList.Any()) //no rings
+            if (PrimaryRing != null)
             {
-                Point? ringCentroid = theRing.Centroid;
-                vector = ringCentroid - MidPoint;
+                List<Ring> ringList = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
+
+                if (ringList.Any()) //no rings
+                {
+                    Point? ringCentroid = PrimaryRing.Centroid;
+                    vector = ringCentroid - MidPoint;
+                }
             }
 
             return vector;

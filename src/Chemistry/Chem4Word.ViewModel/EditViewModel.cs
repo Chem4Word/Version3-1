@@ -5,19 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
+using Chem4Word.Model;
+using Chem4Word.ViewModel.Adorners;
 using Chem4Word.ViewModel.Commands;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Windows;
-using System.Windows.Data;
-using Chem4Word.Model;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Interactivity;
 
-namespace Chem4Word.ViewModel 
+namespace Chem4Word.ViewModel
 {
-    public class EditViewModel :DisplayViewModel
+    public class EditViewModel : DisplayViewModel
     {
         public enum SelectionTypeCode
         {
@@ -27,42 +29,85 @@ namespace Chem4Word.ViewModel
             Molecule = 4
         }
 
-        
+        #region Fields
+
+        private Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
+
+        #endregion Fields
+
         #region Properties
 
-  
         public ObservableCollection<object> SelectedItems { get; }
 
         public UndoManager UndoManager { get; }
 
         private BondOption _selectedBondOption;
+
         public BondOption SelectedBondOption
         {
             get { return _selectedBondOption; }
             set { _selectedBondOption = value; }
         }
 
-        private AtomOption _selectedAtomOption;
-        public AtomOption SelectedAtomOption
-        {
-            get { return _selectedAtomOption; }
+        private ElementBase _selectedElement;
 
-            set { _selectedAtomOption = value; } 
+        public ElementBase SelectedElement
+        {
+            get
+            {
+                var selElements = SelectedElementType;
+                if (selElements.Count == 1)
+                {
+                    return selElements[0];
+                }
+                return null;
+            }
+
+            set
+            {
+                _selectedElement = value;
+                foreach (Atom selectedAtom in SelectedItems.OfType<Atom>())
+                {
+                    selectedAtom.Element = value;
+                }
+            }
         }
+
         /// <summary>
         /// returns a distinct list of selected elements
         /// </summary>
         public List<ElementBase> SelectedElementType
         {
-            get { return SelectedItems.OfType<ElementBase>().Distinct().ToList(); }
+            get
+            {
+                return SelectedItems.OfType<Atom>().Select(a => a.Element).Distinct().ToList();
+            }
         }
-
 
         public List<Bond> SelectedBondType
         {
             get { return SelectedItems.OfType<Bond>().Distinct().ToList(); }
         }
+
+        public Canvas DrawingSurface { get; set; }
+
         #endregion Properties
+
+        private Behavior _activeMode;
+
+        public Behavior ActiveMode
+        {
+            get { return _activeMode; }
+            set
+            {
+                if (_activeMode != null)
+                {
+                    _activeMode.Detach();
+                }
+                _activeMode = value;
+                _activeMode.Attach(DrawingSurface);
+            }
+        }
 
         #region Commands
 
@@ -70,16 +115,15 @@ namespace Chem4Word.ViewModel
 
         public AddAtomCommand AddAtomCommand { get; }
 
-        public  UndoCommand UndoCommand { get; }
+        public UndoCommand UndoCommand { get; }
 
         public RedoCommand RedoCommand { get; }
 
-
         #endregion Commands
 
-        #region constructors
+        #region Constructors
 
-        public EditViewModel(Model.Model model):base(model)
+        public EditViewModel(Model.Model model) : base(model)
         {
             RedoCommand = new RedoCommand(this);
             UndoCommand = new UndoCommand(this);
@@ -91,26 +135,75 @@ namespace Chem4Word.ViewModel
 
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
-
         }
 
-        #endregion constructors
+        #endregion Constructors
+
         private void SelectedItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //switch (e.Action)
-            //{
-            //    case NotifyCollectionChangedAction.Add:
-            //    case NotifyCollectionChangedAction.Move:
-            //    case NotifyCollectionChangedAction.Remove:
-            //    case NotifyCollectionChangedAction.Replace:
-            //        break;
-            //}
-            OnPropertyChanged(nameof(SelectedAtomOption));
+            var newObjects = e.NewItems;
+            var oldObject = e.OldItems;
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    AddSelectionAdorners(newObjects);
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Remove:
+                    RemoveSelectionAdorners(oldObject);
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    RemoveAllAdorners();
+                    break;
+            }
+
+            OnPropertyChanged(nameof(SelectedElement));
             OnPropertyChanged(nameof(SelectedBondOption));
         }
 
-    
+        public void RemoveAllAdorners()
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            var adornerList = _selectionAdorners.Keys.ToList();
+            foreach (object oldObject in adornerList)
+            {
+                layer.Remove(_selectionAdorners[oldObject]);
+                _selectionAdorners.Remove(oldObject);
+            }
+        }
 
+        private void RemoveSelectionAdorners(IList oldObjects)
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            foreach (object oldObject in oldObjects)
+            {
+                if (_selectionAdorners.ContainsKey(oldObject))
+                {
+                    layer.Remove(_selectionAdorners[oldObject]);
+                    _selectionAdorners.Remove(oldObject);
+                }
+            }
+        }
 
+        private void AddSelectionAdorners(IList newObjects)
+        {
+            foreach (object newObject in newObjects)
+            {
+                if (newObject is Atom)
+                {
+                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, (newObject as Atom));
+                    _selectionAdorners[newObject] = atomAdorner;
+                }
+
+                if (newObject is Bond)
+                {
+                }
+            }
+        }
     }
 }

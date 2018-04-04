@@ -42,6 +42,9 @@
             this.Serialize = new System.Windows.Forms.Button();
             this.Examine = new System.Windows.Forms.Button();
             this.Hex = new System.Windows.Forms.Button();
+            this.Timing = new System.Windows.Forms.Button();
+            this.Undo = new System.Windows.Forms.Button();
+            this.Redo = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -175,11 +178,49 @@
             this.Hex.UseVisualStyleBackColor = true;
             this.Hex.Click += new System.EventHandler(this.Hex_Click);
             // 
+            // Timing
+            // 
+            this.Timing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Timing.Location = new System.Drawing.Point(195, 517);
+            this.Timing.Name = "Timing";
+            this.Timing.Size = new System.Drawing.Size(55, 23);
+            this.Timing.TabIndex = 10;
+            this.Timing.Text = "Timing";
+            this.Timing.UseVisualStyleBackColor = true;
+            this.Timing.Click += new System.EventHandler(this.Timing_Click);
+            // 
+            // Undo
+            // 
+            this.Undo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Undo.Enabled = false;
+            this.Undo.Location = new System.Drawing.Point(302, 517);
+            this.Undo.Name = "Undo";
+            this.Undo.Size = new System.Drawing.Size(55, 23);
+            this.Undo.TabIndex = 11;
+            this.Undo.Text = "Undo";
+            this.Undo.UseVisualStyleBackColor = true;
+            this.Undo.Click += new System.EventHandler(this.Undo_Click);
+            // 
+            // Redo
+            // 
+            this.Redo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Redo.Enabled = false;
+            this.Redo.Location = new System.Drawing.Point(363, 517);
+            this.Redo.Name = "Redo";
+            this.Redo.Size = new System.Drawing.Size(55, 23);
+            this.Redo.TabIndex = 12;
+            this.Redo.Text = "Redo";
+            this.Redo.UseVisualStyleBackColor = true;
+            this.Redo.Click += new System.EventHandler(this.Redo_Click);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 544);
+            this.Controls.Add(this.Redo);
+            this.Controls.Add(this.Undo);
+            this.Controls.Add(this.Timing);
             this.Controls.Add(this.Hex);
             this.Controls.Add(this.Examine);
             this.Controls.Add(this.Serialize);
@@ -215,6 +256,9 @@
         private System.Windows.Forms.Button Serialize;
         private System.Windows.Forms.Button Examine;
         private System.Windows.Forms.Button Hex;
+        private System.Windows.Forms.Button Timing;
+        private System.Windows.Forms.Button Undo;
+        private System.Windows.Forms.Button Redo;
     }
 }
 

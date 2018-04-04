@@ -12,10 +12,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
-
-
 
 namespace Chem4Word.Model
 {
@@ -207,10 +207,11 @@ namespace Chem4Word.Model
                 operation: atom =>
                     {
                         Atoms.Add(atom);
-
+                        atom.Parent = this;
                         foreach (Bond b in atom.Bonds.Where(b => b.Parent == null))
                         {
                             Bonds.Add(b);
+                            b.Parent = this;
                         }
                         if (checklist.Contains(atom))
                         {
@@ -351,6 +352,32 @@ namespace Chem4Word.Model
         }
 
         /// <summary>
+        /// Traverses a molecular graph applying an operation to each and every atom.
+        /// Does not require that the atoms be already part of a Molecule.
+        /// </summary>
+        /// <param name="startAtom">start atom</param>
+        /// <param name="operation">delegate pointing to operation to perform</param>
+        /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
+        private void BreadthFirstTraversal(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed)
+        {
+            operation(startAtom);
+
+            Queue<Atom> toDo = new Queue<Atom>();
+
+            toDo.Enqueue(startAtom);
+
+            while (toDo.Count > 0)
+            {
+                var nextAtom = toDo.Dequeue();
+                operation(nextAtom);
+                foreach (Atom neighbour in nextAtom.UnprocessedNeighbours(isntProcessed))
+                {
+                    toDo.Enqueue(neighbour);
+                }
+            }
+        }
+
+        /// <summary>
         /// Cleaves off a degree 1 atom from the working set.
         /// Reduces the adjacent atoms' degree by one
         /// </summary>
@@ -428,8 +455,8 @@ namespace Chem4Word.Model
         public void RebuildRings()
         {
 #if DEBUG
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 #endif
             if (HasRings)
             {
@@ -471,9 +498,9 @@ namespace Chem4Word.Model
                 }
             }
 #if DEBUG
-            Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
-            sw.Stop();
-            Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+            //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
+            //sw.Stop();
+            //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
         }
 
@@ -864,7 +891,7 @@ namespace Chem4Word.Model
 
         /*makes extensive use of the Andrew montone algorithm for determining the convex
        hulls of molecules with or without side chains.
-       Assumes all rings have been calculated  first*/
+       Assumes all rings have been calculated first*/
 
         public IEnumerable<Atom> AtomsSortedForHull()
         {
@@ -876,7 +903,7 @@ namespace Chem4Word.Model
             return atomList;
         }
 
-        #region helpers
+        #region Helpers
 
         public double MeanBondLength
         {
@@ -937,9 +964,9 @@ namespace Chem4Word.Model
             _boundingBox = Rect.Empty;
         }
 
-        #endregion helpers
+        #endregion Helpers
 
-        protected override void ResetCollections() 
+        protected override void ResetCollections()
         {
             base.ResetCollections();
             Atoms = new ObservableCollection<Atom>();
@@ -962,11 +989,98 @@ namespace Chem4Word.Model
         {
         }
 
+        public Molecule Clone()
+        {
+            Molecule clone = new Molecule();
+            Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
+
+            foreach (var atom in Atoms)
+            {
+                Atom a = new Atom();
+
+                // Add properties which would have been serialized to CML
+                a.Id = atom.Id;
+
+                a.Position = atom.Position;
+                a.Element = atom.Element;
+
+                a.IsotopeNumber = atom.IsotopeNumber;
+                a.FormalCharge = atom.FormalCharge;
+
+                // Save for joining up bonds
+                clonedAtoms[atom.Id] = a;
+
+                // Add to clone
+                clone.Atoms.Add(a);
+            }
+
+            foreach (Bond bond in Bonds)
+            {
+                Bond b = new Bond();
+
+                // Add properties which would have been serialized to CML
+                b.Id = bond.Id;
+                b.StartAtom = clonedAtoms[bond.StartAtom.Id];
+                b.EndAtom = clonedAtoms[bond.EndAtom.Id];
+
+                b.Order = bond.Order;
+                b.Stereo = bond.Stereo;
+                b.ExplicitPlacement = bond.ExplicitPlacement;
+
+                // Add to clone
+                clone.Bonds.Add(b);
+            }
+
+            foreach (ChemicalName cn in ChemicalNames)
+            {
+                ChemicalName n = new ChemicalName();
+
+                // Add properties which would have been serialized to CML
+                n.Id = cn.Id;
+                n.DictRef = cn.DictRef;
+                n.Name = cn.Name;
+
+                // Add to clone
+                clone.ChemicalNames.Add(n);
+            }
+
+            foreach (Formula f in Formulas)
+            {
+                Formula ff = new Formula();
+
+                // Add properties which would have been serialized to CML
+                ff.Id = f.Id;
+                ff.Convention = f.Convention;
+                ff.Inline = f.Inline;
+
+                // Add to clone
+                clone.Formulas.Add(f);
+            }
+
+            foreach (var molecule in Molecules)
+            {
+                clone.Molecules.Add(molecule.Clone());
+            }
+
+            return clone;
+        }
+
+        public Molecule Clone2()
+        {
+            BinaryFormatter deserializer = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            deserializer.Serialize(ms, this);
+            ms.Seek(0, 0);
+            var clone = (Molecule)deserializer.Deserialize(ms);
+            //clone.RefreshMolecules();
+            return clone;
+        }
+
         /// <summary>
         /// Does a deep clone of the molecule
         /// </summary>
         /// <returns></returns>
-        public Molecule Clone()
+        public Molecule Clone1()
         {
             Molecule myClone = (Molecule)this.MemberwiseClone();
             myClone.ResetCollections();
@@ -1004,6 +1118,12 @@ namespace Chem4Word.Model
             }
 
             myClone.RebuildRings();
+
+            Debug.Assert(myClone.Atoms.Count == this.Atoms.Count);
+            Debug.Assert(myClone.Bonds.Count == this.Bonds.Count);
+            Debug.Assert(myClone.Rings.Count == this.Rings.Count);
+            Debug.Assert(myClone.ChemicalNames.Count == this.ChemicalNames.Count);
+            Debug.Assert(myClone.Formulas.Count == this.Formulas.Count);
             return myClone;
         }
     }

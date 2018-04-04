@@ -9,7 +9,9 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Interactivity;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model.Converters;
 using Chem4Word.ViewModel;
@@ -126,24 +128,34 @@ namespace Chem4Word.ACME
 
         private void RingDropdown_OnClick(object sender, RoutedEventArgs e)
         {
+            RingPopup.IsOpen = true;
+            RingPopup.Closed += (senderClosed, eClosed) =>
+            {
+                
+
+            };
         }
 
         private void RingSelButton_OnClick(object sender, RoutedEventArgs e)
         {
+            Button selButton = sender as Button;
+            RingButtonPath.Style = (selButton.Content as Path).Style;
+            RingPopup.IsOpen = false;
         }
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
-            // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
 
             tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
-            var vm = new ViewModel.EditViewModel(tempModel);
+            var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;
             this.DataContext = vm;
+
             ScrollIntoView();
-            //BindControls(vm);
+            BindControls(vm);
+            SelectionButton_OnChecked(SelectionButton, new RoutedEventArgs());
         }
 
         public static T FindChild<T>(DependencyObject parent)
@@ -218,6 +230,9 @@ namespace Chem4Word.ACME
             bondBinding.Source = vm;
 
             BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
+
+            vm.DrawingSurface = LocateCanvas();
+
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -231,10 +246,23 @@ namespace Chem4Word.ACME
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
+
+            // ToDo: Get modified Model as Cml
             args.OutputValue = _cml;
             args.Button = "SAVE";
 
             OnOkButtonClick?.Invoke(this, args);
+        }
+
+
+        private void SelectionButton_OnChecked(object sender, RoutedEventArgs e)
+        {
+            var behavior = (Behavior)((sender as RadioButton).Tag);
+            if (behavior != null)
+            {
+
+                _activeViewModel.ActiveMode = behavior;
+            }
         }
     }
 }
