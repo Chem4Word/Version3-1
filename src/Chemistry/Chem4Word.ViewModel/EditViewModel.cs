@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Chem4Word.ViewModel.Commands;
 using System.Collections.ObjectModel;
@@ -14,6 +15,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Interactivity;
 using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel 
@@ -67,6 +69,29 @@ namespace Chem4Word.ViewModel
         public Canvas DrawingSurface { get; set; }
         #endregion Properties
 
+
+
+
+        private Behavior _activeMode;
+
+        public Behavior ActiveMode
+        {
+            get { return _activeMode; }
+            set
+            {
+                if (_activeMode != null)
+                {
+                    _activeMode.Detach();
+                }
+                _activeMode = value;
+                _activeMode.Attach(DrawingSurface);
+            }
+        }
+
+
+
+
+
         #region Commands
 
         public DeleteCommand DeleteCommand { get; }
@@ -101,20 +126,32 @@ namespace Chem4Word.ViewModel
         #endregion constructors
         private void SelectedItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            //switch (e.Action)
-            //{
-            //    case NotifyCollectionChangedAction.Add:
-            //    case NotifyCollectionChangedAction.Move:
-            //    case NotifyCollectionChangedAction.Remove:
-            //    case NotifyCollectionChangedAction.Replace:
-            //        break;
-            //}
+            var newObjects = e.NewItems;
+            var oldObject = e.OldItems;
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    AddSelectionAdorners(newObjects);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                case NotifyCollectionChangedAction.Remove:
+                    RemoveSelectionAdorners(oldObject);
+                    break;
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+            }
             OnPropertyChanged(nameof(SelectedAtomOption));
             OnPropertyChanged(nameof(SelectedBondOption));
         }
 
-    
+        private void RemoveSelectionAdorners(IList oldObject)
+        {
+            throw new NotImplementedException();
+        }
 
-
+        private void AddSelectionAdorners(IList newObjects)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

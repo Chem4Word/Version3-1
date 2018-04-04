@@ -16,10 +16,9 @@ using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class SelectorBehaviour: Behavior<FrameworkElement>
+    public class DrawBehaviour: Behavior<FrameworkElement>
     {
-        private Point elementStartPosition;
-        private Point mouseStartPosition;
+
         private TranslateTransform transform = new TranslateTransform();
 
         protected override void OnAttached()
@@ -41,10 +40,7 @@ namespace Chem4Word.ACME.Behaviors
 
         protected override void OnDetaching()
         {
-            if (AssociatedObject != null)
-            {
-                AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
-            }
+            AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
         }
     }
 }
