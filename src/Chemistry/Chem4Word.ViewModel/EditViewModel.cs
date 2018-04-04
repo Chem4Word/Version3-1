@@ -45,19 +45,30 @@ namespace Chem4Word.ViewModel
             set { _selectedBondOption = value; }
         }
 
-        private AtomOption _selectedAtomOption;
-        public AtomOption SelectedAtomOption
+        private ElementBase _selectedElement;
+        public ElementBase SelectedElement
         {
-            get { return _selectedAtomOption; }
+            get
+            {
+                var selElements = SelectedElementType;
+                if (selElements.Count == 1)
+                {
+                    return selElements[0];
+                }
+                return null;
+            }
 
-            set { _selectedAtomOption = value; } 
+            set { _selectedElement = value; } 
         }
         /// <summary>
         /// returns a distinct list of selected elements
         /// </summary>
         public List<ElementBase> SelectedElementType
         {
-            get { return SelectedItems.OfType<ElementBase>().Distinct().ToList(); }
+            get
+            {
+                return SelectedItems.OfType<ElementBase>().Distinct().ToList();
+            }
         }
 
 
@@ -140,7 +151,7 @@ namespace Chem4Word.ViewModel
                 case NotifyCollectionChangedAction.Replace:
                     break;
             }
-            OnPropertyChanged(nameof(SelectedAtomOption));
+            OnPropertyChanged(nameof(SelectedElement));
             OnPropertyChanged(nameof(SelectedBondOption));
         }
 

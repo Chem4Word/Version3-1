@@ -46,7 +46,7 @@ namespace Chem4Word.ACME.Behaviors
                     var atom = (AtomShape) hitTestResult.VisualHit;
                     MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
-                    ViewModel.SelectedItems.Add(atom);
+                    ViewModel.SelectedItems.Add(atom.ParentAtom);
                    
                 }
 
@@ -55,7 +55,7 @@ namespace Chem4Word.ACME.Behaviors
                     var bond = (BondShape)hitTestResult.VisualHit;
                     MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
-                    ViewModel.SelectedItems.Add(bond);
+                    ViewModel.SelectedItems.Add(bond.ParentBond);
 
                 }
             }

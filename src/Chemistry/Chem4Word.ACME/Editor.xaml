@@ -31,6 +31,7 @@
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
+            <acme:DoNothingConverter x:Key="DoNothingConverter" />
             <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed" />
         </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
@@ -85,7 +86,11 @@
                     ToolTip="Current Atom Type"
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedIndex="0"
-                    SelectedItem="{Binding ElementName=DrawingArea, Path=DataContext.SelectedAtomOption}"
+                    SelectedItem="{Binding ElementName=DrawingArea, 
+                        Path=DataContext.SelectedElement,
+                        Converter={StaticResource DoNothingConverter}, 
+                        Mode=TwoWay}"
+                    SelectedValuePath="Element"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}">
                 </ComboBox>
                 <ComboBox
@@ -327,7 +332,7 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
-                    <!--<local:DoNothingConverter x:Key="DoNothingConverter" />-->
+
                     <LinearGradientBrush x:Key="HatchBrush"  MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
                         <GradientStop Offset="0.00" Color="Black" />
                         <GradientStop Offset="0.25" Color="Black" />
