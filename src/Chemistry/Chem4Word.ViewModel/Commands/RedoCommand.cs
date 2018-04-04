@@ -12,6 +12,7 @@ namespace Chem4Word.ViewModel.Commands
     public class RedoCommand : BaseCommand
     {
         private ViewModel.EditViewModel _currentVM;
+
         public RedoCommand(EditViewModel vm) : base(vm)
         {
             _currentVM = vm;
@@ -33,6 +34,7 @@ namespace Chem4Word.ViewModel.Commands
 
             CanExecuteChanged.Invoke(this, args);
         }
+
         public override event EventHandler CanExecuteChanged;
     }
 }

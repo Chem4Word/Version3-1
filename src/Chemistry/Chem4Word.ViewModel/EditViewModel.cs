@@ -5,24 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
+using Chem4Word.Model;
+using Chem4Word.ViewModel.Adorners;
+using Chem4Word.ViewModel.Commands;
 using System.Collections;
 using System.Collections.Generic;
-using Chem4Word.ViewModel.Commands;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
-using Chem4Word.Model;
-using Chem4Word.ViewModel.Adorners;
 
-namespace Chem4Word.ViewModel 
+namespace Chem4Word.ViewModel
 {
-    public class EditViewModel :DisplayViewModel
+    public class EditViewModel : DisplayViewModel
     {
         public enum SelectionTypeCode
         {
@@ -33,16 +30,19 @@ namespace Chem4Word.ViewModel
         }
 
         #region Fields
-        Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
-        #endregion
-        #region Properties
 
+        private Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
+
+        #endregion Fields
+
+        #region Properties
 
         public ObservableCollection<object> SelectedItems { get; }
 
         public UndoManager UndoManager { get; }
 
         private BondOption _selectedBondOption;
+
         public BondOption SelectedBondOption
         {
             get { return _selectedBondOption; }
@@ -50,6 +50,7 @@ namespace Chem4Word.ViewModel
         }
 
         private ElementBase _selectedElement;
+
         public ElementBase SelectedElement
         {
             get
@@ -69,8 +70,9 @@ namespace Chem4Word.ViewModel
                 {
                     selectedAtom.Element = value;
                 }
-            } 
+            }
         }
+
         /// <summary>
         /// returns a distinct list of selected elements
         /// </summary>
@@ -78,10 +80,9 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                return SelectedItems.OfType<Atom>().Select(a=>a.Element).Distinct().ToList();
+                return SelectedItems.OfType<Atom>().Select(a => a.Element).Distinct().ToList();
             }
         }
-
 
         public List<Bond> SelectedBondType
         {
@@ -89,10 +90,8 @@ namespace Chem4Word.ViewModel
         }
 
         public Canvas DrawingSurface { get; set; }
+
         #endregion Properties
-
-
-
 
         private Behavior _activeMode;
 
@@ -110,27 +109,21 @@ namespace Chem4Word.ViewModel
             }
         }
 
-
-
-
-
         #region Commands
 
         public DeleteCommand DeleteCommand { get; }
 
         public AddAtomCommand AddAtomCommand { get; }
 
-        public  UndoCommand UndoCommand { get; }
+        public UndoCommand UndoCommand { get; }
 
         public RedoCommand RedoCommand { get; }
 
-
-
         #endregion Commands
 
-        #region constructors
+        #region Constructors
 
-        public EditViewModel(Model.Model model):base(model)
+        public EditViewModel(Model.Model model) : base(model)
         {
             RedoCommand = new RedoCommand(this);
             UndoCommand = new UndoCommand(this);
@@ -142,10 +135,10 @@ namespace Chem4Word.ViewModel
 
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
-
         }
 
-        #endregion constructors
+        #endregion Constructors
+
         private void SelectedItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             var newObjects = e.NewItems;
@@ -155,12 +148,15 @@ namespace Chem4Word.ViewModel
                 case NotifyCollectionChangedAction.Add:
                     AddSelectionAdorners(newObjects);
                     break;
+
                 case NotifyCollectionChangedAction.Move:
                 case NotifyCollectionChangedAction.Remove:
                     RemoveSelectionAdorners(oldObject);
                     break;
+
                 case NotifyCollectionChangedAction.Replace:
                     break;
+
                 case NotifyCollectionChangedAction.Reset:
                     RemoveAllAdorners();
                     break;
@@ -176,9 +172,8 @@ namespace Chem4Word.ViewModel
             var adornerList = _selectionAdorners.Keys.ToList();
             foreach (object oldObject in adornerList)
             {
-               layer.Remove(_selectionAdorners[oldObject]);
+                layer.Remove(_selectionAdorners[oldObject]);
                 _selectionAdorners.Remove(oldObject);
-               
             }
         }
 
@@ -187,13 +182,12 @@ namespace Chem4Word.ViewModel
             var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
             foreach (object oldObject in oldObjects)
             {
-                  if (_selectionAdorners.ContainsKey(oldObject))
-                   {
-                        layer.Remove(_selectionAdorners[oldObject]);
-                       _selectionAdorners.Remove(oldObject);
-                   }
+                if (_selectionAdorners.ContainsKey(oldObject))
+                {
+                    layer.Remove(_selectionAdorners[oldObject]);
+                    _selectionAdorners.Remove(oldObject);
+                }
             }
-          
         }
 
         private void AddSelectionAdorners(IList newObjects)
@@ -208,7 +202,6 @@ namespace Chem4Word.ViewModel
 
                 if (newObject is Bond)
                 {
-
                 }
             }
         }

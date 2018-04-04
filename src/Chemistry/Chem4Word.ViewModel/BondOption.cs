@@ -5,10 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Windows;
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
+using System;
+using System.Windows;
 
 namespace Chem4Word.ViewModel
 {

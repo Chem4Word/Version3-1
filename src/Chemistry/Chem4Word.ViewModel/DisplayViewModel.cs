@@ -5,26 +5,20 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model;
+using Chem4Word.Model.Annotations;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
-using Chem4Word.Model;
-using Chem4Word.Model.Annotations;
-using Chem4Word.ViewModel.Commands;
 
 namespace Chem4Word.ViewModel
 {
     public class DisplayViewModel : INotifyPropertyChanged
     {
-
-
         #region Properties
 
         public CompositeCollection AllObjects { get; set; }
@@ -32,10 +26,9 @@ namespace Chem4Word.ViewModel
         public ObservableCollection<Atom> AllAtoms { get; set; }
 
         public ObservableCollection<Bond> AllBonds { get; set; }
-    
 
         public Model.Model Model { get; set; }
-        
+
         #region Layout
 
         //used to calculate the bounds of the atom
@@ -57,29 +50,24 @@ namespace Chem4Word.ViewModel
                 }
                 else
                 {
-                   return new Rect();
+                    return new Rect();
                 }
-                
             }
         }
+
         #endregion Layout
 
         #endregion Properties
 
-
-
-        #region constructors
+        #region Constructors
 
         public DisplayViewModel()
         {
-             FontSize = 23;
+            FontSize = 23;
         }
 
-
-        public DisplayViewModel(Model.Model model):this()
+        public DisplayViewModel(Model.Model model) : this()
         {
-            
-
             AllObjects = model.AllObjects;
 
             AllAtoms = model.AllAtoms;
@@ -92,6 +80,15 @@ namespace Chem4Word.ViewModel
             OnPropertyChanged(nameof(BoundingBox));
         }
 
+        ~DisplayViewModel()
+        {
+            UnbindAtomChanges();
+            AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
+            AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+        }
+
+        #endregion Constructors
+
         private void BindAtomChanges()
         {
             foreach (Atom allAtom in AllAtoms)
@@ -99,6 +96,7 @@ namespace Chem4Word.ViewModel
                 allAtom.PropertyChanged += AllAtom_PropertyChanged;
             }
         }
+
         private void UnbindAtomChanges()
         {
             foreach (Atom allAtom in AllAtoms)
@@ -106,6 +104,7 @@ namespace Chem4Word.ViewModel
                 allAtom.PropertyChanged -= AllAtom_PropertyChanged;
             }
         }
+
         private void AllAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Atom.SymbolText))
@@ -114,17 +113,6 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        ~DisplayViewModel()
-        {
-            UnbindAtomChanges();
-            AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
-            AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
-        }
-
-    
-
-        #endregion
-
         private void AllBonds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged(nameof(BoundingBox));
@@ -132,9 +120,8 @@ namespace Chem4Word.ViewModel
 
         private void AllAtoms_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-           OnPropertyChanged(nameof(BoundingBox));
+            OnPropertyChanged(nameof(BoundingBox));
         }
-
 
         [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;

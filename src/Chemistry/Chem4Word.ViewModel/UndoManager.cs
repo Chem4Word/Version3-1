@@ -46,7 +46,6 @@ namespace Chem4Word.ViewModel
             _redoStack.Push(_editViewModel.Model.Clone());
             _editViewModel.UndoCommand.RaiseCanExecChanged();
             _editViewModel.RedoCommand.RaiseCanExecChanged();
-
         }
 
         public void Redo()
@@ -55,7 +54,6 @@ namespace Chem4Word.ViewModel
             _undoStack.Push(_editViewModel.Model.Clone());
             _editViewModel.UndoCommand.RaiseCanExecChanged();
             _editViewModel.RedoCommand.RaiseCanExecChanged();
-
         }
     }
 }
