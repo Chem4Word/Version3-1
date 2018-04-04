@@ -14,11 +14,11 @@ namespace Chem4Word.ViewModel.Adorners
     public class AtomSelectionAdorner : Adorner
     {
         private Atom _adornedAtom;
-        protected AtomSelectionAdorner(UIElement adornedElement) : base(adornedElement)
+        public  AtomSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
         }
 
-        protected AtomSelectionAdorner(UIElement adornedElement, Atom adornedAtom) : this(adornedElement)
+        public AtomSelectionAdorner(UIElement adornedElement, Atom adornedAtom) : this(adornedElement)
         {
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             _adornedAtom = adornedAtom;
@@ -33,9 +33,15 @@ namespace Chem4Word.ViewModel.Adorners
             SolidColorBrush renderBrush = new SolidColorBrush(Colors.Green);
             renderBrush.Opacity = 0.2;
             Pen renderPen = new Pen(new SolidColorBrush(Colors.Navy), 1.5);
-            double renderRadius = 5.0;
-
-            drawingContext.DrawEllipse(renderBrush,renderPen, _adornedAtom.Position, renderRadius, renderRadius);
+            double renderRadius = 8.0;
+            if (_adornedAtom.SymbolText == "")
+            {
+                drawingContext.DrawEllipse(renderBrush,renderPen, _adornedAtom.Position, renderRadius, renderRadius);
+            }
+            else
+            {
+                drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox());
+            }
         }
     }
 }

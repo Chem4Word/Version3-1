@@ -259,6 +259,7 @@ namespace Chem4Word.ACME
             var behavior = (Behavior)((sender as RadioButton).Tag);
             if (behavior != null)
             {
+
                 _activeViewModel.ActiveMode = behavior;
             }
         }

@@ -15,8 +15,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Interactivity;
 using Chem4Word.Model;
+using Chem4Word.ViewModel.Adorners;
 
 namespace Chem4Word.ViewModel 
 {
@@ -30,10 +32,12 @@ namespace Chem4Word.ViewModel
             Molecule = 4
         }
 
-        
+        #region Fields
+        Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
+        #endregion
         #region Properties
 
-  
+
         public ObservableCollection<object> SelectedItems { get; }
 
         public UndoManager UndoManager { get; }
@@ -67,7 +71,7 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                return SelectedItems.OfType<ElementBase>().Distinct().ToList();
+                return SelectedItems.OfType<Atom>().Select(a=>a.Element).Distinct().ToList();
             }
         }
 
@@ -150,19 +154,56 @@ namespace Chem4Word.ViewModel
                     break;
                 case NotifyCollectionChangedAction.Replace:
                     break;
+                case NotifyCollectionChangedAction.Reset:
+                    RemoveAllAdorners();
+                    break;
             }
+
             OnPropertyChanged(nameof(SelectedElement));
             OnPropertyChanged(nameof(SelectedBondOption));
         }
 
-        private void RemoveSelectionAdorners(IList oldObject)
+        public void RemoveAllAdorners()
         {
-            
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            var adornerList = _selectionAdorners.Keys.ToList();
+            foreach (object oldObject in adornerList)
+            {
+               layer.Remove(_selectionAdorners[oldObject]);
+                _selectionAdorners.Remove(oldObject);
+               
+            }
+        }
+
+        private void RemoveSelectionAdorners(IList oldObjects)
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            foreach (object oldObject in oldObjects)
+            {
+                  if (_selectionAdorners.ContainsKey(oldObject))
+                   {
+                        layer.Remove(_selectionAdorners[oldObject]);
+                       _selectionAdorners.Remove(oldObject);
+                   }
+            }
+          
         }
 
         private void AddSelectionAdorners(IList newObjects)
         {
-            
+            foreach (object newObject in newObjects)
+            {
+                if (newObject is Atom)
+                {
+                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, (newObject as Atom));
+                    _selectionAdorners[newObject] = atomAdorner;
+                }
+
+                if (newObject is Bond)
+                {
+
+                }
+            }
         }
     }
 }
