@@ -145,15 +145,14 @@ namespace Chem4Word.ACME
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
-            // ToDo: Load into initial model
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
 
             tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
-            var vm = new ViewModel.EditViewModel(tempModel);
+            var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;
             this.DataContext = vm;
-            
+
             ScrollIntoView();
             BindControls(vm);
             SelectionButton_OnChecked(SelectionButton, new RoutedEventArgs());
@@ -247,6 +246,8 @@ namespace Chem4Word.ACME
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
+
+            // ToDo: Get modified Model as Cml
             args.OutputValue = _cml;
             args.Button = "SAVE";
 
