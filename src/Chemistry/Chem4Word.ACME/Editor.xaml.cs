@@ -248,6 +248,10 @@ namespace Chem4Word.ACME
             WpfEventArgs args = new WpfEventArgs();
 
             // ToDo: Get modified Model as Cml
+            Model.Model m = _activeViewModel.Model;
+            var atoms = _activeViewModel.AllAtoms;
+            var bonds = _activeViewModel.AllBonds;
+
             args.OutputValue = _cml;
             args.Button = "SAVE";
 
