@@ -60,6 +60,8 @@ namespace Chem4Word.Model.Converters
 
         public static List<XElement> GetAtoms(XElement mol)
         {
+            // Task 336
+            // if input contains "atomArray" then use .Elements else use .Descendants
             var atom = from a in mol.Descendants("atom")
                        select a;
             var atom2 = from a2 in mol.Descendants(cml + "atom")
@@ -69,6 +71,8 @@ namespace Chem4Word.Model.Converters
 
         public static List<XElement> GetBonds(XElement mol)
         {
+            // Task 336
+            // if input contains "bondArray" then use .Elements else use .Descendants
             var bonds = from b in mol.Descendants("bond")
                         select b;
             var bonds2 = from b2 in mol.Descendants(cml + "bond")

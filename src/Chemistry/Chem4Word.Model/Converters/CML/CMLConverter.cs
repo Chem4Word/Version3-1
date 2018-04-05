@@ -287,11 +287,15 @@ namespace Chem4Word.Model.Converters
                 molElement.Add(GetXElement(chemicalName));
             }
 
+            // Task 336
+            // Add atomArray element, then add these to it
             foreach (Atom atom in mol.Atoms)
             {
                 molElement.Add(GetXElement(atom));
             }
 
+            // Task 336
+            // Add bondArray element, then add these to it
             foreach (Bond bond in mol.Bonds)
             {
                 molElement.Add(GetXElement(bond));
@@ -333,8 +337,7 @@ namespace Chem4Word.Model.Converters
                     newModel.Molecules.Add(CreateMolecule(meElement));
                 }
 
-                // Can't use RebuildMolecules() as it trashes the formulae and labels
-                //newModel.RebuildMolecules();
+                // Can't use newModel.RebuildMolecules() as it trashes the formulae and labels
                 newModel.RefreshMolecules();
                 foreach (Molecule molecule in newModel.Molecules)
                 {
