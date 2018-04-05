@@ -107,11 +107,12 @@
                 <!-- see https://dvoituron.com/2011/01/06/toolbar-dropdownbutton-in-wpf/
                 also https://materialdesignicons.com/ for icon paths -->
 
-           
+
                 <RadioButton GroupName="Actions" ToolTip="Select" 
-                             Style="{StaticResource ToolbarButtonStyle}" x:Name="SelectionButton" Checked="SelectionButton_OnChecked"
+                             Style="{StaticResource ToolbarButtonStyle}" 
+                             x:Name="SelectionButton" 
+                             Checked="SelectionButton_OnChecked"
                              IsChecked="True">
-                 
                     <Viewbox Stretch="Uniform" Height="25" Width="25">
                         <Path Width="12.3333" Height="20"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}"

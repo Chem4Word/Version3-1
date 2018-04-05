@@ -252,7 +252,10 @@ namespace Chem4Word.ACME
             var atoms = _activeViewModel.AllAtoms;
             var bonds = _activeViewModel.AllBonds;
 
-            args.OutputValue = _cml;
+            CMLConverter conv = new CMLConverter();
+            var cml = conv.Export(m);
+
+            args.OutputValue = cml;
             args.Button = "SAVE";
 
             OnOkButtonClick?.Invoke(this, args);

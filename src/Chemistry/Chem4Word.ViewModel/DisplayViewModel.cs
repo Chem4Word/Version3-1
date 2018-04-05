@@ -68,6 +68,7 @@ namespace Chem4Word.ViewModel
 
         public DisplayViewModel(Model.Model model) : this()
         {
+            Model = model;
             AllObjects = model.AllObjects;
 
             AllAtoms = model.AllAtoms;
