@@ -95,7 +95,8 @@
                     ToolTip="Current Bond Type"
                     ItemsSource="{StaticResource BondItems}"
                     SelectedIndex="0"
-                    SelectedValue="{Binding ElementName=DrawingArea, Path=DataContext.SelectedBondOption}">
+                    SelectedValue="{Binding SelectedBondOption, Mode=TwoWay, Converter={StaticResource DoNothingConverter}}"
+                    SelectedValuePath="BondOption">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />

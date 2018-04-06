@@ -45,8 +45,14 @@ namespace Chem4Word.ViewModel
 
         public BondOption SelectedBondOption
         {
-            get { return _selectedBondOption; }
-            set { _selectedBondOption = value; }
+            get
+            {
+                return _selectedBondOption;
+            }
+            set
+            {
+                _selectedBondOption = value;
+            }
         }
 
         private ElementBase _selectedElement;
