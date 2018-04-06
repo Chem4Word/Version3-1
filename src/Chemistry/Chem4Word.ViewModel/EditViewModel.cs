@@ -47,11 +47,23 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                return _selectedBondOption;
+                var bonds = SelectedBondType;
+                if (bonds.Count == 1)
+                {
+                    return SelectedBondType[0];
+                }
+                return null;
             }
             set
             {
                 _selectedBondOption = value;
+                foreach (Bond bond in SelectedItems.OfType<Bond>())
+                {
+                    // Task 65
+                    // ToDo: Implement conversion
+                    bond.Order = value.Order.Substring(0,1);
+                    //bond.Stereo = value.Stereo;
+                }
             }
         }
 
@@ -90,9 +102,9 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        public List<Bond> SelectedBondType
+        public List<BondOption> SelectedBondType
         {
-            get { return SelectedItems.OfType<Bond>().Distinct().ToList(); }
+            get { return SelectedItems.OfType<BondOption>().Distinct().ToList(); }
         }
 
         public Canvas DrawingSurface { get; set; }
@@ -208,6 +220,8 @@ namespace Chem4Word.ViewModel
 
                 if (newObject is Bond)
                 {
+                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
+                    _selectionAdorners[newObject] = bondAdorner;
                 }
             }
         }

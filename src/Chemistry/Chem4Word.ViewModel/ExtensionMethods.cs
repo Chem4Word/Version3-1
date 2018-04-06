@@ -14,6 +14,11 @@ namespace Chem4Word.ViewModel
 {
     public static class ExtensionMethods
     {
+        public static Rect BoundingBox(this Bond bond)
+        {
+            return new Rect(bond.StartAtom.Position, bond.EndAtom.Position);
+        }
+
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
