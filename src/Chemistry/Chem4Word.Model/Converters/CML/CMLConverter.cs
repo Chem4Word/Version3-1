@@ -105,24 +105,6 @@ namespace Chem4Word.Model.Converters
 
         public bool CanExport => true;
 
-        private static List<XElement> GetNames(XElement mol)
-        {
-            var names1 = from n1 in mol.Descendants("name")
-                         select n1;
-            var names2 = from n2 in mol.Descendants(CML.cml + "name")
-                         select n2;
-            return names1.Union(names2).ToList();
-        }
-
-        private static List<XElement> GetFormulas(XElement mol)
-        {
-            var formulae1 = from f1 in mol.Descendants("formula")
-                            select f1;
-            var formulae2 = from f2 in mol.Descendants(CML.cml + "formula")
-                            select f2;
-            return formulae1.Union(formulae2).ToList();
-        }
-
         public XElement GetXElement(string concise, string molId)
         {
             XElement result = new XElement(CML.cml + "formula");
@@ -288,17 +270,27 @@ namespace Chem4Word.Model.Converters
             }
 
             // Task 336
-            // Add atomArray element, then add these to it
-            foreach (Atom atom in mol.Atoms)
+            if (mol.Atoms.Count > 0)
             {
-                molElement.Add(GetXElement(atom));
+                // Add atomArray element, then add these to it
+                XElement aaElement = new XElement(CML.cml + "atomArray");
+                foreach (Atom atom in mol.Atoms)
+                {
+                    aaElement.Add(GetXElement(atom));
+                }
+                molElement.Add(aaElement);
             }
 
             // Task 336
-            // Add bondArray element, then add these to it
-            foreach (Bond bond in mol.Bonds)
+            if (mol.Bonds.Count > 0)
             {
-                molElement.Add(GetXElement(bond));
+                XElement baElement = new XElement(CML.cml + "bondArray");
+                // Add bondArray element, then add these to it
+                foreach (Bond bond in mol.Bonds)
+                {
+                    baElement.Add(GetXElement(bond));
+                }
+                molElement.Add(baElement);
             }
             return molElement;
         }
@@ -366,8 +358,8 @@ namespace Chem4Word.Model.Converters
 
             var atomElements = CML.GetAtoms(cmlElement);
             var bondElements = CML.GetBonds(cmlElement);
-            var nameElements = GetNames(cmlElement);
-            var formulaElements = GetFormulas(cmlElement);
+            var nameElements = CML.GetNames(cmlElement);
+            var formulaElements = CML.GetFormulas(cmlElement);
 
             Dictionary<string, Atom> newAtoms = new Dictionary<string, Atom>();
 
