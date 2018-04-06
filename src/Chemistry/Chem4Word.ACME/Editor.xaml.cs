@@ -31,7 +31,7 @@ namespace Chem4Word.ACME
 
         public event EventHandler OnOkButtonClick;
 
-        // ToDo: Remove this
+        // This is used to store the cml until the editor is Loaded
         private string _cml;
 
         /// <summary>
