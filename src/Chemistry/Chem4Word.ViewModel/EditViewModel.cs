@@ -46,6 +46,7 @@ namespace Chem4Word.ViewModel
 
         public BondOption SelectedBondOption
         {
+            // Task 65
             get
             {
                 var bonds = SelectedBondType;
@@ -60,7 +61,6 @@ namespace Chem4Word.ViewModel
                 _selectedBondOption = value;
                 foreach (Bond bond in SelectedItems.OfType<Bond>())
                 {
-                    // Task 65
                     bond.Order = value.Order;
                     if (value.Stereo != null)
                     {
@@ -109,7 +109,18 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                return SelectedItems.OfType<BondOption>().Distinct().ToList();
+                var bonds = SelectedItems.OfType<Bond>().Distinct().ToList();
+                List<BondOption> bondObjects = new List<BondOption>();
+                if (bonds.Any())
+                {
+                    foreach (var bond in bonds)
+                    {
+                        BondOption bo = new BondOption();
+                        bo.Order = bond.Order;
+                        bo.Stereo = bond.Stereo;
+                    }
+                }
+                return bondObjects;
             }
         }
 
