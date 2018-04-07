@@ -118,6 +118,7 @@ namespace Chem4Word.ViewModel
                         BondOption bo = new BondOption();
                         bo.Order = bond.Order;
                         bo.Stereo = bond.Stereo;
+                        bondObjects.Add(bo);
                     }
                 }
                 return bondObjects;
