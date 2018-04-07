@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using Chem4Word.Model;
 using System.Windows;
 using System.Windows.Documents;
@@ -34,8 +35,18 @@ namespace Chem4Word.ViewModel.Adorners
 
             SolidColorBrush renderBrush = new SolidColorBrush(Colors.Green);
             renderBrush.Opacity = 0.2;
-            Pen renderPen = new Pen(new SolidColorBrush(Colors.Navy), 1.5);
-            drawingContext.DrawRectangle(renderBrush, renderPen, _adornedBond.BoundingBox());
+            double renderRadius = 8.0;
+            Pen renderPen = new Pen(new SolidColorBrush(Colors.BlueViolet), 1.5);
+            // Ugly plus does not show for vertical or horizontal bonds
+            //drawingContext.DrawRectangle(renderBrush, renderPen, _adornedBond.BoundingBox());
+
+            // Better, but needs to be joined by lines at tangents
+            drawingContext.DrawEllipse(renderBrush, renderPen, _adornedBond.StartAtom.Position, renderRadius, renderRadius);
+            drawingContext.DrawEllipse(renderBrush, renderPen, _adornedBond.EndAtom.Position, renderRadius, renderRadius);
+
+            //Geometry c1 = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius, renderRadius);
+            //Geometry c2 = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius, renderRadius);
+            //drawingContext.DrawGeometry(renderBrush, renderPen, Geometry.Combine(c1, c2, GeometryCombineMode.Intersect, LayoutTransform));
         }
     }
 }

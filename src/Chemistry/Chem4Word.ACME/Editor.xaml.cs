@@ -151,6 +151,7 @@ namespace Chem4Word.ACME
             tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
             var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;
+            _activeViewModel.Model = tempModel;
             this.DataContext = vm;
 
             ScrollIntoView();
@@ -248,7 +249,8 @@ namespace Chem4Word.ACME
             WpfEventArgs args = new WpfEventArgs();
 
             // ToDo: Get modified Model as Cml
-            args.OutputValue = _cml;
+            CMLConverter cc = new CMLConverter();
+            args.OutputValue = cc.Export(_activeViewModel.Model);
             args.Button = "SAVE";
 
             OnOkButtonClick?.Invoke(this, args);

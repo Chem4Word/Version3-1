@@ -16,6 +16,7 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
+using Chem4Word.Model.Enums;
 
 namespace Chem4Word.ViewModel
 {
@@ -60,9 +61,11 @@ namespace Chem4Word.ViewModel
                 foreach (Bond bond in SelectedItems.OfType<Bond>())
                 {
                     // Task 65
-                    // ToDo: Implement conversion
-                    bond.Order = value.Order.Substring(0,1);
-                    //bond.Stereo = value.Stereo;
+                    bond.Order = value.Order;
+                    if (value.Stereo != null)
+                    {
+                        bond.Stereo = value.Stereo.Value;
+                    }
                 }
             }
         }
@@ -104,7 +107,10 @@ namespace Chem4Word.ViewModel
 
         public List<BondOption> SelectedBondType
         {
-            get { return SelectedItems.OfType<BondOption>().Distinct().ToList(); }
+            get
+            {
+                return SelectedItems.OfType<BondOption>().Distinct().ToList();
+            }
         }
 
         public Canvas DrawingSurface { get; set; }
