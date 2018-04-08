@@ -60,7 +60,7 @@
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\SelectorBehaviour.cs" />
-    <Compile Include="BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="CmlEditor.xaml.cs">
       <DependentUpon>CmlEditor.xaml</DependentUpon>
     </Compile>

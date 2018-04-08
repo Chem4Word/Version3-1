@@ -125,7 +125,6 @@ namespace Chem4Word.ViewModel
                         selectedBondTypes.Add(bo);
                     }
                 }
-                Debug.WriteLine($"{slelectedBonds.Count()} {selectedBondTypes.Count}");
                 return selectedBondTypes;
             }
         }
