@@ -12,10 +12,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
+using Chem4Word.Model.Enums;
 
 namespace Chem4Word.ViewModel
 {
@@ -45,8 +47,31 @@ namespace Chem4Word.ViewModel
 
         public BondOption SelectedBondOption
         {
-            get { return _selectedBondOption; }
-            set { _selectedBondOption = value; }
+            // Task 65
+            get
+            {
+                var bonds = SelectedBondType;
+                if (bonds.Count == 1)
+                {
+                    return SelectedBondType[0];
+                }
+                return null;
+            }
+            set
+            {
+                _selectedBondOption = value;
+                if (value != null)
+                {
+                    foreach (Bond bond in SelectedItems.OfType<Bond>())
+                    {
+                        bond.Order = value.Order;
+                        if (value.Stereo != null)
+                        {
+                            bond.Stereo = value.Stereo.Value;
+                        }
+                    }
+                }
+            }
         }
 
         private ElementBase _selectedElement;
@@ -84,9 +109,24 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        public List<Bond> SelectedBondType
+        public List<BondOption> SelectedBondType
         {
-            get { return SelectedItems.OfType<Bond>().Distinct().ToList(); }
+            get
+            {
+                var dictionary = new Dictionary<string, BondOption>();
+                var selectedBondTypes = new List<BondOption>();
+                var slelectedBonds = SelectedItems.OfType<Bond>();
+                foreach (var bond in slelectedBonds)
+                {
+                    BondOption bo = BondOption.FromBond(bond);
+                    if (!dictionary.ContainsKey(bo.ToString()))
+                    {
+                        dictionary.Add(bo.ToString(), bo);
+                        selectedBondTypes.Add(bo);
+                    }
+                }
+                return selectedBondTypes;
+            }
         }
 
         public Canvas DrawingSurface { get; set; }
@@ -202,6 +242,8 @@ namespace Chem4Word.ViewModel
 
                 if (newObject is Bond)
                 {
+                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
+                    _selectionAdorners[newObject] = bondAdorner;
                 }
             }
         }

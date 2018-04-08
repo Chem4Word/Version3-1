@@ -19,7 +19,6 @@
     xmlns:release="condition:!DEBUG"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     x:Name="AcmeControl" Loaded="ACMEControl_Loaded" Height="774" Width="1013">
-
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -94,8 +93,8 @@
 					Width="48" Height="25"
                     ToolTip="Current Bond Type"
                     ItemsSource="{StaticResource BondItems}"
-                    SelectedIndex="0"
-                    SelectedValue="{Binding ElementName=DrawingArea, Path=DataContext.SelectedBondOption}">
+                    SelectedValue="{Binding SelectedBondOption, Mode=TwoWay, Converter={StaticResource DoNothingConverter}}"
+                    SelectedValuePath="BondOption">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />
@@ -107,10 +106,9 @@
                 <!-- see https://dvoituron.com/2011/01/06/toolbar-dropdownbutton-in-wpf/
                 also https://materialdesignicons.com/ for icon paths -->
 
-
-                <RadioButton GroupName="Actions" ToolTip="Select" 
-                             Style="{StaticResource ToolbarButtonStyle}" 
-                             x:Name="SelectionButton" 
+                <RadioButton GroupName="Actions" ToolTip="Select"
+                             Style="{StaticResource ToolbarButtonStyle}"
+                             x:Name="SelectionButton"
                              Checked="SelectionButton_OnChecked"
                              IsChecked="True">
                     <Viewbox Stretch="Uniform" Height="25" Width="25">
@@ -119,7 +117,7 @@
                               Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z " />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:SelectorBehaviour ViewModel="{Binding}"/>
+                        <behaviors:SelectorBehaviour ViewModel="{Binding}" />
                     </RadioButton.Tag>
                 </RadioButton>
 
@@ -130,7 +128,7 @@
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DrawBehaviour ViewModel="{Binding}"/>
+                        <behaviors:DrawBehaviour ViewModel="{Binding}" />
                     </RadioButton.Tag>
                 </RadioButton>
 
@@ -325,8 +323,8 @@
                         Name="ChemCanvas"
                         Width="{Binding ElementName=ChemicalObjects, Path=Width}"
                         Height="{Binding ElementName=ChemicalObjects, Path=Height}"
-                        Margin="8" 
-                        Background="White"/>
+                        Margin="8"
+                        Background="White" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>

@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using Chem4Word.Model.Annotations;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.ViewModel.Adorners
 {
-    public class LassoAdorner:Adorner
+    public class LassoAdorner : Adorner
     {
         private StreamGeometry _outline;
-           
+
         public LassoAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
@@ -33,7 +35,7 @@ namespace Chem4Word.ViewModel.Adorners
             Pen dashPen = new Pen(SystemColors.HighlightBrush, 1);
             dashPen.DashStyle = DashStyles.Dash;
 
-            drawingContext.DrawGeometry(brush,dashPen,_outline);
+            drawingContext.DrawGeometry(brush, dashPen, _outline);
         }
     }
 }
