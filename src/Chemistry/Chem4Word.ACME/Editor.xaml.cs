@@ -5,6 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.Helpers;
+using Chem4Word.Model.Converters;
+using Chem4Word.ViewModel;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,9 +15,6 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Core.Helpers;
-using Chem4Word.Model.Converters;
-using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME
 {
@@ -24,13 +24,14 @@ namespace Chem4Word.ACME
     public partial class Editor : UserControl
     {
         private EditViewModel _activeViewModel;
-        
+
         public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
 
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
         public event EventHandler OnOkButtonClick;
-        // ToDo: Remove this
+
+        // This is used to store the cml until the editor is Loaded
         private string _cml;
 
         /// <summary>
@@ -53,7 +54,6 @@ namespace Chem4Word.ACME
         // Using a DependencyProperty as the backing store for ShowSave.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowSaveProperty =
             DependencyProperty.Register("ShowSave", typeof(bool), typeof(Editor), new PropertyMetadata(false));
-
 
         private void EnsureApplicationResources()
         {
@@ -101,8 +101,6 @@ namespace Chem4Word.ACME
         {
         }
 
-
-
         public AtomOption SelectedAtomOption
         {
             get { return (AtomOption)GetValue(SelectedAtomOptionProperty); }
@@ -113,14 +111,11 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty SelectedAtomOptionProperty =
             DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
 
-
-
         public Visibility SliderVisibility
         {
-            get { return (Visibility) GetValue(SliderVisibilityProperty); }
+            get { return (Visibility)GetValue(SliderVisibilityProperty); }
             set { SetValue(SliderVisibilityProperty, value); }
         }
-
 
         private void EventSetter_OnHandler(object sender, RoutedEventArgs e)
         {
@@ -188,6 +183,7 @@ namespace Chem4Word.ACME
             }
             return foundChild;
         }
+
         /// <summary>
         /// Centers any chemistry on the drawing area
         /// </summary>
@@ -202,9 +198,6 @@ namespace Chem4Word.ACME
 
             DrawingArea.ScrollToHorizontalOffset(hOffset);
             DrawingArea.ScrollToVerticalOffset(vOffset);
-
-            //DrawingArea.ScrollToHorizontalOffset(boundingBox.Left);
-            //DrawingArea.ScrollToVerticalOffset(boundingBox.Top);
         }
 
         private Canvas LocateCanvas()
@@ -212,7 +205,6 @@ namespace Chem4Word.ACME
             Canvas res = FindChild<Canvas>(DrawingArea);
             return res;
         }
-
 
         /// <summary>
         /// Sets up data bindings btween the dropdowns
@@ -231,7 +223,6 @@ namespace Chem4Word.ACME
             BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
 
             vm.DrawingSurface = LocateCanvas();
-
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -246,13 +237,12 @@ namespace Chem4Word.ACME
         {
             WpfEventArgs args = new WpfEventArgs();
 
-            CMLConverter cc = new CMLConverter();
-            args.OutputValue = cc.Export(_activeViewModel.Model);
+            CMLConverter conv = new CMLConverter();
+            args.OutputValue = conv.Export(_activeViewModel.Model);
             args.Button = "SAVE";
 
             OnOkButtonClick?.Invoke(this, args);
         }
-
 
         private void SelectionButton_OnChecked(object sender, RoutedEventArgs e)
         {

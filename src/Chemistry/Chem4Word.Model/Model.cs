@@ -283,7 +283,7 @@ namespace Chem4Word.Model
         {
             foreach (Molecule molecule in Molecules.ToList())
             {
-                if (molecule.Atoms.Count == 0)
+                if (molecule.Molecules.Count == 0 && molecule.Atoms.Count == 0)
                 {
                     //it's empty, trash it
                     Molecules.Remove(molecule);
