@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -59,12 +60,15 @@ namespace Chem4Word.ViewModel
             set
             {
                 _selectedBondOption = value;
-                foreach (Bond bond in SelectedItems.OfType<Bond>())
+                if (value != null)
                 {
-                    bond.Order = value.Order;
-                    if (value.Stereo != null)
+                    foreach (Bond bond in SelectedItems.OfType<Bond>())
                     {
-                        bond.Stereo = value.Stereo.Value;
+                        bond.Order = value.Order;
+                        if (value.Stereo != null)
+                        {
+                            bond.Stereo = value.Stereo.Value;
+                        }
                     }
                 }
             }
@@ -109,8 +113,20 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                var x = SelectedItems.OfType<Bond>().Select(b => BondOption.FromBond(b)).ToList();
-                return SelectedItems.OfType<Bond>().Select(b => BondOption.FromBond(b)).ToList();
+                var dictionary = new Dictionary<string, BondOption>();
+                var selectedBondTypes = new List<BondOption>();
+                var slelectedBonds = SelectedItems.OfType<Bond>();
+                foreach (var bond in slelectedBonds)
+                {
+                    BondOption bo = BondOption.FromBond(bond);
+                    if (!dictionary.ContainsKey(bo.ToString()))
+                    {
+                        dictionary.Add(bo.ToString(), bo);
+                        selectedBondTypes.Add(bo);
+                    }
+                }
+                Debug.WriteLine($"{slelectedBonds.Count()} {selectedBondTypes.Count}");
+                return selectedBondTypes;
             }
         }
 

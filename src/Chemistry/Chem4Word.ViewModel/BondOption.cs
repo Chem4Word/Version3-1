@@ -48,6 +48,11 @@ namespace Chem4Word.ViewModel
         public static readonly DependencyProperty DisplayStyleProperty =
             DependencyProperty.Register("DisplayStyle", typeof(Style), typeof(BondOption), new PropertyMetadata(null));
 
+        public override string ToString()
+        {
+            return $"{Order} - {Stereo}";
+        }
+
         public static BondOption FromBond(Bond bond)
         {
             return new BondOption()
