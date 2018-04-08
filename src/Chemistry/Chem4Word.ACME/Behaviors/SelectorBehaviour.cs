@@ -6,20 +6,19 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.View;
+using Chem4Word.ViewModel.Adorners;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.View;
-using Chem4Word.ViewModel.Adorners;
 
 namespace Chem4Word.ACME.Behaviors
 {
     public class SelectorBehaviour : BaseEditBehavior
     {
-      
         private bool _lassoVisible;
         private PointCollection _mouseTrack;
         private Point _startpoint;
@@ -42,7 +41,6 @@ namespace Chem4Word.ACME.Behaviors
             {
                 _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             }
-
         }
 
         private void AssociatedObject_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -50,7 +48,7 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.ReleaseMouseCapture();
             _flag = false;
 
-            if (_lassoAdorner!=null)
+            if (_lassoAdorner != null)
             {
                 DisposeLasso();
             }
@@ -92,13 +90,10 @@ namespace Chem4Word.ACME.Behaviors
 
         private void RemoveAdorner(LassoAdorner lassoAdorner, Canvas canvas)
         {
-            var layer =AdornerLayer.GetAdornerLayer(AssociatedObject);
-            
+            var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
+
             layer.Remove(_lassoAdorner);
-
-            
         }
-
 
         private StreamGeometry GetPolyGeometry()
         {
@@ -119,14 +114,13 @@ namespace Chem4Word.ACME.Behaviors
                 return null;
             }
         }
+
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-
             if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
             {
                 ViewModel.SelectedItems.Clear();
             }
-
 
             _mouseTrack = new PointCollection();
             _startpoint = Mouse.GetPosition(AssociatedObject);
@@ -134,7 +128,6 @@ namespace Chem4Word.ACME.Behaviors
 
             Mouse.Capture(AssociatedObject);
             _mouseTrack.Add(_startpoint);
-
 
             if (e.ClickCount == 1) //single click
             {
@@ -149,15 +142,14 @@ namespace Chem4Word.ACME.Behaviors
 
             if (hitTestResult.VisualHit is AtomShape)
             {
-                var atom = (AtomShape) hitTestResult.VisualHit;
+                var atom = (AtomShape)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
                 ViewModel.SelectedItems.Add(atom.ParentAtom);
             }
-
             else if (hitTestResult.VisualHit is BondShape)
             {
-                var bond = (BondShape) hitTestResult.VisualHit;
+                var bond = (BondShape)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
                 ViewModel.SelectedItems.Add(bond.ParentBond);
@@ -186,8 +178,7 @@ namespace Chem4Word.ACME.Behaviors
                     case IntersectionDetail.Intersects:
                     case IntersectionDetail.FullyInside:
                         var selAtom = ((myShape as AtomShape)?.ParentAtom);
-                        var selBond =((myShape as BondShape)?.ParentBond);
-
+                        var selBond = ((myShape as BondShape)?.ParentBond);
 
                         if (!(ViewModel.SelectedItems.Contains(selAtom) || ViewModel.SelectedItems.Contains(selBond)))
                         {
@@ -201,10 +192,10 @@ namespace Chem4Word.ACME.Behaviors
                             }
                         }
                         return HitTestResultBehavior.Continue;
+
                     case IntersectionDetail.Empty:
                         selAtom = ((myShape as AtomShape)?.ParentAtom);
                         selBond = ((myShape as BondShape)?.ParentBond);
-
 
                         if ((ViewModel.SelectedItems.Contains(selAtom) || ViewModel.SelectedItems.Contains(selBond)))
                         {
@@ -218,7 +209,7 @@ namespace Chem4Word.ACME.Behaviors
                             }
                         }
                         return HitTestResultBehavior.Continue;
-                        
+
                     default:
                         return HitTestResultBehavior.Stop;
                 }
@@ -233,9 +224,8 @@ namespace Chem4Word.ACME.Behaviors
             {
                 AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
                 AssociatedObject.IsHitTestVisible = false;
-               
             }
-             _lassoAdorner = null;
+            _lassoAdorner = null;
         }
     }
 }

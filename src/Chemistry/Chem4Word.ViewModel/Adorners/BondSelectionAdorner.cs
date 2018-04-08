@@ -5,15 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
 using Chem4Word.Model;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Chem4Word.ViewModel.Adorners
 {
-    public class BondSelectionAdorner  : Adorner
+    public class BondSelectionAdorner : Adorner
     {
         private Bond _adornedBond;
 
@@ -33,10 +33,13 @@ namespace Chem4Word.ViewModel.Adorners
         {
             base.OnRender(drawingContext);
 
-            SolidColorBrush renderBrush = new SolidColorBrush(Colors.Green);
-            renderBrush.Opacity = 0.2;
             double renderRadius = 8.0;
-            Pen renderPen = new Pen(new SolidColorBrush(Colors.Navy), 1.5);
+
+            SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
+            renderBrush.Opacity = 0.25;
+
+            Pen renderPen = new Pen(SystemColors.HighlightBrush, 1);
+            renderPen.DashStyle = DashStyles.Dash;
 
             Matrix toLeft = new Matrix();
             toLeft.Rotate(-90);

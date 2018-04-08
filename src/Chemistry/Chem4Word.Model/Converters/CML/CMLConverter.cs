@@ -28,6 +28,7 @@ namespace Chem4Word.Model.Converters
         };
 
         #region Model->CML
+
         public bool Compressed { get; set; }
 
         public string Export(Chem4Word.Model.Model model)

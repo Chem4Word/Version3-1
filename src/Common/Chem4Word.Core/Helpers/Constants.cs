@@ -26,6 +26,7 @@ namespace Chem4Word.Core.Helpers
         // Task 336
         // CML constants
         public static string CmlNameSpaceCode = "cml";
+
         public static string CmlElementMolecule = "molecule";
 
         public const string ChemspiderIdName = "chemspider:Id";
@@ -39,6 +40,7 @@ namespace Chem4Word.Core.Helpers
 
         // Registry Locations
         public const string Chem4WordRegistryKey = @"SOFTWARE\Chem4Word V3";
+
         public const string RegistryValueNameLastCheck = "Last Update Check";
         public const string RegistryValueNameVersionsBehind = "Versions Behind";
         public const string Chem4WordSetupRegistryKey = @"SOFTWARE\Chem4Word V3\Setup";
