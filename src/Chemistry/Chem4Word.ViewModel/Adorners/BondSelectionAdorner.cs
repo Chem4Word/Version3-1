@@ -17,7 +17,7 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Bond _adornedBond;
 
-        // ToDo: Task 65
+        // Task 65
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
         }
@@ -36,17 +36,43 @@ namespace Chem4Word.ViewModel.Adorners
             SolidColorBrush renderBrush = new SolidColorBrush(Colors.Green);
             renderBrush.Opacity = 0.2;
             double renderRadius = 8.0;
-            Pen renderPen = new Pen(new SolidColorBrush(Colors.BlueViolet), 1.5);
-            // Ugly plus does not show for vertical or horizontal bonds
-            //drawingContext.DrawRectangle(renderBrush, renderPen, _adornedBond.BoundingBox());
+            Pen renderPen = new Pen(new SolidColorBrush(Colors.Navy), 1.5);
 
-            // Better, but needs to be joined by lines at tangents
-            drawingContext.DrawEllipse(renderBrush, renderPen, _adornedBond.StartAtom.Position, renderRadius, renderRadius);
-            drawingContext.DrawEllipse(renderBrush, renderPen, _adornedBond.EndAtom.Position, renderRadius, renderRadius);
+            Matrix toLeft = new Matrix();
+            toLeft.Rotate(-90);
+            Matrix toRight = new Matrix();
+            toRight.Rotate(90);
 
-            //Geometry c1 = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius, renderRadius);
-            //Geometry c2 = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius, renderRadius);
-            //drawingContext.DrawGeometry(renderBrush, renderPen, Geometry.Combine(c1, c2, GeometryCombineMode.Intersect, LayoutTransform));
+            Vector right = _adornedBond.BondVector * toRight;
+            right.Normalize();
+            Vector left = _adornedBond.BondVector * toLeft;
+            left.Normalize();
+
+            PathFigure pathFigure = new PathFigure();
+            pathFigure.StartPoint = _adornedBond.StartAtom.Position + right * renderRadius;
+            pathFigure.IsClosed = true;
+
+            LineSegment lineSegment1 = new LineSegment();
+            lineSegment1.Point = _adornedBond.StartAtom.Position + left * renderRadius;
+            pathFigure.Segments.Add(lineSegment1);
+
+            LineSegment lineSegment2 = new LineSegment();
+            lineSegment2.Point = _adornedBond.EndAtom.Position + left * renderRadius;
+            pathFigure.Segments.Add(lineSegment2);
+
+            LineSegment lineSegment3 = new LineSegment();
+            lineSegment3.Point = _adornedBond.EndAtom.Position + right * renderRadius;
+            pathFigure.Segments.Add(lineSegment3);
+            List<PathFigure> figures = new List<PathFigure>();
+            figures.Add(pathFigure);
+            Geometry pathGeometry = new PathGeometry(figures);
+
+            Geometry start = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius + 2, renderRadius + 2);
+            Geometry end = new EllipseGeometry(_adornedBond.EndAtom.Position, renderRadius + 2, renderRadius + 2);
+            Geometry final = Geometry.Combine(pathGeometry, start, GeometryCombineMode.Exclude, null);
+            final = Geometry.Combine(final, end, GeometryCombineMode.Exclude, null);
+
+            drawingContext.DrawGeometry(renderBrush, renderPen, final);
         }
     }
 }
