@@ -109,19 +109,8 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                var bonds = SelectedItems.OfType<Bond>().Distinct().ToList();
-                List<BondOption> bondObjects = new List<BondOption>();
-                if (bonds.Any())
-                {
-                    foreach (var bond in bonds)
-                    {
-                        BondOption bo = new BondOption();
-                        bo.Order = bond.Order;
-                        bo.Stereo = bond.Stereo;
-                        bondObjects.Add(bo);
-                    }
-                }
-                return bondObjects;
+                var x = SelectedItems.OfType<Bond>().Select(b => BondOption.FromBond(b)).ToList();
+                return SelectedItems.OfType<Bond>().Select(b => BondOption.FromBond(b)).ToList();
             }
         }
 

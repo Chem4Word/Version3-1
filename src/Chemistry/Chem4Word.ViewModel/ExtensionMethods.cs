@@ -34,7 +34,6 @@ namespace Chem4Word.ViewModel
                     new Size(symbolWidth, FontSize));
 
                 if (atom.ImplicitHydrogenCount > 0)
-
                 {
                     Vector shift = new Vector();
                     Rect hydrogenBox = baseAtomBox;

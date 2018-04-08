@@ -131,8 +131,6 @@ namespace Chem4Word.ACME
             RingPopup.IsOpen = true;
             RingPopup.Closed += (senderClosed, eClosed) =>
             {
-                
-
             };
         }
 
@@ -248,7 +246,6 @@ namespace Chem4Word.ACME
         {
             WpfEventArgs args = new WpfEventArgs();
 
-            // ToDo: Get modified Model as Cml
             CMLConverter cc = new CMLConverter();
             args.OutputValue = cc.Export(_activeViewModel.Model);
             args.Button = "SAVE";
@@ -262,7 +259,6 @@ namespace Chem4Word.ACME
             var behavior = (Behavior)((sender as RadioButton).Tag);
             if (behavior != null)
             {
-
                 _activeViewModel.ActiveMode = behavior;
             }
         }

@@ -47,5 +47,14 @@ namespace Chem4Word.ViewModel
         // Using a DependencyProperty as the backing store for DisplayStyle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DisplayStyleProperty =
             DependencyProperty.Register("DisplayStyle", typeof(Style), typeof(BondOption), new PropertyMetadata(null));
+
+        public static BondOption FromBond(Bond bond)
+        {
+            return new BondOption()
+                {
+                    Stereo = bond.Stereo,
+                    Order = bond.Order
+                };
+        }
     }
 }
