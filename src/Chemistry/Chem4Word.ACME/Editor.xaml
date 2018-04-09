@@ -93,8 +93,8 @@
 					Width="48" Height="25"
                     ToolTip="Current Bond Type"
                     ItemsSource="{StaticResource BondItems}"
-                    SelectedValue="{Binding SelectedBondOption, Mode=TwoWay, Converter={StaticResource DoNothingConverter}}"
-                    SelectedValuePath="BondOption">
+                    SelectedValue="{Binding SelectedBondOptionID, Mode=TwoWay, Converter={StaticResource DoNothingConverter}}"
+                    SelectedValuePath="ID">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />

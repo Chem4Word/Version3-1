@@ -116,11 +116,11 @@
 
     <!-- used to populate the bond dropdown combo -->
     <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
-        <viewModel:BondOption Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
-        <viewModel:BondOption Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
-        <viewModel:BondOption Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
-        <viewModel:BondOption Order="S" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}" />
-        <viewModel:BondOption Order="S" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}" />
+        <viewModel:BondOption ID="1" Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
+        <viewModel:BondOption ID="2" Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
+        <viewModel:BondOption ID="3" Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
+        <viewModel:BondOption ID="4" Order="S" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}" />
+        <viewModel:BondOption ID="5" Order="S" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}" />
     </x:Array>
 
     <x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">

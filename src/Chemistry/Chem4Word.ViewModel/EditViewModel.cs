@@ -34,7 +34,8 @@ namespace Chem4Word.ViewModel
         #region Fields
 
         private Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
-
+        private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
+        private int? _selectedBondOptionID;
         #endregion Fields
 
         #region Properties
@@ -43,36 +44,9 @@ namespace Chem4Word.ViewModel
 
         public UndoManager UndoManager { get; }
 
-        private BondOption _selectedBondOption;
 
-        public BondOption SelectedBondOption
-        {
-            // Task 65
-            get
-            {
-                var bonds = SelectedBondType;
-                if (bonds.Count == 1)
-                {
-                    return SelectedBondType[0];
-                }
-                return null;
-            }
-            set
-            {
-                _selectedBondOption = value;
-                if (value != null)
-                {
-                    foreach (Bond bond in SelectedItems.OfType<Bond>())
-                    {
-                        bond.Order = value.Order;
-                        if (value.Stereo != null)
-                        {
-                            bond.Stereo = value.Stereo.Value;
-                        }
-                    }
-                }
-            }
-        }
+
+      
 
         private ElementBase _selectedElement;
 
@@ -109,23 +83,60 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        public List<BondOption> SelectedBondType
+        public int? SelectedBondOptionID
+        {
+            get
+            {
+                var btList = (from bt in SelectedBondOptions
+                    select bt.ID).Distinct();
+                if (btList.Count() != 1)
+                {
+                    return null;
+                }
+                else
+                {
+                    return btList.ToList()[0];
+                }
+            }
+
+            set
+            {
+                _selectedBondOptionID= value;
+                foreach (Bond bond in SelectedItems.OfType<Bond>())
+                {
+
+                    bond.Order = _bondOptions[_selectedBondOptionID.Value].Order;
+                    bond.Stereo = _bondOptions[_selectedBondOptionID.Value].Stereo.Value;
+                }
+            }
+        }
+
+        public List<BondOption> SelectedBondOptions
         {
             get
             {
                 var dictionary = new Dictionary<string, BondOption>();
                 var selectedBondTypes = new List<BondOption>();
-                var slelectedBonds = SelectedItems.OfType<Bond>();
-                foreach (var bond in slelectedBonds)
-                {
-                    BondOption bo = BondOption.FromBond(bond);
-                    if (!dictionary.ContainsKey(bo.ToString()))
-                    {
-                        dictionary.Add(bo.ToString(), bo);
-                        selectedBondTypes.Add(bo);
-                    }
-                }
-                return selectedBondTypes;
+                var selectedBonds = SelectedItems.OfType<Bond>();
+                //foreach (var bond in selectedBonds)
+                //{
+                //    var options 
+                //    BondOption bo = 
+                //    if (!dictionary.ContainsKey(bo.ToString()))
+                //    {
+                //        dictionary.Add(bo.ToString(), bo);
+                //        selectedBondTypes.Add(bo);
+                //    }
+                //}
+
+                var selbonds = (from Bond selbond in selectedBonds
+                    select new BondOption {Order = selbond.Order, Stereo = selbond.Stereo}).Distinct();
+
+                var selOptions = from BondOption bo in _bondOptions.Values
+                                 join selbond1 in selbonds
+                        on new {bo.Order, bo.Stereo} equals new {selbond1.Order, selbond1.Stereo}
+                        select new BondOption {ID = bo.ID, Order = bo.Order, Stereo = bo.Stereo};
+                return selOptions.ToList();
             }
         }
 
@@ -134,6 +145,7 @@ namespace Chem4Word.ViewModel
         #endregion Properties
 
         private Behavior _activeMode;
+        
 
         public Behavior ActiveMode
         {
@@ -152,11 +164,8 @@ namespace Chem4Word.ViewModel
         #region Commands
 
         public DeleteCommand DeleteCommand { get; }
-
         public AddAtomCommand AddAtomCommand { get; }
-
         public UndoCommand UndoCommand { get; }
-
         public RedoCommand RedoCommand { get; }
 
         #endregion Commands
@@ -175,6 +184,21 @@ namespace Chem4Word.ViewModel
 
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
+
+            LoadBondOptions();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void LoadBondOptions()
+        {
+            //if you add more bond options then you *MUST* update ACMEResources.XAML to correspond
+            _bondOptions[1] = new BondOption {ID = 1, Order = "S", Stereo = BondStereo.None};
+            _bondOptions[2] = new BondOption { ID = 2, Order = "D", Stereo = BondStereo.None};
+            _bondOptions[3] = new BondOption { ID = 3, Order = "T", Stereo = BondStereo.None};
+            _bondOptions[4] = new BondOption { ID = 4, Order = "S", Stereo = BondStereo.Wedge};
+            _bondOptions[5] = new BondOption { ID = 5, Order = "S", Stereo = BondStereo.Hatch};
         }
 
         #endregion Constructors
@@ -203,7 +227,7 @@ namespace Chem4Word.ViewModel
             }
 
             OnPropertyChanged(nameof(SelectedElement));
-            OnPropertyChanged(nameof(SelectedBondOption));
+            OnPropertyChanged(nameof(SelectedBondOptionID));
         }
 
         public void RemoveAllAdorners()
