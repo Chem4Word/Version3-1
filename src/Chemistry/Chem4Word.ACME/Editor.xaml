@@ -30,8 +30,8 @@
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
-            <acme:DoNothingConverter x:Key="DoNothingConverter" />
-            <acme:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed" />
+            <converters:DoNothingConverter x:Key="DoNothingConverter" />
+            <converters:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed" />
         </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
             <ToolBarTray.Resources>
