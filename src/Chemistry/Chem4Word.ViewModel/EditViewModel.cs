@@ -129,16 +129,7 @@ namespace Chem4Word.ViewModel
                 var dictionary = new Dictionary<string, BondOption>();
                 var selectedBondTypes = new List<BondOption>();
                 var selectedBonds = SelectedItems.OfType<Bond>();
-                //foreach (var bond in selectedBonds)
-                //{
-                //    var options 
-                //    BondOption bo = 
-                //    if (!dictionary.ContainsKey(bo.ToString()))
-                //    {
-                //        dictionary.Add(bo.ToString(), bo);
-                //        selectedBondTypes.Add(bo);
-                //    }
-                //}
+               
 
                 var selbonds = (from Bond selbond in selectedBonds
                     select new BondOption {Order = selbond.Order, Stereo = selbond.Stereo}).Distinct();
