@@ -16,13 +16,23 @@ namespace Chem4Word.ACME
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
+            if (value != null)
+            {
+                Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
+                Debug.Write("");
+            }
 
             return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value != null)
+            {
+                Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
+                Debug.Write("");
+            }
+
             return value;
         }
     }
