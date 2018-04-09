@@ -48,7 +48,7 @@ namespace Chem4Word.ViewModel
 
       
 
-        private ElementBase _selectedElement;
+        private ElementBase _selectedElement ;
 
         public ElementBase SelectedElement
         {
@@ -59,6 +59,12 @@ namespace Chem4Word.ViewModel
                 {
                     return selElements[0];
                 }
+
+                if (selElements.Count == 0) //nothing selected so return null
+                {
+                    return _selectedElement;
+                }
+
                 return null;
             }
 
@@ -89,14 +95,19 @@ namespace Chem4Word.ViewModel
             {
                 var btList = (from bt in SelectedBondOptions
                     select bt.ID).Distinct();
-                if (btList.Count() != 1)
+
+                if (btList.Count() == 1)
                 {
-                    return null;
+                    return btList.ToList()[0]; 
+                    
                 }
-                else
+
+                if (btList.Count()==0)
                 {
-                    return btList.ToList()[0];
+                    return _selectedBondOptionID;
                 }
+
+                return null;
             }
 
             set
@@ -184,6 +195,11 @@ namespace Chem4Word.ViewModel
 
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
+
+            PeriodicTable pt = new PeriodicTable();
+            _selectedElement = pt.C;
+
+            _selectedBondOptionID = 1;
 
             LoadBondOptions();
         }
