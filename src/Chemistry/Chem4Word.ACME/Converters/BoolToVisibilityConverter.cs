@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Converters
 {
     [ValueConversion(typeof(bool), typeof(Visibility))]
     public sealed class BoolToVisibilityConverter : IValueConverter

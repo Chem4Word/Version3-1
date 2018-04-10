@@ -87,19 +87,7 @@ namespace Chem4Word.ACME
             }
         }
 
-        public BondOption SelectedBondOption
-        {
-            get { return (BondOption)GetValue(SelectedBondOptionProperty); }
-            set { SetValue(SelectedBondOptionProperty, value); }
-        }
 
-        // Using a DependencyProperty as the backing store for SelectedBondOption.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty SelectedBondOptionProperty =
-            DependencyProperty.Register("SelectedBondOption", typeof(BondOption), typeof(Editor), new FrameworkPropertyMetadata(new PropertyChangedCallback(BondOptionChanged)));
-
-        private static void BondOptionChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-        }
 
         public AtomOption SelectedAtomOption
         {

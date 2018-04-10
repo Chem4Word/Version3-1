@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Converters
 {
     public class DoNothingConverter : IValueConverter
     {
