@@ -28,13 +28,8 @@ namespace Chem4Word.ViewModel.Commands
             _currentVM.UndoManager.Redo();
         }
 
-        public void RaiseCanExecChanged()
-        {
-            var args = new EventArgs();
+       
 
-            CanExecuteChanged.Invoke(this, args);
-        }
-
-        public override event EventHandler CanExecuteChanged;
+        
     }
 }

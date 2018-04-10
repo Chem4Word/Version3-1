@@ -230,7 +230,7 @@
                         </Path>
                     </Viewbox>
                 </Button>
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton">
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton" Command="{Binding CopyCommand}">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="22">
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
@@ -362,7 +362,6 @@
                                     <Setter Property="StrokeEndLineCap" Value="Round" />
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
-
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="hbond">
                                             <Setter Property="StrokeDashArray" Value="1,1" />

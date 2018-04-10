@@ -20,7 +20,13 @@ namespace Chem4Word.ViewModel.Commands
 
         public abstract void Execute(object parameter);
 
-        public abstract event EventHandler CanExecuteChanged;
+        public virtual event EventHandler CanExecuteChanged;
+
+        public virtual void RaiseCanExecChanged()
+        {
+            if(CanExecuteChanged!=null)
+                CanExecuteChanged.Invoke(this, new EventArgs());
+        }
 
         #endregion ICommand Implementation
 
