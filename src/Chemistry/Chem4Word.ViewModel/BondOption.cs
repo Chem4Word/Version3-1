@@ -18,18 +18,15 @@ namespace Chem4Word.ViewModel
     /// </summary>
     public class BondOption : DependencyObject
     {
-
-
-        public int ID
+        public int Id
         {
-            get { return (int)GetValue(IDProperty); }
-            set { SetValue(IDProperty, value); }
+            get { return (int)GetValue(IdProperty); }
+            set { SetValue(IdProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ID.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty IDProperty =
-            DependencyProperty.Register("ID", typeof(int), typeof(BondOption), new PropertyMetadata(default(int)));
-
+        // Using a DependencyProperty as the backing store for Id.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IdProperty =
+            DependencyProperty.Register("Id", typeof(int), typeof(BondOption), new PropertyMetadata(default(int)));
 
         public String Order
         {
@@ -64,15 +61,6 @@ namespace Chem4Word.ViewModel
         public override string ToString()
         {
             return $"{Order} - {Stereo}";
-        }
-
-        public static BondOption FromBond(Bond bond)
-        {
-            return new BondOption()
-                {
-                    Stereo = bond.Stereo,
-                    Order = bond.Order
-                };
         }
     }
 }

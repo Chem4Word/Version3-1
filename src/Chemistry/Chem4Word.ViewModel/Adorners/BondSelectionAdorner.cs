@@ -17,7 +17,6 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Bond _adornedBond;
 
-        // Task 65
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
         }
