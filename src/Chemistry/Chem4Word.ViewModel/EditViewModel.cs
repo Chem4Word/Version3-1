@@ -193,8 +193,8 @@ namespace Chem4Word.ViewModel
         public AddAtomCommand AddAtomCommand { get; }
         public UndoCommand UndoCommand { get; }
         public RedoCommand RedoCommand { get; }
-
         public CopyCommand CopyCommand { get;  }
+        public CutCommand CutCommand { get; }
 
         #endregion Commands
 
@@ -213,6 +213,7 @@ namespace Chem4Word.ViewModel
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
             CopyCommand = new CopyCommand(this);
+            CutCommand = new CutCommand(this);
 
             PeriodicTable pt = new PeriodicTable();
             _selectedElement = pt.C;
@@ -265,6 +266,7 @@ namespace Chem4Word.ViewModel
             OnPropertyChanged(nameof(SelectionType));
 
             CopyCommand.RaiseCanExecChanged();
+            CutCommand.RaiseCanExecChanged();
             
         }
 
