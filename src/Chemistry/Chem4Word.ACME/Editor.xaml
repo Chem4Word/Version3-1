@@ -441,7 +441,6 @@
                                             <SolidColorBrush Color="{Binding Element.Colour}" />
                                         </Setter.Value>
                                     </Setter>
-
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Path=SymbolText}" Value="">
                                             <Setter Property="Fill">

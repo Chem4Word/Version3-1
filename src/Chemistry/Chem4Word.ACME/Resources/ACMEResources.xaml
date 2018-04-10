@@ -116,6 +116,7 @@
 
     <!-- used to populate the bond dropdown combo -->
     <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
+        <!-- modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs -->
         <viewModel:BondOption Id="1" Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
         <viewModel:BondOption Id="2" Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
         <viewModel:BondOption Id="3" Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
