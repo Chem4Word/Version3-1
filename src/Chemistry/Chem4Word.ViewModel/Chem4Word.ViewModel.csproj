@@ -61,6 +61,7 @@
     <Compile Include="Adorners\LassoAdorner.cs" />
     <Compile Include="Adorners\MoleculeSelectionAdorner.cs" />
     <Compile Include="AtomOption.cs" />
+    <Compile Include="BondGeometry.cs" />
     <Compile Include="BondOption.cs" />
     <Compile Include="Commands\AddAtomCommand.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="DisplayViewModel.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Graphics.cs" />
     <Compile Include="UndoManager.cs" />
     <Compile Include="EditViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

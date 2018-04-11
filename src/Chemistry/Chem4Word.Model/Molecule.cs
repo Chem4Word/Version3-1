@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Chem4Word.Model
 {
@@ -1125,6 +1126,11 @@ namespace Chem4Word.Model
             Debug.Assert(myClone.ChemicalNames.Count == this.ChemicalNames.Count);
             Debug.Assert(myClone.Formulas.Count == this.Formulas.Count);
             return myClone;
+        }
+
+        public void Move(Transform lastOperation)
+        {
+            
         }
     }
 }

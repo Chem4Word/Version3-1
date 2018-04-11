@@ -13,7 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-
+using Chem4Word.ViewModel;
 namespace Chem4Word.View
 {
     public class BondShape : Shape

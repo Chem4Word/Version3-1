@@ -19,6 +19,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
+            IsHitTestVisible = false;
         }
 
         public BondSelectionAdorner(UIElement adornedElement, Bond adornedBond) : this(adornedElement)

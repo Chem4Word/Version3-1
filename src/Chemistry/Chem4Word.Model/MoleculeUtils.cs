@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace Chem4Word.Model
 {
@@ -118,6 +119,16 @@ namespace Chem4Word.Model
                 SwapQueues();
 
                 _nextQueue.Clear();
+            }
+        }
+
+        public Point CentrePoint
+        {
+            get
+            {
+                Rect bb = BoundingBox;
+
+                return new Point((bb.BottomLeft.X + bb.BottomRight.X) / 2, (bb.BottomLeft.Y + bb.TopLeft.Y) / 2);
             }
         }
 

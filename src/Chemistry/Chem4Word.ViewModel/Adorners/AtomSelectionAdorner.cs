@@ -16,8 +16,16 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Atom _adornedAtom;
 
+       
+
         public AtomSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
+            IsHitTestVisible = false;
+        }
+
+        private void AtomSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            e.Handled = false;
         }
 
         public AtomSelectionAdorner(UIElement adornedElement, Atom adornedAtom) : this(adornedElement)

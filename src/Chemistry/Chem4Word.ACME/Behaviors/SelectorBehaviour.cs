@@ -25,7 +25,7 @@ namespace Chem4Word.ACME.Behaviors
         private Window _parent;
         private bool _flag;
         private LassoAdorner _lassoAdorner;
-
+        private MoleculeSelectionAdorner _molAdorner;
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -33,6 +33,7 @@ namespace Chem4Word.ACME.Behaviors
             _parent = Application.Current.MainWindow;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
 
@@ -40,6 +41,14 @@ namespace Chem4Word.ACME.Behaviors
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            }
+        }
+
+        private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount > 1)
+            {
+                //MessageBox.Show("Trapped the double click");
             }
         }
 
@@ -88,7 +97,7 @@ namespace Chem4Word.ACME.Behaviors
             VisualTreeHelper.HitTest(AssociatedObject, null, HitTestCallback, new GeometryHitTestParameters(outline));
         }
 
-        private void RemoveAdorner(LassoAdorner lassoAdorner, Canvas canvas)
+        private void RemoveAdorner(Adorner adorner, Canvas canvas)
         {
             var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
 
@@ -129,9 +138,42 @@ namespace Chem4Word.ACME.Behaviors
             Mouse.Capture(AssociatedObject);
             _mouseTrack.Add(_startpoint);
 
+            if (e.ClickCount == 2)
+            {
+                DoMolSelect(e);
+                e.Handled = true;
+            }
+
             if (e.ClickCount == 1) //single click
             {
                 DoSingleSelect(e);
+            }
+
+           
+        }
+
+        private void DoMolSelect(MouseButtonEventArgs e)
+        {
+            var hitTestResult = GetTarget(e);
+            Debug.Print(hitTestResult.ToString());
+
+            if (hitTestResult.VisualHit is AtomShape)
+            {
+                var atom = (AtomShape)hitTestResult.VisualHit;
+                //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
+
+                ViewModel.SelectedItems.Add(atom.ParentAtom.Parent);
+            }
+            else if (hitTestResult.VisualHit is BondShape)
+            {
+                var bond = (BondShape)hitTestResult.VisualHit;
+                //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
+
+                ViewModel.SelectedItems.Add(bond.ParentBond.Parent);
+            }
+            else
+            {
+                ViewModel.SelectedItems.Clear();
             }
         }
 

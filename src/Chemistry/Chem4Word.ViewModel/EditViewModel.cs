@@ -309,6 +309,12 @@ namespace Chem4Word.ViewModel
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
                     _selectionAdorners[newObject] = bondAdorner;
                 }
+
+                if (newObject is Molecule)
+                {
+                    MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
+                    _selectionAdorners[newObject] = molAdorner;
+                }
             }
         }
 
