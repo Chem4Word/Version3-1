@@ -116,11 +116,12 @@
 
     <!-- used to populate the bond dropdown combo -->
     <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
-        <viewModel:BondOption Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
-        <viewModel:BondOption Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
-        <viewModel:BondOption Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
-        <viewModel:BondOption Order="S" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}" />
-        <viewModel:BondOption Order="S" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}" />
+        <!-- modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs -->
+        <viewModel:BondOption Id="1" Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
+        <viewModel:BondOption Id="2" Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
+        <viewModel:BondOption Id="3" Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
+        <viewModel:BondOption Id="4" Order="S" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}" />
+        <viewModel:BondOption Id="5" Order="S" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}" />
     </x:Array>
 
     <x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
@@ -135,30 +136,12 @@
         <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</viewModel:AtomOption>
         <viewModel:AtomOption Element="R"  Foreground="Black">
             <TextBlock>
-        R<Run FontSize="8" BaselineAlignment="Subscript">1</Run>
+                R<Run FontSize="8" BaselineAlignment="Subscript">1</Run>
             </TextBlock>
         </viewModel:AtomOption>
-        <!--
-    <acme:AtomOption Element="R2" Foreground="Black">
-      <TextBlock>
-        R<Run FontSize="8" BaselineAlignment="Subscript">2</Run>
-      </TextBlock>
-    </acme:AtomOption>
-    <acme:AtomOption Element="R3" Foreground="Black">
-      <TextBlock>
-        R<Run FontSize="8" BaselineAlignment="Subscript">3</Run>
-      </TextBlock>
-    </acme:AtomOption>
-    <acme:AtomOption Element="R4" Foreground="Black">
-      <TextBlock>
-        R<Run FontSize="8" BaselineAlignment="Subscript">4</Run>
-      </TextBlock>
-    </acme:AtomOption>
-    <acme:AtomOption Element="X" Foreground="Black">
-      <TextBlock>X</TextBlock>
-    </acme:AtomOption>
-      -->
     </x:Array>
+    <!-- button paths -->
+
     <Geometry x:Key="SelectPath" xml:space="preserve">F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z </Geometry>
     <Geometry x:Key="DrawPath" xml:space="preserve">F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z </Geometry>
@@ -222,5 +205,33 @@
                               5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
                               25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z
                               M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
-                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z</Geometry>
+                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z
+    </Geometry>
+    <!-- thumb styles -->
+
+    <SolidColorBrush x:Key="GrabHandleFillBrush" Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.75" />
+
+    <SolidColorBrush x:Key="GrabHandleBorderBrush"  Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.8" />
+
+    <Style x:Key ="GrabHandleStyle" TargetType="Thumb">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}" />
+        <Setter Property="Opacity" Value="0.75" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Rectangle
+                        Fill="{StaticResource GrabHandleFillBrush}"
+                        Stroke="{StaticResource GrabHandleBorderBrush}"
+                    ></Rectangle>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MolAdornerStyle" TargetType="Thumb" BasedOn="{StaticResource GrabHandleStyle}">
+        <Setter Property="Opacity" Value="0.15" />
+    </Style>
 </ResourceDictionary>

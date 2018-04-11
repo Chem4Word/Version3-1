@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Converters
 {
     public class DoNothingConverter : IValueConverter
     {
@@ -18,8 +18,7 @@ namespace Chem4Word.ACME
         {
             if (value != null)
             {
-                Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
-                Debug.Write("");
+                //Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
             }
 
             return value;
@@ -29,8 +28,7 @@ namespace Chem4Word.ACME
         {
             if (value != null)
             {
-                Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
-                Debug.Write("");
+                //Debug.WriteLine("Value of {0} is {1}", parameter?.ToString(), value);
             }
 
             return value;
