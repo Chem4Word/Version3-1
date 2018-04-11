@@ -317,7 +317,7 @@ namespace Chem4Word.ViewModel
 
         public void CutSelection()
         {
-            MessageBox.Show("Copy code goes here");
+            MessageBox.Show("Cut code goes here");
         }
 
         public void CopySelection()
