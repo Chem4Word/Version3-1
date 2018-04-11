@@ -6,18 +6,11 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Converters;
-using Chem4Word.Model;
 
 namespace Chem4Word.Model
 {
-
     public class ElementConverter : TypeConverter
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context,
@@ -33,11 +26,10 @@ namespace Chem4Word.Model
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-
             try
             {
                 var pt = new PeriodicTable();
-                return pt.Elements[(string) value ?? throw new InvalidOperationException()];
+                return pt.Elements[(string)value ?? throw new InvalidOperationException()];
             }
             catch
             {

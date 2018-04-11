@@ -25,6 +25,7 @@ namespace Chem4Word.ACME.Behaviors
         private Window _parent;
         private bool _flag;
         private LassoAdorner _lassoAdorner;
+        private MoleculeSelectionAdorner _molAdorner;
 
         protected override void OnAttached()
         {
@@ -33,13 +34,42 @@ namespace Chem4Word.ACME.Behaviors
             _parent = Application.Current.MainWindow;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
+            AssociatedObject.MouseRightButtonDown += AssociatedObjectOnMouseRightButtonDown;
+            AssociatedObject.MouseRightButtonUp += AssociatedObjectOnMouseRightButtonUp;
 
             AssociatedObject.IsHitTestVisible = true;
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            }
+        }
+
+        private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+            {
+                ViewModel.SelectedItems.Clear();
+            }
+
+            _mouseTrack = new PointCollection();
+            _startpoint = Mouse.GetPosition(AssociatedObject);
+            _flag = true;
+
+            Mouse.Capture(AssociatedObject);
+            _mouseTrack.Add(_startpoint);
+
+            if (e.ClickCount == 2)
+            {
+                DoMolSelect(e);
+                e.Handled = true;
+            }
+
+            if (e.ClickCount == 1) //single click
+            {
+                DoSingleSelect(e);
             }
         }
 
@@ -52,12 +82,6 @@ namespace Chem4Word.ACME.Behaviors
             {
                 DisposeLasso();
             }
-        }
-
-        private void DisposeLasso()
-        {
-            RemoveAdorner(_lassoAdorner, AssociatedObject);
-            _lassoAdorner = null;
         }
 
         private void AssociatedObject_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -78,6 +102,47 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
+        private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount > 1)
+            {
+                //MessageBox.Show("Trapped the double click");
+            }
+        }
+
+        private void AssociatedObjectOnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("AssociatedObjectOnMouseRightButtonUp");
+            AssociatedObject.ReleaseMouseCapture();
+        }
+
+        private void AssociatedObjectOnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("AssociatedObjectOnMouseRightButtonDown");
+            Mouse.Capture(AssociatedObject);
+            if (e.ClickCount == 1)
+            {
+                var hitTestResult = GetTarget(e);
+                if (hitTestResult.VisualHit is AtomShape)
+                {
+                    var atom = (AtomShape)hitTestResult.VisualHit;
+                    Debug.WriteLine($"Right Click Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
+                }
+                else if (hitTestResult.VisualHit is BondShape)
+                {
+                    var bond = (BondShape)hitTestResult.VisualHit;
+                    var pos = e.GetPosition(AssociatedObject);
+                    Debug.WriteLine($"Right Click Bond {bond.ParentBond.Id} at ({pos.X},{pos.Y})");
+                }
+            }
+        }
+
+        private void DisposeLasso()
+        {
+            RemoveAdorner(_lassoAdorner, AssociatedObject);
+            _lassoAdorner = null;
+        }
+
         private bool Dragging(MouseEventArgs e)
         {
             return e.LeftButton == MouseButtonState.Pressed & _flag;
@@ -88,7 +153,7 @@ namespace Chem4Word.ACME.Behaviors
             VisualTreeHelper.HitTest(AssociatedObject, null, HitTestCallback, new GeometryHitTestParameters(outline));
         }
 
-        private void RemoveAdorner(LassoAdorner lassoAdorner, Canvas canvas)
+        private void RemoveAdorner(Adorner adorner, Canvas canvas)
         {
             var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
 
@@ -115,23 +180,28 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void DoMolSelect(MouseButtonEventArgs e)
         {
-            if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
+            var hitTestResult = GetTarget(e);
+            Debug.Print(hitTestResult.ToString());
+
+            if (hitTestResult.VisualHit is AtomShape)
+            {
+                var atom = (AtomShape)hitTestResult.VisualHit;
+                //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
+
+                ViewModel.SelectedItems.Add(atom.ParentAtom.Parent);
+            }
+            else if (hitTestResult.VisualHit is BondShape)
+            {
+                var bond = (BondShape)hitTestResult.VisualHit;
+                //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
+
+                ViewModel.SelectedItems.Add(bond.ParentBond.Parent);
+            }
+            else
             {
                 ViewModel.SelectedItems.Clear();
-            }
-
-            _mouseTrack = new PointCollection();
-            _startpoint = Mouse.GetPosition(AssociatedObject);
-            _flag = true;
-
-            Mouse.Capture(AssociatedObject);
-            _mouseTrack.Add(_startpoint);
-
-            if (e.ClickCount == 1) //single click
-            {
-                DoSingleSelect(e);
             }
         }
 

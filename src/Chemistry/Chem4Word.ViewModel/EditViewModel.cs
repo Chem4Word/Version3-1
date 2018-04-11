@@ -9,11 +9,13 @@ using Chem4Word.Model;
 using Chem4Word.Model.Enums;
 using Chem4Word.ViewModel.Adorners;
 using Chem4Word.ViewModel.Commands;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
@@ -22,12 +24,14 @@ namespace Chem4Word.ViewModel
 {
     public class EditViewModel : DisplayViewModel
     {
+        [Flags]
         public enum SelectionTypeCode
         {
             None = 0,
             Atom = 1,
             Bond = 2,
-            Molecule = 4
+            Molecule = 4,
+            Reaction = 8
         }
 
         #region Fields
@@ -39,6 +43,32 @@ namespace Chem4Word.ViewModel
         #endregion Fields
 
         #region Properties
+
+        public SelectionTypeCode SelectionType
+        {
+            get
+            {
+                SelectionTypeCode result = SelectionTypeCode.None;
+
+                if (SelectedItems.OfType<Atom>().Any())
+                {
+                    result |= SelectionTypeCode.Atom;
+                }
+                if (SelectedItems.OfType<Bond>().Any())
+                {
+                    result |= SelectionTypeCode.Bond;
+                }
+                if (SelectedItems.OfType<Molecule>().Any())
+                {
+                    result |= SelectionTypeCode.Molecule;
+                }
+                if (SelectedItems.OfType<Reaction>().Any())
+                {
+                    result |= SelectionTypeCode.Reaction;
+                }
+                return result;
+            }
+        }
 
         public ObservableCollection<object> SelectedItems { get; }
 
@@ -161,6 +191,8 @@ namespace Chem4Word.ViewModel
         public AddAtomCommand AddAtomCommand { get; }
         public UndoCommand UndoCommand { get; }
         public RedoCommand RedoCommand { get; }
+        public CopyCommand CopyCommand { get; }
+        public CutCommand CutCommand { get; }
 
         #endregion Commands
 
@@ -178,6 +210,8 @@ namespace Chem4Word.ViewModel
 
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
+            CopyCommand = new CopyCommand(this);
+            CutCommand = new CutCommand(this);
 
             PeriodicTable pt = new PeriodicTable();
             _selectedElement = pt.C;
@@ -227,6 +261,10 @@ namespace Chem4Word.ViewModel
 
             OnPropertyChanged(nameof(SelectedElement));
             OnPropertyChanged(nameof(SelectedBondOptionId));
+            OnPropertyChanged(nameof(SelectionType));
+
+            CopyCommand.RaiseCanExecChanged();
+            CutCommand.RaiseCanExecChanged();
         }
 
         public void RemoveAllAdorners()
@@ -268,7 +306,23 @@ namespace Chem4Word.ViewModel
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
                     _selectionAdorners[newObject] = bondAdorner;
                 }
+
+                if (newObject is Molecule)
+                {
+                    MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
+                    _selectionAdorners[newObject] = molAdorner;
+                }
             }
+        }
+
+        public void CutSelection()
+        {
+            MessageBox.Show("Cut code goes here");
+        }
+
+        public void CopySelection()
+        {
+            MessageBox.Show("Copy code goes here");
         }
     }
 }

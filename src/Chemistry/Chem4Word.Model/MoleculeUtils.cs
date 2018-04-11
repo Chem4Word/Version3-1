@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 
 namespace Chem4Word.Model
 {
@@ -25,7 +26,7 @@ namespace Chem4Word.Model
         {
             public Atom RootAtom { get; set; }
 
-            public static bool operator < (CipData a, CipData b)
+            public static bool operator <(CipData a, CipData b)
             {
                 if ((a.CurrentAtom.Element as Element).AtomicNumber < (b.CurrentAtom.Element as Element).AtomicNumber)
                 {
@@ -46,7 +47,7 @@ namespace Chem4Word.Model
                 return false;
             }
 
-            public static bool operator > (CipData a, CipData b)
+            public static bool operator >(CipData a, CipData b)
             {
                 if ((a.CurrentAtom.Element as Element).AtomicNumber > (b.CurrentAtom.Element as Element).AtomicNumber)
                 {
@@ -118,6 +119,16 @@ namespace Chem4Word.Model
                 SwapQueues();
 
                 _nextQueue.Clear();
+            }
+        }
+
+        public Point CentrePoint
+        {
+            get
+            {
+                Rect bb = BoundingBox;
+
+                return new Point((bb.BottomLeft.X + bb.BottomRight.X) / 2, (bb.BottomLeft.Y + bb.TopLeft.Y) / 2);
             }
         }
 

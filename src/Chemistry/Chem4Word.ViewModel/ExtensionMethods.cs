@@ -19,16 +19,18 @@ namespace Chem4Word.ViewModel
             return new Rect(bond.StartAtom.Position, bond.EndAtom.Position);
         }
 
+        // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
+
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
+            double halfSize = FontSize / 2;
+            Point position = atom.Position;
+            Rect baseAtomBox = new Rect(
+                new Point(position.X - halfSize, position.Y - halfSize),
+                new Point(position.X + halfSize, position.Y + halfSize));
             if (atom.SymbolText != "")
             {
-                double halfSize = FontSize / 2;
-                Point position = atom.Position;
-                Rect baseAtomBox = new Rect(
-                    new Point(position.X - halfSize, position.Y - halfSize),
-                    new Point(position.X + halfSize, position.Y + halfSize));
                 double symbolWidth = atom.SymbolText.Length * FontSize * 0.8;
                 Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                     new Size(symbolWidth, FontSize));
@@ -62,7 +64,8 @@ namespace Chem4Word.ViewModel
             }
             else
             {
-                return new Rect(atom.Position, atom.Position);//empty rect
+                //return new Rect(atom.Position, atom.Position);//empty rect
+                return baseAtomBox;
             }
         }
     }

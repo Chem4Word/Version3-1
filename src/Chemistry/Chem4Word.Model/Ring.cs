@@ -24,9 +24,8 @@ namespace Chem4Word.Model
     [Serializable]
     public class Ring : IComparer<Ring>
     {
-      
         /// <summary>
-        /// Indicates which rings of a set of fused rings 
+        /// Indicates which rings of a set of fused rings
         /// should host a double bond in preference
         /// </summary>
         public int Priority
@@ -141,8 +140,8 @@ namespace Chem4Word.Model
         /// <remarks>Do NOT set explicitly.  Add or remove the ring from a Molecule</remarks>
         public Molecule Parent { get; set; }
 
-       
         private Point? _centroid;
+
         /// <summary>
         /// The center of the ring
         /// </summary>
@@ -157,7 +156,7 @@ namespace Chem4Word.Model
                 return _centroid;
             }
         }
-        
+
         public List<Atom> ConvexHull
         {
             get
@@ -171,8 +170,8 @@ namespace Chem4Word.Model
         private IOrderedEnumerable<Atom> AtomsSortedForHull()
         {
             var atomList = from Atom a in this.Atoms
-                orderby a.Position.X ascending, a.Position.Y descending
-                select a;
+                           orderby a.Position.X ascending, a.Position.Y descending
+                           select a;
             return atomList;
         }
 

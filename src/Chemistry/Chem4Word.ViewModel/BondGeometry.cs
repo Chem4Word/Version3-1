@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Chem4Word.View
+namespace Chem4Word.ViewModel
 {
     /// <summary>
     /// Static class to define bond geometries
@@ -22,12 +22,27 @@ namespace Chem4Word.View
     /// </summary>
     public static class BondGeometry
     {
+        //atom symbol constants
+        public const double Offset = 4.5;
+
+        public const double AtomWidth = 10.0;
+        public const double FontHeight = 24;
+
+        public const double SubscriptHeight = 16;
+
+        //bond constnats
+        public const int DefaultLength = 45;
+
+        public const double WedgeWidth = 12.0;
+
+        public const double VectorTolerance = 0.01;
+
         public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, Point endPoint)
         {
             Vector bondVector = endPoint - startPoint;
             Vector perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
-            perpVector *= Globals.WedgeWidth / 2;
+            perpVector *= WedgeWidth / 2;
             Point point2 = endPoint + perpVector;
             Point point3 = endPoint - perpVector;
 
@@ -71,7 +86,7 @@ namespace Chem4Word.View
             //then work out the points at the thick end of the wedge
             var perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
-            perpVector = perpVector * Globals.WedgeWidth / 2;
+            perpVector = perpVector * WedgeWidth / 2;
 
             Point point2 = startPoint + bondVector + perpVector;
             Point point3 = startPoint + bondVector - perpVector;
@@ -103,7 +118,7 @@ namespace Chem4Word.View
             Vector normal = v.Perpendicular();
             normal.Normalize();
 
-            double distance = Globals.Offset;
+            double distance = Offset;
             Point point1 = startPoint + normal * distance;
             Point point2 = point1 + v;
 
@@ -185,7 +200,7 @@ namespace Chem4Word.View
 
             Point? point3a, point4a;
 
-            double distance = Globals.Offset;
+            double distance = Offset;
 
             if (ringCentroid == null)
             {
@@ -285,7 +300,7 @@ namespace Chem4Word.View
 
             Point point1, point2, point3, point4;
 
-            double distance = Globals.Offset;
+            double distance = Offset;
 
             point1 = startPoint + normal * distance;
             point2 = point1 + v;
@@ -337,7 +352,7 @@ namespace Chem4Word.View
             using (StreamGeometryContext sgc = sg.Open())
             {
                 Vector bondVector = endPoint - startPoint;
-                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / Globals.Offset);
+                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / Offset);
                 if (noOfWiggles < 1)
                 {
                     noOfWiggles = 1;
@@ -368,25 +383,11 @@ namespace Chem4Word.View
                 {
                     Point leftPoint = lastPoint + leftVector;
                     allpoints.Add(leftPoint);
-                    //triangle.Add(leftPoint);
-
-                    //Point midPoint = lastPoint + originalWigglePortion;
-                    //allpoints.Add(midPoint);
-                    //triangle.Add(midPoint);
-                    //allTriangles.Add(triangle);
-                    //triangle = new List<Point>();
-                    //triangle.Add(midPoint);
 
                     Point rightPoint = lastPoint + originalWigglePortion + rightVector;
                     allpoints.Add(rightPoint);
-                    //triangle.Add(rightPoint);
 
                     lastPoint += originalWigglePortion * 2;
-                    //allpoints.Add(lastPoint);
-                    //triangle.Add(lastPoint);
-                    //allTriangles.Add(triangle);
-                    //triangle = new List<Point>();
-                    //triangle.Add(lastPoint);
                 }
 
                 sgc.BeginFigure(startPoint, false, false);
