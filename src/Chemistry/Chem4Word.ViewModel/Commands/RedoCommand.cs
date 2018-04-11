@@ -5,8 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-
 namespace Chem4Word.ViewModel.Commands
 {
     public class RedoCommand : BaseCommand
@@ -27,9 +25,5 @@ namespace Chem4Word.ViewModel.Commands
         {
             _currentVM.UndoManager.Redo();
         }
-
-       
-
-        
     }
 }

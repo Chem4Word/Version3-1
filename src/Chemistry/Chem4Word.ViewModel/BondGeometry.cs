@@ -5,13 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model.Enums;
+using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
-using Chem4Word.Model.Enums;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ViewModel
 {
@@ -36,6 +36,7 @@ namespace Chem4Word.ViewModel
         public const double WedgeWidth = 12.0;
 
         public const double VectorTolerance = 0.01;
+
         public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, Point endPoint)
         {
             Vector bondVector = endPoint - startPoint;
@@ -382,14 +383,11 @@ namespace Chem4Word.ViewModel
                 {
                     Point leftPoint = lastPoint + leftVector;
                     allpoints.Add(leftPoint);
-                   
 
                     Point rightPoint = lastPoint + originalWigglePortion + rightVector;
                     allpoints.Add(rightPoint);
-                    
 
                     lastPoint += originalWigglePortion * 2;
-                   
                 }
 
                 sgc.BeginFigure(startPoint, false, false);

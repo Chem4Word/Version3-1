@@ -5,11 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -32,23 +27,23 @@ namespace Chem4Word.ACME.Graphics
     public class ArrowBase : Shape
     {
         #region "Fields"
+
         protected PathGeometry pathgeo;
 
-
-        #endregion
+        #endregion "Fields"
 
         #region "Constructors"
 
         public ArrowBase()
         {
-
-
         }
 
-        #endregion
+        #endregion "Constructors"
 
         #region "Properties"
+
         #region "Dependency Properties"
+
         public bool IsArrowClosed
         {
             get { return (bool)GetValue(IsArrowClosedProperty); }
@@ -58,9 +53,6 @@ namespace Chem4Word.ACME.Graphics
         // Using a DependencyProperty as the backing store for IsArrowClosed.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsArrowClosedProperty =
             DependencyProperty.Register("IsArrowClosed", typeof(bool), typeof(ArrowBase), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
-
-
-
 
         public Point StartPoint
         {
@@ -72,8 +64,6 @@ namespace Chem4Word.ACME.Graphics
         public static readonly DependencyProperty StartPointProperty =
             DependencyProperty.Register("StartPoint", typeof(Point), typeof(ArrowBase), new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-
-
         public Point EndPoint
         {
             get { return (Point)GetValue(EndPointProperty); }
@@ -83,7 +73,6 @@ namespace Chem4Word.ACME.Graphics
         // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndPointProperty =
             DependencyProperty.Register("EndPoint", typeof(Point), typeof(ArrowBase), new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsMeasure));
-
 
         //readonly property for calculating arrow length
         public double ArrowLength
@@ -125,8 +114,6 @@ namespace Chem4Word.ACME.Graphics
             DependencyProperty.Register("ArrowHeadLength", typeof(double), typeof(ArrowBase), new FrameworkPropertyMetadata(12.0,
                         FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-
-
         public double HeadAngle
         {
             get { return (double)GetValue(HeadAngleProperty); }
@@ -138,7 +125,7 @@ namespace Chem4Word.ACME.Graphics
             DependencyProperty.Register("HeadAngle", typeof(double), typeof(ArrowBase), new FrameworkPropertyMetadata(45.0,
                         FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-        #endregion
+        #endregion "Dependency Properties"
 
         protected override System.Windows.Media.Geometry DefiningGeometry
         {
@@ -151,7 +138,6 @@ namespace Chem4Word.ACME.Graphics
                 var mainline = ArrowLineFigure();
                 //mainline.IsClosed = true;
                 pathgeo.Figures.Add(mainline);
-
 
                 // Draw the arrow at the start of the line.
                 if ((ArrowEnds & ArrowEnds.Start) == ArrowEnds.Start)
@@ -166,11 +152,10 @@ namespace Chem4Word.ACME.Graphics
                 }
                 return pathgeo;
             }
-
-
         }
+
         /// <summary>
-        /// Returns the geometry of the main line. 
+        /// Returns the geometry of the main line.
         /// Overide this if you want to draw a curvy arrow say
         /// </summary>
         /// <returns>PathFigure describing the line of the arrow</returns>
@@ -183,7 +168,8 @@ namespace Chem4Word.ACME.Graphics
             return mainline;
         }
 
-        #endregion
+        #endregion "Properties"
+
         /// <summary>
         /// Returns the head of an arrow
         /// </summary>
@@ -201,10 +187,9 @@ namespace Chem4Word.ACME.Graphics
             PathGeometry tempPG = new PathGeometry();
             tempPG.Figures.Add(line);
 
-
             Point tempPoint, tangent;
 
-            //this is a really cool method to get the angle at the end of a line of any shape. 
+            //this is a really cool method to get the angle at the end of a line of any shape.
             tempPG.GetPointAtFractionLength(progress, out tempPoint, out tangent);
             //chuck away the pathgeometry
             tempPG = null;

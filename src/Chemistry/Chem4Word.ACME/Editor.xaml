@@ -18,7 +18,9 @@
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
-    x:Name="AcmeControl" Loaded="ACMEControl_Loaded" Height="774" Width="1013">
+    x:Name="AcmeControl" Loaded="ACMEControl_Loaded"
+    FontSize="23.0"
+    Height="774" Width="1013">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -311,10 +313,11 @@
 
         <ScrollViewer
             HorizontalScrollBarVisibility="Auto"
-                Height="Auto"
-				VerticalScrollBarVisibility="Auto"
-                Name="DrawingArea"
-            >
+            Height="Auto"
+            Width="Auto"
+            VerticalScrollBarVisibility="Auto"
+            Name="DrawingArea"
+            Background="White">
 
             <ItemsControl Name="ChemicalObjects" HorizontalAlignment="Center" VerticalAlignment="Center" ItemsSource="{Binding AllObjects}"
                         Width="{Binding BoundingBox.Width}" Height="{Binding BoundingBox.Height}" Background="White">
@@ -324,7 +327,6 @@
                         Name="ChemCanvas"
                         Width="{Binding ElementName=ChemicalObjects, Path=Width}"
                         Height="{Binding ElementName=ChemicalObjects, Path=Height}"
-                        Margin="8"
                         Background="White" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>

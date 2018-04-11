@@ -1,17 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System;
 
 namespace Chem4Word.ViewModel.Commands
 {
     public class CopyCommand : BaseCommand
     {
-
         public CopyCommand(EditViewModel vm) : base(vm)
         {
-
         }
 
         public override bool CanExecute(object parameter)
@@ -29,7 +30,6 @@ namespace Chem4Word.ViewModel.Commands
             if (CanExecuteChanged != null)
                 CanExecuteChanged.Invoke(this, new EventArgs());
         }
-
 
         public override event EventHandler CanExecuteChanged;
     }

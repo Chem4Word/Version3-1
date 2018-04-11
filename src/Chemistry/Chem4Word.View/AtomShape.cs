@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model;
+using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,8 +14,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
 using static Chem4Word.View.GlyphUtils;
 
 namespace Chem4Word.View
@@ -464,7 +464,6 @@ namespace Chem4Word.View
 
         #region layout DPs
 
-
         public double FontSize
         {
             get { return (double)GetValue(FontSizeProperty); }
@@ -475,8 +474,8 @@ namespace Chem4Word.View
         public static readonly DependencyProperty FontSizeProperty =
             DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
 
-
         #endregion layout DPs
+
         #region Atom DPs
 
         public string AtomSymbol

@@ -26,6 +26,7 @@ namespace Chem4Word.ACME.Behaviors
         private bool _flag;
         private LassoAdorner _lassoAdorner;
         private MoleculeSelectionAdorner _molAdorner;
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -36,6 +37,8 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
+            AssociatedObject.MouseRightButtonDown += AssociatedObjectOnMouseRightButtonDown;
+            AssociatedObject.MouseRightButtonUp += AssociatedObjectOnMouseRightButtonUp;
 
             AssociatedObject.IsHitTestVisible = true;
             if (_parent != null)
@@ -44,11 +47,29 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.ClickCount > 1)
+            if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
             {
-                //MessageBox.Show("Trapped the double click");
+                ViewModel.SelectedItems.Clear();
+            }
+
+            _mouseTrack = new PointCollection();
+            _startpoint = Mouse.GetPosition(AssociatedObject);
+            _flag = true;
+
+            Mouse.Capture(AssociatedObject);
+            _mouseTrack.Add(_startpoint);
+
+            if (e.ClickCount == 2)
+            {
+                DoMolSelect(e);
+                e.Handled = true;
+            }
+
+            if (e.ClickCount == 1) //single click
+            {
+                DoSingleSelect(e);
             }
         }
 
@@ -61,12 +82,6 @@ namespace Chem4Word.ACME.Behaviors
             {
                 DisposeLasso();
             }
-        }
-
-        private void DisposeLasso()
-        {
-            RemoveAdorner(_lassoAdorner, AssociatedObject);
-            _lassoAdorner = null;
         }
 
         private void AssociatedObject_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -85,6 +100,47 @@ namespace Chem4Word.ACME.Behaviors
 
                 ModifySelection(outline);
             }
+        }
+
+        private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount > 1)
+            {
+                //MessageBox.Show("Trapped the double click");
+            }
+        }
+
+        private void AssociatedObjectOnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("AssociatedObjectOnMouseRightButtonUp");
+            AssociatedObject.ReleaseMouseCapture();
+        }
+
+        private void AssociatedObjectOnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Debug.WriteLine("AssociatedObjectOnMouseRightButtonDown");
+            Mouse.Capture(AssociatedObject);
+            if (e.ClickCount == 1)
+            {
+                var hitTestResult = GetTarget(e);
+                if (hitTestResult.VisualHit is AtomShape)
+                {
+                    var atom = (AtomShape)hitTestResult.VisualHit;
+                    Debug.WriteLine($"Right Click Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
+                }
+                else if (hitTestResult.VisualHit is BondShape)
+                {
+                    var bond = (BondShape)hitTestResult.VisualHit;
+                    var pos = e.GetPosition(AssociatedObject);
+                    Debug.WriteLine($"Right Click Bond {bond.ParentBond.Id} at ({pos.X},{pos.Y})");
+                }
+            }
+        }
+
+        private void DisposeLasso()
+        {
+            RemoveAdorner(_lassoAdorner, AssociatedObject);
+            _lassoAdorner = null;
         }
 
         private bool Dragging(MouseEventArgs e)
@@ -122,34 +178,6 @@ namespace Chem4Word.ACME.Behaviors
             {
                 return null;
             }
-        }
-
-        private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
-            {
-                ViewModel.SelectedItems.Clear();
-            }
-
-            _mouseTrack = new PointCollection();
-            _startpoint = Mouse.GetPosition(AssociatedObject);
-            _flag = true;
-
-            Mouse.Capture(AssociatedObject);
-            _mouseTrack.Add(_startpoint);
-
-            if (e.ClickCount == 2)
-            {
-                DoMolSelect(e);
-                e.Handled = true;
-            }
-
-            if (e.ClickCount == 1) //single click
-            {
-                DoSingleSelect(e);
-            }
-
-           
         }
 
         private void DoMolSelect(MouseButtonEventArgs e)

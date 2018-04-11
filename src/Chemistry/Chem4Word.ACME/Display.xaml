@@ -33,8 +33,7 @@
                     <Canvas
                         x:Name="ChemCanvas"
                         Width="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Width}"
-                        Height="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Height}"
-                        Margin="8" />
+                        Height="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Height}" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.Resources>
@@ -65,8 +64,7 @@
                         Placement="{Binding Path=Placement, Mode=OneWay}"
                         Stereo="{Binding Path=Stereo, Mode=OneWay}"
                         StartPoint="{Binding Path=StartAtom.Position, Mode=OneWay}"
-                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}"
-                        >
+                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
                         <view:BondShape.Style>
                             <Style TargetType="{x:Type view:BondShape}">
                                 <Setter Property="StrokeThickness" Value="2.5" />

@@ -5,11 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
 using Chem4Word.ViewModel.Adorners;
 using Chem4Word.ViewModel.Commands;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -44,7 +44,6 @@ namespace Chem4Word.ViewModel
 
         #region Properties
 
-
         public SelectionTypeCode SelectionType
         {
             get
@@ -68,10 +67,9 @@ namespace Chem4Word.ViewModel
                     result |= SelectionTypeCode.Reaction;
                 }
                 return result;
-
-
             }
         }
+
         public ObservableCollection<object> SelectedItems { get; }
 
         public UndoManager UndoManager { get; }
@@ -193,7 +191,7 @@ namespace Chem4Word.ViewModel
         public AddAtomCommand AddAtomCommand { get; }
         public UndoCommand UndoCommand { get; }
         public RedoCommand RedoCommand { get; }
-        public CopyCommand CopyCommand { get;  }
+        public CopyCommand CopyCommand { get; }
         public CutCommand CutCommand { get; }
 
         #endregion Commands
@@ -267,7 +265,6 @@ namespace Chem4Word.ViewModel
 
             CopyCommand.RaiseCanExecChanged();
             CutCommand.RaiseCanExecChanged();
-            
         }
 
         public void RemoveAllAdorners()
@@ -316,6 +313,11 @@ namespace Chem4Word.ViewModel
                     _selectionAdorners[newObject] = molAdorner;
                 }
             }
+        }
+
+        public void CutSelection()
+        {
+            MessageBox.Show("Copy code goes here");
         }
 
         public void CopySelection()

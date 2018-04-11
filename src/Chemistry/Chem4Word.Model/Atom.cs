@@ -37,8 +37,6 @@ namespace Chem4Word.Model
                 OnPropertyChanged(nameof(SymbolText));
                 OnPropertyChanged(nameof(ImplicitHydrogenCount));
                 OnPropertyChanged(nameof(BoundingBox));
-                
-
             }
         }
 
@@ -429,85 +427,59 @@ namespace Chem4Word.Model
             }
         }
 
-        // This is Clyde's Code saved Just in case it's needed
-        //public Vector BalancingVector
-        //{
-        //    get
-        //    {
-        //        Vector total= new Vector();
-        //        foreach (Bond b in Bonds)
-        //        {
-        //            Vector bv = b.OtherAtom(this).Position - this.Position;
-        //            bv.Normalize();
-        //            total += bv;
-        //        }
+        // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
 
-        //        if (total.Length < VectorTolerance)
-        //        {
-        //            return new Vector();
-        //        }
-        //        else
-        //        {
-        //            total.Normalize();
-        //            total.Negate();
-        //            return total;
-        //        }
-        //    }
-        //}
-
-        
         //tries to get a bounding box for each atom symbol
-        public Rect BoundingBox( double fontSize)
+        public Rect BoundingBox(double fontSize)
         {
-              if (SymbolText != "")
+            double halfSize = fontSize / 2;
+            Point position = Position;
+            Rect baseAtomBox = new Rect(
+                new Point(position.X - halfSize, position.Y - halfSize),
+                new Point(position.X + halfSize, position.Y + halfSize));
+            if (SymbolText != "")
+            {
+                double symbolWidth = SymbolText.Length * fontSize * 0.8;
+                Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
+                    new Size(symbolWidth, fontSize));
+
+                if (ImplicitHydrogenCount > 0)
                 {
-                    double halfSize = fontSize / 2;
-                    Point position = Position;
-                    Rect baseAtomBox = new Rect(
-                        new Point(position.X - halfSize, position.Y - halfSize),
-                        new Point(position.X + halfSize, position.Y + halfSize));
-                    double symbolWidth = SymbolText.Length * fontSize * 0.8;
-                    Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
-                        new Size(symbolWidth, fontSize));
-
-                    if (ImplicitHydrogenCount > 0)
-
+                    Vector shift = new Vector();
+                    Rect hydrogenBox = baseAtomBox;
+                    switch (GetDefaultHOrientation())
                     {
-                        Vector shift = new Vector();
-                        Rect hydrogenBox = baseAtomBox;
-                        switch (GetDefaultHOrientation())
-                        {
-                            case CompassPoints.East:
-                                shift = BasicGeometry.ScreenEast * fontSize;
-                                break;
+                        case CompassPoints.East:
+                            shift = BasicGeometry.ScreenEast * fontSize;
+                            break;
 
-                            case CompassPoints.North:
-                                shift = BasicGeometry.ScreenNorth * fontSize;
-                                break;
+                        case CompassPoints.North:
+                            shift = BasicGeometry.ScreenNorth * fontSize;
+                            break;
 
-                            case CompassPoints.South:
-                                shift = BasicGeometry.ScreenSouth * fontSize;
-                                break;
+                        case CompassPoints.South:
+                            shift = BasicGeometry.ScreenSouth * fontSize;
+                            break;
 
-                            case CompassPoints.West:
-                                shift = BasicGeometry.ScreenWest * fontSize;
-                                break;
-                        }
-                        hydrogenBox.Offset(shift);
-                        mainElementBox.Union(hydrogenBox);
+                        case CompassPoints.West:
+                            shift = BasicGeometry.ScreenWest * fontSize;
+                            break;
                     }
-                    return mainElementBox;
+                    hydrogenBox.Offset(shift);
+                    mainElementBox.Union(hydrogenBox);
                 }
-                else
-                {
-                    return new Rect(Position, Position);//empty rect
-                }
+                return mainElementBox;
+            }
+            else
+            {
+                //return new Rect(Position, Position);//empty rect
+                return baseAtomBox;
+            }
         }
-       
+
         private Rect CenterRectOn(Point position, double fontSize, Point topleft, Point bottomRight)
         {
-            return new Rect(topleft,
-                bottomRight);
+            return new Rect(topleft, bottomRight);
         }
 
         #endregion Properties
@@ -524,7 +496,7 @@ namespace Chem4Word.Model
 
         private void SetupCollections()
         {
-//set up the collections for the atom itself
+            //set up the collections for the atom itself
             Bonds = new ObservableCollection<Bond>();
             Bonds.CollectionChanged += Bonds_CollectionChanged;
             Rings = new ObservableCollection<Ring>();
@@ -540,7 +512,7 @@ namespace Chem4Word.Model
             OnPropertyChanged("ShowSymbol");
             OnPropertyChanged("SymbolText");
 
-            foreach (Bond bond in Bonds.Where(b=>b.OrderValue==2))
+            foreach (Bond bond in Bonds.Where(b => b.OrderValue == 2))
             {
                 bond.NotifyPlacementChanged();
             }
@@ -561,6 +533,7 @@ namespace Chem4Word.Model
         #endregion Constructors
 
         #region INotifyPropertyChanged
+
         [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -662,7 +635,7 @@ namespace Chem4Word.Model
 
         public Atom Clone()
         {
-            Atom clone = (Atom) this.MemberwiseClone();
+            Atom clone = (Atom)this.MemberwiseClone();
             clone.SetupCollections();
             return clone;
         }

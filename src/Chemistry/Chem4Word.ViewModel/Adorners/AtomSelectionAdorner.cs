@@ -16,8 +16,6 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Atom _adornedAtom;
 
-       
-
         public AtomSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
             IsHitTestVisible = false;
