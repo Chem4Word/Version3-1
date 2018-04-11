@@ -180,7 +180,8 @@
                         </Path.Effect>
                     </Path>
                 </RadioButton>
-                <RadioButton GroupName="Actions" Style="{StaticResource ToolbarButtonStyle}" x:Name="ReactionButton">
+                <!-- ReactionButton Hidden (Collapsed)-->
+                <RadioButton GroupName="Actions" Style="{StaticResource ToolbarButtonStyle}" x:Name="ReactionButton" Visibility="Collapsed">
                     <Viewbox Stretch="Uniform">
                         <StackPanel>
                             <TextBlock FontFamily="Arial"  HorizontalAlignment="Center" Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
