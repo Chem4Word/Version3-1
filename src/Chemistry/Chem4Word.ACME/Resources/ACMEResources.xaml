@@ -116,6 +116,7 @@
 
     <!-- used to populate the bond dropdown combo -->
     <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
+        <!-- modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs -->
         <viewModel:BondOption Id="1" Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
         <viewModel:BondOption Id="2" Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
         <viewModel:BondOption Id="3" Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
@@ -139,6 +140,7 @@
             </TextBlock>
         </viewModel:AtomOption>
     </x:Array>
+    <!-- button paths -->
 
     <Geometry x:Key="SelectPath" xml:space="preserve">F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z </Geometry>
     <Geometry x:Key="DrawPath" xml:space="preserve">F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
@@ -203,5 +205,33 @@
                               5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
                               25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z
                               M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
-                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z</Geometry>
+                              5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z
+    </Geometry>
+    <!-- thumb styles -->
+
+    <SolidColorBrush x:Key="GrabHandleFillBrush" Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.75" />
+
+    <SolidColorBrush x:Key="GrabHandleBorderBrush"  Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.8" />
+
+    <Style x:Key ="GrabHandleStyle" TargetType="Thumb">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}" />
+        <Setter Property="Opacity" Value="0.75" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Rectangle
+                        Fill="{StaticResource GrabHandleFillBrush}"
+                        Stroke="{StaticResource GrabHandleBorderBrush}"
+                    ></Rectangle>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MolAdornerStyle" TargetType="Thumb" BasedOn="{StaticResource GrabHandleStyle}">
+        <Setter Property="Opacity" Value="0.15" />
+    </Style>
 </ResourceDictionary>

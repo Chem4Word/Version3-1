@@ -7,10 +7,8 @@
 
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
-using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -33,8 +31,6 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-
-
         //public double FontSize
         //{
         //    get { return (double)GetValue(FontSizeProperty); }
@@ -44,8 +40,6 @@ namespace Chem4Word.ACME
         //// Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
         //public new static readonly DependencyProperty FontSizeProperty =
         //    DependencyProperty.Register("FontSize", typeof(double), typeof(Display), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange|FrameworkPropertyMetadataOptions.AffectsRender));
-
-
 
         public Brush BackgroundColor
         {

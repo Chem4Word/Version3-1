@@ -110,6 +110,7 @@ namespace Chem4Word.Model
         /// </summary>
         [JsonProperty]
         public bool Flippable { get; set; }
+
         /// <summary>
         /// Defines the constituents of the superatom
         /// The 'pivot' atom that bonds to the fragment appears FIRST in the list

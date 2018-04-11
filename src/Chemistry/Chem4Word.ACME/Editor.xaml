@@ -18,7 +18,9 @@
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
-    x:Name="AcmeControl" Loaded="ACMEControl_Loaded" Height="774" Width="1013">
+    x:Name="AcmeControl" Loaded="ACMEControl_Loaded"
+    FontSize="23.0"
+    Height="774" Width="1013">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -178,7 +180,8 @@
                         </Path.Effect>
                     </Path>
                 </RadioButton>
-                <RadioButton GroupName="Actions" Style="{StaticResource ToolbarButtonStyle}" x:Name="ReactionButton">
+                <!-- ReactionButton Hidden (Collapsed)-->
+                <RadioButton GroupName="Actions" Style="{StaticResource ToolbarButtonStyle}" x:Name="ReactionButton" Visibility="Collapsed">
                     <Viewbox Stretch="Uniform">
                         <StackPanel>
                             <TextBlock FontFamily="Arial"  HorizontalAlignment="Center" Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
@@ -214,7 +217,7 @@
             </ToolBar>
             <ToolBar x:Name="EditToolbar" Height="40" BandIndex="2">
 
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton">
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton" Command="{Binding CutCommand}">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="25">
                         <Path   Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
                                 Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
@@ -230,7 +233,7 @@
                         </Path>
                     </Viewbox>
                 </Button>
-                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton">
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton" Command="{Binding CopyCommand}">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="22">
                         <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
@@ -311,9 +314,11 @@
 
         <ScrollViewer
             HorizontalScrollBarVisibility="Auto"
-                Height="Auto"
-				VerticalScrollBarVisibility="Auto"
-                Name="DrawingArea">
+            Height="Auto"
+            Width="Auto"
+            VerticalScrollBarVisibility="Auto"
+            Name="DrawingArea"
+            Background="White">
 
             <ItemsControl Name="ChemicalObjects" HorizontalAlignment="Center" VerticalAlignment="Center" ItemsSource="{Binding AllObjects}"
                         Width="{Binding BoundingBox.Width}" Height="{Binding BoundingBox.Height}" Background="White">
@@ -323,7 +328,6 @@
                         Name="ChemCanvas"
                         Width="{Binding ElementName=ChemicalObjects, Path=Width}"
                         Height="{Binding ElementName=ChemicalObjects, Path=Height}"
-                        Margin="8"
                         Background="White" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
@@ -362,7 +366,6 @@
                                     <Setter Property="StrokeEndLineCap" Value="Round" />
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
-
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="hbond">
                                             <Setter Property="StrokeDashArray" Value="1,1" />
@@ -441,7 +444,6 @@
                                             <SolidColorBrush Color="{Binding Element.Colour}" />
                                         </Setter.Value>
                                     </Setter>
-
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Path=SymbolText}" Value="">
                                             <Setter Property="Fill">

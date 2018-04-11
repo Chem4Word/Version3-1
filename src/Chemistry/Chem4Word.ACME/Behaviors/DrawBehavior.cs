@@ -5,20 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Interactivity;
 using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class DrawBehaviour: BaseEditBehavior
+    public class DrawBehaviour : BaseEditBehavior
     {
-
         private TranslateTransform transform = new TranslateTransform();
 
         protected override void OnAttached()
@@ -29,13 +22,10 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.RenderTransform = transform;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
-            
-
         }
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            
         }
 
         protected override void OnDetaching()

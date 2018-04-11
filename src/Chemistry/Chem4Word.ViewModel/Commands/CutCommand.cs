@@ -5,25 +5,32 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+
 namespace Chem4Word.ViewModel.Commands
 {
-    public class RedoCommand : BaseCommand
+    public class CutCommand : BaseCommand
     {
-        private ViewModel.EditViewModel _currentVM;
-
-        public RedoCommand(EditViewModel vm) : base(vm)
+        public CutCommand(EditViewModel vm) : base(vm)
         {
-            _currentVM = vm;
         }
 
         public override bool CanExecute(object parameter)
         {
-            return _currentVM.UndoManager.CanRedo;
+            return MyEditViewModel.SelectionType != EditViewModel.SelectionTypeCode.None;
         }
 
         public override void Execute(object parameter)
         {
-            _currentVM.UndoManager.Redo();
+            MyEditViewModel.CutSelection();
         }
+
+        public override void RaiseCanExecChanged()
+        {
+            if (CanExecuteChanged != null)
+                CanExecuteChanged.Invoke(this, new EventArgs());
+        }
+
+        public override event EventHandler CanExecuteChanged;
     }
 }
