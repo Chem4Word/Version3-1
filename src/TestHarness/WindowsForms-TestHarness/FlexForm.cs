@@ -142,7 +142,7 @@ namespace WinFormsTestHarness
                     }
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;
-                    Debug.WriteLine($"Displaying {model.ConciseFormula}");
+                    Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
                     EnableNormalButtons();
                     EnableUndoRedoButtons();

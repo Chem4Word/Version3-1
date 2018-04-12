@@ -151,7 +151,7 @@ namespace Chem4Word.ACME
                     chemistryModel.FontSize = FontSize;
                     chemistryModel.RescaleForXaml(Constants.StandardBondLength * 2);
 
-                    Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
+                    //Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
                     Placeholder.DataContext = new Chem4Word.ViewModel.DisplayViewModel(chemistryModel);
                 }
