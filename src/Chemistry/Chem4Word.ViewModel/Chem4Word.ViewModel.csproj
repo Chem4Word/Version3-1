@@ -65,7 +65,7 @@
     <Compile Include="BondOption.cs" />
     <Compile Include="Commands\AddAtomCommand.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
-    <Compile Include="Commands\CopyCommand - Copy.cs" />
+    <Compile Include="Commands\CutCommand.cs" />
     <Compile Include="Commands\CopyCommand.cs" />
     <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\RedoCommand.cs" />

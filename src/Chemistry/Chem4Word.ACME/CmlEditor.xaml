@@ -8,7 +8,7 @@
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid ShowGridLines="False" RenderTransformOrigin="0.502,0.685">
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition />
             <RowDefinition Height="45"></RowDefinition>
         </Grid.RowDefinitions>
         <TextBox x:Name="cmlText" HorizontalAlignment="Stretch"

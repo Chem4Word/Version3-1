@@ -5,13 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model
 {
@@ -32,7 +32,7 @@ namespace Chem4Word.Model
 
         protected ChemistryContainer()
         {
-           ResetCollections();
+            ResetCollections();
         }
 
         protected virtual void ResetCollections()

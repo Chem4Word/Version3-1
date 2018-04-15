@@ -209,29 +209,29 @@
     </Geometry>
     <!-- thumb styles -->
 
-    <SolidColorBrush x:Key="GrabHandleFillBrush" Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.75"/>
-    
-    <SolidColorBrush x:Key="GrabHandleBorderBrush"  Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.8"/>
+    <SolidColorBrush x:Key="GrabHandleFillBrush" Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.75" />
+
+    <SolidColorBrush x:Key="GrabHandleBorderBrush"  Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.8" />
 
     <Style x:Key ="GrabHandleStyle" TargetType="Thumb">
-        <Setter Property="SnapsToDevicePixels" Value="true"/>
-        <Setter Property="OverridesDefaultStyle" Value="true"/>
-        <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}"/>
-        <Setter Property="Opacity" Value="0.75"/>
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}" />
+        <Setter Property="Opacity" Value="0.75" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Rectangle 
-                        Fill="{StaticResource GrabHandleFillBrush}" 
-                        Stroke="{StaticResource GrabHandleBorderBrush}" 
+                    <Rectangle
+                        Fill="{StaticResource GrabHandleFillBrush}"
+                        Stroke="{StaticResource GrabHandleBorderBrush}"
                     ></Rectangle>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="MolAdornerStyle" TargetType="Thumb" BasedOn="{StaticResource GrabHandleStyle}">
-        <Setter Property="Opacity" Value="0.15"/>
+        <Setter Property="Opacity" Value="0.15" />
     </Style>
 </ResourceDictionary>

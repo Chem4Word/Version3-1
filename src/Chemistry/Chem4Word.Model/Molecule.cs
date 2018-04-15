@@ -47,11 +47,12 @@ namespace Chem4Word.Model
 
         private void CalculateBoundingBox()
         {
-            var xMax = Atoms.Select(a => a.Position.X).Max();
-            var xMin = Atoms.Select(a => a.Position.X).Min();
+            Model m = this.Parent as Model;
+            var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
+            var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
 
-            var yMax = Atoms.Select(a => a.Position.Y).Max();
-            var yMin = Atoms.Select(a => a.Position.Y).Min();
+            var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
+            var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
 
             const double padding = 50;
 
@@ -1130,7 +1131,6 @@ namespace Chem4Word.Model
 
         public void Move(Transform lastOperation)
         {
-            
         }
     }
 }

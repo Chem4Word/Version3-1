@@ -24,7 +24,7 @@ namespace Chem4Word.ViewModel.Commands
 
         public virtual void RaiseCanExecChanged()
         {
-            if(CanExecuteChanged!=null)
+            if (CanExecuteChanged != null)
                 CanExecuteChanged.Invoke(this, new EventArgs());
         }
 

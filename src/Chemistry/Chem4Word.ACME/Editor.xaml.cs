@@ -87,8 +87,6 @@ namespace Chem4Word.ACME
             }
         }
 
-
-
         public AtomOption SelectedAtomOption
         {
             get { return (AtomOption)GetValue(SelectedAtomOptionProperty); }
@@ -129,6 +127,7 @@ namespace Chem4Word.ACME
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
 
+            tempModel.FontSize = FontSize;
             tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
             var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;

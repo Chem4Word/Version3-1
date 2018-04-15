@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model;
+using Chem4Word.Model.Annotations;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -13,14 +15,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.ViewModel.Adorners
 {
     public class MoleculeSelectionAdorner : Adorner
     {
-
         private const int ThumbWidth = 10;
         private const int HalfThumbWidth = ThumbWidth / 2;
 
@@ -29,17 +28,18 @@ namespace Chem4Word.ViewModel.Adorners
 
         private Point _canvasPos;
         private readonly Molecule _frag;
+
         //some things to grab hold of
         private readonly Thumb _topLeft; //these do the resizing
+
         private readonly Thumb _topRight; //these do the resizing
         private readonly Thumb _bottomLeft; //these do the resizing
         private readonly Thumb _bottomRight; //these do the resizing
 
-
         private Thumb _bigThumb; //this is the main grab area for the molecule
 
         private Thumb _rotateThumb;  //Grab hold of this to rotate the molecule
-        private readonly VisualCollection _visualChildren ;
+        private readonly VisualCollection _visualChildren;
         private System.Windows.Media.Geometry ghostImage = null;
         private Transform _lastOperation;
         private double _aspectRatio;
@@ -51,18 +51,18 @@ namespace Chem4Word.ViewModel.Adorners
 
         private double _rotateAngle = 0.0;
         private Point _centroid;
+
         //private SnapGeometry _rotateSnapper;
         private Brush _renderBrush;
+
         private Pen _renderPen;
+
         public MoleculeSelectionAdorner([NotNull] UIElement adornedElement, Molecule parent) : base(adornedElement)
         {
-
-
             _visualChildren = new VisualCollection(this);
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
-
 
             BuildBigDragArea();
 
@@ -89,12 +89,10 @@ namespace Chem4Word.ViewModel.Adorners
             //this.PreviewMouseDown += MoleculeAdorner_PreviewMouseDown;
             //this.KeyDown += MoleculeAdorner_KeyDown;
 
-          
             _frag = parent;
 
             _renderBrush = (Brush)FindResource("GrabHandleFillBrush");
             _renderPen = (Pen)FindResource("GrabHandlePen");
-
 
             Focusable = true;
 
@@ -110,7 +108,6 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void BuildBigDragArea()
         {
-
             _bigThumb = new Thumb();
             _visualChildren.Add(_bigThumb);
             //AddLogicalChild(_bigThumb);
@@ -124,7 +121,6 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-
             Point currentPos = new Point(e.HorizontalChange, e.VerticalChange);
             Canvas.SetLeft(_bigThumb, Canvas.GetLeft(_bigThumb) + e.HorizontalChange);
             Canvas.SetTop(_bigThumb, Canvas.GetTop(_bigThumb) + e.VerticalChange);
@@ -132,7 +128,6 @@ namespace Chem4Word.ViewModel.Adorners
             _lastOperation = new TranslateTransform(_canvasPos.X, _canvasPos.Y);
 
             InvalidateVisual();
-
         }
 
         /// <summary>
@@ -145,7 +140,6 @@ namespace Chem4Word.ViewModel.Adorners
         {
             if (_lastOperation != null)
             {
-
                 _frag.Move(_lastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
@@ -162,15 +156,14 @@ namespace Chem4Word.ViewModel.Adorners
             _boundingBox = _frag.BoundingBox;
             _aspectRatio = _boundingBox.Width / _boundingBox.Height;
         }
+
         private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
-
             _dragging = true;
-
         }
 
         /// <summary>
-        /// Override this to 
+        /// Override this to
         /// </summary>
         /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
@@ -179,7 +172,6 @@ namespace Chem4Word.ViewModel.Adorners
             {
                 object elem = AdornedElement;
                 //identify which Molecule the atom belongs to
-
 
                 //take a snapshot of the molecule
 
@@ -191,12 +183,10 @@ namespace Chem4Word.ViewModel.Adorners
 
                 base.OnRender(drawingContext);
             }
-
         }
 
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {
-
             if (cornerThumb != null) return;
 
             cornerThumb = new Thumb();
@@ -209,9 +199,10 @@ namespace Chem4Word.ViewModel.Adorners
             //AddLogicalChild(cornerThumb);
         }
 
-        // Override the VisualChildrenCount and GetVisualChild properties to interface with 
+        // Override the VisualChildrenCount and GetVisualChild properties to interface with
         // the adorner's visual collection.
         protected override int VisualChildrenCount => _visualChildren.Count;
+
         protected override Visual GetVisualChild(int index) => _visualChildren[index];
 
         // Arrange the Adorners.
@@ -250,8 +241,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         public event DragCompletedEventHandler DragResizeCompleted;
 
-        #endregion
-
+        #endregion Events
 
         // Handler for resizing from the bottom-right.
         private void HandleBottomRight(object sender, DragDeltaEventArgs args)
@@ -345,7 +335,6 @@ namespace Chem4Word.ViewModel.Adorners
             _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Top);
 
             InvalidateVisual();
-
         }
 
         private void SetCentroid()
