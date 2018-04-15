@@ -136,6 +136,7 @@ namespace Chem4Word.ACME.Graphics
                 pathgeo = new PathGeometry();
                 pathgeo.Clear();
                 var mainline = ArrowLineFigure();
+                mainline.IsClosed = false;
                 //mainline.IsClosed = true;
                 pathgeo.Figures.Add(mainline);
 

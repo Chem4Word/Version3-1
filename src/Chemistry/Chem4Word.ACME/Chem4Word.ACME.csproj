@@ -74,6 +74,8 @@
     <Compile Include="Display.xaml.cs">
       <DependentUpon>Display.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Graphics\Arc.cs" />
+    <Compile Include="Graphics\ArcArrow.cs" />
     <Compile Include="Graphics\ArrowBase.cs" />
     <Compile Include="Graphics\Shapes.cs" />
     <Compile Include="Properties\Annotations.cs" />
