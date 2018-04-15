@@ -98,6 +98,8 @@ namespace Chem4Word.ViewModel.Adorners
 
             Focusable = true;
 
+            IsHitTestVisible = true;
+
             SetBoundingBox();
         }
 
@@ -147,7 +149,7 @@ namespace Chem4Word.ViewModel.Adorners
                 _frag.Move(_lastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
-                if (DragResizeCompleted != null) DragResizeCompleted(this, e);
+                DragResizeCompleted?.Invoke(this, e);
                 SetCentroid();
             }
             _dragging = false;
@@ -217,8 +219,8 @@ namespace Chem4Word.ViewModel.Adorners
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = _frag.BoundingBox;
-
+            var bbb = _lastOperation.TransformBounds(_frag.BoundingBox);
+            
             _topLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth, ThumbWidth));
             _topRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth,
                 ThumbWidth));

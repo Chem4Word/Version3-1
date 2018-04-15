@@ -36,7 +36,7 @@ namespace Chem4Word.ViewModel
 
         #region Fields
 
-        private Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
+        public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
@@ -273,11 +273,11 @@ namespace Chem4Word.ViewModel
         public void RemoveAllAdorners()
         {
             var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
-            var adornerList = _selectionAdorners.Keys.ToList();
+            var adornerList = SelectionAdorners.Keys.ToList();
             foreach (object oldObject in adornerList)
             {
-                layer.Remove(_selectionAdorners[oldObject]);
-                _selectionAdorners.Remove(oldObject);
+                layer.Remove(SelectionAdorners[oldObject]);
+                SelectionAdorners.Remove(oldObject);
             }
         }
 
@@ -286,10 +286,10 @@ namespace Chem4Word.ViewModel
             var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
             foreach (object oldObject in oldObjects)
             {
-                if (_selectionAdorners.ContainsKey(oldObject))
+                if (SelectionAdorners.ContainsKey(oldObject))
                 {
-                    layer.Remove(_selectionAdorners[oldObject]);
-                    _selectionAdorners.Remove(oldObject);
+                    layer.Remove(SelectionAdorners[oldObject]);
+                    SelectionAdorners.Remove(oldObject);
                 }
             }
         }
@@ -301,19 +301,19 @@ namespace Chem4Word.ViewModel
                 if (newObject is Atom)
                 {
                     AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, (newObject as Atom));
-                    _selectionAdorners[newObject] = atomAdorner;
+                    SelectionAdorners[newObject] = atomAdorner;
                 }
 
                 if (newObject is Bond)
                 {
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
-                    _selectionAdorners[newObject] = bondAdorner;
+                    SelectionAdorners[newObject] = bondAdorner;
                 }
 
                 if (newObject is Molecule)
                 {
                     MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
-                    _selectionAdorners[newObject] = molAdorner;
+                    SelectionAdorners[newObject] = molAdorner;
                 }
             }
         }
