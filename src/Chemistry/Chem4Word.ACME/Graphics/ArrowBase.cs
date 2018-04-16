@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -180,7 +182,21 @@ namespace Chem4Word.ACME.Graphics
         public PathFigure ArrowHeadGeometry(PathFigure line, bool reverse = false)
         {
             Matrix matx = new Matrix();
-            double progress = reverse ? 0.0 : 1.0;  //if we're going for the start or end of line
+
+            double offset = ArrowHeadLength * Math.Cos(HeadAngle);
+
+            var pathbits = line.GetFlattenedPathFigure();
+
+            double length = 0.0;
+            var lastPoint = line.StartPoint;
+            foreach (LineSegment pathSegment in pathbits.Segments.OfType<LineSegment>())
+            {
+                length += (pathSegment.Point - lastPoint).Length;
+                lastPoint = pathSegment.Point;
+            }
+
+
+            double progress = reverse ? (offset/length) : 1.0 -(offset/length);  //if we're going for the start or end of line
             //Vector headVector = pt1 - pt2;
 
             //create a simple geometry so we can use a wpf trick to determine the length
@@ -191,7 +207,19 @@ namespace Chem4Word.ACME.Graphics
             Point tempPoint, tangent;
 
             //this is a really cool method to get the angle at the end of a line of any shape.
-            tempPG.GetPointAtFractionLength(progress, out tempPoint, out tangent);
+
+            //we need to get the actual angle at the point the arrw line enters the head
+            tempPG.GetPointAtFractionLength(progress, out Point garbage, out tangent);
+            //and then the very last point on the line
+            if (reverse)
+            {
+                tempPG.GetPointAtFractionLength(0.0, out tempPoint, out garbage );
+            }
+            else
+            {
+                tempPG.GetPointAtFractionLength(1.0, out tempPoint, out garbage);
+            }
+
             //chuck away the pathgeometry
             tempPG = null;
             //the tangent is an X & Y coordinate that can be converted into a vector

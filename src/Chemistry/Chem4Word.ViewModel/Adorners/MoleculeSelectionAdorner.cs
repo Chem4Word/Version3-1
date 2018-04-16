@@ -23,7 +23,7 @@ namespace Chem4Word.ViewModel.Adorners
         private const int ThumbWidth = 10;
         private const int HalfThumbWidth = ThumbWidth / 2;
 
-        private const int RotateThumbWidth = 120;
+        private const int RotateThumbWidth = 20;
 
 
         private Point _canvasPos;
@@ -236,9 +236,12 @@ namespace Chem4Word.ViewModel.Adorners
         private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             IncrementDragging(e);
+
             Point currentPos = new Point(_dragXTravel, _dragYTravel);
+
             Canvas.SetLeft(_bigThumb, Canvas.GetLeft(_bigThumb) + _dragXTravel);
             Canvas.SetTop(_bigThumb, Canvas.GetTop(_bigThumb) + _dragYTravel);
+
             _canvasPos = currentPos;
             _lastOperation = new TranslateTransform(_canvasPos.X, _canvasPos.Y);
 
@@ -359,9 +362,9 @@ namespace Chem4Word.ViewModel.Adorners
             //add the rotator
             double xplacement, yplacement;
             xplacement = (bbb.Left + bbb.Right) / 2 - _rotateThumb.Width / 2;
-            yplacement = bbb.Top +50;// - ThumbWidth * 3;
+            yplacement = bbb.Top  - _rotateThumb.Width;// - ThumbWidth * 3;
 
-            _rotateThumb.Arrange(new Rect(xplacement, yplacement, _rotateThumb.Width, _rotateThumb.Height));
+            _rotateThumb.Arrange(new Rect(xplacement, yplacement  , _rotateThumb.Width, _rotateThumb.Height));
             // Return the final size.
             //_boundingBox = bbb;
             return finalSize;
