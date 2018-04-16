@@ -1,4 +1,10 @@
-﻿using System;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// -
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +14,11 @@ using System.Windows.Media;
 
 namespace Chem4Word.ACME.Graphics
 {
+    /// <summary>
+    /// ArcArrow draws an arrow of a specifed radius, 
+    /// centered on a point, that has a start and end angle
+    /// Designed to be used directly from XAML
+    /// </summary>
     public class ArcArrow :ArrowBase
     {
         public Point Center
@@ -21,7 +32,9 @@ namespace Chem4Word.ACME.Graphics
             DependencyProperty.Register("Center", typeof(Point), typeof(Arc)
             , new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
 
-
+        /// <summary>
+        /// Measured relative to Compass East 
+        /// </summary>
         public double StartAngle
         {
             get { return (double)GetValue(StartAngleProperty); }
@@ -33,6 +46,9 @@ namespace Chem4Word.ACME.Graphics
             DependencyProperty.Register("StartAngle", typeof(double), typeof(Arc)
             , new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
+        /// <summary>
+        /// Measured relative to Compass East 
+        /// </summary>
         public double EndAngle
         {
             get { return (double)GetValue(EndAngleProperty); }

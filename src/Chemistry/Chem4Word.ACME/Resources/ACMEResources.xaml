@@ -256,8 +256,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
                     <Viewbox Height="20" Width="20" Stretch="Uniform">
-                        <Canvas Height="200" Width="200">
-                            <graphics:ArcArrow Stroke="{StaticResource GrabHandleBorderBrush}" StrokeThickness="35" Fill="Transparent" ArrowHeadLength="50" HeadAngle="45" IsArrowClosed="True" Center="50,50" Radius="100" StartAngle="270" EndAngle="0" SmallAngle="False">
+                        <Canvas Height="200" Width="200" Margin="0">
+                            <graphics:ArcArrow StrokeStartLineCap="Round" Stroke="{StaticResource GrabHandleBorderBrush}" StrokeThickness="35" Fill="Transparent" ArrowHeadLength="50" HeadAngle="45" IsArrowClosed="True" Center="50,50" Radius="100" StartAngle="270" EndAngle="0" SmallAngle="False">
                             </graphics:ArcArrow>
                             <Ellipse Fill="{StaticResource GrabHandleFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" 
                                      Height="50" Width="50" Canvas.Top="25" Canvas.Left="25" />
