@@ -181,12 +181,12 @@ namespace Chem4Word.ACME.Graphics
         /// <returns>Simple path figure of arrow head, oriented appropriately </returns>
         public PathFigure ArrowHeadGeometry(PathFigure line, bool reverse = false)
         {
+
             Matrix matx = new Matrix();
 
             double offset = ArrowHeadLength * Math.Cos(HeadAngle);
 
             var length = GetPathFigureLength(line);
-
 
             double progress = reverse ? (offset/length) : 1.0 -(offset/length);  //if we're going for the start or end of line
             //Vector headVector = pt1 - pt2;
@@ -202,7 +202,6 @@ namespace Chem4Word.ACME.Graphics
 
             //we need to get the actual angle at the very point the arrow line enters the head
             tempPG.GetPointAtFractionLength(progress, out Point garbage, out tangent);
-
 
             //and then the very last point on the line
             if (reverse)
