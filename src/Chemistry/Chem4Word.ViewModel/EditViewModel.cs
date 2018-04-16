@@ -302,7 +302,7 @@ namespace Chem4Word.ViewModel
                    
                     AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
                     SelectionAdorners[newObject] = atomAdorner;
-
+                    //if all atoms are selected then select the mol
                     if (AllAtomsSelected(atom.Parent))
                     {
                         RemoveAdorners(atom.Parent);
