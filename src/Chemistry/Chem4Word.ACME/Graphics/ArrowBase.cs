@@ -185,15 +185,7 @@ namespace Chem4Word.ACME.Graphics
 
             double offset = ArrowHeadLength * Math.Cos(HeadAngle);
 
-            var pathbits = line.GetFlattenedPathFigure();
-
-            double length = 0.0;
-            var lastPoint = line.StartPoint;
-            foreach (LineSegment pathSegment in pathbits.Segments.OfType<LineSegment>())
-            {
-                length += (pathSegment.Point - lastPoint).Length;
-                lastPoint = pathSegment.Point;
-            }
+            var length = GetPathFigureLength(line);
 
 
             double progress = reverse ? (offset/length) : 1.0 -(offset/length);  //if we're going for the start or end of line
@@ -208,8 +200,10 @@ namespace Chem4Word.ACME.Graphics
 
             //this is a really cool method to get the angle at the end of a line of any shape.
 
-            //we need to get the actual angle at the point the arrw line enters the head
+            //we need to get the actual angle at the very point the arrow line enters the head
             tempPG.GetPointAtFractionLength(progress, out Point garbage, out tangent);
+
+
             //and then the very last point on the line
             if (reverse)
             {
@@ -271,6 +265,20 @@ namespace Chem4Word.ACME.Graphics
                 PathFigure pathfig = new PathFigure(tempPoint, psc, true);
                 return pathfig;
             }
+        }
+
+        private static double GetPathFigureLength(PathFigure line)
+        {
+            var pathbits = line.GetFlattenedPathFigure();
+
+            double length = 0.0;
+            var lastPoint = line.StartPoint;
+            foreach (LineSegment pathSegment in pathbits.Segments.OfType<LineSegment>())
+            {
+                length += (pathSegment.Point - lastPoint).Length;
+                lastPoint = pathSegment.Point;
+            }
+            return length;
         }
     }
 }
