@@ -390,7 +390,9 @@ namespace Chem4Word.Model
             foreach (var neighbour in toPrune.Neighbours)
             {
                 if (workingSet.ContainsKey(neighbour))
+                {
                     workingSet[neighbour] -= 1;
+                }
             }
             workingSet.Remove(toPrune);
         }

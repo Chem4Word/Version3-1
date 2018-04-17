@@ -189,7 +189,11 @@ namespace Chem4Word.ViewModel.Adorners
                 _frag.Move(_lastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
-                if (DragResizeCompleted != null) DragResizeCompleted(this, dragCompletedEventArgs);
+                if (DragResizeCompleted != null)
+                {
+                    DragResizeCompleted(this, dragCompletedEventArgs);
+                }
+
                 SetCentroid();
             }
 
@@ -316,7 +320,10 @@ namespace Chem4Word.ViewModel.Adorners
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {
 
-            if (cornerThumb != null) return;
+            if (cornerThumb != null)
+            {
+                return;
+            }
 
             cornerThumb = new Thumb();
 
@@ -383,7 +390,10 @@ namespace Chem4Word.ViewModel.Adorners
         {
             Thumb hitThumb = sender as Thumb;
 
-            if (hitThumb == null) return;
+            if (hitThumb == null)
+            {
+                return;
+            }
 
             IncrementDragging(args);
             var scaleFactor = GetScaleFactor(_boundingBox.Left,
@@ -433,7 +443,11 @@ namespace Chem4Word.ViewModel.Adorners
         {
             Thumb hitThumb = sender as Thumb;
 
-            if (hitThumb == null) return;
+            if (hitThumb == null)
+            {
+                return;
+            }
+
             IncrementDragging(args);
             var scaleFactor = GetScaleFactor(_boundingBox.Left,
              _boundingBox.Top + _dragYTravel,
@@ -450,7 +464,11 @@ namespace Chem4Word.ViewModel.Adorners
         {
             Thumb hitThumb = sender as Thumb;
 
-            if (hitThumb == null) return;
+            if (hitThumb == null)
+            {
+                return;
+            }
+
             IncrementDragging(args);
             var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
             _boundingBox.Top + _dragYTravel,
@@ -467,7 +485,11 @@ namespace Chem4Word.ViewModel.Adorners
         {
             Thumb hitThumb = sender as Thumb;
 
-            if (hitThumb == null) return;
+            if (hitThumb == null)
+            {
+                return;
+            }
+
             IncrementDragging(args);
             var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
             _boundingBox.Top + _dragYTravel,
