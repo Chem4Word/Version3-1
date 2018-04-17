@@ -184,6 +184,7 @@ namespace Chem4Word.ACME.Graphics
 
             Matrix matx = new Matrix();
 
+            //work out how far back the arrowhead extends
             double offset = ArrowHeadLength * Math.Cos(HeadAngle);
 
             var length = GetPathFigureLength(line);
