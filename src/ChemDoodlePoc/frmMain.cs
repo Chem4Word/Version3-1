@@ -171,26 +171,38 @@ namespace ChemDoodlePoc
                     if (radSingle.Checked)
                     {
                         mol = ExecuteJavaScript("GetMolFile");
-                        txtStructure.Text = mol.ToString().Replace("\n", "\r\n");
+                        if (mol != null)
+                        {
+                            txtStructure.Text = mol.ToString().Replace("\n", "\r\n");
+                        }
                     }
                     break;
 
                 case "CML":
                     mol = ExecuteJavaScript("GetCmlFile");
-                    txtStructure.Text = mol.ToString().Replace("\n", "\r\n");
-                    txtStructure.Text = txtStructure.Text.Replace("><", ">\r\n<");
+                    if (mol != null)
+                    {
+                        txtStructure.Text = mol.ToString().Replace("\n", "\r\n");
+                        txtStructure.Text = txtStructure.Text.Replace("><", ">\r\n<");
+                    }
                     break;
 
                 case "JSON":
                     mol = ExecuteJavaScript("GetJSON");
-                    string temp = mol.ToString();
-                    JToken molJson = JObject.Parse(temp);
-                    txtStructure.Text = molJson.ToString();
+                    if (mol != null)
+                    {
+                        string temp = mol.ToString();
+                        JToken molJson = JObject.Parse(temp);
+                        txtStructure.Text = molJson.ToString();
+                    }
                     break;
 
                 case "formula":
                     mol = ExecuteJavaScript("GetFormula");
-                    txtStructure.Text = mol.ToString().Replace("\n", "\r\n");
+                    if (mol != null)
+                    {
+                        txtStructure.Text = mol.ToString().Replace("\n", "\r\n");
+                    }
                     break;
             }
             EnableButtons();

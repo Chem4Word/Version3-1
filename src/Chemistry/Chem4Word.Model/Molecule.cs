@@ -54,21 +54,6 @@ namespace Chem4Word.Model
             var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
             var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
 
-            const double padding = 50;
-
-            double xDiff = Math.Abs(xMax - xMin);
-            if (xDiff < padding)
-            {
-                xMin = xMin - padding / 2 - xDiff;
-                xMax = xMax + padding / 2 + xDiff;
-            }
-            double yDiff = Math.Abs(yMax - yMin);
-            if (yDiff < padding)
-            {
-                yMin = yMin - padding / 2 - yDiff;
-                yMax = yMax + padding / 2 - yDiff;
-            }
-
             _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
         }
 

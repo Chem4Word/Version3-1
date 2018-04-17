@@ -403,10 +403,8 @@ function GetMolFile() {
 }
 
 function GetCmlFile() {
-    if (sketcher.oneMolecule) {
-        var cmlFile = new ChemDoodle.io.CMLInterpreter().write(sketcher.molecules);
-        return cmlFile;
-    }
+    var cmlFile = new ChemDoodle.io.CMLInterpreter().write(sketcher.molecules);
+    return cmlFile;
 }
 
 function GetFirstMolJSON() {
