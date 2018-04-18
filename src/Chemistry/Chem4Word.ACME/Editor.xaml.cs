@@ -143,7 +143,10 @@ namespace Chem4Word.ACME
             where T : DependencyObject
         {
             // Confirm parent is valid.
-            if (parent == null) return null;
+            if (parent == null)
+            {
+                return null;
+            }
 
             T foundChild = null;
 
@@ -159,7 +162,10 @@ namespace Chem4Word.ACME
                     foundChild = FindChild<T>(child);
 
                     // If the child is found, break so we do not overwrite the found child.
-                    if (foundChild != null) break;
+                    if (foundChild != null)
+                    {
+                        break;
+                    }
                 }
                 else
                 {
