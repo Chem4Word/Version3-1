@@ -299,9 +299,11 @@ namespace Chem4Word.ViewModel
                 if (newObject is Atom)
                 {
                     var atom = (Atom) newObject;
-                   
+
                     AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
                     SelectionAdorners[newObject] = atomAdorner;
+                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
                     //if all atoms are selected then select the mol
                     if (AllAtomsSelected(atom.Parent))
                     {
@@ -315,15 +317,45 @@ namespace Chem4Word.ViewModel
                 {
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
                     SelectionAdorners[newObject] = bondAdorner;
+                    bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
 
                 if (newObject is Molecule)
                 {
-                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface,(newObject as Molecule));
-                        SelectionAdorners[newObject] = molAdorner;
-                    }
+                    MoleculeSelectionAdorner molAdorner =
+                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
+                       SelectionAdorners[newObject] = molAdorner;
+                    molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+
                 }
             }
+        }
+
+        private void SelAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (sender is AtomSelectionAdorner)
+                {
+
+                    Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent as Molecule;
+                    RemoveAdorners(mol);
+                    SelectedItems.Add(mol);
+
+                }
+                else if (sender is BondSelectionAdorner)
+                {
+                    Molecule mol = (sender as BondSelectionAdorner).AdornedBond.Parent as Molecule;
+                    RemoveAdorners(mol);
+                    SelectedItems.Add(mol);
+                }
+                else if (sender is MoleculeSelectionAdorner)
+                {
+                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule.Parent as Molecule;
+                }
+                
+            }
+        }
 
         private void RemoveAdorners(Molecule atomParent)
         {
@@ -332,7 +364,9 @@ namespace Chem4Word.ViewModel
             {
                 if (SelectionAdorners.ContainsKey(bond))
                 {
-                    layer.Remove(SelectionAdorners[bond]);
+                    var selectionAdorner = SelectionAdorners[bond];
+                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    layer.Remove(selectionAdorner);
                     SelectionAdorners.Remove(bond);
                 }
             }
@@ -341,7 +375,9 @@ namespace Chem4Word.ViewModel
             {
                 if (SelectionAdorners.ContainsKey(atom))
                 {
-                    layer.Remove(SelectionAdorners[atom]);
+                    var selectionAdorner = SelectionAdorners[atom];
+                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    layer.Remove(selectionAdorner);
                     SelectionAdorners.Remove(atom);
                 }
             }

@@ -17,9 +17,22 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Bond _adornedBond;
 
+        public Bond AdornedBond
+        {
+            get { return _adornedBond; }
+        }
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
-            IsHitTestVisible = false;
+            //this.MouseLeftButtonDown += BondSelectionAdorner_MouseLeftButtonDown;
+
+        }
+
+        private void BondSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                RaiseEvent(e);
+            }
         }
 
         public BondSelectionAdorner(UIElement adornedElement, Bond adornedBond) : this(adornedElement)
@@ -29,6 +42,7 @@ namespace Chem4Word.ViewModel.Adorners
             myAdornerLayer.Add(this);
         }
 
+        
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
@@ -76,6 +90,11 @@ namespace Chem4Word.ViewModel.Adorners
             final = Geometry.Combine(final, end, GeometryCombineMode.Exclude, null);
 
             drawingContext.DrawGeometry(renderBrush, renderPen, final);
+        }
+
+        ~BondSelectionAdorner()
+        {
+            //this.MouseLeftButtonDown -= BondSelectionAdorner_MouseLeftButtonDown;
         }
     }
 }
