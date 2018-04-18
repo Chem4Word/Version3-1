@@ -140,6 +140,8 @@ namespace WinFormsTestHarness
                     {
                         Text = filename;
                     }
+                    Information.Text = $"Formula: {model.ConciseFormula} Bond Length: {model.MeanBondLength}";
+
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");

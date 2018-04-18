@@ -31,8 +31,6 @@
             this.LoadStructure = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.EditStructure = new System.Windows.Forms.Button();
-            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.display1 = new Chem4Word.ACME.Display();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.ChangeBackground = new System.Windows.Forms.Button();
             this.ShowCarbons = new System.Windows.Forms.CheckBox();
@@ -45,6 +43,13 @@
             this.Timing = new System.Windows.Forms.Button();
             this.Undo = new System.Windows.Forms.Button();
             this.Redo = new System.Windows.Forms.Button();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.elementHost2 = new System.Windows.Forms.Integration.ElementHost();
+            this.elementHost3 = new System.Windows.Forms.Integration.ElementHost();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.display1 = new Chem4Word.ACME.Display();
+            this.Information = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -73,19 +78,6 @@
             this.EditStructure.Text = "Edit";
             this.EditStructure.UseVisualStyleBackColor = true;
             this.EditStructure.Click += new System.EventHandler(this.EditStructure_Click);
-            // 
-            // elementHost1
-            // 
-            this.elementHost1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.elementHost1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.elementHost1.Location = new System.Drawing.Point(12, 12);
-            this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(671, 465);
-            this.elementHost1.TabIndex = 1;
-            this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.display1;
             // 
             // ChangeBackground
             // 
@@ -213,11 +205,72 @@
             this.Redo.UseVisualStyleBackColor = true;
             this.Redo.Click += new System.EventHandler(this.Redo_Click);
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
+            this.tableLayoutPanel1.Controls.Add(this.elementHost1, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.elementHost2, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.elementHost3, 0, 0);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(671, 435);
+            this.tableLayoutPanel1.TabIndex = 13;
+            // 
+            // elementHost2
+            // 
+            this.elementHost2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost2.Location = new System.Drawing.Point(539, 3);
+            this.elementHost2.Name = "elementHost2";
+            this.elementHost2.Size = new System.Drawing.Size(129, 429);
+            this.elementHost2.TabIndex = 2;
+            this.elementHost2.Text = "elementHost2";
+            this.elementHost2.Child = null;
+            // 
+            // elementHost3
+            // 
+            this.elementHost3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost3.Location = new System.Drawing.Point(3, 3);
+            this.elementHost3.Name = "elementHost3";
+            this.elementHost3.Size = new System.Drawing.Size(128, 429);
+            this.elementHost3.TabIndex = 3;
+            this.elementHost3.Text = "elementHost3";
+            this.elementHost3.Child = null;
+            // 
+            // elementHost1
+            // 
+            this.elementHost1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.elementHost1.Location = new System.Drawing.Point(137, 3);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(396, 429);
+            this.elementHost1.TabIndex = 1;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = this.display1;
+            // 
+            // Information
+            // 
+            this.Information.AutoSize = true;
+            this.Information.Location = new System.Drawing.Point(149, 454);
+            this.Information.Name = "Information";
+            this.Information.Size = new System.Drawing.Size(16, 13);
+            this.Information.TabIndex = 14;
+            this.Information.Text = "...";
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 544);
+            this.Controls.Add(this.Information);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.Redo);
             this.Controls.Add(this.Undo);
             this.Controls.Add(this.Timing);
@@ -228,13 +281,13 @@
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.EditStructure);
-            this.Controls.Add(this.elementHost1);
             this.Controls.Add(this.RandomElement);
             this.Controls.Add(this.RemoveAtom);
             this.Controls.Add(this.LoadStructure);
             this.Name = "FlexForm";
             this.Text = "Flexible Display";
             this.Load += new System.EventHandler(this.FlexForm_Load);
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -259,6 +312,10 @@
         private System.Windows.Forms.Button Timing;
         private System.Windows.Forms.Button Undo;
         private System.Windows.Forms.Button Redo;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Integration.ElementHost elementHost2;
+        private System.Windows.Forms.Integration.ElementHost elementHost3;
+        private System.Windows.Forms.Label Information;
     }
 }
 
