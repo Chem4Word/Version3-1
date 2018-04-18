@@ -7,10 +7,11 @@
              xmlns:local="clr-namespace:WinFormsTestHarness"
              mc:Ignorable="d"
              d:DesignHeight="150" d:DesignWidth="200">
-    <Grid>
+    <Grid HorizontalAlignment="Stretch">
         <ListBox
             x:Name="StackList"
             Grid.IsSharedSizeScope="True"
+            Width="Auto"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
             <ListBox.ItemTemplate>
@@ -23,8 +24,8 @@
                         <controls:Display
                             Name="Display"
                             HorizontalAlignment="Stretch"
-                            Width="{Binding Path=Model.BoundingBox.Width}"
-                            Height="{Binding Path=Model.BoundingBox.Height}"
+                            BackgroundColor="White"
+                            Background="White"
                             Chemistry="{Binding Path=Model}">
                         </controls:Display>
                     </Border>
