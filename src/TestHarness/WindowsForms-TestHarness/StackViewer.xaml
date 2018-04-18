@@ -6,14 +6,26 @@
              xmlns:controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
              xmlns:local="clr-namespace:WinFormsTestHarness"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="150" d:DesignWidth="200">
     <Grid>
-        <ListBox>
+        <ListBox
+            x:Name="StackList"
+            Grid.IsSharedSizeScope="True"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Border>
-                        <controls:Display>
-
+                    <Border
+                        BorderBrush="Blue"
+                        BorderThickness="2"
+                        CornerRadius="2"
+                        HorizontalAlignment="Stretch">
+                        <controls:Display
+                            Name="Display"
+                            HorizontalAlignment="Stretch"
+                            Width="{Binding Path=Model.BoundingBox.Width}"
+                            Height="{Binding Path=Model.BoundingBox.Height}"
+                            Chemistry="{Binding Path=Model}">
                         </controls:Display>
                     </Border>
                 </DataTemplate>
