@@ -140,7 +140,7 @@ namespace WinFormsTestHarness
                     {
                         Text = filename;
                     }
-                    Information.Text = $"Formula: {model.ConciseFormula} Bond Length: {model.MeanBondLength}";
+                    Information.Text = $"Formula: {model.ConciseFormula} Bond Length: {model.RenderBondLength}";
 
                     display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
                     display1.Chemistry = model;

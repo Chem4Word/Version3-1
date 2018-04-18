@@ -336,6 +336,7 @@ namespace Chem4Word.Model
 
             clone.Relabel();
             clone.RefreshMolecules();
+            clone.RenderBondLength = RenderBondLength;
 
             return clone;
         }
@@ -432,12 +433,35 @@ namespace Chem4Word.Model
             }
         }
 
+        private double? _renderBondLength;
+        public double? RenderBondLength {
+            get
+            {
+                if (_renderBondLength == null)
+                {
+                    return MeanBondLength;
+                }
+                else
+                {
+                    return _renderBondLength;
+                }
+            }
+            set
+            {
+                _renderBondLength = value;
+            }
+        }
+
         /// <summary>
         /// Rescale to new preferred length, to be used in xaml code behind, not normal cs
         /// </summary>
         /// <param name="preferredLength"></param>
         public void RescaleForXaml(double preferredLength)
         {
+            if (_renderBondLength == null)
+            {
+                _renderBondLength = MeanBondLength;
+            }
             ScaleToAverageBondLength(preferredLength);
             RepositionAll(MinX, MinY);
             OnPropertyChanged("BoundingBox");
