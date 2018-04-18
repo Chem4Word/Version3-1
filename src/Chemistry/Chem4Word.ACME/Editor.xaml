@@ -123,6 +123,7 @@
                     </RadioButton.Tag>
                 </RadioButton>
 
+
                 <RadioButton GroupName="Actions" ToolTip="Draw" Style="{StaticResource ToolbarButtonStyle}" Click="SelectionButton_OnChecked" x:Name="DrawButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="24">
                         <Path Width="50.4259" Height="50.4259" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"

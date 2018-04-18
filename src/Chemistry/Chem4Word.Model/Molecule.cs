@@ -37,10 +37,10 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (_boundingBox == Rect.Empty)
-                {
-                    CalculateBoundingBox();
-                }
+                
+                
+                CalculateBoundingBox();
+                
                 return _boundingBox;
             }
         }
