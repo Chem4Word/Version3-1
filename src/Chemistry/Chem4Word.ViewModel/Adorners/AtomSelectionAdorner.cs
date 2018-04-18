@@ -20,12 +20,16 @@ namespace Chem4Word.ViewModel.Adorners
 
         public AtomSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
-            IsHitTestVisible = false;
+            //IsHitTestVisible = false;
+            //this.MouseLeftButtonDown += AtomSelectionAdorner_MouseLeftButtonDown;
         }
 
         private void AtomSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            e.Handled = false;
+            if (e.ClickCount == 2)
+            {
+                this.RaiseEvent(e);
+            }
         }
 
         public AtomSelectionAdorner(UIElement adornedElement, Atom adornedAtom) : this(adornedElement)
@@ -55,6 +59,11 @@ namespace Chem4Word.ViewModel.Adorners
             {
                 drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox());
             }
+        }
+
+        ~AtomSelectionAdorner()
+        {
+            this.MouseLeftButtonDown -= AtomSelectionAdorner_MouseLeftButtonDown;
         }
     }
 }

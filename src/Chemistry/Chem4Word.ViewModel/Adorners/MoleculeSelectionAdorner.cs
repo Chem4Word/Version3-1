@@ -78,17 +78,17 @@ namespace Chem4Word.ViewModel.Adorners
             _bottomLeft.DragStarted += DragStarted;
             _bottomRight.DragStarted += DragStarted;
 
-            _topLeft.DragDelta += HandleTopLeft;
-            _topRight.DragDelta += HandleTopRight;
-            _bottomLeft.DragDelta += HandleBottomLeft;
-            _bottomRight.DragDelta += HandleBottomRight;
+            _topLeft.DragDelta += _topLeft_DragDelta;
+            _topRight.DragDelta += _topRight_DragDelta;
+            _bottomLeft.DragDelta += _bottomLeft_DragDelta;
+            _bottomRight.DragDelta += _bottomRight_DragDelta;
 
             _bottomRight.DragCompleted += _bigThumb_DragCompleted;
             _topRight.DragCompleted += _bigThumb_DragCompleted;
             _topLeft.DragCompleted += _bigThumb_DragCompleted;
             _bottomLeft.DragCompleted += _bigThumb_DragCompleted;
             //wire up the event handling
-            this.PreviewMouseDown += MoleculeAdorner_PreviewMouseDown;
+            this.MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
             this.KeyDown += MoleculeAdorner_KeyDown;
             
             _frag = molecule;
@@ -105,6 +105,14 @@ namespace Chem4Word.ViewModel.Adorners
             myAdornerLayer.Add(this);
         }
 
+        private void MoleculeSelectionAdorner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                RaiseEvent(e);
+            }
+        }
+
         private void MoleculeAdorner_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.Delete))
@@ -117,6 +125,11 @@ namespace Chem4Word.ViewModel.Adorners
                 if (IsWorking)
                 {
                     AbortDragging();
+                }
+
+                else
+                {
+                    
                 }
             }
         }
@@ -229,12 +242,15 @@ namespace Chem4Word.ViewModel.Adorners
 
             _bigThumb = new Thumb();
             _visualChildren.Add(_bigThumb);
+            _bigThumb.IsHitTestVisible = true;
 
             _bigThumb.Style = (Style)FindResource("GrabHandleStyle");
             _bigThumb.Cursor = Cursors.Hand;
             _bigThumb.DragStarted += _bigThumb_DragStarted;
             _bigThumb.DragCompleted += _bigThumb_DragCompleted;
             _bigThumb.DragDelta += _bigThumb_DragDelta;
+            _bigThumb.MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
+           
         }
 
         private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -280,6 +296,9 @@ namespace Chem4Word.ViewModel.Adorners
             _dragging = true;
 
         }
+
+
+        
 
         private void MoleculeAdorner_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -337,6 +356,9 @@ namespace Chem4Word.ViewModel.Adorners
         // Override the VisualChildrenCount and GetVisualChild properties to interface with 
         // the adorner's visual collection.
         protected override int VisualChildrenCount => _visualChildren.Count;
+
+        public Molecule AdornedMolecule => _frag;
+
         protected override Visual GetVisualChild(int index) => _visualChildren[index];
 
         // Arrange the Adorners.
@@ -386,25 +408,7 @@ namespace Chem4Word.ViewModel.Adorners
         #region Resizing
 
         // Handler for resizing from the bottom-right.
-        private void HandleBottomRight(object sender, DragDeltaEventArgs args)
-        {
-            Thumb hitThumb = sender as Thumb;
-
-            if (hitThumb == null)
-            {
-                return;
-            }
-
-            IncrementDragging(args);
-            var scaleFactor = GetScaleFactor(_boundingBox.Left,
-                _boundingBox.Top,
-                _boundingBox.Right +  _dragXTravel,
-                _boundingBox.Bottom + _dragYTravel);
-
-            _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Left, _boundingBox.Top);
-
-            InvalidateVisual();
-        }
+       
 
         private void IncrementDragging(DragDeltaEventArgs args)
         {
@@ -439,7 +443,7 @@ namespace Chem4Word.ViewModel.Adorners
         }
 
         // Handler for resizing from the top-right.
-        private void HandleTopRight(object sender, DragDeltaEventArgs args)
+        private void _topRight_DragDelta(object sender, DragDeltaEventArgs args)
         {
             Thumb hitThumb = sender as Thumb;
 
@@ -448,19 +452,29 @@ namespace Chem4Word.ViewModel.Adorners
                 return;
             }
 
+            
             IncrementDragging(args);
-            var scaleFactor = GetScaleFactor(_boundingBox.Left,
-             _boundingBox.Top + _dragYTravel,
-             _boundingBox.Right + _dragXTravel,
-             _boundingBox.Bottom);
 
-            _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Left, _boundingBox.Bottom);
+            if (NotDraggingBackwards())
+            {
+                var scaleFactor = GetScaleFactor(_boundingBox.Left,
+                    _boundingBox.Top + _dragYTravel,
+                    _boundingBox.Right + _dragXTravel,
+                    _boundingBox.Bottom);
 
-            InvalidateVisual();
+                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Left, _boundingBox.Bottom);
+
+                InvalidateVisual();
+            }
+        }
+
+        private bool NotDraggingBackwards()
+        {
+            return _boundingBox.Width + _dragXTravel > 10 && _boundingBox.Height + _dragYTravel > 10;
         }
 
         // Handler for resizing from the top-left.
-        private void HandleTopLeft(object sender, DragDeltaEventArgs args)
+        private void _topLeft_DragDelta(object sender, DragDeltaEventArgs args)
         {
             Thumb hitThumb = sender as Thumb;
 
@@ -470,18 +484,21 @@ namespace Chem4Word.ViewModel.Adorners
             }
 
             IncrementDragging(args);
-            var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
-            _boundingBox.Top + _dragYTravel,
-            _boundingBox.Right,
-            _boundingBox.Bottom);
+            if (NotDraggingBackwards())
+            {
+                var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
+                    _boundingBox.Top + _dragYTravel,
+                    _boundingBox.Right,
+                    _boundingBox.Bottom);
 
-            _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Bottom);
+                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Bottom);
 
-            InvalidateVisual();
+                InvalidateVisual();
+            }
         }
 
         // Handler for resizing from the bottom-left.
-        private void HandleBottomLeft(object sender, DragDeltaEventArgs args)
+        private void _bottomLeft_DragDelta(object sender, DragDeltaEventArgs args)
         {
             Thumb hitThumb = sender as Thumb;
 
@@ -491,15 +508,41 @@ namespace Chem4Word.ViewModel.Adorners
             }
 
             IncrementDragging(args);
-            var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
-            _boundingBox.Top + _dragYTravel,
-            _boundingBox.Right,
-            _boundingBox.Bottom);
+            if (NotDraggingBackwards())
+            {
+                var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
+                    _boundingBox.Top + _dragYTravel,
+                    _boundingBox.Right,
+                    _boundingBox.Bottom);
 
-            _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Top);
+                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Top);
 
-            InvalidateVisual();
+                InvalidateVisual();
+            }
 
+        }
+
+        private void _bottomRight_DragDelta(object sender, DragDeltaEventArgs args)
+        {
+            Thumb hitThumb = sender as Thumb;
+
+            if (hitThumb == null)
+            {
+                return;
+            }
+
+            IncrementDragging(args);
+            if (NotDraggingBackwards())
+            {
+                var scaleFactor = GetScaleFactor(_boundingBox.Left,
+                    _boundingBox.Top,
+                    _boundingBox.Right + _dragXTravel,
+                    _boundingBox.Bottom + _dragYTravel);
+
+                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Left, _boundingBox.Top);
+
+                InvalidateVisual();
+            }
         }
 
         #endregion
