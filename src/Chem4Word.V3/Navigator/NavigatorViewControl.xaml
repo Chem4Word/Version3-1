@@ -18,15 +18,15 @@
             <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
         </SolidColorBrush>
     </UserControl.Resources>
-
     <Grid>
         <ScrollViewer VerticalAlignment="Stretch">
-            <ItemsControl x:Name="NavigatorList" 
+            <ItemsControl x:Name="NavigatorList"
                           VirtualizingStackPanel.IsVirtualizing="True"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           ScrollViewer.CanContentScroll="True"
-                          Grid.IsSharedSizeScope="True" 
-                          ItemsSource="{Binding Path=NavigatorItems}" 
-                          HorizontalAlignment="Stretch" 
+                          Grid.IsSharedSizeScope="True"
+                          ItemsSource="{Binding Path=NavigatorItems}"
+                          HorizontalAlignment="Stretch"
                           HorizontalContentAlignment="Stretch">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -49,7 +49,6 @@
                         <VirtualizingStackPanel />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-
             </ItemsControl>
         </ScrollViewer>
     </Grid>
