@@ -43,15 +43,15 @@
             this.Timing = new System.Windows.Forms.Button();
             this.Undo = new System.Windows.Forms.Button();
             this.Redo = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.Information = new System.Windows.Forms.Label();
+            this.LayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.DisplayHost = new System.Windows.Forms.Integration.ElementHost();
             this.Display = new Chem4Word.ACME.Display();
             this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
             this.RedoStack = new WinFormsTestHarness.StackViewer();
             this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
             this.UndoStack = new WinFormsTestHarness.StackViewer();
-            this.tableLayoutPanel1.SuspendLayout();
+            this.Information = new System.Windows.Forms.Label();
+            this.LayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // LoadStructure
@@ -207,25 +207,56 @@
             this.Redo.UseVisualStyleBackColor = true;
             this.Redo.Click += new System.EventHandler(this.Redo_Click);
             // 
-            // tableLayoutPanel1
+            // LayoutPanel
             // 
-            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.LayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 60F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel1.Controls.Add(this.DisplayHost, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.RedoHost, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.UndoHost, 0, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(671, 435);
-            this.tableLayoutPanel1.TabIndex = 13;
+            this.LayoutPanel.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.LayoutPanel.ColumnCount = 3;
+            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.LayoutPanel.Controls.Add(this.DisplayHost, 1, 0);
+            this.LayoutPanel.Controls.Add(this.RedoHost, 2, 0);
+            this.LayoutPanel.Controls.Add(this.UndoHost, 0, 0);
+            this.LayoutPanel.Location = new System.Drawing.Point(12, 12);
+            this.LayoutPanel.Name = "LayoutPanel";
+            this.LayoutPanel.RowCount = 1;
+            this.LayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.LayoutPanel.Size = new System.Drawing.Size(671, 435);
+            this.LayoutPanel.TabIndex = 13;
+            // 
+            // DisplayHost
+            // 
+            this.DisplayHost.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.DisplayHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DisplayHost.Location = new System.Drawing.Point(170, 3);
+            this.DisplayHost.Name = "DisplayHost";
+            this.DisplayHost.Size = new System.Drawing.Size(329, 429);
+            this.DisplayHost.TabIndex = 1;
+            this.DisplayHost.Text = "elementHost1";
+            this.DisplayHost.Child = this.Display;
+            // 
+            // RedoHost
+            // 
+            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RedoHost.Location = new System.Drawing.Point(505, 3);
+            this.RedoHost.Name = "RedoHost";
+            this.RedoHost.Size = new System.Drawing.Size(163, 429);
+            this.RedoHost.TabIndex = 2;
+            this.RedoHost.Text = "elementHost2";
+            this.RedoHost.Child = this.RedoStack;
+            // 
+            // UndoHost
+            // 
+            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UndoHost.Location = new System.Drawing.Point(3, 3);
+            this.UndoHost.Name = "UndoHost";
+            this.UndoHost.Size = new System.Drawing.Size(161, 429);
+            this.UndoHost.TabIndex = 3;
+            this.UndoHost.Text = "elementHost3";
+            this.UndoHost.Child = this.UndoStack;
             // 
             // Information
             // 
@@ -237,44 +268,13 @@
             this.Information.TabIndex = 14;
             this.Information.Text = "...";
             // 
-            // DisplayHost
-            // 
-            this.DisplayHost.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.DisplayHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DisplayHost.Location = new System.Drawing.Point(137, 3);
-            this.DisplayHost.Name = "DisplayHost";
-            this.DisplayHost.Size = new System.Drawing.Size(396, 429);
-            this.DisplayHost.TabIndex = 1;
-            this.DisplayHost.Text = "elementHost1";
-            this.DisplayHost.Child = this.Display;
-            // 
-            // RedoHost
-            // 
-            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(539, 3);
-            this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(129, 429);
-            this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "elementHost2";
-            this.RedoHost.Child = this.RedoStack;
-            // 
-            // UndoHost
-            // 
-            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UndoHost.Location = new System.Drawing.Point(3, 3);
-            this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(128, 429);
-            this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "elementHost3";
-            this.UndoHost.Child = this.UndoStack;
-            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(695, 544);
             this.Controls.Add(this.Information);
-            this.Controls.Add(this.tableLayoutPanel1);
+            this.Controls.Add(this.LayoutPanel);
             this.Controls.Add(this.Redo);
             this.Controls.Add(this.Undo);
             this.Controls.Add(this.Timing);
@@ -291,7 +291,7 @@
             this.Name = "FlexForm";
             this.Text = "Flexible Display";
             this.Load += new System.EventHandler(this.FlexForm_Load);
-            this.tableLayoutPanel1.ResumeLayout(false);
+            this.LayoutPanel.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -316,7 +316,7 @@
         private System.Windows.Forms.Button Timing;
         private System.Windows.Forms.Button Undo;
         private System.Windows.Forms.Button Redo;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.TableLayoutPanel LayoutPanel;
         private System.Windows.Forms.Integration.ElementHost RedoHost;
         private System.Windows.Forms.Integration.ElementHost UndoHost;
         private System.Windows.Forms.Label Information;

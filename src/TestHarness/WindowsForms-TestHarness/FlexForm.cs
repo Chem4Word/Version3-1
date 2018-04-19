@@ -41,8 +41,11 @@ namespace WinFormsTestHarness
             sb.Append("|CML molecule files (*.cml)|*.cml");
             sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
+            openFileDialog1.Title = "Open Structure";
+            openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
             openFileDialog1.Filter = sb.ToString();
             openFileDialog1.FileName = "";
+            openFileDialog1.ShowHelp = false;
 
             DialogResult dr = openFileDialog1.ShowDialog();
 
