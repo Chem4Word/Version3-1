@@ -11,9 +11,8 @@
         <ListBox
             x:Name="StackList"
             Grid.IsSharedSizeScope="True"
-            Width="Auto"
-            HorizontalAlignment="Stretch"
-            VerticalAlignment="Stretch">
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+            HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border
