@@ -11,14 +11,13 @@
         <ListBox
             x:Name="StackList"
             Grid.IsSharedSizeScope="True"
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border
                         BorderBrush="Blue"
                         BorderThickness="2"
-                        CornerRadius="2"
                         HorizontalAlignment="Stretch">
                         <controls:Display
                             Name="Display"
