@@ -896,7 +896,10 @@ namespace Chem4Word.Model
 
         public double MeanBondLength
         {
-            get { return Bonds.Average(b => b.BondVector.Length); }
+            get
+            {
+                return Bonds.Any() ? Bonds.Average(b => b.BondVector.Length) : 0;
+            }
         }
 
         public void ScaleToAverageBondLength(double newLength, Model model)

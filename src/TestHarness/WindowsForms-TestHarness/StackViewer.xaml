@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="WinFormsTestHarness.StackViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
+             xmlns:local="clr-namespace:WinFormsTestHarness"
+             mc:Ignorable="d"
+             d:DesignHeight="150" d:DesignWidth="200">
+    <Grid HorizontalAlignment="Stretch">
+        <ListBox
+            x:Name="StackList"
+            Grid.IsSharedSizeScope="True"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border
+                        BorderBrush="Blue"
+                        BorderThickness="2"
+                        HorizontalAlignment="Stretch">
+                        <controls:Display
+                            Name="Display"
+                            HorizontalAlignment="Stretch"
+                            BackgroundColor="White"
+                            Background="White"
+                            Chemistry="{Binding Path=Model}">
+                        </controls:Display>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
