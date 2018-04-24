@@ -20,6 +20,7 @@ namespace Chem4Word.ViewModel
         }
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
+        // ToDo: Duplicated Routine
 
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)

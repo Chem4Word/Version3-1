@@ -325,6 +325,7 @@ namespace Chem4Word.Model
             Relabel();
 
             clone.CustomXmlPartGuid = CustomXmlPartGuid;
+            clone.ScaledForXaml = ScaledForXaml;
 
             foreach (var molecule in Molecules)
             {
@@ -336,7 +337,6 @@ namespace Chem4Word.Model
 
             clone.Relabel();
             clone.RefreshMolecules();
-            clone.RenderBondLength = RenderBondLength;
 
             return clone;
         }
@@ -374,7 +374,19 @@ namespace Chem4Word.Model
         }
 
         //used to calculate the bounds of the atom
-        public double FontSize { get; set; }
+        public double FontSize {
+            get
+            {
+                double fontSize = Globals.DefaultFontSize;
+
+                if (AllBonds.Any())
+                {
+                    fontSize = MeanBondLength * Globals.FontSizePercentageBond;
+                }
+
+                return fontSize;
+            }
+        }
 
         public Rect BoundingBox
         {
@@ -433,36 +445,27 @@ namespace Chem4Word.Model
             }
         }
 
-        private double? _renderBondLength;
-        public double? RenderBondLength {
-            get
+        public bool ScaledForXaml { get; set; }
+
+        public void RescaleForCml()
+        {
+            if (ScaledForXaml)
             {
-                if (_renderBondLength == null)
-                {
-                    return MeanBondLength;
-                }
-                else
-                {
-                    return _renderBondLength;
-                }
-            }
-            set
-            {
-                _renderBondLength = value;
+                ScaleToAverageBondLength(MeanBondLength / Globals.ScaleFactorForXaml);
+                ScaledForXaml = false;
             }
         }
 
         /// <summary>
         /// Rescale to new preferred length, to be used in xaml code behind, not normal cs
         /// </summary>
-        /// <param name="preferredLength"></param>
-        public void RescaleForXaml(double preferredLength)
+        public void RescaleForXaml()
         {
-            if (_renderBondLength == null)
+            if (!ScaledForXaml)
             {
-                _renderBondLength = MeanBondLength;
+                ScaleToAverageBondLength(MeanBondLength * Globals.ScaleFactorForXaml);
+                ScaledForXaml = true;
             }
-            ScaleToAverageBondLength(preferredLength);
             RepositionAll(MinX, MinY);
             OnPropertyChanged("BoundingBox");
         }

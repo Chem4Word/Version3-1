@@ -11,5 +11,10 @@ namespace Chem4Word.Model
     {
         public static PeriodicTable PeriodicTable = new PeriodicTable();
         public const double VectorTolerance = 0.01;
+
+        public const double DefaultFontSize = 20.0d;
+        public const double FontSizePercentageBond = 0.5d;
+
+        public const double ScaleFactorForXaml = 5.0;
     }
 }

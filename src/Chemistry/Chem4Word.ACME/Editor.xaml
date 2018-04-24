@@ -19,7 +19,6 @@
     xmlns:release="condition:!DEBUG"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     x:Name="AcmeControl" Loaded="ACMEControl_Loaded"
-    FontSize="23.0"
     Height="774" Width="1013">
     <UserControl.Resources>
         <ResourceDictionary>

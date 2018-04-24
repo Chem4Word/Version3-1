@@ -17,7 +17,6 @@
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
-    FontSize="23.0"
     x:Name="ACMEDisplay">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />

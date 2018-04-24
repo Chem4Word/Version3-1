@@ -428,6 +428,7 @@ namespace Chem4Word.Model
         }
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
+        // ToDo: Duplicated Routine
 
         //tries to get a bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
