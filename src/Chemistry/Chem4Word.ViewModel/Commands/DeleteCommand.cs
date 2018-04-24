@@ -21,7 +21,7 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.UndoManager.Commit();
+            MyEditViewModel.UndoManager.CommitTrans();
         }
 
         public override event EventHandler CanExecuteChanged;
