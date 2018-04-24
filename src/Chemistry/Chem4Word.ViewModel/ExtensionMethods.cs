@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Diagnostics;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 using System.Windows;
@@ -30,6 +31,7 @@ namespace Chem4Word.ViewModel
             Rect baseAtomBox = new Rect(
                 new Point(position.X - halfSize, position.Y - halfSize),
                 new Point(position.X + halfSize, position.Y + halfSize));
+            Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} baseAtomBox: {baseAtomBox}");
             if (atom.SymbolText != "")
             {
                 double symbolWidth = atom.SymbolText.Length * FontSize * 0.8;
@@ -61,11 +63,12 @@ namespace Chem4Word.ViewModel
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
+                Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                //return new Rect(atom.Position, atom.Position);//empty rect
+                Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }

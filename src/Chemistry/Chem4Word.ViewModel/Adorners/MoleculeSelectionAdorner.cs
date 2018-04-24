@@ -20,11 +20,12 @@ namespace Chem4Word.ViewModel.Adorners
 {
     public class MoleculeSelectionAdorner: Adorner
     {
+        // ToDo: Fix This ?
         private const int ThumbWidth = 10;
         private const int HalfThumbWidth = ThumbWidth / 2;
 
         private const int RotateThumbWidth = 20;
-
+        // ToDo: Fix This ?
 
         private Point _canvasPos;
         private readonly Molecule _frag;

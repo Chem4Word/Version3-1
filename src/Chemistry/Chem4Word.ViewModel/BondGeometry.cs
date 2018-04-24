@@ -22,6 +22,8 @@ namespace Chem4Word.ViewModel
     /// </summary>
     public static class BondGeometry
     {
+        // ToDo: Fix This
+        // Remove All
         //atom symbol constants
         public const double Offset = 4.5;
 
@@ -36,6 +38,8 @@ namespace Chem4Word.ViewModel
         public const double WedgeWidth = 12.0;
 
         public const double VectorTolerance = 0.01;
+
+        // ToDo: Fix This
 
         public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, Point endPoint)
         {

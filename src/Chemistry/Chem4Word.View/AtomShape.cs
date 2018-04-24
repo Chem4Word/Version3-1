@@ -212,6 +212,7 @@ namespace Chem4Word.View
         /// <param name="drawingContext"></param>
         private void RenderAtom(DrawingContext drawingContext)
         {
+            // ToDo: Fix This
             //renders the atom complete with charges, hydrogens and labels.
             //this code is *complex*
 
@@ -336,6 +337,7 @@ namespace Chem4Word.View
         /// <returns></returns>
         private ChargeLabelText DrawChargeOrRadical(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString, Brush fill, CompassPoints defaultHOrientation)
         {
+            // ToDo: Fix This
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
@@ -393,6 +395,7 @@ namespace Chem4Word.View
         //draws the isotope label at ten-o-clock
         private LabelMetrics DrawIsotopeLabel(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics)
         {
+            // ToDo: Fix This
             Debug.Assert(Isotope != null);
 
             string isoLabel = Isotope.ToString();
@@ -411,6 +414,7 @@ namespace Chem4Word.View
         //draws the main atom symbol, or an ellipse if necessary
         private AtomTextMetrics DrawSelf(DrawingContext drawingContext, bool measureOnly = false)
         {
+            // ToDo: Fix This
             if (AtomSymbol == "") //implicit carbon
             {
                 //so draw a circle
@@ -464,6 +468,7 @@ namespace Chem4Word.View
 
         #region layout DPs
 
+        // ToDo: Fix This
         public double FontSize
         {
             get { return (double)GetValue(FontSizeProperty); }

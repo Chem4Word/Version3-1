@@ -32,9 +32,17 @@ namespace Chem4Word.View
             }
         }
 
+        public static double AA
+        {
+            get { return 1; }
+        }
+
+        // ToDo: Fix This
+        // Remove ...
         public static double SymbolSize = 23;
         public static double ScriptSize = SymbolSize * 0.6;
         public static double IsotopeSize = ScriptSize * 0.8;
+        // ToDo: Fix This
 
         public static Typeface SymbolTypeface = new Typeface(new FontFamily("Arial"),
             FontStyles.Normal,

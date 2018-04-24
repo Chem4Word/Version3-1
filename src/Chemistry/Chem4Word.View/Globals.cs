@@ -9,6 +9,8 @@ namespace Chem4Word.View
 {
     public static class Globals
     {
+        // ToDo: Fix This
+        // Remove all
         //atom symbol constants
         public const double Offset = 4.5;
 
@@ -21,6 +23,7 @@ namespace Chem4Word.View
         public const int DefaultLength = 45;
 
         public const double WedgeWidth = 12.0;
+        // ToDo: Fix This
 
         public const double VectorTolerance = 0.01;
     }

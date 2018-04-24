@@ -15,6 +15,6 @@ namespace Chem4Word.Model
         public const double DefaultFontSize = 20.0d;
         public const double FontSizePercentageBond = 0.5d;
 
-        public const double ScaleFactorForXaml = 5.0;
+        public const double ScaleFactorForXaml = 10.0;
     }
 }

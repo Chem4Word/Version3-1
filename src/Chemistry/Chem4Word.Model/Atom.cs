@@ -438,6 +438,7 @@ namespace Chem4Word.Model
             Rect baseAtomBox = new Rect(
                 new Point(position.X - halfSize, position.Y - halfSize),
                 new Point(position.X + halfSize, position.Y + halfSize));
+            Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
             if (SymbolText != "")
             {
                 double symbolWidth = SymbolText.Length * fontSize * 0.8;
@@ -469,11 +470,12 @@ namespace Chem4Word.Model
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
+                Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                //return new Rect(Position, Position);//empty rect
+                Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }

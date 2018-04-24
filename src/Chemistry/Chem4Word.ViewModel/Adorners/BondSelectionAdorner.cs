@@ -47,6 +47,7 @@ namespace Chem4Word.ViewModel.Adorners
         {
             base.OnRender(drawingContext);
 
+            // ToDo: Fix This
             double renderRadius = 8.0;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
