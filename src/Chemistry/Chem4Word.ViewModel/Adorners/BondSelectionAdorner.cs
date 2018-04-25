@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4Word.ViewModel.Adorners
 {
@@ -47,8 +48,8 @@ namespace Chem4Word.ViewModel.Adorners
         {
             base.OnRender(drawingContext);
 
-            // ToDo: Fix This
-            double renderRadius = 8.0;
+            Model.Model model = _adornedBond.Parent.Parent as Model.Model;
+            double renderRadius = (model.MeanBondLength * Globals.FontSizePercentageBond) / 4;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
             renderBrush.Opacity = 0.25;
