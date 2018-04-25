@@ -81,7 +81,9 @@ namespace WinFormsTestHarness
                     Model existing = Display.Chemistry as Model;
                     if (existing != null)
                     {
-                        _undoStack.Push(existing);
+                        Model clone = existing.Clone();
+                        clone.RescaleForCml();
+                        _undoStack.Push(clone);
                     }
                     ShowChemistry(filename, model);
                 }
@@ -147,6 +149,7 @@ namespace WinFormsTestHarness
                     Information.Text = $"Formula: {model.ConciseFormula}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
+                    model.RebuildMolecules();
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
