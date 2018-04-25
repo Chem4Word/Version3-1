@@ -196,17 +196,17 @@ namespace Chem4Word.View
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            double average = Model.Globals.EstimatedAverageBondSize;
-            if (ParentAtom.Parent.Bonds.Any())
-            {
-                average = ParentAtom.Parent.MeanBondLength;
-            }
-            else
-            {
-                average = ParentAtom.Parent.SingleAtomAssumedBondLength;
-            }
+            //double average = Model.Globals.SingleAtomPseudoBondLength;
+            //if (ParentAtom.Parent.Bonds.Any())
+            //{
+            //    average = ParentAtom.Parent.MeanBondLength;
+            //}
+            //else
+            //{
+            //    average = ParentAtom.Parent.SingleAtomAssumedBondLength;
+            //}
 
-            SymbolSize = average / 2.0d;
+            SymbolSize = ParentAtom.Parent.SingleAtomAssumedBondLength / 2.0d;
 
             ScriptSize = SymbolSize * 0.6;
             IsotopeSize = SymbolSize * 0.8;
@@ -440,7 +440,7 @@ namespace Chem4Word.View
             if (AtomSymbol == "") //implicit carbon
             {
                 //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
+                double radiusX = SymbolSize / 3;
                 if (!measureOnly)
                 {
                     drawingContext.DrawEllipse(Fill, null, Position, radiusX, radiusX);
@@ -572,7 +572,7 @@ namespace Chem4Word.View
             get
             {
                 //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
+                double radiusX = SymbolSize / 3;
 
                 return new EllipseGeometry(Position, radiusX, radiusX);
             }

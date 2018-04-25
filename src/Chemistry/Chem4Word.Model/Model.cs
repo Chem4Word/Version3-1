@@ -472,7 +472,14 @@ namespace Chem4Word.Model
         {
             if (!ScaledForXaml)
             {
-                ScaleToAverageBondLength(MeanBondLength * Globals.ScaleFactorForXaml);
+                if (MeanBondLength > 0)
+                {
+                    ScaleToAverageBondLength(MeanBondLength * Globals.ScaleFactorForXaml);
+                }
+                else
+                {
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength / 2);
+                }
                 ScaledForXaml = true;
             }
             RepositionAll(MinX, MinY);

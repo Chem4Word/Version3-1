@@ -10,13 +10,13 @@ namespace Chem4Word.Model
     public static class Globals
     {
         public static PeriodicTable PeriodicTable = new PeriodicTable();
-        public const double VectorTolerance = 0.01;
+        public const double VectorTolerance = 0.01d;
 
         public const double DefaultFontSize = 20.0d;
         public const double FontSizePercentageBond = 0.5d;
 
-        public const double ScaleFactorForXaml = 10.0;
-        public const double EstimatedAverageBondSize = 200.0d;
+        public const double ScaleFactorForXaml = 5.0d;
+        public const double SingleAtomPseudoBondLength = 40.0d;
         public const double BondOffsetPecentage = 0.1d;
     }
 }
