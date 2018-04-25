@@ -146,7 +146,7 @@ namespace WinFormsTestHarness
                     {
                         Text = filename;
                     }
-                    Information.Text = $"Formula: {model.ConciseFormula}";
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
                     model.RebuildMolecules();
