@@ -26,15 +26,15 @@ namespace Chem4Word.ViewModel
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
+            Debug.WriteLine($"ExtensionMethods.BoundingBox() FontSize: {FontSize}");
             double halfSize = FontSize / 2;
             Point position = atom.Position;
             Rect baseAtomBox = new Rect(
                 new Point(position.X - halfSize, position.Y - halfSize),
                 new Point(position.X + halfSize, position.Y + halfSize));
-            Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} baseAtomBox: {baseAtomBox}");
             if (atom.SymbolText != "")
             {
-                double symbolWidth = atom.SymbolText.Length * FontSize * 0.8;
+                double symbolWidth = atom.SymbolText.Length * FontSize; // * 0.8;
                 Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                     new Size(symbolWidth, FontSize));
 

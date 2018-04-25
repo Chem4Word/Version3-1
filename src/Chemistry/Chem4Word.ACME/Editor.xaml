@@ -434,8 +434,7 @@
                             Position="{Binding Path=Position}"
                             AtomSymbol="{Binding Path=SymbolText}"
                             BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
-                            ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
-                            FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                            ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                             <view:AtomShape.Style>
                                 <Style TargetType="{x:Type view:AtomShape}">
                                     <Setter Property="Fill">

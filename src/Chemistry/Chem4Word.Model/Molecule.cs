@@ -894,13 +894,13 @@ namespace Chem4Word.Model
 
         #region Helpers
 
-        public double SingleAtomAssumedBondLength;
+        public double XamlBondLength;
 
         public double MeanBondLength
         {
             get
             {
-                double result = SingleAtomAssumedBondLength;
+                double result = XamlBondLength;
                 if (Bonds.Any())
                 {
                     result = Bonds.Average(b => b.BondVector.Length);

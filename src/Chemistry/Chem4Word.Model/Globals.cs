@@ -12,11 +12,15 @@ namespace Chem4Word.Model
         public static PeriodicTable PeriodicTable = new PeriodicTable();
         public const double VectorTolerance = 0.01d;
 
+        // Font Size to use if all else fails
         public const double DefaultFontSize = 20.0d;
-        public const double FontSizePercentageBond = 0.5d;
-
-        public const double ScaleFactorForXaml = 5.0d;
+        // Imaginary Bond Size for Single Atom
         public const double SingleAtomPseudoBondLength = 40.0d;
+        // Calculate Font size as bond length * FontSizePercentageBond
+        public const double FontSizePercentageBond = 0.5d;
+        // Double Bond Offset as %age of bond length
         public const double BondOffsetPecentage = 0.1d;
+        // How much to magnify CML by for rendering
+        public const double ScaleFactorForXaml = 5.0d;
     }
 }

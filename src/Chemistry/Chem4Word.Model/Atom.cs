@@ -433,15 +433,15 @@ namespace Chem4Word.Model
         //tries to get a bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
+            Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
             double halfSize = fontSize / 2;
             Point position = Position;
             Rect baseAtomBox = new Rect(
                 new Point(position.X - halfSize, position.Y - halfSize),
                 new Point(position.X + halfSize, position.Y + halfSize));
-            Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
             if (SymbolText != "")
             {
-                double symbolWidth = SymbolText.Length * fontSize * 0.8;
+                double symbolWidth = SymbolText.Length * fontSize; // * 0.8;
                 Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                     new Size(symbolWidth, fontSize));
 

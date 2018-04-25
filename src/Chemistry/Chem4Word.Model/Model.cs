@@ -450,7 +450,7 @@ namespace Chem4Word.Model
 
             foreach (var molecule in Molecules)
             {
-                molecule.SingleAtomAssumedBondLength = newLength;
+                molecule.XamlBondLength = newLength;
             }
         }
 

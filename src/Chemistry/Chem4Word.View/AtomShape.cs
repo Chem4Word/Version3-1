@@ -196,17 +196,7 @@ namespace Chem4Word.View
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            //double average = Model.Globals.SingleAtomPseudoBondLength;
-            //if (ParentAtom.Parent.Bonds.Any())
-            //{
-            //    average = ParentAtom.Parent.MeanBondLength;
-            //}
-            //else
-            //{
-            //    average = ParentAtom.Parent.SingleAtomAssumedBondLength;
-            //}
-
-            SymbolSize = ParentAtom.Parent.SingleAtomAssumedBondLength / 2.0d;
+            SymbolSize = ParentAtom.Parent.XamlBondLength / 2.0d;
 
             ScriptSize = SymbolSize * 0.6;
             IsotopeSize = SymbolSize * 0.8;
@@ -234,7 +224,6 @@ namespace Chem4Word.View
         /// <param name="drawingContext"></param>
         private void RenderAtom(DrawingContext drawingContext)
         {
-            // ToDo: Fix This
             //renders the atom complete with charges, hydrogens and labels.
             //this code is *complex*
 
@@ -359,7 +348,6 @@ namespace Chem4Word.View
         /// <returns></returns>
         private ChargeLabelText DrawChargeOrRadical(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString, Brush fill, CompassPoints defaultHOrientation)
         {
-            // ToDo: Fix This
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
@@ -417,7 +405,6 @@ namespace Chem4Word.View
         //draws the isotope label at ten-o-clock
         private LabelMetrics DrawIsotopeLabel(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics)
         {
-            // ToDo: Fix This
             Debug.Assert(Isotope != null);
 
             string isoLabel = Isotope.ToString();
@@ -436,7 +423,6 @@ namespace Chem4Word.View
         //draws the main atom symbol, or an ellipse if necessary
         private AtomTextMetrics DrawSelf(DrawingContext drawingContext, bool measureOnly = false)
         {
-            // ToDo: Fix This
             if (AtomSymbol == "") //implicit carbon
             {
                 //so draw a circle
@@ -487,23 +473,6 @@ namespace Chem4Word.View
                     FrameworkPropertyMetadataOptions.AffectsRender));
 
         #endregion Positioning DPs
-
-        #region layout DPs
-
-        // ToDo: Fix This
-        public double FontSize
-        {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
-        }
-
-        // ToDo: Fix This
-        // Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape),
-                new FrameworkPropertyMetadata(200d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
-
-        #endregion layout DPs
 
         #region Atom DPs
 
