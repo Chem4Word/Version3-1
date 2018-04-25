@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
 
@@ -84,6 +85,11 @@ namespace WinFormsTestHarness
                         Model clone = existing.Clone();
                         clone.RescaleForCml();
                         _undoStack.Push(clone);
+                    }
+
+                    if (model.MeanBondLength < 5 || model.MeanBondLength > 95)
+                    {
+                        model.ScaleToAverageBondLength(20);
                     }
                     ShowChemistry(filename, model);
                 }
@@ -175,7 +181,17 @@ namespace WinFormsTestHarness
             Undo.Enabled = _undoStack.Count > 0;
             UndoStack.StackList.ItemsSource = _undoStack.ToList();
             RedoStack.StackList.ItemsSource = _redoStack.ToList();
-            ListStacks();
+            //ListStacks();
+
+            //if (_undoStack.Count > 1)
+            //{
+            //    foreach (var item in UndoStack.StackList.Items)
+            //    {
+            //        UndoStack.StackList.SelectedItem = 1;
+            //        Debug.WriteLine(item.GetType());
+            //        break;
+            //    }
+            //}
         }
 
         private void SetCarbons(Model model, bool state)

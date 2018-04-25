@@ -970,6 +970,8 @@ namespace Chem4Word.Model
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
+            clone.XamlBondLength = XamlBondLength;
+
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
 
             foreach (var atom in Atoms)
