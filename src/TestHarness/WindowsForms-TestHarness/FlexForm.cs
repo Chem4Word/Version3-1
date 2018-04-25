@@ -183,15 +183,11 @@ namespace WinFormsTestHarness
             RedoStack.StackList.ItemsSource = _redoStack.ToList();
             //ListStacks();
 
-            //if (_undoStack.Count > 1)
-            //{
-            //    foreach (var item in UndoStack.StackList.Items)
-            //    {
-            //        UndoStack.StackList.SelectedItem = 1;
-            //        Debug.WriteLine(item.GetType());
-            //        break;
-            //    }
-            //}
+            UndoStack.StackList.SelectedIndex = UndoStack.StackList.Items.Count - 1;
+            UndoStack.StackList.ScrollIntoView(UndoStack.StackList.SelectedItem);
+
+            RedoStack.StackList.SelectedIndex = RedoStack.StackList.Items.Count - 1;
+            RedoStack.StackList.ScrollIntoView(RedoStack.StackList.SelectedItem);
         }
 
         private void SetCarbons(Model model, bool state)
