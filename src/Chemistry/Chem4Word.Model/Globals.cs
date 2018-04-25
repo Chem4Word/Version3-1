@@ -17,5 +17,6 @@ namespace Chem4Word.Model
 
         public const double ScaleFactorForXaml = 10.0;
         public const double EstimatedAverageBondSize = 200.0d;
+        public const double BondOffsetPecentage = 0.1d;
     }
 }
