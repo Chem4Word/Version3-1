@@ -506,11 +506,11 @@ namespace Chem4Word.Model
         private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             //chnaging the number of bonds causes knock on effects
-            OnPropertyChanged("Degree");
-            OnPropertyChanged("ImplicitHydrogenCount");
-            OnPropertyChanged("BalancingVector");
-            OnPropertyChanged("ShowSymbol");
-            OnPropertyChanged("SymbolText");
+            OnPropertyChanged(nameof(Degree));
+            OnPropertyChanged(nameof(ImplicitHydrogenCount));
+            OnPropertyChanged(nameof(BalancingVector));
+            OnPropertyChanged(nameof(ShowSymbol));
+            OnPropertyChanged(nameof(SymbolText));
 
             foreach (Bond bond in Bonds.Where(b => b.OrderValue == 2))
             {

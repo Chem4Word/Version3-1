@@ -20,26 +20,30 @@ namespace Chem4Word.ViewModel
     /// BeginTrans() and CommitTrans() calls
     /// 
     /// </summary>
-    public class UndoManager
+    public class UndoHandler
     {
 
         private struct UndoRecord
         {
             public int Level;
             public string Description;
-            public Action UndoAction;
-            public Action RedoAction;
+            public Action<object,object,object> UndoAction;
+            public Action<object,object,object> RedoAction;
             public object[] Params;
 
             public void Undo()
-            { }
+            { 
+                UndoAction(Params[0], Params[1], Params[2]);
+            }
 
             public void Redo()
-            { }
+            {
+                RedoAction(Params[0], Params[1], Params[2]);
+            }
 
             public bool IsBufferRecord()
             {
-                return Level != 0;
+                return Level == 0;
             }
         }
 
@@ -55,7 +59,15 @@ namespace Chem4Word.ViewModel
 
         public int TransactionLevel => _transactionLevel;
 
-        public UndoManager(EditViewModel vm)
+            
+  
+        public bool CanRedo => _redoStack.Any(rr => rr.Level!=0);
+
+        public bool CanUndo => _undoStack.Any(ur => ur.Level != 0);
+
+
+        
+        public UndoHandler(EditViewModel vm)
         {
             _editViewModel = vm;
 
@@ -71,12 +83,6 @@ namespace Chem4Word.ViewModel
 
             Initialize();
         }
-            
-  
-        public bool CanRedo => _redoStack.Any(rr => rr.Level!=0);
-
-        public bool CanUndo => _undoStack.Any(ur => ur.Level != 0);
-
         public void Initialize()
         {
             _undoStack = new Stack<UndoRecord>();
@@ -94,9 +100,9 @@ namespace Chem4Word.ViewModel
 
         }
 
-        public void RecordAction(string desc, Action undoAction, Action redoAction, params object[] parameters)
+        public void RecordAction(string desc, Action<object,object,object> undoAction, Action<object,object,object> redoAction, params object[] parameters)
         {
-            _undoStack.Push(new UndoRecord {Level = _transactionLevel, Description = desc, UndoAction = undoAction, RedoAction = redoAction});
+            _undoStack.Push(new UndoRecord {Level = _transactionLevel, Description = desc, UndoAction = undoAction, RedoAction = redoAction, Params = parameters });
         }
 
 
@@ -139,12 +145,17 @@ namespace Chem4Word.ViewModel
             }
             _redoStack.Push(br);
 
-            do
+            while(true)
             {
                 br = _undoStack.Pop();
-                br.Undo();
                 _redoStack.Push(br);
-            } while (!br.IsBufferRecord());
+                if (br.IsBufferRecord())
+                {
+                    break;
+                }
+                br.Undo();
+                
+            } 
 
         }
 
@@ -165,12 +176,17 @@ namespace Chem4Word.ViewModel
             }
             _undoStack.Push(br);
 
-            do
+            while (true)
             {
                 br = _redoStack.Pop();
-                br.Redo();
                 _undoStack.Push(br);
-            } while (!br.IsBufferRecord());
+                if (br.IsBufferRecord())
+                {
+                    break;
+                }
+                br.Redo();
+               
+            } 
         }
     }
 }
