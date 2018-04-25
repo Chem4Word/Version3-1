@@ -37,13 +37,6 @@ namespace Chem4Word.View
             get { return 1; }
         }
 
-        // ToDo: Fix This
-        // Remove ...
-        public static double SymbolSize = 200;
-        public static double ScriptSize = SymbolSize * 0.6;
-        public static double IsotopeSize = ScriptSize * 0.8;
-        // ToDo: Fix This
-
         public static Typeface SymbolTypeface = new Typeface(new FontFamily("Arial"),
             FontStyles.Normal,
             FontWeights.Bold,
@@ -56,16 +49,6 @@ namespace Chem4Word.View
                 throw new InvalidOperationException("No glyphtypeface found");
             }
         }
-
-        //public struct LayoutInfo
-        //{
-        //    public GlyphRun Run;
-        //    public Point NewOrigin;
-        //    public ushort[] Indexes;
-        //    public double Width;
-        //    public double[] AdvanceWidths;
-
-        //}
 
         /// <summary>
         /// Gets the vector that must be added to the atom position to center the glyph

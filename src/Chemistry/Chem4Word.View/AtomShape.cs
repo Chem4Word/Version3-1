@@ -23,7 +23,10 @@ namespace Chem4Word.View
     /// </summary>
     public class AtomShape : Shape
     {
-        private const double MaskOffsetWidth = 2.5;
+        private static double MaskOffsetWidth = 0;
+        public static double SymbolSize = 0;
+        public static double ScriptSize = 0;
+        public static double IsotopeSize = 0;
 
         //list of points that make up the hull of the shape
 
@@ -193,6 +196,18 @@ namespace Chem4Word.View
 
         protected override void OnRender(DrawingContext drawingContext)
         {
+            double average = Model.Globals.EstimatedAverageBondSize;
+            if (ParentAtom.Parent.Bonds.Any())
+            {
+                average = ParentAtom.Parent.MeanBondLength;
+            }
+
+            SymbolSize = average / 2.0d;
+
+            ScriptSize = SymbolSize * 0.6;
+            IsotopeSize = SymbolSize * 0.8;
+            MaskOffsetWidth = SymbolSize * 0.1;
+
             RenderAtom(drawingContext);
         }
 
@@ -230,7 +245,7 @@ namespace Chem4Word.View
             if (AtomSymbol != "")
             {
                 var symbolText = new GlyphText(AtomSymbol,
-                    SymbolTypeface, FontSize, PixelsPerDip());
+                    SymbolTypeface, SymbolSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
                 //grab the hull for later
                 if (symbolText.FlattenedPath != null)
@@ -249,7 +264,7 @@ namespace Chem4Word.View
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
-                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", FontSize);
+                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", SymbolSize);
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
@@ -344,7 +359,7 @@ namespace Chem4Word.View
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth * FontSize * 0.9;
+            Vector chargeOffset = BasicGeometry.ScreenNorth * SymbolSize * 0.9;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter, defaultHOrientation);
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
@@ -404,7 +419,7 @@ namespace Chem4Word.View
             string isoLabel = Isotope.ToString();
             var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
 
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * FontSize;
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * SymbolSize;
             Matrix rotator = new Matrix();
             rotator.Rotate(ClockDirections.Ten.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;
@@ -438,7 +453,7 @@ namespace Chem4Word.View
             }
             else
             {
-                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, FontSize, PixelsPerDip());
+                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, SymbolSize, PixelsPerDip());
                 symbolText.Fill = Fill;
                 symbolText.MeasureAtCenter(Position);
                 if (!measureOnly)
