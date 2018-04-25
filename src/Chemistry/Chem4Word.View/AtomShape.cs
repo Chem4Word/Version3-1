@@ -57,10 +57,13 @@ namespace Chem4Word.View
             //holds the text of the subscript
             private SubLabelText _subText;
 
-            public SubscriptedGroup(int count, string text)
+            private static double FontSize;
+
+            public SubscriptedGroup(int count, string text, double fontSize)
             {
                 Count = count;
                 Text = text;
+                FontSize = fontSize;
             }
 
             /// <summary>
@@ -75,7 +78,7 @@ namespace Chem4Word.View
 
                 List<Point> mainOutline;
                 //first, get some initial size measurements
-                _mainText = new GlyphText(Text, SymbolTypeface, SymbolSize, pixelsPerDip);
+                _mainText = new GlyphText(Text, SymbolTypeface, FontSize, pixelsPerDip);
                 _mainText.Premeasure();
 
                 //measure up the subscript (if we have one)
@@ -148,7 +151,7 @@ namespace Chem4Word.View
                 GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo = null)
             {
                 Point adjunctCenter;
-                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * SymbolSize);
+                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * FontSize);
                 double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width) / 2;
                 switch (direction)
                 {
@@ -227,7 +230,7 @@ namespace Chem4Word.View
             if (AtomSymbol != "")
             {
                 var symbolText = new GlyphText(AtomSymbol,
-                    SymbolTypeface, SymbolSize, PixelsPerDip());
+                    SymbolTypeface, FontSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
                 //grab the hull for later
                 if (symbolText.FlattenedPath != null)
@@ -246,7 +249,7 @@ namespace Chem4Word.View
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
-                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H");
+                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", FontSize);
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
@@ -341,7 +344,7 @@ namespace Chem4Word.View
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth * SymbolSize * 0.9;
+            Vector chargeOffset = BasicGeometry.ScreenNorth * FontSize * 0.9;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter, defaultHOrientation);
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
@@ -401,7 +404,7 @@ namespace Chem4Word.View
             string isoLabel = Isotope.ToString();
             var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
 
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * SymbolSize;
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * FontSize;
             Matrix rotator = new Matrix();
             rotator.Rotate(ClockDirections.Ten.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;
@@ -435,7 +438,7 @@ namespace Chem4Word.View
             }
             else
             {
-                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, SymbolSize, PixelsPerDip());
+                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, FontSize, PixelsPerDip());
                 symbolText.Fill = Fill;
                 symbolText.MeasureAtCenter(Position);
                 if (!measureOnly)
@@ -475,9 +478,11 @@ namespace Chem4Word.View
             set { SetValue(FontSizeProperty, value); }
         }
 
+        // ToDo: Fix This
         // Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape),
+                new FrameworkPropertyMetadata(200d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
 
         #endregion layout DPs
 

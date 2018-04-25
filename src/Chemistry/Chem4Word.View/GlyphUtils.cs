@@ -39,7 +39,7 @@ namespace Chem4Word.View
 
         // ToDo: Fix This
         // Remove ...
-        public static double SymbolSize = 23;
+        public static double SymbolSize = 200;
         public static double ScriptSize = SymbolSize * 0.6;
         public static double IsotopeSize = ScriptSize * 0.8;
         // ToDo: Fix This
