@@ -201,6 +201,10 @@ namespace Chem4Word.View
             {
                 average = ParentAtom.Parent.MeanBondLength;
             }
+            else
+            {
+                average = ParentAtom.Parent.SingleAtomAssumedBondLength;
+            }
 
             SymbolSize = average / 2.0d;
 

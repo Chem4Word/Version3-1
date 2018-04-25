@@ -94,7 +94,7 @@ namespace WinFormsTestHarness
             if (dr == DialogResult.OK)
             {
                 DisplayHost.BackColor = colorDialog1.Color;
-                Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
+                //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
             }
         }
 
@@ -146,7 +146,7 @@ namespace WinFormsTestHarness
                     }
                     Information.Text = $"Formula: {model.ConciseFormula}";
 
-                    Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
+                    //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 

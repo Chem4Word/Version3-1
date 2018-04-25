@@ -439,9 +439,18 @@ namespace Chem4Word.Model
         /// <param name="newLength"></param>
         public void ScaleToAverageBondLength(double newLength)
         {
-            foreach (Molecule molecule in Molecules)
+            if (MeanBondLength > 0)
             {
-                molecule.ScaleToAverageBondLength(newLength, this);
+                double scale = newLength / MeanBondLength;
+                foreach (var atom in AllAtoms)
+                {
+                    atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
+                }
+            }
+
+            foreach (var molecule in Molecules)
+            {
+                molecule.SingleAtomAssumedBondLength = newLength;
             }
         }
 

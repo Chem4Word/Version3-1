@@ -894,33 +894,19 @@ namespace Chem4Word.Model
 
         #region Helpers
 
+        public double SingleAtomAssumedBondLength;
+
         public double MeanBondLength
         {
             get
             {
-                return Bonds.Any() ? Bonds.Average(b => b.BondVector.Length) : 0;
-            }
-        }
-
-        public void ScaleToAverageBondLength(double newLength, Model model)
-        {
-            if (Bonds.Any())
-            {
-                double averageBondLength = MeanBondLength;
-
-                if (averageBondLength != 0 && newLength > 0)
+                double result = SingleAtomAssumedBondLength;
+                if (Bonds.Any())
                 {
-                    double scale = newLength / averageBondLength;
+                    result = Bonds.Average(b => b.BondVector.Length);
+                }
 
-                    foreach (Atom atom in Atoms)
-                    {
-                        atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
-                    }
-                }
-                foreach (Molecule child in Molecules)
-                {
-                    child.ScaleToAverageBondLength(newLength, model);
-                }
+                return result;
             }
         }
 
