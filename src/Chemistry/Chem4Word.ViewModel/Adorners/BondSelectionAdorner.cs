@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4Word.ViewModel.Adorners
 {
@@ -86,8 +85,8 @@ namespace Chem4Word.ViewModel.Adorners
             figures.Add(pathFigure);
             Geometry pathGeometry = new PathGeometry(figures);
 
-            Geometry start = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius + 2, renderRadius + 2);
-            Geometry end = new EllipseGeometry(_adornedBond.EndAtom.Position, renderRadius + 2, renderRadius + 2);
+            Geometry start = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius * 1.25, renderRadius * 1.25);
+            Geometry end = new EllipseGeometry(_adornedBond.EndAtom.Position, renderRadius * 1.25, renderRadius * 1.25);
             Geometry final = Geometry.Combine(pathGeometry, start, GeometryCombineMode.Exclude, null);
             final = Geometry.Combine(final, end, GeometryCombineMode.Exclude, null);
 
