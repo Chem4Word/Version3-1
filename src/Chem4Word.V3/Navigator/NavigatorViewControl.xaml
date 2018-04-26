@@ -41,14 +41,15 @@
     <Grid>
         <ScrollViewer VerticalAlignment="Stretch">
             <ListBox x:Name="NavigatorList"
-                          VirtualizingStackPanel.IsVirtualizing="True"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ScrollViewer.CanContentScroll="True"
-                          Grid.IsSharedSizeScope="True"
-                          ItemContainerStyle="{StaticResource SimpleListBoxItem}"
-                          ItemsSource="{Binding Path=NavigatorItems}"
-                          HorizontalAlignment="Stretch"
-                          HorizontalContentAlignment="Stretch">
+                     Grid.IsSharedSizeScope="True"
+                     ScrollViewer.CanContentScroll="True"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ItemContainerStyle="{StaticResource SimpleListBoxItem}"
+                     ItemsSource="{Binding Path=NavigatorItems}"
+                     HorizontalAlignment="Stretch"
+                     HorizontalContentAlignment="Stretch"
+                     VerticalAlignment="Stretch"
+                     VirtualizingStackPanel.IsVirtualizing="True">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border

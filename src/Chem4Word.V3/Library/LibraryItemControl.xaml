@@ -8,8 +8,7 @@
              xmlns:controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
              x:Name="LibraryControl" x:Class="Chem4Word.Library.LibraryItemControl"
              mc:Ignorable="d"
-             
-             d:DesignWidth="300" Height="Auto" Unloaded="LibraryControl_Unloaded" Loaded="LibraryControl_Loaded">
+             d:DesignWidth="600" Height="Auto" Unloaded="LibraryControl_Unloaded" Loaded="LibraryControl_Loaded">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

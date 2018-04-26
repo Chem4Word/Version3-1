@@ -135,11 +135,12 @@
             Grid.IsSharedSizeScope="True"
             ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
             ItemContainerStyle="{StaticResource SimpleListBoxItem}"
-            VirtualizingStackPanel.IsVirtualizing="True"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.CanContentScroll="True"
-            HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
             VerticalAlignment="Stretch"
+            VirtualizingStackPanel.IsVirtualizing="True"
             Background="{x:Static SystemColors.WindowBrush}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

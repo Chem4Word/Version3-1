@@ -10,6 +10,7 @@ using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -39,6 +40,7 @@ namespace Chem4Word.ViewModel
                     double w = BoundingBox.Width;
                     double n = Math.Max(h, w);
                     _bondThickness =  n / 100;
+                    Debug.WriteLine($"MeanBondLength {Model.MeanBondLength} Width {w} Height {h} Thickness {_bondThickness}");
                 }
                 return _bondThickness;
             }
