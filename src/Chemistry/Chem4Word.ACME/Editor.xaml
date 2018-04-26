@@ -85,7 +85,7 @@
 					FontWeight="DemiBold" FontSize="16"
                     ToolTip="Current Atom Type"
                     ItemsSource="{StaticResource AtomItems}"
-                    SelectedValue="{Binding SelectedElement, Mode=TwoWay, Converter={StaticResource DoNothingConverter}}"
+                    SelectedValue="{Binding SelectedElement, Mode=TwoWay}"
                     SelectedValuePath="Element"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}">
                 </ComboBox>
@@ -94,7 +94,7 @@
 					Width="48" Height="25"
                     ToolTip="Current Bond Type"
                     ItemsSource="{StaticResource BondItems}"
-                    SelectedValue="{Binding SelectedBondOptionId, Mode=TwoWay, Converter={StaticResource DoNothingConverter}}"
+                    SelectedValue="{Binding SelectedBondOptionId, Mode=TwoWay}"
                     SelectedValuePath="Id">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -206,7 +206,7 @@
                         </StackPanel>
                     </Viewbox>
                 </RadioButton>
-                <RadioButton GroupName="Actions" ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}"  FontSize="18"  x:Name="DeleteButton">
+                <RadioButton GroupName="Actions" ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}" Command="{Binding DeleteCommand}" FontSize="18"  x:Name="DeleteButton">
                     <Viewbox Stretch="UniformToFill" Height="24"  Width="24">
                         <Path Style="{StaticResource ToolbarPathStyle}"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
@@ -366,6 +366,27 @@
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
                                     <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="S">
+                                            <Setter Property="StrokeEndLineCap" Value="Round" />
+                                            <Setter Property="StrokeStartLineCap" Value="Round" />
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="D">
+                                            <Setter Property="StrokeEndLineCap" Value="Round" />
+                                            <Setter Property="StrokeStartLineCap" Value="Round" />
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="T">
+                                            <Setter Property="StrokeEndLineCap" Value="Round" />
+                                            <Setter Property="StrokeStartLineCap" Value="Round" />
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="hbond">
                                             <Setter Property="StrokeDashArray" Value="1,1" />
                                         </DataTrigger>
@@ -387,7 +408,6 @@
                                         <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Indeterminate">
                                             <Setter Property="Fill" Value="Black" />
                                             <Setter Property="Stroke" Value="Black" />
-                                            <Setter Property="StrokeThickness" Value="1.5" />
                                             <Setter Property="StrokeLineJoin" Value="Round" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Hatch">

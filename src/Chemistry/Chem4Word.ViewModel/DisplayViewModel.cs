@@ -38,19 +38,26 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                if (AllAtoms.Any())
+                try
                 {
-                    var modelRect = AllAtoms[0].BoundingBox(FontSize);
-                    for (int i = 1; i < AllAtoms.Count; i++)
+                    if (AllAtoms.Any())
                     {
-                        var atom = AllAtoms[i];
-                        modelRect.Union(atom.BoundingBox(FontSize));
+                        var modelRect = AllAtoms[0].BoundingBox(FontSize);
+                        for (int i = 1; i < AllAtoms.Count; i++)
+                        {
+                            var atom = AllAtoms[i];
+                            modelRect.Union(atom.BoundingBox(FontSize));
+                        }
+                        return modelRect;
                     }
-                    return modelRect;
+                    else
+                    {
+                        return new Rect();
+                    }
                 }
-                else
+                catch (System.NullReferenceException ex)
                 {
-                    return new Rect();
+                    return new Rect(0,0,0,0);
                 }
             }
         }

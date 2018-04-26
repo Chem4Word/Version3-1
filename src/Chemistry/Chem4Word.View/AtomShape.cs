@@ -573,7 +573,12 @@ namespace Chem4Word.View
         // Using a DependencyProperty as the backing store for ImplicitHydrogenCount.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ImplicitHydrogenCountProperty =
             DependencyProperty.Register("ImplicitHydrogenCount", typeof(int), typeof(AtomShape),
-                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender, ImplicitHCallback));
+
+        private static void ImplicitHCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
+        {
+
+        }
 
         #endregion Dependency Properties
     }

@@ -73,7 +73,7 @@ namespace Chem4Word.ViewModel
 
         public ObservableCollection<object> SelectedItems { get; }
 
-        public UndoManager UndoManager { get; }
+        public UndoHandler UndoManager { get; }
 
         private ElementBase _selectedElement;
 
@@ -207,7 +207,7 @@ namespace Chem4Word.ViewModel
             SelectedItems = new ObservableCollection<object>();
             SelectedItems.CollectionChanged += SelectedItemsOnCollectionChanged;
 
-            UndoManager = new UndoManager(this);
+            UndoManager = new UndoHandler(this);
 
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
@@ -266,6 +266,7 @@ namespace Chem4Word.ViewModel
 
             CopyCommand.RaiseCanExecChanged();
             CutCommand.RaiseCanExecChanged();
+            DeleteCommand.RaiseCanExecChanged();
         }
 
         public void RemoveAllAdorners()
@@ -406,6 +407,63 @@ namespace Chem4Word.ViewModel
         public void CopySelection()
         {
             MessageBox.Show("Copy code goes here");
+        }
+
+        public void DeleteAtom(Atom atom)
+        {
+
+            UndoManager.BeginTrans();
+            var bondlist = atom.Bonds.ToList();
+            foreach (Bond bond in bondlist)
+            {
+                DeleteBond(bond);
+            }
+
+            SelectedItems.Remove(atom);
+            Action<object, object, object> undoAction = (delatom, mol, dummy) => { (mol as Molecule).Atoms.Add((delatom as Atom)); };
+            Action<object, object, object> redoAction = (delatom, mol, dummy) => { (mol as Molecule).Atoms.Remove((delatom as Atom)); };
+            
+            UndoManager.RecordAction("Delete Atom", undoAction, redoAction, atom, atom.Parent, null);
+            atom.Parent.Atoms.Remove(atom);
+
+            
+            UndoManager.CommitTrans();
+        }
+
+        public void DeleteBond(Bond bond)
+        {
+            UndoManager.BeginTrans();
+
+            Action<object, object, object> redoAction = (b, a1, a2) =>
+            {
+                var b1 = (bond as Bond);
+                b1.StartAtom = null;
+                b1.EndAtom = null;
+            };
+
+            Action<object, object, object> undoAction = (b, a1, a2) =>
+            {
+                var b1 = (bond as Bond);
+                b1.StartAtom = a1 as Atom;
+                b1.EndAtom = a2 as Atom;
+            };
+            SelectedItems.Remove(bond);
+            UndoManager.RecordAction("Delete Bond: remove start and end atoms", undoAction, redoAction, bond, bond.StartAtom, bond.EndAtom, null);
+
+            bond.StartAtom = null;
+            bond.EndAtom = null;
+
+            Molecule parent = bond.Parent;
+            if (parent != null)
+            {
+                undoAction = (delbond, mol, dummy) => { (mol as Molecule).Bonds.Add((delbond as Bond)); };
+                redoAction = (delbond, mol, dummy) => { (mol as Molecule).Bonds.Remove((delbond as Bond)); };
+
+                UndoManager.RecordAction("Delete Bond", undoAction, redoAction, bond, bond.Parent, null);
+                parent.Bonds.Remove(bond);
+            }
+
+            UndoManager.CommitTrans();
         }
     }
 }
