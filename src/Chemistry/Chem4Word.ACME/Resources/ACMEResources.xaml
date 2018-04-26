@@ -4,7 +4,8 @@
     xmlns:conv="clr-namespace:Chem4Word.ACME.Converters"
     xmlns:model ="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
-    xmlns:acme="clr-namespace:Chem4Word.ACME">
+    xmlns:acme="clr-namespace:Chem4Word.ACME"
+    xmlns:graphics ="clr-namespace:Chem4Word.ACME.Graphics">
     <!-- Simple shapes for use in menus, buttons etc -->
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Brushes.xaml" />
@@ -233,5 +234,39 @@
 
     <Style x:Key="MolAdornerStyle" TargetType="Thumb" BasedOn="{StaticResource GrabHandleStyle}">
         <Setter Property="Opacity" Value="0.15" />
+    </Style>
+
+    <Style
+        x:Key="RotateThumb"
+        TargetType="Thumb">
+        <Setter
+            Property="SnapsToDevicePixels"
+            Value="true" />
+        <Setter
+            Property="OverridesDefaultStyle"
+            Value="true" />
+        <Setter
+            Property="Background"
+            Value="{StaticResource GrabHandleFillBrush}" />
+        <Setter
+            Property="BorderBrush"
+            Value="{StaticResource GrabHandleBorderBrush}" />
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Viewbox Height="20" Width="20" Stretch="Uniform">
+                        <Canvas Height="200" Width="200" Margin="0">
+                            <graphics:ArcArrow StrokeStartLineCap="Round" 
+                                               Stroke="{StaticResource GrabHandleBorderBrush}" StrokeThickness="35" 
+                                               Fill="Transparent" ArrowHeadLength="50" HeadAngle="45" IsArrowClosed="True" Center="50,50" 
+                                               Radius="100" StartAngle="270" EndAngle="0" SmallAngle="False"/>
+                            <Ellipse Fill="{StaticResource GrabHandleFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" 
+                                     Height="50" Width="50" Canvas.Top="25" Canvas.Left="25" />
+                        </Canvas>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

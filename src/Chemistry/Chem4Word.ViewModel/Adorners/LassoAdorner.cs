@@ -15,9 +15,17 @@ namespace Chem4Word.ViewModel.Adorners
     public class LassoAdorner : Adorner
     {
         private StreamGeometry _outline;
+        private SolidColorBrush _solidColorBrush;
+        private Pen _dashPen;
 
         public LassoAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
+            _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
+            _solidColorBrush.Opacity = 0.25;
+
+
+            _dashPen = new Pen(SystemColors.HighlightBrush, 1);
+            _dashPen.DashStyle = DashStyles.Dash;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
@@ -27,15 +35,23 @@ namespace Chem4Word.ViewModel.Adorners
             _outline = outline;
         }
 
+        public StreamGeometry Outline
+        {
+            get { return _outline; }
+            set
+            {
+                _outline = value; 
+                InvalidateVisual();
+            }
+
+        }
+
+
         protected override void OnRender(DrawingContext drawingContext)
         {
-            SolidColorBrush brush = new SolidColorBrush(SystemColors.HighlightColor);
-            brush.Opacity = 0.25;
+         
 
-            Pen dashPen = new Pen(SystemColors.HighlightBrush, 1);
-            dashPen.DashStyle = DashStyles.Dash;
-
-            drawingContext.DrawGeometry(brush, dashPen, _outline);
+            drawingContext.DrawGeometry(_solidColorBrush, _dashPen, _outline);
         }
     }
 }

@@ -31,16 +31,6 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-        //public double FontSize
-        //{
-        //    get { return (double)GetValue(FontSizeProperty); }
-        //    set { SetValue(FontSizeProperty, value); }
-        //}
-
-        //// Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
-        //public new static readonly DependencyProperty FontSizeProperty =
-        //    DependencyProperty.Register("FontSize", typeof(double), typeof(Display), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange|FrameworkPropertyMetadataOptions.AffectsRender));
-
         public Brush BackgroundColor
         {
             get { return (Brush)GetValue(BackgroundColorProperty); }
@@ -148,10 +138,9 @@ namespace Chem4Word.ACME
             {
                 if (chemistryModel.AllAtoms.Count > 0)
                 {
-                    chemistryModel.FontSize = FontSize;
-                    chemistryModel.RescaleForXaml(Constants.StandardBondLength * 2);
+                    chemistryModel.RescaleForXaml();
 
-                    Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
+                    //Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
                     Placeholder.DataContext = new Chem4Word.ViewModel.DisplayViewModel(chemistryModel);
                 }

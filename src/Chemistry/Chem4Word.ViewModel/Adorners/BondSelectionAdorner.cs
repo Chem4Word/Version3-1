@@ -17,9 +17,22 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Bond _adornedBond;
 
+        public Bond AdornedBond
+        {
+            get { return _adornedBond; }
+        }
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
-            IsHitTestVisible = false;
+            //this.MouseLeftButtonDown += BondSelectionAdorner_MouseLeftButtonDown;
+
+        }
+
+        private void BondSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                RaiseEvent(e);
+            }
         }
 
         public BondSelectionAdorner(UIElement adornedElement, Bond adornedBond) : this(adornedElement)
@@ -29,11 +42,13 @@ namespace Chem4Word.ViewModel.Adorners
             myAdornerLayer.Add(this);
         }
 
+        
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
 
-            double renderRadius = 8.0;
+            Model.Model model = _adornedBond.Parent.Parent as Model.Model;
+            double renderRadius = (model.MeanBondLength * Globals.FontSizePercentageBond) / 4;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
             renderBrush.Opacity = 0.25;
@@ -70,12 +85,17 @@ namespace Chem4Word.ViewModel.Adorners
             figures.Add(pathFigure);
             Geometry pathGeometry = new PathGeometry(figures);
 
-            Geometry start = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius + 2, renderRadius + 2);
-            Geometry end = new EllipseGeometry(_adornedBond.EndAtom.Position, renderRadius + 2, renderRadius + 2);
+            Geometry start = new EllipseGeometry(_adornedBond.StartAtom.Position, renderRadius * 1.25, renderRadius * 1.25);
+            Geometry end = new EllipseGeometry(_adornedBond.EndAtom.Position, renderRadius * 1.25, renderRadius * 1.25);
             Geometry final = Geometry.Combine(pathGeometry, start, GeometryCombineMode.Exclude, null);
             final = Geometry.Combine(final, end, GeometryCombineMode.Exclude, null);
 
             drawingContext.DrawGeometry(renderBrush, renderPen, final);
+        }
+
+        ~BondSelectionAdorner()
+        {
+            //this.MouseLeftButtonDown -= BondSelectionAdorner_MouseLeftButtonDown;
         }
     }
 }

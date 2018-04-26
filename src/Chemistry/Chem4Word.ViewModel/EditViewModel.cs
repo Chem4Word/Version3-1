@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,7 +37,7 @@ namespace Chem4Word.ViewModel
 
         #region Fields
 
-        private Dictionary<object, Adorner> _selectionAdorners = new Dictionary<object, Adorner>();
+        public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
@@ -270,11 +271,11 @@ namespace Chem4Word.ViewModel
         public void RemoveAllAdorners()
         {
             var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
-            var adornerList = _selectionAdorners.Keys.ToList();
+            var adornerList = SelectionAdorners.Keys.ToList();
             foreach (object oldObject in adornerList)
             {
-                layer.Remove(_selectionAdorners[oldObject]);
-                _selectionAdorners.Remove(oldObject);
+                layer.Remove(SelectionAdorners[oldObject]);
+                SelectionAdorners.Remove(oldObject);
             }
         }
 
@@ -283,10 +284,10 @@ namespace Chem4Word.ViewModel
             var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
             foreach (object oldObject in oldObjects)
             {
-                if (_selectionAdorners.ContainsKey(oldObject))
+                if (SelectionAdorners.ContainsKey(oldObject))
                 {
-                    layer.Remove(_selectionAdorners[oldObject]);
-                    _selectionAdorners.Remove(oldObject);
+                    layer.Remove(SelectionAdorners[oldObject]);
+                    SelectionAdorners.Remove(oldObject);
                 }
             }
         }
@@ -297,23 +298,105 @@ namespace Chem4Word.ViewModel
             {
                 if (newObject is Atom)
                 {
-                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, (newObject as Atom));
-                    _selectionAdorners[newObject] = atomAdorner;
+                    var atom = (Atom) newObject;
+
+                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
+                    SelectionAdorners[newObject] = atomAdorner;
+                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
+                    //if all atoms are selected then select the mol
+                    if (AllAtomsSelected(atom.Parent))
+                    {
+                        RemoveAdorners(atom.Parent);
+                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent);
+                        SelectionAdorners[newObject] = molAdorner;
+                    }
                 }
 
                 if (newObject is Bond)
                 {
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
-                    _selectionAdorners[newObject] = bondAdorner;
+                    SelectionAdorners[newObject] = bondAdorner;
+                    bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
 
                 if (newObject is Molecule)
                 {
-                    MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
-                    _selectionAdorners[newObject] = molAdorner;
+                    MoleculeSelectionAdorner molAdorner =
+                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
+                       SelectionAdorners[newObject] = molAdorner;
+                    molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+
                 }
             }
         }
+
+        private void SelAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                if (sender is AtomSelectionAdorner)
+                {
+
+                    Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent as Molecule;
+                    RemoveAdorners(mol);
+                    SelectedItems.Add(mol);
+
+                }
+                else if (sender is BondSelectionAdorner)
+                {
+                    Molecule mol = (sender as BondSelectionAdorner).AdornedBond.Parent as Molecule;
+                    RemoveAdorners(mol);
+                    SelectedItems.Add(mol);
+                }
+                else if (sender is MoleculeSelectionAdorner)
+                {
+                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule.Parent as Molecule;
+                }
+                
+            }
+        }
+
+        private void RemoveAdorners(Molecule atomParent)
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            foreach (Bond bond in atomParent.Bonds)
+            {
+                if (SelectionAdorners.ContainsKey(bond))
+                {
+                    var selectionAdorner = SelectionAdorners[bond];
+                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    layer.Remove(selectionAdorner);
+                    SelectionAdorners.Remove(bond);
+                }
+            }
+
+            foreach (Atom atom in atomParent.Atoms)
+            {
+                if (SelectionAdorners.ContainsKey(atom))
+                {
+                    var selectionAdorner = SelectionAdorners[atom];
+                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    layer.Remove(selectionAdorner);
+                    SelectionAdorners.Remove(atom);
+                }
+            }
+        }
+
+        private bool AllAtomsSelected(Molecule atomParent)
+        {
+            Debug.WriteLine($"Atom count = {atomParent.Atoms.Count()}, Adornder Count = {MolAtomAdorners(atomParent).Count()}");
+            return atomParent.Atoms.Count() == MolAtomAdorners(atomParent).Count();
+        }
+
+        private IEnumerable<AtomSelectionAdorner> MolAtomAdorners(Molecule atomParent)
+        {
+            return SelectionAdorners.Values.OfType<AtomSelectionAdorner>()
+                .Where(asl => asl.AdornedAtom.Parent == atomParent);
+        }
+
+
+      
 
         public void CutSelection()
         {

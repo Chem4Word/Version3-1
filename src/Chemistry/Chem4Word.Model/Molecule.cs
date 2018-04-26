@@ -54,21 +54,6 @@ namespace Chem4Word.Model
             var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
             var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
 
-            const double padding = 50;
-
-            double xDiff = Math.Abs(xMax - xMin);
-            if (xDiff < padding)
-            {
-                xMin = xMin - padding / 2 - xDiff;
-                xMax = xMax + padding / 2 + xDiff;
-            }
-            double yDiff = Math.Abs(yMax - yMin);
-            if (yDiff < padding)
-            {
-                yMin = yMin - padding / 2 - yDiff;
-                yMax = yMax + padding / 2 - yDiff;
-            }
-
             _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
         }
 
@@ -390,7 +375,9 @@ namespace Chem4Word.Model
             foreach (var neighbour in toPrune.Neighbours)
             {
                 if (workingSet.ContainsKey(neighbour))
+                {
                     workingSet[neighbour] -= 1;
+                }
             }
             workingSet.Remove(toPrune);
         }
@@ -907,30 +894,19 @@ namespace Chem4Word.Model
 
         #region Helpers
 
+        public double XamlBondLength;
+
         public double MeanBondLength
         {
-            get { return Bonds.Average(b => b.BondVector.Length); }
-        }
-
-        public void ScaleToAverageBondLength(double newLength, Model model)
-        {
-            if (Bonds.Any())
+            get
             {
-                double averageBondLength = MeanBondLength;
-
-                if (averageBondLength != 0 && newLength > 0)
+                double result = XamlBondLength;
+                if (Bonds.Any())
                 {
-                    double scale = newLength / averageBondLength;
+                    result = Bonds.Average(b => b.BondVector.Length);
+                }
 
-                    foreach (Atom atom in Atoms)
-                    {
-                        atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
-                    }
-                }
-                foreach (Molecule child in Molecules)
-                {
-                    child.ScaleToAverageBondLength(newLength, model);
-                }
+                return result;
             }
         }
 
@@ -994,6 +970,8 @@ namespace Chem4Word.Model
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
+            clone.XamlBondLength = XamlBondLength;
+
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
 
             foreach (var atom in Atoms)

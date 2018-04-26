@@ -5,11 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
 using Chem4Word.Model.Geometry;
 using Chem4Word.ViewModel;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -96,7 +98,7 @@ namespace Chem4Word.View
             //SetFillAngle(d);
         }
 
-        protected override System.Windows.Media.Geometry DefiningGeometry
+        protected override Geometry DefiningGeometry
         {
             //clips the bond geometry by the space of the start and end atom
             get
@@ -164,11 +166,10 @@ namespace Chem4Word.View
         public static readonly DependencyProperty OrderValueProperty =
             DependencyProperty.Register("OrderValue", typeof(int), typeof(BondShape), new PropertyMetadata(1));
 
-        public System.Windows.Media.Geometry GetBondGeometry(Point? startPoint, Point? endPoint)
+        public Geometry GetBondGeometry(Point? startPoint, Point? endPoint)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
-
             if (startPoint != null & endPoint != null)
             {
                 //check to see if it's a wedge or a hatch yet
