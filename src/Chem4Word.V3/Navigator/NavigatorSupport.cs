@@ -167,7 +167,6 @@ namespace Chem4Word.Navigator
                     }
 
                     SelectNavigatorItem(guidString);
-
                 }
                 catch (Exception ex)
                 {
