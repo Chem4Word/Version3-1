@@ -84,6 +84,7 @@
                 Height="150"
                 Margin="8"
                 HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
             Chemistry="{Binding Path=XML}"
             Background="{Binding RelativeSource={RelativeSource AncestorType=local:LibraryItemControl}, Path=Background}"/>
         <Grid

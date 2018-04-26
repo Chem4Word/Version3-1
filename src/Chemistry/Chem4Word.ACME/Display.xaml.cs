@@ -118,7 +118,7 @@ namespace Chem4Word.ACME
                         var conv = new CMLConverter();
                         chemistryModel = conv.Import(data);
                     }
-                    if (data.Contains("M  END"))
+                    else if (data.Contains("M  END"))
                     {
                         var conv = new SdFileConverter();
                         chemistryModel = conv.Import(data);
@@ -142,7 +142,7 @@ namespace Chem4Word.ACME
 
                     //Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
 
-                    Placeholder.DataContext = new Chem4Word.ViewModel.DisplayViewModel(chemistryModel);
+                    Placeholder.DataContext = new ViewModel.DisplayViewModel(chemistryModel);
                 }
                 else
                 {

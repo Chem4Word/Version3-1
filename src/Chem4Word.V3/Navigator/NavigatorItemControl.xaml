@@ -43,6 +43,7 @@
                 Height="150"
                 Margin="8"
                 HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
                 Chemistry="{Binding Path=ChemicalStructure}"
             Background="{Binding ElementName=NavItemControl, Path=Background}"
             />

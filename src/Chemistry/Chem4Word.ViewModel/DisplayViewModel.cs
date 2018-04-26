@@ -29,6 +29,21 @@ namespace Chem4Word.ViewModel
 
         public Model.Model Model { get; set; }
 
+        private double _bondThickness = 0;
+        public double BondThickness {
+            get
+            {
+                if (_bondThickness == 0)
+                {
+                    double h = BoundingBox.Height;
+                    double w = BoundingBox.Width;
+                    double n = Math.Max(h, w);
+                    _bondThickness =  n / 100;
+                }
+                return _bondThickness;
+            }
+        }
+
         #region Layout
 
         //used to calculate the bounds of the atom
@@ -52,12 +67,12 @@ namespace Chem4Word.ViewModel
                     }
                     else
                     {
-                        return new Rect();
+                        return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                     }
                 }
                 catch (System.NullReferenceException ex)
                 {
-                    return new Rect(0,0,0,0);
+                    return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }
             }
         }
