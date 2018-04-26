@@ -288,6 +288,97 @@ namespace Chem4Word.Model
             }
         }
 
+        public double BondLineThickness
+        {
+            get
+            {
+                Vector v = StartAtom.Position - EndAtom.Position;
+                double abl = v.Length / Globals.ScaleFactorForXaml;
+                double result = Globals.DefaultBondLineThickness;
+                switch (abl)
+                {
+                    // Bond Length = 5
+                    case double n when (n > 2.5 && n < 7.5):
+                        result = 2.5;
+                        break;
+                    // Bond Length = 10
+                    case double n when (n > 7.5 && n < 12.5):
+                        result = 5.0;
+                        break;
+                    // Bond Length = 15
+                    case double n when (n > 12.5 && n < 17.5):
+                        result = 7.5;
+                        break;
+                    // Bond Length = 20
+                    case double n when (n > 17.5 && n < 22.5):
+                        result = 10.0;
+                        break;
+                    // Bond Length = 25
+                    case double n when (n > 22.5 && n < 27.5):
+                        result = 12.5;
+                        break;
+                    // Bond Length = 30
+                    case double n when (n > 27.5 && n < 32.5):
+                        result = 15.0;
+                        break;
+                    // Bond Length = 35
+                    case double n when (n > 32.5 && n < 37.5):
+                        result = 17.5;
+                        break;
+                    // Bond Length = 40
+                    case double n when (n > 37.5 && n < 42.5):
+                        result = 20.0;
+                        break;
+                    // Bond Length = 45
+                    case double n when (n > 42.5 && n < 47.5):
+                        result = 25.0;
+                        break;
+                    // Bond Length = 50
+                    case double n when (n > 47.5 && n < 52.5):
+                        result = 22.5;
+                        break;
+                    // Bond Length = 55
+                    case double n when (n > 52.5 && n < 57.5):
+                        result = 25.0;
+                        break;
+                    // Bond Length = 60
+                    case double n when (n > 57.5 && n < 62.5):
+                        result = 27.5;
+                        break;
+                    // Bond Length = 65
+                    case double n when (n > 62.5 && n < 67.5):
+                        result = 30.0;
+                        break;
+                    // Bond Length = 70
+                    case double n when (n > 67.5 && n < 72.5):
+                        result = 32.5;
+                        break;
+                    // Bond Length = 75
+                    case double n when (n > 72.5 && n < 77.5):
+                        result = 35.0;
+                        break;
+                    // Bond Length = 80
+                    case double n when (n > 77.5 && n < 82.5):
+                        result = 37.5;
+                        break;
+                    // Bond Length = 85
+                    case double n when (n > 82.5 && n < 87.5):
+                        result = 40.0;
+                        break;
+                    // Bond Length = 90
+                    case double n when (n > 87.5 && n < 92.5):
+                        result = 42.5;
+                        break;
+                    // Bond Length = 95
+                    case double n when (n > 92.5):
+                        result = 45.0;
+                        break;
+                }
+
+                return result;
+            }
+        }
+
         public double Angle
         {
             get { return Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector); }

@@ -20,7 +20,7 @@
     </UserControl.Resources>
     <Grid>
         <ScrollViewer VerticalAlignment="Stretch">
-            <ItemsControl x:Name="NavigatorList"
+            <ListBox x:Name="NavigatorList"
                           VirtualizingStackPanel.IsVirtualizing="True"
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                           ScrollViewer.CanContentScroll="True"
@@ -28,7 +28,7 @@
                           ItemsSource="{Binding Path=NavigatorItems}"
                           HorizontalAlignment="Stretch"
                           HorizontalContentAlignment="Stretch">
-                <ItemsControl.ItemTemplate>
+                <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border
                         BorderBrush="{StaticResource Chem4WordBlue}"
@@ -43,13 +43,8 @@
                             x:Name="NavigatorItemControl" />
                         </Border>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </ScrollViewer>
     </Grid>
 </UserControl>

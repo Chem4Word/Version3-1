@@ -73,7 +73,7 @@
             // 
             this.EditStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EditStructure.Enabled = false;
-            this.EditStructure.Location = new System.Drawing.Point(608, 486);
+            this.EditStructure.Location = new System.Drawing.Point(1052, 486);
             this.EditStructure.Name = "EditStructure";
             this.EditStructure.Size = new System.Drawing.Size(75, 23);
             this.EditStructure.TabIndex = 2;
@@ -109,7 +109,7 @@
             // 
             this.RemoveAtom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.RemoveAtom.Enabled = false;
-            this.RemoveAtom.Location = new System.Drawing.Point(496, 486);
+            this.RemoveAtom.Location = new System.Drawing.Point(940, 486);
             this.RemoveAtom.Name = "RemoveAtom";
             this.RemoveAtom.Size = new System.Drawing.Size(97, 23);
             this.RemoveAtom.TabIndex = 5;
@@ -121,7 +121,7 @@
             // 
             this.RandomElement.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.RandomElement.Enabled = false;
-            this.RandomElement.Location = new System.Drawing.Point(496, 517);
+            this.RandomElement.Location = new System.Drawing.Point(940, 517);
             this.RandomElement.Name = "RandomElement";
             this.RandomElement.Size = new System.Drawing.Size(97, 23);
             this.RandomElement.TabIndex = 6;
@@ -134,7 +134,7 @@
             this.EditorType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.EditorType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.EditorType.Enabled = false;
-            this.EditorType.Location = new System.Drawing.Point(608, 519);
+            this.EditorType.Location = new System.Drawing.Point(1052, 519);
             this.EditorType.Name = "EditorType";
             this.EditorType.Size = new System.Drawing.Size(75, 21);
             this.EditorType.TabIndex = 0;
@@ -224,16 +224,16 @@
             this.LayoutPanel.Name = "LayoutPanel";
             this.LayoutPanel.RowCount = 1;
             this.LayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.LayoutPanel.Size = new System.Drawing.Size(671, 435);
+            this.LayoutPanel.Size = new System.Drawing.Size(1115, 435);
             this.LayoutPanel.TabIndex = 13;
             // 
             // DisplayHost
             // 
             this.DisplayHost.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.DisplayHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DisplayHost.Location = new System.Drawing.Point(170, 3);
+            this.DisplayHost.Location = new System.Drawing.Point(281, 3);
             this.DisplayHost.Name = "DisplayHost";
-            this.DisplayHost.Size = new System.Drawing.Size(329, 429);
+            this.DisplayHost.Size = new System.Drawing.Size(551, 429);
             this.DisplayHost.TabIndex = 1;
             this.DisplayHost.Text = "elementHost1";
             this.DisplayHost.Child = this.Display;
@@ -241,9 +241,9 @@
             // RedoHost
             // 
             this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(505, 3);
+            this.RedoHost.Location = new System.Drawing.Point(838, 3);
             this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(163, 429);
+            this.RedoHost.Size = new System.Drawing.Size(274, 429);
             this.RedoHost.TabIndex = 2;
             this.RedoHost.Text = "elementHost2";
             this.RedoHost.Child = this.RedoStack;
@@ -253,7 +253,7 @@
             this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.UndoHost.Location = new System.Drawing.Point(3, 3);
             this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(161, 429);
+            this.UndoHost.Size = new System.Drawing.Size(272, 429);
             this.UndoHost.TabIndex = 3;
             this.UndoHost.Text = "elementHost3";
             this.UndoHost.Child = this.UndoStack;
@@ -272,7 +272,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(695, 544);
+            this.ClientSize = new System.Drawing.Size(1139, 544);
             this.Controls.Add(this.Information);
             this.Controls.Add(this.LayoutPanel);
             this.Controls.Add(this.Redo);
