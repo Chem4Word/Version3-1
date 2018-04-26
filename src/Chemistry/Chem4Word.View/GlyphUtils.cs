@@ -32,11 +32,6 @@ namespace Chem4Word.View
             }
         }
 
-        public static double AA
-        {
-            get { return 1; }
-        }
-
         public static Typeface SymbolTypeface = new Typeface(new FontFamily("Arial"),
             FontStyles.Normal,
             FontWeights.Bold,
