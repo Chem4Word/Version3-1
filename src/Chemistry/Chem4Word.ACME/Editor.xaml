@@ -366,6 +366,27 @@
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
                                     <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="S">
+                                            <Setter Property="StrokeEndLineCap" Value="Round" />
+                                            <Setter Property="StrokeStartLineCap" Value="Round" />
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="D">
+                                            <Setter Property="StrokeEndLineCap" Value="Round" />
+                                            <Setter Property="StrokeStartLineCap" Value="Round" />
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="T">
+                                            <Setter Property="StrokeEndLineCap" Value="Round" />
+                                            <Setter Property="StrokeStartLineCap" Value="Round" />
+                                            <Setter Property="Fill" Value="Black" />
+                                            <Setter Property="Stroke" Value="Black" />
+                                            <Setter Property="StrokeLineJoin" Value="Round" />
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="hbond">
                                             <Setter Property="StrokeDashArray" Value="1,1" />
                                         </DataTrigger>
@@ -387,7 +408,6 @@
                                         <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Indeterminate">
                                             <Setter Property="Fill" Value="Black" />
                                             <Setter Property="Stroke" Value="Black" />
-                                            <Setter Property="StrokeThickness" Value="1.5" />
                                             <Setter Property="StrokeLineJoin" Value="Round" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Hatch">
