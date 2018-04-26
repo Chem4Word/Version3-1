@@ -15,8 +15,10 @@ using IChem4Word.Contracts;
 using Microsoft.Office.Interop.Word;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Microsoft.Office.Tools;
 
 namespace Chem4Word.Navigator
 {
@@ -24,6 +26,41 @@ namespace Chem4Word.Navigator
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+
+        public static void SelectNavigatorItem(string guid)
+        {
+            CustomTaskPane custTaskPane = null;
+            foreach (CustomTaskPane taskPane in Globals.Chem4WordV3.CustomTaskPanes)
+            {
+                Application app = Globals.Chem4WordV3.Application;
+                if (app.ActiveWindow == taskPane.Window && taskPane.Title == Constants.NavigatorTaskPaneTitle)
+                {
+                    custTaskPane = taskPane;
+                }
+
+                if (custTaskPane != null)
+                {
+                    var navHost = custTaskPane.Control as NavigatorHost;
+                    if (navHost != null)
+                    {
+                        var navigatorList = navHost.navigatorView1.NavigatorList;
+                        int idx = 0;
+                        foreach (var item in navigatorList.Items)
+                        {
+                            var navigatorItem = item as NavigatorItem;
+                            if (navigatorItem.CMLId.Equals(guid))
+                            {
+                                navigatorList.SelectedIndex = idx;
+                                navigatorList.ScrollIntoView(navigatorList.SelectedItem);
+                                break;
+                            }
+                            idx++;
+                        }
+                    }
+                }
+            }
+
+        }
 
         public static void InsertChemistry(bool isCopy, Application app, Display display)
         {
@@ -128,6 +165,9 @@ namespace Chem4Word.Navigator
                             }
                         }
                     }
+
+                    SelectNavigatorItem(guidString);
+
                 }
                 catch (Exception ex)
                 {
