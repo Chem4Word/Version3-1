@@ -19,7 +19,6 @@
     xmlns:release="condition:!DEBUG"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     x:Name="AcmeControl" Loaded="ACMEControl_Loaded"
-    FontSize="23.0"
     Height="774" Width="1013">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -362,7 +361,7 @@
                         EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
                             <view:BondShape.Style>
                                 <Style TargetType="{x:Type view:BondShape}">
-                                    <Setter Property="StrokeThickness" Value="2.5" />
+                                    <Setter Property="StrokeThickness" Value="{Binding Path=BondLineThickness}" />
                                     <Setter Property="StrokeEndLineCap" Value="Round" />
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
@@ -435,8 +434,7 @@
                             Position="{Binding Path=Position}"
                             AtomSymbol="{Binding Path=SymbolText}"
                             BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
-                            ImplicitHydrogenCount="{Binding ImplicitHydrogenCount, Mode=OneWay, Converter={StaticResource DoNothingConverter}}"
-                            FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                            ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                             <view:AtomShape.Style>
                                 <Style TargetType="{x:Type view:AtomShape}">
                                     <Setter Property="Fill">

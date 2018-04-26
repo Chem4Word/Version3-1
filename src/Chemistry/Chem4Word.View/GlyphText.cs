@@ -119,7 +119,7 @@ namespace Chem4Word.View
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
-            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, GlyphUtils.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
+            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, AtomShape.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
 
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
@@ -183,25 +183,25 @@ namespace Chem4Word.View
 
     public class MainLabelText : GlyphText
     {
-        public MainLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.SymbolSize, pixelsPerDip)
+        public MainLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.SymbolSize, pixelsPerDip)
         { }
     }
 
     public class SubLabelText : GlyphText
     {
-        public SubLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.ScriptSize, pixelsPerDip)
+        public SubLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.ScriptSize, pixelsPerDip)
         { }
     }
 
     public class IsotopeLabelText : GlyphText
     {
-        public IsotopeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.IsotopeSize, pixelsPerDip)
+        public IsotopeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
         { }
     }
 
     public class ChargeLabelText : GlyphText
     {
-        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, GlyphUtils.IsotopeSize, pixelsPerDip)
+        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
         {
         }
     }

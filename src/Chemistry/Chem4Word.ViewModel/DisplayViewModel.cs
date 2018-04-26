@@ -63,12 +63,16 @@ namespace Chem4Word.ViewModel
 
         public DisplayViewModel()
         {
-            FontSize = 23;
         }
 
         public DisplayViewModel(Model.Model model) : this()
         {
             Model = model;
+            FontSize = Globals.DefaultFontSize;
+            if (model.AllBonds.Any())
+            {
+                FontSize = model.MeanBondLength * Globals.FontSizePercentageBond;
+            }
             AllObjects = model.AllObjects;
 
             AllAtoms = model.AllAtoms;

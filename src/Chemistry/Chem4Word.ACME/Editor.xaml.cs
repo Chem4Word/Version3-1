@@ -127,8 +127,7 @@ namespace Chem4Word.ACME
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
 
-            tempModel.FontSize = FontSize;
-            tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
+            tempModel.RescaleForXaml();
             var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;
             _activeViewModel.Model = tempModel;
@@ -230,8 +229,11 @@ namespace Chem4Word.ACME
         {
             WpfEventArgs args = new WpfEventArgs();
 
+            Model.Model result = _activeViewModel.Model.Clone();
+            result.RescaleForCml();
+
             CMLConverter conv = new CMLConverter();
-            args.OutputValue = conv.Export(_activeViewModel.Model);
+            args.OutputValue = conv.Export(result);
             args.Button = "SAVE";
 
             OnOkButtonClick?.Invoke(this, args);

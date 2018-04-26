@@ -23,7 +23,10 @@ namespace Chem4Word.View
     /// </summary>
     public class AtomShape : Shape
     {
-        private const double MaskOffsetWidth = 2.5;
+        private static double MaskOffsetWidth = 0;
+        public static double SymbolSize = 0;
+        public static double ScriptSize = 0;
+        public static double IsotopeSize = 0;
 
         //list of points that make up the hull of the shape
 
@@ -57,10 +60,13 @@ namespace Chem4Word.View
             //holds the text of the subscript
             private SubLabelText _subText;
 
-            public SubscriptedGroup(int count, string text)
+            private static double FontSize;
+
+            public SubscriptedGroup(int count, string text, double fontSize)
             {
                 Count = count;
                 Text = text;
+                FontSize = fontSize;
             }
 
             /// <summary>
@@ -75,7 +81,7 @@ namespace Chem4Word.View
 
                 List<Point> mainOutline;
                 //first, get some initial size measurements
-                _mainText = new GlyphText(Text, SymbolTypeface, SymbolSize, pixelsPerDip);
+                _mainText = new GlyphText(Text, SymbolTypeface, FontSize, pixelsPerDip);
                 _mainText.Premeasure();
 
                 //measure up the subscript (if we have one)
@@ -148,7 +154,7 @@ namespace Chem4Word.View
                 GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo = null)
             {
                 Point adjunctCenter;
-                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * SymbolSize);
+                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * FontSize);
                 double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width) / 2;
                 switch (direction)
                 {
@@ -190,6 +196,12 @@ namespace Chem4Word.View
 
         protected override void OnRender(DrawingContext drawingContext)
         {
+            SymbolSize = ParentAtom.Parent.XamlBondLength / 2.0d;
+
+            ScriptSize = SymbolSize * 0.6;
+            IsotopeSize = SymbolSize * 0.8;
+            MaskOffsetWidth = SymbolSize * 0.1;
+
             RenderAtom(drawingContext);
         }
 
@@ -245,7 +257,7 @@ namespace Chem4Word.View
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
-                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H");
+                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", SymbolSize);
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
@@ -414,7 +426,7 @@ namespace Chem4Word.View
             if (AtomSymbol == "") //implicit carbon
             {
                 //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
+                double radiusX = SymbolSize / 3;
                 if (!measureOnly)
                 {
                     drawingContext.DrawEllipse(Fill, null, Position, radiusX, radiusX);
@@ -461,20 +473,6 @@ namespace Chem4Word.View
                     FrameworkPropertyMetadataOptions.AffectsRender));
 
         #endregion Positioning DPs
-
-        #region layout DPs
-
-        public double FontSize
-        {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
-
-        #endregion layout DPs
 
         #region Atom DPs
 
@@ -543,7 +541,7 @@ namespace Chem4Word.View
             get
             {
                 //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
+                double radiusX = SymbolSize / 3;
 
                 return new EllipseGeometry(Position, radiusX, radiusX);
             }
