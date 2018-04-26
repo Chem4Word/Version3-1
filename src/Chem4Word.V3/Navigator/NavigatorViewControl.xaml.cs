@@ -46,6 +46,13 @@ namespace Chem4Word.Navigator
             }
         }
 
+        public void SelectItem(string guid)
+        {
+            foreach (var item in this.NavigatorList.Items)
+            {
+            }
+        }
+
         public Document ActiveDocument
         {
             get { return _activeDoc; }

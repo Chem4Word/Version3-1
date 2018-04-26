@@ -11,7 +11,6 @@
     mc:Ignorable="d"
     Background="{Binding RelativeSource={RelativeSource AncestorType=local:NavigatorView}, Path=Background}"
     x:Name="NavItemControl" Loaded="NavItemControl_Loaded">
-
     <UserControl.Resources>
         <SolidColorBrush x:Key="Chem4WordBlue">
             <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
@@ -22,7 +21,6 @@
             <Setter Property="Foreground" Value="Blue" />
         </Style>
     </UserControl.Resources>
-
     <Grid HorizontalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
