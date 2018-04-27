@@ -29,6 +29,12 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding UndoCommand}" Modifiers="Control" Key="Z"/>
+        <KeyBinding Command="{Binding RedoCommand}" Modifiers="Control" Key="Y"/>
+        <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
+    </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
             <converters:DoNothingConverter x:Key="DoNothingConverter" />
