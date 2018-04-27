@@ -17,24 +17,45 @@
         <SolidColorBrush x:Key="Chem4WordBlue">
             <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
         </SolidColorBrush>
+        <Style x:Key="SimpleListBoxItem" TargetType="ListBoxItem">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border
+                            Name="Border"
+                            Padding="3"
+                            SnapsToDevicePixels="true">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource Chem4WordBlue}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <ScrollViewer VerticalAlignment="Stretch">
             <ListBox x:Name="NavigatorList"
-                          VirtualizingStackPanel.IsVirtualizing="True"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ScrollViewer.CanContentScroll="True"
-                          Grid.IsSharedSizeScope="True"
-                          ItemsSource="{Binding Path=NavigatorItems}"
-                          HorizontalAlignment="Stretch"
-                          HorizontalContentAlignment="Stretch">
+                     Grid.IsSharedSizeScope="True"
+                     ScrollViewer.CanContentScroll="True"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ItemContainerStyle="{StaticResource SimpleListBoxItem}"
+                     ItemsSource="{Binding Path=NavigatorItems}"
+                     HorizontalAlignment="Stretch"
+                     HorizontalContentAlignment="Stretch"
+                     VerticalAlignment="Stretch"
+                     VirtualizingStackPanel.IsVirtualizing="True">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border
                         BorderBrush="{StaticResource Chem4WordBlue}"
-                        BorderThickness="2"
-                        HorizontalAlignment="Stretch"
-                        CornerRadius="2">
+                        BorderThickness="1"
+                        HorizontalAlignment="Stretch">
                             <local:NavigatorItemControl
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
