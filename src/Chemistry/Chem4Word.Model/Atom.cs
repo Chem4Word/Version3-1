@@ -433,7 +433,7 @@ namespace Chem4Word.Model
         //tries to get a bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
-            Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
+            //Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
             double halfSize = fontSize / 2;
             Point position = Position;
             Rect baseAtomBox = new Rect(
@@ -470,12 +470,12 @@ namespace Chem4Word.Model
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
-                Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
+                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
+                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }

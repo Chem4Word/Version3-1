@@ -10,6 +10,7 @@ using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -28,6 +29,22 @@ namespace Chem4Word.ViewModel
         public ObservableCollection<Bond> AllBonds { get; set; }
 
         public Model.Model Model { get; set; }
+
+        private double _bondThickness = 0;
+        public double BondThickness {
+            get
+            {
+                if (_bondThickness == 0)
+                {
+                    double h = BoundingBox.Height;
+                    double w = BoundingBox.Width;
+                    double n = Math.Max(h, w);
+                    _bondThickness =  n / 100;
+                    Debug.WriteLine($"MeanBondLength {Model.MeanBondLength} Width {w} Height {h} Thickness {_bondThickness}");
+                }
+                return _bondThickness;
+            }
+        }
 
         #region Layout
 
@@ -52,12 +69,12 @@ namespace Chem4Word.ViewModel
                     }
                     else
                     {
-                        return new Rect();
+                        return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                     }
                 }
                 catch (System.NullReferenceException ex)
                 {
-                    return new Rect(0,0,0,0);
+                    return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }
             }
         }

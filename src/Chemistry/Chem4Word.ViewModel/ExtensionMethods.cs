@@ -26,7 +26,7 @@ namespace Chem4Word.ViewModel
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
-            Debug.WriteLine($"ExtensionMethods.BoundingBox() FontSize: {FontSize}");
+            //Debug.WriteLine($"ExtensionMethods.BoundingBox() FontSize: {FontSize}");
             double halfSize = FontSize / 2;
             Point position = atom.Position;
             Rect baseAtomBox = new Rect(
@@ -63,12 +63,12 @@ namespace Chem4Word.ViewModel
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
-                Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} mainElementBox: {mainElementBox}");
+                //Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} baseAtomBox: {baseAtomBox}");
+                //Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }

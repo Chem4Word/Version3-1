@@ -28,6 +28,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using Chem4Word.Navigator;
 using Extensions = Microsoft.Office.Tools.Word.Extensions;
 using OfficeTools = Microsoft.Office.Tools;
 using Word = Microsoft.Office.Interop.Word;
@@ -852,10 +853,19 @@ namespace Chem4Word
                     {
                         if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                         {
-                            Debug.WriteLine($"  Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
-                            doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
-                            chemistrySelected = true;
-                            break;
+                            if (cc.Tag != null)
+                            {
+                                string guid = CustomXmlPartHelper.GuidFromTag(cc.Tag);
+                                Guid g;
+                                if (Guid.TryParse(guid, out g))
+                                {
+                                    Debug.WriteLine($"  Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
+                                    NavigatorSupport.SelectNavigatorItem(guid);
+                                    doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
+                                    chemistrySelected = true;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }

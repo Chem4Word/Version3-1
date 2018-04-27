@@ -361,7 +361,7 @@
                         EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
                             <view:BondShape.Style>
                                 <Style TargetType="{x:Type view:BondShape}">
-                                    <Setter Property="StrokeThickness" Value="{Binding Path=BondLineThickness}" />
+                                    <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.BondThickness}" />
                                     <Setter Property="StrokeEndLineCap" Value="Round" />
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
