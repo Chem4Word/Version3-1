@@ -27,18 +27,18 @@ namespace Chem4Word.ViewModel
         {
             public int Level;
             public string Description;
-            public Action<object,object,object> UndoAction;
-            public Action<object,object,object> RedoAction;
+            public Action<object,object,object, object> UndoAction;
+            public Action<object,object,object, object> RedoAction;
             public object[] Params;
 
             public void Undo()
             { 
-                UndoAction(Params[0], Params[1], Params[2]);
+                UndoAction(Params[0], Params[1], Params[2], Params[3]);
             }
 
             public void Redo()
             {
-                RedoAction(Params[0], Params[1], Params[2]);
+                RedoAction(Params[0], Params[1], Params[2], Params[3]);
             }
 
             public bool IsBufferRecord()
@@ -100,9 +100,20 @@ namespace Chem4Word.ViewModel
 
         }
 
-        public void RecordAction(string desc, Action<object,object,object> undoAction, Action<object,object,object> redoAction, params object[] parameters)
+        public void RecordAction(string desc, 
+            Action<object,object,object, object> undoAction, 
+            Action<object,object,object, object> redoAction, 
+            object param1 = null, object param2=null, object param3=null, object param4=null)
         {
-            _undoStack.Push(new UndoRecord {Level = _transactionLevel, Description = desc, UndoAction = undoAction, RedoAction = redoAction, Params = parameters });
+            //performing a new action should clear the redo
+            if (_redoStack.Any())
+            {
+                _redoStack.Clear();
+            }
+            _undoStack.Push(new UndoRecord {Level = _transactionLevel,
+                Description = desc, UndoAction = undoAction,
+                RedoAction = redoAction,
+                Params =new object[] {param1,param2,param3,param4} });
         }
 
 
@@ -123,7 +134,7 @@ namespace Chem4Word.ViewModel
             {
                 _undoStack.Push(_bufferRecord);
             }
-
+            //tell the parent viewmodel the command status has changed
             _editViewModel.UndoCommand.RaiseCanExecChanged();
             _editViewModel.RedoCommand.RaiseCanExecChanged();
         }

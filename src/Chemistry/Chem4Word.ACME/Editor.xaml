@@ -29,6 +29,12 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding UndoCommand}" Modifiers="Control" Key="Z"/>
+        <KeyBinding Command="{Binding RedoCommand}" Modifiers="Control" Key="Y"/>
+        <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
+    </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
             <converters:DoNothingConverter x:Key="DoNothingConverter" />
@@ -463,13 +469,15 @@
                                         </Setter.Value>
                                     </Setter>
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=SymbolText}" Value="">
+                                        <!-- if the atom symbol is empty then we have a vertex carbon -->
+                                        <Trigger Property="AtomSymbol" Value="">
                                             <Setter Property="Fill">
                                                 <Setter.Value>
                                                     <SolidColorBrush Color="Transparent" />
                                                 </Setter.Value>
                                             </Setter>
-                                        </DataTrigger>
+                                        </Trigger>
+                                      
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Fill">
                                                 <Setter.Value>

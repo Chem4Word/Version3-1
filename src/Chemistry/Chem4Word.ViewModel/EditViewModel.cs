@@ -98,11 +98,37 @@ namespace Chem4Word.ViewModel
             set
             {
                 _selectedElement = value;
-                foreach (Atom selectedAtom in SelectedItems.OfType<Atom>())
+
+                var selAtoms = SelectedItems.OfType<Atom>().ToList();
+                SelectedItems.Clear();
+                SetElement(value, selAtoms);
+            }
+        }
+
+        private  void SetElement(ElementBase value, List<Atom> selAtoms)
+        {
+            UndoManager.BeginTrans();
+
+            Action<object, object, object, object> undo, redo;
+            foreach (Atom selectedAtom in selAtoms)
+            {
+                if (selectedAtom.Element != value)
                 {
+                    redo = (atom, dummy0, dummy1, dummy2) =>
+                    {
+                        (atom as Atom).Element = (value as ElementBase);
+                    };
+
+                    undo = (atom, elem, dummy1, dummy2) =>
+                    {
+                        (atom as Atom).Element = elem as ElementBase;
+                    };
+                    UndoManager.RecordAction($"Set Element to {value.Symbol}", undo, redo, selectedAtom, selectedAtom.Element);
                     selectedAtom.Element = value;
                 }
             }
+
+            UndoManager.CommitTrans();
         }
 
         /// <summary>
@@ -420,8 +446,8 @@ namespace Chem4Word.ViewModel
             }
 
             SelectedItems.Remove(atom);
-            Action<object, object, object> undoAction = (delatom, mol, dummy) => { (mol as Molecule).Atoms.Add((delatom as Atom)); };
-            Action<object, object, object> redoAction = (delatom, mol, dummy) => { (mol as Molecule).Atoms.Remove((delatom as Atom)); };
+            Action<object, object, object, object> undoAction = (delatom, mol, dummy, dummy2) => { (mol as Molecule).Atoms.Add((delatom as Atom)); };
+            Action<object, object, object, object> redoAction = (delatom, mol, dummy, dummy2) => { (mol as Molecule).Atoms.Remove((delatom as Atom)); };
             
             UndoManager.RecordAction("Delete Atom", undoAction, redoAction, atom, atom.Parent, null);
             atom.Parent.Atoms.Remove(atom);
@@ -434,14 +460,14 @@ namespace Chem4Word.ViewModel
         {
             UndoManager.BeginTrans();
 
-            Action<object, object, object> redoAction = (b, a1, a2) =>
+            Action<object, object, object, object> redoAction = (b, a1, a2, dummy) =>
             {
                 var b1 = (bond as Bond);
                 b1.StartAtom = null;
                 b1.EndAtom = null;
             };
 
-            Action<object, object, object> undoAction = (b, a1, a2) =>
+            Action<object, object, object, object> undoAction = (b, a1, a2, dummy) =>
             {
                 var b1 = (bond as Bond);
                 b1.StartAtom = a1 as Atom;
@@ -456,8 +482,8 @@ namespace Chem4Word.ViewModel
             Molecule parent = bond.Parent;
             if (parent != null)
             {
-                undoAction = (delbond, mol, dummy) => { (mol as Molecule).Bonds.Add((delbond as Bond)); };
-                redoAction = (delbond, mol, dummy) => { (mol as Molecule).Bonds.Remove((delbond as Bond)); };
+                undoAction = (delbond, mol, dummy, dummy2) => { (mol as Molecule).Bonds.Add((delbond as Bond)); };
+                redoAction = (delbond, mol, dummy, dummy2) => { (mol as Molecule).Bonds.Remove((delbond as Bond)); };
 
                 UndoManager.RecordAction("Delete Bond", undoAction, redoAction, bond, bond.Parent, null);
                 parent.Bonds.Remove(bond);
