@@ -98,11 +98,37 @@ namespace Chem4Word.ViewModel
             set
             {
                 _selectedElement = value;
-                foreach (Atom selectedAtom in SelectedItems.OfType<Atom>())
+
+                var selAtoms = SelectedItems.OfType<Atom>().ToList();
+                SelectedItems.Clear();
+                SetElement(value, selAtoms);
+            }
+        }
+
+        private  void SetElement(ElementBase value, List<Atom> selAtoms)
+        {
+            UndoManager.BeginTrans();
+
+            Action<object, object, object, object> undo, redo;
+            foreach (Atom selectedAtom in selAtoms)
+            {
+                if (selectedAtom.Element != value)
                 {
+                    redo = (atom, dummy0, dummy1, dummy2) =>
+                    {
+                        (atom as Atom).Element = (value as ElementBase);
+                    };
+
+                    undo = (atom, elem, dummy1, dummy2) =>
+                    {
+                        (atom as Atom).Element = elem as ElementBase;
+                    };
+                    UndoManager.RecordAction($"Set Element to {value.Symbol}", undo, redo, selectedAtom, selectedAtom.Element);
                     selectedAtom.Element = value;
                 }
             }
+
+            UndoManager.CommitTrans();
         }
 
         /// <summary>

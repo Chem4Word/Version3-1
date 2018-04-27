@@ -134,7 +134,7 @@ namespace Chem4Word.ViewModel
             {
                 _undoStack.Push(_bufferRecord);
             }
-
+            //tell the parent viewmodel the command status has changed
             _editViewModel.UndoCommand.RaiseCanExecChanged();
             _editViewModel.RedoCommand.RaiseCanExecChanged();
         }
