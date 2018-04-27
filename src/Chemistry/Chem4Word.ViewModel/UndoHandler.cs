@@ -105,7 +105,15 @@ namespace Chem4Word.ViewModel
             Action<object,object,object, object> redoAction, 
             object param1 = null, object param2=null, object param3=null, object param4=null)
         {
-            _undoStack.Push(new UndoRecord {Level = _transactionLevel, Description = desc, UndoAction = undoAction, RedoAction = redoAction, Params =new object[] {param1,param2,param3,param4} });
+            //performing a new action should clear the redo
+            if (_redoStack.Any())
+            {
+                _redoStack.Clear();
+            }
+            _undoStack.Push(new UndoRecord {Level = _transactionLevel,
+                Description = desc, UndoAction = undoAction,
+                RedoAction = redoAction,
+                Params =new object[] {param1,param2,param3,param4} });
         }
 
 
