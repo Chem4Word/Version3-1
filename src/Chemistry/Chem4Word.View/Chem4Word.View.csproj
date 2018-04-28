@@ -77,7 +77,6 @@
     <Compile Include="AtomShape.cs" />
     <Compile Include="BondShape.cs" />
     <Compile Include="CanvasAutoSize.cs" />
-    <Compile Include="Globals.cs" />
     <Compile Include="GlyphText.cs" />
     <Compile Include="GlyphUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

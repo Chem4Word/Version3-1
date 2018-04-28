@@ -92,11 +92,13 @@ namespace Chem4Word.ACME.Behaviors
                 _mouseTrack.Add(pos);
                 var outline = GetPolyGeometry();
 
-                if (_lassoAdorner != null)
+
+                if (_lassoAdorner == null)
                 {
-                    RemoveAdorner(_lassoAdorner, AssociatedObject);
+                    _lassoAdorner = new LassoAdorner(AssociatedObject, outline);
                 }
-                _lassoAdorner = new LassoAdorner(AssociatedObject, outline);
+
+                _lassoAdorner.Outline = outline;
 
                 ModifySelection(outline);
             }

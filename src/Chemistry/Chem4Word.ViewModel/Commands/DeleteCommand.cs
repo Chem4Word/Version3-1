@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Commands
 {
@@ -21,15 +22,52 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.UndoManager.Commit();
+            MyEditViewModel.UndoManager.BeginTrans();
+            //first do the astom and associated bonds
+            if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) == EditViewModel.SelectionTypeCode.Atom))
+            {
+
+                var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
+                foreach (Atom atom in atoms )
+                {
+                    MyEditViewModel.DeleteAtom(atom);
+                }
+               
+            }
+
+            //now do any bonds remaing:  this is important if only bonds have been selected
+
+
+            if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Bond) ==
+                 EditViewModel.SelectionTypeCode.Bond))
+            {
+                var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
+
+                foreach (Bond bond in bonds)
+                {
+
+                    MyEditViewModel.DeleteBond(bond);
+                }
+            }
+
+            MyEditViewModel.UndoManager.CommitTrans();
         }
 
         public override event EventHandler CanExecuteChanged;
 
         public DeleteCommand(EditViewModel vm) : base(vm)
         {
+
         }
 
+
         #endregion ICommand Implementation
+
+        public override void RaiseCanExecChanged()
+        {
+            var args = new EventArgs();
+
+            CanExecuteChanged.Invoke(this, args);
+        }
     }
 }

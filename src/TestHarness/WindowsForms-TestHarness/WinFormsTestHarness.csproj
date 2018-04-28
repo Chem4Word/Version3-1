@@ -105,6 +105,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StackViewer.xaml.cs">
+      <DependentUpon>StackViewer.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Dumper.resx">
       <DependentUpon>Dumper.cs</DependentUpon>
     </EmbeddedResource>
@@ -153,6 +156,16 @@
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Chemistry\Chem4Word.ViewModel\Chem4Word.ViewModel.csproj">
+      <Project>{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}</Project>
+      <Name>Chem4Word.ViewModel</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="StackViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

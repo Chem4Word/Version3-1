@@ -11,8 +11,11 @@ namespace Chem4Word.ViewModel.Commands
 {
     public class UndoCommand : BaseCommand
     {
+        private EditViewModel _currentVM;
+
         public UndoCommand(EditViewModel vm) : base(vm)
         {
+
         }
 
         public override bool CanExecute(object parameter)
@@ -22,6 +25,7 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
+            MyEditViewModel.UndoManager.Undo();
         }
 
         public override event EventHandler CanExecuteChanged;

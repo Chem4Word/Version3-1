@@ -10,6 +10,7 @@ using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -29,6 +30,22 @@ namespace Chem4Word.ViewModel
 
         public Model.Model Model { get; set; }
 
+        private double _bondThickness = 0;
+        public double BondThickness {
+            get
+            {
+                if (_bondThickness == 0)
+                {
+                    double h = BoundingBox.Height;
+                    double w = BoundingBox.Width;
+                    double n = Math.Max(h, w);
+                    _bondThickness =  n / 100;
+                    Debug.WriteLine($"MeanBondLength {Model.MeanBondLength} Width {w} Height {h} Thickness {_bondThickness}");
+                }
+                return _bondThickness;
+            }
+        }
+
         #region Layout
 
         //used to calculate the bounds of the atom
@@ -38,19 +55,26 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                if (AllAtoms.Any())
+                try
                 {
-                    var modelRect = AllAtoms[0].BoundingBox(FontSize);
-                    for (int i = 1; i < AllAtoms.Count; i++)
+                    if (AllAtoms.Any())
                     {
-                        var atom = AllAtoms[i];
-                        modelRect.Union(atom.BoundingBox(FontSize));
+                        var modelRect = AllAtoms[0].BoundingBox(FontSize);
+                        for (int i = 1; i < AllAtoms.Count; i++)
+                        {
+                            var atom = AllAtoms[i];
+                            modelRect.Union(atom.BoundingBox(FontSize));
+                        }
+                        return modelRect;
                     }
-                    return modelRect;
+                    else
+                    {
+                        return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
+                    }
                 }
-                else
+                catch (System.NullReferenceException ex)
                 {
-                    return new Rect();
+                    return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }
             }
         }
@@ -63,12 +87,16 @@ namespace Chem4Word.ViewModel
 
         public DisplayViewModel()
         {
-            FontSize = 23;
         }
 
         public DisplayViewModel(Model.Model model) : this()
         {
             Model = model;
+            FontSize = Globals.DefaultFontSize;
+            if (model.AllBonds.Any())
+            {
+                FontSize = model.MeanBondLength * Globals.FontSizePercentageBond;
+            }
             AllObjects = model.AllObjects;
 
             AllAtoms = model.AllAtoms;

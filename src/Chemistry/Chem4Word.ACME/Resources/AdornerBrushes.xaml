@@ -26,74 +26,7 @@
                 Opacity="0.8" />
         </Pen.Brush>
     </Pen>
-    <Style
-        x:Key="RotateThumb"
-        TargetType="Thumb">
-        <Setter
-            Property="SnapsToDevicePixels"
-            Value="true" />
-        <Setter
-            Property="OverridesDefaultStyle"
-            Value="true" />
-        <Setter
-            Property="Background"
-            Value="{StaticResource GrabHandleFillBrush}" />
-        <Setter
-            Property="BorderBrush"
-            Value="{StaticResource GrabHandleBorderBrush}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Thumb">
-                    <Canvas
-                        Height="30"
-                        Width="30">
-                        <Ellipse
-                            Canvas.Left="10"
-                            Canvas.Top="10"
-                            Height="10"
-                            Width="10"
-                            Fill="{StaticResource GrabHandleFillBrush}"
-                            Stroke="{StaticResource GrabHandleBorderBrush}" />
-                        <Path Stroke="{StaticResource GrabHandleBorderBrush}">
-                            <Path.Data>
-                                <PathGeometry>
-                                    <PathGeometry.Figures>
-                                        <PathFigureCollection>
-                                            <PathFigure StartPoint="25,15">
-                                                <PathFigure.Segments>
-                                                    <PathSegmentCollection>
-                                                        <ArcSegment
-                                                            IsLargeArc="True"
-                                                            Point="15,5"
-                                                            Size="10,10"
-                                                            SweepDirection="Clockwise" />
-                                                    </PathSegmentCollection>
-                                                </PathFigure.Segments>
-                                            </PathFigure>
-                                            <PathFigure StartPoint="15, 5">
-                                                <PathFigure.Segments>
-                                                    <PathSegmentCollection>
-                                                        <LineSegment Point="9,4" />
-                                                    </PathSegmentCollection>
-                                                </PathFigure.Segments>
-                                            </PathFigure>
-                                            <PathFigure StartPoint="15, 5">
-                                                <PathFigure.Segments>
-                                                    <PathSegmentCollection>
-                                                        <LineSegment Point="10,9.5" />
-                                                    </PathSegmentCollection>
-                                                </PathFigure.Segments>
-                                            </PathFigure>
-                                        </PathFigureCollection>
-                                    </PathGeometry.Figures>
-                                </PathGeometry>
-                            </Path.Data>
-                        </Path>
-                    </Canvas>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+  
 
     <Style
         x:Key="AtomThumb"

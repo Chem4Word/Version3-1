@@ -17,7 +17,6 @@
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
-    FontSize="23.0"
     x:Name="ACMEDisplay">
     <UserControl.Resources>
         <ResourceDictionary Source="Resources/BondBrushes.xaml" />
@@ -67,7 +66,7 @@
                         EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
                         <view:BondShape.Style>
                             <Style TargetType="{x:Type view:BondShape}">
-                                <Setter Property="StrokeThickness" Value="2.5" />
+                                <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.BondThickness}" />
                                 <Setter Property="StrokeEndLineCap" Value="Round" />
                                 <Setter Property="StrokeStartLineCap" Value="Round" />
                                 <Setter Property="Fill" Value="Black" />
@@ -152,8 +151,7 @@
                         Position="{Binding Path=Position}"
                         AtomSymbol="{Binding Path=SymbolText}"
                         BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
-                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
-                        FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                         <view:AtomShape.Style>
                             <Style TargetType="{x:Type view:AtomShape}">
                                 <Setter Property="Fill">

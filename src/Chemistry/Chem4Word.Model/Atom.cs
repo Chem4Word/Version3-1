@@ -428,10 +428,12 @@ namespace Chem4Word.Model
         }
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
+        // ToDo: Duplicated Routine
 
         //tries to get a bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
+            //Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
             double halfSize = fontSize / 2;
             Point position = Position;
             Rect baseAtomBox = new Rect(
@@ -439,7 +441,7 @@ namespace Chem4Word.Model
                 new Point(position.X + halfSize, position.Y + halfSize));
             if (SymbolText != "")
             {
-                double symbolWidth = SymbolText.Length * fontSize * 0.8;
+                double symbolWidth = SymbolText.Length * fontSize; // * 0.8;
                 Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                     new Size(symbolWidth, fontSize));
 
@@ -468,11 +470,12 @@ namespace Chem4Word.Model
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
+                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                //return new Rect(Position, Position);//empty rect
+                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }
@@ -506,11 +509,11 @@ namespace Chem4Word.Model
         private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             //chnaging the number of bonds causes knock on effects
-            OnPropertyChanged("Degree");
-            OnPropertyChanged("ImplicitHydrogenCount");
-            OnPropertyChanged("BalancingVector");
-            OnPropertyChanged("ShowSymbol");
-            OnPropertyChanged("SymbolText");
+            OnPropertyChanged(nameof(Degree));
+            OnPropertyChanged(nameof(ImplicitHydrogenCount));
+            OnPropertyChanged(nameof(BalancingVector));
+            OnPropertyChanged(nameof(ShowSymbol));
+            OnPropertyChanged(nameof(SymbolText));
 
             foreach (Bond bond in Bonds.Where(b => b.OrderValue == 2))
             {

@@ -16,14 +16,20 @@ namespace Chem4Word.ViewModel.Adorners
     {
         private Atom _adornedAtom;
 
+        public Atom AdornedAtom => _adornedAtom;
+
         public AtomSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
-            IsHitTestVisible = false;
+            //IsHitTestVisible = false;
+            //this.MouseLeftButtonDown += AtomSelectionAdorner_MouseLeftButtonDown;
         }
 
         private void AtomSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            e.Handled = false;
+            if (e.ClickCount == 2)
+            {
+                this.RaiseEvent(e);
+            }
         }
 
         public AtomSelectionAdorner(UIElement adornedElement, Atom adornedAtom) : this(adornedElement)
@@ -37,7 +43,8 @@ namespace Chem4Word.ViewModel.Adorners
         {
             base.OnRender(drawingContext);
 
-            double renderRadius = 8.0;
+            Model.Model model = _adornedAtom.Parent.Parent as Model.Model;
+            double renderRadius = (model.MeanBondLength * Globals.FontSizePercentageBond) / 4;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
             renderBrush.Opacity = 0.25;
@@ -53,6 +60,11 @@ namespace Chem4Word.ViewModel.Adorners
             {
                 drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox());
             }
+        }
+
+        ~AtomSelectionAdorner()
+        {
+            this.MouseLeftButtonDown -= AtomSelectionAdorner_MouseLeftButtonDown;
         }
     }
 }
