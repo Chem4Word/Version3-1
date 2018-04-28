@@ -202,7 +202,10 @@ namespace Chem4Word.View
             IsotopeSize = SymbolSize * 0.8;
             MaskOffsetWidth = SymbolSize * 0.1;
 
-            RenderAtom(drawingContext);
+            if (SymbolSize > 0)
+            {
+                RenderAtom(drawingContext);
+            }
         }
 
         #endregion Overrides
