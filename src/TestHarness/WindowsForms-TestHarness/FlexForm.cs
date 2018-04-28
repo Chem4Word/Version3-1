@@ -18,6 +18,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.ViewModel;
 
 namespace WinFormsTestHarness
 {
@@ -175,19 +176,35 @@ namespace WinFormsTestHarness
             EditorType.Enabled = true;
         }
 
+        private List<DisplayViewModel> StackToList(Stack<Model> stack)
+        {
+            List<DisplayViewModel> list = new List<DisplayViewModel>();
+            foreach (var item in stack)
+            {
+                list.Add(new DisplayViewModel
+                {
+                    Model = item
+                });
+            }
+            return list;
+        }
+
         private void EnableUndoRedoButtons()
         {
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
-            UndoStack.StackList.ItemsSource = _undoStack.ToList();
-            RedoStack.StackList.ItemsSource = _redoStack.ToList();
+
+            UndoStack.StackList.ItemsSource = StackToList(_undoStack);
+            RedoStack.StackList.ItemsSource = StackToList(_redoStack);
             //ListStacks();
 
-            UndoStack.StackList.SelectedIndex = UndoStack.StackList.Items.Count - 1;
-            UndoStack.StackList.ScrollIntoView(UndoStack.StackList.SelectedItem);
+            //// Select last item
+            //UndoStack.StackList.SelectedIndex = UndoStack.StackList.Items.Count - 1;
+            //UndoStack.StackList.ScrollIntoView(UndoStack.StackList.SelectedItem);
 
-            RedoStack.StackList.SelectedIndex = RedoStack.StackList.Items.Count - 1;
-            RedoStack.StackList.ScrollIntoView(RedoStack.StackList.SelectedItem);
+            //// Select last item
+            //RedoStack.StackList.SelectedIndex = RedoStack.StackList.Items.Count - 1;
+            //RedoStack.StackList.ScrollIntoView(RedoStack.StackList.SelectedItem);
         }
 
         private void SetCarbons(Model model, bool state)
@@ -511,12 +528,15 @@ namespace WinFormsTestHarness
         private void Undo_Click(object sender, EventArgs e)
         {
             Model m = _undoStack.Pop();
+            m.Relabel();
+            m.RescaleForCml();
             Debug.WriteLine($"Popped {m.ConciseFormula}");
 
             Model c = Display.Chemistry as Model;
             Debug.WriteLine($"Pushing {c.ConciseFormula}");
             Model clone = c.Clone();
-            clone.RescaleForCml();
+            clone.RefreshMolecules();
+
             _redoStack.Push(clone);
 
             ShowChemistry($"Undo -> {m.ConciseFormula}", m);
@@ -525,11 +545,15 @@ namespace WinFormsTestHarness
         private void Redo_Click(object sender, EventArgs e)
         {
             Model m = _redoStack.Pop();
+            m.Relabel();
+            m.RescaleForCml();
             Debug.WriteLine($"Popped {m.ConciseFormula}");
 
             Model c = Display.Chemistry as Model;
             Debug.WriteLine($"Pushing {c.ConciseFormula}");
             Model clone = c.Clone();
+            clone.RefreshMolecules();
+            clone.Relabel();
             clone.RescaleForCml();
             _undoStack.Push(clone);
 

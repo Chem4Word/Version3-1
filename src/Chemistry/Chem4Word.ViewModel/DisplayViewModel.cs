@@ -112,25 +112,37 @@ namespace Chem4Word.ViewModel
         ~DisplayViewModel()
         {
             UnbindAtomChanges();
-            AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
-            AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+            if (AllAtoms != null)
+            {
+                AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
+            }
+            if (AllBonds != null)
+            {
+                AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+            }
         }
 
         #endregion Constructors
 
         private void BindAtomChanges()
         {
-            foreach (Atom allAtom in AllAtoms)
+            if (AllAtoms != null && AllAtoms.Any())
             {
-                allAtom.PropertyChanged += AllAtom_PropertyChanged;
+                foreach (Atom allAtom in AllAtoms)
+                {
+                    allAtom.PropertyChanged += AllAtom_PropertyChanged;
+                }
             }
         }
 
         private void UnbindAtomChanges()
         {
-            foreach (Atom allAtom in AllAtoms)
+            if (AllAtoms != null && AllAtoms.Any())
             {
-                allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+                foreach (Atom allAtom in AllAtoms)
+                {
+                    allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+                }
             }
         }
 
