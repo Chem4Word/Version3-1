@@ -45,6 +45,14 @@ namespace Chem4Word.ViewModel
             }
         }
 
+        public double HalfBondThickness
+        {
+            get
+            {
+                return BondThickness / 2;
+            }
+        }
+
         #region Layout
 
         //used to calculate the bounds of the atom
