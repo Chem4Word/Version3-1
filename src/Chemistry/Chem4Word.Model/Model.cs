@@ -296,26 +296,6 @@ namespace Chem4Word.Model
             AddNewMols();
         }
 
-        /// <summary>
-        /// Deep clones the molecule
-        /// all the way down to the atoms
-        /// </summary>
-        /// <returns></returns>
-        public Model Clone1()
-        {
-            //v important:  the labels are used to match up
-            //old and new objects
-            this.Relabel();
-
-            Model clone = (Model)this.MemberwiseClone();
-            clone.ResetCollections();
-            foreach (var mol in Molecules)
-            {
-                clone.Molecules.Add(mol.Clone());
-            }
-            return clone;
-        }
-
         public Model Clone()
         {
             Model clone = new Model();
@@ -338,26 +318,6 @@ namespace Chem4Word.Model
             clone.Relabel();
             clone.RefreshMolecules();
 
-            return clone;
-        }
-
-        public Model Clone2()
-        {
-            BinaryFormatter deserializer = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            deserializer.Serialize(ms, this);
-            ms.Seek(0, 0);
-            var clone = (Model)deserializer.Deserialize(ms);
-            clone.RefreshMolecules();
-            foreach (Molecule toRefresh in Molecules)
-            {
-                toRefresh.RebuildRings();
-            }
-            Debug.Assert(clone.Molecules.Count == this.Molecules.Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.Bonds).ToList().Count == this.Molecules.SelectMany(m => m.Bonds).ToList().Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.Rings).ToList().Count == this.Molecules.SelectMany(m => m.Rings).ToList().Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count == this.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.Formulas).ToList().Count == this.Molecules.SelectMany(m => m.Formulas).ToList().Count);
             return clone;
         }
 
