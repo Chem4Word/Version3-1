@@ -74,10 +74,6 @@ namespace Chem4Word.ACME
                             UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/BondBrushes.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
                             UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(

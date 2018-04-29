@@ -30,19 +30,18 @@ namespace Chem4Word.ViewModel
 
         public Model.Model Model { get; set; }
 
-        private double _bondThickness = 0;
+        private double? _bondThickness;
         public double BondThickness {
             get
             {
-                if (_bondThickness == 0)
+                if (_bondThickness == null)
                 {
                     double h = BoundingBox.Height;
                     double w = BoundingBox.Width;
                     double n = Math.Max(h, w);
                     _bondThickness =  n / 100;
-                    Debug.WriteLine($"MeanBondLength {Model.MeanBondLength} Width {w} Height {h} Thickness {_bondThickness}");
                 }
-                return _bondThickness;
+                return _bondThickness.Value;
             }
         }
 

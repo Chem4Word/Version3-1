@@ -337,12 +337,14 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Resources>
-
                     <LinearGradientBrush x:Key="HatchBrush"  MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
                         <GradientStop Offset="0.00" Color="Black" />
                         <GradientStop Offset="0.25" Color="Black" />
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
+                        <LinearGradientBrush.RelativeTransform>
+                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                        </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
                             <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
                         </LinearGradientBrush.Transform>
@@ -352,6 +354,9 @@
                         <GradientStop Offset="0.25" Color="DarkOrange" />
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
+                        <LinearGradientBrush.RelativeTransform>
+                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                        </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
                             <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
                         </LinearGradientBrush.Transform>
@@ -367,7 +372,7 @@
                         EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
                             <view:BondShape.Style>
                                 <Style TargetType="{x:Type view:BondShape}">
-                                    <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.BondThickness}" />
+                                    <Setter Property="StrokeThickness" Value="{Binding ElementName=ChemCanvas,Path=DataContext.EditBondThickness}" />
                                     <Setter Property="StrokeEndLineCap" Value="Round" />
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
                                     <Setter Property="Fill" Value="Black" />
@@ -428,6 +433,17 @@
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="Stereo" Value="Wedge" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Stroke">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="DarkOrange" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </MultiTrigger>
                                         <MultiTrigger>
                                             <MultiTrigger.Conditions>
                                                 <Condition Property="IsMouseOver" Value="True" />

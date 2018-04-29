@@ -18,9 +18,6 @@
     xmlns:release="condition:!DEBUG"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
     x:Name="ACMEDisplay">
-    <UserControl.Resources>
-        <ResourceDictionary Source="Resources/BondBrushes.xaml" />
-    </UserControl.Resources>
     <Viewbox Name="Placeholder">
         <ItemsControl
             Name="ChemicalObjects"
@@ -42,6 +39,9 @@
                     <GradientStop Offset="0.25" Color="Black" />
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
+                    <LinearGradientBrush.RelativeTransform>
+                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                    </LinearGradientBrush.RelativeTransform>
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
                     </LinearGradientBrush.Transform>
@@ -51,6 +51,9 @@
                     <GradientStop Offset="0.25" Color="DarkOrange" />
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
+                    <LinearGradientBrush.RelativeTransform>
+                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                    </LinearGradientBrush.RelativeTransform>
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
                     </LinearGradientBrush.Transform>

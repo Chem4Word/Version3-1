@@ -45,6 +45,13 @@ namespace Chem4Word.ViewModel
 
         #region Properties
 
+        public double EditBondThickness
+        {
+            get
+            {
+                return BondThickness / Globals.DefaultBondLineThickness;
+            }
+        }
         public SelectionTypeCode SelectionType
         {
             get
