@@ -36,10 +36,20 @@ namespace Chem4Word.ViewModel
             {
                 if (_bondThickness == null)
                 {
-                    double h = BoundingBox.Height;
-                    double w = BoundingBox.Width;
-                    double n = Math.Max(h, w);
-                    _bondThickness =  n / 100;
+                    //Debug.WriteLine($"BondThickness; MeanBondLength: {Model.MeanBondLength}");
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Width: {BoundingBox.Width}");
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Height: {BoundingBox.Height}");
+
+                    double height = BoundingBox.Height;
+                    double width = BoundingBox.Width;
+                    double area = width * height;
+                    double sqrt = Math.Sqrt(area);
+
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Area: {area}");
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Sqrt: {sqrt}");
+
+                    _bondThickness = ((Model.MeanBondLength / sqrt) * (Globals.ScaleFactorForXaml * 3)) + 1.0d;
+                    //Debug.WriteLine($"BondThickness; BondThickness --> {_bondThickness}");
                 }
                 return _bondThickness.Value;
             }
