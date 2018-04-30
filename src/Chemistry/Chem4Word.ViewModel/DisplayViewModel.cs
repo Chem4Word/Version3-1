@@ -30,19 +30,26 @@ namespace Chem4Word.ViewModel
 
         public Model.Model Model { get; set; }
 
-        private double _bondThickness = 0;
+        private double? _bondThickness;
         public double BondThickness {
             get
             {
-                if (_bondThickness == 0)
+                if (_bondThickness == null)
                 {
                     double h = BoundingBox.Height;
                     double w = BoundingBox.Width;
                     double n = Math.Max(h, w);
                     _bondThickness =  n / 100;
-                    Debug.WriteLine($"MeanBondLength {Model.MeanBondLength} Width {w} Height {h} Thickness {_bondThickness}");
                 }
-                return _bondThickness;
+                return _bondThickness.Value;
+            }
+        }
+
+        public double HalfBondThickness
+        {
+            get
+            {
+                return BondThickness / 2;
             }
         }
 
@@ -112,25 +119,37 @@ namespace Chem4Word.ViewModel
         ~DisplayViewModel()
         {
             UnbindAtomChanges();
-            AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
-            AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+            if (AllAtoms != null)
+            {
+                AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
+            }
+            if (AllBonds != null)
+            {
+                AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+            }
         }
 
         #endregion Constructors
 
         private void BindAtomChanges()
         {
-            foreach (Atom allAtom in AllAtoms)
+            if (AllAtoms != null && AllAtoms.Any())
             {
-                allAtom.PropertyChanged += AllAtom_PropertyChanged;
+                foreach (Atom allAtom in AllAtoms)
+                {
+                    allAtom.PropertyChanged += AllAtom_PropertyChanged;
+                }
             }
         }
 
         private void UnbindAtomChanges()
         {
-            foreach (Atom allAtom in AllAtoms)
+            if (AllAtoms != null && AllAtoms.Any())
             {
-                allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+                foreach (Atom allAtom in AllAtoms)
+                {
+                    allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+                }
             }
         }
 

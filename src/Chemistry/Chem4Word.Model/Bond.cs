@@ -303,6 +303,15 @@ namespace Chem4Word.Model
             }
         }
 
+        public double HatchScaling
+        {
+            get
+            {
+                Vector v = StartAtom.Position - EndAtom.Position;
+                return v.Length / (Globals.SingleAtomPseudoBondLength * 2);
+            }
+        }
+
         public double Angle
         {
             get { return Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector); }

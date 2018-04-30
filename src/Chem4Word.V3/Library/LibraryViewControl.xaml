@@ -75,10 +75,9 @@
     <Grid Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -129,19 +128,18 @@
                 </Button.Content>
             </Button>
         </Grid>
-        <ScrollViewer Grid.Row="2" VerticalAlignment="Stretch">
-            <ListBox
-            x:Name="GalleryList"
-            Grid.IsSharedSizeScope="True"
-            ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
-            ItemContainerStyle="{StaticResource SimpleListBoxItem}"
-            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-            ScrollViewer.CanContentScroll="True"
-            HorizontalAlignment="Stretch"
-            HorizontalContentAlignment="Stretch"
-            VerticalAlignment="Stretch"
-            VirtualizingStackPanel.IsVirtualizing="True"
-            Background="{x:Static SystemColors.WindowBrush}">
+        <ScrollViewer Grid.Row="1" VerticalAlignment="Stretch">
+            <ListBox x:Name="GalleryList"
+                Grid.IsSharedSizeScope="True"
+                ItemsSource="{Binding Mode=OneWay, Path=ChemistryItems}"
+                ItemContainerStyle="{StaticResource SimpleListBoxItem}"
+                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                ScrollViewer.CanContentScroll="True"
+                HorizontalAlignment="Stretch"
+                HorizontalContentAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                VirtualizingStackPanel.IsVirtualizing="True"
+                Background="{x:Static SystemColors.WindowBrush}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Border

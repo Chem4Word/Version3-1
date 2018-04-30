@@ -1045,68 +1045,6 @@ namespace Chem4Word.Model
             return clone;
         }
 
-        public Molecule Clone2()
-        {
-            BinaryFormatter deserializer = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            deserializer.Serialize(ms, this);
-            ms.Seek(0, 0);
-            var clone = (Molecule)deserializer.Deserialize(ms);
-            //clone.RefreshMolecules();
-            return clone;
-        }
-
-        /// <summary>
-        /// Does a deep clone of the molecule
-        /// </summary>
-        /// <returns></returns>
-        public Molecule Clone1()
-        {
-            Molecule myClone = (Molecule)this.MemberwiseClone();
-            myClone.ResetCollections();
-
-            Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
-            foreach (Molecule mol in Molecules)
-            {
-                myClone.Molecules.Add(mol.Clone());
-            }
-
-            foreach (Atom atom in Atoms)
-            {
-                Atom newAtom = atom.Clone();
-                newAtom.Bonds.Clear();
-                myClone.Atoms.Add(newAtom);
-                clonedAtoms[atom.Id] = newAtom;
-            }
-
-            foreach (Bond bond in Bonds)
-            {
-                Bond newBond = bond.Clone();
-                newBond.StartAtom = clonedAtoms[bond.StartAtom.Id];
-                newBond.EndAtom = clonedAtoms[bond.EndAtom.Id];
-                myClone.Bonds.Add(newBond);
-            }
-
-            foreach (ChemicalName cn in ChemicalNames)
-            {
-                myClone.ChemicalNames.Add(cn.Clone());
-            }
-
-            foreach (Formula f in Formulas)
-            {
-                myClone.Formulas.Add(f);
-            }
-
-            myClone.RebuildRings();
-
-            Debug.Assert(myClone.Atoms.Count == this.Atoms.Count);
-            Debug.Assert(myClone.Bonds.Count == this.Bonds.Count);
-            Debug.Assert(myClone.Rings.Count == this.Rings.Count);
-            Debug.Assert(myClone.ChemicalNames.Count == this.ChemicalNames.Count);
-            Debug.Assert(myClone.Formulas.Count == this.Formulas.Count);
-            return myClone;
-        }
-
         public void Move(Transform lastOperation)
         {
         }
