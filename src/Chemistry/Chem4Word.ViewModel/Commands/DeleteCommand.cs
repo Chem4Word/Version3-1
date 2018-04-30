@@ -67,7 +67,7 @@ namespace Chem4Word.ViewModel.Commands
         {
             var args = new EventArgs();
 
-            CanExecuteChanged.Invoke(this, args);
+            CanExecuteChanged?.Invoke(this, args);
         }
     }
 }

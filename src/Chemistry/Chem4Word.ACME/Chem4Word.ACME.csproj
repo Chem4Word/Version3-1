@@ -59,6 +59,7 @@
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
+    <Compile Include="Behaviors\DeleteBehavior.cs" />
     <Compile Include="Behaviors\SelectorBehaviour.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="CmlEditor.xaml.cs">

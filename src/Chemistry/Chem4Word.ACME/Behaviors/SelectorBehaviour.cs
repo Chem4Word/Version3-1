@@ -292,10 +292,19 @@ namespace Chem4Word.ACME.Behaviors
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            if (AssociatedObject != null)
+            _parent = Application.Current.MainWindow;
+
+            AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
+            AssociatedObject.PreviewMouseLeftButtonDown -= AssociatedObject_PreviewMouseLeftButtonDown;
+            AssociatedObject.MouseLeftButtonUp -= AssociatedObject_MouseLeftButtonUp;
+            AssociatedObject.PreviewMouseMove -= AssociatedObject_PreviewMouseMove;
+            AssociatedObject.MouseRightButtonDown -= AssociatedObjectOnMouseRightButtonDown;
+            AssociatedObject.MouseRightButtonUp -= AssociatedObjectOnMouseRightButtonUp;
+
+            AssociatedObject.IsHitTestVisible = false;
+            if (_parent != null)
             {
-                AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
-                AssociatedObject.IsHitTestVisible = false;
+                _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
             }
             _lassoAdorner = null;
         }
