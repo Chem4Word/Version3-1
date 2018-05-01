@@ -17,7 +17,7 @@ using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class SelectorBehaviour : BaseEditBehavior
+    public class SelectorBehavior : BaseEditBehavior
     {
         private bool _lassoVisible;
         private PointCollection _mouseTrack;

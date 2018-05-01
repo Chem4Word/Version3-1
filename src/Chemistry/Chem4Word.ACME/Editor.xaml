@@ -124,7 +124,7 @@
                               Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:SelectorBehaviour ViewModel="{Binding}" />
+                        <behaviors:SelectorBehavior ViewModel="{Binding}" />
                     </RadioButton.Tag>
                 </RadioButton>
 
