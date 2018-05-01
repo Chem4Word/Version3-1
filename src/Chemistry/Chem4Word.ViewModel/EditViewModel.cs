@@ -224,7 +224,7 @@ namespace Chem4Word.ViewModel
                     _activeMode.Detach();
                 }
                 _activeMode = value;
-                _activeMode.Attach(DrawingSurface);
+                _activeMode?.Attach(DrawingSurface);
             }
         }
 

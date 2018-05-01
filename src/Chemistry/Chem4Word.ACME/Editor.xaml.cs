@@ -131,7 +131,7 @@ namespace Chem4Word.ACME
 
             ScrollIntoView();
             BindControls(vm);
-            SelectionButton_OnChecked(SelectionButton, new RoutedEventArgs());
+            ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
         }
 
         public static T FindChild<T>(DependencyObject parent)
@@ -235,12 +235,20 @@ namespace Chem4Word.ACME
             OnOkButtonClick?.Invoke(this, args);
         }
 
-        private void SelectionButton_OnChecked(object sender, RoutedEventArgs e)
+        private void ModeButton_OnChecked(object sender, RoutedEventArgs e)
         {
-            var behavior = (Behavior)((sender as RadioButton).Tag);
-            if (behavior != null)
+            if (_activeViewModel != null)
             {
-                _activeViewModel.ActiveMode = behavior;
+                if (_activeViewModel.ActiveMode != null)
+                {
+                    _activeViewModel.ActiveMode = null;
+                }
+
+                var behavior = (Behavior) ((sender as RadioButton).Tag);
+                if (behavior != null)
+                {
+                    _activeViewModel.ActiveMode = behavior;
+                }
             }
         }
     }
