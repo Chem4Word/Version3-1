@@ -10,7 +10,7 @@ using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class DrawBehaviour : BaseEditBehavior
+    public class DrawBehavior : BaseEditBehavior
     {
         private TranslateTransform transform = new TranslateTransform();
 

@@ -135,7 +135,7 @@
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DrawBehaviour ViewModel="{Binding}" />
+                        <behaviors:DrawBehavior ViewModel="{Binding}" />
                     </RadioButton.Tag>
                 </RadioButton>
 
