@@ -196,6 +196,7 @@ namespace WinFormsTestHarness
 
             UndoStack.StackList.ItemsSource = StackToList(_undoStack);
             RedoStack.StackList.ItemsSource = StackToList(_redoStack);
+
             //ListStacks();
 
             //// Select last item

@@ -27,8 +27,6 @@ namespace Chem4Word.Model
     [Serializable]
     public class Model : ChemistryContainer, INotifyPropertyChanged
     {
-        private const int Padding = 25;
-
         public string CustomXmlPartGuid { get; set; }
 
         public string ConciseFormula
