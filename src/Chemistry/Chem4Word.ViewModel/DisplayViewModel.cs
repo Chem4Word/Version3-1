@@ -82,6 +82,9 @@ namespace Chem4Word.ViewModel
                             var atom = AllAtoms[i];
                             modelRect.Union(atom.BoundingBox(FontSize));
                         }
+
+                        //var half = FontSize / 2;
+                        //modelRect = new Rect(modelRect.X - half, modelRect.Y - half, modelRect.Width + half, modelRect.Height + half);
                         return modelRect;
                     }
                     else
