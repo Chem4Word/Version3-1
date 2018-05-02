@@ -181,12 +181,35 @@ namespace Chem4Word.ViewModel
             set
             {
                 _selectedBondOptionId = value;
-                foreach (Bond bond in SelectedItems.OfType<Bond>())
+                if (value != null)
                 {
-                    bond.Order = _bondOptions[_selectedBondOptionId.Value].Order;
-                    bond.Stereo = _bondOptions[_selectedBondOptionId.Value].Stereo.Value;
+                    SetBondOption(value.Value);
                 }
             }
+        }
+
+        private void SetBondOption(int bondOptionId)
+        {
+            UndoManager.BeginTrans();
+            var bondOption = _bondOptions[_selectedBondOptionId.Value];
+            foreach (Bond bond in SelectedItems.OfType<Bond>())
+            {
+                Action<object,object,object,object> redo = ( dummy0, dummy1, dummy2, dummy3) =>
+                {
+                    (bond as Bond).Stereo = bondOption.Stereo.Value;
+                    (bond as Bond).Order = bondOption.Order;
+                };
+
+                Action<object, object, object, object> undo = (stereo, order, dummy1, dummy2) =>
+                {
+                    (bond as Bond).Stereo = (BondStereo)stereo;
+                    (bond as Bond).Order = (string)order;
+                };
+                UndoManager.RecordAction($"Set BondOption to {_selectedBondOptionId}", undo, redo, bond.Stereo, bond.Order );
+                bond.Order = bondOption.Order;
+                bond.Stereo = bondOption.Stereo.Value;
+            }
+            UndoManager.CommitTrans();
         }
 
         public List<BondOption> SelectedBondOptions
