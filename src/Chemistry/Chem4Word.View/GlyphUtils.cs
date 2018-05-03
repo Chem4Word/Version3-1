@@ -66,10 +66,8 @@ namespace Chem4Word.View
         /// <param name="symbolText">Text for the atom symbol</param>
         /// <param name="glyphTypeFace">Glyph type face used</param>
         /// <param name="size">Size in DIPS of the font</param>
-        /// <returns>GlyphInfo of  glyph indexes, overall width and array of advance widths</returns>
-        public static
-            GlyphInfo
-            GetGlyphs(string symbolText, GlyphTypeface glyphTypeFace, double size)
+        /// <returns>GlyphInfo of glyph indexes, overall width and array of advance widths</returns>
+        public static GlyphInfo GetGlyphs(string symbolText, GlyphTypeface glyphTypeFace, double size)
         {
             ushort[] glyphIndexes = new ushort[symbolText.Length];
             double[] advanceWidths = new double[symbolText.Length];
@@ -88,9 +86,6 @@ namespace Chem4Word.View
                 uprightBaselineOffsets[n] = ubo;
                 totalWidth += width;
             }
-#if DEBUG
-
-#endif
             return new GlyphInfo { AdvanceWidths = advanceWidths, Indexes = glyphIndexes, Width = totalWidth, UprightBaselineOffsets = uprightBaselineOffsets };
         }
 
@@ -108,15 +103,15 @@ namespace Chem4Word.View
         /// Returns a rough outline of a glyph run.  useful for calculating a convex hull
         /// </summary>
         /// <param name="glyphRun">Glyph run to outline</param>
-        /// <returns>List<Point> of geomtry tracing the GlyphRun</Point></returns>
-        public static List<Point> GetOutline(this GlyphRun glyphRun)
+        /// <returns>List<Point> of geometry tracing the GlyphRun</Point></returns>
+        public static List<Point> GetOutline(this GlyphRun glyphRun, double size)
         {
             List<Point> retval = new List<Point>();
 
             if (glyphRun != null)
             {
                 var geo = glyphRun.BuildGeometry();
-                geo = geo.GetWidenedPathGeometry(new Pen(Brushes.Wheat, 50)).GetOutlinedPathGeometry();
+                geo = geo.GetWidenedPathGeometry(new Pen(Brushes.Wheat, size / 8)).GetOutlinedPathGeometry();
                 var pg = geo.GetFlattenedPathGeometry(0.2, ToleranceType.Relative);
 
                 foreach (var f in pg.Figures)
@@ -137,22 +132,11 @@ namespace Chem4Word.View
         }
 
         /// <summary>
-        /// Generates a subscript for a glyph run
-        /// </summary>
-        /// <param name="script">text of subscript</param>
-        /// <param name="gtf">GlphTypeFace used</param>
-        /// <param name="subscriptSize">size of scubscript (generally 60% of main text)</param>
-        /// <param name="bottomLeft">starting point for placing the subscript</param>
-        /// <returns></returns>
-
-        /// <summary>
         /// gets a bounding box holding the overall glyph run
         /// </summary>
         /// <param name="glyphRun"></param>
         /// <param name="origin">where the run will be centered</param>
         /// <returns></returns>
-        ///
-
         public static Rect GetBoundingBox(this GlyphRun glyphRun, Point origin)
         {
             Rect rect = glyphRun.ComputeInkBoundingBox();

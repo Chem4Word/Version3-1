@@ -17,11 +17,9 @@ using System.Windows.Shapes;
 namespace Chem4Word.View
 {
     /// <summary>
-    /// wraps up some of the glyph handling into a handy class
+    /// Wraps up some of the glyph handling into a handy class
     /// Mostly stateful and uses properties to simplify the client code
     /// </summary>
-    ///
-    ///
     public class GlyphText
     {
         public string Text { get; }
@@ -52,7 +50,7 @@ namespace Chem4Word.View
         {
             get
             {
-                var outline = GlyphUtils.GetOutline(TextRun);
+                var outline = GlyphUtils.GetOutline(TextRun, TypeSize);
 
                 var sortedHull = (from Point p in outline
                                   orderby p.X ascending, p.Y descending
@@ -111,7 +109,7 @@ namespace Chem4Word.View
             get
             {
                 Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector;
-                return TextRun.GetOutline().Select(p => p + offset).ToList();
+                return TextRun.GetOutline(TypeSize).Select(p => p + offset).ToList();
             }
         }
 
@@ -145,7 +143,7 @@ namespace Chem4Word.View
                 BoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
                 Geocenter = bottomLeft,
                 TotalBoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
-                FlattenedPath = GlyphUtils.GetOutline(TextRun),
+                FlattenedPath = GlyphUtils.GetOutline(TextRun, TypeSize),
                 OffsetVector = new Vector(0.0d, 0.0d)
             };
         }
@@ -155,6 +153,7 @@ namespace Chem4Word.View
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
+            // ToDo: Uncomment to see Text BoundingBox
             //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
 #endif
             TextRun = groupGlyphRun;
@@ -183,25 +182,29 @@ namespace Chem4Word.View
 
     public class MainLabelText : GlyphText
     {
-        public MainLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.SymbolSize, pixelsPerDip)
+        public MainLabelText(string text, float pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, AtomShape.SymbolSize, pixelsPerDip)
         { }
     }
 
     public class SubLabelText : GlyphText
     {
-        public SubLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.ScriptSize, pixelsPerDip)
+        public SubLabelText(string text, float pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, AtomShape.ScriptSize, pixelsPerDip)
         { }
     }
 
     public class IsotopeLabelText : GlyphText
     {
-        public IsotopeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
+        public IsotopeLabelText(string text, float pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
         { }
     }
 
     public class ChargeLabelText : GlyphText
     {
-        public ChargeLabelText(string text, float pixelsPerDip) : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
+        public ChargeLabelText(string text, float pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
         {
         }
     }

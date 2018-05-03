@@ -28,24 +28,25 @@ namespace Chem4Word.View
         public static double ScriptSize = 0;
         public static double IsotopeSize = 0;
 
-        //list of points that make up the hull of the shape
-
         #region Members
 
+        //list of points that make up the hull of the shape
         private List<Point> _shapeHull;
 
         #endregion Members
 
-        #region constructors
+        #region Constructors
 
         //needs a default constructor to be used in XAML
+        public AtomShape()
+        {
+        }
 
-        #endregion constructors
+        #endregion Constructors
 
         /// <summary>
         /// Defines a subscripted group of atoms eg H_3
         /// </summary>
-        ///
         private class SubscriptedGroup
         {
             //how many atoms in the group
@@ -101,7 +102,6 @@ namespace Chem4Word.View
 
                 if (_subText != null)
                 //get the offset for the subscript
-
                 {
                     Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width + _mainText.TrailingBearing + _subText.LeadingBearing,
                         _subText.TextMetrics.BoundingBox.Height / 2);
@@ -171,7 +171,6 @@ namespace Chem4Word.View
                         break;
 
                     case CompassPoints.West:
-
                         if (subscriptInfo != null)
                         {
                             adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest *
@@ -580,7 +579,6 @@ namespace Chem4Word.View
 
         private static void ImplicitHCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
-
         }
 
         #endregion Dependency Properties
