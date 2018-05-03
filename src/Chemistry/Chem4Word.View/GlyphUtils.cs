@@ -116,6 +116,7 @@ namespace Chem4Word.View
             if (glyphRun != null)
             {
                 var geo = glyphRun.BuildGeometry();
+                geo = geo.GetWidenedPathGeometry(new Pen(Brushes.Wheat, 50)).GetOutlinedPathGeometry();
                 var pg = geo.GetFlattenedPathGeometry(0.2, ToleranceType.Relative);
 
                 foreach (var f in pg.Figures)
