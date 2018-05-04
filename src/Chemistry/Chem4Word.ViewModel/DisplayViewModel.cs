@@ -84,7 +84,7 @@ namespace Chem4Word.ViewModel
                         }
 
                         //var half = FontSize / 2;
-                        //modelRect = new Rect(modelRect.X - half, modelRect.Y - half, modelRect.Width + half, modelRect.Height + half);
+                        //modelRect = new Rect(modelRect.X - half, modelRect.Y - half, modelRect.Width + FontSize, modelRect.Height + FontSize);
                         return modelRect;
                     }
                     else
