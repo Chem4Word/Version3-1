@@ -176,13 +176,13 @@
                                     </debug:Setter.Value>
                                 </debug:Setter>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Path=SymbolText}" Value="">
+                                    <Trigger Property="AtomSymbol" Value="">
                                         <Setter Property="Fill">
                                             <Setter.Value>
                                                 <SolidColorBrush Color="Transparent" />
                                             </Setter.Value>
                                         </Setter>
-                                    </DataTrigger>
+                                    </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
                                             <Setter.Value>
