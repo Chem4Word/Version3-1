@@ -27,8 +27,6 @@ namespace Chem4Word.Model
     [Serializable]
     public class Model : ChemistryContainer, INotifyPropertyChanged
     {
-        private const int Padding = 25;
-
         public string CustomXmlPartGuid { get; set; }
 
         public string ConciseFormula
@@ -296,26 +294,6 @@ namespace Chem4Word.Model
             AddNewMols();
         }
 
-        /// <summary>
-        /// Deep clones the molecule
-        /// all the way down to the atoms
-        /// </summary>
-        /// <returns></returns>
-        public Model Clone1()
-        {
-            //v important:  the labels are used to match up
-            //old and new objects
-            this.Relabel();
-
-            Model clone = (Model)this.MemberwiseClone();
-            clone.ResetCollections();
-            foreach (var mol in Molecules)
-            {
-                clone.Molecules.Add(mol.Clone());
-            }
-            return clone;
-        }
-
         public Model Clone()
         {
             Model clone = new Model();
@@ -325,6 +303,7 @@ namespace Chem4Word.Model
             Relabel();
 
             clone.CustomXmlPartGuid = CustomXmlPartGuid;
+            clone.ScaledForXaml = ScaledForXaml;
 
             foreach (var molecule in Molecules)
             {
@@ -337,26 +316,6 @@ namespace Chem4Word.Model
             clone.Relabel();
             clone.RefreshMolecules();
 
-            return clone;
-        }
-
-        public Model Clone2()
-        {
-            BinaryFormatter deserializer = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            deserializer.Serialize(ms, this);
-            ms.Seek(0, 0);
-            var clone = (Model)deserializer.Deserialize(ms);
-            clone.RefreshMolecules();
-            foreach (Molecule toRefresh in Molecules)
-            {
-                toRefresh.RebuildRings();
-            }
-            Debug.Assert(clone.Molecules.Count == this.Molecules.Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.Bonds).ToList().Count == this.Molecules.SelectMany(m => m.Bonds).ToList().Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.Rings).ToList().Count == this.Molecules.SelectMany(m => m.Rings).ToList().Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count == this.Molecules.SelectMany(m => m.ChemicalNames).ToList().Count);
-            Debug.Assert(clone.Molecules.SelectMany(m => m.Formulas).ToList().Count == this.Molecules.SelectMany(m => m.Formulas).ToList().Count);
             return clone;
         }
 
@@ -373,7 +332,19 @@ namespace Chem4Word.Model
         }
 
         //used to calculate the bounds of the atom
-        public double FontSize { get; set; }
+        public double FontSize {
+            get
+            {
+                double fontSize = Globals.DefaultFontSize;
+
+                if (AllBonds.Any())
+                {
+                    fontSize = MeanBondLength * Globals.FontSizePercentageBond;
+                }
+
+                return fontSize;
+            }
+        }
 
         public Rect BoundingBox
         {
@@ -426,19 +397,56 @@ namespace Chem4Word.Model
         /// <param name="newLength"></param>
         public void ScaleToAverageBondLength(double newLength)
         {
-            foreach (Molecule molecule in Molecules)
+            if (MeanBondLength > 0)
             {
-                molecule.ScaleToAverageBondLength(newLength, this);
+                double scale = newLength / MeanBondLength;
+                foreach (var atom in AllAtoms)
+                {
+                    atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
+                }
+            }
+
+            foreach (var molecule in Molecules)
+            {
+                molecule.XamlBondLength = newLength;
+            }
+        }
+
+        public bool ScaledForXaml { get; set; }
+
+        public void RescaleForCml()
+        {
+            if (ScaledForXaml)
+            {
+                if (MeanBondLength > 0)
+                {
+                    ScaleToAverageBondLength(MeanBondLength / Globals.ScaleFactorForXaml);
+                }
+                else
+                {
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength);
+                }
+                ScaledForXaml = false;
             }
         }
 
         /// <summary>
         /// Rescale to new preferred length, to be used in xaml code behind, not normal cs
         /// </summary>
-        /// <param name="preferredLength"></param>
-        public void RescaleForXaml(double preferredLength)
+        public void RescaleForXaml()
         {
-            ScaleToAverageBondLength(preferredLength);
+            if (!ScaledForXaml)
+            {
+                if (MeanBondLength > 0)
+                {
+                    ScaleToAverageBondLength(MeanBondLength * Globals.ScaleFactorForXaml);
+                }
+                else
+                {
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength);
+                }
+                ScaledForXaml = true;
+            }
             RepositionAll(MinX, MinY);
             OnPropertyChanged("BoundingBox");
         }

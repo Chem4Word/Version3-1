@@ -10,6 +10,7 @@ using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -29,6 +30,39 @@ namespace Chem4Word.ViewModel
 
         public Model.Model Model { get; set; }
 
+        private double? _bondThickness;
+        public double BondThickness {
+            get
+            {
+                if (_bondThickness == null)
+                {
+                    //Debug.WriteLine($"BondThickness; MeanBondLength: {Model.MeanBondLength}");
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Width: {BoundingBox.Width}");
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Height: {BoundingBox.Height}");
+
+                    double height = BoundingBox.Height;
+                    double width = BoundingBox.Width;
+                    double area = width * height;
+                    double sqrt = Math.Sqrt(area);
+
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Area: {area}");
+                    //Debug.WriteLine($"BondThickness; BoundingBox.Sqrt: {sqrt}");
+
+                    _bondThickness = ((Model.MeanBondLength / sqrt) * (Globals.ScaleFactorForXaml * 3)) + 1.0d;
+                    //Debug.WriteLine($"BondThickness; BondThickness --> {_bondThickness}");
+                }
+                return _bondThickness.Value;
+            }
+        }
+
+        public double HalfBondThickness
+        {
+            get
+            {
+                return BondThickness / 2;
+            }
+        }
+
         #region Layout
 
         //used to calculate the bounds of the atom
@@ -38,19 +72,29 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                if (AllAtoms.Any())
+                try
                 {
-                    var modelRect = AllAtoms[0].BoundingBox(FontSize);
-                    for (int i = 1; i < AllAtoms.Count; i++)
+                    if (AllAtoms.Any())
                     {
-                        var atom = AllAtoms[i];
-                        modelRect.Union(atom.BoundingBox(FontSize));
+                        var modelRect = AllAtoms[0].BoundingBox(FontSize);
+                        for (int i = 1; i < AllAtoms.Count; i++)
+                        {
+                            var atom = AllAtoms[i];
+                            modelRect.Union(atom.BoundingBox(FontSize));
+                        }
+
+                        //var half = FontSize / 2;
+                        //modelRect = new Rect(modelRect.X - half, modelRect.Y - half, modelRect.Width + FontSize, modelRect.Height + FontSize);
+                        return modelRect;
                     }
-                    return modelRect;
+                    else
+                    {
+                        return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
+                    }
                 }
-                else
+                catch (System.NullReferenceException ex)
                 {
-                    return new Rect();
+                    return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }
             }
         }
@@ -63,12 +107,16 @@ namespace Chem4Word.ViewModel
 
         public DisplayViewModel()
         {
-            FontSize = 23;
         }
 
         public DisplayViewModel(Model.Model model) : this()
         {
             Model = model;
+            FontSize = Globals.DefaultFontSize;
+            if (model.AllBonds.Any())
+            {
+                FontSize = model.MeanBondLength * Globals.FontSizePercentageBond;
+            }
             AllObjects = model.AllObjects;
 
             AllAtoms = model.AllAtoms;
@@ -84,25 +132,37 @@ namespace Chem4Word.ViewModel
         ~DisplayViewModel()
         {
             UnbindAtomChanges();
-            AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
-            AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+            if (AllAtoms != null)
+            {
+                AllAtoms.CollectionChanged -= AllAtoms_CollectionChanged;
+            }
+            if (AllBonds != null)
+            {
+                AllBonds.CollectionChanged -= AllBonds_CollectionChanged;
+            }
         }
 
         #endregion Constructors
 
         private void BindAtomChanges()
         {
-            foreach (Atom allAtom in AllAtoms)
+            if (AllAtoms != null && AllAtoms.Any())
             {
-                allAtom.PropertyChanged += AllAtom_PropertyChanged;
+                foreach (Atom allAtom in AllAtoms)
+                {
+                    allAtom.PropertyChanged += AllAtom_PropertyChanged;
+                }
             }
         }
 
         private void UnbindAtomChanges()
         {
-            foreach (Atom allAtom in AllAtoms)
+            if (AllAtoms != null && AllAtoms.Any())
             {
-                allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+                foreach (Atom allAtom in AllAtoms)
+                {
+                    allAtom.PropertyChanged -= AllAtom_PropertyChanged;
+                }
             }
         }
 

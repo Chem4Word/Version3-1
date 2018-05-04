@@ -9,13 +9,16 @@ using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.ViewModel;
 
 namespace WinFormsTestHarness
 {
@@ -23,8 +26,6 @@ namespace WinFormsTestHarness
     {
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
-
-        private bool _cloneViaCml = false;
 
         public FlexForm()
         {
@@ -40,8 +41,11 @@ namespace WinFormsTestHarness
             sb.Append("|CML molecule files (*.cml)|*.cml");
             sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
+            openFileDialog1.Title = "Open Structure";
+            openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
             openFileDialog1.Filter = sb.ToString();
             openFileDialog1.FileName = "";
+            openFileDialog1.ShowHelp = false;
 
             DialogResult dr = openFileDialog1.ShowDialog();
 
@@ -76,10 +80,17 @@ namespace WinFormsTestHarness
 
                 if (model != null)
                 {
-                    Model existing = display1.Chemistry as Model;
+                    Model existing = Display.Chemistry as Model;
                     if (existing != null)
                     {
-                        _undoStack.Push(existing);
+                        Model clone = existing.Clone();
+                        clone.RescaleForCml();
+                        _undoStack.Push(clone);
+                    }
+
+                    if (model.MeanBondLength < 5 || model.MeanBondLength > 95)
+                    {
+                        model.ScaleToAverageBondLength(20);
                     }
                     ShowChemistry(filename, model);
                 }
@@ -91,22 +102,24 @@ namespace WinFormsTestHarness
             DialogResult dr = colorDialog1.ShowDialog();
             if (dr == DialogResult.OK)
             {
-                elementHost1.BackColor = colorDialog1.Color;
-                display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
+                DisplayHost.BackColor = colorDialog1.Color;
+                //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
             }
         }
 
         private void EditStructure_Click(object sender, EventArgs e)
         {
-            Model model = display1.Chemistry as Model;
+            Model model = Display.Chemistry as Model;
             if (model != null)
             {
+                Model clone = model.Clone();
+                clone.RescaleForCml();
                 CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(model), EditorType.Text);
+                EditorHost editorHost = new EditorHost(cc.Export(clone), EditorType.Text);
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
-                    _undoStack.Push(model);
+                    _undoStack.Push(clone);
                     Model m = cc.Import(editorHost.OutputValue);
                     ShowChemistry($"Edited {m.ConciseFormula}", m);
                 }
@@ -140,8 +153,11 @@ namespace WinFormsTestHarness
                     {
                         Text = filename;
                     }
-                    display1.BackgroundColor = ColorToBrush(elementHost1.BackColor);
-                    display1.Chemistry = model;
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
+
+                    //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
+                    model.RebuildMolecules();
+                    Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
                     EnableNormalButtons();
@@ -160,11 +176,36 @@ namespace WinFormsTestHarness
             EditorType.Enabled = true;
         }
 
+        private List<DisplayViewModel> StackToList(Stack<Model> stack)
+        {
+            List<DisplayViewModel> list = new List<DisplayViewModel>();
+            foreach (var item in stack)
+            {
+                list.Add(new DisplayViewModel
+                {
+                    Model = item
+                });
+            }
+            return list;
+        }
+
         private void EnableUndoRedoButtons()
         {
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
-            ListStacks();
+
+            UndoStack.StackList.ItemsSource = StackToList(_undoStack);
+            RedoStack.StackList.ItemsSource = StackToList(_redoStack);
+
+            //ListStacks();
+
+            //// Select last item
+            //UndoStack.StackList.SelectedIndex = UndoStack.StackList.Items.Count - 1;
+            //UndoStack.StackList.ScrollIntoView(UndoStack.StackList.SelectedItem);
+
+            //// Select last item
+            //RedoStack.StackList.SelectedIndex = RedoStack.StackList.Items.Count - 1;
+            //RedoStack.StackList.ScrollIntoView(RedoStack.StackList.SelectedItem);
         }
 
         private void SetCarbons(Model model, bool state)
@@ -187,60 +228,62 @@ namespace WinFormsTestHarness
 
         private void ShowCarbons_CheckedChanged(object sender, EventArgs e)
         {
-            Model model = display1.Chemistry as Model;
+            Model model = Display.Chemistry as Model;
             if (model != null)
             {
                 Model newModel = model.Clone();
-                newModel.FontSize = display1.FontSize;
                 SetCarbons(newModel, ShowCarbons.Checked);
                 Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
                 Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");
-                //newModel.RebuildMolecules();
-                display1.Chemistry = newModel;
+                Display.Chemistry = newModel;
             }
         }
 
         private void RemoveAtom_Click(object sender, EventArgs e)
         {
-            Model model = display1.Chemistry as Model;
+            Model model = Display.Chemistry as Model;
             if (model != null)
             {
-                _undoStack.Push(model);
-                Model clone = null;
-                if (_cloneViaCml)
-                {
-                    // This works ...
-                    CMLConverter cc = new CMLConverter();
-                    clone = cc.Import(cc.Export(model));
-                }
-                else
-                {
-                    // This is not right ...
-                    int beforeAtoms = model.AllAtoms.Count;
-                    int beforeBonds = model.AllBonds.Count;
-                    Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-
-                    clone = model.Clone();
-                    int afterAtoms = model.AllAtoms.Count;
-                    int afterBonds = model.AllBonds.Count;
-
-                    if (beforeAtoms != afterAtoms
-                        || beforeBonds != afterBonds
-                        || clone.AllAtoms.Count != model.AllAtoms.Count
-                        || clone.AllBonds.Count != model.AllBonds.Count)
-                    {
-                        Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-                        Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
-                        int cloneAtoms = clone.AllAtoms.Count;
-                        int cloneBonds = clone.AllBonds.Count;
-                        Debugger.Break();
-                    }
-                }
+                Model clone = model.Clone();
+                clone.RescaleForCml();
+                _undoStack.Push(clone);
                 EnableUndoRedoButtons();
 
-                if (clone.AllAtoms.Any())
+                //Model clone = null;
+                //if (_cloneViaCml)
+                //{
+                //    // This works ...
+                //    CMLConverter cc = new CMLConverter();
+                //    clone = cc.Import(cc.Export(model));
+                //}
+                //else
+                //{
+                //    // This is not right ...
+                //    int beforeAtoms = model.AllAtoms.Count;
+                //    int beforeBonds = model.AllBonds.Count;
+                //    Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+
+                //    clone = model.Clone();
+                //    int afterAtoms = model.AllAtoms.Count;
+                //    int afterBonds = model.AllBonds.Count;
+
+                //    if (beforeAtoms != afterAtoms
+                //        || beforeBonds != afterBonds
+                //        || clone.AllAtoms.Count != model.AllAtoms.Count
+                //        || clone.AllBonds.Count != model.AllBonds.Count)
+                //    {
+                //        Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+                //        Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
+                //        int cloneAtoms = clone.AllAtoms.Count;
+                //        int cloneBonds = clone.AllBonds.Count;
+                //        Debugger.Break();
+                //    }
+                //}
+
+                Model clone2 = clone.Clone();
+                if (clone2.AllAtoms.Any())
                 {
-                    Molecule modelMolecule = clone.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
+                    Molecule modelMolecule = clone2.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
                     var atom = modelMolecule.Atoms[0];
                     foreach (var neighbouringBond in atom.Bonds)
                     {
@@ -251,60 +294,63 @@ namespace WinFormsTestHarness
                     modelMolecule.Atoms.Remove(atom);
                 }
 
-                foreach (var mol in clone.Molecules)
+                foreach (var mol in clone2.Molecules)
                 {
                     mol.ConciseFormula = "";
                 }
 
-                clone.RefreshMolecules();
+                clone2.RefreshMolecules();
                 //display1.Chemistry = model;
-                ShowChemistry("Remove", clone);
+                ShowChemistry("Remove Atom", clone2);
             }
         }
 
         private void RandomElement_Click(object sender, EventArgs e)
         {
-            Model model = display1.Chemistry as Model;
+            Model model = Display.Chemistry as Model;
             if (model != null)
             {
-                _undoStack.Push(model);
-                Model clone = null;
-                if (_cloneViaCml)
-                {
-                    // This works ...
-                    CMLConverter cc = new CMLConverter();
-                    clone = cc.Import(cc.Export(model));
-                }
-                else
-                {
-                    // This is not right ...
-                    int beforeAtoms = model.AllAtoms.Count;
-                    int beforeBonds = model.AllBonds.Count;
-                    Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-
-                    clone = model.Clone();
-                    int afterAtoms = model.AllAtoms.Count;
-                    int afterBonds = model.AllBonds.Count;
-
-                    if (beforeAtoms != afterAtoms
-                        || beforeBonds != afterBonds
-                        || clone.AllAtoms.Count != model.AllAtoms.Count
-                        || clone.AllBonds.Count != model.AllBonds.Count)
-                    {
-                        Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-                        Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
-                        int cloneAtoms = clone.AllAtoms.Count;
-                        int cloneBonds = clone.AllBonds.Count;
-                        Debugger.Break();
-                    }
-                }
+                Model clone = model.Clone();
+                clone.RescaleForCml();
+                _undoStack.Push(clone);
                 EnableUndoRedoButtons();
 
-                if (clone.AllAtoms.Any())
+                //if (_cloneViaCml)
+                //{
+                //    // This works ...
+                //    CMLConverter cc = new CMLConverter();
+                //    clone = cc.Import(cc.Export(model));
+                //}
+                //else
+                //{
+                //    // This is not right ...
+                //    int beforeAtoms = model.AllAtoms.Count;
+                //    int beforeBonds = model.AllBonds.Count;
+                //    Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+
+                //    clone = model.Clone();
+                //    int afterAtoms = model.AllAtoms.Count;
+                //    int afterBonds = model.AllBonds.Count;
+
+                //    if (beforeAtoms != afterAtoms
+                //        || beforeBonds != afterBonds
+                //        || clone.AllAtoms.Count != model.AllAtoms.Count
+                //        || clone.AllBonds.Count != model.AllBonds.Count)
+                //    {
+                //        Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
+                //        Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
+                //        int cloneAtoms = clone.AllAtoms.Count;
+                //        int cloneBonds = clone.AllBonds.Count;
+                //        Debugger.Break();
+                //    }
+                //}
+
+                Model clone2 = clone.Clone();
+                if (clone2.AllAtoms.Any())
                 {
                     var rnd = new Random(DateTime.Now.Millisecond);
 
-                    var maxAtoms = clone.AllAtoms.Count;
+                    var maxAtoms = clone2.AllAtoms.Count;
                     int targetAtom = rnd.Next(0, maxAtoms);
 
                     var elements = Globals.PeriodicTable.Elements;
@@ -315,21 +361,21 @@ namespace WinFormsTestHarness
                     {
                         Debugger.Break();
                     }
-                    clone.AllAtoms[targetAtom].Element = x as ElementBase;
+                    clone2.AllAtoms[targetAtom].Element = x as ElementBase;
                     if (x.Symbol.Equals("C"))
                     {
-                        clone.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                        clone2.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
                     }
 
-                    foreach (var mol in clone.Molecules)
+                    foreach (var mol in clone2.Molecules)
                     {
                         mol.ConciseFormula = "";
                     }
-                    clone.RefreshMolecules();
+                    clone2.RefreshMolecules();
                 }
 
                 //display1.Chemistry = model;
-                ShowChemistry("Random", clone);
+                ShowChemistry("Random Element", clone2);
             }
         }
 
@@ -343,7 +389,7 @@ namespace WinFormsTestHarness
 
         private void Serialize_Click(object sender, EventArgs e)
         {
-            Model model = display1.Chemistry as Model;
+            Model model = Display.Chemistry as Model;
             if (model != null)
             {
                 string filename = $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.bin";
@@ -389,7 +435,7 @@ namespace WinFormsTestHarness
                 ms2.Position = 0;
                 Model x = new BinaryFormatter().Deserialize(ms2) as Model;
                 x.RebuildMolecules();
-                display1.Chemistry = x;
+                Display.Chemistry = x;
             }
         }
 
@@ -428,7 +474,7 @@ namespace WinFormsTestHarness
 
         private void Timing_Click(object sender, EventArgs e)
         {
-            Model x = display1.Chemistry as Model;
+            Model x = Display.Chemistry as Model;
             if (x != null)
             {
                 int max = 1000;
@@ -445,13 +491,13 @@ namespace WinFormsTestHarness
 
                         for (int i = 0; i < max; i++)
                         {
-                            Model model = display1.Chemistry as Model;
+                            Model model = Display.Chemistry as Model;
                             models.Push(model.Clone());
                         }
                         for (int i = 0; i < max; i++)
                         {
                             Model model = models.Pop();
-                            display1.Chemistry = model;
+                            Display.Chemistry = model;
                         }
 
                         sw.Stop();
@@ -464,13 +510,13 @@ namespace WinFormsTestHarness
 
                         for (int i = 0; i < max; i++)
                         {
-                            Model model = display1.Chemistry as Model;
+                            Model model = Display.Chemistry as Model;
                             cmlModels.Push(cc.Export(model));
                         }
                         for (int i = 0; i < max; i++)
                         {
                             Model model = cc.Import(cmlModels.Pop());
-                            display1.Chemistry = model;
+                            Display.Chemistry = model;
                         }
 
                         sw.Stop();
@@ -483,20 +529,35 @@ namespace WinFormsTestHarness
         private void Undo_Click(object sender, EventArgs e)
         {
             Model m = _undoStack.Pop();
+            m.Relabel();
+            m.RescaleForCml();
             Debug.WriteLine($"Popped {m.ConciseFormula}");
-            Model c = display1.Chemistry as Model;
+
+            Model c = Display.Chemistry as Model;
             Debug.WriteLine($"Pushing {c.ConciseFormula}");
-            _redoStack.Push(c.Clone());
+            Model clone = c.Clone();
+            clone.RefreshMolecules();
+
+            _redoStack.Push(clone);
+
             ShowChemistry($"Undo -> {m.ConciseFormula}", m);
         }
 
         private void Redo_Click(object sender, EventArgs e)
         {
             Model m = _redoStack.Pop();
+            m.Relabel();
+            m.RescaleForCml();
             Debug.WriteLine($"Popped {m.ConciseFormula}");
-            Model c = display1.Chemistry as Model;
+
+            Model c = Display.Chemistry as Model;
             Debug.WriteLine($"Pushing {c.ConciseFormula}");
-            _undoStack.Push(c.Clone());
+            Model clone = c.Clone();
+            clone.RefreshMolecules();
+            clone.Relabel();
+            clone.RescaleForCml();
+            _undoStack.Push(clone);
+
             ShowChemistry($"Redo -> {m.ConciseFormula}", m);
         }
 

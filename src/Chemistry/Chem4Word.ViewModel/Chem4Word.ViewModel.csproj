@@ -73,7 +73,7 @@
     <Compile Include="DisplayViewModel.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Graphics.cs" />
-    <Compile Include="UndoManager.cs" />
+    <Compile Include="UndoHandler.cs" />
     <Compile Include="EditViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

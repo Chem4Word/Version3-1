@@ -96,9 +96,17 @@ namespace Chem4Word.Model
             }
             set
             {
-                _startAtom?.Bonds.Remove(this);
+                if (_startAtom != null)
+                {
+                    _startAtom.Bonds.Remove(this);
+                }
+
+                ;
                 _startAtom = value;
-                _startAtom.Bonds.Add(this);
+                if (_startAtom != null)
+                {
+                    _startAtom.Bonds.Add(this);
+                }
                 OnPropertyChanged();
             }
         }
@@ -114,9 +122,16 @@ namespace Chem4Word.Model
             }
             set
             {
-                _endAtom?.Bonds.Remove(this);
+                if (_endAtom != null)
+                {
+                    _endAtom.Bonds.Remove(this);
+                }
+
                 _endAtom = value;
-                _endAtom.Bonds.Add(this);
+                if (_endAtom != null)
+                {
+                    _endAtom.Bonds.Add(this);
+                }
                 OnPropertyChanged();
             }
         }
@@ -285,6 +300,15 @@ namespace Chem4Word.Model
             {
                 _stereo = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public double HatchScaling
+        {
+            get
+            {
+                Vector v = StartAtom.Position - EndAtom.Position;
+                return v.Length / (Globals.SingleAtomPseudoBondLength * 2);
             }
         }
 

@@ -21,11 +21,9 @@ namespace Chem4Word.ViewModel.Adorners
 {
     public class MoleculeSelectionAdorner: Adorner
     {
-        private const int ThumbWidth = 10;
-        private const int HalfThumbWidth = ThumbWidth / 2;
-
-        private const int RotateThumbWidth = 20;
-
+        private static int ThumbWidth;
+        private static int HalfThumbWidth;
+        private static int RotateThumbWidth;
 
         private Point _canvasPos;
         private readonly Molecule _frag;
@@ -66,8 +64,9 @@ namespace Chem4Word.ViewModel.Adorners
         {
             _visualChildren = new VisualCollection(this);
 
-
-
+            ThumbWidth = (int) molecule.MeanBondLength / 20;
+            HalfThumbWidth = ThumbWidth / 2;
+            RotateThumbWidth = (int) molecule.MeanBondLength / 10;
             BuildBigDragArea();
 
             BuildAdornerCorner(ref _topLeft, Cursors.SizeNWSE);

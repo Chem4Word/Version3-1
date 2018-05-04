@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Diagnostics;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 using System.Windows;
@@ -20,10 +21,12 @@ namespace Chem4Word.ViewModel
         }
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
+        // ToDo: Duplicated Routine
 
         //tries to get a bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
+            //Debug.WriteLine($"ExtensionMethods.BoundingBox() FontSize: {FontSize}");
             double halfSize = FontSize / 2;
             Point position = atom.Position;
             Rect baseAtomBox = new Rect(
@@ -31,7 +34,7 @@ namespace Chem4Word.ViewModel
                 new Point(position.X + halfSize, position.Y + halfSize));
             if (atom.SymbolText != "")
             {
-                double symbolWidth = atom.SymbolText.Length * FontSize * 0.8;
+                double symbolWidth = atom.SymbolText.Length * FontSize; // * 0.8;
                 Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
                     new Size(symbolWidth, FontSize));
 
@@ -60,11 +63,12 @@ namespace Chem4Word.ViewModel
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
+                //Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                //return new Rect(atom.Position, atom.Position);//empty rect
+                //Debug.WriteLine($"ExtensionMethods.BoundingBox() {atom.SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }

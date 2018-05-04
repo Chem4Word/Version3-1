@@ -102,6 +102,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.ViewModel", "Chemistry\Chem4Word.ViewModel\Chem4Word.ViewModel.csproj", "{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64

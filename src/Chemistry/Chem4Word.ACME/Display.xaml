@@ -17,11 +17,7 @@
     xmlns:debug="condition:DEBUG"
     xmlns:release="condition:!DEBUG"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
-    FontSize="23.0"
     x:Name="ACMEDisplay">
-    <UserControl.Resources>
-        <ResourceDictionary Source="Resources/BondBrushes.xaml" />
-    </UserControl.Resources>
     <Viewbox Name="Placeholder">
         <ItemsControl
             Name="ChemicalObjects"
@@ -43,6 +39,9 @@
                     <GradientStop Offset="0.25" Color="Black" />
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
+                    <LinearGradientBrush.RelativeTransform>
+                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                    </LinearGradientBrush.RelativeTransform>
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
                     </LinearGradientBrush.Transform>
@@ -52,6 +51,9 @@
                     <GradientStop Offset="0.25" Color="DarkOrange" />
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
+                    <LinearGradientBrush.RelativeTransform>
+                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                    </LinearGradientBrush.RelativeTransform>
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
                     </LinearGradientBrush.Transform>
@@ -67,7 +69,7 @@
                         EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
                         <view:BondShape.Style>
                             <Style TargetType="{x:Type view:BondShape}">
-                                <Setter Property="StrokeThickness" Value="2.5" />
+                                <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.BondThickness}" />
                                 <Setter Property="StrokeEndLineCap" Value="Round" />
                                 <Setter Property="StrokeStartLineCap" Value="Round" />
                                 <Setter Property="Fill" Value="Black" />
@@ -105,7 +107,7 @@
                                     <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Indeterminate">
                                         <Setter Property="Fill" Value="Black" />
                                         <Setter Property="Stroke" Value="Black" />
-                                        <Setter Property="StrokeThickness" Value="1.5" />
+                                        <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.HalfBondThickness}" />
                                         <Setter Property="StrokeLineJoin" Value="Round" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Hatch">
@@ -152,8 +154,7 @@
                         Position="{Binding Path=Position}"
                         AtomSymbol="{Binding Path=SymbolText}"
                         BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
-                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}"
-                        FontSize="{Binding ElementName=ACMEDisplay, Path=FontSize}">
+                        ImplicitHydrogenCount="{Binding ImplicitHydrogenCount}">
                         <view:AtomShape.Style>
                             <Style TargetType="{x:Type view:AtomShape}">
                                 <Setter Property="Fill">

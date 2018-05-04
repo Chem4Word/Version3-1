@@ -23,26 +23,30 @@ namespace Chem4Word.View
     /// </summary>
     public class AtomShape : Shape
     {
-        private const double MaskOffsetWidth = 2.5;
-
-        //list of points that make up the hull of the shape
+        private static double MaskOffsetWidth = 0;
+        public static double SymbolSize = 0;
+        public static double ScriptSize = 0;
+        public static double IsotopeSize = 0;
 
         #region Members
 
+        //list of points that make up the hull of the shape
         private List<Point> _shapeHull;
 
         #endregion Members
 
-        #region constructors
+        #region Constructors
 
         //needs a default constructor to be used in XAML
+        public AtomShape()
+        {
+        }
 
-        #endregion constructors
+        #endregion Constructors
 
         /// <summary>
         /// Defines a subscripted group of atoms eg H_3
         /// </summary>
-        ///
         private class SubscriptedGroup
         {
             //how many atoms in the group
@@ -57,10 +61,13 @@ namespace Chem4Word.View
             //holds the text of the subscript
             private SubLabelText _subText;
 
-            public SubscriptedGroup(int count, string text)
+            private static double FontSize;
+
+            public SubscriptedGroup(int count, string text, double fontSize)
             {
                 Count = count;
                 Text = text;
+                FontSize = fontSize;
             }
 
             /// <summary>
@@ -75,7 +82,7 @@ namespace Chem4Word.View
 
                 List<Point> mainOutline;
                 //first, get some initial size measurements
-                _mainText = new GlyphText(Text, SymbolTypeface, SymbolSize, pixelsPerDip);
+                _mainText = new GlyphText(Text, SymbolTypeface, FontSize, pixelsPerDip);
                 _mainText.Premeasure();
 
                 //measure up the subscript (if we have one)
@@ -95,7 +102,6 @@ namespace Chem4Word.View
 
                 if (_subText != null)
                 //get the offset for the subscript
-
                 {
                     Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width + _mainText.TrailingBearing + _subText.LeadingBearing,
                         _subText.TextMetrics.BoundingBox.Height / 2);
@@ -148,7 +154,7 @@ namespace Chem4Word.View
                 GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo = null)
             {
                 Point adjunctCenter;
-                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * SymbolSize);
+                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * FontSize);
                 double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width) / 2;
                 switch (direction)
                 {
@@ -165,7 +171,6 @@ namespace Chem4Word.View
                         break;
 
                     case CompassPoints.West:
-
                         if (subscriptInfo != null)
                         {
                             adjunctCenter = parentMetrics.Geocenter + (BasicGeometry.ScreenWest *
@@ -190,7 +195,16 @@ namespace Chem4Word.View
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            RenderAtom(drawingContext);
+            SymbolSize = ParentAtom.Parent.XamlBondLength / 2.0d;
+
+            ScriptSize = SymbolSize * 0.6;
+            IsotopeSize = SymbolSize * 0.8;
+            MaskOffsetWidth = SymbolSize * 0.1;
+
+            if (SymbolSize > 0)
+            {
+                RenderAtom(drawingContext);
+            }
         }
 
         #endregion Overrides
@@ -245,7 +259,7 @@ namespace Chem4Word.View
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
-                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H");
+                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", SymbolSize);
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
@@ -414,7 +428,7 @@ namespace Chem4Word.View
             if (AtomSymbol == "") //implicit carbon
             {
                 //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
+                double radiusX = SymbolSize / 3;
                 if (!measureOnly)
                 {
                     drawingContext.DrawEllipse(Fill, null, Position, radiusX, radiusX);
@@ -461,20 +475,6 @@ namespace Chem4Word.View
                     FrameworkPropertyMetadataOptions.AffectsRender));
 
         #endregion Positioning DPs
-
-        #region layout DPs
-
-        public double FontSize
-        {
-            get { return (double)GetValue(FontSizeProperty); }
-            set { SetValue(FontSizeProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for FontSize.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty FontSizeProperty =
-            DependencyProperty.Register("FontSize", typeof(double), typeof(AtomShape), new FrameworkPropertyMetadata(23d, FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsRender));
-
-        #endregion layout DPs
 
         #region Atom DPs
 
@@ -543,7 +543,7 @@ namespace Chem4Word.View
             get
             {
                 //so draw a circle
-                double radiusX = Globals.AtomWidth / 2;
+                double radiusX = SymbolSize / 3;
 
                 return new EllipseGeometry(Position, radiusX, radiusX);
             }
@@ -575,7 +575,11 @@ namespace Chem4Word.View
         // Using a DependencyProperty as the backing store for ImplicitHydrogenCount.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ImplicitHydrogenCountProperty =
             DependencyProperty.Register("ImplicitHydrogenCount", typeof(int), typeof(AtomShape),
-                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender));
+                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender, ImplicitHCallback));
+
+        private static void ImplicitHCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
+        {
+        }
 
         #endregion Dependency Properties
     }

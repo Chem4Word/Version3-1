@@ -74,10 +74,6 @@ namespace Chem4Word.ACME
                             UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/BondBrushes.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
                             UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
@@ -127,8 +123,7 @@ namespace Chem4Word.ACME
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
 
-            tempModel.FontSize = FontSize;
-            tempModel.RescaleForXaml(Constants.StandardBondLength * 2);
+            tempModel.RescaleForXaml();
             var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;
             _activeViewModel.Model = tempModel;
@@ -136,14 +131,17 @@ namespace Chem4Word.ACME
 
             ScrollIntoView();
             BindControls(vm);
-            SelectionButton_OnChecked(SelectionButton, new RoutedEventArgs());
+            ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
         }
 
         public static T FindChild<T>(DependencyObject parent)
             where T : DependencyObject
         {
             // Confirm parent is valid.
-            if (parent == null) return null;
+            if (parent == null)
+            {
+                return null;
+            }
 
             T foundChild = null;
 
@@ -159,7 +157,10 @@ namespace Chem4Word.ACME
                     foundChild = FindChild<T>(child);
 
                     // If the child is found, break so we do not overwrite the found child.
-                    if (foundChild != null) break;
+                    if (foundChild != null)
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -224,19 +225,30 @@ namespace Chem4Word.ACME
         {
             WpfEventArgs args = new WpfEventArgs();
 
+            Model.Model result = _activeViewModel.Model.Clone();
+            result.RescaleForCml();
+
             CMLConverter conv = new CMLConverter();
-            args.OutputValue = conv.Export(_activeViewModel.Model);
+            args.OutputValue = conv.Export(result);
             args.Button = "SAVE";
 
             OnOkButtonClick?.Invoke(this, args);
         }
 
-        private void SelectionButton_OnChecked(object sender, RoutedEventArgs e)
+        private void ModeButton_OnChecked(object sender, RoutedEventArgs e)
         {
-            var behavior = (Behavior)((sender as RadioButton).Tag);
-            if (behavior != null)
+            if (_activeViewModel != null)
             {
-                _activeViewModel.ActiveMode = behavior;
+                if (_activeViewModel.ActiveMode != null)
+                {
+                    _activeViewModel.ActiveMode = null;
+                }
+
+                var behavior = (Behavior) ((sender as RadioButton).Tag);
+                if (behavior != null)
+                {
+                    _activeViewModel.ActiveMode = behavior;
+                }
             }
         }
     }

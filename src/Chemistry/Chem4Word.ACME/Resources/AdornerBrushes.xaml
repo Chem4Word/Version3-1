@@ -32,8 +32,6 @@
                 Opacity="0.8" />
         </Pen.Brush>
     </Pen>
-  
-
     <Style
         x:Key="AtomThumb"
         TargetType="Thumb">

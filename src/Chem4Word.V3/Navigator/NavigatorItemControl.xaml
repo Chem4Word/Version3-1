@@ -6,12 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Chem4Word.Navigator"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:library="clr-namespace:Chem4Word.Library"
     d:DesignWidth="300"
     mc:Ignorable="d"
     Background="{Binding RelativeSource={RelativeSource AncestorType=local:NavigatorView}, Path=Background}"
     x:Name="NavItemControl" Loaded="NavItemControl_Loaded">
-
     <UserControl.Resources>
         <SolidColorBrush x:Key="Chem4WordBlue">
             <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
@@ -22,16 +20,12 @@
             <Setter Property="Foreground" Value="Blue" />
         </Style>
     </UserControl.Resources>
-
-    <Grid HorizontalAlignment="Stretch">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition SharedSizeGroup="col1" />
-        </Grid.ColumnDefinitions>
         <local:FormulaBlock
                 Grid.Row="0"
                 Margin="2"

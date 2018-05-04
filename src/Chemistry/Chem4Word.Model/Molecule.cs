@@ -894,30 +894,19 @@ namespace Chem4Word.Model
 
         #region Helpers
 
+        public double XamlBondLength;
+
         public double MeanBondLength
         {
-            get { return Bonds.Average(b => b.BondVector.Length); }
-        }
-
-        public void ScaleToAverageBondLength(double newLength, Model model)
-        {
-            if (Bonds.Any())
+            get
             {
-                double averageBondLength = MeanBondLength;
-
-                if (averageBondLength != 0 && newLength > 0)
+                double result = XamlBondLength;
+                if (Bonds.Any())
                 {
-                    double scale = newLength / averageBondLength;
+                    result = Bonds.Average(b => b.BondVector.Length);
+                }
 
-                    foreach (Atom atom in Atoms)
-                    {
-                        atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
-                    }
-                }
-                foreach (Molecule child in Molecules)
-                {
-                    child.ScaleToAverageBondLength(newLength, model);
-                }
+                return result;
             }
         }
 
@@ -981,6 +970,8 @@ namespace Chem4Word.Model
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
+            clone.XamlBondLength = XamlBondLength;
+
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
 
             foreach (var atom in Atoms)
@@ -1052,68 +1043,6 @@ namespace Chem4Word.Model
             }
 
             return clone;
-        }
-
-        public Molecule Clone2()
-        {
-            BinaryFormatter deserializer = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            deserializer.Serialize(ms, this);
-            ms.Seek(0, 0);
-            var clone = (Molecule)deserializer.Deserialize(ms);
-            //clone.RefreshMolecules();
-            return clone;
-        }
-
-        /// <summary>
-        /// Does a deep clone of the molecule
-        /// </summary>
-        /// <returns></returns>
-        public Molecule Clone1()
-        {
-            Molecule myClone = (Molecule)this.MemberwiseClone();
-            myClone.ResetCollections();
-
-            Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
-            foreach (Molecule mol in Molecules)
-            {
-                myClone.Molecules.Add(mol.Clone());
-            }
-
-            foreach (Atom atom in Atoms)
-            {
-                Atom newAtom = atom.Clone();
-                newAtom.Bonds.Clear();
-                myClone.Atoms.Add(newAtom);
-                clonedAtoms[atom.Id] = newAtom;
-            }
-
-            foreach (Bond bond in Bonds)
-            {
-                Bond newBond = bond.Clone();
-                newBond.StartAtom = clonedAtoms[bond.StartAtom.Id];
-                newBond.EndAtom = clonedAtoms[bond.EndAtom.Id];
-                myClone.Bonds.Add(newBond);
-            }
-
-            foreach (ChemicalName cn in ChemicalNames)
-            {
-                myClone.ChemicalNames.Add(cn.Clone());
-            }
-
-            foreach (Formula f in Formulas)
-            {
-                myClone.Formulas.Add(f);
-            }
-
-            myClone.RebuildRings();
-
-            Debug.Assert(myClone.Atoms.Count == this.Atoms.Count);
-            Debug.Assert(myClone.Bonds.Count == this.Bonds.Count);
-            Debug.Assert(myClone.Rings.Count == this.Rings.Count);
-            Debug.Assert(myClone.ChemicalNames.Count == this.ChemicalNames.Count);
-            Debug.Assert(myClone.Formulas.Count == this.Formulas.Count);
-            return myClone;
         }
 
         public void Move(Transform lastOperation)

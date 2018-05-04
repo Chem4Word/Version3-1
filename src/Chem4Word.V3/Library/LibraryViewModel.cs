@@ -21,6 +21,8 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Model.Converters;
 
 namespace Chem4Word.Library
 {
@@ -469,9 +471,24 @@ namespace Chem4Word.Library
 
                     mol.ID = (long)chemistry["ID"];
                     var byteArray = (Byte[])chemistry["Chemistry"];
-                    mol.XML = Encoding.UTF8.GetString(byteArray);
+
+                    string xml = Encoding.UTF8.GetString(byteArray);
+                    CMLConverter cc = new CMLConverter();
+                    Model.Model tempModel = cc.Import(xml);
+                    double meanBondLength = tempModel.MeanBondLength;
+                    if (meanBondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
+                        || meanBondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
+                    {
+                        tempModel.ScaleToAverageBondLength(Constants.StandardBondLength);
+                        double after = tempModel.MeanBondLength;
+                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {meanBondLength.ToString("#0.00")} to {after.ToString("#0.00")}");
+                    }
+                    mol.XML = cc.Export(tempModel);
+                    //mol.XML = Encoding.UTF8.GetString(byteArray);
+
                     mol.Name = chemistry["name"] as string;
                     mol.Formula = chemistry["formula"] as string;
+
                     ChemistryItems.Add(mol);
                     LoadOtherNames(mol);
                     mol.Initializing = false;
