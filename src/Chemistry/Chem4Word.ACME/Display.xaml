@@ -66,7 +66,8 @@
                         Placement="{Binding Path=Placement, Mode=OneWay}"
                         Stereo="{Binding Path=Stereo, Mode=OneWay}"
                         StartPoint="{Binding Path=StartAtom.Position, Mode=OneWay}"
-                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
+                        EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}"
+                        Order="{Binding  Path=Order, Mode=OneWay}">
                         <view:BondShape.Style>
                             <Style TargetType="{x:Type view:BondShape}">
                                 <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.BondThickness}" />
@@ -86,34 +87,34 @@
                                     </debug:Setter.Value>
                                 </debug:Setter>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="hbond">
+                                    <Trigger Property="Order" Value="hbond">
                                         <Setter Property="StrokeDashArray" Value="1,1" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Order, Mode=OneWay}" Value="partial01">
+                                    </Trigger>
+                                    <Trigger Property="Order" Value="partial01">
                                         <Setter Property="StrokeDashArray" Value="2,1" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="None">
+                                    </Trigger>
+                                    <Trigger Property="Stereo" Value="None">
                                         <Setter Property="Fill" Value="Black" />
                                         <Setter Property="Stroke" Value="Black" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Trans">
+                                    </Trigger>
+                                    <Trigger Property="Stereo" Value="Trans">
                                         <Setter Property="Fill" Value="Black" />
                                         <Setter Property="Stroke" Value="Black" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Cis">
+                                    </Trigger>
+                                    <Trigger Property="Stereo" Value="Cis">
                                         <Setter Property="Fill" Value="Black" />
                                         <Setter Property="Stroke" Value="Black" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Indeterminate">
+                                    </Trigger>
+                                    <Trigger Property="Stereo" Value="Indeterminate">
                                         <Setter Property="Fill" Value="Black" />
                                         <Setter Property="Stroke" Value="Black" />
                                         <Setter Property="StrokeThickness" Value="{Binding ElementName=Placeholder,Path=DataContext.HalfBondThickness}" />
                                         <Setter Property="StrokeLineJoin" Value="Round" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=Stereo, Mode=OneWay}" Value="Hatch">
+                                    </Trigger>
+                                    <Trigger Property="Stereo" Value="Hatch">
                                         <Setter Property="Fill" Value="{StaticResource HatchBrush}" />
                                         <Setter Property="Stroke" Value="Transparent" />
-                                    </DataTrigger>
+                                    </Trigger>
                                     <!-- highlights the bonds on mouseover -->
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
