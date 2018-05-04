@@ -543,5 +543,30 @@ namespace Chem4Word.ViewModel
 
             UndoManager.CommitTrans();
         }
+
+        public void DoOperation(Transform lastOperation, List<Atom> toList)
+        {
+            UndoManager.BeginTrans();
+            foreach (Atom atom in toList)
+            {
+                var lastPosition = atom.Position;
+                var newPosition = lastOperation.Transform(lastPosition);
+                Action<object, object, object, object> undo = (dummy, dummy0, dummy1, dummy2) =>
+                {
+                    SelectedItems.Clear();
+                    (atom as Atom).Position = (Point)lastPosition ;
+                };
+
+                Action<object, object, object, object> redo = (dummy, dummy0, dummy1, dummy2) =>
+                {
+                    SelectedItems.Clear();
+                    (atom as Atom).Position = (Point)newPosition ;
+                };
+                UndoManager.RecordAction("Move/resize fragment", undo, redo);
+                atom.Position = newPosition;
+            }
+
+            UndoManager.CommitTrans();
+        }
     }
 }

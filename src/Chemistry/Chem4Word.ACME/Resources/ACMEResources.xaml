@@ -255,7 +255,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Viewbox Height="20" Width="20" Stretch="Uniform">
+                    <Viewbox Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" Stretch="Uniform">
                         <Canvas Height="200" Width="200" Margin="0">
                             <graphics:ArcArrow StrokeStartLineCap="Round" 
                                                Stroke="{StaticResource GrabHandleBorderBrush}" StrokeThickness="35" 

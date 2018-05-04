@@ -21,9 +21,10 @@ namespace Chem4Word.ViewModel.Adorners
 {
     public class MoleculeSelectionAdorner: Adorner
     {
-        private static int ThumbWidth;
-        private static int HalfThumbWidth;
-        private static int RotateThumbWidth;
+        //static as they need to be set only when the adorner is first created
+        private static double? ThumbWidth; 
+        private static double HalfThumbWidth;
+        private static double RotateThumbWidth;
 
         private Point _canvasPos;
         private readonly Molecule _frag;
@@ -62,11 +63,16 @@ namespace Chem4Word.ViewModel.Adorners
         public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
         {
-            _visualChildren = new VisualCollection(this);
 
-            ThumbWidth = (int) molecule.MeanBondLength / 20;
-            HalfThumbWidth = ThumbWidth / 2;
-            RotateThumbWidth = (int) molecule.MeanBondLength / 10;
+            CurrentModel = currentModel;
+
+            _visualChildren = new VisualCollection(this);
+            if (ThumbWidth == null)
+            {
+                ThumbWidth = (int) CurrentModel.Model.MeanBondLength / 10;
+                HalfThumbWidth = ThumbWidth.Value / 2;
+                RotateThumbWidth = CurrentModel.Model.MeanBondLength / 7.5;
+            }
             BuildBigDragArea();
 
             BuildAdornerCorner(ref _topLeft, Cursors.SizeNWSE);
@@ -92,7 +98,7 @@ namespace Chem4Word.ViewModel.Adorners
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
 
-            CurrentModel = currentModel;
+           
         }
 
         private void AttachHandlers()
@@ -291,7 +297,6 @@ namespace Chem4Word.ViewModel.Adorners
             if (_lastOperation != null)
             {
 
-                _frag.Move(_lastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
                
@@ -387,13 +392,13 @@ namespace Chem4Word.ViewModel.Adorners
                 bbb = _lastOperation.TransformBounds(bbb);
             }
 
-            _topLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth, ThumbWidth));
-            _topRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth,
-                ThumbWidth));
+            _topLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth.Value, ThumbWidth.Value));
+            _topRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth.Value,
+                ThumbWidth.Value));
             _bottomLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top + bbb.Height - HalfThumbWidth,
-                ThumbWidth, ThumbWidth));
+                ThumbWidth.Value, ThumbWidth.Value));
             _bottomRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth,
-                bbb.Height + bbb.Top - HalfThumbWidth, ThumbWidth, ThumbWidth));
+                bbb.Height + bbb.Top - HalfThumbWidth, ThumbWidth.Value, ThumbWidth.Value));
             //put a box right around the entire shebang
 
             _bigThumb.Arrange(bbb);
