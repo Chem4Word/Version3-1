@@ -460,10 +460,7 @@ namespace Chem4Word.ViewModel
             return SelectionAdorners.Values.OfType<AtomSelectionAdorner>()
                 .Where(asl => asl.AdornedAtom.Parent == atomParent);
         }
-
-
-      
-
+       
         public void CutSelection()
         {
             MessageBox.Show("Cut code goes here");
@@ -529,6 +526,39 @@ namespace Chem4Word.ViewModel
             }
 
             UndoManager.CommitTrans();
+        }
+
+        public void DrawDefaultAtomChain(Atom lastAtom, Point newAtomPos)
+        {
+            Atom newAtom = new Atom();
+            newAtom.Element = _selectedElement;
+            newAtom.Position = newAtomPos;
+            
+            if (lastAtom != null)
+            {
+                UndoManager.BeginTrans();
+
+                var _currentMol = lastAtom.Parent;
+                _currentMol.Atoms.Add(newAtom);
+
+                AddNewBond(lastAtom, newAtom, _currentMol);
+
+
+                UndoManager.CommitTrans();
+            }
+        }
+
+        private void AddNewBond(Atom a, Atom b, Molecule mol)
+        {
+            Bond newbond = new Bond();
+
+            newbond.Stereo = _bondOptions[_selectedBondOptionId.Value].Stereo.Value;
+            newbond.Order = _bondOptions[_selectedBondOptionId.Value].Order;
+
+            newbond.StartAtom = a;
+            newbond.EndAtom = b;
+
+            mol.Bonds.Add(newbond);
         }
     }
 }

@@ -81,6 +81,8 @@
     <Compile Include="Graphics\Shapes.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\KeyboardUtils.cs" />
+    <Compile Include="Utils\SnapGeometry.cs" />
     <Compile Include="WpfEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
