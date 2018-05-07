@@ -593,8 +593,8 @@ namespace Chem4Word.ViewModel
         private void AddNewBond(Atom a, Atom b, Molecule mol)
         {
             UndoManager.BeginTrans();
-            var stereo = _bondOptions[_selectedBondOptionId.Value].Stereo.Value;
-            var order = _bondOptions[_selectedBondOptionId.Value].Order;
+            var stereo = CurrentStereo;
+            var order = CurrentBondOrder;
 
             Bond newbond = new Bond();
 
@@ -626,6 +626,16 @@ namespace Chem4Word.ViewModel
 
 
             UndoManager.CommitTrans();
+        }
+
+        public string CurrentBondOrder
+        {
+            get { return _bondOptions[_selectedBondOptionId.Value].Order; }
+        }
+
+        public BondStereo CurrentStereo
+        {
+            get { return _bondOptions[_selectedBondOptionId.Value].Stereo.Value; }
         }
     }
 }

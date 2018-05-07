@@ -11,6 +11,7 @@ using System.Windows.Media;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model;
 using Chem4Word.View;
+using Chem4Word.ViewModel.Adorners;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -21,6 +22,8 @@ namespace Chem4Word.ACME.Behaviors
         private bool _flag;
         private SnapGeometry _angleSnapper;
         private Window _parent;
+
+        private DrawBondAdorner _dba;
         public DrawBehavior()
         {
             
@@ -47,9 +50,31 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
+            Point lastPos = e.GetPosition(AssociatedObject);
+
             if (Dragging(e))
             {
-                
+                if (_dba == null)
+                {
+                    _dba=new DrawBondAdorner(AssociatedObject);
+
+                    
+
+
+                }
+
+                var atomUnderCursor = GetAtomUnderCursor(e);
+                if (atomUnderCursor != null)
+                {
+                    lastPos = atomUnderCursor.Position;
+                }
+
+                _dba.BondOrder = ViewModel.CurrentBondOrder;
+                _dba.Stereo = ViewModel.CurrentStereo;
+                _dba.StartPoint = _currentAtomShape.Position;
+                _dba.EndPoint = lastPos;
+
+
             }
         }
 
