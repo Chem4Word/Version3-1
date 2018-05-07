@@ -27,13 +27,33 @@
                 <ResourceDictionary Source="Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type Path}" x:Key="ToolbarPathStyle">
+                <Setter Property="Fill" Value="Black" />
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect Color="LightGray" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style TargetType="{x:Type Button}" x:Key="CommandButtonStyle">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Width" Value="30" />
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+            <converters:BoolToVisibilityConverter x:Key="VisConverter" TrueValue="Visible" FalseValue="Collapsed" />
         </ResourceDictionary>
     </UserControl.Resources>
 
     <UserControl.InputBindings>
-        <KeyBinding Command="{Binding UndoCommand}" Modifiers="Control" Key="Z"/>
-        <KeyBinding Command="{Binding RedoCommand}" Modifiers="Control" Key="Y"/>
-        <KeyBinding Command="{Binding DeleteCommand}" Key="Delete"/>
+        <KeyBinding Command="{Binding UndoCommand}" Modifiers="Control" Key="Z" />
+        <KeyBinding Command="{Binding RedoCommand}" Modifiers="Control" Key="Y" />
+        <KeyBinding Command="{Binding DeleteCommand}" Key="Delete" />
     </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
@@ -118,8 +138,8 @@
                              x:Name="SelectionButton"
                              Checked="ModeButton_OnChecked"
                              IsChecked="True">
-                    <Viewbox Stretch="Uniform" Height="25" Width="25">
-                        <Path Width="12.3333" Height="20"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
+                    <Viewbox Stretch="Uniform" Height="24" Width="24">
+                        <Path Width="12.3333" Height="20"  Stretch="Fill"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}"
                               Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z" />
                     </Viewbox>
@@ -130,7 +150,7 @@
 
                 <RadioButton GroupName="Actions" ToolTip="Draw" Style="{StaticResource ToolbarButtonStyle}" Click="ModeButton_OnChecked" x:Name="DrawButton">
                     <Viewbox Stretch="UniformToFill" Height="24" Width="24">
-                        <Path Width="50.4259" Height="50.4259" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
+                        <Path Width="24" Height="24" Stretch="Fill"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z" />
                     </Viewbox>
@@ -175,7 +195,7 @@
                         </WrapPanel>
                     </Border>
                 </Popup>
-                <RadioButton GroupName="Actions" Style="{StaticResource ToolbarButtonStyle}" x:Name="ChainButton">
+                <RadioButton GroupName="Actions"  x:Name="ChainButton">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
                             <RotateTransform Angle="180" />
@@ -214,7 +234,7 @@
                 </RadioButton>
                 <RadioButton GroupName="Actions" ToolTip="Delete" Style="{StaticResource ToolbarButtonStyle}" FontSize="18" Click="ModeButton_OnChecked"  x:Name="DeleteButton">
                     <Viewbox Stretch="UniformToFill" Height="24"  Width="24">
-                        <Path Style="{StaticResource ToolbarPathStyle}"
+                        <Path
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
                               2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" />
                     </Viewbox>
@@ -226,8 +246,8 @@
             <ToolBar x:Name="EditToolbar" Height="40" BandIndex="2">
 
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CutButton" Command="{Binding CutCommand}">
-                    <Viewbox Stretch="UniformToFill" Height="24" Width="25">
-                        <Path   Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
+                    <Viewbox Stretch="UniformToFill" Height="24" Width="24">
+                        <Path   Stretch="UniformToFill"
                                 Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
                                 33.538,38.5699L 36.9626,42.1932L 32.4905,46.6858C 32.8191,47.5548 33,48.5048 33,49.5C 33,53.6421 29.866,57 26,57C 22.134,57 19,53.6421
                                 19,49.5C 19,45.3579 22.134,42 26,42 Z M 26,45C 23.7908,45 22,47.0147 22,49.5C 22,51.9853 23.7908,54 26,54C 28.2091,54 30,51.9853
@@ -242,8 +262,8 @@
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="CopyButton" Command="{Binding CopyCommand}">
-                    <Viewbox Stretch="UniformToFill" Height="24" Width="22">
-                        <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
+                    <Viewbox Stretch="UniformToFill" Height="24" Width="24">
+                        <Path Stretch="UniformToFill"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
                               59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L
                               46,25.25 Z">
@@ -251,9 +271,8 @@
                     </Viewbox>
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="PasteButton">
-                    <Viewbox Stretch="UniformToFill" Width="22" Height="26">
-
-                        <Path Stretch="UniformToFill" Style="{StaticResource ToolbarPathStyle}"
+                    <Viewbox Stretch="UniformToFill" Width="24" Height="24">
+                        <Path Stretch="UniformToFill"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001
                                 20,52.6569 20,51.0001L 20,24.0001C 20,22.3432 21.3431,21.0001 23,21.0001L 26.5001,20.9999C 26.5001,20.9999
                                 27.4999,20.8807 27.4999,19.5C 27.4999,18.1193 29.1191,17 30.4999,17L 38.4998,17.0001C 39.8798,17.0001 41.4988,18.6176 41.5,19.9979L
@@ -265,7 +284,7 @@
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="UndoButton" Command="{Binding UndoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
-                        <Path Width="24" Height="24" Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
+                        <Path Width="24" Height="24" Stretch="Fill"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
                               27.296C 55.1649,28.0987 55.6564,28.9607 56.0698,29.8821C 56.4832,30.8035 56.8065,31.7766 57.0396,32.8014C 57.2727,33.8262 57.3892,
                               34.8883 57.3892,35.9878C 57.3892,37.0566 57.276,38.1517 57.0495,39.2733C 56.823,40.3948 56.4491,41.5394 55.928,42.7071C 55.4068,
@@ -286,7 +305,7 @@
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="RedoButton" Command="{Binding RedoCommand}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
-                        <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
+                        <Path Width="24" Height="24"  Stretch="Fill"
                               Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data="F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
                               29.8821C 19.5168,30.8035 19.1935,31.7766 18.9604,32.8014C 18.7273,33.8262 18.6107,34.8883 18.6107,35.9878C 18.6107,
                               37.0566 18.724,38.1517 18.9505,39.2733C 19.177,40.3948 19.5508,41.5394 20.072,42.7071C 20.5932,43.8748 21.287,
@@ -307,14 +326,52 @@
                 </Button>
                 <Button Style="{StaticResource CommandButtonStyle}" x:Name="SaveButton" Click="SaveButton_OnClick" Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
                     <Viewbox Stretch="UniformToFill" Width="24" Height="24">
-                        <Path Width="24" Height="24"  Stretch="Fill" Style="{StaticResource ToolbarPathStyle}"
-                              Fill="{StaticResource ResourceKey=Chem4WordBrush}" Data ="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
+                        <Path Width="24" Height="24"  Stretch="Fill"
+                              Fill="{StaticResource Chem4WordBrush}" Data ="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
                               23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334
                               18.999978,2.0000334z M2.5,2C2.224,2,2,2.2249994,2,2.5L2,29.5C2,29.775,2.224,30,2.5,30L5.9999927,30
                               5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
                               25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z
                               M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
                               5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z" />
+                    </Viewbox>
+                </Button>
+            </ToolBar>
+            <ToolBar x:Name="ManipulationsToolbar" Height="40" BandIndex="2">
+
+                <Button Style="{StaticResource CommandButtonStyle}" ToolTip="Flip Vertical" x:Name="FlipVerticalButton">
+                    <Viewbox Width="24" Height="24">
+                        <Path  Data="M16.399987,0L28.399977,32 16.399987,32z M11.99999,0L11.99999,32 0,32z"
+                               Stretch="Uniform" Fill="{StaticResource Chem4WordBrush}" Width="24" Height="24" Margin="0,0,0,0" />
+                    </Viewbox>
+                </Button>
+
+                <Button Style="{StaticResource CommandButtonStyle}" ToolTip="Flip Horizontal" x:Name="FlipHorizontalButton">
+                    <Viewbox Width="24" Height="24">
+                        <Path  Data="M0,16.400004L32,16.400004 32,28.4z M32,0L32,11.999996 0,11.999996z" Stretch="Uniform" Fill="{StaticResource Chem4WordBrush}"
+                               Width="24" Height="24" Margin="0,0,0,0" />
+                    </Viewbox>
+                </Button>
+
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="FuseButton" ToolTip="Fuse">
+                    <Viewbox Width="24" Height="24">
+                        <Path Data="M9.8261027,14.856148C10.22809,14.856148 10.629084,14.856148 11.031085,14.957131 10.22809,17.265165 8.9231171,18.872173 8.4211259,19.474169L4.5061779,23.188221C3.8032012,23.790216,3.8032012,24.89423,4.4061885,25.497232L4.9071726,25.99922C5.5101752,26.701252,6.6141467,26.701252,7.3171391,26.099226L11.432081,22.284191C12.436063,21.481205 14.243026,20.67819 15.949009,19.875173 16.350996,21.682195 15.849004,23.690208 14.343031,25.09522L10.22809,28.910255C7.9191346,31.018276,4.3051924,31.018276,2.0972187,28.709265L1.5952277,28.207247C-0.61273084,25.898235,-0.51274154,22.385204,1.7962284,20.17617L5.9111547,16.262134C6.9151525,15.358136,8.4211259,14.856148,9.8261027,14.856148z M19.964938,10.239103C20.265944,10.239103 20.666937,10.33911 20.867924,10.640108 21.369915,11.142095 21.369915,12.046125 20.867924,12.548114L12.737053,20.076195C12.235062,20.578182 11.332077,20.578182 10.830085,20.076195 10.328094,19.574177 10.328094,18.671182 10.830085,18.169164L18.960955,10.540101C19.261961,10.33911,19.662957,10.239103,19.964938,10.239103z M25.886858,0C27.392832,2.1338451E-07,28.797808,0.60202569,29.901795,1.7060088L30.403786,2.2080271C32.611746,4.5170376,32.511755,8.0300691,30.202786,10.239103L26.087843,14.053132C24.681876,15.358136 22.674902,15.860154 20.867924,15.45915 21.168929,14.354129 21.67092,12.949118 23.276898,11.042088L27.392832,7.2270834C28.094817,6.6250579,28.094817,5.5210445,27.492821,4.9190495L26.99083,4.5170376C26.38885,3.8140287,25.284863,3.8140287,24.581871,4.4170311L20.566933,8.1310833C18.75997,9.3350732 17.253981,9.9381053 15.949009,10.33911 15.648003,8.5320871 16.249999,6.725065 17.655983,5.3200538L21.770909,1.4050113C22.975893,0.50201875,24.380869,2.1338451E-07,25.886858,0z"
+                              Stretch="Uniform" Fill="{StaticResource Chem4WordBrush }" Width="24" Height="24" Margin="0,0,0,0" />
+                    </Viewbox>
+                </Button>
+
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="GroupButton" ToolTip="Group fragments">
+                    <Viewbox Width="24" Height="24">
+
+                        <Path Data="M26.000001,26.000999L32.000001,26.000999 32.000001,32.000999 26.000001,32.000999z M0,26.000999L6,26.000999 6,32.000999 0,32.000999z M12.00001,12L12.00001,20.000001 20.001021,20.000001 20.001021,12z M0,0.00099805132L6,0.00099805132 6,6.0009981 0,6.0009981z M26.000009,0.00099471335L32.00001,0.00099471335 32.00001,6.0009947 26.000009,6.0009947z M8.0010204,0L22.001021,0 22.001021,10 32.000009,10 32.000009,24.000001 30.00001,24.000001 30.00001,12 22.001021,12 22.001021,22.000001 12.00001,22.000001 12.00001,30.000001 24.000009,30.000001 24.000009,32.000001 10.00001,32.000001 10.00001,22.000001 0.0010204315,22.000001 0.0010204315,8.0000001 2.0010204,8.0000001 2.0010204,20.000001 10.00001,20.000001 10.00001,10 20.001021,10 20.001021,1.9999999 8.0010204,1.9999999z" Stretch="Uniform" Fill="{StaticResource Chem4WordBrush}"
+                                  Width="24" Height="24" Margin="0,0,0,0">
+                        </Path>
+                    </Viewbox>
+                </Button>
+                <Button Style="{StaticResource CommandButtonStyle}" x:Name="UngroupButton" ToolTip="Ungroup fragments">
+                    <Viewbox>
+                        <Path Data="M16.000001,13.998991L16.000001,16 14.001024,16 14.001024,26 16.000001,26 16.000001,27.998991 26.000001,27.998991 26.000001,26 28.001024,26 28.001024,15.999996 26.00001,15.999996 26.00001,13.998991z M26.00001,9.9999963L32.00001,9.9999963 32.00001,15.999996 30.001024,15.999996 30.001024,26 32.000001,26 32.000001,32 26.000001,32 26.000001,29.998991 16.000001,29.998991 16.000001,32 10,32 10,26 12.001024,26 12.001024,16 10,16 10,9.9999996 16.000001,9.9999996 16.000001,11.998992 26.00001,11.998992z M0,0L6,0 6,1.9990015 16.000001,1.9990015 16.000001,0 22.000001,0 22.000001,5.9999995 20.001021,5.9999995 20.001021,9.9990016 18.001021,9.9990016 18.001021,5.9999995 16.000001,5.9999995 16.000001,3.9990015 6,3.9990015 6,6 4.0010204,6 4.0010204,16 6,16 6,17.999002 10.001021,17.999002 10.001021,19.999002 6,19.999002 6,22 0,22 0,16 2.0010204,16 2.0010204,6 0,6z"
+                                  Stretch="Uniform" Fill="{StaticResource Chem4WordBrush}" Width="24" Height="24" Margin="0,0,0,0" />
                     </Viewbox>
                 </Button>
             </ToolBar>
@@ -346,7 +403,7 @@
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
                         <LinearGradientBrush.RelativeTransform>
-                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                         </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
                             <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
@@ -358,7 +415,7 @@
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
                         <LinearGradientBrush.RelativeTransform>
-                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}"/>
+                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                         </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
                             <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
@@ -498,7 +555,7 @@
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>
-                                      
+
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Fill">
                                                 <Setter.Value>
