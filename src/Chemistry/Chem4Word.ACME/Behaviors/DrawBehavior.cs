@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Utils;
+using Chem4Word.Model;
 using Chem4Word.View;
 
 namespace Chem4Word.ACME.Behaviors
@@ -19,7 +20,7 @@ namespace Chem4Word.ACME.Behaviors
         private AtomShape _currentAtomShape;
         private bool _flag;
         private SnapGeometry _angleSnapper;
-
+        private Window _parent;
         public DrawBehavior()
         {
             
@@ -29,12 +30,19 @@ namespace Chem4Word.ACME.Behaviors
         {
             base.OnAttached();
 
+            _parent = Application.Current.MainWindow;
             Window parent = Application.Current.MainWindow;
             AssociatedObject.RenderTransform = _transform;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.MouseMove += AssociatedObject_MouseMove;
+
+            AssociatedObject.IsHitTestVisible = true;
+            if (_parent != null)
+            {
+                _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            }
         }
 
         private void AssociatedObject_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -47,16 +55,35 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (Dragging(e))
-            {
-                var lastAtom = GetAtomUnderCursor(e);
+            AssociatedObject.ReleaseMouseCapture();
+            
 
-                if (lastAtom == _currentAtomShape) //both are the same atom or both are null
-                {
-                    ViewModel.DrawDefaultAtomChain(lastAtom.ParentAtom);
-                }
+            var lastAtomShape = GetAtomUnderCursor(e);
+
+            // ReSharper disable once PossibleUnintendedReferenceComparison
+            if (lastAtomShape == null)
+            {
+                ViewModel.AddAtomChain(null, e.GetPosition(AssociatedObject));
             }
+            else if (lastAtomShape!=null && lastAtomShape == _currentAtomShape) //both are the same atom or both are null
+            {
+                Point newAtomPos = GetNewChainEndPos(lastAtomShape);
+
+                ViewModel.AddAtomChain(lastAtomShape.ParentAtom, newAtomPos);
+            }
+            else if (Dragging(e))
+            {
+            }
+
             _flag = false;
+        }
+
+        private Point GetNewChainEndPos(AtomShape lastAtomShape)
+        {
+            Atom lastAtom = lastAtomShape.ParentAtom;
+            Vector newDirection = lastAtom.BalancingVector * ViewModel.Model.MeanBondLength;
+            return lastAtom.Position + newDirection;
+
         }
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -73,26 +100,9 @@ namespace Chem4Word.ACME.Behaviors
         }
         private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
-
             var result = GetTarget(mouseButtonEventArgs);
-            var id = ((GeometryHitTestResult)result).IntersectionDetail;
+            return  (result?.VisualHit as AtomShape);
 
-            var myShape = (result.VisualHit);
-
-            if (myShape is AtomShape)
-            {
-                switch (id)
-                {
-                    case IntersectionDetail.FullyContains:
-                    case IntersectionDetail.Intersects:
-                    case IntersectionDetail.FullyInside:
-                        return (AtomShape)myShape;
-
-                    case IntersectionDetail.Empty:
-                        return null;
-                }
-            }
-            return null;
 
         }
 
@@ -109,7 +119,11 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp -= AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.MouseMove -= AssociatedObject_MouseMove;
-
+            AssociatedObject.IsHitTestVisible = false;
+            if (_parent != null)
+            {
+                _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
+using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME.Utils
 {
@@ -19,6 +20,7 @@ namespace Chem4Word.ACME.Utils
         private readonly Point _startPoint;
         private readonly int _lockAngle;
 
+        public EditViewModel ViewModel { get; set; }
         /// <summary>
         ///     Creates a new SnapGeometry
         /// </summary>
@@ -48,7 +50,7 @@ namespace Chem4Word.ACME.Utils
             double angleInRads = 0.0;
 
             //snap the length if desired
-            double bondLength = SnapLength(originalDisplacement, KeyboardUtils.HoldingDownShift());
+            double bondLength = SnapLength(originalDisplacement, ViewModel.Model.MeanBondLength,   KeyboardUtils.HoldingDownShift());
 
             //and then snap the angle
             angleInRads = SnapAngle(startAngle, originalDisplacement, KeyboardUtils.HoldingDownControl());
@@ -75,9 +77,9 @@ namespace Chem4Word.ACME.Utils
             return angleInRads;
         }
 
-        public static double SnapLength(Vector originalDisplacement, bool holdingDownShift = false)
+        public static double SnapLength(Vector originalDisplacement, double newbondLength, bool holdingDownShift = false)
         {
-            double bondLength = NormalizeBondLength(originalDisplacement, Bond.DefaultLength);
+            double bondLength = NormalizeBondLength(originalDisplacement, newbondLength);
 
             if (holdingDownShift)
             {
@@ -101,10 +103,10 @@ namespace Chem4Word.ACME.Utils
 
         private static double GetBondAngle(int startAngle, Vector originalDisplacement)
         {
-            return Math.Floor(Vector.AngleBetween(BasicGeometry.North(), originalDisplacement) + startAngle);
+            return Math.Floor(Vector.AngleBetween(BasicGeometry.ScreenNorth, originalDisplacement) + startAngle);
         }
 
-        private static double NormalizeBondLength(Vector originalDisplacement, int defaultLength)
+        private static double NormalizeBondLength(Vector originalDisplacement, double defaultLength)
         {
             return (Math.Floor(originalDisplacement.Length / defaultLength) + 1) * defaultLength;
         }

@@ -528,7 +528,7 @@ namespace Chem4Word.ViewModel
             UndoManager.CommitTrans();
         }
 
-        public void DrawDefaultAtomChain(Atom lastAtom, Point newAtomPos)
+        public void AddAtomChain(Atom lastAtom, Point newAtomPos)
         {
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
@@ -538,27 +538,94 @@ namespace Chem4Word.ViewModel
             {
                 UndoManager.BeginTrans();
 
-                var _currentMol = lastAtom.Parent;
+               
+                Molecule _currentMol = lastAtom.Parent;
                 _currentMol.Atoms.Add(newAtom);
 
+                Action<object, object, object, object> undo = (a, m, dummy, dummy0) =>
+                {
+                    (m as Molecule).Atoms.Remove(a as Atom);
+                };
+                Action<object, object, object, object> redo = (a, m, dummy, dummy0) =>
+                {
+                    (m as Molecule).Atoms.Add(a as Atom);
+                };
+                UndoManager.RecordAction("Add new atom", undo,redo, newAtom, _currentMol);
                 AddNewBond(lastAtom, newAtom, _currentMol);
 
 
+                UndoManager.CommitTrans();
+            }
+
+            else
+            {
+                UndoManager.BeginTrans();
+
+                var _currentMol = new Molecule();
+                this.Model.Molecules.Add(_currentMol);
+                Action<object, object, object, object> undo = (mol, model, dummy, dummy0) =>
+                {
+                    (model as Model.Model).Molecules.Remove(mol as Molecule);
+                };
+                Action<object, object, object, object> redo = (mol, model, dummy, dummy0) =>
+                {
+                    (model as Model.Model).Molecules.Add(mol as Molecule);
+                };
+
+                UndoManager.RecordAction("Add new molecule", undo, redo, _currentMol, this.Model);
+
+                Action<object, object, object, object> undo2 = (a, m, dummy, dummy0) =>
+                {
+                    (m as Molecule).Atoms.Remove(a as Atom);
+                };
+                Action<object, object, object, object> redo2 = (a, m, dummy, dummy0) =>
+                {
+                    (m as Molecule).Atoms.Add(a as Atom);
+                };
+                UndoManager.RecordAction("Add new atom", undo, redo, newAtom, _currentMol);
+
+                _currentMol.Atoms.Add(newAtom);
+                
                 UndoManager.CommitTrans();
             }
         }
 
         private void AddNewBond(Atom a, Atom b, Molecule mol)
         {
+            UndoManager.BeginTrans();
+            var stereo = _bondOptions[_selectedBondOptionId.Value].Stereo.Value;
+            var order = _bondOptions[_selectedBondOptionId.Value].Order;
+
             Bond newbond = new Bond();
 
-            newbond.Stereo = _bondOptions[_selectedBondOptionId.Value].Stereo.Value;
-            newbond.Order = _bondOptions[_selectedBondOptionId.Value].Order;
+            newbond.Stereo = stereo;
+            newbond.Order = order;
 
             newbond.StartAtom = a;
             newbond.EndAtom = b;
 
             mol.Bonds.Add(newbond);
+
+            Action<object, object, object, object> undo = (bond, parent, dummy, dummy0) =>
+            {
+                var bn = bond as Bond;
+
+                (parent as Molecule).Bonds.Remove(bn);
+                bn.StartAtom = null;
+                bn.EndAtom = null;
+            };
+            Action<object, object, object, object> redo = (bond, parent, atomA, atomb) =>
+            {
+                var bn = bond as Bond;
+                bn.StartAtom = (atomA as Atom);
+                bn.EndAtom = (atomb as Atom);
+                (parent as Molecule).Bonds.Add(bn);
+            };
+
+            UndoManager.RecordAction("Add new bond", undo, redo, newbond, mol, a,b);
+
+
+            UndoManager.CommitTrans();
         }
     }
 }
