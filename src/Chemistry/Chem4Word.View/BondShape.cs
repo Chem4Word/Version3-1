@@ -166,6 +166,20 @@ namespace Chem4Word.View
         public static readonly DependencyProperty OrderValueProperty =
             DependencyProperty.Register("OrderValue", typeof(int), typeof(BondShape), new PropertyMetadata(1));
 
+
+
+        public string Order
+        {
+            get { return (string)GetValue(OrderProperty); }
+            set { SetValue(OrderProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Order.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty OrderProperty =
+            DependencyProperty.Register("Order", typeof(string), typeof(BondShape), new PropertyMetadata("S"));
+
+
+
         public Geometry GetBondGeometry(Point? startPoint, Point? endPoint)
         {
             //Vector startOffset = new Vector();
