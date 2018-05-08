@@ -822,5 +822,18 @@ namespace Chem4Word.Model
             Bond clone = (Bond)this.MemberwiseClone();
             return clone;
         }
+
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
     }
 }

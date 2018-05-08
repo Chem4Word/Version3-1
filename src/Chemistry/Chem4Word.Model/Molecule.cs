@@ -409,6 +409,18 @@ namespace Chem4Word.Model
             }
         }
 
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
         #endregion Graph Stuff
 
         #region Ring stuff
