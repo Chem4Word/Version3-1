@@ -5,7 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Utils;
@@ -33,6 +36,8 @@ namespace Chem4Word.ACME.Behaviors
         {
             base.OnAttached();
 
+            ViewModel.SelectedItems?.Clear();
+
             _parent = Application.Current.MainWindow;
             Window parent = Application.Current.MainWindow;
             AssociatedObject.RenderTransform = _transform;
@@ -50,27 +55,29 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            Point lastPos = e.GetPosition(AssociatedObject);
+
+            Point lastPos;
 
             if (Dragging(e))
             {
-                if (_dba == null)
-                {
-                    _dba=new DrawBondAdorner(AssociatedObject);
-
-                    
-
-
-                }
-
                 var atomUnderCursor = GetAtomUnderCursor(e);
                 if (atomUnderCursor != null)
                 {
                     lastPos = atomUnderCursor.Position;
                 }
-
-                _dba.BondOrder = ViewModel.CurrentBondOrder;
-                _dba.Stereo = ViewModel.CurrentStereo;
+                else
+                {
+                    lastPos = e.GetPosition(AssociatedObject);
+                }
+                if (_dba == null)
+                {
+                    _dba = new DrawBondAdorner(AssociatedObject)
+                    {
+                        Stereo = ViewModel.CurrentStereo,
+                        BondOrder = ViewModel.CurrentBondOrder
+                    };
+                }
+             
                 _dba.StartPoint = _currentAtomShape.Position;
                 _dba.EndPoint = lastPos;
 
@@ -78,29 +85,51 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
+        private AtomShape GetAtomUnderCursor(MouseEventArgs e)
+        {
+            var result = GetTarget(e.GetPosition(AssociatedObject));
+            return (result?.VisualHit as AtomShape);
+        }
+
         private void AssociatedObject_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             AssociatedObject.ReleaseMouseCapture();
-            
 
-            var lastAtomShape = GetAtomUnderCursor(e);
+           
+
+            var landedAtomShape = GetAtomUnderCursor(e);
 
             // ReSharper disable once PossibleUnintendedReferenceComparison
-            if (lastAtomShape == null)
+            if (landedAtomShape == null)  //no atom hit
             {
-                ViewModel.AddAtomChain(null, e.GetPosition(AssociatedObject));
+                ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, e.GetPosition(AssociatedObject));
             }
-            else if (lastAtomShape!=null && lastAtomShape == _currentAtomShape) //both are the same atom or both are null
+            else if (landedAtomShape == _currentAtomShape) //both are the same atom
             {
-                Point newAtomPos = GetNewChainEndPos(lastAtomShape);
+                Point newAtomPos = GetNewChainEndPos(landedAtomShape);
 
-                ViewModel.AddAtomChain(lastAtomShape.ParentAtom, newAtomPos);
+                ViewModel.AddAtomChain(landedAtomShape.ParentAtom, newAtomPos);
             }
-            else if (Dragging(e))
+            else //we must have hit a different atom altogether
             {
+                ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
+                    _currentAtomShape.ParentAtom.Parent);
             }
+
+            if (_dba != null)
+            {
+                RemoveAdorner(ref _dba);
+            }
+
 
             _flag = false;
+        }
+        private void RemoveAdorner(ref DrawBondAdorner adorner)
+        {
+            var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
+
+            layer.Remove(adorner);
+            adorner = null;
         }
 
         private Point GetNewChainEndPos(AtomShape lastAtomShape)
@@ -125,15 +154,15 @@ namespace Chem4Word.ACME.Behaviors
         }
         private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
-            var result = GetTarget(mouseButtonEventArgs);
+            var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
             return  (result?.VisualHit as AtomShape);
 
 
         }
 
-        private HitTestResult GetTarget(MouseButtonEventArgs e)
+        private HitTestResult GetTarget(Point p)
         {
-            return VisualTreeHelper.HitTest(AssociatedObject, e.GetPosition(AssociatedObject));
+            return VisualTreeHelper.HitTest(AssociatedObject,p);
         }
 
        

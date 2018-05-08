@@ -590,7 +590,7 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        private void AddNewBond(Atom a, Atom b, Molecule mol)
+        public void AddNewBond(Atom a, Atom b, Molecule mol)
         {
             UndoManager.BeginTrans();
             var stereo = CurrentStereo;
