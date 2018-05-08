@@ -540,7 +540,7 @@ namespace Chem4Word.ViewModel
 
                
                 Molecule _currentMol = lastAtom.Parent;
-                _currentMol.Atoms.Add(newAtom);
+                
 
                 Action<object, object, object, object> undo = (a, m, dummy, dummy0) =>
                 {
@@ -551,6 +551,9 @@ namespace Chem4Word.ViewModel
                     (m as Molecule).Atoms.Add(a as Atom);
                 };
                 UndoManager.RecordAction("Add new atom", undo,redo, newAtom, _currentMol);
+
+                redo.Invoke(newAtom, _currentMol, null, null);
+
                 AddNewBond(lastAtom, newAtom, _currentMol);
 
 
@@ -571,6 +574,7 @@ namespace Chem4Word.ViewModel
                 {
                     (model as Model.Model).Molecules.Add(mol as Molecule);
                 };
+                redo.Invoke(_currentMol, this.Model, null, null);
 
                 UndoManager.RecordAction("Add new molecule", undo, redo, _currentMol, this.Model);
 
@@ -584,8 +588,9 @@ namespace Chem4Word.ViewModel
                 };
                 UndoManager.RecordAction("Add new atom", undo, redo, newAtom, _currentMol);
 
-                _currentMol.Atoms.Add(newAtom);
-                
+                redo2.Invoke(newAtom, _currentMol, null, null);
+
+
                 UndoManager.CommitTrans();
             }
         }

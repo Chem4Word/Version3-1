@@ -427,6 +427,10 @@ namespace Chem4Word.Model
             }
         }
 
+        public bool IsIsolated {
+            get { return Degree == 0; }  
+        }
+
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
         // ToDo: Duplicated Routine
 
