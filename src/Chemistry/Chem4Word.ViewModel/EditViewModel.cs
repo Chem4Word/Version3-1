@@ -538,9 +538,7 @@ namespace Chem4Word.ViewModel
             {
                 UndoManager.BeginTrans();
 
-               
                 Molecule _currentMol = lastAtom.Parent;
-                
 
                 Action<object, object, object, object> undo = (a, m, dummy, dummy0) =>
                 {
@@ -611,13 +609,20 @@ namespace Chem4Word.ViewModel
 
             mol.Bonds.Add(newbond);
 
+            mol.RebuildRings();
+            
+
             Action<object, object, object, object> undo = (bond, parent, dummy, dummy0) =>
             {
                 var bn = bond as Bond;
-
+                var isCyclic = bn.IsCyclic();
                 (parent as Molecule).Bonds.Remove(bn);
                 bn.StartAtom = null;
                 bn.EndAtom = null;
+                if (isCyclic)
+                {
+                    (parent as Molecule).RebuildRings();
+                }
             };
             Action<object, object, object, object> redo = (bond, parent, atomA, atomb) =>
             {
@@ -625,9 +630,12 @@ namespace Chem4Word.ViewModel
                 bn.StartAtom = (atomA as Atom);
                 bn.EndAtom = (atomb as Atom);
                 (parent as Molecule).Bonds.Add(bn);
+                (parent as Molecule).RebuildRings();
+
             };
 
             UndoManager.RecordAction("Add new bond", undo, redo, newbond, mol, a,b);
+
 
 
             UndoManager.CommitTrans();

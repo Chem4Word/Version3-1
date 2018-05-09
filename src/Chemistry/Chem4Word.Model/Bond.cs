@@ -814,7 +814,7 @@ namespace Chem4Word.Model
         //public int ZIndex => 1;
         public void NotifyPlacementChanged()
         {
-            OnPropertyChanged("Placement");
+            OnPropertyChanged(nameof(Placement));
         }
 
         public Bond Clone()

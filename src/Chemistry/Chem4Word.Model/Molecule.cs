@@ -503,6 +503,18 @@ namespace Chem4Word.Model
             //sw.Stop();
             //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
+            RefreshRingBonds();
+        }
+
+        private void RefreshRingBonds()
+        {
+            foreach (Ring ring in Rings)
+            {
+                foreach (Bond ringBond in ring.Bonds)
+                {
+                    ringBond.NotifyPlacementChanged();
+                }
+            }
         }
 
         /// <summary>
