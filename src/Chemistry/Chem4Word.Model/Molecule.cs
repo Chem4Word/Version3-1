@@ -45,9 +45,25 @@ namespace Chem4Word.Model
             }
         }
 
+        /// <summary>
+        /// returns the top level model, or null if it's a floating molecule
+        /// </summary>
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
+
         private void CalculateBoundingBox()
         {
-            Model m = this.Parent as Model;
+            Model m = this.Model;
             var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
             var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
 
@@ -971,6 +987,7 @@ namespace Chem4Word.Model
         {
             Molecule clone = new Molecule();
             clone.XamlBondLength = XamlBondLength;
+            clone.Id = Id;
 
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
 

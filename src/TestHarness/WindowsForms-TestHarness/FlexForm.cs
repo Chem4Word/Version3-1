@@ -27,6 +27,8 @@ namespace WinFormsTestHarness
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
 
+        private Model _currentModel = null;
+
         public FlexForm()
         {
             InitializeComponent();
@@ -109,7 +111,7 @@ namespace WinFormsTestHarness
 
         private void EditStructure_Click(object sender, EventArgs e)
         {
-            Model model = Display.Chemistry as Model;
+            Model model = _currentModel;
             if (model != null)
             {
                 Model clone = model.Clone();
@@ -156,7 +158,9 @@ namespace WinFormsTestHarness
                     Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
-                    model.RebuildMolecules();
+                    //model.RebuildMolecules();
+                    model.RefreshMolecules();
+                    _currentModel = model;
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 

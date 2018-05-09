@@ -244,7 +244,7 @@ namespace Chem4Word.Model
 
         /// <summary>
         /// Regenerates molecule collections from the bottom up
-        ///
+        /// WARNING THIS IS VERY DESTRUCTIVE CALL AT YOUR PERIL
         /// </summary>
         public void RebuildMolecules()
         {
@@ -308,6 +308,7 @@ namespace Chem4Word.Model
             foreach (var molecule in Molecules)
             {
                 Molecule m = molecule.Clone();
+                m.Id = molecule.Id;
                 m.ConciseFormula = m.CalculatedFormula();
                 m.RebuildRings();
                 clone.Molecules.Add(m);

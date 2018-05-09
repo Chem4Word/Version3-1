@@ -368,6 +368,22 @@ namespace Chem4Word.Model
             get { return Bonds.Sum(b => b.OrderValue) ?? 0d; }
         }
 
+        /// <summary>
+        /// returns the top level model, or null if it's a floating molecule
+        /// </summary>
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
+
         public Atom SelfRef => this;
 
         //atoms go over bonds in a visual display
