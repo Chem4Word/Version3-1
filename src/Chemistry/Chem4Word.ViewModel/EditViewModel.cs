@@ -125,21 +125,22 @@ namespace Chem4Word.ViewModel
         {
             UndoManager.BeginTrans();
 
-            Action<object, object, object, object> undo, redo;
+            Action undo, redo;
             foreach (Atom selectedAtom in selAtoms)
             {
                 if (selectedAtom.Element != value)
                 {
-                    redo = (atom, dummy0, dummy1, dummy2) =>
+                    redo = () =>
                     {
-                        (atom as Atom).Element = (value as ElementBase);
+                        selectedAtom.Element = value;
                     };
+                    var lastElement = selectedAtom.Element;
 
-                    undo = (atom, elem, dummy1, dummy2) =>
+                    undo = () =>
                     {
-                        (atom as Atom).Element = elem as ElementBase;
+                        selectedAtom.Element = lastElement;
                     };
-                    UndoManager.RecordAction($"Set Element to {value.Symbol}", undo, redo, selectedAtom, selectedAtom.Element);
+                    UndoManager.RecordAction($"Set Element to {value.Symbol}", undo, redo);
                     selectedAtom.Element = value;
                 }
             }
@@ -194,18 +195,20 @@ namespace Chem4Word.ViewModel
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
             foreach (Bond bond in SelectedItems.OfType<Bond>())
             {
-                Action<object,object,object,object> redo = ( dummy0, dummy1, dummy2, dummy3) =>
+                Action redo = () =>
                 {
-                    (bond as Bond).Stereo = bondOption.Stereo.Value;
-                    (bond as Bond).Order = bondOption.Order;
+                    bond.Stereo = bondOption.Stereo.Value;
+                    bond.Order = bondOption.Order;
                 };
 
-                Action<object, object, object, object> undo = (stereo, order, dummy1, dummy2) =>
+                var bondStereo = bond.Stereo;
+                var bondOrder = bond.Order;
+                Action undo = () =>
                 {
-                    (bond as Bond).Stereo = (BondStereo)stereo;
-                    (bond as Bond).Order = (string)order;
+                    bond.Stereo = bondStereo;
+                    bond.Order = bondOrder;
                 };
-                UndoManager.RecordAction($"Set BondOption to {_selectedBondOptionId}", undo, redo, bond.Stereo, bond.Order );
+                UndoManager.RecordAction($"Set BondOption to {_selectedBondOptionId}", undo, redo);
                 bond.Order = bondOption.Order;
                 bond.Stereo = bondOption.Stereo.Value;
             }
@@ -482,10 +485,19 @@ namespace Chem4Word.ViewModel
             }
 
             SelectedItems.Remove(atom);
-            Action<object, object, object, object> undoAction = (delatom, mol, dummy, dummy2) => { (mol as Molecule).Atoms.Add((delatom as Atom)); };
-            Action<object, object, object, object> redoAction = (delatom, mol, dummy, dummy2) => { (mol as Molecule).Atoms.Remove((delatom as Atom)); };
+
+            var parent = atom.Parent;
+
+            Action undoAction = () =>
+            {
+                parent.Atoms.Add(atom);
+            };
+            Action redoAction = () =>
+            {
+                parent.Atoms.Remove(atom);
+            };
             
-            UndoManager.RecordAction("Delete Atom", undoAction, redoAction, atom, atom.Parent, null);
+            UndoManager.RecordAction("Delete Atom", undoAction, redoAction);
             atom.Parent.Atoms.Remove(atom);
 
             
@@ -495,33 +507,44 @@ namespace Chem4Word.ViewModel
         public void DeleteBond(Bond bond)
         {
             UndoManager.BeginTrans();
+            var a1 = bond.StartAtom;
+            var a2 = bond.EndAtom;
 
-            Action<object, object, object, object> redoAction = (b, a1, a2, dummy) =>
+            Action redoAction = () =>
             {
-                var b1 = (bond as Bond);
-                b1.StartAtom = null;
-                b1.EndAtom = null;
+                
+                bond.StartAtom = null;
+                bond.EndAtom = null;
+                bond.Parent.RebuildRings();
             };
 
-            Action<object, object, object, object> undoAction = (b, a1, a2, dummy) =>
+            Action undoAction = () =>
             {
-                var b1 = (bond as Bond);
-                b1.StartAtom = a1 as Atom;
-                b1.EndAtom = a2 as Atom;
+                
+                bond.StartAtom = a1;
+                bond.EndAtom = a2;
+                bond.Parent.RebuildRings();
             };
             SelectedItems.Remove(bond);
-            UndoManager.RecordAction("Delete Bond: remove start and end atoms", undoAction, redoAction, bond, bond.StartAtom, bond.EndAtom, null);
+            UndoManager.RecordAction("Delete Bond: remove start and end atoms", undoAction, redoAction);
 
             bond.StartAtom = null;
             bond.EndAtom = null;
 
             Molecule parent = bond.Parent;
+
             if (parent != null)
             {
-                undoAction = (delbond, mol, dummy, dummy2) => { (mol as Molecule).Bonds.Add((delbond as Bond)); };
-                redoAction = (delbond, mol, dummy, dummy2) => { (mol as Molecule).Bonds.Remove((delbond as Bond)); };
+                undoAction = () =>
+                {
+                    parent.Bonds.Add(bond);
+                };
+                redoAction = () =>
+                {
+                    parent.Bonds.Remove(bond);
+                };
 
-                UndoManager.RecordAction("Delete Bond", undoAction, redoAction, bond, bond.Parent, null);
+                UndoManager.RecordAction("Delete Bond", undoAction, redoAction);
                 parent.Bonds.Remove(bond);
             }
 
@@ -540,17 +563,17 @@ namespace Chem4Word.ViewModel
 
                 Molecule _currentMol = lastAtom.Parent;
 
-                Action<object, object, object, object> undo = (a, m, dummy, dummy0) =>
+                Action undo = () =>
                 {
-                    (m as Molecule).Atoms.Remove(a as Atom);
+                    _currentMol.Atoms.Remove(newAtom);
                 };
-                Action<object, object, object, object> redo = (a, m, dummy, dummy0) =>
+                Action redo = () =>
                 {
-                    (m as Molecule).Atoms.Add(a as Atom);
+                    _currentMol.Atoms.Add(newAtom);
                 };
-                UndoManager.RecordAction("Add new atom", undo,redo, newAtom, _currentMol);
+                UndoManager.RecordAction("Add new atom", undo,redo);
 
-                redo.Invoke(newAtom, _currentMol, null, null);
+                redo.Invoke();
 
                 AddNewBond(lastAtom, newAtom, _currentMol);
 
@@ -563,30 +586,38 @@ namespace Chem4Word.ViewModel
                 UndoManager.BeginTrans();
 
                 var _currentMol = new Molecule();
-                this.Model.Molecules.Add(_currentMol);
-                Action<object, object, object, object> undo = (mol, model, dummy, dummy0) =>
-                {
-                    (model as Model.Model).Molecules.Remove(mol as Molecule);
-                };
-                Action<object, object, object, object> redo = (mol, model, dummy, dummy0) =>
-                {
-                    (model as Model.Model).Molecules.Add(mol as Molecule);
-                };
-                redo.Invoke(_currentMol, this.Model, null, null);
+ 
+                
 
-                UndoManager.RecordAction("Add new molecule", undo, redo, _currentMol, this.Model);
-
-                Action<object, object, object, object> undo2 = (a, m, dummy, dummy0) =>
+                Action undo = () =>
                 {
-                    (m as Molecule).Atoms.Remove(a as Atom);
+                    Model.Molecules.Remove(_currentMol);
                 };
-                Action<object, object, object, object> redo2 = (a, m, dummy, dummy0) =>
+                Action redo = () =>
                 {
-                    (m as Molecule).Atoms.Add(a as Atom);
-                };
-                UndoManager.RecordAction("Add new atom", undo, redo, newAtom, _currentMol);
+            
+                    Model.ScaledForXaml = true;
+                    _currentMol.XamlBondLength = Globals.SingleAtomPseudoBondLength;
 
-                redo2.Invoke(newAtom, _currentMol, null, null);
+                    Model.Molecules.Add(_currentMol);
+
+
+                };
+                redo.Invoke();
+
+                UndoManager.RecordAction("Add new molecule", undo, redo);
+
+                Action undo2 = () =>
+                {
+                    _currentMol.Atoms.Remove(newAtom);
+                };
+                Action redo2 = () =>
+                {
+                    _currentMol.Atoms.Add(newAtom);
+                };
+                UndoManager.RecordAction("Add new atom", undo, redo);
+
+                redo2.Invoke();
 
 
                 UndoManager.CommitTrans();
@@ -612,32 +643,26 @@ namespace Chem4Word.ViewModel
             mol.RebuildRings();
             
 
-            Action<object, object, object, object> undo = (bond, parent, dummy, dummy0) =>
+            Action undo = () =>
             {
-                var bn = bond as Bond;
-                var isCyclic = bn.IsCyclic();
-                (parent as Molecule).Bonds.Remove(bn);
-                bn.StartAtom = null;
-                bn.EndAtom = null;
+                var isCyclic = newbond.IsCyclic();
+                mol.Bonds.Remove(newbond);
+                newbond.StartAtom = null;
+                newbond.EndAtom = null;
                 if (isCyclic)
                 {
-                    (parent as Molecule).RebuildRings();
+                    mol.RebuildRings();
                 }
             };
-            Action<object, object, object, object> redo = (bond, parent, atomA, atomb) =>
+            Action redo = () =>
             {
-                var bn = bond as Bond;
-                bn.StartAtom = (atomA as Atom);
-                bn.EndAtom = (atomb as Atom);
-                (parent as Molecule).Bonds.Add(bn);
-                (parent as Molecule).RebuildRings();
-
+                newbond.StartAtom = a;
+                newbond.EndAtom = b;
+                mol.Bonds.Add(newbond);
+                mol.RebuildRings();
             };
 
-            UndoManager.RecordAction("Add new bond", undo, redo, newbond, mol, a,b);
-
-
-
+            UndoManager.RecordAction("Add new bond", undo, redo);
             UndoManager.CommitTrans();
         }
 
@@ -649,6 +674,57 @@ namespace Chem4Word.ViewModel
         public BondStereo CurrentStereo
         {
             get { return _bondOptions[_selectedBondOptionId.Value].Stereo.Value; }
+        }
+
+        public void IncreaseBondOrder(Bond existingBond)
+        {
+            UndoManager.BeginTrans();
+
+            var stereo = existingBond.Stereo;
+            var order = existingBond.Order;
+
+
+            Action redo = () =>
+            {
+                existingBond.Stereo = BondStereo.None;
+                if (existingBond.Order == Bond.OrderZero)
+                {
+                    existingBond.Order = Bond.OrderSingle;
+                    existingBond.NotifyPlacementChanged();
+                }
+                if (existingBond.Order == Bond.OrderSingle)
+                {
+                    existingBond.Order = Bond.OrderDouble;
+                    existingBond.NotifyPlacementChanged();
+                }
+                else if (existingBond.Order == Bond.OrderDouble)
+                {
+                    existingBond.Order = Bond.OrderTriple;
+                    existingBond.NotifyPlacementChanged();
+                }
+                else if (existingBond.Order == Bond.OrderTriple)
+                {
+                    existingBond.Order = Bond.OrderSingle;
+                    existingBond.NotifyPlacementChanged();
+                }
+                existingBond.StartAtom.NotifyBondingChanged();
+                existingBond.EndAtom.NotifyBondingChanged();
+            };
+            Action undo = () =>
+            {
+                existingBond.Stereo = stereo;
+                existingBond.Order = order;
+                existingBond.NotifyPlacementChanged();
+                existingBond.StartAtom.NotifyBondingChanged();
+                existingBond.EndAtom.NotifyBondingChanged();
+
+            };
+
+            UndoManager.RecordAction("Increase Bond Order", undo, redo);
+            redo();
+
+            UndoManager.CommitTrans();
+
         }
     }
 }

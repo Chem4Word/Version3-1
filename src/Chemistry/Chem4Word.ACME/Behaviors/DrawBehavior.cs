@@ -112,8 +112,18 @@ namespace Chem4Word.ACME.Behaviors
             }
             else //we must have hit a different atom altogether
             {
-                ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
+                //already has a bond to the target atom
+                var existingBond = _currentAtomShape.ParentAtom.BondBetween(landedAtomShape.ParentAtom);
+                if (existingBond!=null)
+                {
+                    ViewModel.IncreaseBondOrder(existingBond);
+                }
+                else //doesn't have a bond to the target atom
+                {
+                    ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
                     _currentAtomShape.ParentAtom.Parent);
+                }
+                
             }
 
             if (_dba != null)
@@ -135,7 +145,7 @@ namespace Chem4Word.ACME.Behaviors
         private Point GetNewChainEndPos(AtomShape lastAtomShape)
         {
             Atom lastAtom = lastAtomShape.ParentAtom;
-            Vector newDirection = lastAtom.BalancingVector * ViewModel.Model.MeanBondLength;
+            Vector newDirection = lastAtom.BalancingVector * lastAtom.Parent.XamlBondLength;
             return lastAtom.Position + newDirection;
 
         }

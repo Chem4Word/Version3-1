@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -84,6 +85,10 @@ namespace Chem4Word.Model
 
             Warnings = new List<string>();
             Errors = new List<string>();
+
+            var g = Guid.NewGuid();
+            var gc = new GuidConverter();
+            this.Id = gc.ConvertToString(g);
         }
 
         /// <summary>

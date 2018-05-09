@@ -513,6 +513,10 @@ namespace Chem4Word.Model
             //Default values
             FormalCharge = null;
             DoubletRadical = false;
+
+            var g = Guid.NewGuid();
+            var gc = new GuidConverter();
+            this.Id = gc.ConvertToString(g);
         }
 
         private void SetupCollections()
@@ -527,16 +531,21 @@ namespace Chem4Word.Model
         private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             //chnaging the number of bonds causes knock on effects
-            OnPropertyChanged(nameof(Degree));
-            OnPropertyChanged(nameof(ImplicitHydrogenCount));
-            OnPropertyChanged(nameof(BalancingVector));
-            OnPropertyChanged(nameof(ShowSymbol));
-            OnPropertyChanged(nameof(SymbolText));
+            NotifyBondingChanged();
 
             foreach (Bond bond in Bonds.Where(b => b.OrderValue == 2))
             {
                 bond.NotifyPlacementChanged();
             }
+        }
+
+        public void NotifyBondingChanged()
+        {
+            OnPropertyChanged(nameof(Degree));
+            OnPropertyChanged(nameof(ImplicitHydrogenCount));
+            OnPropertyChanged(nameof(BalancingVector));
+            OnPropertyChanged(nameof(ShowSymbol));
+            OnPropertyChanged(nameof(SymbolText));
         }
 
         private void Rings_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -590,12 +599,12 @@ namespace Chem4Word.Model
 
         public Bond BondBetween(Atom neighbour)
         {
-            if (!Neighbours.Contains(neighbour))
-            {
-                // ReSharper disable once NotResolvedInText
-                throw new ArgumentOutOfRangeException("Atom is not a neighbour.");
-            }
-            return Bonds.First(b => b.OtherAtom(this) == neighbour);
+            //if (!Neighbours.Contains(neighbour))
+            //{
+            //    // ReSharper disable once NotResolvedInText
+            //    throw new ArgumentOutOfRangeException("Atom is not a neighbour.");
+            //}
+            return Bonds.FirstOrDefault(b => b.OtherAtom(this) == neighbour);
         }
 
         public double GetDistance(Atom other)

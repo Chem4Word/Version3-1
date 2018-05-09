@@ -53,6 +53,9 @@ namespace Chem4Word.Model
 
         public Bond()
         {
+            var g = Guid.NewGuid();
+            var gc = new GuidConverter();
+            this.Id = gc.ConvertToString(g);
         }
 
         private void Rings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

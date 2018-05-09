@@ -506,5 +506,9 @@ namespace Chem4Word.Model
         }
 
         #endregion Diagnostics
+
+       
+
+       
     }
 }
