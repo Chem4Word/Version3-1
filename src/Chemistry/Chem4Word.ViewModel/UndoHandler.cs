@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Chem4Word.ViewModel
 {
@@ -98,15 +99,14 @@ namespace Chem4Word.ViewModel
 
         }
 
-        public void RecordAction(string desc, 
-            Action  undoAction, 
-            Action  redoAction)
-        {
+        public void RecordAction(Action  undoAction, Action  redoAction, [CallerMemberName] string desc = null)
+        { 
             //performing a new action should clear the redo
             if (_redoStack.Any())
             {
                 _redoStack.Clear();
             }
+
             _undoStack.Push(new UndoRecord {Level = _transactionLevel,
                 Description = desc, UndoAction = undoAction,
                 RedoAction = redoAction
