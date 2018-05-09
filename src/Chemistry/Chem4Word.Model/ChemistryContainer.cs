@@ -77,12 +77,12 @@ namespace Chem4Word.Model
             {
                 child.Parent = null;
 
-                foreach (Atom atom in child.Atoms.ToList())
+                foreach (Atom atom in child.AllAtoms.ToList())
                 {
                     AllAtoms.Remove(atom);
                 }
 
-                foreach (Bond bond in child.Bonds.ToList())
+                foreach (Bond bond in child.AllBonds.ToList())
                 {
                     AllBonds.Remove(bond);
                 }
@@ -95,7 +95,7 @@ namespace Chem4Word.Model
             {
                 child.Parent = this;
 
-                foreach (Atom atom in child.Atoms)
+                foreach (Atom atom in child.AllAtoms)
                 {
                     if (!AllAtoms.Contains(atom))
                     {
@@ -103,7 +103,7 @@ namespace Chem4Word.Model
                     }
                 }
 
-                foreach (Bond bond in child.Bonds)
+                foreach (Bond bond in child.AllBonds)
                 {
                     if (!AllBonds.Contains(bond))
                     {
