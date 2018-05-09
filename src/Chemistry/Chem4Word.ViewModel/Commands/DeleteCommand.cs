@@ -22,7 +22,7 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.UndoManager.BeginTrans();
+            MyEditViewModel.UndoManager.BeginUndoBlock();
             //first do the astom and associated bonds
             if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) == EditViewModel.SelectionTypeCode.Atom))
             {
@@ -50,7 +50,7 @@ namespace Chem4Word.ViewModel.Commands
                 }
             }
 
-            MyEditViewModel.UndoManager.CommitTrans();
+            MyEditViewModel.UndoManager.EndUndoBlock();
         }
 
         public override event EventHandler CanExecuteChanged;

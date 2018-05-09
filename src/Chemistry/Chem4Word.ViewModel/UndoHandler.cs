@@ -18,7 +18,7 @@ namespace Chem4Word.ViewModel
     /// All actions to be recorded should be
     /// packaged as a pair of actions, for both undo and redo
     /// Every set of actions MUST be nested between
-    /// BeginTrans() and CommitTrans() calls
+    /// BeginUndoBlock() and EndUndoBlock() calls
     /// 
     /// </summary>
     public class UndoHandler
@@ -88,7 +88,7 @@ namespace Chem4Word.ViewModel
             _redoStack = new Stack<UndoRecord>();
         }
 
-        public void BeginTrans()
+        public void BeginUndoBlock()
         {
             //push a buffer record onto the stack
             if (_transactionLevel == 0)
@@ -117,7 +117,7 @@ namespace Chem4Word.ViewModel
         /// <summary>
         /// Ends a transaction block.  Transactions may be nested
         /// </summary>
-        public void CommitTrans()
+        public void EndUndoBlock()
         {
             _transactionLevel--;
             

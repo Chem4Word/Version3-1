@@ -55,35 +55,37 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-
-            Point lastPos;
-
-            if (Dragging(e))
+            if (_currentAtomShape != null)
             {
-                var atomUnderCursor = GetAtomUnderCursor(e);
-                if (atomUnderCursor != null)
+                Point lastPos;
+
+                if (Dragging(e))
                 {
-                    lastPos = atomUnderCursor.Position;
-                }
-                else
-                {
-                    lastPos = e.GetPosition(AssociatedObject);
-                }
-                if (_dba == null)
-                {
-                    _dba = new DrawBondAdorner(AssociatedObject)
+                    var atomUnderCursor = GetAtomUnderCursor(e);
+                    if (atomUnderCursor != null)
                     {
-                        Stereo = ViewModel.CurrentStereo,
-                        BondOrder = ViewModel.CurrentBondOrder
-                    };
+                        lastPos = atomUnderCursor.Position;
+                    }
+                    else
+                    {
+                        lastPos = e.GetPosition(AssociatedObject);
+                    }
+
+                    if (_dba == null)
+                    {
+                        _dba = new DrawBondAdorner(AssociatedObject)
+                        {
+                            Stereo = ViewModel.CurrentStereo,
+                            BondOrder = ViewModel.CurrentBondOrder
+                        };
+                    }
+
+                    _dba.StartPoint = _currentAtomShape.Position;
+                    _dba.EndPoint = lastPos;
                 }
-             
-                _dba.StartPoint = _currentAtomShape.Position;
-                _dba.EndPoint = lastPos;
-
-
             }
         }
+        
 
         private AtomShape GetAtomUnderCursor(MouseEventArgs e)
         {
@@ -153,10 +155,13 @@ namespace Chem4Word.ACME.Behaviors
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             _currentAtomShape = GetAtomUnderCursor(e);
+            if(_currentAtomShape!=null)
+             
             Mouse.Capture(AssociatedObject);
             _flag = true;
 
             _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo:AssociatedObject));
+
         }
         private bool Dragging(MouseEventArgs e)
         {

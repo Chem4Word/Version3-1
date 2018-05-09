@@ -123,7 +123,7 @@ namespace Chem4Word.ViewModel
 
         private  void SetElement(ElementBase value, List<Atom> selAtoms)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
 
             Action undo, redo;
             foreach (Atom selectedAtom in selAtoms)
@@ -145,7 +145,7 @@ namespace Chem4Word.ViewModel
                 }
             }
 
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Chem4Word.ViewModel
 
         private void SetBondOption(int bondOptionId)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
             foreach (Bond bond in SelectedItems.OfType<Bond>())
             {
@@ -212,7 +212,7 @@ namespace Chem4Word.ViewModel
                 bond.Order = bondOption.Order;
                 bond.Stereo = bondOption.Stereo.Value;
             }
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         public List<BondOption> SelectedBondOptions
@@ -477,7 +477,7 @@ namespace Chem4Word.ViewModel
         public void DeleteAtom(Atom atom)
         {
 
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
             var bondlist = atom.Bonds.ToList();
             foreach (Bond bond in bondlist)
             {
@@ -501,12 +501,12 @@ namespace Chem4Word.ViewModel
             atom.Parent.Atoms.Remove(atom);
 
             
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         public void DeleteBond(Bond bond)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
             var a1 = bond.StartAtom;
             var a2 = bond.EndAtom;
 
@@ -548,7 +548,7 @@ namespace Chem4Word.ViewModel
                 parent.Bonds.Remove(bond);
             }
 
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         public void AddAtomChain(Atom lastAtom, Point newAtomPos)
@@ -559,31 +559,31 @@ namespace Chem4Word.ViewModel
             
             if (lastAtom != null)
             {
-                UndoManager.BeginTrans();
+                UndoManager.BeginUndoBlock();
 
-                Molecule _currentMol = lastAtom.Parent;
+                Molecule currentMol = lastAtom.Parent;
 
                 Action undo = () =>
                 {
-                    _currentMol.Atoms.Remove(newAtom);
+                    currentMol.Atoms.Remove(newAtom);
                 };
                 Action redo = () =>
                 {
-                    _currentMol.Atoms.Add(newAtom);
+                    currentMol.Atoms.Add(newAtom);
                 };
                 UndoManager.RecordAction(undo,redo);
 
-                redo.Invoke();
+                redo();
 
-                AddNewBond(lastAtom, newAtom, _currentMol);
+                AddNewBond(lastAtom, newAtom, currentMol);
 
 
-                UndoManager.CommitTrans();
+                UndoManager.EndUndoBlock();
             }
 
             else
             {
-                UndoManager.BeginTrans();
+                UndoManager.BeginUndoBlock();
 
                 var _currentMol = new Molecule();
  
@@ -620,13 +620,14 @@ namespace Chem4Word.ViewModel
                 redo2.Invoke();
 
 
-                UndoManager.CommitTrans();
+                UndoManager.EndUndoBlock();
             }
         }
 
         public void AddNewBond(Atom a, Atom b, Molecule mol)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
+
             var stereo = CurrentStereo;
             var order = CurrentBondOrder;
 
@@ -637,11 +638,6 @@ namespace Chem4Word.ViewModel
 
             newbond.StartAtom = a;
             newbond.EndAtom = b;
-
-            mol.Bonds.Add(newbond);
-
-            mol.RebuildRings();
-            
 
             Action undo = () =>
             {
@@ -661,9 +657,17 @@ namespace Chem4Word.ViewModel
                 mol.Bonds.Add(newbond);
                 mol.RebuildRings();
             };
+            
+
+       
 
             UndoManager.RecordAction(undo, redo);
-            UndoManager.CommitTrans();
+
+           
+
+            UndoManager.EndUndoBlock();
+
+            redo();
         }
 
         public string CurrentBondOrder
@@ -678,7 +682,7 @@ namespace Chem4Word.ViewModel
 
         public void IncreaseBondOrder(Bond existingBond)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
 
             var stereo = existingBond.Stereo;
             var order = existingBond.Order;
@@ -723,7 +727,7 @@ namespace Chem4Word.ViewModel
             UndoManager.RecordAction(undo, redo);
             redo();
 
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
 
         }
     }
