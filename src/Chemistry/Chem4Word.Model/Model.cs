@@ -169,9 +169,14 @@ namespace Chem4Word.Model
         {
             int iBondcount = 0, iAtomCount = 0, iMolcount = 0;
 
+            // ToDo: Implement recursive re-labeling
+
             foreach (Molecule m in Molecules)
             {
                 m.Id = $"m{++iMolcount}";
+                if (m.Molecules.Any())
+                {
+                }
                 foreach (Atom a in m.Atoms)
                 {
                     a.Id = $"a{(++iAtomCount)}";
@@ -244,7 +249,9 @@ namespace Chem4Word.Model
 
         /// <summary>
         /// Regenerates molecule collections from the bottom up
-        /// WARNING THIS IS VERY DESTRUCTIVE CALL AT YOUR PERIL
+        /// WARNING ** THIS IS VERY DESTRUCTIVE CALL AT YOUR PERIL **
+        /// ToDo: Get rid of this routine
+        /// HACK: This routine should never exist it's too destructive
         /// </summary>
         public void RebuildMolecules()
         {
@@ -347,6 +354,8 @@ namespace Chem4Word.Model
             }
         }
 
+        public double XamlBondLength;
+
         public Rect BoundingBox
         {
             get
@@ -407,10 +416,7 @@ namespace Chem4Word.Model
                 }
             }
 
-            foreach (var molecule in Molecules)
-            {
-                molecule.XamlBondLength = newLength;
-            }
+            XamlBondLength = newLength;
         }
 
         public bool ScaledForXaml { get; set; }
