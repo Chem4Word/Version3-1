@@ -49,7 +49,7 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                return BondThickness / Globals.DefaultBondLineThickness;
+                return BondThickness * Globals.DefaultBondLineFactor;
             }
         }
 

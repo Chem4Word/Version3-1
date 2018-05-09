@@ -13,7 +13,7 @@ namespace Chem4Word.Model
         public const double VectorTolerance = 0.01d;
 
         // LineThickness of Bond if all else fails
-        public const double DefaultBondLineThickness = 2.5;
+        public const double DefaultBondLineFactor = 1.0;
         // Font Size to use if all else fails
         public const double DefaultFontSize = 20.0d;
         // Imaginary Bond Size for Single Atom
