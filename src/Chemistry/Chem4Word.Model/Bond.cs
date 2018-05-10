@@ -33,6 +33,8 @@ namespace Chem4Word.Model
 
         public bool Processed { get; set; }
 
+        
+
         public Bond SelfRef
         {
             get { return this; }
@@ -53,6 +55,9 @@ namespace Chem4Word.Model
 
         public Bond()
         {
+            var g = Guid.NewGuid();
+            var gc = new GuidConverter();
+            this.Id = gc.ConvertToString(g);
         }
 
         private void Rings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -814,13 +819,26 @@ namespace Chem4Word.Model
         //public int ZIndex => 1;
         public void NotifyPlacementChanged()
         {
-            OnPropertyChanged("Placement");
+            OnPropertyChanged(nameof(Placement));
         }
 
         public Bond Clone()
         {
             Bond clone = (Bond)this.MemberwiseClone();
             return clone;
+        }
+
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
         }
     }
 }

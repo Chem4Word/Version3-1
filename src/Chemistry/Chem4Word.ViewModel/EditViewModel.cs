@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
+using System.Windows.Media;
 
 namespace Chem4Word.ViewModel
 {
@@ -49,7 +50,7 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                return BondThickness / Globals.DefaultBondLineThickness;
+                return BondThickness * Globals.DefaultBondLineFactor;
             }
         }
 
@@ -123,28 +124,29 @@ namespace Chem4Word.ViewModel
 
         private  void SetElement(ElementBase value, List<Atom> selAtoms)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
 
-            Action<object, object, object, object> undo, redo;
+            Action undo, redo;
             foreach (Atom selectedAtom in selAtoms)
             {
                 if (selectedAtom.Element != value)
                 {
-                    redo = (atom, dummy0, dummy1, dummy2) =>
+                    redo = () =>
                     {
-                        (atom as Atom).Element = (value as ElementBase);
+                        selectedAtom.Element = value;
                     };
+                    var lastElement = selectedAtom.Element;
 
-                    undo = (atom, elem, dummy1, dummy2) =>
+                    undo = () =>
                     {
-                        (atom as Atom).Element = elem as ElementBase;
+                        selectedAtom.Element = lastElement;
                     };
-                    UndoManager.RecordAction($"Set Element to {value.Symbol}", undo, redo, selectedAtom, selectedAtom.Element);
+                    UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
                     selectedAtom.Element = value;
                 }
             }
 
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         /// <summary>
@@ -190,26 +192,28 @@ namespace Chem4Word.ViewModel
 
         private void SetBondOption(int bondOptionId)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
             foreach (Bond bond in SelectedItems.OfType<Bond>())
             {
-                Action<object,object,object,object> redo = ( dummy0, dummy1, dummy2, dummy3) =>
+                Action redo = () =>
                 {
-                    (bond as Bond).Stereo = bondOption.Stereo.Value;
-                    (bond as Bond).Order = bondOption.Order;
+                    bond.Stereo = bondOption.Stereo.Value;
+                    bond.Order = bondOption.Order;
                 };
 
-                Action<object, object, object, object> undo = (stereo, order, dummy1, dummy2) =>
+                var bondStereo = bond.Stereo;
+                var bondOrder = bond.Order;
+                Action undo = () =>
                 {
-                    (bond as Bond).Stereo = (BondStereo)stereo;
-                    (bond as Bond).Order = (string)order;
+                    bond.Stereo = bondStereo;
+                    bond.Order = bondOrder;
                 };
-                UndoManager.RecordAction($"Set BondOption to {_selectedBondOptionId}", undo, redo, bond.Stereo, bond.Order );
+                UndoManager.RecordAction(undo, redo);
                 bond.Order = bondOption.Order;
                 bond.Stereo = bondOption.Stereo.Value;
             }
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         public List<BondOption> SelectedBondOptions
@@ -374,7 +378,7 @@ namespace Chem4Word.ViewModel
                     if (AllAtomsSelected(atom.Parent))
                     {
                         RemoveAdorners(atom.Parent);
-                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent);
+                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
                         SelectionAdorners[newObject] = molAdorner;
                     }
                 }
@@ -389,12 +393,24 @@ namespace Chem4Word.ViewModel
                 if (newObject is Molecule)
                 {
                     MoleculeSelectionAdorner molAdorner =
-                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
+                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
                        SelectionAdorners[newObject] = molAdorner;
+                    molAdorner.DragResizeCompleted += MolAdorner_DragResizeCompleted;
                     molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
 
                 }
             }
+        }
+
+        private void MolAdorner_DragResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+           //we've completed the drag operation
+            //remove the existing molecule adorner
+            var movedMolecule = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+            SelectedItems.Remove(movedMolecule);
+
+            //and add in a new one
+            SelectedItems.Add(movedMolecule);
         }
 
         private void SelAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -460,10 +476,7 @@ namespace Chem4Word.ViewModel
             return SelectionAdorners.Values.OfType<AtomSelectionAdorner>()
                 .Where(asl => asl.AdornedAtom.Parent == atomParent);
         }
-
-
-      
-
+       
         public void CutSelection()
         {
             MessageBox.Show("Cut code goes here");
@@ -477,7 +490,7 @@ namespace Chem4Word.ViewModel
         public void DeleteAtom(Atom atom)
         {
 
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
             var bondlist = atom.Bonds.ToList();
             foreach (Bond bond in bondlist)
             {
@@ -485,50 +498,274 @@ namespace Chem4Word.ViewModel
             }
 
             SelectedItems.Remove(atom);
-            Action<object, object, object, object> undoAction = (delatom, mol, dummy, dummy2) => { (mol as Molecule).Atoms.Add((delatom as Atom)); };
-            Action<object, object, object, object> redoAction = (delatom, mol, dummy, dummy2) => { (mol as Molecule).Atoms.Remove((delatom as Atom)); };
+
+            var parent = atom.Parent;
+
+            Action undoAction = () =>
+            {
+                parent.Atoms.Add(atom);
+            };
+            Action redoAction = () =>
+            {
+                parent.Atoms.Remove(atom);
+            };
             
-            UndoManager.RecordAction("Delete Atom", undoAction, redoAction, atom, atom.Parent, null);
+            UndoManager.RecordAction(undoAction, redoAction);
             atom.Parent.Atoms.Remove(atom);
 
             
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
         }
 
         public void DeleteBond(Bond bond)
         {
-            UndoManager.BeginTrans();
+            UndoManager.BeginUndoBlock();
+            var a1 = bond.StartAtom;
+            var a2 = bond.EndAtom;
 
-            Action<object, object, object, object> redoAction = (b, a1, a2, dummy) =>
-            {
-                var b1 = (bond as Bond);
-                b1.StartAtom = null;
-                b1.EndAtom = null;
+            Action redoAction = () =>
+            {   
+                bond.StartAtom = null;
+                bond.EndAtom = null;
+                bond.Parent.RebuildRings();
             };
 
-            Action<object, object, object, object> undoAction = (b, a1, a2, dummy) =>
+            Action undoAction = () =>
             {
-                var b1 = (bond as Bond);
-                b1.StartAtom = a1 as Atom;
-                b1.EndAtom = a2 as Atom;
+                
+                bond.StartAtom = a1;
+                bond.EndAtom = a2;
+                bond.Parent.RebuildRings();
             };
             SelectedItems.Remove(bond);
-            UndoManager.RecordAction("Delete Bond: remove start and end atoms", undoAction, redoAction, bond, bond.StartAtom, bond.EndAtom, null);
+            UndoManager.RecordAction(undoAction, redoAction);
 
             bond.StartAtom = null;
             bond.EndAtom = null;
 
             Molecule parent = bond.Parent;
+
             if (parent != null)
             {
-                undoAction = (delbond, mol, dummy, dummy2) => { (mol as Molecule).Bonds.Add((delbond as Bond)); };
-                redoAction = (delbond, mol, dummy, dummy2) => { (mol as Molecule).Bonds.Remove((delbond as Bond)); };
+                undoAction = () =>
+                {
+                    parent.Bonds.Add(bond);
+                };
+                redoAction = () =>
+                {
+                    parent.Bonds.Remove(bond);
+                };
 
-                UndoManager.RecordAction("Delete Bond", undoAction, redoAction, bond, bond.Parent, null);
+                UndoManager.RecordAction(undoAction, redoAction);
                 parent.Bonds.Remove(bond);
             }
 
-            UndoManager.CommitTrans();
+            UndoManager.EndUndoBlock();
+        }
+
+        public void AddAtomChain(Atom lastAtom, Point newAtomPos)
+        {
+            Atom newAtom = new Atom();
+            newAtom.Element = _selectedElement;
+            newAtom.Position = newAtomPos;
+            
+            if (lastAtom != null)
+            {
+                UndoManager.BeginUndoBlock();
+
+                Molecule currentMol = lastAtom.Parent;
+
+                Action undo = () =>
+                {
+                    currentMol.Atoms.Remove(newAtom);
+                };
+                Action redo = () =>
+                {
+                    currentMol.Atoms.Add(newAtom);
+                };
+                UndoManager.RecordAction(undo,redo);
+
+                redo();
+
+                AddNewBond(lastAtom, newAtom, currentMol);
+
+
+                UndoManager.EndUndoBlock();
+            }
+
+            else
+            {
+                UndoManager.BeginUndoBlock();
+
+                var _currentMol = new Molecule();
+ 
+                
+
+                Action undo = () =>
+                {
+                    Model.Molecules.Remove(_currentMol);
+                };
+                Action redo = () =>
+                {
+            
+                    Model.ScaledForXaml = true;
+                    Model.XamlBondLength = Globals.SingleAtomPseudoBondLength;
+
+                    Model.Molecules.Add(_currentMol);
+
+
+                };
+                redo.Invoke();
+
+                UndoManager.RecordAction(undo, redo);
+
+                Action undo2 = () =>
+                {
+                    _currentMol.Atoms.Remove(newAtom);
+                };
+                Action redo2 = () =>
+                {
+                    _currentMol.Atoms.Add(newAtom);
+                };
+                UndoManager.RecordAction(undo, redo);
+
+                redo2.Invoke();
+
+
+                UndoManager.EndUndoBlock();
+            }
+        }
+
+        public void AddNewBond(Atom a, Atom b, Molecule mol)
+        {
+            UndoManager.BeginUndoBlock();
+
+            var stereo = CurrentStereo;
+            var order = CurrentBondOrder;
+
+            Bond newbond = new Bond();
+
+            newbond.Stereo = stereo;
+            newbond.Order = order;
+
+            newbond.StartAtom = a;
+            newbond.EndAtom = b;
+
+            Action undo = () =>
+            {
+                var isCyclic = newbond.IsCyclic();
+                mol.Bonds.Remove(newbond);
+                newbond.StartAtom = null;
+                newbond.EndAtom = null;
+                if (isCyclic)
+                {
+                    mol.RebuildRings();
+                }
+            };
+            Action redo = () =>
+            {
+                newbond.StartAtom = a;
+                newbond.EndAtom = b;
+                mol.Bonds.Add(newbond);
+                mol.RebuildRings();
+            };
+            
+
+       
+
+            UndoManager.RecordAction(undo, redo);
+
+           
+
+            UndoManager.EndUndoBlock();
+
+            redo();
+        }
+
+        public string CurrentBondOrder
+        {
+            get { return _bondOptions[_selectedBondOptionId.Value].Order; }
+        }
+
+        public BondStereo CurrentStereo
+        {
+            get { return _bondOptions[_selectedBondOptionId.Value].Stereo.Value; }
+        }
+
+        public void IncreaseBondOrder(Bond existingBond)
+        {
+            UndoManager.BeginUndoBlock();
+
+            var stereo = existingBond.Stereo;
+            var order = existingBond.Order;
+
+
+            Action redo = () =>
+            {
+                existingBond.Stereo = BondStereo.None;
+                if (existingBond.Order == Bond.OrderZero)
+                {
+                    existingBond.Order = Bond.OrderSingle;
+                    existingBond.NotifyPlacementChanged();
+                }
+                if (existingBond.Order == Bond.OrderSingle)
+                {
+                    existingBond.Order = Bond.OrderDouble;
+                    existingBond.NotifyPlacementChanged();
+                }
+                else if (existingBond.Order == Bond.OrderDouble)
+                {
+                    existingBond.Order = Bond.OrderTriple;
+                    existingBond.NotifyPlacementChanged();
+                }
+                else if (existingBond.Order == Bond.OrderTriple)
+                {
+                    existingBond.Order = Bond.OrderSingle;
+                    existingBond.NotifyPlacementChanged();
+                }
+                existingBond.StartAtom.NotifyBondingChanged();
+                existingBond.EndAtom.NotifyBondingChanged();
+            };
+            Action undo = () =>
+            {
+                existingBond.Stereo = stereo;
+                existingBond.Order = order;
+                existingBond.NotifyPlacementChanged();
+                existingBond.StartAtom.NotifyBondingChanged();
+                existingBond.EndAtom.NotifyBondingChanged();
+
+            };
+
+            UndoManager.RecordAction(undo, redo);
+            redo();
+
+            UndoManager.EndUndoBlock();
+
+        }
+
+        public void DoOperation(Transform lastOperation, List<Atom> toList)
+        {
+            UndoManager.BeginUndoBlock();
+            foreach (Atom atom in toList)
+            {
+                var lastPosition = atom.Position;
+                var newPosition = lastOperation.Transform(lastPosition);
+                Action undo = () =>
+                {
+                    SelectedItems.Clear();
+                    (atom as Atom).Position = (Point)lastPosition ;
+                };
+
+                Action redo = () =>
+                {
+                    SelectedItems.Clear();
+                    (atom as Atom).Position = (Point)newPosition ;
+                };
+                UndoManager.RecordAction( undo, redo);
+                atom.Position = newPosition;
+            }
+
+            UndoManager.EndUndoBlock();
         }
     }
 }

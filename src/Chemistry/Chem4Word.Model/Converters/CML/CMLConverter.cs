@@ -192,7 +192,7 @@ namespace Chem4Word.Model.Converters
                 if (bond.Stereo == BondStereo.Cis || bond.Stereo == BondStereo.Trans)
                 {
                     Debugger.Break();
-                    // ToDo: Fix 1st and last atomRefs
+                    // Hack: Fix 1st and last atomRefs
                     result = new XElement(CML.cml + "bondStereo",
                                 new XAttribute("atomRefs4", $"{bond.StartAtom.Id} {bond.StartAtom.Id} {bond.EndAtom.Id} {bond.EndAtom.Id}"),
                                 GetStereoString(bond.Stereo));
@@ -255,43 +255,53 @@ namespace Chem4Word.Model.Converters
         {
             XElement molElement = new XElement(CML.cml + "molecule", new XAttribute("id", mol.Id));
 
-            if (!string.IsNullOrEmpty(mol.ConciseFormula))
+            if (mol.Molecules.Any())
             {
-                molElement.Add(GetXElement(mol.ConciseFormula, mol.Id));
-            }
-
-            foreach (Formula formula in mol.Formulas)
-            {
-                molElement.Add(GetXElement(formula, mol.ConciseFormula));
-            }
-
-            foreach (ChemicalName chemicalName in mol.ChemicalNames)
-            {
-                molElement.Add(GetXElement(chemicalName));
-            }
-
-            // Task 336
-            if (mol.Atoms.Count > 0)
-            {
-                // Add atomArray element, then add these to it
-                XElement aaElement = new XElement(CML.cml + "atomArray");
-                foreach (Atom atom in mol.Atoms)
+                foreach (var childMolecule in mol.Molecules)
                 {
-                    aaElement.Add(GetXElement(atom));
+                    molElement.Add(GetMoleculeElement(childMolecule));
                 }
-                molElement.Add(aaElement);
             }
-
-            // Task 336
-            if (mol.Bonds.Count > 0)
+            else
             {
-                XElement baElement = new XElement(CML.cml + "bondArray");
-                // Add bondArray element, then add these to it
-                foreach (Bond bond in mol.Bonds)
+                if (!string.IsNullOrEmpty(mol.ConciseFormula))
                 {
-                    baElement.Add(GetXElement(bond));
+                    molElement.Add(GetXElement(mol.ConciseFormula, mol.Id));
                 }
-                molElement.Add(baElement);
+
+                foreach (Formula formula in mol.Formulas)
+                {
+                    molElement.Add(GetXElement(formula, mol.ConciseFormula));
+                }
+
+                foreach (ChemicalName chemicalName in mol.ChemicalNames)
+                {
+                    molElement.Add(GetXElement(chemicalName));
+                }
+
+                // Task 336
+                if (mol.Atoms.Count > 0)
+                {
+                    // Add atomArray element, then add these to it
+                    XElement aaElement = new XElement(CML.cml + "atomArray");
+                    foreach (Atom atom in mol.Atoms)
+                    {
+                        aaElement.Add(GetXElement(atom));
+                    }
+                    molElement.Add(aaElement);
+                }
+
+                // Task 336
+                if (mol.Bonds.Count > 0)
+                {
+                    XElement baElement = new XElement(CML.cml + "bondArray");
+                    // Add bondArray element, then add these to it
+                    foreach (Bond bond in mol.Bonds)
+                    {
+                        baElement.Add(GetXElement(bond));
+                    }
+                    molElement.Add(baElement);
+                }
             }
             return molElement;
         }

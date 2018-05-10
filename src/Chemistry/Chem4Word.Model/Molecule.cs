@@ -11,10 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Media;
 
@@ -37,17 +36,20 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (_boundingBox == Rect.Empty)
-                {
-                    CalculateBoundingBox();
-                }
+                
+                
+                CalculateBoundingBox();
+                
                 return _boundingBox;
             }
         }
 
+        /// <summary>
+        /// returns the top level model, or null if it's a floating molecule
+      
         private void CalculateBoundingBox()
         {
-            Model m = this.Parent as Model;
+            Model m = this.Model;
             var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
             var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
 
@@ -84,6 +86,10 @@ namespace Chem4Word.Model
 
             Warnings = new List<string>();
             Errors = new List<string>();
+
+            var g = Guid.NewGuid();
+            var gc = new GuidConverter();
+            this.Id = gc.ConvertToString(g);
         }
 
         /// <summary>
@@ -249,6 +255,18 @@ namespace Chem4Word.Model
                 Atom start = this.Atoms[0];
                 Refresh(start);
             }
+            foreach (Molecule molecule in Molecules.ToList())
+            {
+                if (molecule.Molecules.Count == 0 && molecule.Atoms.Count == 0)
+                {
+                    //it's empty, trash it
+                    Molecules.Remove(molecule);
+                }
+                else
+                {
+                    molecule.Refresh();
+                }
+            }
         }
 
         #region Properties
@@ -409,6 +427,18 @@ namespace Chem4Word.Model
             }
         }
 
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
         #endregion Graph Stuff
 
         #region Ring stuff
@@ -491,6 +521,18 @@ namespace Chem4Word.Model
             //sw.Stop();
             //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
+            RefreshRingBonds();
+        }
+
+        private void RefreshRingBonds()
+        {
+            foreach (Ring ring in Rings)
+            {
+                foreach (Bond ringBond in ring.Bonds)
+                {
+                    ringBond.NotifyPlacementChanged();
+                }
+            }
         }
 
         /// <summary>
@@ -860,7 +902,7 @@ namespace Chem4Word.Model
             }
         }
 
-        public System.Windows.Point Centroid
+        public Point Centroid
         {
             get
             {
@@ -894,13 +936,12 @@ namespace Chem4Word.Model
 
         #region Helpers
 
-        public double XamlBondLength;
-
         public double MeanBondLength
         {
             get
             {
-                double result = XamlBondLength;
+                double result = Model.XamlBondLength;
+
                 if (Bonds.Any())
                 {
                     result = Bonds.Average(b => b.BondVector.Length);
@@ -970,7 +1011,7 @@ namespace Chem4Word.Model
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
-            clone.XamlBondLength = XamlBondLength;
+            clone.Id = Id;
 
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
 
