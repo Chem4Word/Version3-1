@@ -254,6 +254,18 @@ namespace Chem4Word.Model
                 Atom start = this.Atoms[0];
                 Refresh(start);
             }
+            foreach (Molecule molecule in Molecules.ToList())
+            {
+                if (molecule.Molecules.Count == 0 && molecule.Atoms.Count == 0)
+                {
+                    //it's empty, trash it
+                    Molecules.Remove(molecule);
+                }
+                else
+                {
+                    molecule.Refresh();
+                }
+            }
         }
 
         #region Properties

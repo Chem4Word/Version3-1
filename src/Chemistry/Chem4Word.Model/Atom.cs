@@ -516,7 +516,7 @@ namespace Chem4Word.Model
 
             var g = Guid.NewGuid();
             var gc = new GuidConverter();
-            this.Id = gc.ConvertToString(g);
+            Id = gc.ConvertToString(g);
         }
 
         private void SetupCollections()
