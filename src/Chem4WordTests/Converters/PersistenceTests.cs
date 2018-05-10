@@ -144,6 +144,34 @@ namespace Chem4Word.Model.Converters.Tests
         }
 
         [TestMethod()]
+        public void CmlImportNested()
+        {
+            CMLConverter mc = new CMLConverter();
+            Model model = mc.Import(ResourceHelper.GetStringResource("NestedMolecules.xml"));
+
+            model.RefreshMolecules();
+
+            // Basic Sanity Checks
+            Assert.IsTrue(model.Molecules.Count == 1, $"Expected 1 Molecule; Got {model.Molecules.Count}");
+            // Check molecule m0 has 4 child molecules and no atoms
+            Molecule molecule = model.Molecules[0];
+            Assert.IsTrue(molecule.Molecules.Count == 4, $"Expected 4 Molecule; Got {molecule.Molecules.Count}");
+            Assert.IsTrue(molecule.Atoms.Count == 0, $"Expected 0 Atoms; Got {molecule.Atoms.Count}");
+            // Check molecule m2 has no child molecules and 6 atoms
+            molecule = model.Molecules[0].Molecules[1];
+            Assert.IsTrue(molecule.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule.Molecules.Count}");
+            Assert.IsTrue(molecule.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule.Atoms.Count}");
+            // Check molecule m1 has 1 child molecules and no atoms
+            molecule = model.Molecules[0].Molecules[0];
+            Assert.IsTrue(molecule.Molecules.Count == 1, $"Expected 1 Molecule; Got {molecule.Molecules.Count}");
+            Assert.IsTrue(molecule.Atoms.Count == 0, $"Expected 0 Atoms; Got {molecule.Atoms.Count}");
+            // Check molecule m5 has 1 child molecules and 6 atoms
+            molecule = model.Molecules[0].Molecules[0].Molecules[0];
+            Assert.IsTrue(molecule.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule.Molecules.Count}");
+            Assert.IsTrue(molecule.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule.Atoms.Count}");
+        }
+
+        [TestMethod()]
         public void SdfImportBenzene()
         {
             SdFileConverter mc = new SdFileConverter();
