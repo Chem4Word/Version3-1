@@ -147,7 +147,7 @@ namespace Chem4Word.ACME.Behaviors
         private Point GetNewChainEndPos(AtomShape lastAtomShape)
         {
             Atom lastAtom = lastAtomShape.ParentAtom;
-            Vector newDirection = lastAtom.BalancingVector * lastAtom.Parent.XamlBondLength;
+            Vector newDirection = lastAtom.BalancingVector * ViewModel.Model.XamlBondLength;
             return lastAtom.Position + newDirection;
 
         }

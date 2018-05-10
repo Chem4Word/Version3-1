@@ -597,7 +597,7 @@ namespace Chem4Word.ViewModel
                 {
             
                     Model.ScaledForXaml = true;
-                    _currentMol.XamlBondLength = Globals.SingleAtomPseudoBondLength;
+                    Model.XamlBondLength = Globals.SingleAtomPseudoBondLength;
 
                     Model.Molecules.Add(_currentMol);
 

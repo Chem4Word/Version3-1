@@ -33,21 +33,7 @@ namespace Chem4Word.Model
 
         public bool Processed { get; set; }
 
-        /// <summary>
-        /// returns the top level model, or null if it's a floating molecule
-        /// </summary>
-        public Model Model
-        {
-            get
-            {
-                object currentParent = Parent;
-                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
-                {
-                    currentParent = ((ChemistryContainer)currentParent).Parent;
-                }
-                return (currentParent as Model);
-            }
-        }
+        
 
         public Bond SelfRef
         {
