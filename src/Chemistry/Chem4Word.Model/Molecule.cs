@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -45,20 +46,7 @@ namespace Chem4Word.Model
 
         /// <summary>
         /// returns the top level model, or null if it's a floating molecule
-        /// </summary>
-        public Model Model
-        {
-            get
-            {
-                object currentParent = Parent;
-                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
-                {
-                    currentParent = ((ChemistryContainer)currentParent).Parent;
-                }
-                return (currentParent as Model);
-            }
-        }
-
+      
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
@@ -98,6 +86,10 @@ namespace Chem4Word.Model
 
             Warnings = new List<string>();
             Errors = new List<string>();
+
+            var g = Guid.NewGuid();
+            var gc = new GuidConverter();
+            this.Id = gc.ConvertToString(g);
         }
 
         /// <summary>
@@ -263,6 +255,18 @@ namespace Chem4Word.Model
                 Atom start = this.Atoms[0];
                 Refresh(start);
             }
+            foreach (Molecule molecule in Molecules.ToList())
+            {
+                if (molecule.Molecules.Count == 0 && molecule.Atoms.Count == 0)
+                {
+                    //it's empty, trash it
+                    Molecules.Remove(molecule);
+                }
+                else
+                {
+                    molecule.Refresh();
+                }
+            }
         }
 
         #region Properties
@@ -423,6 +427,18 @@ namespace Chem4Word.Model
             }
         }
 
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
         #endregion Graph Stuff
 
         #region Ring stuff
@@ -505,6 +521,18 @@ namespace Chem4Word.Model
             //sw.Stop();
             //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
+            RefreshRingBonds();
+        }
+
+        private void RefreshRingBonds()
+        {
+            foreach (Ring ring in Rings)
+            {
+                foreach (Bond ringBond in ring.Bonds)
+                {
+                    ringBond.NotifyPlacementChanged();
+                }
+            }
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Chem4Word.ViewModel
 {
@@ -17,7 +18,7 @@ namespace Chem4Word.ViewModel
     /// All actions to be recorded should be
     /// packaged as a pair of actions, for both undo and redo
     /// Every set of actions MUST be nested between
-    /// BeginTrans() and CommitTrans() calls
+    /// BeginUndoBlock() and EndUndoBlock() calls
     /// 
     /// </summary>
     public class UndoHandler
@@ -27,18 +28,23 @@ namespace Chem4Word.ViewModel
         {
             public int Level;
             public string Description;
-            public Action<object,object,object, object> UndoAction;
-            public Action<object,object,object, object> RedoAction;
-            public object[] Params;
+            public Action UndoAction;
+            public Action RedoAction;
 
             public void Undo()
-            { 
-                UndoAction(Params[0], Params[1], Params[2], Params[3]);
+            {
+                if (!IsBufferRecord())
+                {
+                    UndoAction();
+                }
             }
 
             public void Redo()
             {
-                RedoAction(Params[0], Params[1], Params[2], Params[3]);
+                if (!IsBufferRecord())
+                {
+                    RedoAction();
+                }
             }
 
             public bool IsBufferRecord()
@@ -77,8 +83,7 @@ namespace Chem4Word.ViewModel
                 Description = "#buffer#",
                 Level = 0,
                 UndoAction = null,
-                RedoAction = null,
-                Params = null
+                RedoAction = null
             };
 
             Initialize();
@@ -89,7 +94,7 @@ namespace Chem4Word.ViewModel
             _redoStack = new Stack<UndoRecord>();
         }
 
-        public void BeginTrans()
+        public void BeginUndoBlock()
         {
             //push a buffer record onto the stack
             if (_transactionLevel == 0)
@@ -100,27 +105,25 @@ namespace Chem4Word.ViewModel
 
         }
 
-        public void RecordAction(string desc, 
-            Action<object,object,object, object> undoAction, 
-            Action<object,object,object, object> redoAction, 
-            object param1 = null, object param2=null, object param3=null, object param4=null)
-        {
+        public void RecordAction(Action  undoAction, Action  redoAction, [CallerMemberName] string desc = null)
+        { 
             //performing a new action should clear the redo
             if (_redoStack.Any())
             {
                 _redoStack.Clear();
             }
+
             _undoStack.Push(new UndoRecord {Level = _transactionLevel,
                 Description = desc, UndoAction = undoAction,
-                RedoAction = redoAction,
-                Params =new object[] {param1,param2,param3,param4} });
+                RedoAction = redoAction
+                });
         }
 
 
         /// <summary>
         /// Ends a transaction block.  Transactions may be nested
         /// </summary>
-        public void CommitTrans()
+        public void EndUndoBlock()
         {
             _transactionLevel--;
             
@@ -137,6 +140,26 @@ namespace Chem4Word.ViewModel
             //tell the parent viewmodel the command status has changed
             _editViewModel.UndoCommand.RaiseCanExecChanged();
             _editViewModel.RedoCommand.RaiseCanExecChanged();
+        }
+
+        /// <summary>
+        /// Rolls back the current undo block
+        /// and removes the last buffer record
+        /// </summary>
+        public void RollbackUndoBlock()
+        {
+            var br = _undoStack.Pop();
+            if (br.IsBufferRecord())
+            {
+                throw new InvalidDataException("First rollback action is a buffer record.");
+            }
+
+            while (!br.IsBufferRecord())
+            {
+                br.Undo();
+                br = _undoStack.Pop();
+            }
+            _transactionLevel = 0;
         }
 
         public void Undo()

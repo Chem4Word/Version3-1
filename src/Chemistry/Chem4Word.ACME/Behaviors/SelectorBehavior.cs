@@ -47,6 +47,8 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
+
+        
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
@@ -141,7 +143,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void DisposeLasso()
         {
-            RemoveAdorner(_lassoAdorner, AssociatedObject);
+            RemoveAdorner(_lassoAdorner);
             _lassoAdorner = null;
         }
 
@@ -155,11 +157,11 @@ namespace Chem4Word.ACME.Behaviors
             VisualTreeHelper.HitTest(AssociatedObject, null, HitTestCallback, new GeometryHitTestParameters(outline));
         }
 
-        private void RemoveAdorner(Adorner adorner, Canvas canvas)
+        private void RemoveAdorner(Adorner adorner)
         {
             var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
 
-            layer.Remove(_lassoAdorner);
+            layer.Remove(adorner);
         }
 
         private StreamGeometry GetPolyGeometry()
