@@ -12,9 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Media;
 
@@ -45,9 +43,25 @@ namespace Chem4Word.Model
             }
         }
 
+        /// <summary>
+        /// returns the top level model, or null if it's a floating molecule
+        /// </summary>
+        public Model Model
+        {
+            get
+            {
+                object currentParent = Parent;
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
+                {
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
+                }
+                return (currentParent as Model);
+            }
+        }
+
         private void CalculateBoundingBox()
         {
-            Model m = this.Parent as Model;
+            Model m = this.Model;
             var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
             var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
 
@@ -860,7 +874,7 @@ namespace Chem4Word.Model
             }
         }
 
-        public System.Windows.Point Centroid
+        public Point Centroid
         {
             get
             {
@@ -894,13 +908,12 @@ namespace Chem4Word.Model
 
         #region Helpers
 
-        public double XamlBondLength;
-
         public double MeanBondLength
         {
             get
             {
-                double result = XamlBondLength;
+                double result = Model.XamlBondLength;
+
                 if (Bonds.Any())
                 {
                     result = Bonds.Average(b => b.BondVector.Length);
@@ -970,7 +983,7 @@ namespace Chem4Word.Model
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
-            clone.XamlBondLength = XamlBondLength;
+            clone.Id = Id;
 
             Dictionary<string, Atom> clonedAtoms = new Dictionary<string, Atom>();
 
