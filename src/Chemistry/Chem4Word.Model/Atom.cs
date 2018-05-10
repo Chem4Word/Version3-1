@@ -116,6 +116,15 @@ namespace Chem4Word.Model
             {
                 _position = value;
                 OnPropertyChanged();
+                RingCentroidChanged();
+            }
+        }
+
+        private void RingCentroidChanged()
+        {
+            foreach (Ring ring in Rings)
+            {
+                ring.RingCentroidChanged();
             }
         }
 

@@ -9,6 +9,12 @@
             Path=Color}"
         Opacity="0.75" />
     <SolidColorBrush
+        x:Key="BigThumbFillBrush"
+        Color="{Binding
+            Source={x:Static SystemColors.HighlightBrush},
+            Path=Color}"
+        Opacity="0.1" />
+    <SolidColorBrush
         x:Key="GrabHandleBorderBrush"
         Color="{Binding
             Source={x:Static SystemColors.HighlightBrush},
@@ -80,6 +86,22 @@
                 <ControlTemplate TargetType="Thumb">
                     <Rectangle
                         Fill="{StaticResource GrabHandleFillBrush}"
+                        Stroke="{StaticResource GrabHandleBorderBrush}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="BigThumbStyle" TargetType="Thumb" BasedOn="{StaticResource GrabHandleStyle}">
+
+        <Setter
+            Property="Background"
+            Value="{StaticResource BigThumbFillBrush}" />
+         <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Rectangle
+                        Fill="{StaticResource BigThumbFillBrush}"
                         Stroke="{StaticResource GrabHandleBorderBrush}" />
                 </ControlTemplate>
             </Setter.Value>
