@@ -154,7 +154,7 @@ namespace Chem4Word.View
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
             // ToDo: Uncomment to see Text BoundingBox
-            dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
+            //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
 #endif
             TextRun = groupGlyphRun;
         }
