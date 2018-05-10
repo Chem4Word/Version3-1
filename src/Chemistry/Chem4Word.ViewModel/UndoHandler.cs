@@ -32,13 +32,19 @@ namespace Chem4Word.ViewModel
             public Action RedoAction;
 
             public void Undo()
-            { 
-                UndoAction();
+            {
+                if (!IsBufferRecord())
+                {
+                    UndoAction();
+                }
             }
 
             public void Redo()
             {
-                RedoAction();
+                if (!IsBufferRecord())
+                {
+                    RedoAction();
+                }
             }
 
             public bool IsBufferRecord()
@@ -134,6 +140,25 @@ namespace Chem4Word.ViewModel
             //tell the parent viewmodel the command status has changed
             _editViewModel.UndoCommand.RaiseCanExecChanged();
             _editViewModel.RedoCommand.RaiseCanExecChanged();
+        }
+
+        /// <summary>
+        /// Rolls back the current undo block
+        /// and removes the last buffer record
+        /// </summary>
+        public void RollbackUndoBlock()
+        {
+            var br = _undoStack.Pop();
+            if (br.IsBufferRecord())
+            {
+                throw new InvalidDataException("First rollback action is a buffer record.");
+            }
+
+            while (!br.IsBufferRecord())
+            {
+                br.Undo();
+                br = _undoStack.Pop();
+            }
         }
 
         public void Undo()

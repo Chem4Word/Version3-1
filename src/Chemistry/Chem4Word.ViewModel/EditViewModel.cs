@@ -511,8 +511,7 @@ namespace Chem4Word.ViewModel
             var a2 = bond.EndAtom;
 
             Action redoAction = () =>
-            {
-                
+            {   
                 bond.StartAtom = null;
                 bond.EndAtom = null;
                 bond.Parent.RebuildRings();
