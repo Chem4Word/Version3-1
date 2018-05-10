@@ -20,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
+using System.Windows.Media;
 
 namespace Chem4Word.ViewModel
 {
@@ -377,7 +378,7 @@ namespace Chem4Word.ViewModel
                     if (AllAtomsSelected(atom.Parent))
                     {
                         RemoveAdorners(atom.Parent);
-                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent);
+                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
                         SelectionAdorners[newObject] = molAdorner;
                     }
                 }
@@ -392,12 +393,24 @@ namespace Chem4Word.ViewModel
                 if (newObject is Molecule)
                 {
                     MoleculeSelectionAdorner molAdorner =
-                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule));
+                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
                        SelectionAdorners[newObject] = molAdorner;
+                    molAdorner.DragResizeCompleted += MolAdorner_DragResizeCompleted;
                     molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
 
                 }
             }
+        }
+
+        private void MolAdorner_DragResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+           //we've completed the drag operation
+            //remove the existing molecule adorner
+            var movedMolecule = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+            SelectedItems.Remove(movedMolecule);
+
+            //and add in a new one
+            SelectedItems.Add(movedMolecule);
         }
 
         private void SelAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -728,6 +741,31 @@ namespace Chem4Word.ViewModel
 
             UndoManager.EndUndoBlock();
 
+        }
+
+        public void DoOperation(Transform lastOperation, List<Atom> toList)
+        {
+            UndoManager.BeginTrans();
+            foreach (Atom atom in toList)
+            {
+                var lastPosition = atom.Position;
+                var newPosition = lastOperation.Transform(lastPosition);
+                Action<object, object, object, object> undo = (dummy, dummy0, dummy1, dummy2) =>
+                {
+                    SelectedItems.Clear();
+                    (atom as Atom).Position = (Point)lastPosition ;
+                };
+
+                Action<object, object, object, object> redo = (dummy, dummy0, dummy1, dummy2) =>
+                {
+                    SelectedItems.Clear();
+                    (atom as Atom).Position = (Point)newPosition ;
+                };
+                UndoManager.RecordAction("Move/resize fragment", undo, redo);
+                atom.Position = newPosition;
+            }
+
+            UndoManager.CommitTrans();
         }
     }
 }

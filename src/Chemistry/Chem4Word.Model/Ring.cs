@@ -11,9 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model
 {
@@ -22,7 +25,7 @@ namespace Chem4Word.Model
     /// </summary>
     [DebuggerDisplay("Atoms: {Atoms.Count} Priority: {Priority}")]
     [Serializable]
-    public class Ring : IComparer<Ring>
+    public class Ring : IComparer<Ring>, INotifyPropertyChanged
     {
         /// <summary>
         /// Indicates which rings of a set of fused rings
@@ -142,6 +145,12 @@ namespace Chem4Word.Model
 
         private Point? _centroid;
 
+
+        internal void RingCentroidChanged()
+        {
+            OnPropertyChanged("Centroid");
+        }
+
         /// <summary>
         /// The center of the ring
         /// </summary>
@@ -149,10 +158,7 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (_centroid == null)
-                {
-                    _centroid = Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
-                }
+                _centroid = Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
                 return _centroid;
             }
         }
@@ -296,5 +302,13 @@ namespace Chem4Word.Model
         }
 
         #endregion Operators
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

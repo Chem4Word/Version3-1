@@ -9,6 +9,7 @@ using Chem4Word.Model;
 using Chem4Word.Model.Annotations;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -20,9 +21,10 @@ namespace Chem4Word.ViewModel.Adorners
 {
     public class MoleculeSelectionAdorner: Adorner
     {
-        private static int ThumbWidth;
-        private static int HalfThumbWidth;
-        private static int RotateThumbWidth;
+        //static as they need to be set only when the adorner is first created
+        private static double? ThumbWidth; 
+        private static double HalfThumbWidth;
+        private static double RotateThumbWidth;
 
         private Point _canvasPos;
         private readonly Molecule _frag;
@@ -54,15 +56,23 @@ namespace Chem4Word.ViewModel.Adorners
         private double _dragXTravel;
         private double _dragYTravel;
 
+        public readonly EditViewModel CurrentModel;
+        private Brush _bigBrush;
 
-        public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule)
+
+        public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
         {
-            _visualChildren = new VisualCollection(this);
 
-            ThumbWidth = (int) molecule.MeanBondLength / 20;
-            HalfThumbWidth = ThumbWidth / 2;
-            RotateThumbWidth = (int) molecule.MeanBondLength / 10;
+            CurrentModel = currentModel;
+
+            _visualChildren = new VisualCollection(this);
+            if (ThumbWidth == null)
+            {
+                ThumbWidth = (int) CurrentModel.Model.MeanBondLength / 10;
+                HalfThumbWidth = ThumbWidth.Value / 2;
+                RotateThumbWidth = CurrentModel.Model.MeanBondLength / 7.5;
+            }
             BuildBigDragArea();
 
             BuildAdornerCorner(ref _topLeft, Cursors.SizeNWSE);
@@ -72,6 +82,27 @@ namespace Chem4Word.ViewModel.Adorners
 
             BuildRotateThumb(ref _rotateThumb, Cursors.Hand);
 
+            AttachHandlers();
+
+            _frag = molecule;
+
+            _renderBrush = (Brush)FindResource("GrabHandleFillBrush");
+            _bigBrush = (Brush)FindResource("BigThumbFillBrush");
+            _renderPen = (Pen)FindResource("GrabHandlePen");
+
+
+            Focusable = true;
+            IsHitTestVisible = true;
+            SetBoundingBox();
+
+            var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
+            myAdornerLayer.Add(this);
+
+           
+        }
+
+        private void AttachHandlers()
+        {
             _topLeft.DragStarted += DragStarted;
             _topRight.DragStarted += DragStarted;
             _bottomLeft.DragStarted += DragStarted;
@@ -89,19 +120,6 @@ namespace Chem4Word.ViewModel.Adorners
             //wire up the event handling
             this.MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
             this.KeyDown += MoleculeAdorner_KeyDown;
-            
-            _frag = molecule;
-
-            _renderBrush = (Brush)FindResource("GrabHandleFillBrush");
-            _renderPen = (Pen)FindResource("GrabHandlePen");
-
-
-            Focusable = true;
-            IsHitTestVisible = true;
-            SetBoundingBox();
-
-            var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
-            myAdornerLayer.Add(this);
         }
 
         private void MoleculeSelectionAdorner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -243,7 +261,7 @@ namespace Chem4Word.ViewModel.Adorners
             _visualChildren.Add(_bigThumb);
             _bigThumb.IsHitTestVisible = true;
 
-            _bigThumb.Style = (Style)FindResource("GrabHandleStyle");
+            _bigThumb.Style = (Style)FindResource("BigThumbStyle");
             _bigThumb.Cursor = Cursors.Hand;
             _bigThumb.DragStarted += _bigThumb_DragStarted;
             _bigThumb.DragCompleted += _bigThumb_DragCompleted;
@@ -279,11 +297,13 @@ namespace Chem4Word.ViewModel.Adorners
             if (_lastOperation != null)
             {
 
-                _frag.Move(_lastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
-                DragResizeCompleted?.Invoke(this, e);
+               
                 SetCentroid();
+                //move the molecule
+                CurrentModel.DoOperation(_lastOperation, AdornedMolecule.Atoms.ToList());
+                DragResizeCompleted?.Invoke(this, e);
             }
             _dragging = false;
             _resizing = false;
@@ -372,13 +392,13 @@ namespace Chem4Word.ViewModel.Adorners
                 bbb = _lastOperation.TransformBounds(bbb);
             }
 
-            _topLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth, ThumbWidth));
-            _topRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth,
-                ThumbWidth));
+            _topLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth.Value, ThumbWidth.Value));
+            _topRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth, bbb.Top - HalfThumbWidth, ThumbWidth.Value,
+                ThumbWidth.Value));
             _bottomLeft.Arrange(new Rect(bbb.Left - HalfThumbWidth, bbb.Top + bbb.Height - HalfThumbWidth,
-                ThumbWidth, ThumbWidth));
+                ThumbWidth.Value, ThumbWidth.Value));
             _bottomRight.Arrange(new Rect(bbb.Left + bbb.Width - HalfThumbWidth,
-                bbb.Height + bbb.Top - HalfThumbWidth, ThumbWidth, ThumbWidth));
+                bbb.Height + bbb.Top - HalfThumbWidth, ThumbWidth.Value, ThumbWidth.Value));
             //put a box right around the entire shebang
 
             _bigThumb.Arrange(bbb);
