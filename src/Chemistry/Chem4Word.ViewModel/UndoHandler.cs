@@ -159,6 +159,7 @@ namespace Chem4Word.ViewModel
                 br.Undo();
                 br = _undoStack.Pop();
             }
+            _transactionLevel = 0;
         }
 
         public void Undo()
