@@ -496,9 +496,11 @@
                     </Viewbox>
                 </Button>
             </ToolBar>
-            <ToolBar x:Name="BondLength"
+            <ToolBar x:Name="BondLengthToolbar"
                 BandIndex="4">
                 <ComboBox x:Name="BondLengthSelector"
+                    Width="50"
+                    FontSize="18"
                     SelectedIndex="3"
                     ToolTip="Change Bond Length">
                     <ComboBoxItem>5</ComboBoxItem>
