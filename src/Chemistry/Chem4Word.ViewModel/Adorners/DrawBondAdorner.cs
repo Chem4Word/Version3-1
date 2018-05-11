@@ -57,12 +57,14 @@ namespace Chem4Word.ViewModel.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            var outline = GetBondGeometry(StartPoint, EndPoint, Stereo, BondOrder);
+            // ToDo: This may not be accurate
+            var length = (StartPoint - EndPoint).Length;
+            var outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder);
 
             drawingContext.DrawGeometry(_solidColorBrush, _dashPen, outline);
         }
 
-        public Geometry GetBondGeometry(Point startPoint, Point endPoint, BondStereo stereo, string order)
+        public Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, BondStereo stereo, string order)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
@@ -70,12 +72,12 @@ namespace Chem4Word.ViewModel.Adorners
             //check to see if it's a wedge or a hatch yet
             if (stereo == BondStereo.Wedge | stereo == BondStereo.Hatch)
             {
-                return BondGeometry.WedgeBondGeometry(startPoint, endPoint);
+                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, bondLength);
             }
 
             if (stereo == BondStereo.Indeterminate && (order == Bond.OrderSingle))
             {
-                return BondGeometry.WavyBondGeometry(startPoint, endPoint);
+                return BondGeometry.WavyBondGeometry(startPoint, endPoint, bondLength);
             }
 
             var ordervalue = Bond.OrderToOrderValue(order);
@@ -96,17 +98,17 @@ namespace Chem4Word.ViewModel.Adorners
             {
                 if (stereo == BondStereo.Indeterminate)
                 {
-                    return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, ref dummy);
+                    return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, bondLength, ref dummy);
                 }
                 Point? centroid = null;
 
-                return BondGeometry.DoubleBondGeometry(startPoint, endPoint, BondDirection.None,
+                return BondGeometry.DoubleBondGeometry(startPoint, endPoint, bondLength, BondDirection.None,
                     ref dummy, centroid);
             }
             //tripe bond
             if (ordervalue == 3)
             {
-                return BondGeometry.TripleBondGeometry(startPoint, endPoint, ref dummy);
+                return BondGeometry.TripleBondGeometry(startPoint, endPoint, bondLength, ref dummy);
             }
 
             return null;

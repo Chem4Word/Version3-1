@@ -184,17 +184,19 @@ namespace Chem4Word.View
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
+            var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
+
             if (startPoint != null & endPoint != null)
             {
                 //check to see if it's a wedge or a hatch yet
                 if (ParentBond.Stereo == BondStereo.Wedge | ParentBond.Stereo == BondStereo.Hatch)
                 {
-                    return BondGeometry.WedgeBondGeometry(startPoint.Value, endPoint.Value);
+                    return BondGeometry.WedgeBondGeometry(startPoint.Value, endPoint.Value, modelXamlBondLength);
                 }
 
                 if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
                 {
-                    return BondGeometry.WavyBondGeometry(startPoint.Value, endPoint.Value);
+                    return BondGeometry.WavyBondGeometry(startPoint.Value, endPoint.Value, modelXamlBondLength);
                 }
 
                 //single or dotted bond
@@ -214,20 +216,20 @@ namespace Chem4Word.View
                 {
                     if (ParentBond.Stereo == BondStereo.Indeterminate)
                     {
-                        return BondGeometry.CrossedDoubleGeometry(startPoint.Value, endPoint.Value, ref _enclosingPoly);
+                        return BondGeometry.CrossedDoubleGeometry(startPoint.Value, endPoint.Value, modelXamlBondLength, ref _enclosingPoly);
                     }
                     Point? centroid = null;
                     if (ParentBond.IsCyclic())
                     {
                         centroid = ParentBond.PrimaryRing?.Centroid;
                     }
-                    return BondGeometry.DoubleBondGeometry(startPoint.Value, endPoint.Value, Placement,
+                    return BondGeometry.DoubleBondGeometry(startPoint.Value, endPoint.Value, modelXamlBondLength, Placement,
                         ref _enclosingPoly, centroid);
                 }
                 //tripe bond
                 if (ParentBond.OrderValue == 3)
                 {
-                    return BondGeometry.TripleBondGeometry(startPoint.Value, endPoint.Value, ref _enclosingPoly);
+                    return BondGeometry.TripleBondGeometry(startPoint.Value, endPoint.Value, modelXamlBondLength, ref _enclosingPoly);
                 }
 
                 return null;
@@ -268,7 +270,9 @@ namespace Chem4Word.View
                 {
                     centroid = ParentBond.PrimaryRing?.Centroid;
                 }
-                _enclosingPoly = BondGeometry.GetDoubleBondPoints(StartPoint.Value, EndPoint.Value,
+
+                var bondLength = ParentBond.Model.XamlBondLength;
+                _enclosingPoly = BondGeometry.GetDoubleBondPoints(StartPoint.Value, EndPoint.Value, bondLength,
                     Placement, centroid, out point1,
                     out point2, out point3, out point4);
                 Pen solidPen = new Pen(Fill, StrokeThickness);

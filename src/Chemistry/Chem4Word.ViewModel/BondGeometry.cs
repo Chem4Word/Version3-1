@@ -23,12 +23,12 @@ namespace Chem4Word.ViewModel
     /// </summary>
     public static class BondGeometry
     {
-        public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, Point endPoint)
+        public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, Point endPoint, double bondLength)
         {
             Vector bondVector = endPoint - startPoint;
             Vector perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
-            perpVector *= bondVector.Length * Globals.BondOffsetPecentage;
+            perpVector *= bondLength * Globals.BondOffsetPecentage;
             Point point2 = endPoint + perpVector;
             Point point3 = endPoint - perpVector;
 
@@ -96,15 +96,16 @@ namespace Chem4Word.ViewModel
         /// </summary>
         /// <param name="startPoint">Where the bond starts</param>
         /// <param name="endPoint">Where it ends</param>
+        /// <param name="bondLength"></param>
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static System.Windows.Media.Geometry TripleBondGeometry(Point startPoint, Point endPoint, ref List<Point> enclosingPoly)
+        public static System.Windows.Media.Geometry TripleBondGeometry(Point startPoint, Point endPoint, double bondLength, ref List<Point> enclosingPoly)
         {
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
             normal.Normalize();
 
-            double distance = v.Length * Globals.BondOffsetPecentage;
+            double distance = bondLength * Globals.BondOffsetPecentage;
             Point point1 = startPoint + normal * distance;
             Point point2 = point1 + v;
 
@@ -135,11 +136,12 @@ namespace Chem4Word.ViewModel
         /// </summary>
         /// <param name="startPoint"></param>
         /// <param name="endPoint"></param>
+        /// <param name="bondLength"></param>
         /// <param name="doubleBondPlacement"></param>
         /// <param name="ringCentroid"></param>
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static System.Windows.Media.Geometry DoubleBondGeometry(Point startPoint, Point endPoint,
+        public static System.Windows.Media.Geometry DoubleBondGeometry(Point startPoint, Point endPoint, double bondLength,
             BondDirection doubleBondPlacement, ref List<Point> enclosingPoly, Point? ringCentroid = null)
 
         {
@@ -147,9 +149,7 @@ namespace Chem4Word.ViewModel
             Point point2;
             Point point3;
             Point point4;
-            enclosingPoly = GetDoubleBondPoints(startPoint, endPoint, doubleBondPlacement, ringCentroid, out point1, out point2, out point3, out point4);
-
-            ;
+            enclosingPoly = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid, out point1, out point2, out point3, out point4);
 
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
@@ -169,6 +169,7 @@ namespace Chem4Word.ViewModel
         /// </summary>
         /// <param name="startPoint"></param>
         /// <param name="endPoint"></param>
+        /// <param name="bondLength"></param>
         /// <param name="doubleBondPlacement"></param>
         /// <param name="ringCentroid"></param>
         /// <param name="point1"></param>
@@ -176,7 +177,7 @@ namespace Chem4Word.ViewModel
         /// <param name="point3"></param>
         /// <param name="point4"></param>
         /// <returns></returns>
-        public static List<Point> GetDoubleBondPoints(Point startPoint, Point endPoint, BondDirection doubleBondPlacement,
+        public static List<Point> GetDoubleBondPoints(Point startPoint, Point endPoint, double bondLength, BondDirection doubleBondPlacement,
             Point? ringCentroid, out Point point1, out Point point2, out Point point3, out Point point4)
         {
             List<Point> enclosingPoly;
@@ -186,7 +187,7 @@ namespace Chem4Word.ViewModel
 
             Point? point3a, point4a;
 
-            double distance = v.Length * Globals.BondOffsetPecentage;
+            double distance = bondLength * Globals.BondOffsetPecentage;
 
             if (ringCentroid == null)
             {
@@ -278,7 +279,7 @@ namespace Chem4Word.ViewModel
         /// <param name="endPoint"></param>
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, ref List<Point> enclosingPoly)
+        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, double bondLength, ref List<Point> enclosingPoly)
         {
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
@@ -286,7 +287,7 @@ namespace Chem4Word.ViewModel
 
             Point point1, point2, point3, point4;
 
-            double distance = v.Length * Globals.BondOffsetPecentage;
+            double distance = bondLength * Globals.BondOffsetPecentage;
 
             point1 = startPoint + normal * distance;
             point2 = point1 + v;
@@ -332,20 +333,20 @@ namespace Chem4Word.ViewModel
             return figures;
         }
 
-        public static Geometry WavyBondGeometry(Point startPoint, Point endPoint)
+        public static Geometry WavyBondGeometry(Point startPoint, Point endPoint, double bondLength)
         {
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
                 Vector bondVector = endPoint - startPoint;
-                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / bondVector.Length * Globals.BondOffsetPecentage);
+                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / bondLength * Globals.BondOffsetPecentage);
                 if (noOfWiggles < 1)
                 {
                     noOfWiggles = 1;
                 }
 
-                double wiggleLength = bondVector.Length / noOfWiggles;
-                Debug.WriteLine($"v.Length: {bondVector.Length} noOfWiggles: {noOfWiggles}");
+                double wiggleLength = bondLength / noOfWiggles;
+                Debug.WriteLine($"bondLength: {bondLength} noOfWiggles: {noOfWiggles}");
 
                 Vector originalWigglePortion = bondVector;
                 originalWigglePortion.Normalize();

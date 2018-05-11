@@ -627,9 +627,6 @@ namespace Chem4Word.ViewModel
                 };
                 Action redo = () =>
                 {
-                    Model.ScaledForXaml = true;
-                    Model.XamlBondLength = Globals.SingleAtomPseudoBondLength;
-
                     Model.Molecules.Add(_currentMol);
                 };
                 redo.Invoke();
