@@ -40,11 +40,24 @@ namespace Chem4Word.ViewModel
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
+        private List<BondLengthOption> _bondLengthOptions = new List<BondLengthOption>();
+        private BondLengthOption _selectedBondLengthOption;
         private int? _selectedBondOptionId;
 
         #endregion Fields
 
         #region Properties
+
+        public List<BondLengthOption> BondLengthOptions
+        {
+            get { return _bondLengthOptions; }
+        }
+
+        public BondLengthOption SelectedBondLengthOption
+        {
+            get { return _selectedBondLengthOption; }
+            set { _selectedBondLengthOption = value; }
+        }
 
         public double EditBondThickness
         {
@@ -122,7 +135,7 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        private  void SetElement(ElementBase value, List<Atom> selAtoms)
+        private void SetElement(ElementBase value, List<Atom> selAtoms)
         {
             UndoManager.BeginUndoBlock();
 
@@ -289,6 +302,24 @@ namespace Chem4Word.ViewModel
             _selectedBondOptionId = 1;
 
             LoadBondOptions();
+            LoadBondLengthOptions();
+        }
+
+        private void LoadBondLengthOptions()
+        {
+            for (int i = 5; i <= 95; i += 5)
+            {
+                var option = new BondLengthOption
+                {
+                    ChosenValue = (int)(i * Globals.ScaleFactorForXaml),
+                    DisplayAs = i.ToString("0")
+                };
+                _bondLengthOptions.Add(option);
+                if (Math.Abs(i * Globals.ScaleFactorForXaml - Model.XamlBondLength) < 2.5 * Globals.ScaleFactorForXaml)
+                {
+                    _selectedBondLengthOption = option;
+                }
+            }
         }
 
         /// <summary>
@@ -368,7 +399,7 @@ namespace Chem4Word.ViewModel
             {
                 if (newObject is Atom)
                 {
-                    var atom = (Atom) newObject;
+                    var atom = (Atom)newObject;
 
                     AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
                     SelectionAdorners[newObject] = atomAdorner;
@@ -394,17 +425,16 @@ namespace Chem4Word.ViewModel
                 {
                     MoleculeSelectionAdorner molAdorner =
                         new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
-                       SelectionAdorners[newObject] = molAdorner;
+                    SelectionAdorners[newObject] = molAdorner;
                     molAdorner.DragResizeCompleted += MolAdorner_DragResizeCompleted;
                     molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
-
                 }
             }
         }
 
         private void MolAdorner_DragResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-           //we've completed the drag operation
+            //we've completed the drag operation
             //remove the existing molecule adorner
             var movedMolecule = (sender as MoleculeSelectionAdorner).AdornedMolecule;
             SelectedItems.Remove(movedMolecule);
@@ -419,11 +449,9 @@ namespace Chem4Word.ViewModel
             {
                 if (sender is AtomSelectionAdorner)
                 {
-
                     Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent as Molecule;
                     RemoveAdorners(mol);
                     SelectedItems.Add(mol);
-
                 }
                 else if (sender is BondSelectionAdorner)
                 {
@@ -435,7 +463,6 @@ namespace Chem4Word.ViewModel
                 {
                     Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule.Parent as Molecule;
                 }
-                
             }
         }
 
@@ -476,7 +503,7 @@ namespace Chem4Word.ViewModel
             return SelectionAdorners.Values.OfType<AtomSelectionAdorner>()
                 .Where(asl => asl.AdornedAtom.Parent == atomParent);
         }
-       
+
         public void CutSelection()
         {
             MessageBox.Show("Cut code goes here");
@@ -489,7 +516,6 @@ namespace Chem4Word.ViewModel
 
         public void DeleteAtom(Atom atom)
         {
-
             UndoManager.BeginUndoBlock();
             var bondlist = atom.Bonds.ToList();
             foreach (Bond bond in bondlist)
@@ -509,11 +535,10 @@ namespace Chem4Word.ViewModel
             {
                 parent.Atoms.Remove(atom);
             };
-            
+
             UndoManager.RecordAction(undoAction, redoAction);
             atom.Parent.Atoms.Remove(atom);
 
-            
             UndoManager.EndUndoBlock();
         }
 
@@ -524,7 +549,7 @@ namespace Chem4Word.ViewModel
             var a2 = bond.EndAtom;
 
             Action redoAction = () =>
-            {   
+            {
                 bond.StartAtom = null;
                 bond.EndAtom = null;
                 bond.Parent.RebuildRings();
@@ -532,7 +557,6 @@ namespace Chem4Word.ViewModel
 
             Action undoAction = () =>
             {
-                
                 bond.StartAtom = a1;
                 bond.EndAtom = a2;
                 bond.Parent.RebuildRings();
@@ -568,7 +592,7 @@ namespace Chem4Word.ViewModel
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
             newAtom.Position = newAtomPos;
-            
+
             if (lastAtom != null)
             {
                 UndoManager.BeginUndoBlock();
@@ -583,23 +607,19 @@ namespace Chem4Word.ViewModel
                 {
                     currentMol.Atoms.Add(newAtom);
                 };
-                UndoManager.RecordAction(undo,redo);
+                UndoManager.RecordAction(undo, redo);
 
                 redo();
 
                 AddNewBond(lastAtom, newAtom, currentMol);
 
-
                 UndoManager.EndUndoBlock();
             }
-
             else
             {
                 UndoManager.BeginUndoBlock();
 
                 var _currentMol = new Molecule();
- 
-                
 
                 Action undo = () =>
                 {
@@ -607,13 +627,10 @@ namespace Chem4Word.ViewModel
                 };
                 Action redo = () =>
                 {
-            
                     Model.ScaledForXaml = true;
                     Model.XamlBondLength = Globals.SingleAtomPseudoBondLength;
 
                     Model.Molecules.Add(_currentMol);
-
-
                 };
                 redo.Invoke();
 
@@ -630,7 +647,6 @@ namespace Chem4Word.ViewModel
                 UndoManager.RecordAction(undo, redo);
 
                 redo2.Invoke();
-
 
                 UndoManager.EndUndoBlock();
             }
@@ -669,13 +685,8 @@ namespace Chem4Word.ViewModel
                 mol.Bonds.Add(newbond);
                 mol.RebuildRings();
             };
-            
-
-       
 
             UndoManager.RecordAction(undo, redo);
-
-           
 
             UndoManager.EndUndoBlock();
 
@@ -698,7 +709,6 @@ namespace Chem4Word.ViewModel
 
             var stereo = existingBond.Stereo;
             var order = existingBond.Order;
-
 
             Action redo = () =>
             {
@@ -733,14 +743,12 @@ namespace Chem4Word.ViewModel
                 existingBond.NotifyPlacementChanged();
                 existingBond.StartAtom.NotifyBondingChanged();
                 existingBond.EndAtom.NotifyBondingChanged();
-
             };
 
             UndoManager.RecordAction(undo, redo);
             redo();
 
             UndoManager.EndUndoBlock();
-
         }
 
         public void DoOperation(Transform lastOperation, List<Atom> toList)
@@ -753,15 +761,15 @@ namespace Chem4Word.ViewModel
                 Action undo = () =>
                 {
                     SelectedItems.Clear();
-                    (atom as Atom).Position = (Point)lastPosition ;
+                    (atom as Atom).Position = (Point)lastPosition;
                 };
 
                 Action redo = () =>
                 {
                     SelectedItems.Clear();
-                    (atom as Atom).Position = (Point)newPosition ;
+                    (atom as Atom).Position = (Point)newPosition;
                 };
-                UndoManager.RecordAction( undo, redo);
+                UndoManager.RecordAction(undo, redo);
                 atom.Position = newPosition;
             }
 

@@ -10,7 +10,6 @@ using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -31,7 +30,9 @@ namespace Chem4Word.ViewModel
         public Model.Model Model { get; set; }
 
         private double? _bondThickness;
-        public double BondThickness {
+
+        public double BondThickness
+        {
             get
             {
                 if (_bondThickness == null)
@@ -48,7 +49,7 @@ namespace Chem4Word.ViewModel
                     //Debug.WriteLine($"BondThickness; BoundingBox.Area: {area}");
                     //Debug.WriteLine($"BondThickness; BoundingBox.Sqrt: {sqrt}");
 
-                    _bondThickness = ((Model.MeanBondLength / sqrt) * (Globals.ScaleFactorForXaml * 3)) + 1.0d;
+                    _bondThickness = ((Model.XamlBondLength / sqrt) * (Globals.ScaleFactorForXaml * 3)) + 1.0d;
                     //Debug.WriteLine($"BondThickness; BondThickness --> {_bondThickness}");
                 }
                 return _bondThickness.Value;
@@ -115,7 +116,7 @@ namespace Chem4Word.ViewModel
             FontSize = Globals.DefaultFontSize;
             if (model.AllBonds.Any())
             {
-                FontSize = model.MeanBondLength * Globals.FontSizePercentageBond;
+                FontSize = model.XamlBondLength * Globals.FontSizePercentageBond;
             }
             AllObjects = model.AllObjects;
 

@@ -15,6 +15,7 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.Model;
 
 namespace Chem4Word.ACME
 {
@@ -219,6 +220,19 @@ namespace Chem4Word.ACME
 
         private void DrawingArea_Loaded(object sender, RoutedEventArgs e)
         {
+        }
+
+        private void BondLengthCombo_OnChange(object sender, RoutedEventArgs e)
+        {
+            BondLengthOption blo = BondLengthSelector.SelectedItem as BondLengthOption;
+            if (blo != null)
+            {
+                if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
+                {
+                    _activeViewModel.Model.ScaleToAverageBondLength(blo.ChosenValue);
+                    ScrollIntoView();
+                }
+            }
         }
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)

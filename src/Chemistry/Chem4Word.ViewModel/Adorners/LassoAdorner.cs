@@ -23,7 +23,6 @@ namespace Chem4Word.ViewModel.Adorners
             _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
             _solidColorBrush.Opacity = 0.25;
 
-
             _dashPen = new Pen(SystemColors.HighlightBrush, 1);
             _dashPen.DashStyle = DashStyles.Dash;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
@@ -40,17 +39,13 @@ namespace Chem4Word.ViewModel.Adorners
             get { return _outline; }
             set
             {
-                _outline = value; 
+                _outline = value;
                 InvalidateVisual();
             }
-
         }
-
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-         
-
             drawingContext.DrawGeometry(_solidColorBrush, _dashPen, _outline);
         }
     }
