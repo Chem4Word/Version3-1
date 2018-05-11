@@ -500,7 +500,8 @@
                 BandIndex="4">
                 <ComboBox x:Name="BondLengthSelector"
                     Width="50"
-                    FontSize="18"
+                    FontFamily="Arial"
+                    FontSize="16"
                     SelectedIndex="3"
                     ToolTip="Change Bond Length">
                     <ComboBoxItem>5</ComboBoxItem>
