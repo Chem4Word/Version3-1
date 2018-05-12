@@ -5,16 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model;
 using Chem4Word.View;
 using Chem4Word.ViewModel.Adorners;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -27,9 +25,9 @@ namespace Chem4Word.ACME.Behaviors
         private Window _parent;
 
         private DrawBondAdorner _dba;
+
         public DrawBehavior()
         {
-            
         }
 
         protected override void OnAttached()
@@ -85,7 +83,6 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
         }
-        
 
         private AtomShape GetAtomUnderCursor(MouseEventArgs e)
         {
@@ -96,8 +93,6 @@ namespace Chem4Word.ACME.Behaviors
         private void AssociatedObject_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             AssociatedObject.ReleaseMouseCapture();
-
-           
 
             var landedAtomShape = GetAtomUnderCursor(e);
 
@@ -116,7 +111,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 //already has a bond to the target atom
                 var existingBond = _currentAtomShape.ParentAtom.BondBetween(landedAtomShape.ParentAtom);
-                if (existingBond!=null)
+                if (existingBond != null)
                 {
                     ViewModel.IncreaseBondOrder(existingBond);
                 }
@@ -125,7 +120,6 @@ namespace Chem4Word.ACME.Behaviors
                     ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
                     _currentAtomShape.ParentAtom.Parent);
                 }
-                
             }
 
             if (_dba != null)
@@ -133,9 +127,9 @@ namespace Chem4Word.ACME.Behaviors
                 RemoveAdorner(ref _dba);
             }
 
-
             _flag = false;
         }
+
         private void RemoveAdorner(ref DrawBondAdorner adorner)
         {
             var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
@@ -149,38 +143,36 @@ namespace Chem4Word.ACME.Behaviors
             Atom lastAtom = lastAtomShape.ParentAtom;
             Vector newDirection = lastAtom.BalancingVector * ViewModel.Model.XamlBondLength;
             return lastAtom.Position + newDirection;
-
         }
 
-        private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _currentAtomShape = GetAtomUnderCursor(e);
-            if(_currentAtomShape!=null)
-             
-            Mouse.Capture(AssociatedObject);
+            if (_currentAtomShape != null)
+            {
+                Mouse.Capture(AssociatedObject);
+            }
+
             _flag = true;
 
-            _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo:AssociatedObject));
-
+            _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo: AssociatedObject));
         }
+
         private bool Dragging(MouseEventArgs e)
         {
             return e.LeftButton == MouseButtonState.Pressed & _flag;
         }
+
         private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-            return  (result?.VisualHit as AtomShape);
-
-
+            return (result?.VisualHit as AtomShape);
         }
 
         private HitTestResult GetTarget(Point p)
         {
-            return VisualTreeHelper.HitTest(AssociatedObject,p);
+            return VisualTreeHelper.HitTest(AssociatedObject, p);
         }
-
-       
 
         protected override void OnDetaching()
         {
