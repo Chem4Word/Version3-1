@@ -416,6 +416,7 @@ namespace Chem4Word.Model
                 }
             }
 
+            OnPropertyChanged(nameof(BoundingBox));
             XamlBondLength = newLength;
         }
 

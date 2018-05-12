@@ -481,7 +481,7 @@
         <ScrollViewer Name="DrawingArea"
             Width="Auto"
             Height="Auto"
-            Background="White"
+            Background="AliceBlue"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto">
 

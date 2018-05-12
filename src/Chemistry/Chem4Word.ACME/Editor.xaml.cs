@@ -5,7 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.Helpers;
+using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using Chem4Word.ViewModel;
 using System;
@@ -15,7 +15,6 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model;
 
 namespace Chem4Word.ACME
 {
@@ -182,7 +181,6 @@ namespace Chem4Word.ACME
 
             var boundingBox = _activeViewModel.BoundingBox;
             double hOffset = (boundingBox.Right - boundingBox.Left) / 2;
-
             double vOffset = (boundingBox.Bottom - boundingBox.Top) / 2;
 
             DrawingArea.ScrollToHorizontalOffset(hOffset);
@@ -258,7 +256,7 @@ namespace Chem4Word.ACME
                     _activeViewModel.ActiveMode = null;
                 }
 
-                var behavior = (Behavior) ((sender as RadioButton).Tag);
+                var behavior = (Behavior)((sender as RadioButton).Tag);
                 if (behavior != null)
                 {
                     _activeViewModel.ActiveMode = behavior;
