@@ -3,17 +3,12 @@
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
-// 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Chem4Word.Model;
+//
 using Chem4Word.Model.Geometry;
 using Chem4Word.ViewModel;
+using System;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Chem4Word.ACME.Utils
 {
@@ -27,6 +22,7 @@ namespace Chem4Word.ACME.Utils
         private readonly int _lockAngle;
 
         public EditViewModel ViewModel { get; set; }
+
         /// <summary>
         ///     Creates a new SnapGeometry
         /// </summary>
@@ -56,7 +52,7 @@ namespace Chem4Word.ACME.Utils
             double angleInRads = 0.0;
 
             //snap the length if desired
-            double bondLength = SnapLength(originalDisplacement, ViewModel.Model.MeanBondLength,   KeyboardUtils.HoldingDownShift());
+            double bondLength = SnapLength(originalDisplacement, ViewModel.Model.XamlBondLength, KeyboardUtils.HoldingDownShift());
 
             //and then snap the angle
             angleInRads = SnapAngle(startAngle, originalDisplacement, KeyboardUtils.HoldingDownControl());

@@ -347,7 +347,7 @@ namespace Chem4Word.Model
 
                 if (AllBonds.Any())
                 {
-                    fontSize = MeanBondLength * Globals.FontSizePercentageBond;
+                    fontSize = XamlBondLength * Globals.FontSizePercentageBond;
                 }
 
                 return fontSize;

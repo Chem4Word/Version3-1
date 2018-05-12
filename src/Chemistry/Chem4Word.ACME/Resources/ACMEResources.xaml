@@ -1,12 +1,12 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:conv="clr-namespace:Chem4Word.ACME.Converters"
-    xmlns:model ="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
-    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
     xmlns:acme="clr-namespace:Chem4Word.ACME"
-    xmlns:graphics ="clr-namespace:Chem4Word.ACME.Graphics">
-    <!-- Simple shapes for use in menus, buttons etc -->
+    xmlns:conv="clr-namespace:Chem4Word.ACME.Converters"
+    xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
+    xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
+    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel">
+    <!--  Simple shapes for use in menus, buttons etc  -->
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Brushes.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -47,33 +47,29 @@
         <Setter Property="Data" Value="M 0,7 L 25,10 l 0 -7 Z" />
     </Style>
 
-    <LinearGradientBrush x:Key="HatchBondBrush" EndPoint="50,5"
-                  MappingMode="Absolute"
-                  SpreadMethod="Repeat"
-                  StartPoint="50,0">
-        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Offset="0" />
-        <GradientStop Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" Offset="0.1" />
-        <GradientStop Color="Transparent" Offset="0.1" />
-        <GradientStop Color="Transparent" Offset="0.2" />
+    <LinearGradientBrush x:Key="HatchBondBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+        <GradientStop Offset="0" Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <GradientStop Offset="0.1" Color="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
+        <GradientStop Offset="0.1" Color="Transparent" />
+        <GradientStop Offset="0.2" Color="Transparent" />
     </LinearGradientBrush>
-    <Style x:Key="HatchBondStyle" TargetType="Path" BasedOn="{StaticResource WedgeBondStyle}">
+    <Style x:Key="HatchBondStyle"
+        BasedOn="{StaticResource WedgeBondStyle}"
+        TargetType="Path">
         <Setter Property="Fill">
             <Setter.Value>
-                <LinearGradientBrush EndPoint="50,5"
-            MappingMode="Absolute"
-            SpreadMethod="Repeat"
-            StartPoint="50,0">
-                    <GradientStop Color="{x:Static SystemColors.WindowTextColor}" Offset="0" />
-                    <GradientStop Color="{x:Static SystemColors.WindowTextColor}" Offset="0.2" />
-                    <GradientStop Color="Transparent" Offset="0.2" />
-                    <GradientStop Color="Transparent" Offset="0.4" />
+                <LinearGradientBrush MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+                    <GradientStop Offset="0" Color="{x:Static SystemColors.WindowTextColor}" />
+                    <GradientStop Offset="0.2" Color="{x:Static SystemColors.WindowTextColor}" />
+                    <GradientStop Offset="0.2" Color="Transparent" />
+                    <GradientStop Offset="0.4" Color="Transparent" />
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="90" />
                     </LinearGradientBrush.Transform>
                 </LinearGradientBrush>
             </Setter.Value>
         </Setter>
-        <Setter Property="Stroke" Value="{x:Null}"></Setter>
+        <Setter Property="Stroke" Value="{x:Null}" />
     </Style>
 
     <Style x:Key="BenzeneStyle" TargetType="Path">
@@ -115,33 +111,73 @@
         <Setter Property="Data" Value="M 0, 12 L 8.66025403784439, 18 L 17.3205080756888, 12 L 25.9807621135332, 18" />
     </Style>
 
-    <!-- used to populate the bond dropdown combo -->
+    <!--  used to populate the bond dropdown combo  -->
     <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
-        <!-- modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs -->
-        <viewModel:BondOption Id="1" Order="S" Stereo="None" DisplayStyle="{StaticResource SingleBondStyle}" />
-        <viewModel:BondOption Id="2" Order="D" Stereo="None" DisplayStyle="{StaticResource DoubleBondStyle}" />
-        <viewModel:BondOption Id="3" Order="T" Stereo="None" DisplayStyle="{StaticResource TripleBondStyle}" />
-        <viewModel:BondOption Id="4" Order="S" Stereo="Wedge" DisplayStyle="{StaticResource WedgeBondStyle}" />
-        <viewModel:BondOption Id="5" Order="S" Stereo="Hatch" DisplayStyle="{StaticResource HatchBondStyle}" />
+        <!--  modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs  -->
+        <viewModel:BondOption
+            DisplayStyle="{StaticResource SingleBondStyle}"
+            Id="1"
+            Order="S"
+            Stereo="None" />
+        <viewModel:BondOption
+            DisplayStyle="{StaticResource DoubleBondStyle}"
+            Id="2"
+            Order="D"
+            Stereo="None" />
+        <viewModel:BondOption
+            DisplayStyle="{StaticResource TripleBondStyle}"
+            Id="3"
+            Order="T"
+            Stereo="None" />
+        <viewModel:BondOption
+            DisplayStyle="{StaticResource WedgeBondStyle}"
+            Id="4"
+            Order="S"
+            Stereo="Wedge" />
+        <viewModel:BondOption
+            DisplayStyle="{StaticResource HatchBondStyle}"
+            Id="5"
+            Order="S"
+            Stereo="Hatch" />
     </x:Array>
 
     <x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
-        <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">C</viewModel:AtomOption>
-        <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">H</viewModel:AtomOption>
-        <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">N</viewModel:AtomOption>
-        <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">O</viewModel:AtomOption>
-        <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">P</viewModel:AtomOption>
-        <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">S</viewModel:AtomOption>
-        <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">Cl</viewModel:AtomOption>
-        <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">Br</viewModel:AtomOption>
-        <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">I</viewModel:AtomOption>
-        <viewModel:AtomOption Element="R"  Foreground="Black">
+        <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">
+            C
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">
+            H
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">
+            N
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">
+            O
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">
+            P
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">
+            S
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">
+            Cl
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">
+            Br
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">
+            I
+        </viewModel:AtomOption>
+        <viewModel:AtomOption Element="R" Foreground="Black">
             <TextBlock>
-                R<Run FontSize="8" BaselineAlignment="Subscript">1</Run>
+                R<Run BaselineAlignment="Subscript" FontSize="8">
+                    1
+                </Run>
             </TextBlock>
         </viewModel:AtomOption>
     </x:Array>
-    <!-- button paths -->
+    <!--  button paths  -->
 
     <Geometry x:Key="SelectPath" xml:space="preserve">F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z </Geometry>
     <Geometry x:Key="DrawPath" xml:space="preserve">F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
@@ -208,13 +244,17 @@
                               M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999
                               5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z
     </Geometry>
-    <!-- thumb styles -->
+    <!--  thumb styles  -->
 
-    <SolidColorBrush x:Key="GrabHandleFillBrush" Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.75" />
+    <SolidColorBrush x:Key="GrabHandleFillBrush"
+        Opacity="0.75"
+        Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" />
 
-    <SolidColorBrush x:Key="GrabHandleBorderBrush"  Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" Opacity="0.8" />
+    <SolidColorBrush x:Key="GrabHandleBorderBrush"
+        Opacity="0.8"
+        Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" />
 
-    <Style x:Key ="GrabHandleStyle" TargetType="Thumb">
+    <Style x:Key="GrabHandleStyle" TargetType="Thumb">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
@@ -223,46 +263,55 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Rectangle
-                        Fill="{StaticResource GrabHandleFillBrush}"
-                        Stroke="{StaticResource GrabHandleBorderBrush}"
-                    ></Rectangle>
+                    <Rectangle Fill="{StaticResource GrabHandleFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="MolAdornerStyle" TargetType="Thumb" BasedOn="{StaticResource GrabHandleStyle}">
+    <Style x:Key="MolAdornerStyle"
+        BasedOn="{StaticResource GrabHandleStyle}"
+        TargetType="Thumb">
         <Setter Property="Opacity" Value="0.15" />
     </Style>
 
-    <Style
-        x:Key="RotateThumb"
-        TargetType="Thumb">
-        <Setter
-            Property="SnapsToDevicePixels"
-            Value="true" />
-        <Setter
-            Property="OverridesDefaultStyle"
-            Value="true" />
-        <Setter
-            Property="Background"
-            Value="{StaticResource GrabHandleFillBrush}" />
-        <Setter
-            Property="BorderBrush"
-            Value="{StaticResource GrabHandleBorderBrush}" />
+    <Style x:Key="RotateThumb" TargetType="Thumb">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}" />
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Viewbox Height="{TemplateBinding Height}" Width="{TemplateBinding Width}" Stretch="Uniform">
-                        <Canvas Height="200" Width="200" Margin="0">
-                            <graphics:ArcArrow StrokeStartLineCap="Round" 
-                                               Stroke="{StaticResource GrabHandleBorderBrush}" StrokeThickness="35" 
-                                               Fill="Transparent" ArrowHeadLength="50" HeadAngle="45" IsArrowClosed="True" Center="50,50" 
-                                               Radius="100" StartAngle="270" EndAngle="0" SmallAngle="False"/>
-                            <Ellipse Fill="{StaticResource GrabHandleFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" 
-                                     Height="50" Width="50" Canvas.Top="25" Canvas.Left="25" />
+                    <Viewbox
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Stretch="Uniform">
+                        <Canvas
+                            Width="200"
+                            Height="200"
+                            Margin="0">
+                            <graphics:ArcArrow
+                                ArrowHeadLength="50"
+                                Center="50,50"
+                                EndAngle="0"
+                                Fill="Transparent"
+                                HeadAngle="45"
+                                IsArrowClosed="True"
+                                Radius="100"
+                                SmallAngle="False"
+                                StartAngle="270"
+                                Stroke="{StaticResource GrabHandleBorderBrush}"
+                                StrokeStartLineCap="Round"
+                                StrokeThickness="35" />
+                            <Ellipse
+                                Canvas.Left="25"
+                                Canvas.Top="25"
+                                Width="50"
+                                Height="50"
+                                Fill="{StaticResource GrabHandleFillBrush}"
+                                Stroke="{StaticResource GrabHandleBorderBrush}" />
                         </Canvas>
                     </Viewbox>
                 </ControlTemplate>

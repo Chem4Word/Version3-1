@@ -21,10 +21,10 @@ namespace Chem4Word.ViewModel.Adorners
         {
             get { return _adornedBond; }
         }
+
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
             //this.MouseLeftButtonDown += BondSelectionAdorner_MouseLeftButtonDown;
-
         }
 
         private void BondSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -42,13 +42,12 @@ namespace Chem4Word.ViewModel.Adorners
             myAdornerLayer.Add(this);
         }
 
-        
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
 
             Model.Model model = _adornedBond.Model;
-            double renderRadius = (model.MeanBondLength * Globals.FontSizePercentageBond) / 4;
+            double renderRadius = (model.XamlBondLength * Globals.FontSizePercentageBond) / 4;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
             renderBrush.Opacity = 0.25;
