@@ -641,7 +641,7 @@ namespace Chem4Word.ViewModel
                 {
                     _currentMol.Atoms.Add(newAtom);
                 };
-                UndoManager.RecordAction(undo, redo);
+                UndoManager.RecordAction(undo2, redo2);
 
                 redo2.Invoke();
 
