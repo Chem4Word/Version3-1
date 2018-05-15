@@ -265,14 +265,23 @@ namespace Chem4Word.Model
 
                             if (Degree == 2)
                             {
-                                Point p1 = this.Bonds[0].OtherAtom(this).Position;
-                                Point p2 = this.Bonds[1].OtherAtom(this).Position;
+                                // This code is triggered when adding the first Atom to a bond
+                                //  at this point one of the atoms is undefined
+                                Atom a1 = Bonds[0].OtherAtom(this);
+                                Atom a2 = Bonds[1].OtherAtom(this);
 
-                                double angle1 = Vector.AngleBetween(-(this.Position - p1), this.Position - p2);
-
-                                if (Math.Abs(angle1) < 8)
+                                if (a1 != null && a2 != null)
                                 {
-                                    return "C";
+                                    double angle1 = Vector.AngleBetween(-(this.Position - a1.Position), this.Position - a2.Position);
+
+                                    if (Math.Abs(angle1) < 8)
+                                    {
+                                        return "C";
+                                    }
+                                }
+                                else
+                                {
+                                    //Debugger.Break();
                                 }
                             }
 
