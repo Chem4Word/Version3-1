@@ -61,6 +61,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         public readonly EditViewModel CurrentModel;
         private Brush _bigBrush;
+        private Point _startPos;
 
         public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
@@ -268,7 +269,9 @@ namespace Chem4Word.ViewModel.Adorners
             Canvas.SetTop(_bigThumb, Canvas.GetTop(_bigThumb) + _dragYTravel);
 
             _canvasPos = currentPos;
-            _lastOperation = new TranslateTransform(_canvasPos.X, _canvasPos.Y);
+
+            Vector displacement = _canvasPos - _startPos;
+            _lastOperation = new TranslateTransform(displacement.X, displacement.Y);
 
             InvalidateVisual();
         }
@@ -281,6 +284,7 @@ namespace Chem4Word.ViewModel.Adorners
         /// <param name="e"></param>
         private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
+
             if (_lastOperation != null)
             {
                 SetBoundingBox();
@@ -290,15 +294,18 @@ namespace Chem4Word.ViewModel.Adorners
                 //move the molecule
                 CurrentModel.DoOperation(_lastOperation, AdornedMolecule.Atoms.ToList());
                 DragResizeCompleted?.Invoke(this, e);
+
+                _dragging = false;
+                _resizing = false;
             }
-            _dragging = false;
-            _resizing = false;
         }
 
         private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
             InitializeDragging();
             _dragging = true;
+  
+            _startPos = new Point(Canvas.GetLeft(_bigThumb), Canvas.GetTop(_bigThumb));
         }
 
         private void MoleculeAdorner_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
