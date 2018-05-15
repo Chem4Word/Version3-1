@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -24,7 +25,9 @@ namespace Chem4Word.ACME.Behaviors
         private SnapGeometry _angleSnapper;
         private Window _parent;
 
-        private DrawBondAdorner _dba;
+        private DrawBondAdorner _adorner;
+        private Point _lastPos;
+        private AtomShape _lastAtomShape;
 
         public DrawBehavior()
         {
@@ -67,20 +70,27 @@ namespace Chem4Word.ACME.Behaviors
                     else
                     {
                         lastPos = e.GetPosition(AssociatedObject);
+
+                       var angleBetween = Vector.AngleBetween((_lastAtomShape?.ParentAtom?.BalancingVector)?? BasicGeometry.ScreenNorth, BasicGeometry.ScreenNorth);
+
+                       lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
+                       
+                        
                     }
 
-                    if (_dba == null)
+                    if (_adorner == null)
                     {
-                        _dba = new DrawBondAdorner(AssociatedObject)
+                        _adorner = new DrawBondAdorner(AssociatedObject, ViewModel.BondThickness)
                         {
                             Stereo = ViewModel.CurrentStereo,
                             BondOrder = ViewModel.CurrentBondOrder
                         };
                     }
-
-                    _dba.StartPoint = _currentAtomShape.Position;
-                    _dba.EndPoint = lastPos;
+                    _adorner.StartPoint = _currentAtomShape.Position;
+                    _adorner.EndPoint = lastPos;
+                    _lastPos = lastPos;
                 }
+               
             }
         }
 
@@ -99,7 +109,7 @@ namespace Chem4Word.ACME.Behaviors
             // ReSharper disable once PossibleUnintendedReferenceComparison
             if (landedAtomShape == null)  //no atom hit
             {
-                ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, e.GetPosition(AssociatedObject));
+                ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, _lastPos);
             }
             else if (landedAtomShape == _currentAtomShape) //both are the same atom
             {
@@ -122,9 +132,9 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
 
-            if (_dba != null)
+            if (_adorner != null)
             {
-                RemoveAdorner(ref _dba);
+                RemoveAdorner(ref _adorner);
             }
 
             _flag = false;
@@ -148,14 +158,19 @@ namespace Chem4Word.ACME.Behaviors
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             _currentAtomShape = GetAtomUnderCursor(e);
-            if (_currentAtomShape != null)
+            if (_currentAtomShape == null)
+            {
+                _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo: AssociatedObject), ViewModel);
+            }
+            else
             {
                 Mouse.Capture(AssociatedObject);
+                _angleSnapper = new SnapGeometry(_currentAtomShape.ParentAtom.Position, ViewModel);
+                _lastAtomShape = _currentAtomShape;
             }
-
             _flag = true;
 
-            _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo: AssociatedObject));
+            
         }
 
         private bool Dragging(MouseEventArgs e)

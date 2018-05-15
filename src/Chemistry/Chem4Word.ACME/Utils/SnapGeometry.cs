@@ -21,15 +21,16 @@ namespace Chem4Word.ACME.Utils
         private readonly Point _startPoint;
         private readonly int _lockAngle;
 
-        public EditViewModel ViewModel { get; set; }
+        public EditViewModel ViewModel { get; }
 
         /// <summary>
         ///     Creates a new SnapGeometry
         /// </summary>
         /// <param name="startPoint">location of the angle where the bond swings from.</param>
         /// <param name="angleIncrement">Angle in degrees - must be a factor of 360</param>
-        public SnapGeometry(Point startPoint, int angleIncrement = 30)
+        public SnapGeometry(Point startPoint, EditViewModel viewModel,  int angleIncrement = 15)
         {
+            ViewModel = viewModel;
             _startPoint = startPoint;
             if (360 % angleIncrement != 0)
             {
@@ -46,7 +47,7 @@ namespace Chem4Word.ACME.Utils
         /// <param name="currentCoords">Coordinates of the mouse pointer</param>
         /// <param name="startAngle">Optional angle to start the locking at</param>
         /// <returns></returns>
-        public Point SnapBond(Point currentCoords, MouseEventArgs e, int startAngle = 0)
+        public Point SnapBond(Point currentCoords, MouseEventArgs e, double startAngle = 0d)
         {
             Vector originalDisplacement = currentCoords - _startPoint;
             double angleInRads = 0.0;
@@ -63,18 +64,24 @@ namespace Chem4Word.ACME.Utils
             return Vector.Add(offset, _startPoint);
         }
 
-        public double SnapAngle(int startAngle, Vector originalDisplacement, bool holdingDownControl = false)
+        public double SnapAngle(double startAngle, Vector originalDisplacement, bool holdingDownControl = false)
         {
+
             int originalAngle =
                 (int)GetBondAngle(startAngle, originalDisplacement);
-            double newangle = NormalizeBondAngle(originalAngle, _lockAngle);
-            double angleInRads = 2 * Math.PI * newangle / 360;
+            double angleInRads = 0.0;
             // Debug.WriteLine(newangle);
             //actually locks the angle to a multiple of the _lockAngle with a leeway of _lockangle/2 either way
             if (holdingDownControl)
             {
                 //unlock the bond angle
-                angleInRads = 2 * Math.PI * originalAngle / 360;
+                angleInRads = 2 * Math.PI * (originalAngle + startAngle) / 360;
+            }
+
+            else
+            {
+                 double newangle = NormalizeBondAngle(originalAngle, _lockAngle) + startAngle;
+                 angleInRads = 2 * Math.PI * newangle / 360;
             }
             return angleInRads;
         }
@@ -103,9 +110,9 @@ namespace Chem4Word.ACME.Utils
             return Math.Floor((double)(originalAngle + lockAngle / 2) / lockAngle) * lockAngle;
         }
 
-        private static double GetBondAngle(int startAngle, Vector originalDisplacement)
+        private static double GetBondAngle(double startAngle, Vector originalDisplacement)
         {
-            return Math.Floor(Vector.AngleBetween(BasicGeometry.ScreenNorth, originalDisplacement) + startAngle);
+            return Math.Floor(Vector.AngleBetween(BasicGeometry.ScreenNorth, originalDisplacement) - startAngle);
         }
 
         private static double NormalizeBondLength(Vector originalDisplacement, double defaultLength)
