@@ -303,7 +303,7 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.MouseRightButtonDown -= AssociatedObjectOnMouseRightButtonDown;
             AssociatedObject.MouseRightButtonUp -= AssociatedObjectOnMouseRightButtonUp;
 
-            AssociatedObject.IsHitTestVisible = false;
+            //AssociatedObject.IsHitTestVisible = false;
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;

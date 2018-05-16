@@ -179,7 +179,7 @@
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
                                             <Setter.Value>
-                                                <SolidColorBrush Opacity="0.25" Color="{x:Static SystemColors.HighlightColor}"/>
+                                                <SolidColorBrush Opacity="0.5" Color="{x:Static SystemColors.HighlightColor}"/>
                                             </Setter.Value>
                                         </Setter>
                                         

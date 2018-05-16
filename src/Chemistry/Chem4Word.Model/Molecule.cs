@@ -318,6 +318,11 @@ namespace Chem4Word.Model
                 _count = value;
             }
         }
+        /// <summary>
+        /// Use the Tag during editing operations to store state
+        /// Not persisted to the model
+        /// </summary>
+        public object Tag { get; set; }
 
         #endregion Properties
 

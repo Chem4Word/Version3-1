@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model;
 using Chem4Word.View;
@@ -28,6 +29,7 @@ namespace Chem4Word.ACME.Behaviors
         private DrawBondAdorner _adorner;
         private Point _lastPos;
         private AtomShape _lastAtomShape;
+        private Atom _lastAtom;
 
         public DrawBehavior()
         {
@@ -109,13 +111,13 @@ namespace Chem4Word.ACME.Behaviors
             // ReSharper disable once PossibleUnintendedReferenceComparison
             if (landedAtomShape == null)  //no atom hit
             {
-                ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, _lastPos);
+                ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, _lastPos, ClockDirections.Two);
             }
             else if (landedAtomShape == _currentAtomShape) //both are the same atom
             {
-                Point newAtomPos = GetNewChainEndPos(landedAtomShape);
+                var newAtomPos = GetNewChainEndPos(landedAtomShape);
 
-                ViewModel.AddAtomChain(landedAtomShape.ParentAtom, newAtomPos);
+                ViewModel.AddAtomChain(landedAtomShape.ParentAtom, newAtomPos.NewPos, newAtomPos.sproutDir);
             }
             else //we must have hit a different atom altogether
             {
@@ -148,11 +150,79 @@ namespace Chem4Word.ACME.Behaviors
             adorner = null;
         }
 
-        private Point GetNewChainEndPos(AtomShape lastAtomShape)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lastAtomShape"></param>
+        /// <returns></returns>
+        private (Point NewPos, ClockDirections sproutDir) GetNewChainEndPos(AtomShape lastAtomShape)
         {
-            Atom lastAtom = lastAtomShape.ParentAtom;
-            Vector newDirection = lastAtom.BalancingVector * ViewModel.Model.XamlBondLength;
-            return lastAtom.Position + newDirection;
+            ClockDirections GetGeneralDir(Vector bondVector)
+            {
+                double bondAngle = Vector.AngleBetween(BasicGeometry.ScreenNorth, bondVector);
+
+                ClockDirections hour = (ClockDirections) BasicGeometry.SnapToClock(bondAngle);
+                return hour;
+            }
+
+            var lastAtom = lastAtomShape.ParentAtom;
+            Vector newDirection;
+
+            ClockDirections newTag;
+
+
+            if (lastAtom.Degree == 0) //isolated atom
+            {
+                newDirection = ClockDirections.Two.ToVector() * ViewModel.Model.XamlBondLength;
+                newTag = ClockDirections.Two;
+            }
+            else if (lastAtom.Degree == 1)
+            {
+                Vector bondVector = lastAtom.Position - lastAtom.Neighbours[0].Position;
+
+                var hour = GetGeneralDir(bondVector);
+
+
+                //Tag is used to store the direction the atom sprouted from its previous atom
+                if (hour == ClockDirections.Two)
+                {
+                   newTag= ClockDirections.Four;
+                }
+                else if (hour == ClockDirections.Four)
+                {
+                    newTag = ClockDirections.Two;
+                }
+                else if (hour == ClockDirections.Eight)
+                {
+                    newTag = ClockDirections.Ten;
+                }
+
+                else if (hour == ClockDirections.Ten)
+                {
+                    newTag = ClockDirections.Eight;
+                }
+                else if (hour == ClockDirections.Twelve )
+                {
+                    newTag = ClockDirections.Four;
+                }
+                else if (hour ==ClockDirections.Six)
+                {
+                    newTag = ClockDirections.Eight;
+                }
+                else
+                {
+                    newTag = ClockDirections.Two;
+                }
+
+                newDirection = newTag.ToVector() * ViewModel.Model.XamlBondLength;
+            }
+            else
+            {
+                newDirection = lastAtom.BalancingVector * ViewModel.Model.XamlBondLength;
+                newTag = GetGeneralDir(newDirection);
+
+            }
+            return (newDirection+lastAtom.Position, newTag);
         }
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -169,8 +239,6 @@ namespace Chem4Word.ACME.Behaviors
                 _lastAtomShape = _currentAtomShape;
             }
             _flag = true;
-
-            
         }
 
         private bool Dragging(MouseEventArgs e)
@@ -195,7 +263,7 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp -= AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.MouseMove -= AssociatedObject_MouseMove;
-            AssociatedObject.IsHitTestVisible = false;
+            //AssociatedObject.IsHitTestVisible = false;
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;

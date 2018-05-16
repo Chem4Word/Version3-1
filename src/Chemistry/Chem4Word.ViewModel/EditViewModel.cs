@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
 using System.Windows.Media;
+using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ViewModel
 {
@@ -587,24 +588,28 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void AddAtomChain(Atom lastAtom, Point newAtomPos)
+        public void AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir)
         {
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
             newAtom.Position = newAtomPos;
 
+            object oldDir = lastAtom?.Tag;
+
             if (lastAtom != null)
             {
                 UndoManager.BeginUndoBlock();
-
+               
                 Molecule currentMol = lastAtom.Parent;
 
                 Action undo = () =>
                 {
+                    lastAtom.Tag = oldDir;
                     currentMol.Atoms.Remove(newAtom);
                 };
                 Action redo = () =>
                 {
+                    lastAtom.Tag = dir;
                     currentMol.Atoms.Add(newAtom);
                 };
                 UndoManager.RecordAction(undo, redo);
@@ -635,11 +640,13 @@ namespace Chem4Word.ViewModel
 
                 Action undo2 = () =>
                 {
+                    newAtom.Tag = null;
                     _currentMol.Atoms.Remove(newAtom);
                 };
                 Action redo2 = () =>
                 {
                     _currentMol.Atoms.Add(newAtom);
+                    newAtom.Tag = dir;
                 };
                 UndoManager.RecordAction(undo2, redo2);
 
