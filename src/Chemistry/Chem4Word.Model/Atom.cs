@@ -693,5 +693,10 @@ namespace Chem4Word.Model
             clone.SetupCollections();
             return clone;
         }
+
+        public void ImplicitHChanged()
+        {
+            OnPropertyChanged(nameof(ImplicitHydrogenCount));
+        }
     }
 }

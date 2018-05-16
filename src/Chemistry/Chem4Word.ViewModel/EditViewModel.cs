@@ -206,28 +206,33 @@ namespace Chem4Word.ViewModel
 
         private void SetBondOption(int bondOptionId)
         {
-            UndoManager.BeginUndoBlock();
+           
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
-            foreach (Bond bond in SelectedItems.OfType<Bond>())
+            if (SelectedItems.OfType<Bond>().Any())
             {
-                Action redo = () =>
+                UndoManager.BeginUndoBlock();
+                foreach (Bond bond in SelectedItems.OfType<Bond>())
                 {
-                    bond.Stereo = bondOption.Stereo.Value;
-                    bond.Order = bondOption.Order;
-                };
+                    Action redo = () =>
+                    {
+                        bond.Stereo = bondOption.Stereo.Value;
+                        bond.Order = bondOption.Order;
+                    };
 
-                var bondStereo = bond.Stereo;
-                var bondOrder = bond.Order;
-                Action undo = () =>
-                {
-                    bond.Stereo = bondStereo;
-                    bond.Order = bondOrder;
-                };
-                UndoManager.RecordAction(undo, redo);
-                bond.Order = bondOption.Order;
-                bond.Stereo = bondOption.Stereo.Value;
+                    var bondStereo = bond.Stereo;
+                    var bondOrder = bond.Order;
+                    Action undo = () =>
+                    {
+                        bond.Stereo = bondStereo;
+                        bond.Order = bondOrder;
+                    };
+                    UndoManager.RecordAction(undo, redo);
+                    bond.Order = bondOption.Order;
+                    bond.Stereo = bondOption.Stereo.Value;
+                }
+
+                UndoManager.EndUndoBlock();
             }
-            UndoManager.EndUndoBlock();
         }
 
         public List<BondOption> SelectedBondOptions
@@ -779,5 +784,57 @@ namespace Chem4Word.ViewModel
 
             UndoManager.EndUndoBlock();
         }
+
+        public void SwapBondDirection(Bond parentBond)
+        {
+            UndoManager.BeginUndoBlock();
+
+            var startAtom = parentBond.StartAtom;
+            var endAtom = parentBond.EndAtom;
+
+            Action undo = () =>
+            {
+                parentBond.StartAtom = startAtom;
+                parentBond.EndAtom = endAtom;
+            };
+
+            Action redo = () =>
+            {
+                parentBond.StartAtom = endAtom;
+                parentBond.EndAtom = startAtom;
+            };
+            UndoManager.RecordAction(undo, redo);
+
+            redo();
+            UndoManager.EndUndoBlock();
+        }
+
+        public void SetBondAttributes(Bond parentBond)
+        {
+            UndoManager.BeginUndoBlock();
+
+            var order = parentBond.Order;
+            var stereo = parentBond.Stereo;
+
+            Action undo = () =>
+            {
+                parentBond.Order = order;
+                parentBond.Stereo = stereo;
+            };
+
+            Action redo = () =>
+            {
+                parentBond.Order = CurrentBondOrder;
+                parentBond.Stereo = CurrentStereo;
+            };
+            UndoManager.RecordAction(undo, redo);
+
+            redo();
+            UndoManager.EndUndoBlock();
+        }
+
+        public bool Dirty =>
+            UndoManager.CanUndo;
+        
     }
 }

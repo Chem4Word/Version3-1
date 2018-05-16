@@ -198,6 +198,9 @@ namespace Chem4Word.Model
 
                 _order = value;
                 OnPropertyChanged();
+
+                StartAtom?.ImplicitHChanged();
+                EndAtom?.ImplicitHChanged();
             }
         }
 
@@ -846,5 +849,6 @@ namespace Chem4Word.Model
                 return (currentParent as Model);
             }
         }
+
     }
 }

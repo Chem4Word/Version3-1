@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model.Enums;
 using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ACME.Behaviors
@@ -107,32 +108,49 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.ReleaseMouseCapture();
 
             var landedAtomShape = GetAtomUnderCursor(e);
+            var landedBondShape = GetBondUnderCursor(e);
 
-            // ReSharper disable once PossibleUnintendedReferenceComparison
-            if (landedAtomShape == null)  //no atom hit
+            if (landedBondShape != null)
             {
-                ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, _lastPos, ClockDirections.Two);
-            }
-            else if (landedAtomShape == _currentAtomShape) //both are the same atom
-            {
-                var newAtomPos = GetNewChainEndPos(landedAtomShape);
-
-                ViewModel.AddAtomChain(landedAtomShape.ParentAtom, newAtomPos.NewPos, newAtomPos.sproutDir);
-            }
-            else //we must have hit a different atom altogether
-            {
-                //already has a bond to the target atom
-                var existingBond = _currentAtomShape.ParentAtom.BondBetween(landedAtomShape.ParentAtom);
-                if (existingBond != null)
+                if (landedBondShape.Stereo == BondStereo.Hatch & ViewModel.CurrentStereo ==BondStereo.Hatch | 
+                    landedBondShape.Stereo == BondStereo.Wedge & ViewModel.CurrentStereo ==BondStereo.Wedge)
                 {
-                    ViewModel.IncreaseBondOrder(existingBond);
+                    ViewModel.SwapBondDirection(landedBondShape.ParentBond);
                 }
-                else //doesn't have a bond to the target atom
+                else
                 {
-                    ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
-                    _currentAtomShape.ParentAtom.Parent);
+                    ViewModel.SetBondAttributes(landedBondShape.ParentBond);
                 }
             }
+            else
+            {
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (landedAtomShape == null)  //no atom hit
+                {
+                    ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, _lastPos, ClockDirections.Two);
+                }
+                else if (landedAtomShape == _currentAtomShape) //both are the same atom
+                {
+                    var newAtomPos = GetNewChainEndPos(landedAtomShape);
+
+                    ViewModel.AddAtomChain(landedAtomShape.ParentAtom, newAtomPos.NewPos, newAtomPos.sproutDir);
+                }
+                else //we must have hit a different atom altogether
+                {
+                    //already has a bond to the target atom
+                    var existingBond = _currentAtomShape.ParentAtom.BondBetween(landedAtomShape.ParentAtom);
+                    if (existingBond != null)
+                    {
+                        ViewModel.IncreaseBondOrder(existingBond);
+                    }
+                    else //doesn't have a bond to the target atom
+                    {
+                        ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
+                            _currentAtomShape.ParentAtom.Parent);
+                    }
+                }
+            }
+           
 
             if (_adorner != null)
             {
@@ -251,6 +269,14 @@ namespace Chem4Word.ACME.Behaviors
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
             return (result?.VisualHit as AtomShape);
         }
+
+        private BondShape GetBondUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
+            return (result?.VisualHit as BondShape);
+        }
+
+
 
         private HitTestResult GetTarget(Point p)
         {

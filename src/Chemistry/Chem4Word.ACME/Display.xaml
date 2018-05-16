@@ -182,8 +182,6 @@
                                                 <SolidColorBrush Opacity="0.5" Color="{x:Static SystemColors.HighlightColor}"/>
                                             </Setter.Value>
                                         </Setter>
-                                        
-                                        
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
