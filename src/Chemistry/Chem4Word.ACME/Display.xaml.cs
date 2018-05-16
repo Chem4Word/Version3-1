@@ -138,9 +138,7 @@ namespace Chem4Word.ACME
             {
                 if (chemistryModel.AllAtoms.Count > 0)
                 {
-                    chemistryModel.RescaleForXaml();
-
-                    //Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
+                    chemistryModel.RescaleForXaml(true);
 
                     Placeholder.DataContext = new ViewModel.DisplayViewModel(chemistryModel);
                 }

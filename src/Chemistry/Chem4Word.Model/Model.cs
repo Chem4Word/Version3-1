@@ -441,7 +441,7 @@ namespace Chem4Word.Model
         /// <summary>
         /// Rescale to new preferred length, to be used in xaml code behind, not normal cs
         /// </summary>
-        public void RescaleForXaml()
+        public void RescaleForXaml(bool forDisplay)
         {
             if (!ScaledForXaml)
             {
@@ -454,9 +454,13 @@ namespace Chem4Word.Model
                     ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength);
                 }
                 ScaledForXaml = true;
+
+                if (forDisplay)
+                {
+                    RepositionAll(MinX, MinY);
+                }
+                OnPropertyChanged(nameof(BoundingBox));
             }
-            RepositionAll(MinX, MinY);
-            OnPropertyChanged("BoundingBox");
         }
 
         #endregion Layout
