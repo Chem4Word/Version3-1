@@ -235,11 +235,11 @@ namespace Chem4Word.ACME
             {
                 if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
-                    Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-                    Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
+                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
+                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
                     _activeViewModel.Model.ScaleToAverageBondLength(blo.ChosenValue);
-                    Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-                    Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
+                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
+                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
                     ScrollIntoView();
                 }
             }
