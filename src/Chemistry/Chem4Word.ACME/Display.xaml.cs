@@ -6,11 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core;
-using Chem4Word.Core.Helpers;
 using Chem4Word.Model.Converters;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

@@ -189,27 +189,8 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
-            // Original From Clyde
-            // -------------------
-            //var boundingBox = _activeViewModel.Model.BoundingBox;
-            //double hOffset = (boundingBox.Right - boundingBox.Left) / 2;
-            //double vOffset = (boundingBox.Bottom - boundingBox.Top) / 2;
-
-            // From Diagram Designer
-            // ---------------------
-            //double scale = 1;
-            //double halfViewportHeight = DrawingArea.ViewportHeight / 2;
-            //double halfViewportWidth = DrawingArea.ViewportWidth / 2;
-            //double newVerticalOffset = ((DrawingArea.VerticalOffset + halfViewportHeight) * scale - halfViewportHeight);
-            //double newHorizontalOffset = ((DrawingArea.HorizontalOffset + halfViewportWidth) * scale - halfViewportWidth);
-
-            //DrawingArea.ScrollToHorizontalOffset(newHorizontalOffset);
-            //DrawingArea.ScrollToVerticalOffset(newVerticalOffset);
-
-            Canvas canvas = LocateCanvas();
-            double newVerticalOffset = (canvas.ActualWidth - _activeViewModel.Model.BoundingBox.Width) / 2.0;
-            double newHorizontalOffset = (canvas.ActualHeight - _activeViewModel.Model.BoundingBox.Height) / 2.0;
-
+            double newVerticalOffset = _activeViewModel.Model.BoundingBox.Left;
+            double newHorizontalOffset = _activeViewModel.Model.BoundingBox.Top;
             DrawingArea.ScrollToHorizontalOffset(newVerticalOffset);
             DrawingArea.ScrollToVerticalOffset(newHorizontalOffset);
         }
