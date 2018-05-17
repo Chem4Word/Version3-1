@@ -211,6 +211,7 @@ namespace Chem4Word.ViewModel
                     break;
                 }
                 br.Redo();
+               
             } 
         }
     }
