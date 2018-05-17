@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -15,6 +14,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Adorners
 {
@@ -40,27 +40,28 @@ namespace Chem4Word.ViewModel.Adorners
 
         private Thumb _rotateThumb;  //Grab hold of this to rotate the molecule
         private readonly VisualCollection _visualChildren;
-        private System.Windows.Media.Geometry ghostImage = null;
+        private Geometry ghostImage;
         private Transform _lastOperation;
         private double _aspectRatio;
         private Rect _boundingBox;
 
-        private bool _dragging = false;
-        private bool _resizing = false;
-        private bool _rotating = false;
+        private bool _dragging;
+        private bool _resizing;
+        private bool _rotating;
 
-        private double _rotateAngle = 0.0;
+        private double _rotateAngle;
         private Point _centroid;
 
         //private SnapGeometry _rotateSnapper;
-        private Brush _renderBrush;
+        private readonly Brush _renderBrush;
 
-        private Pen _renderPen;
+        private readonly Pen _renderPen;
         private double _dragXTravel;
         private double _dragYTravel;
 
         public readonly EditViewModel CurrentModel;
         private Brush _bigBrush;
+        private Point _startPos;
 
         public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
@@ -116,8 +117,8 @@ namespace Chem4Word.ViewModel.Adorners
             _topLeft.DragCompleted += _bigThumb_DragCompleted;
             _bottomLeft.DragCompleted += _bigThumb_DragCompleted;
             //wire up the event handling
-            this.MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
-            this.KeyDown += MoleculeAdorner_KeyDown;
+            MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
+            KeyDown += MoleculeAdorner_KeyDown;
         }
 
         private void MoleculeSelectionAdorner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -128,7 +129,7 @@ namespace Chem4Word.ViewModel.Adorners
             }
         }
 
-        private void MoleculeAdorner_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void MoleculeAdorner_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.Delete))
             {
@@ -140,6 +141,7 @@ namespace Chem4Word.ViewModel.Adorners
                 if (IsWorking)
                 {
                     AbortDragging();
+                    
                 }
                 else
                 {
@@ -264,11 +266,12 @@ namespace Chem4Word.ViewModel.Adorners
 
             Point currentPos = new Point(_dragXTravel, _dragYTravel);
 
-            Canvas.SetLeft(_bigThumb, Canvas.GetLeft(_bigThumb) + _dragXTravel);
-            Canvas.SetTop(_bigThumb, Canvas.GetTop(_bigThumb) + _dragYTravel);
+            Canvas.SetLeft(_bigThumb,_startPos.X + _dragXTravel);
+            Canvas.SetTop(_bigThumb, _startPos.Y +  _dragYTravel);
 
             _canvasPos = currentPos;
-            _lastOperation = new TranslateTransform(_canvasPos.X, _canvasPos.Y);
+            Vector displacement = _canvasPos - _startPos;
+            _lastOperation = new TranslateTransform(displacement.X, displacement.Y);
 
             InvalidateVisual();
         }
@@ -281,6 +284,7 @@ namespace Chem4Word.ViewModel.Adorners
         /// <param name="e"></param>
         private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
+
             if (_lastOperation != null)
             {
                 SetBoundingBox();
@@ -290,18 +294,23 @@ namespace Chem4Word.ViewModel.Adorners
                 //move the molecule
                 CurrentModel.DoOperation(_lastOperation, AdornedMolecule.Atoms.ToList());
                 DragResizeCompleted?.Invoke(this, e);
+
+                _dragging = false;
+                _resizing = false;
             }
             _dragging = false;
-            _resizing = false;
         }
 
         private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
+            _dragging = true;
             InitializeDragging();
             _dragging = true;
+  
+            _startPos = new Point(Canvas.GetLeft(_bigThumb), Canvas.GetTop(_bigThumb));
         }
 
-        private void MoleculeAdorner_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void MoleculeAdorner_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
         }
 
@@ -318,12 +327,12 @@ namespace Chem4Word.ViewModel.Adorners
 
                 //take a snapshot of the molecule
 
-                ghostImage = _frag?.Ghost();
+                var fragImage = _frag.Ghost();
                 Debug.WriteLine(_lastOperation.ToString());
-                ghostImage.Transform = _lastOperation;
+                fragImage.Transform = _lastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(_renderBrush, _renderPen, ghostImage);
-
+                drawingContext.DrawGeometry(_renderBrush, _renderPen, fragImage);
+   
                 base.OnRender(drawingContext);
             }
         }
@@ -407,6 +416,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void IncrementDragging(DragDeltaEventArgs args)
         {
+            
             _dragXTravel += args.HorizontalChange;
             _dragYTravel += args.VerticalChange;
         }

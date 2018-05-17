@@ -44,8 +44,8 @@
                     </LinearGradientBrush.Transform>
                 </LinearGradientBrush>
                 <LinearGradientBrush x:Key="HighlightHatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
-                    <GradientStop Offset="0.00" Color="DarkOrange" />
-                    <GradientStop Offset="0.25" Color="DarkOrange" />
+                    <GradientStop Offset="0.00" Color="{x:Static SystemColors.HighlightColor}" />
+                    <GradientStop Offset="0.25" Color="{x:Static SystemColors.HighlightColor}" />
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
                     <LinearGradientBrush.RelativeTransform>
@@ -114,7 +114,7 @@
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="DarkOrange" />
+                                                <SolidColorBrush Color="{x:Static SystemColors.HighlightColor}" />
                                             </Setter.Value>
                                         </Setter>
                                     </Trigger>
@@ -125,7 +125,7 @@
                                         </MultiTrigger.Conditions>
                                         <Setter Property="Stroke">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="DarkOrange" />
+                                                <SolidColorBrush Color="{x:Static SystemColors.HighlightColor}" />
                                             </Setter.Value>
                                         </Setter>
                                     </MultiTrigger>
@@ -179,7 +179,7 @@
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
                                             <Setter.Value>
-                                                <SolidColorBrush Color="DarkOrange" />
+                                                <SolidColorBrush Opacity="0.5" Color="{x:Static SystemColors.HighlightColor}"/>
                                             </Setter.Value>
                                         </Setter>
                                     </Trigger>
