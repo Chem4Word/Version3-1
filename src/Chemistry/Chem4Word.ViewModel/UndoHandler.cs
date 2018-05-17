@@ -182,9 +182,7 @@ namespace Chem4Word.ViewModel
                     break;
                 }
                 br.Undo();
-                
             } 
-
         }
 
         public void Redo()
@@ -213,7 +211,6 @@ namespace Chem4Word.ViewModel
                     break;
                 }
                 br.Redo();
-               
             } 
         }
     }
