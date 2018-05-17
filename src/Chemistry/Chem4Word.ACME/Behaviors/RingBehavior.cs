@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Chem4Word.Model;
+using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Chem4Word.ViewModel;
 
@@ -80,6 +81,7 @@ namespace Chem4Word.ACME.Behaviors
             List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
 
             List<Point> preferredPlacements;
+            var xamlBondSize = ViewModel.Model.XamlBondLength;
 
             if (hitAtom != null)
             {
@@ -88,31 +90,40 @@ namespace Chem4Word.ACME.Behaviors
 
                 //try to work out exactly where best to place the ring
 
-                var xamlBondSize = ViewModel.Model.XamlBondLength;
-
                 placements = PaceOut(hitAtom, direction, xamlBondSize, RingSize);
                 altPlacements = PaceOut(hitAtom, -direction, xamlBondSize, RingSize);
 
-                var overlap = GetOverlap(parentMolecule, placements);
-                var altOverlap = GetOverlap(parentMolecule, altPlacements);
-
-                
-                //if (overlap.GetArea(0.0001, ToleranceType.Relative) < altOverlap.GetArea(0.0001, ToleranceType.Relative))
-                //{
-                    preferredPlacements = placements;
-                //}
-                //else
-                //{
-                //    preferredPlacements = altPlacements;
-                //}
-
-                
             }
-            else if (hitBond!=null)
+            else if (hitBond != null)
             {
                 parentMolecule = hitBond.Parent;
                 Vector bondDirection = hitBond.BondVector;
 
+                placements = PaceOut(hitBond, true, RingSize);
+                altPlacements = PaceOut(hitBond, false, RingSize);
+
+            }
+            else //clicked on empty space
+            {
+                parentMolecule = null;
+                placements = PaceOut(hitAtom, BasicGeometry.ScreenNorth, xamlBondSize, RingSize);
+                altPlacements = PaceOut(hitAtom, BasicGeometry.ScreenSouth, xamlBondSize, RingSize);
+            }
+
+            if (parentMolecule != null)
+            {
+                if (!parentMolecule.Overlaps(placements))
+                {
+                    preferredPlacements = placements;
+                }
+                else
+                {
+                    preferredPlacements = altPlacements;
+                }
+            }
+            else
+            {
+                preferredPlacements = placements;
             }
 
             foreach (Point placement in preferredPlacements)
@@ -126,6 +137,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
 
                 ViewModel.DrawRing(newAtomPlacements, Unsaturated);
+            
         }
 
         private static Geometry GetOverlap(Molecule parentMolecule, List<Point> placements)
@@ -158,9 +170,9 @@ namespace Chem4Word.ACME.Behaviors
             rotator.Rotate(-90);
             rotator.Rotate(exteriorAngle/2);
 
-            Vector bonddir = direction;
-            bonddir.Normalize();
-            bonddir *= bondSize;
+            Vector bondVector = direction;
+            bondVector.Normalize();
+            bondVector *= bondSize;
 
 
             var lastPos = startAtom.Position;
@@ -168,16 +180,15 @@ namespace Chem4Word.ACME.Behaviors
 
             for (int i = 1; i < ringSize; i++)
             {
-                bonddir = bonddir * rotator;
-                lastPos = lastPos + bonddir;
+                var newBondVector = bondVector * rotator;
+                lastPos = lastPos + newBondVector;
                 placements.Add(lastPos);
-                rotator = new Matrix();
                 rotator.Rotate(exteriorAngle);
             }
             return placements;
         }
 
-        private List<Point> PaceOut(Bond startBond, bool followsBond, double bondSize, int ringSize)
+        private List<Point> PaceOut(Bond startBond, bool followsBond,  int ringSize)
         {
             List<Point> placements = new List<Point>();
 

@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Chem4Word.Model
 {
@@ -1092,6 +1093,22 @@ namespace Chem4Word.Model
 
         public void Move(Transform lastOperation)
         {
+        }
+
+
+        public bool Overlaps(List<Point> placements)
+        {
+            
+            var hull = BasicGeometry.BuildPath(ConvexHull.Select(a => a.Position).ToList());
+
+            var path = BasicGeometry.BuildPath(placements);
+
+            return (hull.Data.FillContains(path.Data,0.01,ToleranceType.Absolute));
+            
+      
+       
+           
+
         }
     }
 }

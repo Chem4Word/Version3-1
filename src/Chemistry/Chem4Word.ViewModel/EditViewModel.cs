@@ -602,11 +602,16 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir)
+        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir)
         {
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
             newAtom.Position = newAtomPos;
+            object tag=null;
+            if (dir != ClockDirections.Nothing)
+            {
+                tag = dir;
+            }
 
             object oldDir = lastAtom?.Tag;
 
@@ -623,7 +628,7 @@ namespace Chem4Word.ViewModel
                 };
                 Action redo = () =>
                 {
-                    lastAtom.Tag = dir;//save the last sprouted direction in the tag object
+                    lastAtom.Tag = tag;//save the last sprouted direction in the tag object
                     currentMol.Atoms.Add(newAtom);
                 };
                 UndoManager.RecordAction(undo, redo);
@@ -660,7 +665,7 @@ namespace Chem4Word.ViewModel
                 Action redo2 = () =>
                 {
                     _currentMol.Atoms.Add(newAtom);
-                    newAtom.Tag = dir;
+                    newAtom.Tag = tag;
                 };
                 UndoManager.RecordAction(undo2, redo2);
 
@@ -668,6 +673,8 @@ namespace Chem4Word.ViewModel
 
                 UndoManager.EndUndoBlock();
             }
+
+            return newAtom;
         }
 
         public void AddNewBond(Atom a, Atom b, Molecule mol)
@@ -847,7 +854,74 @@ namespace Chem4Word.ViewModel
 
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
         {
+            UndoManager.BeginUndoBlock();
+            for (int i = 1; i <= newAtomPlacements.Count; i++)
+            {
+                NewAtomPlacement currentPlacement = newAtomPlacements[i % newAtomPlacements.Count];
+                NewAtomPlacement previousPlacement = newAtomPlacements[i-1];
+
+                Atom previousAtom = previousPlacement.ExistingAtom;
+                Atom currentAtom = currentPlacement.ExistingAtom;
+
+                if (currentAtom == null)
+                {
+                    Atom insertAtom = null;
+                  
+                        insertAtom = AddAtomChain(previousAtom, currentPlacement.Position,
+                            ClockDirections.Nothing);
+                        currentPlacement.ExistingAtom = insertAtom;
+
+                }
+                else if (previousAtom!=null && previousAtom.BondBetween(currentAtom)==null)
+                {
+                    AddNewBond(previousAtom,currentAtom, previousAtom.Parent);
+                }
+            }
+
+            if (unsaturated)
+            {
+
+
+                string bondOrder =
+                    newAtomPlacements[0].ExistingAtom.BondBetween(newAtomPlacements[1].ExistingAtom).Order;
+
+                for (int i = 1; i <= newAtomPlacements.Count; i++)
+                {
+
+                    NewAtomPlacement currentPlacement = newAtomPlacements[i % newAtomPlacements.Count];
+                    NewAtomPlacement previousPlacement = newAtomPlacements[i-1];
+                    Bond existingBond = currentPlacement.ExistingAtom.BondBetween(previousPlacement.ExistingAtom);
+
+                    UndoManager.BeginUndoBlock();
+
+                    var tempBondOrder = existingBond.Order;
+
+                    Action redo = () =>
+                    {
+                        if (bondOrder == Bond.OrderSingle)
+                        {
+                            existingBond.Order = Bond.OrderDouble;
+                            bondOrder = Bond.OrderDouble;
+                        }
+                        else if (bondOrder == Bond.OrderDouble)
+                        {
+                            existingBond.Order = Bond.OrderSingle;
+                            bondOrder = Bond.OrderSingle;
+                        }
+                    };
+
+                    Action undo = () => { existingBond.Order = tempBondOrder; };
+
+                    UndoManager.RecordAction(undo, redo, "Set Bond Unsaturated");
+                    UndoManager.EndUndoBlock();
+                    redo();
+
+                }
+            }
+
+            newAtomPlacements[0].ExistingAtom.Parent.Refresh();
             
+            UndoManager.EndUndoBlock();
         }
     }
 }
