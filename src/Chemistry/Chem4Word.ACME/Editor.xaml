@@ -174,10 +174,16 @@
 
                 <RadioButton Name="RingButton"
                     GroupName="Actions"
-                    ToolTip="Insert a ring">
+                    ToolTip="Insert a ring"
+                    Checked="ModeButton_OnChecked">
+                    
                     <StackPanel Orientation="Horizontal">
                         <Path Name="RingButtonPath" Style="{StaticResource BenzeneStyle}" />
                     </StackPanel>
+
+                    <RadioButton.Tag>
+                        <behaviors:RingBehavior RingSize="6" Unsaturated="True" ViewModel="{Binding}" />
+                    </RadioButton.Tag>
                 </RadioButton>
                 <Button Name="RingDropdownButton"
                     Width="10"
@@ -186,6 +192,7 @@
                     <Viewbox Stretch="Uniform">
                         <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
+                    
                 </Button>
                 <!--  Print Toggle Button Popup  -->
                 <Popup x:Name="RingPopup"
@@ -196,28 +203,38 @@
                             <!--  Print to local  -->
                             <Button
                                 Click="RingSelButton_OnClick"
-                                Tag="6U"
+                                
                                 ToolTip="Benzene">
                                 <Path Style="{StaticResource BenzeneStyle}" />
+                                <Button.Tag>
+                                    <behaviors:RingBehavior RingSize="6" Unsaturated="True" ViewModel="{Binding}" />
+                                </Button.Tag>
                             </Button>
                             <!--  Print to network  -->
                             <Button
                                 Click="RingSelButton_OnClick"
-                                Tag="6S"
                                 ToolTip="Cyclochexane">
                                 <Path Style="{StaticResource CyclohexStyle}" />
+                                <Button.Tag>
+                                    <behaviors:RingBehavior RingSize="6" Unsaturated="False" ViewModel="{Binding}" />
+                                </Button.Tag>
                             </Button>
                             <Button
                                 Click="RingSelButton_OnClick"
-                                Tag="5S"
+
                                 ToolTip="Cyclopentane">
                                 <Path Style="{StaticResource CyclopentStyle}" />
+                                <Button.Tag>
+                                    <behaviors:RingBehavior RingSize="5" Unsaturated="False" ViewModel="{Binding}" />
+                                </Button.Tag>
                             </Button>
                             <Button
                                 Click="RingSelButton_OnClick"
-                                Tag="5U"
                                 ToolTip="Cyclopentadiene">
                                 <Path Style="{StaticResource CyclopentadieneStyle}" />
+                                <Button.Tag>
+                                    <behaviors:RingBehavior RingSize="5" Unsaturated="True" ViewModel="{Binding}" />
+                                </Button.Tag>
                             </Button>
                         </WrapPanel>
                     </Border>

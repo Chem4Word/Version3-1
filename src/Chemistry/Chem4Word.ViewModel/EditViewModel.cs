@@ -648,7 +648,7 @@ namespace Chem4Word.ViewModel
                 {
                     Model.Molecules.Add(_currentMol);
                 };
-                redo.Invoke();
+                redo();
 
                 UndoManager.RecordAction(undo, redo);
 
@@ -664,7 +664,7 @@ namespace Chem4Word.ViewModel
                 };
                 UndoManager.RecordAction(undo2, redo2);
 
-                redo2.Invoke();
+                redo2();
 
                 UndoManager.EndUndoBlock();
             }
@@ -844,6 +844,10 @@ namespace Chem4Word.ViewModel
 
         public bool Dirty =>
             UndoManager.CanUndo;
-        
+
+        public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

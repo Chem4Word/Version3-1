@@ -16,6 +16,7 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.ACME.Behaviors;
 
 namespace Chem4Word.ACME
 {
@@ -116,6 +117,13 @@ namespace Chem4Word.ACME
         {
             Button selButton = sender as Button;
             RingButtonPath.Style = (selButton.Content as Path).Style;
+
+            string ringspec = (string) selButton.Tag;
+
+            RingButton.Tag = selButton.Tag;
+
+            ModeButton_OnChecked(RingButton, null);
+
             RingPopup.IsOpen = false;
         }
 
@@ -272,6 +280,13 @@ namespace Chem4Word.ACME
             OnOkButtonClick?.Invoke(this, args);
         }
 
+
+        /// <summary>
+        /// Sets the current behaviour of the editor to the
+        /// behavior specified in the button's tag property
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ModeButton_OnChecked(object sender, RoutedEventArgs e)
         {
             if (_activeViewModel != null)
@@ -287,6 +302,11 @@ namespace Chem4Word.ACME
                     _activeViewModel.ActiveMode = behavior;
                 }
             }
+        }
+
+        private void RingButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

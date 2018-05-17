@@ -28,6 +28,16 @@ namespace Chem4Word.ACME.Behaviors
         private bool _unsaturated;
         private Window _parent;
 
+        public RingBehavior()
+        {
+        }
+
+        public RingBehavior(string ringspec):this()
+        {
+            RingSize = int.Parse(ringspec[0].ToString());
+            Unsaturated = ringspec[1] == 'U';
+        }
+
         public bool Unsaturated
         {
             get { return _unsaturated; }
@@ -44,8 +54,7 @@ namespace Chem4Word.ACME.Behaviors
             _parent = Application.Current.MainWindow;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
-            AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
-            AssociatedObject.MouseMove += AssociatedObject_MouseMove;
+
 
 
             AssociatedObject.IsHitTestVisible = true;
@@ -57,15 +66,6 @@ namespace Chem4Word.ACME.Behaviors
 
         }
 
-        private void AssociatedObject_MouseMove(object sender, MouseEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void AssociatedObject_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -94,7 +94,7 @@ namespace Chem4Word.ACME.Behaviors
                 var altOverlap = GetOverlap(parentMolecule, altPlacements);
 
                 List<Point> preferredPlacements;
-                if (overlap.GetArea(0.01, ToleranceType.Relative) < altOverlap.GetArea(0.01, ToleranceType.Relative))
+                if (overlap.GetArea(0.0001, ToleranceType.Relative) < altOverlap.GetArea(0.0001, ToleranceType.Relative))
                 {
                     preferredPlacements = placements;
                 }
@@ -117,7 +117,6 @@ namespace Chem4Word.ACME.Behaviors
 
                 ViewModel.DrawRing(newAtomPlacements, Unsaturated);
 
-
             }
             else if (hitBond!=null)
             {
@@ -139,15 +138,75 @@ namespace Chem4Word.ACME.Behaviors
             return combinedGeo;
         }
 
-        private List<Point> PaceOut(Atom hitAtom, Vector direction, double xamlBondSize, int ringSize)
+        private List<Point> PaceOut(Atom startAtom, Vector direction, double bondSize, int ringSize)
         {
-            throw new NotImplementedException();
+            List<Point> placements = new List<Point>();
+
+            //the direction vector points towards the centre of the ring from the start atom
+            //so, assuming we are going clockwise, we take the perpendicular of the vector
+            //rotate through -90 degrees and then clockwise through half the angle.
+            //subsequent rotations are through the full exterior angle
+
+            double exteriorAngle = 360.0 / ringSize;
+            Matrix rotator = new Matrix();
+
+
+            //do the initial rotation
+            rotator.Rotate(-90);
+            rotator.Rotate(exteriorAngle/2);
+
+            Vector bonddir = direction;
+            bonddir.Normalize();
+            bonddir *= bondSize;
+
+
+            var lastPos = startAtom.Position;
+            placements.Add(startAtom.Position);
+
+            for (int i = 1; i < ringSize; i++)
+            {
+                bonddir = bonddir * rotator;
+                lastPos = lastPos + bonddir;
+                placements.Add(lastPos);
+                rotator = new Matrix();
+                rotator.Rotate(exteriorAngle);
+            }
+            return placements;
         }
 
-        private void _parent_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private List<Point> PaceOut(Bond startBond, bool followsBond, double bondSize, int ringSize)
         {
-            throw new NotImplementedException();
+            List<Point> placements = new List<Point>();
+
+            Point lastPos;
+
+            Vector bondVector;
+            if (followsBond)
+            {
+                bondVector = startBond.EndAtom.Position - startBond.StartAtom.Position;
+                lastPos = startBond.StartAtom.Position;
+
+            }
+            else
+            {
+                bondVector = startBond.StartAtom.Position - startBond.EndAtom.Position;
+                lastPos = startBond.EndAtom.Position;
+            }
+
+            double exteriorAngle = 360.0 / ringSize;
+            Matrix rotator = new Matrix();
+
+            placements.Add(lastPos);
+            for (int i = 1; i < ringSize; i++)
+            {
+                bondVector = bondVector * rotator;
+                lastPos = lastPos + bondVector;
+                placements.Add(lastPos);
+                rotator.Rotate(exteriorAngle);
+            }
+            return placements;
         }
+
 
         private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
