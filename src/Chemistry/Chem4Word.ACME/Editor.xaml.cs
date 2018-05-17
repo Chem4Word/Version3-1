@@ -118,8 +118,6 @@ namespace Chem4Word.ACME
             Button selButton = sender as Button;
             RingButtonPath.Style = (selButton.Content as Path).Style;
 
-            string ringspec = (string) selButton.Tag;
-
             RingButton.Tag = selButton.Tag;
 
             ModeButton_OnChecked(RingButton, null);

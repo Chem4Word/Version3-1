@@ -77,6 +77,9 @@ namespace Chem4Word.ACME.Behaviors
             List<Point> placements;
             List<Point> altPlacements;
 
+            List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
+
+            List<Point> preferredPlacements;
 
             if (hitAtom != null)
             {
@@ -93,19 +96,26 @@ namespace Chem4Word.ACME.Behaviors
                 var overlap = GetOverlap(parentMolecule, placements);
                 var altOverlap = GetOverlap(parentMolecule, altPlacements);
 
-                List<Point> preferredPlacements;
-                if (overlap.GetArea(0.0001, ToleranceType.Relative) < altOverlap.GetArea(0.0001, ToleranceType.Relative))
-                {
+                
+                //if (overlap.GetArea(0.0001, ToleranceType.Relative) < altOverlap.GetArea(0.0001, ToleranceType.Relative))
+                //{
                     preferredPlacements = placements;
-                }
-                else
-                {
-                    preferredPlacements = altPlacements;
-                }
+                //}
+                //else
+                //{
+                //    preferredPlacements = altPlacements;
+                //}
 
-                List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
+                
+            }
+            else if (hitBond!=null)
+            {
+                parentMolecule = hitBond.Parent;
+                Vector bondDirection = hitBond.BondVector;
 
-                foreach (Point placement in preferredPlacements)
+            }
+
+            foreach (Point placement in preferredPlacements)
                 {
                     var nap = new NewAtomPlacement
                     {
@@ -116,26 +126,19 @@ namespace Chem4Word.ACME.Behaviors
                 }
 
                 ViewModel.DrawRing(newAtomPlacements, Unsaturated);
-
-            }
-            else if (hitBond!=null)
-            {
-                parentMolecule = hitBond.Parent;
-                Vector bondDirection = hitBond.BondVector;
-
-            }
         }
 
-        private static CombinedGeometry GetOverlap(Molecule parentMolecule, List<Point> placements)
+        private static Geometry GetOverlap(Molecule parentMolecule, List<Point> placements)
         {
             Polygon molPolygon = new Polygon();
             molPolygon.Points = new PointCollection(parentMolecule.ConvexHull.Select(a => a.Position));
 
             Polygon firstRing = new Polygon();
             firstRing.Points = new PointCollection(placements);
-            var firstRingGeo = firstRing.RenderedGeometry;
-            var combinedGeo = new CombinedGeometry(GeometryCombineMode.Intersect, firstRingGeo, molPolygon.RenderedGeometry);
-            return combinedGeo;
+            var res= PathGeometry.Combine(molPolygon.RenderedGeometry, firstRing.RenderedGeometry, GeometryCombineMode.Intersect,
+                null);
+
+            return res;
         }
 
         private List<Point> PaceOut(Atom startAtom, Vector direction, double bondSize, int ringSize)

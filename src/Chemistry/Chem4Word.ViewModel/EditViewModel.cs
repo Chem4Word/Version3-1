@@ -847,7 +847,7 @@ namespace Chem4Word.ViewModel
 
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }
