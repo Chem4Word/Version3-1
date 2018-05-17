@@ -36,9 +36,7 @@ namespace Chem4Word.ACME.Behaviors
 
             ViewModel.SelectedItems?.Clear();
 
-            _parent = Application.Current.MainWindow;
-            Window parent = Application.Current.MainWindow;
-            AssociatedObject.RenderTransform = _transform;
+          
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;

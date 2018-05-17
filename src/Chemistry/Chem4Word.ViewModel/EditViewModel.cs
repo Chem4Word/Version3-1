@@ -24,6 +24,12 @@ using System.Windows.Media;
 
 namespace Chem4Word.ViewModel
 {
+    public class NewAtomPlacement
+    {
+        public Point Position { get; set; }
+        public Atom ExistingAtom { get; set; }
+    }
+
     public class EditViewModel : DisplayViewModel
     {
         [Flags]
@@ -769,6 +775,15 @@ namespace Chem4Word.ViewModel
                 UndoManager.RecordAction(undo, redo);
                 atom.Position = newPosition;
             }
+
+            UndoManager.EndUndoBlock();
+        }
+
+        public void DrawRing(List<NewAtomPlacement> preferredPlacements, bool unsaturated)
+        {
+           
+            UndoManager.BeginUndoBlock();
+
 
             UndoManager.EndUndoBlock();
         }

@@ -60,6 +60,7 @@
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
+    <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="Behaviors\SelectorBehavior.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="CmlEditor.xaml.cs">
