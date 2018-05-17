@@ -154,7 +154,8 @@ namespace Chem4Word.View
 
         // Using a DependencyProperty as the backing store for Stereo.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StereoProperty =
-            DependencyProperty.Register("Stereo", typeof(BondStereo), typeof(BondShape), new PropertyMetadata(BondStereo.None));
+            DependencyProperty.Register("Stereo", typeof(BondStereo), typeof(BondShape), 
+                new FrameworkPropertyMetadata(BondStereo.None, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public int OrderValue
         {
@@ -164,7 +165,8 @@ namespace Chem4Word.View
 
         // Using a DependencyProperty as the backing store for OrderValue.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderValueProperty =
-            DependencyProperty.Register("OrderValue", typeof(int), typeof(BondShape), new PropertyMetadata(1));
+            DependencyProperty.Register("OrderValue", typeof(int), typeof(BondShape), 
+                new FrameworkPropertyMetadata(1, FrameworkPropertyMetadataOptions.AffectsRender));
 
 
 
@@ -176,7 +178,7 @@ namespace Chem4Word.View
 
         // Using a DependencyProperty as the backing store for Order.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderProperty =
-            DependencyProperty.Register("Order", typeof(string), typeof(BondShape), new PropertyMetadata("S"));
+            DependencyProperty.Register("Order", typeof(string), typeof(BondShape), new FrameworkPropertyMetadata(Bond.OrderSingle, FrameworkPropertyMetadataOptions.AffectsRender));
 
 
 

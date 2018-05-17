@@ -145,6 +145,12 @@ namespace Chem4Word.Model
         }
 
         /// <summary>
+        /// Use the Tag during editing operations to store state
+        /// Not persisted to the model
+        /// </summary>
+        public  object Tag { get; set; }
+
+        /// <summary>
         /// If null, defaults to the most abundant isotope
         /// </summary>
         ///
@@ -686,6 +692,11 @@ namespace Chem4Word.Model
             Atom clone = (Atom)this.MemberwiseClone();
             clone.SetupCollections();
             return clone;
+        }
+
+        public void ImplicitHChanged()
+        {
+            OnPropertyChanged(nameof(ImplicitHydrogenCount));
         }
     }
 }

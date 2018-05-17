@@ -360,22 +360,7 @@
                             Stretch="Fill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="SaveButton"
-                    Click="SaveButton_OnClick"
-                    Style="{StaticResource CommandButtonStyle}"
-                    Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
-                    <Viewbox
-                        Width="24"
-                        Height="24"
-                        Stretch="UniformToFill">
-                        <Path
-                            Width="24"
-                            Height="24"
-                            Data="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033 23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334 18.999978,2.0000334z M2.5,2C2.224,2,2,2.2249994,2,2.5L2,29.5C2,29.775,2.224,30,2.5,30L5.9999927,30 5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566 25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999 5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z"
-                            Fill="{StaticResource Chem4WordBrush}"
-                            Stretch="Fill" />
-                    </Viewbox>
-                </Button>
+
             </ToolBar>
             <ToolBar x:Name="ManipulationsToolbar"
                 Height="40"
@@ -475,8 +460,43 @@
                     SelectedItem="{Binding Path=SelectedBondLengthOption}"
                     SelectionChanged="BondLengthCombo_OnChange"
                     ToolTip="Change Bond Length" />
+                <ComboBox x:Name="ZoomFactor"
+                    Width="65"
+                    FontFamily="Arial"
+                    FontSize="16"
+                    SelectedIndex="3"
+                    SelectionChanged="ZoomFactorCombo_OnChange"
+                    ToolTip="Change Zoom">
+                    <ComboBoxItem>25%</ComboBoxItem>
+                    <ComboBoxItem>50%</ComboBoxItem>
+                    <ComboBoxItem>75%</ComboBoxItem>
+                    <ComboBoxItem>100%</ComboBoxItem>
+                    <ComboBoxItem>200%</ComboBoxItem>
+                    <ComboBoxItem>400%</ComboBoxItem>
+                </ComboBox>
+            </ToolBar>
+            <ToolBar x:Name="ImportantToolbar"
+                Height="40"
+                BandIndex="99">
+                <Button x:Name="SaveButton"
+                    Click="SaveButton_OnClick"
+                    Style="{StaticResource CommandButtonStyle}"
+                    Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
+                    <Viewbox
+                        Width="24"
+                        Height="24"
+                        Stretch="UniformToFill">
+                        <Path
+                            Width="24"
+                            Height="24"
+                            Data="M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033 23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334 18.999978,2.0000334z M2.5,2C2.224,2,2,2.2249994,2,2.5L2,29.5C2,29.775,2.224,30,2.5,30L5.9999927,30 5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566 25.999978,2.1661739 25.999978,12.000034 9.9999783,12.000034 9.9999783,2z M2.5,0L26.277001,0 32,3.434 32,29.5C32,30.879,30.878001,31.999999,29.5,31.999999L25.999993,31.999999 5.9999927,32.00001 2.5,31.999999C1.1220002,31.999999,0,30.879,0,29.5L0,2.5C0,1.1209993,1.1220002,0,2.5,0z"
+                            Fill="{StaticResource Chem4WordBrush}"
+                            Stretch="Fill" />
+                    </Viewbox>
+                </Button>
             </ToolBar>
         </ToolBarTray>
+        <ToolBarTray />
 
         <ScrollViewer Name="DrawingArea"
             Width="Auto"
@@ -486,8 +506,6 @@
             VerticalScrollBarVisibility="Auto">
 
             <ItemsControl Name="ChemicalObjects"
-                Width="{Binding BoundingBox.Width}"
-                Height="{Binding BoundingBox.Height}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Background="White"
@@ -495,8 +513,8 @@
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <Canvas Name="ChemCanvas"
-                            Width="{Binding ElementName=ChemicalObjects, Path=Width}"
-                            Height="{Binding ElementName=ChemicalObjects, Path=Height}"
+                            MinWidth="4000"
+                            MinHeight="3000"
                             Background="White" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
@@ -514,8 +532,8 @@
                         </LinearGradientBrush.Transform>
                     </LinearGradientBrush>
                     <LinearGradientBrush x:Key="HighlightHatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
-                        <GradientStop Offset="0.00" Color="DarkOrange" />
-                        <GradientStop Offset="0.25" Color="DarkOrange" />
+                        <GradientStop Offset="0.00" Color="{x:Static SystemColors.HighlightColor}" />
+                        <GradientStop Offset="0.25" Color="{x:Static SystemColors.HighlightColor}" />
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
                         <LinearGradientBrush.RelativeTransform>
@@ -594,7 +612,7 @@
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Fill">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="DarkOrange" />
+                                                    <SolidColorBrush Color="{x:Static SystemColors.HighlightColor}" />
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>
@@ -605,7 +623,7 @@
                                             </MultiTrigger.Conditions>
                                             <Setter Property="Stroke">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="DarkOrange" />
+                                                    <SolidColorBrush Color="{x:Static SystemColors.HighlightColor}" />
                                                 </Setter.Value>
                                             </Setter>
                                         </MultiTrigger>
@@ -616,7 +634,7 @@
                                             </MultiTrigger.Conditions>
                                             <Setter Property="Stroke">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="DarkOrange" />
+                                                    <SolidColorBrush Color="{x:Static SystemColors.HighlightColor}" />
                                                 </Setter.Value>
                                             </Setter>
                                         </MultiTrigger>
@@ -661,7 +679,7 @@
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Fill">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Color="DarkOrange" />
+                                                    <SolidColorBrush Opacity="0.5" Color="{x:Static SystemColors.HighlightColor}" />
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>

@@ -36,17 +36,15 @@ namespace Chem4Word.Model
         {
             get
             {
-                
-                
                 CalculateBoundingBox();
-                
+
                 return _boundingBox;
             }
         }
 
         /// <summary>
         /// returns the top level model, or null if it's a floating molecule
-      
+
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
@@ -318,6 +316,11 @@ namespace Chem4Word.Model
                 _count = value;
             }
         }
+        /// <summary>
+        /// Use the Tag during editing operations to store state
+        /// Not persisted to the model
+        /// </summary>
+        public object Tag { get; set; }
 
         #endregion Properties
 
@@ -439,6 +442,7 @@ namespace Chem4Word.Model
                 return (currentParent as Model);
             }
         }
+
         #endregion Graph Stuff
 
         #region Ring stuff

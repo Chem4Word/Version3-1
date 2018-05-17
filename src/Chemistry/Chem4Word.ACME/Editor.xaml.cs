@@ -5,17 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.Helpers;
+using Chem4Word.Model;
 using Chem4Word.Model.Converters;
 using Chem4Word.ViewModel;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model;
 
 namespace Chem4Word.ACME
 {
@@ -124,11 +124,22 @@ namespace Chem4Word.ACME
             CMLConverter cc = new CMLConverter();
             Model.Model tempModel = cc.Import(_cml);
 
-            tempModel.RescaleForXaml();
+            tempModel.RescaleForXaml(false);
             var vm = new EditViewModel(tempModel);
             _activeViewModel = vm;
             _activeViewModel.Model = tempModel;
             this.DataContext = vm;
+
+            Canvas c = LocateCanvas();
+            //Debug.WriteLine($"Canvas is {c.ActualWidth} x {c.ActualHeight}");
+            //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
+            //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
+            double x = (c.ActualWidth - _activeViewModel.Model.BoundingBox.Width) / 2.0;
+            double y = (c.ActualHeight - _activeViewModel.Model.BoundingBox.Height) / 2.0;
+            _activeViewModel.Model.RepositionAll(-x, -y);
+
+            //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
+            //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
 
             ScrollIntoView();
             BindControls(vm);
@@ -178,15 +189,10 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
-            var chemCanvas = LocateCanvas();
-
-            var boundingBox = _activeViewModel.BoundingBox;
-            double hOffset = (boundingBox.Right - boundingBox.Left) / 2;
-
-            double vOffset = (boundingBox.Bottom - boundingBox.Top) / 2;
-
-            DrawingArea.ScrollToHorizontalOffset(hOffset);
-            DrawingArea.ScrollToVerticalOffset(vOffset);
+            double newVerticalOffset = _activeViewModel.Model.BoundingBox.Left;
+            double newHorizontalOffset = _activeViewModel.Model.BoundingBox.Top;
+            DrawingArea.ScrollToHorizontalOffset(newVerticalOffset);
+            DrawingArea.ScrollToVerticalOffset(newHorizontalOffset);
         }
 
         private Canvas LocateCanvas()
@@ -229,9 +235,26 @@ namespace Chem4Word.ACME
             {
                 if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
+                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
+                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
                     _activeViewModel.Model.ScaleToAverageBondLength(blo.ChosenValue);
+                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
+                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
                     ScrollIntoView();
                 }
+            }
+        }
+
+        private void ZoomFactorCombo_OnChange(object sender, RoutedEventArgs e)
+        {
+            // ToDo: Plumbing in place ready to use ...
+            ComboBox cb = sender as ComboBox;
+            ComboBoxItem cbi = cb?.SelectedItem as ComboBoxItem;
+            string selected = cbi?.Content as string;
+            switch (selected)
+            {
+                case "100%":
+                    break;
             }
         }
 
@@ -258,7 +281,7 @@ namespace Chem4Word.ACME
                     _activeViewModel.ActiveMode = null;
                 }
 
-                var behavior = (Behavior) ((sender as RadioButton).Tag);
+                var behavior = (Behavior)((sender as RadioButton).Tag);
                 if (behavior != null)
                 {
                     _activeViewModel.ActiveMode = behavior;

@@ -21,6 +21,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
 using System.Windows.Media;
+using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ViewModel
 {
@@ -143,29 +144,32 @@ namespace Chem4Word.ViewModel
 
         private void SetElement(ElementBase value, List<Atom> selAtoms)
         {
-            UndoManager.BeginUndoBlock();
-
-            Action undo, redo;
-            foreach (Atom selectedAtom in selAtoms)
+            if (selAtoms.Any())
             {
-                if (selectedAtom.Element != value)
+                UndoManager.BeginUndoBlock();
+
+                Action undo, redo;
+                foreach (Atom selectedAtom in selAtoms)
                 {
-                    redo = () =>
+                    if (selectedAtom.Element != value)
                     {
+                        redo = () =>
+                        {
+                            selectedAtom.Element = value;
+                        };
+                        var lastElement = selectedAtom.Element;
+
+                        undo = () =>
+                        {
+                            selectedAtom.Element = lastElement;
+                        };
+                        UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
                         selectedAtom.Element = value;
-                    };
-                    var lastElement = selectedAtom.Element;
-
-                    undo = () =>
-                    {
-                        selectedAtom.Element = lastElement;
-                    };
-                    UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
-                    selectedAtom.Element = value;
+                    }
                 }
-            }
 
-            UndoManager.EndUndoBlock();
+                UndoManager.EndUndoBlock();
+            }
         }
 
         /// <summary>
@@ -211,28 +215,33 @@ namespace Chem4Word.ViewModel
 
         private void SetBondOption(int bondOptionId)
         {
-            UndoManager.BeginUndoBlock();
+           
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
-            foreach (Bond bond in SelectedItems.OfType<Bond>())
+            if (SelectedItems.OfType<Bond>().Any())
             {
-                Action redo = () =>
+                UndoManager.BeginUndoBlock();
+                foreach (Bond bond in SelectedItems.OfType<Bond>())
                 {
-                    bond.Stereo = bondOption.Stereo.Value;
-                    bond.Order = bondOption.Order;
-                };
+                    Action redo = () =>
+                    {
+                        bond.Stereo = bondOption.Stereo.Value;
+                        bond.Order = bondOption.Order;
+                    };
 
-                var bondStereo = bond.Stereo;
-                var bondOrder = bond.Order;
-                Action undo = () =>
-                {
-                    bond.Stereo = bondStereo;
-                    bond.Order = bondOrder;
-                };
-                UndoManager.RecordAction(undo, redo);
-                bond.Order = bondOption.Order;
-                bond.Stereo = bondOption.Stereo.Value;
+                    var bondStereo = bond.Stereo;
+                    var bondOrder = bond.Order;
+                    Action undo = () =>
+                    {
+                        bond.Stereo = bondStereo;
+                        bond.Order = bondOrder;
+                    };
+                    UndoManager.RecordAction(undo, redo);
+                    bond.Order = bondOption.Order;
+                    bond.Stereo = bondOption.Stereo.Value;
+                }
+
+                UndoManager.EndUndoBlock();
             }
-            UndoManager.EndUndoBlock();
         }
 
         public List<BondOption> SelectedBondOptions
@@ -593,24 +602,28 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void AddAtomChain(Atom lastAtom, Point newAtomPos)
+        public void AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir)
         {
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
             newAtom.Position = newAtomPos;
 
+            object oldDir = lastAtom?.Tag;
+
             if (lastAtom != null)
             {
                 UndoManager.BeginUndoBlock();
-
+               
                 Molecule currentMol = lastAtom.Parent;
 
                 Action undo = () =>
                 {
+                    lastAtom.Tag = oldDir;
                     currentMol.Atoms.Remove(newAtom);
                 };
                 Action redo = () =>
                 {
+                    lastAtom.Tag = dir;//save the last sprouted direction in the tag object
                     currentMol.Atoms.Add(newAtom);
                 };
                 UndoManager.RecordAction(undo, redo);
@@ -641,11 +654,13 @@ namespace Chem4Word.ViewModel
 
                 Action undo2 = () =>
                 {
+                    newAtom.Tag = null;
                     _currentMol.Atoms.Remove(newAtom);
                 };
                 Action redo2 = () =>
                 {
                     _currentMol.Atoms.Add(newAtom);
+                    newAtom.Tag = dir;
                 };
                 UndoManager.RecordAction(undo2, redo2);
 
@@ -779,13 +794,56 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void DrawRing(List<NewAtomPlacement> preferredPlacements, bool unsaturated)
+        public void SwapBondDirection(Bond parentBond)
         {
-           
             UndoManager.BeginUndoBlock();
 
+            var startAtom = parentBond.StartAtom;
+            var endAtom = parentBond.EndAtom;
 
+            Action undo = () =>
+            {
+                parentBond.StartAtom = startAtom;
+                parentBond.EndAtom = endAtom;
+            };
+
+            Action redo = () =>
+            {
+                parentBond.StartAtom = endAtom;
+                parentBond.EndAtom = startAtom;
+            };
+            UndoManager.RecordAction(undo, redo);
+
+            redo();
             UndoManager.EndUndoBlock();
         }
+
+        public void SetBondAttributes(Bond parentBond)
+        {
+            UndoManager.BeginUndoBlock();
+
+            var order = parentBond.Order;
+            var stereo = parentBond.Stereo;
+
+            Action undo = () =>
+            {
+                parentBond.Order = order;
+                parentBond.Stereo = stereo;
+            };
+
+            Action redo = () =>
+            {
+                parentBond.Order = CurrentBondOrder;
+                parentBond.Stereo = CurrentStereo;
+            };
+            UndoManager.RecordAction(undo, redo);
+
+            redo();
+            UndoManager.EndUndoBlock();
+        }
+
+        public bool Dirty =>
+            UndoManager.CanUndo;
+        
     }
 }

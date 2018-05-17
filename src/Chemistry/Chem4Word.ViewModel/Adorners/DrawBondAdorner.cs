@@ -44,12 +44,12 @@ namespace Chem4Word.ViewModel.Adorners
         public static readonly DependencyProperty EndPointProperty =
             DependencyProperty.Register("EndPoint", typeof(Point), typeof(DrawBondAdorner), new FrameworkPropertyMetadata(new Point(0d, 0d), FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public DrawBondAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
+        public DrawBondAdorner([NotNull] UIElement adornedElement, double bondThickness) : base(adornedElement)
         {
             _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
             _solidColorBrush.Opacity = 0.5;
 
-            _dashPen = new Pen(SystemColors.HighlightBrush, 1);
+            _dashPen = new Pen(SystemColors.HighlightBrush, bondThickness );
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);

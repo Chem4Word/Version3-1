@@ -198,6 +198,9 @@ namespace Chem4Word.Model
 
                 _order = value;
                 OnPropertyChanged();
+
+                StartAtom?.ImplicitHChanged();
+                EndAtom?.ImplicitHChanged();
             }
         }
 
@@ -785,6 +788,12 @@ namespace Chem4Word.Model
         }
 
         /// <summary>
+        /// Use the Tag during editing operations to store state
+        /// Not persisted to the model
+        /// </summary>
+        public object Tag { get; set; }
+
+        /// <summary>
         /// indicates which side of bond to draw subsidiary double bond
         /// </summary>
         /// if bond order is not 2, returns null
@@ -840,5 +849,6 @@ namespace Chem4Word.Model
                 return (currentParent as Model);
             }
         }
+
     }
 }

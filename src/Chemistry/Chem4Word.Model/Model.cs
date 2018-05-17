@@ -10,10 +10,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Data;
 
@@ -340,7 +338,8 @@ namespace Chem4Word.Model
         }
 
         //used to calculate the bounds of the atom
-        public double FontSize {
+        public double FontSize
+        {
             get
             {
                 double fontSize = Globals.DefaultFontSize;
@@ -416,6 +415,7 @@ namespace Chem4Word.Model
                 }
             }
 
+            OnPropertyChanged(nameof(BoundingBox));
             XamlBondLength = newLength;
         }
 
@@ -440,7 +440,7 @@ namespace Chem4Word.Model
         /// <summary>
         /// Rescale to new preferred length, to be used in xaml code behind, not normal cs
         /// </summary>
-        public void RescaleForXaml()
+        public void RescaleForXaml(bool forDisplay)
         {
             if (!ScaledForXaml)
             {
@@ -453,9 +453,13 @@ namespace Chem4Word.Model
                     ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength);
                 }
                 ScaledForXaml = true;
+
+                if (forDisplay)
+                {
+                    RepositionAll(MinX, MinY);
+                }
+                OnPropertyChanged(nameof(BoundingBox));
             }
-            RepositionAll(MinX, MinY);
-            OnPropertyChanged("BoundingBox");
         }
 
         #endregion Layout
@@ -513,9 +517,5 @@ namespace Chem4Word.Model
         }
 
         #endregion Diagnostics
-
-       
-
-       
     }
 }
