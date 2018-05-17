@@ -138,29 +138,32 @@ namespace Chem4Word.ViewModel
 
         private void SetElement(ElementBase value, List<Atom> selAtoms)
         {
-            UndoManager.BeginUndoBlock();
-
-            Action undo, redo;
-            foreach (Atom selectedAtom in selAtoms)
+            if (selAtoms.Any())
             {
-                if (selectedAtom.Element != value)
+                UndoManager.BeginUndoBlock();
+
+                Action undo, redo;
+                foreach (Atom selectedAtom in selAtoms)
                 {
-                    redo = () =>
+                    if (selectedAtom.Element != value)
                     {
+                        redo = () =>
+                        {
+                            selectedAtom.Element = value;
+                        };
+                        var lastElement = selectedAtom.Element;
+
+                        undo = () =>
+                        {
+                            selectedAtom.Element = lastElement;
+                        };
+                        UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
                         selectedAtom.Element = value;
-                    };
-                    var lastElement = selectedAtom.Element;
-
-                    undo = () =>
-                    {
-                        selectedAtom.Element = lastElement;
-                    };
-                    UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
-                    selectedAtom.Element = value;
+                    }
                 }
-            }
 
-            UndoManager.EndUndoBlock();
+                UndoManager.EndUndoBlock();
+            }
         }
 
         /// <summary>
@@ -614,7 +617,7 @@ namespace Chem4Word.ViewModel
                 };
                 Action redo = () =>
                 {
-                    lastAtom.Tag = dir;
+                    lastAtom.Tag = dir;//save the last sprouted direction in the tag object
                     currentMol.Atoms.Add(newAtom);
                 };
                 UndoManager.RecordAction(undo, redo);

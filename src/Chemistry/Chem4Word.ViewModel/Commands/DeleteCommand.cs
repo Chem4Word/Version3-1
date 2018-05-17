@@ -22,43 +22,41 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.UndoManager.BeginUndoBlock();
-            //first do the astom and associated bonds
-            if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) == EditViewModel.SelectionTypeCode.Atom))
+            var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
+            var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
+
+            if (atoms.Any()|bonds.Any())
             {
-
-                var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
-                foreach (Atom atom in atoms )
+                MyEditViewModel.UndoManager.BeginUndoBlock();
+                //first do the astom and associated bonds
+                if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) ==
+                     EditViewModel.SelectionTypeCode.Atom))
                 {
-                    MyEditViewModel.DeleteAtom(atom);
+                    foreach (Atom atom in atoms)
+                    {
+                        MyEditViewModel.DeleteAtom(atom);
+                    }
                 }
-               
-            }
 
-            //now do any bonds remaing:  this is important if only bonds have been selected
+                //now do any bonds remaining:  this is important if only bonds have been selected
 
-
-            if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Bond) ==
-                 EditViewModel.SelectionTypeCode.Bond))
-            {
-                var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
-
-                foreach (Bond bond in bonds)
+                if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Bond) ==
+                     EditViewModel.SelectionTypeCode.Bond))
                 {
-
-                    MyEditViewModel.DeleteBond(bond);
+                    foreach (Bond bond in bonds)
+                    {
+                        MyEditViewModel.DeleteBond(bond);
+                    }
                 }
-            }
 
-            MyEditViewModel.UndoManager.EndUndoBlock();
+                MyEditViewModel.UndoManager.EndUndoBlock();
+            }
         }
 
         public override event EventHandler CanExecuteChanged;
 
         public DeleteCommand(EditViewModel vm) : base(vm)
-        {
-
-        }
+        {}
 
 
         #endregion ICommand Implementation

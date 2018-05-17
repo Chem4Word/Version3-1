@@ -38,7 +38,6 @@ namespace Chem4Word.ViewModel
                     UndoAction();
                 }
             }
-
             public void Redo()
             {
                 if (!IsBufferRecord())
@@ -64,14 +63,9 @@ namespace Chem4Word.ViewModel
         private int _transactionLevel = 0;
 
         public int TransactionLevel => _transactionLevel;
-
-            
-  
         public bool CanRedo => _redoStack.Any(rr => rr.Level!=0);
 
         public bool CanUndo => _undoStack.Any(ur => ur.Level != 0);
-
-
         
         public UndoHandler(EditViewModel vm)
         {

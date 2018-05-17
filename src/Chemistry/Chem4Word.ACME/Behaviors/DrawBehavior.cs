@@ -131,9 +131,9 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else if (landedAtomShape == _currentAtomShape) //both are the same atom
                 {
-                    var newAtomPos = GetNewChainEndPos(landedAtomShape);
+                    var atomMetrics = GetNewChainEndPos(landedAtomShape);
 
-                    ViewModel.AddAtomChain(landedAtomShape.ParentAtom, newAtomPos.NewPos, newAtomPos.sproutDir);
+                    ViewModel.AddAtomChain(landedAtomShape.ParentAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
                 }
                 else //we must have hit a different atom altogether
                 {
@@ -200,39 +200,24 @@ namespace Chem4Word.ACME.Behaviors
 
                 var hour = GetGeneralDir(bondVector);
 
+                if (VirginAtom(lastAtom)) //it hasn't yet sprouted
+                {
+                    //Tag is used to store the direction the atom sprouted from its previous atom
+                    newTag = GetNewSproutDirection(hour);
+                    newDirection = newTag.ToVector() * ViewModel.Model.XamlBondLength;
+                }
+                else //it has sprouted, so where to put the new branch?
+                {
+                    var vecA = ((ClockDirections) lastAtom.Tag).ToVector();
+                    vecA.Normalize();
+                    var vecB = -bondVector;
+                    vecB.Normalize();
 
-                //Tag is used to store the direction the atom sprouted from its previous atom
-                if (hour == ClockDirections.Two)
-                {
-                   newTag= ClockDirections.Four;
+                    var balancingvector = -(vecA + vecB);
+                    balancingvector.Normalize();
+                    newTag = GetGeneralDir(balancingvector);
+                    newDirection = balancingvector * ViewModel.Model.XamlBondLength;
                 }
-                else if (hour == ClockDirections.Four)
-                {
-                    newTag = ClockDirections.Two;
-                }
-                else if (hour == ClockDirections.Eight)
-                {
-                    newTag = ClockDirections.Ten;
-                }
-
-                else if (hour == ClockDirections.Ten)
-                {
-                    newTag = ClockDirections.Eight;
-                }
-                else if (hour == ClockDirections.Twelve )
-                {
-                    newTag = ClockDirections.Four;
-                }
-                else if (hour ==ClockDirections.Six)
-                {
-                    newTag = ClockDirections.Eight;
-                }
-                else
-                {
-                    newTag = ClockDirections.Two;
-                }
-
-                newDirection = newTag.ToVector() * ViewModel.Model.XamlBondLength;
             }
             else
             {
@@ -241,6 +226,56 @@ namespace Chem4Word.ACME.Behaviors
 
             }
             return (newDirection+lastAtom.Position, newTag);
+        }
+
+        private bool VirginAtom(Atom lastAtom)
+        {
+            return lastAtom.Tag == null;
+        }
+
+        private static ClockDirections GetNewSproutDirection(ClockDirections hour)
+        {
+            ClockDirections newTag;
+            switch (hour)
+            {
+                case ClockDirections.One:
+                    newTag = ClockDirections.Four;
+                    break;
+                case ClockDirections.Two:
+                    newTag = ClockDirections.Four;
+                    break;
+                case ClockDirections.Three:
+                    newTag = ClockDirections.Two;
+                    break;
+                case ClockDirections.Four:
+                    newTag = ClockDirections.Two;
+                    break;
+                case ClockDirections.Five:
+                    newTag = ClockDirections.Two;
+                    break;
+                case ClockDirections.Six:
+                    newTag = ClockDirections.Eight;
+                    break;
+                case ClockDirections.Seven:
+                    newTag = ClockDirections.Nine;
+                    break;
+                case ClockDirections.Eight:
+                    newTag = ClockDirections.Ten;
+                    break;
+                case ClockDirections.Nine:
+                    newTag = ClockDirections.Ten;
+                    break;
+                case ClockDirections.Ten:
+                    newTag = ClockDirections.Eight;
+                    break;
+                case ClockDirections.Twelve:
+                    newTag = ClockDirections.Two;
+                    break;
+                default:
+                    newTag = ClockDirections.Two;
+                    break;
+            }
+            return newTag;
         }
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
