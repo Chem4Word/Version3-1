@@ -36,17 +36,15 @@ namespace Chem4Word.Model
         {
             get
             {
-                
-                
                 CalculateBoundingBox();
-                
+
                 return _boundingBox;
             }
         }
 
         /// <summary>
         /// returns the top level model, or null if it's a floating molecule
-      
+
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
@@ -439,6 +437,7 @@ namespace Chem4Word.Model
                 return (currentParent as Model);
             }
         }
+
         #endregion Graph Stuff
 
         #region Ring stuff

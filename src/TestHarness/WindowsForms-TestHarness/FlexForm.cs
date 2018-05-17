@@ -27,8 +27,6 @@ namespace WinFormsTestHarness
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
 
-        private Model _currentModel = null;
-
         public FlexForm()
         {
             InitializeComponent();
@@ -87,6 +85,8 @@ namespace WinFormsTestHarness
                     {
                         Model clone = existing.Clone();
                         clone.RescaleForCml();
+
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
                         _undoStack.Push(clone);
                     }
 
@@ -111,16 +111,18 @@ namespace WinFormsTestHarness
 
         private void EditStructure_Click(object sender, EventArgs e)
         {
-            Model model = _currentModel;
+            Model model = Display.Chemistry as Model;
             if (model != null)
             {
                 Model clone = model.Clone();
                 clone.RescaleForCml();
+
                 CMLConverter cc = new CMLConverter();
                 EditorHost editorHost = new EditorHost(cc.Export(clone), EditorType.Text);
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
+                    Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
                     _undoStack.Push(clone);
                     Model m = cc.Import(editorHost.OutputValue);
                     ShowChemistry($"Edited {m.ConciseFormula}", m);
@@ -158,9 +160,8 @@ namespace WinFormsTestHarness
                     Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
-                    //model.RebuildMolecules();
                     model.RefreshMolecules();
-                    _currentModel = model;
+
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
@@ -183,11 +184,12 @@ namespace WinFormsTestHarness
         private List<DisplayViewModel> StackToList(Stack<Model> stack)
         {
             List<DisplayViewModel> list = new List<DisplayViewModel>();
+            CMLConverter cc = new CMLConverter();
             foreach (var item in stack)
             {
                 list.Add(new DisplayViewModel
                 {
-                    Model = item
+                    Model = cc.Import(cc.Export(item))
                 });
             }
             return list;
@@ -533,15 +535,13 @@ namespace WinFormsTestHarness
         private void Undo_Click(object sender, EventArgs e)
         {
             Model m = _undoStack.Pop();
-            m.Relabel();
-            m.RescaleForCml();
-            Debug.WriteLine($"Popped {m.ConciseFormula}");
+            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Undo Stack");
 
             Model c = Display.Chemistry as Model;
-            Debug.WriteLine($"Pushing {c.ConciseFormula}");
             Model clone = c.Clone();
-            clone.RefreshMolecules();
+            clone.RescaleForCml();
 
+            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Redo Stack");
             _redoStack.Push(clone);
 
             ShowChemistry($"Undo -> {m.ConciseFormula}", m);
@@ -550,16 +550,13 @@ namespace WinFormsTestHarness
         private void Redo_Click(object sender, EventArgs e)
         {
             Model m = _redoStack.Pop();
-            m.Relabel();
-            m.RescaleForCml();
-            Debug.WriteLine($"Popped {m.ConciseFormula}");
+            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Redo Stack");
 
             Model c = Display.Chemistry as Model;
-            Debug.WriteLine($"Pushing {c.ConciseFormula}");
             Model clone = c.Clone();
-            clone.RefreshMolecules();
-            clone.Relabel();
             clone.RescaleForCml();
+
+            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Undo Stack");
             _undoStack.Push(clone);
 
             ShowChemistry($"Redo -> {m.ConciseFormula}", m);

@@ -145,7 +145,7 @@ namespace Chem4Word.ACME.Behaviors
             return lastAtom.Position + newDirection;
         }
 
-        private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _currentAtomShape = GetAtomUnderCursor(e);
             if (_currentAtomShape != null)

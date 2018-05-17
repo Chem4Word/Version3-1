@@ -214,9 +214,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.LayoutPanel.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.LayoutPanel.ColumnCount = 3;
-            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 275F));
+            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.LayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 275F));
             this.LayoutPanel.Controls.Add(this.DisplayHost, 1, 0);
             this.LayoutPanel.Controls.Add(this.RedoHost, 2, 0);
             this.LayoutPanel.Controls.Add(this.UndoHost, 0, 0);
@@ -231,21 +231,21 @@
             // 
             this.DisplayHost.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.DisplayHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DisplayHost.Location = new System.Drawing.Point(281, 3);
+            this.DisplayHost.Location = new System.Drawing.Point(278, 3);
             this.DisplayHost.Name = "DisplayHost";
-            this.DisplayHost.Size = new System.Drawing.Size(551, 429);
+            this.DisplayHost.Size = new System.Drawing.Size(559, 429);
             this.DisplayHost.TabIndex = 1;
-            this.DisplayHost.Text = "elementHost1";
+            this.DisplayHost.Text = "centreHost";
             this.DisplayHost.Child = this.Display;
             // 
             // RedoHost
             // 
             this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(838, 3);
+            this.RedoHost.Location = new System.Drawing.Point(843, 3);
             this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(274, 429);
+            this.RedoHost.Size = new System.Drawing.Size(269, 429);
             this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "elementHost2";
+            this.RedoHost.Text = "rightHost";
             this.RedoHost.Child = this.RedoStack;
             // 
             // UndoHost
@@ -253,9 +253,9 @@
             this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.UndoHost.Location = new System.Drawing.Point(3, 3);
             this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(272, 429);
+            this.UndoHost.Size = new System.Drawing.Size(269, 429);
             this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "elementHost3";
+            this.UndoHost.Text = "leftHost";
             this.UndoHost.Child = this.UndoStack;
             // 
             // Information

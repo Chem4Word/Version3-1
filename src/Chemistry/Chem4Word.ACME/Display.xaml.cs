@@ -6,11 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core;
-using Chem4Word.Core.Helpers;
 using Chem4Word.Model.Converters;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -138,9 +135,7 @@ namespace Chem4Word.ACME
             {
                 if (chemistryModel.AllAtoms.Count > 0)
                 {
-                    chemistryModel.RescaleForXaml();
-
-                    //Debug.WriteLine($"Ring count == {chemistryModel.Molecules.SelectMany(m => m.Rings).Count()}");
+                    chemistryModel.RescaleForXaml(true);
 
                     Placeholder.DataContext = new ViewModel.DisplayViewModel(chemistryModel);
                 }
