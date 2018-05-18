@@ -736,7 +736,6 @@ namespace Chem4Word.Model
             atomsSoFar = new Queue<AtomData>();
 
             //set up a front node and shove it onto the queue
-            AtomData frontNode;
             //shove the neigbours onto the queue to prime it
             foreach (Atom initialAtom in startAtom.Neighbours)
             {
@@ -747,7 +746,7 @@ namespace Chem4Word.Model
             //now scan the Molecule and detect all rings
             while (atomsSoFar.Any())
             {
-                frontNode = atomsSoFar.Dequeue();
+                AtomData frontNode = atomsSoFar.Dequeue();
                 foreach (Atom m in frontNode.CurrentAtom.Neighbours)
                 {
                     if (m != frontNode.Source) //ignore an atom that we've visited
@@ -758,7 +757,7 @@ namespace Chem4Word.Model
                             temp.Add(m);
                             temp.UnionWith(path[frontNode.CurrentAtom]);
                             path[m] = temp; //add on the path built up so far
-                            AtomData newItem = new AtomData() { Source = frontNode.CurrentAtom, CurrentAtom = m };
+                            AtomData newItem = new AtomData { Source = frontNode.CurrentAtom, CurrentAtom = m };
                             atomsSoFar.Enqueue(newItem);
                         }
                         else //we've got a collision - is it a ring closure
@@ -907,13 +906,7 @@ namespace Chem4Word.Model
             }
         }
 
-        public Point Centroid
-        {
-            get
-            {
-                return new Point(0, 0);
-            }
-        }
+        public Point Centroid => new Point(0, 0);
 
         public List<Atom> ConvexHull
         {
@@ -1120,15 +1113,8 @@ namespace Chem4Word.Model
             
             var overlapDetails = hull.Data?.FillContainsWithDetail(path.Data, 0.01, ToleranceType.Absolute);
 
-
-
             return (overlapDetails!=null && (overlapDetails == IntersectionDetail.FullyContains |
                     overlapDetails == IntersectionDetail.FullyInside | overlapDetails == IntersectionDetail.Intersects));
-
-
-
-
-
 
         }
     }
