@@ -1102,12 +1102,14 @@ namespace Chem4Word.Model
             var hull = BasicGeometry.BuildPath(ConvexHull.Select(a => a.Position).ToList());
 
             var path = BasicGeometry.BuildPath(placements);
+            var overlapDetails = hull.Data.FillContainsWithDetail(path.Data, 0.01, ToleranceType.Absolute);
+            return (overlapDetails == IntersectionDetail.FullyContains |
+                    overlapDetails == IntersectionDetail.FullyInside | overlapDetails == IntersectionDetail.Intersects);
 
-            return (hull.Data.FillContains(path.Data,0.01,ToleranceType.Absolute));
-            
-      
-       
-           
+
+
+
+
 
         }
     }

@@ -192,29 +192,32 @@ namespace Chem4Word.ACME.Behaviors
         {
             List<Point> placements = new List<Point>();
 
-            Point lastPos;
+            Point lastPos, nextPos;
 
             Vector bondVector;
             if (followsBond)
             {
                 bondVector = startBond.EndAtom.Position - startBond.StartAtom.Position;
                 lastPos = startBond.StartAtom.Position;
+                nextPos = startBond.EndAtom.Position;
 
             }
             else
             {
                 bondVector = startBond.StartAtom.Position - startBond.EndAtom.Position;
                 lastPos = startBond.EndAtom.Position;
+                nextPos = startBond.StartAtom.Position;
             }
 
             double exteriorAngle = 360.0 / ringSize;
             Matrix rotator = new Matrix();
 
             placements.Add(lastPos);
+
             for (int i = 1; i < ringSize; i++)
             {
-                bondVector = bondVector * rotator;
-                lastPos = lastPos + bondVector;
+                var newBondVector = bondVector * rotator;
+                lastPos = lastPos + newBondVector;
                 placements.Add(lastPos);
                 rotator.Rotate(exteriorAngle);
             }
@@ -240,7 +243,14 @@ namespace Chem4Word.ACME.Behaviors
         }
         protected override void OnDetaching()
         {
-            base.OnDetaching();
+            AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
+
+            if (_parent != null)
+            {
+                _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
+            }
+
+            _parent = null;
         }
     }
 }

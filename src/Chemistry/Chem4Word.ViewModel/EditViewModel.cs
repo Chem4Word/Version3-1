@@ -16,6 +16,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -854,6 +855,38 @@ namespace Chem4Word.ViewModel
 
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
         {
+            void MakeRingUnsaturated(List<NewAtomPlacement> list)
+            {
+                string bondOrder =
+                    list[0].ExistingAtom.BondBetween(list[1].ExistingAtom).Order;
+
+                int startpos = 0;
+
+                while (startpos < list.Count)
+                {
+                    var nextPos = (startpos + 1) % list.Count;
+
+                    while (startpos < list.Count & list[startpos].ExistingAtom.IsUnsaturated &
+                           list[nextPos].ExistingAtom.IsUnsaturated)
+                    {
+                        startpos++;
+                    }
+
+                    nextPos = (startpos + 1) % list.Count;
+
+                    if (!list[startpos].ExistingAtom.IsUnsaturated & !list[nextPos].ExistingAtom.IsUnsaturated)
+                    {
+                        list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom)
+                            .Order = Bond.OrderDouble;
+                        startpos += 2;
+                    }
+                    else
+                    {
+                        startpos++;
+                    }
+                }
+            }
+
             UndoManager.BeginUndoBlock();
             for (int i = 1; i <= newAtomPlacements.Count; i++)
             {
@@ -877,51 +910,15 @@ namespace Chem4Word.ViewModel
                     AddNewBond(previousAtom,currentAtom, previousAtom.Parent);
                 }
             }
-
+            //set the alternating single and double bonds if unsaturated
             if (unsaturated)
             {
-
-
-                string bondOrder =
-                    newAtomPlacements[0].ExistingAtom.BondBetween(newAtomPlacements[1].ExistingAtom).Order;
-
-                for (int i = 1; i <= newAtomPlacements.Count; i++)
-                {
-
-                    NewAtomPlacement currentPlacement = newAtomPlacements[i % newAtomPlacements.Count];
-                    NewAtomPlacement previousPlacement = newAtomPlacements[i-1];
-                    Bond existingBond = currentPlacement.ExistingAtom.BondBetween(previousPlacement.ExistingAtom);
-
-                    UndoManager.BeginUndoBlock();
-
-                    var tempBondOrder = existingBond.Order;
-
-                    Action redo = () =>
-                    {
-                        if (bondOrder == Bond.OrderSingle)
-                        {
-                            existingBond.Order = Bond.OrderDouble;
-                            bondOrder = Bond.OrderDouble;
-                        }
-                        else if (bondOrder == Bond.OrderDouble)
-                        {
-                            existingBond.Order = Bond.OrderSingle;
-                            bondOrder = Bond.OrderSingle;
-                        }
-                    };
-
-                    Action undo = () => { existingBond.Order = tempBondOrder; };
-
-                    UndoManager.RecordAction(undo, redo, "Set Bond Unsaturated");
-                    UndoManager.EndUndoBlock();
-                    redo();
-
-                }
+                MakeRingUnsaturated(newAtomPlacements);
             }
 
-            newAtomPlacements[0].ExistingAtom.Parent.Refresh();
+        newAtomPlacements[0].ExistingAtom.Parent.Refresh();
             
-            UndoManager.EndUndoBlock();
+        UndoManager.EndUndoBlock();
         }
     }
 }
