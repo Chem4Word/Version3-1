@@ -826,7 +826,7 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void SetBondAttributes(Bond parentBond)
+        public void SetBondAttributes(Bond parentBond, string newOrder = null, BondStereo? newStereo =null)
         {
             UndoManager.BeginUndoBlock();
 
@@ -841,8 +841,8 @@ namespace Chem4Word.ViewModel
 
             Action redo = () =>
             {
-                parentBond.Order = CurrentBondOrder;
-                parentBond.Stereo = CurrentStereo;
+                parentBond.Order = newOrder??CurrentBondOrder;
+                parentBond.Stereo = newStereo??CurrentStereo;
             };
             UndoManager.RecordAction(undo, redo);
 
@@ -855,6 +855,7 @@ namespace Chem4Word.ViewModel
 
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
         {
+
             void MakeRingUnsaturated(List<NewAtomPlacement> list)
             {
                 string bondOrder =
@@ -866,18 +867,23 @@ namespace Chem4Word.ViewModel
                 {
                     var nextPos = (startpos + 1) % list.Count;
 
-                    while (startpos < list.Count & list[startpos].ExistingAtom.IsUnsaturated &
+                    while (startpos < list.Count && list[startpos].ExistingAtom.IsUnsaturated &&
                            list[nextPos].ExistingAtom.IsUnsaturated)
                     {
                         startpos++;
                     }
 
+                    if (startpos == list.Count)
+                    {
+                        break;
+                    }
                     nextPos = (startpos + 1) % list.Count;
 
                     if (!list[startpos].ExistingAtom.IsUnsaturated & !list[nextPos].ExistingAtom.IsUnsaturated)
                     {
-                        list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom)
-                            .Order = Bond.OrderDouble;
+                        SetBondAttributes(list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom),
+                            Bond.OrderDouble, BondStereo.None);
+                        
                         startpos += 2;
                     }
                     else
@@ -888,9 +894,12 @@ namespace Chem4Word.ViewModel
             }
 
             UndoManager.BeginUndoBlock();
+
+            //work around the ring adding atoms
             for (int i = 1; i <= newAtomPlacements.Count; i++)
             {
-                NewAtomPlacement currentPlacement = newAtomPlacements[i % newAtomPlacements.Count];
+                int currIndex = i % newAtomPlacements.Count;
+                NewAtomPlacement currentPlacement = newAtomPlacements[currIndex];
                 NewAtomPlacement previousPlacement = newAtomPlacements[i-1];
 
                 Atom previousAtom = previousPlacement.ExistingAtom;
@@ -899,16 +908,25 @@ namespace Chem4Word.ViewModel
                 if (currentAtom == null)
                 {
                     Atom insertAtom = null;
-                  
-                        insertAtom = AddAtomChain(previousAtom, currentPlacement.Position,
-                            ClockDirections.Nothing);
-                        currentPlacement.ExistingAtom = insertAtom;
+
+                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position,
+                        ClockDirections.Nothing);
+                    Debug.Assert(insertAtom!=null);
+                    currentPlacement.ExistingAtom = insertAtom;
 
                 }
                 else if (previousAtom!=null && previousAtom.BondBetween(currentAtom)==null)
                 {
                     AddNewBond(previousAtom,currentAtom, previousAtom.Parent);
                 }
+
+               
+            }
+            //join up the ring if there is no last bond
+            if (newAtomPlacements[0].ExistingAtom
+                    .BondBetween(newAtomPlacements[1].ExistingAtom) == null)
+            {
+                AddNewBond(newAtomPlacements[0].ExistingAtom, newAtomPlacements[1].ExistingAtom, newAtomPlacements[0].ExistingAtom.Parent);
             }
             //set the alternating single and double bonds if unsaturated
             if (unsaturated)
@@ -916,8 +934,13 @@ namespace Chem4Word.ViewModel
                 MakeRingUnsaturated(newAtomPlacements);
             }
 
-        newAtomPlacements[0].ExistingAtom.Parent.Refresh();
-            
+           
+            newAtomPlacements[0].ExistingAtom.Parent.Refresh();
+
+            Action undo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
+            Action redo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
+
+            UndoManager.RecordAction(undo, redo, "Molecule refresh");
         UndoManager.EndUndoBlock();
         }
     }

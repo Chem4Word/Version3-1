@@ -467,7 +467,7 @@ namespace Chem4Word.Model
 
         public bool IsIsolated => Degree == 0;
 
-        public bool IsUnsaturated => BondOrders > Degree;
+        public bool IsUnsaturated => BondOrders > (double) Degree;
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
         // ToDo: Duplicated Routine

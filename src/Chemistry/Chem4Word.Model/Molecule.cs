@@ -1100,11 +1100,30 @@ namespace Chem4Word.Model
         {
             
             var hull = BasicGeometry.BuildPath(ConvexHull.Select(a => a.Position).ToList());
-
             var path = BasicGeometry.BuildPath(placements);
-            var overlapDetails = hull.Data.FillContainsWithDetail(path.Data, 0.01, ToleranceType.Absolute);
-            return (overlapDetails == IntersectionDetail.FullyContains |
-                    overlapDetails == IntersectionDetail.FullyInside | overlapDetails == IntersectionDetail.Intersects);
+
+            foreach (Point placement in placements)
+            {
+                if (hull.Data.FillContains(placement,1,ToleranceType.Absolute))
+                {
+                    return true;
+                }
+            }
+
+            foreach (Point point in Atoms.Select(a=>a.Position))
+            {
+                if (path.Data.FillContains(point, 1, ToleranceType.Absolute))
+                {
+                    return true;
+                }
+            }
+            
+            var overlapDetails = hull.Data?.FillContainsWithDetail(path.Data, 0.01, ToleranceType.Absolute);
+
+
+
+            return (overlapDetails!=null && (overlapDetails == IntersectionDetail.FullyContains |
+                    overlapDetails == IntersectionDetail.FullyInside | overlapDetails == IntersectionDetail.Intersects));
 
 
 
