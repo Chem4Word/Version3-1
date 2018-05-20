@@ -1087,8 +1087,7 @@ namespace Chem4Word.Model
         public void Move(Transform lastOperation)
         {
         }
-
-
+        
         public bool Overlaps(List<Point> placements)
         {
             
