@@ -512,7 +512,7 @@
                 ItemsSource="{Binding AllObjects}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Name="ChemCanvas"
+                        <controls:ChemistryCanvas x:Name="ChemCanvas"
                             MinWidth="4000"
                             MinHeight="3000"
                             Background="White" />
@@ -691,5 +691,11 @@
                 </ItemsControl.Resources>
             </ItemsControl>
         </ScrollViewer>
+        <controls:ZoomBox x:Name="zoomBox"
+            Width="180"
+            Margin="0,5,25,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            ScrollViewer="{Binding ElementName=DrawingArea}" />
     </DockPanel>
 </UserControl>

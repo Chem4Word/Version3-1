@@ -81,6 +81,10 @@ namespace Chem4Word.ACME
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
                             UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
             }
         }
 
@@ -185,7 +189,7 @@ namespace Chem4Word.ACME
         }
 
         /// <summary>
-        /// Centers any chemistry on the drawing area
+        /// Scrolls drawing into view
         /// </summary>
         private void ScrollIntoView()
         {
@@ -235,11 +239,14 @@ namespace Chem4Word.ACME
             {
                 if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
+                    // ToDo: Add Undo
                     //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
                     //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
                     _activeViewModel.Model.ScaleToAverageBondLength(blo.ChosenValue);
                     //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
                     //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
+                    Canvas c = LocateCanvas();
+                    _activeViewModel.Model.CentreInCanvas(new Rect(new Size(c.ActualWidth, c.ActualHeight)));
                     ScrollIntoView();
                 }
             }

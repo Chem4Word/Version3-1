@@ -64,6 +64,8 @@
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
     <Compile Include="Behaviors\SelectorBehavior.cs" />
+    <Compile Include="Controls\ChemistryCanvas.cs" />
+    <Compile Include="Controls\ZoomBox.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="CmlEditor.xaml.cs">
       <DependentUpon>CmlEditor.xaml</DependentUpon>
@@ -114,6 +116,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Resources\ControlStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\ZoomBox.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

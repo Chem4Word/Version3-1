@@ -388,6 +388,20 @@ namespace Chem4Word.Model
         }
 
         /// <summary>
+        /// Centres drawing in given canvas rectangle
+        /// </summary>
+        /// <param name="canvas"></param>
+        public void CentreInCanvas(Rect canvas)
+        {
+            // ToDo: Get this working
+            double offsetX = BoundingBox.Left - canvas.Width - BoundingBox.Width;
+            double offsetY = BoundingBox.Top - canvas.Height - BoundingBox.Height;
+
+            //RepositionAll(offsetX, offsetY);
+            //OnPropertyChanged(nameof(BoundingBox));
+        }
+
+        /// <summary>
         /// Drags all Atoms back to the origin by the specified offset
         /// </summary>
         /// <param name="x"> X offset</param>
@@ -415,8 +429,8 @@ namespace Chem4Word.Model
                 }
             }
 
-            OnPropertyChanged(nameof(BoundingBox));
             XamlBondLength = newLength;
+            OnPropertyChanged(nameof(BoundingBox));
         }
 
         public bool ScaledForXaml { get; set; }
