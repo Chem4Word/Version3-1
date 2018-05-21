@@ -457,7 +457,7 @@
                     FontFamily="Arial"
                     FontSize="16"
                     ItemsSource="{Binding Path=BondLengthOptions}"
-                    SelectedItem="{Binding Path=SelectedBondLengthOption}"
+                    SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
                     SelectionChanged="BondLengthCombo_OnChange"
                     ToolTip="Change Bond Length" />
                 <ComboBox x:Name="ZoomFactor"
