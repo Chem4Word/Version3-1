@@ -1088,33 +1088,58 @@ namespace Chem4Word.Model
         {
         }
         
+
+
+        //public bool Overlaps(List<Point> placements)
+        //{
+        //    for (int i = 1; i < placements.Count; i++)
+        //    {
+        //        int start = i;
+        //        int end = (i + 1) % placements.Count;
+        //        Point startPoint = placements[start];
+        //        Point endPoint = placements[end];
+        //        foreach (Bond myBond in Bonds)
+        //        {
+        //            Point? intersection = BasicGeometry.LineSegmentsIntersect(startPoint, endPoint,
+        //                myBond.StartAtom.Position,
+        //                myBond.EndAtom.Position);
+                    
+        //            if (intersection != null)
+        //            {
+        //                return true;
+        //            }
+
+        //        }
+
+        //    }
+        //    return false;
+
+        //}
+
         public bool Overlaps(List<Point> placements)
         {
-            
-            var hull = BasicGeometry.BuildPath(ConvexHull.Select(a => a.Position).ToList());
-            var path = BasicGeometry.BuildPath(placements);
+            var cg = GetOverlapGeometry(placements);
 
-            foreach (Point placement in placements)
-            {
-                if (hull.Data.FillContains(placement,1,ToleranceType.Absolute))
-                {
-                    return true;
-                }
-            }
+            bool overlaps = !cg.IsEmpty();
 
-            foreach (Point point in Atoms.Select(a=>a.Position))
-            {
-                if (path.Data.FillContains(point, 1, ToleranceType.Absolute))
-                {
-                    return true;
-                }
-            }
-            
-            var overlapDetails = hull.Data?.FillContainsWithDetail(path.Data, 0.01, ToleranceType.Absolute);
+            return overlaps;
+        }
 
-            return (overlapDetails!=null && (overlapDetails == IntersectionDetail.FullyContains |
-                    overlapDetails == IntersectionDetail.FullyInside | overlapDetails == IntersectionDetail.Intersects));
+        private CombinedGeometry GetOverlapGeometry(List<Point> placements)
+        {
+            Path hull = BasicGeometry.BuildPath(this.ConvexHull.Select(a => a.Position).ToList());
+            Path otherGeo = BasicGeometry.BuildPath(placements);
 
+            System.Windows.Media.Geometry hullgeo = hull.Data;
+            System.Windows.Media.Geometry placementsgeo = otherGeo.Data;
+            hullgeo.Freeze();
+            placementsgeo.Freeze();
+
+            var val1 = hullgeo.GetFlattenedPathGeometry();
+            var val2 = placementsgeo.GetFlattenedPathGeometry();
+
+            CombinedGeometry cg = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2);
+            return cg;
         }
     }
 }
