@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model.Annotations;
 using Chem4Word.Model.Enums;
 using Chem4Word.Model.Geometry;
 using System;
@@ -16,7 +17,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model
 {
@@ -145,7 +145,6 @@ namespace Chem4Word.Model
 
         private Point? _centroid;
 
-
         internal void RingCentroidChanged()
         {
             OnPropertyChanged("Centroid");
@@ -215,12 +214,9 @@ namespace Chem4Word.Model
                       select n;
             var nextatoms = adj.ToArray();
 
-            //Debug.Assert(nextatoms.Count() == 2);
-
             if (nextatoms.Length >= 2)
             {
                 Vector v1 = nextatoms[0].Position - start.Position;
-
                 Vector v2 = nextatoms[1].Position - start.Position;
 
                 //make sure a positive angle is the direction in which we want to travel
