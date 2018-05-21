@@ -205,7 +205,9 @@ namespace Chem4Word.Model
             res.Add(start);
             Atom next;
             if (start == null)
+            {
                 start = Atoms[0];
+            }
 
             //start with the start atom, and find the other two adjacent atoms that are part of the ring
             var adj = from n in start.Neighbours
@@ -215,24 +217,27 @@ namespace Chem4Word.Model
 
             //Debug.Assert(nextatoms.Count() == 2);
 
-            Vector v1 = nextatoms[0].Position - start.Position;
-
-            Vector v2 = nextatoms[1].Position - start.Position;
-
-            //make sure a positive angle is the direction in which we want to travel
-            //multiply the angle by the direction to choose the correct atom
-            double angle = (int)direction * Vector.AngleBetween(v1, v2);
-
-            next = angle > 0 ? nextatoms[0] : nextatoms[1];
-            //circle the ring, making sure we ignore atoms we've visited already
-            while (next != null)
+            if (nextatoms.Length >= 2)
             {
-                yield return next;
-                res.Add(next);
-                var candidates = next.NeighbourSet; //get the set of atoms around the next atom
-                //get rid of all the atoms NOT in the ring or already in the set
-                candidates.RemoveWhere(a => res.Contains(a) || !this.Atoms.Contains(a));
-                next = candidates.FirstOrDefault();
+                Vector v1 = nextatoms[0].Position - start.Position;
+
+                Vector v2 = nextatoms[1].Position - start.Position;
+
+                //make sure a positive angle is the direction in which we want to travel
+                //multiply the angle by the direction to choose the correct atom
+                double angle = (int)direction * Vector.AngleBetween(v1, v2);
+
+                next = angle > 0 ? nextatoms[0] : nextatoms[1];
+                //circle the ring, making sure we ignore atoms we've visited already
+                while (next != null)
+                {
+                    yield return next;
+                    res.Add(next);
+                    var candidates = next.NeighbourSet; //get the set of atoms around the next atom
+                    //get rid of all the atoms NOT in the ring or already in the set
+                    candidates.RemoveWhere(a => res.Contains(a) || !this.Atoms.Contains(a));
+                    next = candidates.FirstOrDefault();
+                }
             }
         }
 
