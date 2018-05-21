@@ -691,11 +691,5 @@
                 </ItemsControl.Resources>
             </ItemsControl>
         </ScrollViewer>
-        <controls:ZoomBox x:Name="zoomBox"
-            Width="180"
-            Margin="0,5,25,0"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            ScrollViewer="{Binding ElementName=DrawingArea}" />
     </DockPanel>
 </UserControl>
