@@ -195,10 +195,9 @@ namespace Chem4Word.Model
         /// Circles a ring
         /// </summary>
         /// <param name="start">Atom to start at</param>
-        /// <param name="anticlockwise">Which direction to go in</param>
+        /// <param name="direction">Which direction to go in</param>
         /// <returns>IEnumerable&lt;Atom&gt; that interates through the ring</returns>
-        public IEnumerable<Atom> Traverse(Atom start = null,
-            Enums.BondDirection direction = BondDirection.Anticlockwise)
+        public IEnumerable<Atom> Traverse(Atom start = null, BondDirection direction = BondDirection.Anticlockwise)
         {
             HashSet<Atom> res = new HashSet<Atom>();
             res.Add(start);

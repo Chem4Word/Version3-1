@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -102,6 +103,10 @@ namespace Chem4Word.Model
 
         #endregion Constructors
 
+        /// <summary>
+        /// Calculated Molecular Formula
+        /// </summary>
+        /// <returns></returns>
         public string CalculatedFormula()
         {
             string result = "";
@@ -317,6 +322,7 @@ namespace Chem4Word.Model
                 _count = value;
             }
         }
+
         /// <summary>
         /// Use the Tag during editing operations to store state
         /// Not persisted to the model
@@ -1006,6 +1012,79 @@ namespace Chem4Word.Model
         {
         }
 
+        public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
+        {
+            Id = $"m{++iMolcount}";
+            foreach (Atom a in Atoms)
+            {
+                a.Id = $"a{++iAtomCount}";
+            }
+
+            foreach (Bond b in Bonds)
+            {
+                b.Id = $"b{++iBondcount}";
+            }
+
+            if (includeNames)
+            {
+                int formulaCount = 0;
+                int nameCount = 0;
+                string prefix = $"{Id}.f";
+
+                foreach (Formula f in Formulas)
+                {
+                    if (!string.IsNullOrEmpty(f.Id) && f.Id.StartsWith(prefix))
+                    {
+                        string temp = f.Id.Substring(prefix.Length);
+                        int value = 0;
+                        int.TryParse(temp, out value);
+                        formulaCount = Math.Max(formulaCount, value);
+                    }
+                }
+
+                formulaCount++;
+
+                foreach (Formula f in Formulas)
+                {
+                    if (string.IsNullOrEmpty(f.Id) || !f.Id.StartsWith(prefix))
+                    {
+                        f.Id = $"{prefix}{formulaCount++}";
+                    }
+                }
+
+                prefix = $"{Id}.n";
+
+                foreach (ChemicalName n in ChemicalNames)
+                {
+                    if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith(prefix))
+                    {
+                        string temp = n.Id.Substring(prefix.Length);
+                        int value = 0;
+                        int.TryParse(temp, out value);
+                        nameCount = Math.Max(nameCount, value);
+                    }
+                }
+
+                nameCount++;
+
+                foreach (ChemicalName n in ChemicalNames)
+                {
+                    if (string.IsNullOrEmpty(n.Id) || !n.Id.StartsWith(prefix))
+                    {
+                        n.Id = $"{prefix}{nameCount++}";
+                    }
+                }
+            }
+
+            if (Molecules.Any())
+            {
+                foreach (var mol in Molecules)
+                {
+                    mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
+                }
+            }
+        }
+
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
@@ -1087,34 +1166,6 @@ namespace Chem4Word.Model
         public void Move(Transform lastOperation)
         {
         }
-        
-
-
-        //public bool Overlaps(List<Point> placements)
-        //{
-        //    for (int i = 1; i < placements.Count; i++)
-        //    {
-        //        int start = i;
-        //        int end = (i + 1) % placements.Count;
-        //        Point startPoint = placements[start];
-        //        Point endPoint = placements[end];
-        //        foreach (Bond myBond in Bonds)
-        //        {
-        //            Point? intersection = BasicGeometry.LineSegmentsIntersect(startPoint, endPoint,
-        //                myBond.StartAtom.Position,
-        //                myBond.EndAtom.Position);
-                    
-        //            if (intersection != null)
-        //            {
-        //                return true;
-        //            }
-
-        //        }
-
-        //    }
-        //    return false;
-
-        //}
 
         public bool Overlaps(List<Point> placements)
         {
@@ -1149,18 +1200,16 @@ namespace Chem4Word.Model
         public void Merge(Molecule mol)
         {
             Parent.Molecules.Remove(mol);
-            foreach (Atom newAtom in 
+            foreach (Atom newAtom in
                mol.Atoms.ToArray())
             {
                 mol.Atoms.Remove(newAtom);
                 Atoms.Add(newAtom);
-
             }
             foreach (Bond newBond in mol.Bonds.ToArray())
             {
                 mol.Bonds.Remove(newBond);
                 Bonds.Add(newBond);
-
             }
             RebuildRings();
         }
