@@ -709,7 +709,15 @@ namespace Chem4Word.ViewModel
                 newbond.StartAtom = a;
                 newbond.EndAtom = b;
                 mol.Bonds.Add(newbond);
-                mol.RebuildRings();
+                if (newbond.StartAtom.Parent != newbond.EndAtom.Parent)
+                {
+                    newbond.StartAtom.Parent.Merge(newbond.EndAtom.Parent);
+                }
+                else
+                {
+                    mol.RebuildRings();
+                }
+               
             };
 
             UndoManager.RecordAction(undo, redo);

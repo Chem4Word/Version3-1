@@ -1141,5 +1141,28 @@ namespace Chem4Word.Model
             CombinedGeometry cg = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2);
             return cg;
         }
+
+        /// <summary>
+        /// Joins another molecule into this one
+        /// </summary>
+        /// <param name="mol">Molecule to merge into this one</param>
+        public void Merge(Molecule mol)
+        {
+            Parent.Molecules.Remove(mol);
+            foreach (Atom newAtom in 
+               mol.Atoms.ToArray())
+            {
+                mol.Atoms.Remove(newAtom);
+                Atoms.Add(newAtom);
+
+            }
+            foreach (Bond newBond in mol.Bonds.ToArray())
+            {
+                mol.Bonds.Remove(newBond);
+                Bonds.Add(newBond);
+
+            }
+            RebuildRings();
+        }
     }
 }
