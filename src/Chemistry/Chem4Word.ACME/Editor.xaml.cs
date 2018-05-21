@@ -135,13 +135,7 @@ namespace Chem4Word.ACME
             this.DataContext = vm;
 
             Canvas c = LocateCanvas();
-            //double x = (c.ActualWidth - _activeViewModel.Model.BoundingBox.Width) / 2.0;
-            //double y = (c.ActualHeight - _activeViewModel.Model.BoundingBox.Height) / 2.0;
             _activeViewModel.Model.CentreInCanvas(new Size(c.ActualWidth, c.ActualHeight));
-            //_activeViewModel.Model.RepositionAll(-x, -y);
-
-            //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-            //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
 
             ScrollIntoView();
             BindControls(vm);
@@ -197,7 +191,7 @@ namespace Chem4Word.ACME
         /// and the view model
         /// </summary>
         /// <param name="vm">EditViewModel for ACME</param>
-        private void BindControls(ViewModel.EditViewModel vm)
+        private void BindControls(EditViewModel vm)
         {
             Binding atomBinding = new Binding("SelectedAtomOption");
             atomBinding.Source = vm;

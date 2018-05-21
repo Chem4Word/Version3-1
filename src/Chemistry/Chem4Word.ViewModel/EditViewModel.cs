@@ -7,6 +7,7 @@
 
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
+using Chem4Word.Model.Geometry;
 using Chem4Word.ViewModel.Adorners;
 using Chem4Word.ViewModel.Commands;
 using System;
@@ -21,7 +22,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
 using System.Windows.Media;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ViewModel
 {
@@ -209,7 +209,6 @@ namespace Chem4Word.ViewModel
 
         private void SetBondOption(int bondOptionId)
         {
-           
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
             if (SelectedItems.OfType<Bond>().Any())
             {
@@ -242,8 +241,6 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                var dictionary = new Dictionary<string, BondOption>();
-                var selectedBondTypes = new List<BondOption>();
                 var selectedBonds = SelectedItems.OfType<Bond>();
 
                 var selbonds = (from Bond selbond in selectedBonds
@@ -630,7 +627,7 @@ namespace Chem4Word.ViewModel
             if (lastAtom != null)
             {
                 UndoManager.BeginUndoBlock();
-               
+
                 Molecule currentMol = lastAtom.Parent;
 
                 Action undo = () =>
@@ -861,6 +858,5 @@ namespace Chem4Word.ViewModel
 
         public bool Dirty =>
             UndoManager.CanUndo;
-        
     }
 }
