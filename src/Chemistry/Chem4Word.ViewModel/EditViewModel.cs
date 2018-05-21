@@ -523,6 +523,29 @@ namespace Chem4Word.ViewModel
             MessageBox.Show("Copy code goes here");
         }
 
+        public void SetAverageBondLength(double newLength, Size canvas)
+        {
+            UndoManager.BeginUndoBlock();
+            double currentLength = Model.MeanBondLength;
+
+            Action undoAction = () =>
+            {
+                Model.ScaleToAverageBondLength(currentLength);
+                Model.CentreInCanvas(canvas);
+            };
+            Action redoAction = () =>
+            {
+                Model.ScaleToAverageBondLength(newLength);
+                Model.CentreInCanvas(canvas);
+            };
+
+            UndoManager.RecordAction(undoAction, redoAction);
+
+            redoAction.Invoke();
+
+            UndoManager.EndUndoBlock();
+        }
+
         public void DeleteAtom(Atom atom)
         {
             UndoManager.BeginUndoBlock();

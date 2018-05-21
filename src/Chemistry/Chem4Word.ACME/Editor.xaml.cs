@@ -188,17 +188,6 @@ namespace Chem4Word.ACME
             return foundChild;
         }
 
-        /// <summary>
-        /// Scrolls drawing into view
-        /// </summary>
-        private void ScrollIntoView()
-        {
-            double newVerticalOffset = _activeViewModel.Model.BoundingBox.Left;
-            double newHorizontalOffset = _activeViewModel.Model.BoundingBox.Top;
-            DrawingArea.ScrollToHorizontalOffset(newVerticalOffset);
-            DrawingArea.ScrollToVerticalOffset(newHorizontalOffset);
-        }
-
         private Canvas LocateCanvas()
         {
             Canvas res = FindChild<Canvas>(DrawingArea);
@@ -234,19 +223,12 @@ namespace Chem4Word.ACME
 
         private void BondLengthCombo_OnChange(object sender, RoutedEventArgs e)
         {
-            BondLengthOption blo = BondLengthSelector.SelectedItem as BondLengthOption;
-            if (blo != null)
+            if (BondLengthSelector.SelectedItem is BondLengthOption blo)
             {
                 if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
-                    // ToDo: Add Undo
-                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
-                    _activeViewModel.Model.ScaleToAverageBondLength(blo.ChosenValue);
-                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
                     Canvas c = LocateCanvas();
-                    _activeViewModel.Model.CentreInCanvas(new Rect(new Size(c.ActualWidth, c.ActualHeight)));
+                    _activeViewModel.SetAverageBondLength(blo.ChosenValue, new Size(c.ActualWidth, c.ActualHeight));
                     ScrollIntoView();
                 }
             }
@@ -263,6 +245,18 @@ namespace Chem4Word.ACME
                 case "100%":
                     break;
             }
+        }
+
+        /// <summary>
+        /// Scrolls drawing into view
+        /// </summary>
+        private void ScrollIntoView()
+        {
+            // ToDo: Get this working better
+            double newVerticalOffset = _activeViewModel.Model.BoundingBox.Left;
+            double newHorizontalOffset = _activeViewModel.Model.BoundingBox.Top;
+            DrawingArea.ScrollToHorizontalOffset(newVerticalOffset);
+            DrawingArea.ScrollToVerticalOffset(newHorizontalOffset);
         }
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)

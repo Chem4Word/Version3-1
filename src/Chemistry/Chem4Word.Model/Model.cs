@@ -388,24 +388,25 @@ namespace Chem4Word.Model
         }
 
         /// <summary>
-        /// Centres drawing in given canvas rectangle
+        /// Centres the model in a canvas
         /// </summary>
         /// <param name="canvas"></param>
-        public void CentreInCanvas(Rect canvas)
+        public void CentreInCanvas(Size canvas)
         {
-            // ToDo: Get this working
-            double offsetX = BoundingBox.Left - canvas.Width - BoundingBox.Width;
-            double offsetY = BoundingBox.Top - canvas.Height - BoundingBox.Height;
+            // Re-Centre scaled drawing on Canvas, does not need to be undone
+            double desiredLeft = (canvas.Width - BoundingBox.Width) / 2.0;
+            double desiredTop = (canvas.Height - BoundingBox.Height) / 2.0;
+            double offsetLeft = BoundingBox.Left - desiredLeft;
+            double offsetTop = BoundingBox.Top - desiredTop;
 
-            //RepositionAll(offsetX, offsetY);
-            //OnPropertyChanged(nameof(BoundingBox));
+            RepositionAll(offsetLeft, offsetTop);
         }
 
         /// <summary>
         /// Drags all Atoms back to the origin by the specified offset
         /// </summary>
-        /// <param name="x"> X offset</param>
-        /// <param name="y"> Y offset</param>
+        /// <param name="x">X offset</param>
+        /// <param name="y">Y offset</param>
         public void RepositionAll(double x, double y)
         {
             foreach (Molecule molecule in Molecules)
@@ -431,6 +432,7 @@ namespace Chem4Word.Model
 
             XamlBondLength = newLength;
             OnPropertyChanged(nameof(BoundingBox));
+            OnPropertyChanged(nameof(XamlBondLength));
         }
 
         public bool ScaledForXaml { get; set; }
