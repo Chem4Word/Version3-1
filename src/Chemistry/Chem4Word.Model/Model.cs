@@ -160,7 +160,7 @@ namespace Chem4Word.Model
                     }
                     break;
             }
-            OnPropertyChanged("BoundingBox");
+            OnPropertyChanged(nameof(BoundingBox));
         }
 
         public void Relabel(bool includeNames)
@@ -276,7 +276,7 @@ namespace Chem4Word.Model
                 Molecule m = new Molecule(seed);
                 Molecules.Add(m);
             }
-            OnPropertyChanged("BoundingBox");
+            OnPropertyChanged(nameof(BoundingBox));
         }
 
         /// <summary>

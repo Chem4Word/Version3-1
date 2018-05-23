@@ -58,10 +58,7 @@ namespace Chem4Word.ViewModel
 
         public double HalfBondThickness
         {
-            get
-            {
-                return BondThickness / 2;
-            }
+            get { return BondThickness / 2; }
         }
 
         #region Layout
@@ -91,7 +88,7 @@ namespace Chem4Word.ViewModel
                         return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                     }
                 }
-                catch (System.NullReferenceException ex)
+                catch (NullReferenceException)
                 {
                     return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }
