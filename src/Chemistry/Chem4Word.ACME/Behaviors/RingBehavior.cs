@@ -125,8 +125,6 @@ namespace Chem4Word.ACME.Behaviors
                 //altPlacements = PaceOut(e.GetPosition(AssociatedObject), BasicGeometry.ScreenSouth, xamlBondSize, RingSize);
             }
 
-          
-
             foreach (Point placement in preferredPlacements)
                 {
                     var nap = new NewAtomPlacement
@@ -137,8 +135,7 @@ namespace Chem4Word.ACME.Behaviors
                     newAtomPlacements.Add(nap);
                 }
 
-                ViewModel.DrawRing(newAtomPlacements, Unsaturated);
-            
+                ViewModel.DrawRing(newAtomPlacements, Unsaturated); 
         }
 
 
