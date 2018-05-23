@@ -131,7 +131,7 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     var nap = new NewAtomPlacement
                     {
-                        ExistingAtom = (GetTarget(placement).VisualHit as AtomShape)?.ParentAtom,
+                        ExistingAtom = (GetTarget(placement)?.VisualHit as AtomShape)?.ParentAtom,
                         Position = placement
                     };
                     newAtomPlacements.Add(nap);

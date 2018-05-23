@@ -546,6 +546,7 @@ namespace Chem4Word.ViewModel
             Action undoAction = () =>
             {
                 parent.Atoms.Add(atom);
+                SelectedItems.Add(atom);
             };
             Action redoAction = () =>
             {
@@ -584,12 +585,14 @@ namespace Chem4Word.ViewModel
                 bond.StartAtom = a1;
                 bond.EndAtom = a2;
                 a1.Parent.Bonds.Add(bond);
+                SelectedItems.Add(bond);
                 if (a2.Parent != a1.Parent)
                 {
                     a1.Parent.Merge(a2.Parent);
                 }
                 if (isTopLevel)
                 {
+
                     a1.Parent.RebuildRings();
                 }
             };
