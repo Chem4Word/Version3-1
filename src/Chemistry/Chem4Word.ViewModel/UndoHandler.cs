@@ -126,10 +126,20 @@ namespace Chem4Word.ViewModel
                 throw new IndexOutOfRangeException("Attempted to unwind empty undo stack.");
             }
 
+
             //we've concluded a transaction block so terminated it
             if (_transactionLevel == 0)
+
             {
-                _undoStack.Push(_bufferRecord);
+                if (_undoStack.Peek().IsBufferRecord())
+                {
+                    _undoStack.Pop();//no point in comitting an empty block so just remove it
+                }
+                else
+                {
+                    _undoStack.Push(_bufferRecord);
+                }
+                
             }
             //tell the parent viewmodel the command status has changed
             _editViewModel.UndoCommand.RaiseCanExecChanged();

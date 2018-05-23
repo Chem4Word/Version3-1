@@ -167,73 +167,9 @@ namespace Chem4Word.Model
         {
             int iBondcount = 0, iAtomCount = 0, iMolcount = 0;
 
-            // ToDo: Implement recursive re-labeling
-
             foreach (Molecule m in Molecules)
             {
-                m.Id = $"m{++iMolcount}";
-                if (m.Molecules.Any())
-                {
-                }
-                foreach (Atom a in m.Atoms)
-                {
-                    a.Id = $"a{(++iAtomCount)}";
-                }
-                foreach (Bond b in m.Bonds)
-                {
-                    b.Id = $"b{++iBondcount}";
-                }
-
-                if (includeNames)
-                {
-                    int formulaCount = 0;
-                    int nameCount = 0;
-                    string prefix = $"{m.Id}.f";
-
-                    foreach (Formula f in m.Formulas)
-                    {
-                        if (!string.IsNullOrEmpty(f.Id) && f.Id.StartsWith(prefix))
-                        {
-                            string temp = f.Id.Substring(prefix.Length);
-                            int value = 0;
-                            int.TryParse(temp, out value);
-                            formulaCount = Math.Max(formulaCount, value);
-                        }
-                    }
-
-                    formulaCount++;
-
-                    foreach (Formula f in m.Formulas)
-                    {
-                        if (string.IsNullOrEmpty(f.Id) || !f.Id.StartsWith(prefix))
-                        {
-                            f.Id = $"{prefix}{formulaCount++}";
-                        }
-                    }
-
-                    prefix = $"{m.Id}.n";
-
-                    foreach (ChemicalName n in m.ChemicalNames)
-                    {
-                        if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith(prefix))
-                        {
-                            string temp = n.Id.Substring(prefix.Length);
-                            int value = 0;
-                            int.TryParse(temp, out value);
-                            nameCount = Math.Max(nameCount, value);
-                        }
-                    }
-
-                    nameCount++;
-
-                    foreach (ChemicalName n in m.ChemicalNames)
-                    {
-                        if (string.IsNullOrEmpty(n.Id) || !n.Id.StartsWith(prefix))
-                        {
-                            n.Id = $"{prefix}{nameCount++}";
-                        }
-                    }
-                }
+                m.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
             }
         }
 

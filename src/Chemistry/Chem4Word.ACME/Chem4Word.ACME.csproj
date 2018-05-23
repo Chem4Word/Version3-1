@@ -63,6 +63,7 @@
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
+    <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="Behaviors\SelectorBehavior.cs" />
     <Compile Include="Controls\ChemistryCanvas.cs" />
     <Compile Include="Controls\ZoomBox.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Controls\ModeButton.cs" />
     <Compile Include="Converters\DoNothingConverter.cs" />
     <Compile Include="Converters\ElementConverter.cs" />
+    <Compile Include="Converters\EnabledConverter.cs" />
     <Compile Include="Converters\ModeConverter.cs" />
     <Compile Include="Editor.xaml.cs">
       <DependentUpon>Editor.xaml</DependentUpon>
@@ -83,6 +85,7 @@
     <Compile Include="Graphics\Arc.cs" />
     <Compile Include="Graphics\ArcArrow.cs" />
     <Compile Include="Graphics\ArrowBase.cs" />
+    <Compile Include="Graphics\RegularPolygon.cs" />
     <Compile Include="Graphics\Shapes.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

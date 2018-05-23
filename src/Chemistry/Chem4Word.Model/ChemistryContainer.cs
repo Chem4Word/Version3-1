@@ -195,5 +195,12 @@ namespace Chem4Word.Model
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public void CheckForMerge(Molecule mol2)
+        {
+            
+        }
+
+        
     }
 }

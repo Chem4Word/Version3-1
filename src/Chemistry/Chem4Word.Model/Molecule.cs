@@ -14,8 +14,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Chem4Word.Model
 {
@@ -48,13 +50,21 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
-            var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
+            if (m!=null & Atoms.Any())
+            {
+                var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
+                var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
 
-            var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
-            var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
+                var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
+                var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
 
-            _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+                _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            }
+
+            else
+            {
+                _boundingBox= new Rect(new Size(0.0, 0.0));
+            }
         }
 
         public string ConciseFormula { get; set; }
@@ -101,6 +111,10 @@ namespace Chem4Word.Model
 
         #endregion Constructors
 
+        /// <summary>
+        /// Calculated Molecular Formula
+        /// </summary>
+        /// <returns></returns>
         public string CalculatedFormula()
         {
             string result = "";
@@ -316,6 +330,7 @@ namespace Chem4Word.Model
                 _count = value;
             }
         }
+
         /// <summary>
         /// Use the Tag during editing operations to store state
         /// Not persisted to the model
@@ -735,7 +750,6 @@ namespace Chem4Word.Model
             atomsSoFar = new Queue<AtomData>();
 
             //set up a front node and shove it onto the queue
-            AtomData frontNode;
             //shove the neigbours onto the queue to prime it
             foreach (Atom initialAtom in startAtom.Neighbours)
             {
@@ -746,7 +760,7 @@ namespace Chem4Word.Model
             //now scan the Molecule and detect all rings
             while (atomsSoFar.Any())
             {
-                frontNode = atomsSoFar.Dequeue();
+                AtomData frontNode = atomsSoFar.Dequeue();
                 foreach (Atom m in frontNode.CurrentAtom.Neighbours)
                 {
                     if (m != frontNode.Source) //ignore an atom that we've visited
@@ -757,7 +771,7 @@ namespace Chem4Word.Model
                             temp.Add(m);
                             temp.UnionWith(path[frontNode.CurrentAtom]);
                             path[m] = temp; //add on the path built up so far
-                            AtomData newItem = new AtomData() { Source = frontNode.CurrentAtom, CurrentAtom = m };
+                            AtomData newItem = new AtomData { Source = frontNode.CurrentAtom, CurrentAtom = m };
                             atomsSoFar.Enqueue(newItem);
                         }
                         else //we've got a collision - is it a ring closure
@@ -906,13 +920,7 @@ namespace Chem4Word.Model
             }
         }
 
-        public Point Centroid
-        {
-            get
-            {
-                return new Point(0, 0);
-            }
-        }
+        public Point Centroid => new Point(0, 0);
 
         public List<Atom> ConvexHull
         {
@@ -1017,6 +1025,79 @@ namespace Chem4Word.Model
         {
         }
 
+        public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
+        {
+            Id = $"m{++iMolcount}";
+            foreach (Atom a in Atoms)
+            {
+                a.Id = $"a{++iAtomCount}";
+            }
+
+            foreach (Bond b in Bonds)
+            {
+                b.Id = $"b{++iBondcount}";
+            }
+
+            if (includeNames)
+            {
+                int formulaCount = 0;
+                int nameCount = 0;
+                string prefix = $"{Id}.f";
+
+                foreach (Formula f in Formulas)
+                {
+                    if (!string.IsNullOrEmpty(f.Id) && f.Id.StartsWith(prefix))
+                    {
+                        string temp = f.Id.Substring(prefix.Length);
+                        int value = 0;
+                        int.TryParse(temp, out value);
+                        formulaCount = Math.Max(formulaCount, value);
+                    }
+                }
+
+                formulaCount++;
+
+                foreach (Formula f in Formulas)
+                {
+                    if (string.IsNullOrEmpty(f.Id) || !f.Id.StartsWith(prefix))
+                    {
+                        f.Id = $"{prefix}{formulaCount++}";
+                    }
+                }
+
+                prefix = $"{Id}.n";
+
+                foreach (ChemicalName n in ChemicalNames)
+                {
+                    if (!string.IsNullOrEmpty(n.Id) && n.Id.StartsWith(prefix))
+                    {
+                        string temp = n.Id.Substring(prefix.Length);
+                        int value = 0;
+                        int.TryParse(temp, out value);
+                        nameCount = Math.Max(nameCount, value);
+                    }
+                }
+
+                nameCount++;
+
+                foreach (ChemicalName n in ChemicalNames)
+                {
+                    if (string.IsNullOrEmpty(n.Id) || !n.Id.StartsWith(prefix))
+                    {
+                        n.Id = $"{prefix}{nameCount++}";
+                    }
+                }
+            }
+
+            if (Molecules.Any())
+            {
+                foreach (var mol in Molecules)
+                {
+                    mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
+                }
+            }
+        }
+
         public Molecule Clone()
         {
             Molecule clone = new Molecule();
@@ -1097,6 +1178,88 @@ namespace Chem4Word.Model
 
         public void Move(Transform lastOperation)
         {
+        }
+
+        public bool Overlaps(List<Point> placements)
+        {
+            var cg = GetOverlapGeometry(placements);
+
+            bool overlaps = !cg.IsEmpty();
+
+            return overlaps;
+        }
+
+        private CombinedGeometry GetOverlapGeometry(List<Point> placements)
+        {
+            Path hull = BasicGeometry.BuildPath(this.ConvexHull.Select(a => a.Position).ToList());
+            Path otherGeo = BasicGeometry.BuildPath(placements);
+
+            System.Windows.Media.Geometry hullgeo = hull.Data;
+            System.Windows.Media.Geometry placementsgeo = otherGeo.Data;
+            hullgeo.Freeze();
+            placementsgeo.Freeze();
+
+            var val1 = hullgeo.GetFlattenedPathGeometry();
+            var val2 = placementsgeo.GetFlattenedPathGeometry();
+
+            CombinedGeometry cg = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2);
+            return cg;
+        }
+
+        /// <summary>
+        /// Joins another molecule into this one
+        /// </summary>
+        /// <param name="mol">Molecule to merge into this one</param>
+        public void Merge(Molecule mol)
+        {
+            Debug.Assert(mol!=this);
+            Debug.Assert(mol!=null);
+            Parent.Molecules.Remove(mol);
+            foreach (Atom newAtom in
+               mol.Atoms.ToArray())
+            {
+                mol.Atoms.Remove(newAtom);
+                if (!Atoms.Contains(newAtom))
+                {
+                    Atoms.Add(newAtom);
+                }
+            }
+            foreach (Bond newBond in mol.Bonds.ToArray())
+            {
+                mol.Bonds.Remove(newBond);
+                if (!Bonds.Contains(newBond))
+                {
+                    Bonds.Add(newBond);
+                }
+            }
+        }
+        /// <summary>
+        /// split a molecule into two
+        /// assuming that the bond between a and b has already
+        /// been deleted
+        /// </summary>
+        /// <param name="a">Atom from first molecule</param>
+        /// <param name="b">Atom from second molecule</param>
+        public void Split(Atom a, Atom b)
+        {
+            Debug.Assert(a.BondBetween(b)==null);
+
+            b.Parent = null;
+            Refresh();
+
+            if(b.Parent==null)//if it's non-null after refresh, then it was part of a ring system
+            {
+                Molecule newmol = new Molecule();
+
+                Parent.Molecules.Add(newmol);
+                newmol.Refresh(b);
+
+                foreach (Atom oldAtom in newmol.Atoms)
+                {
+                    Atoms.Remove(oldAtom);
+                }
+            }
+          
         }
     }
 }
