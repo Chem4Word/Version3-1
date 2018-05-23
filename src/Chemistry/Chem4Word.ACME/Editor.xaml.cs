@@ -141,6 +141,7 @@ namespace Chem4Word.ACME
             BindControls(vm);
             ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
 
+            // Hack: Couldn't find a better way to do this
             _activeViewModel.BondLengthCombo = BondLengthSelector;
         }
 

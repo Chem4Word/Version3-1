@@ -534,6 +534,7 @@ namespace Chem4Word.ViewModel
 
                 FontSize = currentLength * Globals.FontSizePercentageBond;
                 SelectedBondLengthOption = blo;
+                // Hack: Couldn't find a better way to do this
                 BondLengthCombo.SelectedItem = blo;
             };
             Action redoAction = () =>
