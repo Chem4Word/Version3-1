@@ -246,11 +246,8 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
-            // ToDo: Get this working better
-            double newVerticalOffset = _activeViewModel.Model.BoundingBox.Left;
-            double newHorizontalOffset = _activeViewModel.Model.BoundingBox.Top;
-            DrawingArea.ScrollToHorizontalOffset(newVerticalOffset);
-            DrawingArea.ScrollToVerticalOffset(newHorizontalOffset);
+            DrawingArea.ScrollToHorizontalOffset((DrawingArea.ExtentWidth - DrawingArea.ViewportWidth) / 2);
+            DrawingArea.ScrollToVerticalOffset((DrawingArea.ExtentHeight - DrawingArea.ViewportHeight) / 2);
         }
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)

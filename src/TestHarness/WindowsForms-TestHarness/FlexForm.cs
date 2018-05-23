@@ -90,7 +90,7 @@ namespace WinFormsTestHarness
                         _undoStack.Push(clone);
                     }
 
-                    if (model.MeanBondLength < 5 || model.MeanBondLength > 95)
+                    if (model.MeanBondLength < 2.5 || model.MeanBondLength > 97.5)
                     {
                         model.ScaleToAverageBondLength(20);
                     }

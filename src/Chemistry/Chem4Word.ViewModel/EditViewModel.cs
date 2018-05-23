@@ -41,8 +41,6 @@ namespace Chem4Word.ViewModel
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
-        private List<BondLengthOption> _bondLengthOptions = new List<BondLengthOption>();
-        private BondLengthOption _selectedBondLengthOption;
         private int? _selectedBondOptionId;
 
         public ComboBox BondLengthCombo { get; set; }
@@ -51,16 +49,8 @@ namespace Chem4Word.ViewModel
 
         #region Properties
 
-        public List<BondLengthOption> BondLengthOptions
-        {
-            get { return _bondLengthOptions; }
-        }
-
-        public BondLengthOption SelectedBondLengthOption
-        {
-            get { return _selectedBondLengthOption; }
-            set { _selectedBondLengthOption = value; }
-        }
+        public List<BondLengthOption> BondLengthOptions { get; } = new List<BondLengthOption>();
+        public BondLengthOption SelectedBondLengthOption { get; set; }
 
         public double EditBondThickness
         {
@@ -322,10 +312,10 @@ namespace Chem4Word.ViewModel
                     ChosenValue = (int)(i * Globals.ScaleFactorForXaml),
                     DisplayAs = i.ToString("0")
                 };
-                _bondLengthOptions.Add(option);
+                BondLengthOptions.Add(option);
                 if (Math.Abs(i * Globals.ScaleFactorForXaml - Model.XamlBondLength) < 2.5 * Globals.ScaleFactorForXaml)
                 {
-                    _selectedBondLengthOption = option;
+                    SelectedBondLengthOption = option;
                 }
             }
         }
@@ -528,7 +518,7 @@ namespace Chem4Word.ViewModel
             double currentLength = Model.MeanBondLength;
             SelectedBondLengthOption = null;
             BondLengthOption blo = null;
-            foreach (var option in _bondLengthOptions)
+            foreach (var option in BondLengthOptions)
             {
                 if (Math.Abs(option.ChosenValue - currentLength) < 2.5 * Globals.ScaleFactorForXaml)
                 {
