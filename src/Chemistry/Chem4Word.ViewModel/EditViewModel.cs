@@ -566,7 +566,8 @@ namespace Chem4Word.ViewModel
             var a1 = bond.StartAtom;
             var a2 = bond.EndAtom;
             Molecule parent = bond.Parent;
-        
+
+            Model.Model mod = bond.Model;
 
             bool isTopLevel = UndoManager.TransactionLevel == 1;
             Action redoAction = () =>
@@ -585,7 +586,9 @@ namespace Chem4Word.ViewModel
             {
                 bond.StartAtom = a1;
                 bond.EndAtom = a2;
+
                 a1.Parent.Bonds.Add(bond);
+
                 SelectedItems.Clear();
                 SelectedItems.Add(bond);
                 if (a2.Parent != a1.Parent)

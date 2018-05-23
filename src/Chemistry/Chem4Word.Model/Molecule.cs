@@ -50,7 +50,7 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            if (Atoms.Any())
+            if (m!=null & Atoms.Any())
             {
                 var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
                 var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();

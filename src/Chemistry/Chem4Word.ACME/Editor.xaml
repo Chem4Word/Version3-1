@@ -14,6 +14,7 @@
     xmlns:release="condition:!DEBUG"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
+             
     Width="1013"
     Height="774"
     d:DataContext="{d:DesignInstance viewModel:EditViewModel}"
@@ -200,19 +201,25 @@
                     PlacementTarget="{Binding ElementName=RingButton}"
                     StaysOpen="False">
                     <Border>
-                        <WrapPanel Width="70">
-                            <!--  Print to local  -->
-                            <Button
+                        <Grid Width="70">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Button Grid.Column="0" Grid.Row="0"
                                 Click="RingSelButton_OnClick"
-                                
                                 ToolTip="Benzene">
                                 <Path Style="{StaticResource BenzeneStyle}" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior RingSize="6" Unsaturated="True" ViewModel="{Binding}" />
                                 </Button.Tag>
                             </Button>
-                            <!--  Print to network  -->
-                            <Button
+                            <Button Grid.Column="1" Grid.Row="0"
                                 Click="RingSelButton_OnClick"
                                 ToolTip="Cyclochexane">
                                 <Path Style="{StaticResource CyclohexStyle}" />
@@ -220,7 +227,7 @@
                                     <behaviors:RingBehavior RingSize="6" Unsaturated="False" ViewModel="{Binding}" />
                                 </Button.Tag>
                             </Button>
-                            <Button
+                            <Button Grid.Column="0" Grid.Row="1"
                                 Click="RingSelButton_OnClick"
 
                                 ToolTip="Cyclopentane">
@@ -229,7 +236,7 @@
                                     <behaviors:RingBehavior RingSize="5" Unsaturated="False" ViewModel="{Binding}" />
                                 </Button.Tag>
                             </Button>
-                            <Button
+                            <Button Grid.Column="1" Grid.Row="1"
                                 Click="RingSelButton_OnClick"
                                 ToolTip="Cyclopentadiene">
                                 <Path Style="{StaticResource CyclopentadieneStyle}" />
@@ -237,7 +244,23 @@
                                     <behaviors:RingBehavior RingSize="5" Unsaturated="True" ViewModel="{Binding}" />
                                 </Button.Tag>
                             </Button>
-                        </WrapPanel>
+                            <Button Grid.Column="0" Grid.Row="2"
+                                Click="RingSelButton_OnClick"
+                                    ToolTip="Cycloheptane">
+                                <Path Style="{StaticResource CycloheptaneStyle}"/>
+                                <Button.Tag>
+                                    <behaviors:RingBehavior RingSize="7" Unsaturated="False" ViewModel="{Binding}" />
+                                </Button.Tag>
+                            </Button>
+                            <Button Grid.Column="1" Grid.Row="2"
+                                Click="RingSelButton_OnClick"
+                                    ToolTip="Cyclooctane">
+                                <Path Style="{StaticResource CyclooctaneStyle}"/>
+                                <Button.Tag>
+                                    <behaviors:RingBehavior RingSize="8" Unsaturated="False"  ViewModel="{Binding}" />
+                                </Button.Tag>
+                            </Button>
+                        </Grid>
                     </Border>
                 </Popup>
                 <RadioButton x:Name="ChainButton" GroupName="Actions">

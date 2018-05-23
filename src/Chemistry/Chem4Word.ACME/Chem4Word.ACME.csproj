@@ -83,6 +83,7 @@
     <Compile Include="Graphics\Arc.cs" />
     <Compile Include="Graphics\ArcArrow.cs" />
     <Compile Include="Graphics\ArrowBase.cs" />
+    <Compile Include="Graphics\RegularPolygon.cs" />
     <Compile Include="Graphics\Shapes.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

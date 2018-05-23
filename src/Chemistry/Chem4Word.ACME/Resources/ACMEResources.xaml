@@ -103,7 +103,33 @@
         <Setter Property="Width" Value="25" />
         <Setter Property="Data" Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z M 12,20.5 M 5.52786404500042,15.7977179816602 L 8,8.18926585129899 M 16,8.18926585129899 L 18.4721359549996,15.7977179816602" />
     </Style>
-
+    <graphics:RegularPolygon x:Key="Heptagon"  SideLength="8.0" PointCount="7"/>
+    <graphics:RegularPolygon x:Key="Octagon"  SideLength="8.0" PointCount="8"/>
+    <Style x:Key="CycloheptaneStyle" TargetType="Path">
+        <Setter Property="Tag" Value="Cycloheptane" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M4,0L11.2077509432194,3.47106991294047L12.9879184148699,11.2704932103951L8,17.5251450701393L-3.5527136788005E-15,17.5251450701393L-4.98791841486987,11.2704932103951L-3.20775094321936,3.47106991294046z"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform X="7.5" Y="5"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="CyclooctaneStyle" TargetType="Path">
+        <Setter Property="Tag" Value="Cyclooctane" />
+        <Setter Property="Height" Value="25" />
+        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
+        <Setter Property="Width" Value="25" />
+        <Setter Property="Data" Value="M4,0L11.3910362600903,3.06146745892072L14.452503719011,10.452503719011L11.3910362600903,17.8435399791013L4,20.905007438022L-3.39103626009029,17.8435399791013L-6.45250371901101,10.452503719011L-3.3910362600903,3.06146745892072z"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform X="7.5" Y="3"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <Style x:Key="ChainStyle" TargetType="Path">
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
