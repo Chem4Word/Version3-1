@@ -524,11 +524,23 @@ namespace Chem4Word.ViewModel
         {
             UndoManager.BeginUndoBlock();
             double currentLength = Model.MeanBondLength;
+            SelectedBondLengthOption = null;
+            BondLengthOption blo = null;
+            foreach (var option in _bondLengthOptions)
+            {
+                if (Math.Abs(option.ChosenValue - currentLength) < 2.5 * Globals.ScaleFactorForXaml)
+                {
+                    blo = option;
+                    break;
+                }
+            }
 
             Action undoAction = () =>
             {
                 Model.ScaleToAverageBondLength(currentLength);
                 Model.CentreInCanvas(canvas);
+
+                SelectedBondLengthOption = blo;
             };
             Action redoAction = () =>
             {

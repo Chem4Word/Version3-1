@@ -28,7 +28,8 @@
                 <ResourceDictionary Source="Resources/ControlStyles.xaml" />
                 <ResourceDictionary Source="Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}">
+            <Style x:Key="CommandButtonStyle"
+                TargetType="{x:Type Button}">
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="Background" Value="Transparent" />
@@ -46,13 +47,17 @@
     </UserControl.Resources>
 
     <UserControl.InputBindings>
-        <KeyBinding Key="Z"
+        <KeyBinding
+            Key="Z"
             Command="{Binding UndoCommand}"
             Modifiers="Control" />
-        <KeyBinding Key="Y"
+        <KeyBinding
+            Key="Y"
             Command="{Binding RedoCommand}"
             Modifiers="Control" />
-        <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
+        <KeyBinding
+            Key="Delete"
+            Command="{Binding DeleteCommand}" />
     </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
@@ -61,18 +66,23 @@
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
         </DockPanel.Resources>
-        <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
+        <ToolBarTray
+            DockPanel.Dock="Top"
+            IsLocked="True">
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
-                    <EventSetter Event="Button.Click" Handler="EventSetter_OnHandler" />
+                    <EventSetter
+                        Event="Button.Click"
+                        Handler="EventSetter_OnHandler" />
                 </Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBrushKey}}" />
                     <Setter Property="BorderThickness" Value="1" />
                     <Setter Property="Padding" Value="2" />
                 </Style>
-                <Style x:Key="ToolbarButtonStyle" TargetType="{x:Type RadioButton}">
+                <Style x:Key="ToolbarButtonStyle"
+                    TargetType="{x:Type RadioButton}">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="Transparent" />
                     <Setter Property="Background" Value="Transparent" />
@@ -83,7 +93,8 @@
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
-                <Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}">
+                <Style x:Key="CommandButtonStyle"
+                    TargetType="{x:Type Button}">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="Transparent" />
                     <Setter Property="Background" Value="Transparent" />
@@ -95,7 +106,8 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ToolBarTray.Resources>
-            <ToolBar x:Name="DrawingToolbar" BandIndex="0">
+            <ToolBar x:Name="DrawingToolbar"
+                BandIndex="0">
                 <ComboBox x:Name="AtomCombo"
                     Width="48"
                     Height="25"
@@ -176,7 +188,8 @@
                     GroupName="Actions"
                     ToolTip="Insert a ring">
                     <StackPanel Orientation="Horizontal">
-                        <Path Name="RingButtonPath" Style="{StaticResource BenzeneStyle}" />
+                        <Path Name="RingButtonPath"
+                            Style="{StaticResource BenzeneStyle}" />
                     </StackPanel>
                 </RadioButton>
                 <Button Name="RingDropdownButton"
@@ -184,7 +197,9 @@
                     Click="RingDropdown_OnClick"
                     ToolTip="Select Ring">
                     <Viewbox Stretch="Uniform">
-                        <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
+                        <Path
+                            Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z"
+                            Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                 </Button>
                 <!--  Print Toggle Button Popup  -->
@@ -222,7 +237,8 @@
                         </WrapPanel>
                     </Border>
                 </Popup>
-                <RadioButton x:Name="ChainButton" GroupName="Actions">
+                <RadioButton x:Name="ChainButton"
+                    GroupName="Actions">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
                             <RotateTransform Angle="180" />
@@ -243,7 +259,9 @@
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>
-                                NH<Run BaselineAlignment="Subscript" FontSize="12">
+                                NH<Run
+                                    BaselineAlignment="Subscript"
+                                    FontSize="12">
                                     3
                                 </Run></TextBlock>
                             <graphics:ArrowBase
@@ -265,7 +283,9 @@
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>
-                                H<Run BaselineAlignment="Subscript" FontSize="12">
+                                H<Run
+                                    BaselineAlignment="Subscript"
+                                    FontSize="12">
                                     2
                                 </Run>
                                 O</TextBlock>
@@ -282,7 +302,9 @@
                         Width="24"
                         Height="24"
                         Stretch="Uniform">
-                        <Path Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
+                        <Path
+                            Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"
+                            Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                     <RadioButton.Tag>
                         <behaviors:DeleteBehavior ViewModel="{Binding}" />
@@ -319,7 +341,8 @@
                             Stretch="UniformToFill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="PasteButton" Style="{StaticResource CommandButtonStyle}">
+                <Button x:Name="PasteButton"
+                    Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -369,7 +392,9 @@
                 <Button x:Name="FlipVerticalButton"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Vertical">
-                    <Viewbox Width="24" Height="24">
+                    <Viewbox
+                        Width="24"
+                        Height="24">
                         <Path
                             Width="24"
                             Height="24"
@@ -383,7 +408,9 @@
                 <Button x:Name="FlipHorizontalButton"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Horizontal">
-                    <Viewbox Width="24" Height="24">
+                    <Viewbox
+                        Width="24"
+                        Height="24">
                         <Path
                             Width="24"
                             Height="24"
@@ -397,7 +424,9 @@
                 <Button x:Name="FuseButton"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Fuse">
-                    <Viewbox Width="24" Height="24">
+                    <Viewbox
+                        Width="24"
+                        Height="24">
                         <Path
                             Width="24"
                             Height="24"
@@ -411,7 +440,9 @@
                 <Button x:Name="GroupButton"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Group fragments">
-                    <Viewbox Width="24" Height="24">
+                    <Viewbox
+                        Width="24"
+                        Height="24">
 
                         <Path
                             Width="24"
@@ -450,7 +481,8 @@
                     </Viewbox>
                 </Button>
             </ToolBar>
-            <ToolBar x:Name="BondLengthToolbar" BandIndex="4">
+            <ToolBar x:Name="BondLengthToolbar"
+                BandIndex="4">
                 <ComboBox x:Name="BondLengthSelector"
                     Width="50"
                     DisplayMemberPath="DisplayAs"
@@ -525,7 +557,9 @@
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
                         <LinearGradientBrush.RelativeTransform>
-                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
+                            <ScaleTransform
+                                ScaleX="{Binding Path=HatchScaling, Mode=OneWay}"
+                                ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                         </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
                             <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
@@ -537,7 +571,9 @@
                         <GradientStop Offset="0.25" Color="Transparent" />
                         <GradientStop Offset="0.30" Color="Transparent" />
                         <LinearGradientBrush.RelativeTransform>
-                            <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
+                            <ScaleTransform
+                                ScaleX="{Binding Path=HatchScaling, Mode=OneWay}"
+                                ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                         </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
                             <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
@@ -679,7 +715,9 @@
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter Property="Fill">
                                                 <Setter.Value>
-                                                    <SolidColorBrush Opacity="0.5" Color="{x:Static SystemColors.HighlightColor}" />
+                                                    <SolidColorBrush
+                                                        Opacity="0.5"
+                                                        Color="{x:Static SystemColors.HighlightColor}" />
                                                 </Setter.Value>
                                             </Setter>
                                         </Trigger>
