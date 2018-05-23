@@ -421,7 +421,8 @@
                 </Button>
 
                 <Button x:Name="AddHydrogens"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Add Explicit Hydrogens">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -437,7 +438,8 @@
                 </Button>
 
                 <Button x:Name="RemoveHydrogens"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Remove Explicit Hydrogens">
                     <Viewbox
                         Width="24"
                         Height="24"
