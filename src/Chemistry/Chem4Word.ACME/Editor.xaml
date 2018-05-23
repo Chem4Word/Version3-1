@@ -314,7 +314,6 @@
             <ToolBar x:Name="EditToolbar"
                 Height="40"
                 BandIndex="2">
-
                 <Button x:Name="CutButton"
                     Command="{Binding CutCommand}"
                     Style="{StaticResource CommandButtonStyle}">
@@ -418,6 +417,38 @@
                             Data="M0,16.400004L32,16.400004 32,28.4z M32,0L32,11.999996 0,11.999996z"
                             Fill="{StaticResource Chem4WordBrush}"
                             Stretch="Uniform" />
+                    </Viewbox>
+                </Button>
+
+                <Button x:Name="AddHydrogens"
+                    Style="{StaticResource CommandButtonStyle}">
+                    <Viewbox
+                        Width="24"
+                        Height="24"
+                        Stretch="Uniform">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="Arial"
+                            Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
+                            +H
+                        </TextBlock>
+                    </Viewbox>
+                </Button>
+
+                <Button x:Name="RemoveHydrogens"
+                    Style="{StaticResource CommandButtonStyle}">
+                    <Viewbox
+                        Width="24"
+                        Height="24"
+                        Stretch="Uniform">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="Arial"
+                            Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
+                            -H
+                        </TextBlock>
                     </Viewbox>
                 </Button>
 
