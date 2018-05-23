@@ -5,24 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
+using Chem4Word.Model.Geometry;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ACME.Graphics
 {
-    public class RegularPolygon :Shape
+    public class RegularPolygon : Shape
     {
-
-
-
-
         public int PointCount
         {
             get { return (int)GetValue(PointCountProperty); }
@@ -32,8 +24,6 @@ namespace Chem4Word.ACME.Graphics
         // Using a DependencyProperty as the backing store for PointCount.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PointCountProperty =
             DependencyProperty.Register("PointCount", typeof(int), typeof(RegularPolygon), new PropertyMetadata(4));
-
-
 
         public double SideLength
         {
@@ -45,7 +35,6 @@ namespace Chem4Word.ACME.Graphics
         public static readonly DependencyProperty SideLengthProperty =
             DependencyProperty.Register("SideLength", typeof(double), typeof(RegularPolygon), new PropertyMetadata(25.0));
 
-
         protected override Geometry DefiningGeometry
         {
             get
@@ -54,7 +43,6 @@ namespace Chem4Word.ACME.Graphics
 
                 path.Data.Freeze();
                 return path.Data;
-
             }
         }
 

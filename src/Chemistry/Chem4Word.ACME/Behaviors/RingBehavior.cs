@@ -5,26 +5,19 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Chem4Word.ViewModel;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class RingBehavior :BaseEditBehavior
+    public class RingBehavior : BaseEditBehavior
     {
-
         private int _ringSize;
 
         public int RingSize
@@ -40,7 +33,7 @@ namespace Chem4Word.ACME.Behaviors
         {
         }
 
-        public RingBehavior(string ringspec):this()
+        public RingBehavior(string ringspec) : this()
         {
             RingSize = int.Parse(ringspec[0].ToString());
             Unsaturated = ringspec[1] == 'U';
@@ -52,8 +45,6 @@ namespace Chem4Word.ACME.Behaviors
             set { _unsaturated = value; }
         }
 
-
-
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -63,22 +54,18 @@ namespace Chem4Word.ACME.Behaviors
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
 
-
-
             AssociatedObject.IsHitTestVisible = true;
 
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             }
-
         }
-
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Molecule parentMolecule;
-            
+
             Atom hitAtom = GetAtomUnderCursor(e)?.ParentAtom;
             Bond hitBond = GetBondUnderCursor(e)?.ParentBond;
 
@@ -107,7 +94,6 @@ namespace Chem4Word.ACME.Behaviors
 
                 preferredPlacements = PaceOut(hitAtom, direction, xamlBondSize, RingSize);
                 //altPlacements = PaceOut(hitAtom, -direction, xamlBondSize, RingSize);
-
             }
             else if (hitBond != null)
             {
@@ -131,7 +117,6 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     preferredPlacements = placements;
                 }
-
             }
             else //clicked on empty space
             {
@@ -141,18 +126,17 @@ namespace Chem4Word.ACME.Behaviors
             }
 
             foreach (Point placement in preferredPlacements)
+            {
+                var nap = new NewAtomPlacement
                 {
-                    var nap = new NewAtomPlacement
-                    {
-                        ExistingAtom = (GetTarget(placement)?.VisualHit as AtomShape)?.ParentAtom,
-                        Position = placement
-                    };
-                    newAtomPlacements.Add(nap);
-                }
+                    ExistingAtom = (GetTarget(placement)?.VisualHit as AtomShape)?.ParentAtom,
+                    Position = placement
+                };
+                newAtomPlacements.Add(nap);
+            }
 
-                ViewModel.DrawRing(newAtomPlacements, Unsaturated); 
+            ViewModel.DrawRing(newAtomPlacements, Unsaturated);
         }
-
 
         private List<Point> PaceOut(Atom startAtom, Vector direction, double bondSize, int ringSize)
         {
@@ -166,15 +150,13 @@ namespace Chem4Word.ACME.Behaviors
             double exteriorAngle = 360.0 / ringSize;
             Matrix rotator = new Matrix();
 
-
             //do the initial rotation
             rotator.Rotate(-90);
-            rotator.Rotate(exteriorAngle/2);
+            rotator.Rotate(exteriorAngle / 2);
 
             Vector bondVector = direction;
             bondVector.Normalize();
             bondVector *= bondSize;
-
 
             var lastPos = startAtom.Position;
             placements.Add(startAtom.Position);
@@ -189,7 +171,7 @@ namespace Chem4Word.ACME.Behaviors
             return placements;
         }
 
-        private List<Point> PaceOut(Bond startBond, bool followsBond,  int ringSize)
+        private List<Point> PaceOut(Bond startBond, bool followsBond, int ringSize)
         {
             List<Point> placements = new List<Point>();
 
@@ -201,7 +183,6 @@ namespace Chem4Word.ACME.Behaviors
                 bondVector = startBond.EndAtom.Position - startBond.StartAtom.Position;
                 lastPos = startBond.StartAtom.Position;
                 nextPos = startBond.EndAtom.Position;
-
             }
             else
             {
@@ -237,7 +218,6 @@ namespace Chem4Word.ACME.Behaviors
             double exteriorAngle = 360.0 / ringSize;
             Matrix rotator = new Matrix();
 
-
             //do the initial rotation
             rotator.Rotate(-90);
             rotator.Rotate(exteriorAngle / 2);
@@ -245,7 +225,6 @@ namespace Chem4Word.ACME.Behaviors
             Vector bondVector = direction;
             bondVector.Normalize();
             bondVector *= bondSize;
-
 
             var lastPos = start;
             placements.Add(start);
@@ -259,6 +238,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             return placements;
         }
+
         private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
@@ -275,6 +255,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             return VisualTreeHelper.HitTest(AssociatedObject, p);
         }
+
         protected override void OnDetaching()
         {
             AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;

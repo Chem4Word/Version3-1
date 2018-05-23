@@ -6,8 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model;
-using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Media;
 
 namespace Chem4Word.ViewModel
@@ -17,11 +15,10 @@ namespace Chem4Word.ViewModel
         /// <summary>
         /// Returns a ghost image of the molecule for dragging, resizing and rotating
         /// </summary>
-        /// <param name="deformedCoords">optional List of coordinates by atoms that have become displaced by an operation</param>
+        /// <param name="mol">optional List of coordinates by atoms that have become displaced by an operation</param>
         /// <returns></returns>
         public static System.Windows.Media.Geometry Ghost(this Molecule mol)
         {
-           
             System.Windows.Media.GeometryGroup ghostGeometry = new GeometryGroup();
             foreach (Bond b in mol.Bonds)
             {
