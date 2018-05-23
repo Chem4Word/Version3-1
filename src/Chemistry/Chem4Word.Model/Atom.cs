@@ -466,7 +466,7 @@ namespace Chem4Word.Model
         }
 
         public bool IsIsolated {
-            get { return Degree == 0; }  
+            get { return Degree == 0; }
         }
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
@@ -475,7 +475,7 @@ namespace Chem4Word.Model
         //tries to get a bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
-            //Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
+            Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
             double halfSize = fontSize / 2;
             Point position = Position;
             Rect baseAtomBox = new Rect(

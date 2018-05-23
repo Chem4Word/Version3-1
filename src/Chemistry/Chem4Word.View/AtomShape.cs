@@ -196,7 +196,7 @@ namespace Chem4Word.View
         protected override void OnRender(DrawingContext drawingContext)
         {
             SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
-
+            //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
             ScriptSize = SymbolSize * 0.6;
             IsotopeSize = SymbolSize * 0.8;
             MaskOffsetWidth = SymbolSize * 0.1;

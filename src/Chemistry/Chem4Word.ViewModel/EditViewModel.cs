@@ -532,6 +532,7 @@ namespace Chem4Word.ViewModel
                 Model.ScaleToAverageBondLength(currentLength);
                 Model.CentreInCanvas(canvas);
 
+                FontSize = currentLength * Globals.FontSizePercentageBond;
                 SelectedBondLengthOption = blo;
                 BondLengthCombo.SelectedItem = blo;
             };
@@ -539,6 +540,8 @@ namespace Chem4Word.ViewModel
             {
                 Model.ScaleToAverageBondLength(newLength);
                 Model.CentreInCanvas(canvas);
+
+                FontSize = newLength * Globals.FontSizePercentageBond;
             };
 
             UndoManager.RecordAction(undoAction, redoAction);

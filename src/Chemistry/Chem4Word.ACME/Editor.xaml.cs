@@ -246,6 +246,13 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
+            Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {_activeViewModel.BoundingBox.Width}");
+            Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {_activeViewModel.BoundingBox.Height}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportHeight: {DrawingArea.ViewportHeight}");
+
             DrawingArea.ScrollToHorizontalOffset((DrawingArea.ExtentWidth - DrawingArea.ViewportWidth) / 2);
             DrawingArea.ScrollToVerticalOffset((DrawingArea.ExtentHeight - DrawingArea.ViewportHeight) / 2);
         }
