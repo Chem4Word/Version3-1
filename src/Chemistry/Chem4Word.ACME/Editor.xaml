@@ -498,7 +498,8 @@
                     FontSize="16"
                     SelectedIndex="3"
                     SelectionChanged="ZoomFactorCombo_OnChange"
-                    ToolTip="Change Zoom">
+                    ToolTip="Change Zoom"
+                    Visibility="Collapsed">
                     <ComboBoxItem>25%</ComboBoxItem>
                     <ComboBoxItem>50%</ComboBoxItem>
                     <ComboBoxItem>75%</ComboBoxItem>
