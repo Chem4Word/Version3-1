@@ -63,8 +63,8 @@ namespace Chem4Word.ACME
                 // create the Application object
                 new Application();
 
-                // merge in your application resources
-                //need to do this for controls hosted in Winforms
+                // Merge in your application resources
+                // We need to do this for controls hosted in Winforms
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
@@ -80,6 +80,10 @@ namespace Chem4Word.ACME
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
+                            UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
                             UriKind.Relative)) as ResourceDictionary);
             }
         }
@@ -131,19 +135,14 @@ namespace Chem4Word.ACME
             this.DataContext = vm;
 
             Canvas c = LocateCanvas();
-            //Debug.WriteLine($"Canvas is {c.ActualWidth} x {c.ActualHeight}");
-            //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-            //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
-            double x = (c.ActualWidth - _activeViewModel.Model.BoundingBox.Width) / 2.0;
-            double y = (c.ActualHeight - _activeViewModel.Model.BoundingBox.Height) / 2.0;
-            _activeViewModel.Model.RepositionAll(-x, -y);
-
-            //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-            //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
+            _activeViewModel.Model.CentreInCanvas(new Size(c.ActualWidth, c.ActualHeight));
 
             ScrollIntoView();
             BindControls(vm);
             ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
+
+            // Hack: Couldn't find a better way to do this
+            _activeViewModel.BondLengthCombo = BondLengthSelector;
         }
 
         public static T FindChild<T>(DependencyObject parent)
@@ -184,17 +183,6 @@ namespace Chem4Word.ACME
             return foundChild;
         }
 
-        /// <summary>
-        /// Centers any chemistry on the drawing area
-        /// </summary>
-        private void ScrollIntoView()
-        {
-            double newVerticalOffset = _activeViewModel.Model.BoundingBox.Left;
-            double newHorizontalOffset = _activeViewModel.Model.BoundingBox.Top;
-            DrawingArea.ScrollToHorizontalOffset(newVerticalOffset);
-            DrawingArea.ScrollToVerticalOffset(newHorizontalOffset);
-        }
-
         private Canvas LocateCanvas()
         {
             Canvas res = FindChild<Canvas>(DrawingArea);
@@ -202,11 +190,11 @@ namespace Chem4Word.ACME
         }
 
         /// <summary>
-        /// Sets up data bindings btween the dropdowns
+        /// Sets up data bindings between the dropdowns
         /// and the view model
         /// </summary>
         /// <param name="vm">EditViewModel for ACME</param>
-        private void BindControls(ViewModel.EditViewModel vm)
+        private void BindControls(EditViewModel vm)
         {
             Binding atomBinding = new Binding("SelectedAtomOption");
             atomBinding.Source = vm;
@@ -230,16 +218,12 @@ namespace Chem4Word.ACME
 
         private void BondLengthCombo_OnChange(object sender, RoutedEventArgs e)
         {
-            BondLengthOption blo = BondLengthSelector.SelectedItem as BondLengthOption;
-            if (blo != null)
+            if (BondLengthSelector.SelectedItem is BondLengthOption blo)
             {
                 if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
-                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
-                    _activeViewModel.Model.ScaleToAverageBondLength(blo.ChosenValue);
-                    //Debug.WriteLine($"Model WH is {_activeViewModel.Model.BoundingBox.Width} x {_activeViewModel.Model.BoundingBox.Height}");
-                    //Debug.WriteLine($"Model TL is {_activeViewModel.Model.BoundingBox.Top} x {_activeViewModel.Model.BoundingBox.Left}");
+                    Canvas c = LocateCanvas();
+                    _activeViewModel.SetAverageBondLength(blo.ChosenValue, new Size(c.ActualWidth, c.ActualHeight));
                     ScrollIntoView();
                 }
             }
@@ -256,6 +240,22 @@ namespace Chem4Word.ACME
                 case "100%":
                     break;
             }
+        }
+
+        /// <summary>
+        /// Scrolls drawing into view
+        /// </summary>
+        private void ScrollIntoView()
+        {
+            Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {_activeViewModel.BoundingBox.Width}");
+            Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {_activeViewModel.BoundingBox.Height}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
+            Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportHeight: {DrawingArea.ViewportHeight}");
+
+            DrawingArea.ScrollToHorizontalOffset((DrawingArea.ExtentWidth - DrawingArea.ViewportWidth) / 2);
+            DrawingArea.ScrollToVerticalOffset((DrawingArea.ExtentHeight - DrawingArea.ViewportHeight) / 2);
         }
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)

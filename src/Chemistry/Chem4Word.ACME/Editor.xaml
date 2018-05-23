@@ -292,7 +292,6 @@
             <ToolBar x:Name="EditToolbar"
                 Height="40"
                 BandIndex="2">
-
                 <Button x:Name="CutButton"
                     Command="{Binding CutCommand}"
                     Style="{StaticResource CommandButtonStyle}">
@@ -394,6 +393,40 @@
                     </Viewbox>
                 </Button>
 
+                <Button x:Name="AddHydrogens"
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Add Explicit Hydrogens">
+                    <Viewbox
+                        Width="24"
+                        Height="24"
+                        Stretch="Uniform">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="Arial"
+                            Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
+                            +H
+                        </TextBlock>
+                    </Viewbox>
+                </Button>
+
+                <Button x:Name="RemoveHydrogens"
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Remove Explicit Hydrogens">
+                    <Viewbox
+                        Width="24"
+                        Height="24"
+                        Stretch="Uniform">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="Arial"
+                            Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
+                            -H
+                        </TextBlock>
+                    </Viewbox>
+                </Button>
+
                 <Button x:Name="FuseButton"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Fuse">
@@ -457,7 +490,7 @@
                     FontFamily="Arial"
                     FontSize="16"
                     ItemsSource="{Binding Path=BondLengthOptions}"
-                    SelectedItem="{Binding Path=SelectedBondLengthOption}"
+                    SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
                     SelectionChanged="BondLengthCombo_OnChange"
                     ToolTip="Change Bond Length" />
                 <ComboBox x:Name="ZoomFactor"
@@ -466,7 +499,8 @@
                     FontSize="16"
                     SelectedIndex="3"
                     SelectionChanged="ZoomFactorCombo_OnChange"
-                    ToolTip="Change Zoom">
+                    ToolTip="Change Zoom"
+                    Visibility="Collapsed">
                     <ComboBoxItem>25%</ComboBoxItem>
                     <ComboBoxItem>50%</ComboBoxItem>
                     <ComboBoxItem>75%</ComboBoxItem>
@@ -512,7 +546,7 @@
                 ItemsSource="{Binding AllObjects}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas Name="ChemCanvas"
+                        <controls:ChemistryCanvas x:Name="ChemCanvas"
                             MinWidth="4000"
                             MinHeight="3000"
                             Background="White" />

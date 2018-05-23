@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model.Annotations;
 using Chem4Word.Model.Enums;
 using Chem4Word.Model.Geometry;
 using System;
@@ -16,7 +17,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model
 {
@@ -79,7 +79,7 @@ namespace Chem4Word.Model
             }
         }
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// Collection of atoms that go to make up the ring
@@ -125,7 +125,9 @@ namespace Chem4Word.Model
                 Vector toCenter = center.Value - b.StartAtom.Position;
                 Vector bv = b.BondVector;
                 if (Vector.AngleBetween(toCenter, bv) > 0)
+                {
                     return BondDirection.Clockwise;
+                }
                 else
                 {
                     return BondDirection.Anticlockwise;
@@ -144,7 +146,6 @@ namespace Chem4Word.Model
         public Molecule Parent { get; set; }
 
         private Point? _centroid;
-
 
         internal void RingCentroidChanged()
         {
@@ -205,7 +206,9 @@ namespace Chem4Word.Model
             res.Add(start);
             Atom next;
             if (start == null)
+            {
                 start = Atoms[0];
+            }
 
             //start with the start atom, and find the other two adjacent atoms that are part of the ring
             var adj = from n in start.Neighbours
@@ -216,7 +219,6 @@ namespace Chem4Word.Model
             //Debug.Assert(nextatoms.Count() == 2);
 
             Vector v1 = nextatoms[0].Position - start.Position;
-
             Vector v2 = nextatoms[1].Position - start.Position;
 
             //make sure a positive angle is the direction in which we want to travel
@@ -236,7 +238,7 @@ namespace Chem4Word.Model
             }
         }
 
-        #endregion properties
+        #endregion Properties
 
         #region Constructors
 
