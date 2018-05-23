@@ -563,43 +563,41 @@ namespace Chem4Word.ViewModel
             UndoManager.BeginUndoBlock();
             var a1 = bond.StartAtom;
             var a2 = bond.EndAtom;
+            Molecule parent = bond.Parent;
+        
 
+            bool isTopLevel = UndoManager.TransactionLevel == 1;
             Action redoAction = () =>
             {
                 bond.StartAtom = null;
                 bond.EndAtom = null;
-                bond.Parent.RebuildRings();
+                parent?.Bonds.Remove(bond);
+                parent?.Split(a1, a2);
+                if (isTopLevel)
+                {
+                    parent?.RebuildRings();
+                }
             };
 
             Action undoAction = () =>
             {
                 bond.StartAtom = a1;
                 bond.EndAtom = a2;
-                bond.Parent.RebuildRings();
+                a1.Parent.Bonds.Add(bond);
+                if (a2.Parent != a1.Parent)
+                {
+                    a1.Parent.Merge(a2.Parent);
+                }
+                if (isTopLevel)
+                {
+                    a1.Parent.RebuildRings();
+                }
             };
-            SelectedItems.Remove(bond);
+
+
+            redoAction();
+
             UndoManager.RecordAction(undoAction, redoAction);
-
-            bond.StartAtom = null;
-            bond.EndAtom = null;
-
-            Molecule parent = bond.Parent;
-
-            if (parent != null)
-            {
-                undoAction = () =>
-                {
-                    parent.Bonds.Add(bond);
-                };
-                redoAction = () =>
-                {
-                    parent.Bonds.Remove(bond);
-                };
-
-                UndoManager.RecordAction(undoAction, redoAction);
-                parent.Bonds.Remove(bond);
-            }
-
             UndoManager.EndUndoBlock();
         }
 

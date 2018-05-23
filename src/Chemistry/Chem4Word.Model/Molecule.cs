@@ -1199,19 +1199,54 @@ namespace Chem4Word.Model
         /// <param name="mol">Molecule to merge into this one</param>
         public void Merge(Molecule mol)
         {
+            Debug.Assert(mol!=this);
+            Debug.Assert(mol!=null);
             Parent.Molecules.Remove(mol);
             foreach (Atom newAtom in
                mol.Atoms.ToArray())
             {
                 mol.Atoms.Remove(newAtom);
-                Atoms.Add(newAtom);
+                if (!Atoms.Contains(newAtom))
+                {
+                    Atoms.Add(newAtom);
+                }
             }
             foreach (Bond newBond in mol.Bonds.ToArray())
             {
                 mol.Bonds.Remove(newBond);
-                Bonds.Add(newBond);
+                if (!Bonds.Contains(newBond))
+                {
+                    Bonds.Add(newBond);
+                }
             }
-            RebuildRings();
+        }
+        /// <summary>
+        /// split a molecule into two
+        /// assuming that the bond between a and b has already
+        /// been deleted
+        /// </summary>
+        /// <param name="a">Atom from first molecule</param>
+        /// <param name="b">Atom from second molecule</param>
+        public void Split(Atom a, Atom b)
+        {
+            Debug.Assert(a.BondBetween(b)==null);
+
+            b.Parent = null;
+            Refresh();
+
+            if(b.Parent==null)//if it's non-null after refresh, then it was part of a ring system
+            {
+                Molecule newmol = new Molecule();
+
+                Parent.Molecules.Add(newmol);
+                newmol.Refresh(b);
+
+                foreach (Atom oldAtom in newmol.Atoms)
+                {
+                    Atoms.Remove(oldAtom);
+                }
+            }
+          
         }
     }
 }
