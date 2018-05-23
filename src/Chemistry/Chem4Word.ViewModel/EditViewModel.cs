@@ -45,6 +45,8 @@ namespace Chem4Word.ViewModel
         private BondLengthOption _selectedBondLengthOption;
         private int? _selectedBondOptionId;
 
+        public ComboBox BondLengthCombo { get; set; }
+
         #endregion Fields
 
         #region Properties
@@ -541,6 +543,7 @@ namespace Chem4Word.ViewModel
                 Model.CentreInCanvas(canvas);
 
                 SelectedBondLengthOption = blo;
+                BondLengthCombo.SelectedItem = blo;
             };
             Action redoAction = () =>
             {

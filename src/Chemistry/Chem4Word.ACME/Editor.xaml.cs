@@ -140,6 +140,8 @@ namespace Chem4Word.ACME
             ScrollIntoView();
             BindControls(vm);
             ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
+
+            _activeViewModel.BondLengthCombo = BondLengthSelector;
         }
 
         public static T FindChild<T>(DependencyObject parent)
