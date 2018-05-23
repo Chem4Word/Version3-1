@@ -72,6 +72,7 @@
     <Compile Include="Controls\ModeButton.cs" />
     <Compile Include="Converters\DoNothingConverter.cs" />
     <Compile Include="Converters\ElementConverter.cs" />
+    <Compile Include="Converters\EnabledConverter.cs" />
     <Compile Include="Converters\ModeConverter.cs" />
     <Compile Include="Editor.xaml.cs">
       <DependentUpon>Editor.xaml</DependentUpon>

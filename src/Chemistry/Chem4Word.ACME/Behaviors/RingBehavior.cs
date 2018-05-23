@@ -86,7 +86,15 @@ namespace Chem4Word.ACME.Behaviors
             if (hitAtom != null)
             {
                 parentMolecule = hitAtom.Parent;
-                Vector direction = hitAtom.BalancingVector;
+                Vector direction;
+                if (hitAtom.Degree != 0)
+                {
+                    direction = hitAtom.BalancingVector;
+                }
+                else
+                {
+                    direction = BasicGeometry.ScreenNorth;
+                }
 
                 //try to work out exactly where best to place the ring
 

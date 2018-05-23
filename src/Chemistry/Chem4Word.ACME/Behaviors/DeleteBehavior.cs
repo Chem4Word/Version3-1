@@ -64,12 +64,6 @@ namespace Chem4Word.ACME.Behaviors
         }
 
       
-
-      
-
-
-      
-
         private void AssociatedObjectOnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Debug.WriteLine("AssociatedObjectOnMouseRightButtonDown");

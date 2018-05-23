@@ -546,6 +546,7 @@ namespace Chem4Word.ViewModel
             Action undoAction = () =>
             {
                 parent.Atoms.Add(atom);
+                SelectedItems.Clear();
                 SelectedItems.Add(atom);
             };
             Action redoAction = () =>
@@ -585,6 +586,7 @@ namespace Chem4Word.ViewModel
                 bond.StartAtom = a1;
                 bond.EndAtom = a2;
                 a1.Parent.Bonds.Add(bond);
+                SelectedItems.Clear();
                 SelectedItems.Add(bond);
                 if (a2.Parent != a1.Parent)
                 {
@@ -951,6 +953,36 @@ namespace Chem4Word.ViewModel
 
             UndoManager.RecordAction(undo, redo, "Molecule refresh");
         UndoManager.EndUndoBlock();
+        }
+
+        public void DeleteMolecule(Molecule mol)
+        {
+            UndoManager.BeginUndoBlock();
+         
+            Model.Model theModel = mol.Model;
+            var atomList = mol.Atoms.ToList();
+            var bondList = mol.Bonds.ToList();
+
+            bool isTopLevel = UndoManager.TransactionLevel == 1;
+           
+            Action redoAction = () =>
+            {
+                mol.Parent = null;
+                theModel.Molecules.Remove(mol);
+                SelectedItems.Remove(mol);
+            };
+
+            Action undoAction = () =>
+            {
+                mol.Parent = theModel;
+                theModel.Molecules.Add(mol);
+                SelectedItems.Add(mol);
+            };
+
+            redoAction();
+
+            UndoManager.RecordAction(undoAction, redoAction);
+            UndoManager.EndUndoBlock();
         }
     }
 }

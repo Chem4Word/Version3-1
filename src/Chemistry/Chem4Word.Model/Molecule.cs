@@ -50,13 +50,21 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
-            var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
+            if (Atoms.Any())
+            {
+                var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
+                var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
 
-            var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
-            var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
+                var yMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Bottom).Max();
+                var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
 
-            _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+                _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            }
+
+            else
+            {
+                _boundingBox= new Rect(new Size(0.0, 0.0));
+            }
         }
 
         public string ConciseFormula { get; set; }

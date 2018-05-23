@@ -24,21 +24,20 @@ namespace Chem4Word.ViewModel.Commands
         {
             var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
             var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
-
+            var mols = MyEditViewModel.SelectedItems.OfType<Molecule>().ToList();
             if (atoms.Any()|bonds.Any())
             {
                 MyEditViewModel.UndoManager.BeginUndoBlock();
-                //first do the astom and associated bonds
-                if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) ==
-                     EditViewModel.SelectionTypeCode.Atom))
+                //do any bonds remaining:  this is important if only bonds have been selected
+
+                if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Molecule) ==
+                     EditViewModel.SelectionTypeCode.Molecule))
                 {
-                    foreach (Atom atom in atoms)
+                    foreach (Molecule mol in mols)
                     {
-                        MyEditViewModel.DeleteAtom(atom);
+                        MyEditViewModel.DeleteMolecule(mol);
                     }
                 }
-
-                //now do any bonds remaining:  this is important if only bonds have been selected
 
                 if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Bond) ==
                      EditViewModel.SelectionTypeCode.Bond))
@@ -48,6 +47,18 @@ namespace Chem4Word.ViewModel.Commands
                         MyEditViewModel.DeleteBond(bond);
                     }
                 }
+
+                //do the atom and any remaining associated bonds
+                if (((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) ==
+                     EditViewModel.SelectionTypeCode.Atom))
+                {
+                    foreach (Atom atom in atoms)
+                    {
+                        MyEditViewModel.DeleteAtom(atom);
+                    }
+                }
+
+               
 
                 MyEditViewModel.UndoManager.EndUndoBlock();
             }
