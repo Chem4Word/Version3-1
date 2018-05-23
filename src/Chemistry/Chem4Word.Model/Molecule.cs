@@ -963,6 +963,11 @@ namespace Chem4Word.Model
             }
         }
 
+        /// <summary>
+        /// Moves all atoms of molecule by inverse of x and y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public void RepositionAll(double x, double y)
         {
             var offsetVector = new Vector(-x, -y);

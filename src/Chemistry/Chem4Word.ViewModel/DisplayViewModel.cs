@@ -49,6 +49,7 @@ namespace Chem4Word.ViewModel
                     //Debug.WriteLine($"BondThickness; BoundingBox.Area: {area}");
                     //Debug.WriteLine($"BondThickness; BoundingBox.Sqrt: {sqrt}");
 
+                    // ToDo: Get this working better for small bond lengths
                     _bondThickness = ((Model.XamlBondLength / sqrt) * (Globals.ScaleFactorForXaml * 3)) + 1.0d;
                     //Debug.WriteLine($"BondThickness; BondThickness --> {_bondThickness}");
                 }
@@ -58,10 +59,7 @@ namespace Chem4Word.ViewModel
 
         public double HalfBondThickness
         {
-            get
-            {
-                return BondThickness / 2;
-            }
+            get { return BondThickness / 2; }
         }
 
         #region Layout
@@ -91,7 +89,7 @@ namespace Chem4Word.ViewModel
                         return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                     }
                 }
-                catch (System.NullReferenceException ex)
+                catch (NullReferenceException)
                 {
                     return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }

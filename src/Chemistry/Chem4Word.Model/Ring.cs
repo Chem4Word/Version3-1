@@ -79,7 +79,7 @@ namespace Chem4Word.Model
             }
         }
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// Collection of atoms that go to make up the ring
@@ -125,7 +125,9 @@ namespace Chem4Word.Model
                 Vector toCenter = center.Value - b.StartAtom.Position;
                 Vector bv = b.BondVector;
                 if (Vector.AngleBetween(toCenter, bv) > 0)
+                {
                     return BondDirection.Clockwise;
+                }
                 else
                 {
                     return BondDirection.Anticlockwise;
@@ -236,7 +238,7 @@ namespace Chem4Word.Model
             }
         }
 
-        #endregion properties
+        #endregion Properties
 
         #region Constructors
 

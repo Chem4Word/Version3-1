@@ -18,4 +18,5 @@
     <SolidColorBrush x:Key="RBrush" Color="Black" />
     <SolidColorBrush x:Key="NobleBrush" Color="Cyan" />
     <SolidColorBrush x:Key="AlkaliBrush" Color="BlueViolet" />
+
 </ResourceDictionary>

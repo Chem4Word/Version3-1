@@ -7,6 +7,7 @@
 
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
+using Chem4Word.Model.Geometry;
 using Chem4Word.ViewModel.Adorners;
 using Chem4Word.ViewModel.Commands;
 using System;
@@ -22,7 +23,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
 using System.Windows.Media;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ViewModel
 {
@@ -48,24 +48,16 @@ namespace Chem4Word.ViewModel
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
-        private List<BondLengthOption> _bondLengthOptions = new List<BondLengthOption>();
-        private BondLengthOption _selectedBondLengthOption;
         private int? _selectedBondOptionId;
+
+        public ComboBox BondLengthCombo { get; set; }
 
         #endregion Fields
 
         #region Properties
 
-        public List<BondLengthOption> BondLengthOptions
-        {
-            get { return _bondLengthOptions; }
-        }
-
-        public BondLengthOption SelectedBondLengthOption
-        {
-            get { return _selectedBondLengthOption; }
-            set { _selectedBondLengthOption = value; }
-        }
+        public List<BondLengthOption> BondLengthOptions { get; } = new List<BondLengthOption>();
+        public BondLengthOption SelectedBondLengthOption { get; set; }
 
         public double EditBondThickness
         {
@@ -216,7 +208,6 @@ namespace Chem4Word.ViewModel
 
         private void SetBondOption(int bondOptionId)
         {
-           
             var bondOption = _bondOptions[_selectedBondOptionId.Value];
             if (SelectedItems.OfType<Bond>().Any())
             {
@@ -249,8 +240,6 @@ namespace Chem4Word.ViewModel
         {
             get
             {
-                var dictionary = new Dictionary<string, BondOption>();
-                var selectedBondTypes = new List<BondOption>();
                 var selectedBonds = SelectedItems.OfType<Bond>();
 
                 var selbonds = (from Bond selbond in selectedBonds
@@ -330,10 +319,10 @@ namespace Chem4Word.ViewModel
                     ChosenValue = (int)(i * Globals.ScaleFactorForXaml),
                     DisplayAs = i.ToString("0")
                 };
-                _bondLengthOptions.Add(option);
+                BondLengthOptions.Add(option);
                 if (Math.Abs(i * Globals.ScaleFactorForXaml - Model.XamlBondLength) < 2.5 * Globals.ScaleFactorForXaml)
                 {
-                    _selectedBondLengthOption = option;
+                    SelectedBondLengthOption = option;
                 }
             }
         }
@@ -530,6 +519,46 @@ namespace Chem4Word.ViewModel
             MessageBox.Show("Copy code goes here");
         }
 
+        public void SetAverageBondLength(double newLength, Size canvas)
+        {
+            UndoManager.BeginUndoBlock();
+            double currentLength = Model.MeanBondLength;
+            SelectedBondLengthOption = null;
+            BondLengthOption blo = null;
+            foreach (var option in BondLengthOptions)
+            {
+                if (Math.Abs(option.ChosenValue - currentLength) < 2.5 * Globals.ScaleFactorForXaml)
+                {
+                    blo = option;
+                    break;
+                }
+            }
+
+            Action undoAction = () =>
+            {
+                Model.ScaleToAverageBondLength(currentLength);
+                Model.CentreInCanvas(canvas);
+
+                FontSize = currentLength * Globals.FontSizePercentageBond;
+                SelectedBondLengthOption = blo;
+                // Hack: Couldn't find a better way to do this
+                BondLengthCombo.SelectedItem = blo;
+            };
+            Action redoAction = () =>
+            {
+                Model.ScaleToAverageBondLength(newLength);
+                Model.CentreInCanvas(canvas);
+
+                FontSize = newLength * Globals.FontSizePercentageBond;
+            };
+
+            UndoManager.RecordAction(undoAction, redoAction);
+
+            redoAction.Invoke();
+
+            UndoManager.EndUndoBlock();
+        }
+
         public void DeleteAtom(Atom atom)
         {
             UndoManager.BeginUndoBlock();
@@ -625,7 +654,7 @@ namespace Chem4Word.ViewModel
             if (lastAtom != null)
             {
                 UndoManager.BeginUndoBlock();
-               
+
                 Molecule currentMol = lastAtom.Parent;
 
                 Action undo = () =>
