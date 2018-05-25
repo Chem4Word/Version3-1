@@ -1182,25 +1182,25 @@ namespace Chem4Word.Model
 
         public bool Overlaps(List<Point> placements)
         {
-            var cg = GetOverlapGeometry(placements);
+            var overlap = GetOverlapGeometry(placements, out System.Windows.Media.Geometry hullgeo);
 
-            bool overlaps = !cg.IsEmpty();
+            bool overlaps = overlap.GetArea() > hullgeo.GetArea() * 0.01;
 
             return overlaps;
         }
 
-        private CombinedGeometry GetOverlapGeometry(List<Point> placements)
+        private CombinedGeometry GetOverlapGeometry(List<Point> placements, out System.Windows.Media.Geometry hullgeo )
         {
             Path hull = BasicGeometry.BuildPath(this.ConvexHull.Select(a => a.Position).ToList());
             Path otherGeo = BasicGeometry.BuildPath(placements);
 
-            System.Windows.Media.Geometry hullgeo = hull.Data;
-            System.Windows.Media.Geometry placementsgeo = otherGeo.Data;
+            hullgeo = hull.Data;
+            System.Windows.Media.Geometry  placementsGeo = otherGeo.Data;
             hullgeo.Freeze();
-            placementsgeo.Freeze();
+            placementsGeo.Freeze();
 
-            var val1 = hullgeo.GetFlattenedPathGeometry();
-            var val2 = placementsgeo.GetFlattenedPathGeometry();
+            var val1 = hullgeo;//.GetFlattenedPathGeometry();
+            var val2 = placementsGeo;//.GetFlattenedPathGeometry();
 
             CombinedGeometry cg = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2);
             return cg;

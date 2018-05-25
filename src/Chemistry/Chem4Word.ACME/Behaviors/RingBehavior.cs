@@ -8,6 +8,7 @@
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 using Chem4Word.View;
+using Chem4Word.Core;
 using Chem4Word.ViewModel;
 using System.Collections.Generic;
 using System.Windows;
@@ -108,9 +109,14 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         preferredPlacements = placements;
                     }
-                    else
+                    else if (!parentMolecule.Overlaps(altPlacements))
                     {
                         preferredPlacements = altPlacements;
+                    }
+                    else
+                    {
+                        UserInteractions.AlertUser("No room left to draw any more rings!");
+                        return;
                     }
                 }
                 else
