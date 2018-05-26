@@ -1028,7 +1028,60 @@ namespace Chem4Word.ViewModel
 
         public void AddHydrogens()
         {
-            Debugger.Break();
+            List<Atom> targetAtoms = new List<Atom>();
+
+            foreach (var atom in AllAtoms)
+            {
+                if (atom.ImplicitHydrogenCount > 0)
+                {
+                    targetAtoms.Add(atom);
+                }
+            }
+
+            if (targetAtoms.Any())
+            {
+                Debugger.Break();
+                List<Atom> newAtoms = new List<Atom>();
+                List<Bond> newBonds = new List<Bond>();
+                foreach (var atom in targetAtoms)
+                {
+                    double seperation = 90.0;
+                    if (atom.Bonds.Count > 1)
+                    {
+                        seperation = 30.0;
+                    }
+                    var vector = atom.BalancingVector;
+                    switch (atom.ImplicitHydrogenCount)
+                    {
+                        case 1:
+                            // Do Nothing
+                            break;
+                        case 2:
+                            Matrix matrix1 = new Matrix();
+                            matrix1.Rotate(seperation / 2);
+                            vector = vector * matrix1;
+                            break;
+                        case 3:
+                            Matrix matrix2 = new Matrix();
+                            matrix2.Rotate(seperation);
+                            vector = vector * matrix2;
+                            break;
+                    }
+
+                    for (int i = 0; i < atom.ImplicitHydrogenCount; i++)
+                    {
+                        var aa = new Atom();
+                        aa.Element.Symbol = "H";
+                        aa.Position = atom.Position + vector * Model.XamlBondLength;
+                        newAtoms.Add(aa);
+                        var bb = new Bond();
+                        bb.StartAtom = atom;
+                        bb.EndAtom = aa;
+                        newBonds.Add(bb);
+                    }
+                }
+                Debugger.Break();
+            }
         }
 
         public void RemoveHydrogens()
