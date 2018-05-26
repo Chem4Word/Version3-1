@@ -14,7 +14,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -50,7 +49,7 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            if (m!=null & Atoms.Any())
+            if (m != null & Atoms.Any())
             {
                 var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
                 var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
@@ -60,10 +59,9 @@ namespace Chem4Word.Model
 
                 _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
             }
-
             else
             {
-                _boundingBox= new Rect(new Size(0.0, 0.0));
+                _boundingBox = new Rect(new Size(0.0, 0.0));
             }
         }
 
@@ -1212,8 +1210,8 @@ namespace Chem4Word.Model
         /// <param name="mol">Molecule to merge into this one</param>
         public void Merge(Molecule mol)
         {
-            Debug.Assert(mol!=this);
-            Debug.Assert(mol!=null);
+            Debug.Assert(mol != this);
+            Debug.Assert(mol != null);
             Parent.Molecules.Remove(mol);
             foreach (Atom newAtom in
                mol.Atoms.ToArray())
@@ -1233,6 +1231,7 @@ namespace Chem4Word.Model
                 }
             }
         }
+
         /// <summary>
         /// split a molecule into two
         /// assuming that the bond between a and b has already
@@ -1242,12 +1241,12 @@ namespace Chem4Word.Model
         /// <param name="b">Atom from second molecule</param>
         public void Split(Atom a, Atom b)
         {
-            Debug.Assert(a.BondBetween(b)==null);
+            Debug.Assert(a.BondBetween(b) == null);
 
             b.Parent = null;
             Refresh();
 
-            if(b.Parent==null)//if it's non-null after refresh, then it was part of a ring system
+            if (b.Parent == null)//if it's non-null after refresh, then it was part of a ring system
             {
                 Molecule newmol = new Molecule();
 
@@ -1259,7 +1258,6 @@ namespace Chem4Word.Model
                     Atoms.Remove(oldAtom);
                 }
             }
-          
         }
     }
 }

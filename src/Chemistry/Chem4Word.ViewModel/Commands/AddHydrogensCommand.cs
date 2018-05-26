@@ -22,7 +22,7 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            Debugger.Break();
+            MyEditViewModel.AddHydrogens();
         }
     }
 }
