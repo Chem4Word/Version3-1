@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -644,11 +643,9 @@ namespace Chem4Word.ViewModel
                 }
                 if (isTopLevel)
                 {
-
                     a1.Parent.RebuildRings();
                 }
             };
-
 
             redoAction();
 
@@ -661,7 +658,7 @@ namespace Chem4Word.ViewModel
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
             newAtom.Position = newAtomPos;
-            object tag=null;
+            object tag = null;
             if (dir != ClockDirections.Nothing)
             {
                 tag = dir;
@@ -770,7 +767,6 @@ namespace Chem4Word.ViewModel
                 {
                     mol.RebuildRings();
                 }
-               
             };
 
             UndoManager.RecordAction(undo, redo);
@@ -887,7 +883,7 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void SetBondAttributes(Bond parentBond, string newOrder = null, BondStereo? newStereo =null)
+        public void SetBondAttributes(Bond parentBond, string newOrder = null, BondStereo? newStereo = null)
         {
             UndoManager.BeginUndoBlock();
 
@@ -902,8 +898,8 @@ namespace Chem4Word.ViewModel
 
             Action redo = () =>
             {
-                parentBond.Order = newOrder??CurrentBondOrder;
-                parentBond.Stereo = newStereo??CurrentStereo;
+                parentBond.Order = newOrder ?? CurrentBondOrder;
+                parentBond.Stereo = newStereo ?? CurrentStereo;
             };
             UndoManager.RecordAction(undo, redo);
 
@@ -916,7 +912,6 @@ namespace Chem4Word.ViewModel
 
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
         {
-
             void MakeRingUnsaturated(List<NewAtomPlacement> list)
             {
                 string bondOrder =
@@ -944,7 +939,7 @@ namespace Chem4Word.ViewModel
                     {
                         SetBondAttributes(list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom),
                             Bond.OrderDouble, BondStereo.None);
-                        
+
                         startpos += 2;
                     }
                     else
@@ -961,7 +956,7 @@ namespace Chem4Word.ViewModel
             {
                 int currIndex = i % newAtomPlacements.Count;
                 NewAtomPlacement currentPlacement = newAtomPlacements[currIndex];
-                NewAtomPlacement previousPlacement = newAtomPlacements[i-1];
+                NewAtomPlacement previousPlacement = newAtomPlacements[i - 1];
 
                 Atom previousAtom = previousPlacement.ExistingAtom;
                 Atom currentAtom = currentPlacement.ExistingAtom;
@@ -972,16 +967,13 @@ namespace Chem4Word.ViewModel
 
                     insertAtom = AddAtomChain(previousAtom, currentPlacement.Position,
                         ClockDirections.Nothing);
-                    Debug.Assert(insertAtom!=null);
+                    Debug.Assert(insertAtom != null);
                     currentPlacement.ExistingAtom = insertAtom;
-
                 }
-                else if (previousAtom!=null && previousAtom.BondBetween(currentAtom)==null)
+                else if (previousAtom != null && previousAtom.BondBetween(currentAtom) == null)
                 {
-                    AddNewBond(previousAtom,currentAtom, previousAtom.Parent);
+                    AddNewBond(previousAtom, currentAtom, previousAtom.Parent);
                 }
-
-               
             }
             //join up the ring if there is no last bond
             if (newAtomPlacements[0].ExistingAtom
@@ -995,26 +987,25 @@ namespace Chem4Word.ViewModel
                 MakeRingUnsaturated(newAtomPlacements);
             }
 
-           
             newAtomPlacements[0].ExistingAtom.Parent.Refresh();
 
             Action undo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
             Action redo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
 
             UndoManager.RecordAction(undo, redo, "Molecule refresh");
-        UndoManager.EndUndoBlock();
+            UndoManager.EndUndoBlock();
         }
 
         public void DeleteMolecule(Molecule mol)
         {
             UndoManager.BeginUndoBlock();
-         
+
             Model.Model theModel = mol.Model;
             var atomList = mol.Atoms.ToList();
             var bondList = mol.Bonds.ToList();
 
             bool isTopLevel = UndoManager.TransactionLevel == 1;
-           
+
             Action redoAction = () =>
             {
                 mol.Parent = null;
@@ -1042,7 +1033,40 @@ namespace Chem4Word.ViewModel
 
         public void RemoveHydrogens()
         {
-            Debugger.Break();
+            List<Atom> targetAtoms = new List<Atom>();
+            List<Bond> targetBonds = new List<Bond>();
+
+            var allHydrogens = AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
+            if (allHydrogens.Any())
+            {
+                foreach (var hydrogen in allHydrogens)
+                {
+                    // Terminal Atom?
+                    if (hydrogen.Degree == 1)
+                    {
+                        // Not Stereo
+                        if (hydrogen.Bonds[0].Stereo == BondStereo.None)
+                        {
+                            targetAtoms.Add(hydrogen);
+                            targetBonds.Add(hydrogen.Bonds[0]);
+                        }
+                    }
+                }
+            }
+
+            if (targetAtoms.Any())
+            {
+                UndoManager.BeginUndoBlock();
+                foreach (var bond in targetBonds)
+                {
+                    DeleteBond(bond);
+                }
+                foreach (var atom in targetAtoms)
+                {
+                    DeleteAtom(atom);
+                }
+                UndoManager.EndUndoBlock();
+            }
         }
     }
 }

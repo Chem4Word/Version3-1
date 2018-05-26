@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 namespace Chem4Word.ViewModel.Commands
 {
     public class AddHydrogensCommand : BaseCommand
@@ -15,12 +17,12 @@ namespace Chem4Word.ViewModel.Commands
 
         public override bool CanExecute(object parameter)
         {
-            throw new System.NotImplementedException();
+            return true;
         }
 
         public override void Execute(object parameter)
         {
-            throw new System.NotImplementedException();
+            Debugger.Break();
         }
     }
 }
