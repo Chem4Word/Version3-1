@@ -7,23 +7,20 @@
 
 namespace Chem4Word.ViewModel.Commands
 {
-    public class RedoCommand : BaseCommand
+    public class AddHydrogensCommand : BaseCommand
     {
-        private EditViewModel _currentVM;
-
-        public RedoCommand(EditViewModel vm) : base(vm)
+        public AddHydrogensCommand(EditViewModel vm) : base(vm)
         {
-            _currentVM = vm;
         }
 
         public override bool CanExecute(object parameter)
         {
-            return _currentVM.UndoManager.CanRedo;
+            throw new System.NotImplementedException();
         }
 
         public override void Execute(object parameter)
         {
-            _currentVM.UndoManager.Redo();
+            throw new System.NotImplementedException();
         }
     }
 }

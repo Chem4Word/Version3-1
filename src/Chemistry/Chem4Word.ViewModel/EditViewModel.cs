@@ -281,6 +281,15 @@ namespace Chem4Word.ViewModel
         public RedoCommand RedoCommand { get; }
         public CopyCommand CopyCommand { get; }
         public CutCommand CutCommand { get; }
+        public PasteCommand PasteCommand { get; }
+        public MirrorCommand MirrorCommand { get; }
+        public FlipCommand FlipCommand { get; }
+        public AddHydrogensCommand AddHydrogensCommand { get; }
+        public RemoveHydrogensCommand RemoveHydrogensCommand { get; }
+        public FuseCommand FuseCommand { get; }
+        public GroupCommand GroupCommand { get; }
+        public UnGroupCommand UnGroupCommand { get; }
+        public SettingsCommand SettingsCommand { get; }
 
         #endregion Commands
 
@@ -300,6 +309,15 @@ namespace Chem4Word.ViewModel
             AddAtomCommand = new AddAtomCommand(this);
             CopyCommand = new CopyCommand(this);
             CutCommand = new CutCommand(this);
+            PasteCommand = new PasteCommand(this);
+            MirrorCommand = new MirrorCommand(this);
+            FlipCommand = new FlipCommand(this);
+            AddHydrogensCommand = new AddHydrogensCommand(this);
+            RemoveHydrogensCommand = new RemoveHydrogensCommand(this);
+            FuseCommand = new FuseCommand(this);
+            GroupCommand = new GroupCommand(this);
+            UnGroupCommand = new UnGroupCommand(this);
+            SettingsCommand = new SettingsCommand(this);
 
             PeriodicTable pt = new PeriodicTable();
             _selectedElement = pt.C;
@@ -1015,6 +1033,16 @@ namespace Chem4Word.ViewModel
 
             UndoManager.RecordAction(undoAction, redoAction);
             UndoManager.EndUndoBlock();
+        }
+
+        public void AddHydrogens()
+        {
+            Debugger.Break();
+        }
+
+        public void RemoveHydrogens()
+        {
+            Debugger.Break();
         }
     }
 }
