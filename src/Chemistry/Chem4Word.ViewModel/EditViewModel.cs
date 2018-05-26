@@ -1072,7 +1072,7 @@ namespace Chem4Word.ViewModel
                     {
                         var aa = new Atom();
                         aa.Element.Symbol = "H";
-                        aa.Position = atom.Position + vector * Model.XamlBondLength;
+                        aa.Position = atom.Position + vector * (Model.XamlBondLength / 2);
                         newAtoms.Add(aa);
                         var bb = new Bond();
                         bb.StartAtom = atom;
