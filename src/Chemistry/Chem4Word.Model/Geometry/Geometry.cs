@@ -334,7 +334,7 @@ namespace Chem4Word.Model.Geometry
 
             Path path = new Path
             {
-                StrokeThickness = 1
+                StrokeThickness = 0.0,
             };
 
             if (points.Length == 0)
@@ -344,7 +344,7 @@ namespace Chem4Word.Model.Geometry
             PathSegmentCollection pathSegments = new PathSegmentCollection();
             for (int i = 1; i < points.Length; i++)
             {
-                pathSegments.Add(new LineSegment(points[i], true));
+                pathSegments.Add(new LineSegment(points[i], false));
             }
             path.Data = new PathGeometry
             {
@@ -354,11 +354,12 @@ namespace Chem4Word.Model.Geometry
                     {
                         StartPoint = points[0],
                         Segments = pathSegments,
-                        IsClosed = isClosed
+                        IsClosed = isClosed,
+                        IsFilled = true
                     }
                 }
             };
-
+            
             return path;
         }
     }

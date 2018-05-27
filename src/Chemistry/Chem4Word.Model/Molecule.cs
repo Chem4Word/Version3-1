@@ -1182,29 +1182,59 @@ namespace Chem4Word.Model
 
         public bool Overlaps(List<Point> placements)
         {
-            var overlap = GetOverlapGeometry(placements, out System.Windows.Media.Geometry hullgeo);
+            var area = OverlapArea(placements);
 
-            bool overlaps = overlap.GetArea() > hullgeo.GetArea() * 0.01;
+            if (area.GetArea() >= 0.01)
+            {
+                return true;
+            }
+            else
+            {
+                var chainAtoms = Atoms.Where(a => !a.Rings.Any()).ToList();
+                var placementsArea = BasicGeometry.BuildPath(placements).Data;
+                foreach (var chainAtom in chainAtoms)
+                {
+                    if (placementsArea.FillContains(chainAtom.Position))
+                    {
+                        return true;
+                    }
+                }
+            }
 
-            return overlaps;
+            return false;
         }
 
-        private CombinedGeometry GetOverlapGeometry(List<Point> placements, out System.Windows.Media.Geometry hullgeo )
+        private PathGeometry OverlapArea(List<Point> placements)
         {
-            Path hull = BasicGeometry.BuildPath(this.ConvexHull.Select(a => a.Position).ToList());
+            PathGeometry ringsGeo=null;
+            foreach (Ring r in Rings)
+            {
+                Path ringHull = BasicGeometry.BuildPath(r.Traverse().Select(a => a.Position).ToList());
+                if (ringsGeo == null)
+                {
+                    ringsGeo = ringHull.Data.GetOutlinedPathGeometry();
+                }
+                else
+                {
+                    var hull = ringHull.Data;
+                    var hullGeo = hull.GetOutlinedPathGeometry();
+                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo,  hullGeo).GetOutlinedPathGeometry();
+                }
+            }
             Path otherGeo = BasicGeometry.BuildPath(placements);
 
-            hullgeo = hull.Data;
-            System.Windows.Media.Geometry  placementsGeo = otherGeo.Data;
-            hullgeo.Freeze();
-            placementsGeo.Freeze();
+            var val1 = ringsGeo;
+            val1.FillRule = FillRule.EvenOdd;
+            var val2 = otherGeo.Data.GetOutlinedPathGeometry();
+            val2.FillRule = FillRule.EvenOdd;
 
-            var val1 = hullgeo;//.GetFlattenedPathGeometry();
-            var val2 = placementsGeo;//.GetFlattenedPathGeometry();
+            var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2).GetOutlinedPathGeometry();
+            //return (id == IntersectionDetail.FullyContains | id == IntersectionDetail.FullyInside |
+            //        id == IntersectionDetail.Intersects);
 
-            CombinedGeometry cg = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2);
-            return cg;
+            return overlap;
         }
+
 
         /// <summary>
         /// Joins another molecule into this one
