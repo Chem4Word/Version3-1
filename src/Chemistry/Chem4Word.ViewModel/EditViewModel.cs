@@ -1051,29 +1051,32 @@ namespace Chem4Word.ViewModel
                     {
                         seperation = 30.0;
                     }
+
                     var vector = atom.BalancingVector;
-                    switch (atom.ImplicitHydrogenCount)
-                    {
-                        case 1:
-                            // Do Nothing
-                            break;
-                        case 2:
-                            Matrix matrix1 = new Matrix();
-                            matrix1.Rotate(seperation / 2);
-                            vector = vector * matrix1;
-                            break;
-                        case 3:
-                            Matrix matrix2 = new Matrix();
-                            matrix2.Rotate(seperation);
-                            vector = vector * matrix2;
-                            break;
-                    }
 
                     for (int i = 0; i < atom.ImplicitHydrogenCount; i++)
                     {
+                        var atomVector = atom.BalancingVector;
+                        switch (i)
+                        {
+                            case 0:
+                                // Do Nothing
+                                break;
+                            case 1:
+                                Matrix matrix1 = new Matrix();
+                                matrix1.Rotate(seperation / 2);
+                                atomVector = vector * matrix1;
+                                break;
+                            case 2:
+                                Matrix matrix2 = new Matrix();
+                                matrix2.Rotate(seperation);
+                                atomVector = vector * matrix2;
+                                break;
+                        }
+
                         var aa = new Atom();
                         aa.Element = Globals.PeriodicTable.H;
-                        aa.Position = atom.Position + vector * (Model.XamlBondLength / 2);
+                        aa.Position = atom.Position + atomVector * (Model.XamlBondLength / 2);
                         newAtoms.Add(aa);
                         if (!parents.ContainsKey(aa.Id))
                         {
@@ -1082,6 +1085,8 @@ namespace Chem4Word.ViewModel
                         var bb = new Bond();
                         bb.StartAtom = atom;
                         bb.EndAtom = aa;
+                        bb.Stereo = BondStereo.None;
+                        bb.Order = "1";
                         newBonds.Add(bb);
                         if (!parents.ContainsKey(bb.Id))
                         {
@@ -1092,13 +1097,13 @@ namespace Chem4Word.ViewModel
 
                 Debugger.Break();
 
-                foreach (var bond in newBonds)
-                {
-                    parents[bond.Id].Bonds.Add(bond);
-                }
                 foreach (var atom in newAtoms)
                 {
                     parents[atom.Id].Atoms.Add(atom);
+                }
+                foreach (var bond in newBonds)
+                {
+                    parents[bond.Id].Bonds.Add(bond);
                 }
 
                 //UndoManager.BeginUndoBlock();
@@ -1130,7 +1135,6 @@ namespace Chem4Word.ViewModel
                 //UndoManager.EndUndoBlock();
 
                 //redoAction();
-
             }
         }
 
