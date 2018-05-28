@@ -1043,6 +1043,7 @@ namespace Chem4Word.ViewModel
                 Debugger.Break();
                 List<Atom> newAtoms = new List<Atom>();
                 List<Bond> newBonds = new List<Bond>();
+                Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
                 foreach (var atom in targetAtoms)
                 {
                     double seperation = 90.0;
@@ -1074,13 +1075,62 @@ namespace Chem4Word.ViewModel
                         aa.Element = Globals.PeriodicTable.H;
                         aa.Position = atom.Position + vector * (Model.XamlBondLength / 2);
                         newAtoms.Add(aa);
+                        if (!parents.ContainsKey(aa.Id))
+                        {
+                            parents.Add(aa.Id, atom.Parent);
+                        }
                         var bb = new Bond();
                         bb.StartAtom = atom;
                         bb.EndAtom = aa;
                         newBonds.Add(bb);
+                        if (!parents.ContainsKey(bb.Id))
+                        {
+                            parents.Add(bb.Id, atom.Parent);
+                        }
                     }
                 }
+
                 Debugger.Break();
+
+                foreach (var bond in newBonds)
+                {
+                    parents[bond.Id].Bonds.Add(bond);
+                }
+                foreach (var atom in newAtoms)
+                {
+                    parents[atom.Id].Atoms.Add(atom);
+                }
+
+                //UndoManager.BeginUndoBlock();
+                //Action undoAction = () =>
+                //{
+                //    foreach (var atom in newAtoms)
+                //    {
+                //        atom.Parent.Atoms.Remove(atom);
+                //    }
+                //    foreach (var bond in newBonds)
+                //    {
+                //        bond.Parent.Bonds.Remove(bond);
+                //    }
+                //};
+
+                //Action redoAction = () =>
+                //{
+                //    foreach (var bond in newBonds)
+                //    {
+                //        bond.Parent.Bonds.Add(bond);
+                //    }
+                //    foreach (var atom in newAtoms)
+                //    {
+                //        atom.Parent.Atoms.Add(atom);
+                //    }
+                //};
+
+                //UndoManager.RecordAction(undoAction, redoAction);
+                //UndoManager.EndUndoBlock();
+
+                //redoAction();
+
             }
         }
 
@@ -1101,12 +1151,12 @@ namespace Chem4Word.ViewModel
                         // Not Stereo
                         if (hydrogen.Bonds[0].Stereo == BondStereo.None)
                         {
-                            if (!parents.ContainsKey(hydrogen.Parent.Id))
+                            if (!parents.ContainsKey(hydrogen.Id))
                             {
                                 parents.Add(hydrogen.Id, hydrogen.Parent);
                             }
                             targetAtoms.Add(hydrogen);
-                            if (!parents.ContainsKey(hydrogen.Bonds[0].Parent.Id))
+                            if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
                             {
                                 parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
                             }
