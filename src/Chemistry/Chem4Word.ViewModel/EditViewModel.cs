@@ -1071,7 +1071,7 @@ namespace Chem4Word.ViewModel
                     for (int i = 0; i < atom.ImplicitHydrogenCount; i++)
                     {
                         var aa = new Atom();
-                        aa.Element.Symbol = "H";
+                        aa.Element = Globals.PeriodicTable.H;
                         aa.Position = atom.Position + vector * (Model.XamlBondLength / 2);
                         newAtoms.Add(aa);
                         var bb = new Bond();
@@ -1088,6 +1088,7 @@ namespace Chem4Word.ViewModel
         {
             List<Atom> targetAtoms = new List<Atom>();
             List<Bond> targetBonds = new List<Bond>();
+            Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
 
             var allHydrogens = AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
             if (allHydrogens.Any())
@@ -1100,7 +1101,15 @@ namespace Chem4Word.ViewModel
                         // Not Stereo
                         if (hydrogen.Bonds[0].Stereo == BondStereo.None)
                         {
+                            if (!parents.ContainsKey(hydrogen.Parent.Id))
+                            {
+                                parents.Add(hydrogen.Id, hydrogen.Parent);
+                            }
                             targetAtoms.Add(hydrogen);
+                            if (!parents.ContainsKey(hydrogen.Bonds[0].Parent.Id))
+                            {
+                                parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
+                            }
                             targetBonds.Add(hydrogen.Bonds[0]);
                         }
                     }
@@ -1110,15 +1119,34 @@ namespace Chem4Word.ViewModel
             if (targetAtoms.Any())
             {
                 UndoManager.BeginUndoBlock();
-                foreach (var bond in targetBonds)
+                Action undoAction = () =>
                 {
-                    DeleteBond(bond);
-                }
-                foreach (var atom in targetAtoms)
+                    foreach (var atom in targetAtoms)
+                    {
+                        parents[atom.Id].Atoms.Add(atom);
+                    }
+                    foreach (var bond in targetBonds)
+                    {
+                        parents[bond.Id].Bonds.Add(bond);
+                    }
+                };
+
+                Action redoAction = () =>
                 {
-                    DeleteAtom(atom);
-                }
+                    foreach (var bond in targetBonds)
+                    {
+                        bond.Parent.Bonds.Remove(bond);
+                    }
+                    foreach (var atom in targetAtoms)
+                    {
+                        atom.Parent.Atoms.Remove(atom);
+                    }
+                };
+
+                UndoManager.RecordAction(undoAction, redoAction);
                 UndoManager.EndUndoBlock();
+
+                redoAction();
             }
         }
     }
