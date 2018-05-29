@@ -57,6 +57,7 @@ namespace Chem4Word.ViewModel.Commands
                     }
                 }
                 MyEditViewModel.UndoManager.EndUndoBlock();
+                MyEditViewModel.SelectedItems.Clear();
             }
         }
 

@@ -215,10 +215,7 @@ namespace Chem4Word.ViewModel.Adorners
                 _frag.Move(_lastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
-                if (DragResizeCompleted != null)
-                {
-                    DragResizeCompleted(this, dragCompletedEventArgs);
-                }
+                DragResizeCompleted?.Invoke(this, dragCompletedEventArgs);
 
                 SetCentroid();
             }
