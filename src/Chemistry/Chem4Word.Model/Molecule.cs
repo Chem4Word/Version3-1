@@ -1180,7 +1180,7 @@ namespace Chem4Word.Model
         {
         }
 
-        public bool Overlaps(List<Point> placements)
+        public bool Overlaps(List<Point> placements, List<Atom> excludeAtoms = null)
         {
             var area = OverlapArea(placements);
 
@@ -1191,10 +1191,20 @@ namespace Chem4Word.Model
             else
             {
                 var chainAtoms = Atoms.Where(a => !a.Rings.Any()).ToList();
+                if (excludeAtoms!=null)
+                {
+                    foreach (Atom excludeAtom in excludeAtoms)
+                    {
+                        if (chainAtoms.Contains(excludeAtom))
+                        {
+                            chainAtoms.Remove(excludeAtom);
+                        }
+                    }
+                }
                 var placementsArea = BasicGeometry.BuildPath(placements).Data;
                 foreach (var chainAtom in chainAtoms)
                 {
-                    if (placementsArea.FillContains(chainAtom.Position))
+                    if (placementsArea.FillContains(chainAtom.Position, 0.01, ToleranceType.Relative))
                     {
                         return true;
                     }
@@ -1273,7 +1283,7 @@ namespace Chem4Word.Model
         public void Split(Atom a, Atom b)
         {
             Debug.Assert(a.BondBetween(b)==null);
-
+            
             b.Parent = null;
             Refresh();
 
