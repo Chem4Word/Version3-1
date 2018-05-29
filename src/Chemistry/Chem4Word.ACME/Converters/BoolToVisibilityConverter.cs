@@ -29,7 +29,9 @@ namespace Chem4Word.ACME.Converters
             object parameter, CultureInfo culture)
         {
             if (!(value is bool))
+            {
                 return null;
+            }
             return (bool)value ? TrueValue : FalseValue;
         }
 
@@ -37,9 +39,14 @@ namespace Chem4Word.ACME.Converters
             object parameter, CultureInfo culture)
         {
             if (Equals(value, TrueValue))
+            {
                 return true;
+            }
+
             if (Equals(value, FalseValue))
+            {
                 return false;
+            }
             return null;
         }
     }

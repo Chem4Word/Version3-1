@@ -28,7 +28,9 @@ namespace Chem4Word.ViewModel.Commands
         public override void RaiseCanExecChanged()
         {
             if (CanExecuteChanged != null)
+            {
                 CanExecuteChanged.Invoke(this, new EventArgs());
+            }
         }
 
         public override event EventHandler CanExecuteChanged;
