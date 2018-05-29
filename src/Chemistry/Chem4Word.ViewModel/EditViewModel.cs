@@ -575,7 +575,7 @@ namespace Chem4Word.ViewModel
             Action undoAction = () =>
             {
                 parent.Atoms.Add(atom);
-                SelectedItems.Clear();
+                //SelectedItems.Clear();
                 SelectedItems.Add(atom);
             };
             Action redoAction = () =>
@@ -601,6 +601,10 @@ namespace Chem4Word.ViewModel
             bool isTopLevel = UndoManager.TransactionLevel == 1;
             Action redoAction = () =>
             {
+                if (SelectedItems.Contains(bond))
+                {
+                    SelectedItems.Remove(bond);
+                }
                 bond.StartAtom = null;
                 bond.EndAtom = null;
                 parent?.Bonds.Remove(bond);
@@ -618,7 +622,7 @@ namespace Chem4Word.ViewModel
 
                 a1.Parent.Bonds.Add(bond);
 
-                SelectedItems.Clear();
+                
                 SelectedItems.Add(bond);
                 if (a2.Parent != a1.Parent)
                 {

@@ -1244,7 +1244,7 @@ namespace Chem4Word.Model
         {
             Debug.Assert(mol!=this);
             Debug.Assert(mol!=null);
-            Parent.Molecules.Remove(mol);
+            Parent?.Molecules.Remove(mol);
             foreach (Atom newAtom in
                mol.Atoms.ToArray())
             {

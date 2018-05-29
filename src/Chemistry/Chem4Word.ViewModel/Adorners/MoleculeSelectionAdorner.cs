@@ -92,7 +92,7 @@ namespace Chem4Word.ViewModel.Adorners
             _bigBrush = (Brush)FindResource("BigThumbFillBrush");
             _renderPen = (Pen)FindResource("GrabHandlePen");
 
-            Focusable = true;
+            Focusable = false;
             IsHitTestVisible = true;
             SetBoundingBox();
 
@@ -133,18 +133,19 @@ namespace Chem4Word.ViewModel.Adorners
         {
             if (Keyboard.IsKeyDown(Key.Delete))
             {
-                //_frag.Delete();
+                //bubble it up
+                e.Handled = false;
             }
-
-            if (Keyboard.IsKeyDown(Key.Escape))
+            else if ((Keyboard.IsKeyDown(Key.Z) | (Keyboard.IsKeyDown(Key.Y)) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control))
             {
+                e.Handled = false;
+            }  
+            else if (Keyboard.IsKeyDown(Key.Escape))
+            {
+                e.Handled = true;
                 if (IsWorking)
                 {
-                    AbortDragging();
-                    
-                }
-                else
-                {
+                    AbortDragging();                    
                 }
             }
         }
