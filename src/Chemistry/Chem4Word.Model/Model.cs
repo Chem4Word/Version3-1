@@ -278,7 +278,7 @@ namespace Chem4Word.Model
         {
             get
             {
-                double fontSize = Globals.DefaultFontSize;
+                double fontSize = Globals.DefaultFontSize * Globals.ScaleFactorForXaml;
 
                 if (AllBonds.Any())
                 {
@@ -383,7 +383,7 @@ namespace Chem4Word.Model
                 }
                 else
                 {
-                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength);
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength / Globals.ScaleFactorForXaml);
                 }
                 ScaledForXaml = false;
             }
@@ -402,7 +402,7 @@ namespace Chem4Word.Model
                 }
                 else
                 {
-                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength);
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength * Globals.ScaleFactorForXaml);
                 }
                 ScaledForXaml = true;
 

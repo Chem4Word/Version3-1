@@ -5,7 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
+using Chem4Word.Model;
+using System.Linq;
 
 namespace Chem4Word.ViewModel.Commands
 {
@@ -17,6 +18,10 @@ namespace Chem4Word.ViewModel.Commands
 
         public override bool CanExecute(object parameter)
         {
+            var mols = MyEditViewModel.SelectedItems.OfType<Molecule>().ToList();
+            var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
+            var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
+
             return true;
         }
 

@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics;
 
 namespace Chem4Word.ViewModel.Commands
 {
@@ -15,12 +16,12 @@ namespace Chem4Word.ViewModel.Commands
 
         public override bool CanExecute(object parameter)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public override void Execute(object parameter)
         {
-            throw new NotImplementedException();
+            Debugger.Break();
         }
 
         public override event EventHandler CanExecuteChanged;

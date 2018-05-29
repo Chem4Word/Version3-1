@@ -17,7 +17,7 @@ namespace Chem4Word.ViewModel.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return true;
+            return false;
         }
 
         public override void Execute(object parameter)

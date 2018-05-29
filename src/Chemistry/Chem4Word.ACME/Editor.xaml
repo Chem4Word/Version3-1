@@ -481,7 +481,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontFamily="Arial"
-                            Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
+                            Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled, Converter={StaticResource EnabledConverter}, ConverterParameter={StaticResource ResourceKey=Chem4WordBrush}}">
                             +H
                         </TextBlock>
                     </Viewbox>
@@ -499,7 +499,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontFamily="Arial"
-                            Foreground="{StaticResource ResourceKey=Chem4WordBrush}">
+                            Foreground="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled, Converter={StaticResource EnabledConverter}, ConverterParameter={StaticResource ResourceKey=Chem4WordBrush}}">
                             -H
                         </TextBlock>
                     </Viewbox>
