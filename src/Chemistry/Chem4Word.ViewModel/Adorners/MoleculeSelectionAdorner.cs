@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -14,7 +15,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Adorners
 {
@@ -264,8 +264,8 @@ namespace Chem4Word.ViewModel.Adorners
 
             Point currentPos = new Point(_dragXTravel, _dragYTravel);
 
-            Canvas.SetLeft(_bigThumb,_startPos.X + _dragXTravel);
-            Canvas.SetTop(_bigThumb, _startPos.Y +  _dragYTravel);
+            Canvas.SetLeft(_bigThumb, _startPos.X + _dragXTravel);
+            Canvas.SetTop(_bigThumb, _startPos.Y + _dragYTravel);
 
             _canvasPos = currentPos;
             Vector displacement = _canvasPos - _startPos;
@@ -282,7 +282,6 @@ namespace Chem4Word.ViewModel.Adorners
         /// <param name="e"></param>
         private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-
             if (_lastOperation != null)
             {
                 SetBoundingBox();
@@ -304,7 +303,7 @@ namespace Chem4Word.ViewModel.Adorners
             _dragging = true;
             InitializeDragging();
             _dragging = true;
-  
+
             _startPos = new Point(Canvas.GetLeft(_bigThumb), Canvas.GetTop(_bigThumb));
         }
 
@@ -330,7 +329,7 @@ namespace Chem4Word.ViewModel.Adorners
                 fragImage.Transform = _lastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
                 drawingContext.DrawGeometry(_renderBrush, _renderPen, fragImage);
-   
+
                 base.OnRender(drawingContext);
             }
         }
@@ -414,7 +413,6 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void IncrementDragging(DragDeltaEventArgs args)
         {
-            
             _dragXTravel += args.HorizontalChange;
             _dragYTravel += args.VerticalChange;
         }

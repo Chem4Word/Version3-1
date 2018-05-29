@@ -109,7 +109,7 @@ namespace Chem4Word.ViewModel
         public DisplayViewModel(Model.Model model) : this()
         {
             Model = model;
-            FontSize = Globals.DefaultFontSize;
+            FontSize = Globals.DefaultFontSize * Globals.ScaleFactorForXaml;
             if (model.AllBonds.Any())
             {
                 FontSize = model.XamlBondLength * Globals.FontSizePercentageBond;

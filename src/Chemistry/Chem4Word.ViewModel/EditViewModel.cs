@@ -17,7 +17,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -281,6 +280,15 @@ namespace Chem4Word.ViewModel
         public RedoCommand RedoCommand { get; }
         public CopyCommand CopyCommand { get; }
         public CutCommand CutCommand { get; }
+        public PasteCommand PasteCommand { get; }
+        public MirrorCommand MirrorCommand { get; }
+        public FlipCommand FlipCommand { get; }
+        public AddHydrogensCommand AddHydrogensCommand { get; }
+        public RemoveHydrogensCommand RemoveHydrogensCommand { get; }
+        public FuseCommand FuseCommand { get; }
+        public GroupCommand GroupCommand { get; }
+        public UnGroupCommand UnGroupCommand { get; }
+        public SettingsCommand SettingsCommand { get; }
 
         #endregion Commands
 
@@ -300,6 +308,15 @@ namespace Chem4Word.ViewModel
             AddAtomCommand = new AddAtomCommand(this);
             CopyCommand = new CopyCommand(this);
             CutCommand = new CutCommand(this);
+            PasteCommand = new PasteCommand(this);
+            MirrorCommand = new MirrorCommand(this);
+            FlipCommand = new FlipCommand(this);
+            AddHydrogensCommand = new AddHydrogensCommand(this);
+            RemoveHydrogensCommand = new RemoveHydrogensCommand(this);
+            FuseCommand = new FuseCommand(this);
+            GroupCommand = new GroupCommand(this);
+            UnGroupCommand = new UnGroupCommand(this);
+            SettingsCommand = new SettingsCommand(this);
 
             PeriodicTable pt = new PeriodicTable();
             _selectedElement = pt.C;
@@ -650,11 +667,9 @@ namespace Chem4Word.ViewModel
                 }
                 if (isTopLevel)
                 {
-
                     a1.Parent.RebuildRings();
                 }
             };
-
 
             redoAction();
 
@@ -667,7 +682,7 @@ namespace Chem4Word.ViewModel
             Atom newAtom = new Atom();
             newAtom.Element = _selectedElement;
             newAtom.Position = newAtomPos;
-            object tag=null;
+            object tag = null;
             if (dir != ClockDirections.Nothing)
             {
                 tag = dir;
@@ -776,7 +791,6 @@ namespace Chem4Word.ViewModel
                 {
                     mol.RebuildRings();
                 }
-               
             };
 
             UndoManager.RecordAction(undo, redo);
@@ -893,7 +907,7 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public void SetBondAttributes(Bond parentBond, string newOrder = null, BondStereo? newStereo =null)
+        public void SetBondAttributes(Bond parentBond, string newOrder = null, BondStereo? newStereo = null)
         {
             UndoManager.BeginUndoBlock();
 
@@ -908,8 +922,8 @@ namespace Chem4Word.ViewModel
 
             Action redo = () =>
             {
-                parentBond.Order = newOrder??CurrentBondOrder;
-                parentBond.Stereo = newStereo??CurrentStereo;
+                parentBond.Order = newOrder ?? CurrentBondOrder;
+                parentBond.Stereo = newStereo ?? CurrentStereo;
             };
             UndoManager.RecordAction(undo, redo);
 
@@ -922,7 +936,6 @@ namespace Chem4Word.ViewModel
 
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated)
         {
-
             void MakeRingUnsaturated(List<NewAtomPlacement> list)
             {
                 string bondOrder =
@@ -950,7 +963,7 @@ namespace Chem4Word.ViewModel
                     {
                         SetBondAttributes(list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom),
                             Bond.OrderDouble, BondStereo.None);
-                        
+
                         startpos += 2;
                     }
                     else
@@ -967,7 +980,7 @@ namespace Chem4Word.ViewModel
             {
                 int currIndex = i % newAtomPlacements.Count;
                 NewAtomPlacement currentPlacement = newAtomPlacements[currIndex];
-                NewAtomPlacement previousPlacement = newAtomPlacements[i-1];
+                NewAtomPlacement previousPlacement = newAtomPlacements[i - 1];
 
                 Atom previousAtom = previousPlacement.ExistingAtom;
                 Atom currentAtom = currentPlacement.ExistingAtom;
@@ -978,16 +991,13 @@ namespace Chem4Word.ViewModel
 
                     insertAtom = AddAtomChain(previousAtom, currentPlacement.Position,
                         ClockDirections.Nothing);
-                    Debug.Assert(insertAtom!=null);
+                    Debug.Assert(insertAtom != null);
                     currentPlacement.ExistingAtom = insertAtom;
-
                 }
-                else if (previousAtom!=null && previousAtom.BondBetween(currentAtom)==null)
+                else if (previousAtom != null && previousAtom.BondBetween(currentAtom) == null)
                 {
-                    AddNewBond(previousAtom,currentAtom, previousAtom.Parent);
+                    AddNewBond(previousAtom, currentAtom, previousAtom.Parent);
                 }
-
-               
             }
             //join up the ring if there is no last bond
             if (newAtomPlacements[0].ExistingAtom
@@ -1001,7 +1011,6 @@ namespace Chem4Word.ViewModel
                 MakeRingUnsaturated(newAtomPlacements);
             }
 
-           
             newAtomPlacements[0].ExistingAtom.Parent.Refresh();
 
             Action undo = () =>
@@ -1012,19 +1021,19 @@ namespace Chem4Word.ViewModel
             Action redo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
 
             UndoManager.RecordAction(undo, redo, "Molecule refresh");
-        UndoManager.EndUndoBlock();
+            UndoManager.EndUndoBlock();
         }
 
         public void DeleteMolecule(Molecule mol)
         {
             UndoManager.BeginUndoBlock();
-         
+
             Model.Model theModel = mol.Model;
             var atomList = mol.Atoms.ToList();
             var bondList = mol.Bonds.ToList();
 
             bool isTopLevel = UndoManager.TransactionLevel == 1;
-           
+
             Action redoAction = () =>
             {
                 mol.Parent = null;
@@ -1043,6 +1052,258 @@ namespace Chem4Word.ViewModel
 
             UndoManager.RecordAction(undoAction, redoAction);
             UndoManager.EndUndoBlock();
+        }
+
+        public void AddHydrogens()
+        {
+            List<Atom> targetAtoms = new List<Atom>();
+            var mols = SelectedItems.OfType<Molecule>().ToList();
+            if (mols.Any())
+            {
+                foreach (var mol in mols)
+                {
+                    foreach (var atom in mol.AllAtoms)
+                    {
+                        if (atom.ImplicitHydrogenCount > 0)
+                        {
+                            targetAtoms.Add(atom);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var atom in AllAtoms)
+                {
+                    if (atom.ImplicitHydrogenCount > 0)
+                    {
+                        targetAtoms.Add(atom);
+                    }
+                }
+            }
+
+            if (targetAtoms.Any())
+            {
+                List<Atom> newAtoms = new List<Atom>();
+                List<Bond> newBonds = new List<Bond>();
+                Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
+                foreach (var atom in targetAtoms)
+                {
+                    double seperation = 90.0;
+                    if (atom.Bonds.Count > 1)
+                    {
+                        seperation = 30.0;
+                    }
+
+                    int hydrogenCount = atom.ImplicitHydrogenCount;
+                    var vector = atom.BalancingVector;
+                    switch (hydrogenCount)
+                    {
+                        case 1:
+                            // Use balancing vector as is
+                            break;
+
+                        case 2:
+                            Matrix matrix1 = new Matrix();
+                            matrix1.Rotate(-seperation / 2);
+                            vector = vector * matrix1;
+                            break;
+
+                        case 3:
+                            Matrix matrix2 = new Matrix();
+                            matrix2.Rotate(-seperation);
+                            vector = vector * matrix2;
+                            break;
+
+                        case 4:
+                            // Use default balancing vector (Screen.North) as is
+                            break;
+                    }
+
+                    Matrix matrix3 = new Matrix();
+                    matrix3.Rotate(seperation);
+
+                    for (int i = 0; i < hydrogenCount; i++)
+                    {
+                        if (i > 0)
+                        {
+                            vector = vector * matrix3;
+                        }
+
+                        var aa = new Atom
+                        {
+                            Element = Globals.PeriodicTable.H,
+                            Position = atom.Position + vector * (Model.XamlBondLength * Globals.ExplicitHydrogenBondPercentage)
+                        };
+                        newAtoms.Add(aa);
+                        if (!parents.ContainsKey(aa.Id))
+                        {
+                            parents.Add(aa.Id, atom.Parent);
+                        }
+                        var bb = new Bond
+                        {
+                            StartAtom = atom,
+                            EndAtom = aa,
+                            Stereo = BondStereo.None,
+                            Order = "S"
+                        };
+                        newBonds.Add(bb);
+                        if (!parents.ContainsKey(bb.Id))
+                        {
+                            parents.Add(bb.Id, atom.Parent);
+                        }
+                    }
+                }
+
+                UndoManager.BeginUndoBlock();
+                Action undoAction = () =>
+                {
+                    //foreach (var atom in newAtoms)
+                    //{
+                    //    foreach (var bond in newBonds)
+                    //    {
+                    //        atom.Bonds.Remove(bond);
+                    //    }
+                    //}
+                    foreach (var bond in newBonds)
+                    {
+                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
+                        bond.Parent.Bonds.Remove(bond);
+                    }
+                    foreach (var atom in newAtoms)
+                    {
+                        atom.Parent.Atoms.Remove(atom);
+                    }
+                };
+
+                Action redoAction = () =>
+                {
+                    foreach (var atom in newAtoms)
+                    {
+                        parents[atom.Id].Atoms.Add(atom);
+                    }
+                    foreach (var bond in newBonds)
+                    {
+                        parents[bond.Id].Bonds.Add(bond);
+                    }
+                };
+
+                UndoManager.RecordAction(undoAction, redoAction);
+                UndoManager.EndUndoBlock();
+
+                redoAction();
+            }
+            SelectedItems.Clear();
+        }
+
+        public void RemoveHydrogens()
+        {
+            List<Atom> targetAtoms = new List<Atom>();
+            List<Bond> targetBonds = new List<Bond>();
+            Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
+
+            var mols = SelectedItems.OfType<Molecule>().ToList();
+            if (mols.Any())
+            {
+                foreach (var mol in mols)
+                {
+                    var allHydrogens = mol.AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
+                    if (allHydrogens.Any())
+                    {
+                        foreach (var hydrogen in allHydrogens)
+                        {
+                            // Terminal Atom?
+                            if (hydrogen.Degree == 1)
+                            {
+                                // Not Stereo
+                                if (hydrogen.Bonds[0].Stereo == BondStereo.None)
+                                {
+                                    if (!parents.ContainsKey(hydrogen.Id))
+                                    {
+                                        parents.Add(hydrogen.Id, hydrogen.Parent);
+                                    }
+                                    targetAtoms.Add(hydrogen);
+                                    if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
+                                    {
+                                        parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
+                                    }
+                                    targetBonds.Add(hydrogen.Bonds[0]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var allHydrogens = AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
+                if (allHydrogens.Any())
+                {
+                    foreach (var hydrogen in allHydrogens)
+                    {
+                        // Terminal Atom?
+                        if (hydrogen.Degree == 1)
+                        {
+                            // Not Stereo
+                            if (hydrogen.Bonds[0].Stereo == BondStereo.None)
+                            {
+                                if (!parents.ContainsKey(hydrogen.Id))
+                                {
+                                    parents.Add(hydrogen.Id, hydrogen.Parent);
+                                }
+                                targetAtoms.Add(hydrogen);
+                                if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
+                                {
+                                    parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
+                                }
+                                targetBonds.Add(hydrogen.Bonds[0]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (targetAtoms.Any())
+            {
+                UndoManager.BeginUndoBlock();
+                Action undoAction = () =>
+                {
+                    foreach (var atom in targetAtoms)
+                    {
+                        parents[atom.Id].Atoms.Add(atom);
+                    }
+                    foreach (var bond in targetBonds)
+                    {
+                        parents[bond.Id].Bonds.Add(bond);
+                    }
+                };
+
+                Action redoAction = () =>
+                {
+                    //foreach (var atom in targetAtoms)
+                    //{
+                    //    foreach (var bond in targetBonds)
+                    //    {
+                    //        atom.Bonds.Remove(bond);
+                    //    }
+                    //}
+                    foreach (var bond in targetBonds)
+                    {
+                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
+                        bond.Parent.Bonds.Remove(bond);
+                    }
+                    foreach (var atom in targetAtoms)
+                    {
+                        atom.Parent.Atoms.Remove(atom);
+                    }
+                };
+
+                UndoManager.RecordAction(undoAction, redoAction);
+                UndoManager.EndUndoBlock();
+
+                redoAction();
+            }
+            SelectedItems.Clear();
         }
     }
 }
