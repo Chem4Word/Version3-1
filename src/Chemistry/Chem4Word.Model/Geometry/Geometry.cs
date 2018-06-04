@@ -345,7 +345,7 @@ namespace Chem4Word.Model.Geometry
             PathSegmentCollection pathSegments = new PathSegmentCollection();
             for (int i = 1; i < points.Length; i++)
             {
-                pathSegments.Add(new LineSegment(points[i], false));
+                pathSegments.Add(new LineSegment(points[i], true));
             }
             path.Data = new PathGeometry
             {
