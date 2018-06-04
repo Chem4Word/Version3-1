@@ -326,7 +326,7 @@ namespace Chem4Word.Model.Geometry
         /// Takes a list of poinst and builds a  Path object from it.
         /// Generally used for constructing masks
         /// </summary>
-        /// <param name="hull">List of points makking up the path </param>
+        /// <param name="hull">List of points making up the path </param>
         /// <returns></returns>
         public static Path BuildPath(List<Point> hull, bool isClosed = true)
         {
@@ -341,6 +341,7 @@ namespace Chem4Word.Model.Geometry
             {
                 return path;
             }
+
             PathSegmentCollection pathSegments = new PathSegmentCollection();
             for (int i = 1; i < points.Length; i++)
             {

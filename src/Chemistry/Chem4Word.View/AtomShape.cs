@@ -314,6 +314,24 @@ namespace Chem4Word.View
             drawingContext.DrawGeometry(BackgroundColor,
                 new Pen(BackgroundColor, MaskOffsetWidth),
                 BasicGeometry.BuildPath(shapeHull).Data);
+
+            // Show points for debugging
+            SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
+            SolidColorBrush otherPoints = new SolidColorBrush(Colors.Blue);
+            int i = 0;
+            foreach (var point in shapeHull)
+            {
+                if (i == 0)
+                {
+                    drawingContext.DrawEllipse(firstPoint, null, point, 1, 1);
+
+                }
+                else
+                {
+                    drawingContext.DrawEllipse(otherPoints, null, point, 1, 1);
+                }
+                i++;
+            }
         }
 
         /// <summary>
