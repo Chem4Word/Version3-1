@@ -7,18 +7,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model.Geometry
 {
     public enum ClockDirections
     {
-        Nothing =0,
+        Nothing = 0,
         One,
         Two,
         Three,
@@ -33,7 +31,6 @@ namespace Chem4Word.Model.Geometry
         Twelve
     }
 
-   
     public static class AngleMethods
     {
         public static Vector ToVector(this ClockDirections dir)
@@ -41,12 +38,13 @@ namespace Chem4Word.Model.Geometry
             Matrix rotator = new Matrix();
             rotator.Rotate((int)dir.ToDegrees());
             return BasicGeometry.ScreenNorth * rotator;
-
         }
+
         public static double ToDegrees(this ClockDirections cd)
         {
             return 30 * ((int)cd % 12);
         }
+
         /// <summary>
         /// Splits the angle between two clock directions
         /// </summary>
@@ -55,8 +53,7 @@ namespace Chem4Word.Model.Geometry
         /// <returns>A clock direction pointing to the new direction </returns>
         public static ClockDirections Split(this ClockDirections first, ClockDirections second)
         {
-            return (ClockDirections) ((((int) first + (int) second) % 12) / 2);
-
+            return (ClockDirections)((((int)first + (int)second) % 12) / 2);
         }
 
         public static double ToDegrees(this CompassPoints cp)
@@ -359,7 +356,7 @@ namespace Chem4Word.Model.Geometry
                     }
                 }
             };
-            
+
             return path;
         }
     }

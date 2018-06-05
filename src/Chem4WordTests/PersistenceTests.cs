@@ -8,13 +8,15 @@
 using Chem4WordTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using Chem4Word.Model;
+using Chem4Word.Model.Converters;
 
-namespace Chem4Word.Model.Converters.Tests
+namespace Chem4WordTests
 {
-    [TestClass()]
+    [TestClass]
     public class PersistenceTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportBenzene()
         {
             CMLConverter mc = new CMLConverter();
@@ -33,7 +35,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(m.Molecules.SelectMany(m1 => m1.Rings).Count() == 1, $"Expected 1 Ring; Got {m.Molecules.SelectMany(m1 => m1.Rings).Count()}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportTestosterone()
         {
             CMLConverter mc = new CMLConverter();
@@ -53,7 +55,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(list.Count == 4, $"Expected 4 Rings; Got {list.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportTestosteroneThenRefresh()
         {
             CMLConverter mc = new CMLConverter();
@@ -75,7 +77,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(list.Count == 4, $"Expected 4 Rings; Got {list.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportCopperPhthalocyanine()
         {
             CMLConverter mc = new CMLConverter();
@@ -91,7 +93,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(list.Count == 12, $"Expected 12 Rings; Got {list.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportCopperPhthalocyanineThenRefresh()
         {
             CMLConverter mc = new CMLConverter();
@@ -109,7 +111,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(list.Count == 12, $"Expected 12 Rings; Got {list.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportPhthalocyanine()
         {
             CMLConverter mc = new CMLConverter();
@@ -125,7 +127,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(list.Count == 8, $"Expected 8 Rings; Got {list.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportPhthalocyanineThenRefresh()
         {
             CMLConverter mc = new CMLConverter();
@@ -143,7 +145,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(list.Count == 8, $"Expected 8 Rings; Got {list.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void CmlImportNested()
         {
             CMLConverter mc = new CMLConverter();
@@ -171,7 +173,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(molecule.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule.Atoms.Count}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void SdfImportBenzene()
         {
             SdFileConverter mc = new SdFileConverter();
@@ -190,7 +192,7 @@ namespace Chem4Word.Model.Converters.Tests
             Assert.IsTrue(m.Molecules.SelectMany(m1 => m1.Rings).Count() == 1, $"Expected 1 Ring; Got {m.Molecules.SelectMany(m1 => m1.Rings).Count()}");
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void SdfImportBasicParafuchsin()
         {
             SdFileConverter mc = new SdFileConverter();
