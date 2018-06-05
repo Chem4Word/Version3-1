@@ -16,6 +16,9 @@ namespace Chem4WordTests
             CMLConverter mc = new CMLConverter();
             Model m = mc.Import(ResourceHelper.GetStringResource("Carbon.xml"));
 
+            int atomBondsCount1 = m.Molecules[0].Atoms[0].Bonds.Count;
+            Assert.AreEqual(0, atomBondsCount1, $"Expected 0; got {atomBondsCount1}");
+
             Molecule mol = m.Molecules[0];
             Atom a0 = mol.Atoms[0];
 
@@ -36,13 +39,14 @@ namespace Chem4WordTests
             mol.Atoms.Add(aa);
             mol.Bonds.Add(bb);
 
-            Debug.WriteLine(a0.Bonds.Count);
+            int atomBondsCount2 = m.Molecules[0].Atoms[0].Bonds.Count;
+            Assert.AreEqual(1, atomBondsCount2, $"Expected 1; got {atomBondsCount2}");
 
             mol.Bonds.Remove(bb);
             mol.Atoms.Remove(aa);
 
-            Debug.WriteLine(a0.Bonds.Count);
-            Debug.WriteLine(".");
+            int atomBondsCount3 = m.Molecules[0].Atoms[0].Bonds.Count;
+            Assert.AreEqual(0, atomBondsCount3, $"Expected 0; got {atomBondsCount3}");
         }
     }
 }
