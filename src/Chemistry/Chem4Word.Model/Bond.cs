@@ -18,7 +18,6 @@ using System.Windows;
 
 namespace Chem4Word.Model
 {
-    [DebuggerDisplay("Id: {Id} From: {StartAtom.Id} To: {EndAtom.Id}")]
     [Serializable]
     public class Bond : INotifyPropertyChanged
     {
@@ -33,7 +32,10 @@ namespace Chem4Word.Model
 
         public bool Processed { get; set; }
 
-        
+        public override string ToString()
+        {
+            return $"Bond: {Id} From: {StartAtom.Id} To: {EndAtom.Id}";
+        }
 
         public Bond SelfRef
         {
@@ -849,6 +851,5 @@ namespace Chem4Word.Model
                 return (currentParent as Model);
             }
         }
-
     }
 }

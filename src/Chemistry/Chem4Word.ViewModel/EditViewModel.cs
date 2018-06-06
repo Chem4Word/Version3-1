@@ -1262,6 +1262,8 @@ namespace Chem4Word.ViewModel
                     foreach (var bond in targetBonds)
                     {
                         // BUG: Removing a bond does not remove it from an Atom's Bond Collection
+                        bond.StartAtom = null;
+                        bond.EndAtom = null;
                         bond.Parent.Bonds.Remove(bond);
                     }
                     foreach (var atom in targetAtoms)
