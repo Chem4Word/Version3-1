@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
@@ -176,6 +177,7 @@ namespace Chem4Word.Model.Geometry
             {
                 if ((point1 - point0).Value.Length < epsilon || (point2 - point2).Value.Length < epsilon)
                 {
+                    Debugger.Break();
                     throw new ArgumentException("coincident points in GetAngle");
                 }
 

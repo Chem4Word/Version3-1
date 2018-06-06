@@ -454,6 +454,7 @@ namespace WinFormsTestHarness
     {
         public void ReadValueInfo(BinarySerializationStreamAnalyzer analyzer)
         {
+            Debugger.Break();
             throw new NotImplementedException();
         }
 
@@ -498,12 +499,26 @@ namespace WinFormsTestHarness
         {
             MemberInfo junk = new MemberInfo();
             for (int i = 0; i < Slots; i++)
+            {
                 TypeHelper.GetTypeValue(this, junk, analyzer);
+            }
         }
 
         public int ObjectID { get; set; }
         public long? ParentObjectID { get; set; }
-        public SerialObject RelevantObject { get { return this; } set { throw new NotImplementedException(); } }
+
+        public SerialObject RelevantObject
+        {
+            get
+            {
+                return this;
+            }
+            set
+            {
+                Debugger.Break();
+                throw new NotImplementedException();
+            }
+        }
         public BinaryArrayTypeEnumeration ArrayType;
         public int Rank;
         public List<int> Lengths;
@@ -518,7 +533,9 @@ namespace WinFormsTestHarness
             {
                 int outValue = 1;
                 foreach (int length in Lengths)
+                {
                     outValue = outValue * length;
+                }
                 return outValue;
             }
         }

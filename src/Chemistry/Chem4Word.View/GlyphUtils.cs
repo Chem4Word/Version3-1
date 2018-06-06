@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 
@@ -41,6 +42,7 @@ namespace Chem4Word.View
         {
             if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
             {
+                Debugger.Break();
                 throw new InvalidOperationException("No glyphtypeface found");
             }
         }

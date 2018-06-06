@@ -79,6 +79,7 @@ namespace Chem4Word.Model
             {
                 if (StartAtom == null | EndAtom == null)
                 {
+                    Debugger.Break();
                     throw new InvalidOperationException("Both atoms must be assigned");
                 }
                 else
@@ -346,6 +347,7 @@ namespace Chem4Word.Model
             else
             {
                 // ReSharper disable once NotResolvedInText
+                Debugger.Break();
                 throw new ArgumentOutOfRangeException("Atom is not part of this bond.");
             }
         }

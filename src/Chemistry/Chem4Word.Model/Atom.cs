@@ -228,15 +228,18 @@ namespace Chem4Word.Model
                     }
                     else
                     {
+                        Debugger.Break();
                         throw new ArgumentOutOfRangeException("ShowSymbol", Resources.ExplicitCError);
                     }
                 }
                 else if (this.Element is FunctionalGroup)
                 {
+                    Debugger.Break();
                     throw new ArgumentOutOfRangeException("ShowSymbol", Resources.ExplicitCError);
                 }
                 else
                 {
+                    Debugger.Break();
                     throw new ArgumentOutOfRangeException("ShowSymbol", Resources.ExplicitCError);
                 }
             }

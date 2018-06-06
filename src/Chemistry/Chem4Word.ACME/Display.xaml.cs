@@ -8,6 +8,7 @@
 using Chem4Word.Core;
 using Chem4Word.Model.Converters;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -126,6 +127,7 @@ namespace Chem4Word.ACME
             {
                 if (Chemistry != null && !(Chemistry is ChemistryModel))
                 {
+                    Debugger.Break();
                     throw new ArgumentException("Object must be of type 'Chem4Word.Model.Model'.");
                 }
                 chemistryModel = Chemistry as ChemistryModel;

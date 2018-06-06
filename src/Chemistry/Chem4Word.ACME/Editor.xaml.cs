@@ -304,6 +304,7 @@ namespace Chem4Word.ACME
 
         private void RingButton_OnClick(object sender, RoutedEventArgs e)
         {
+            Debugger.Break();
             throw new NotImplementedException();
         }
     }

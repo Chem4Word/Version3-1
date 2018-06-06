@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Chem4Word.Model.Geometry;
@@ -170,6 +171,7 @@ namespace Chem4Word.Model
 
             if (queueManager.Count != 4)
             {
+                Debugger.Break();
                 throw new ArgumentException("Number of neigbouring atoms does not equal 4.");
             }
 

@@ -322,6 +322,7 @@ namespace Chem4Word.Model
                 {
                     if (Parent == null)
                     {
+                        Debugger.Break();
                         throw new ArgumentOutOfRangeException("Not allowed to set Count on a top-level molecule");
                     }
                 }

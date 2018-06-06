@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -555,7 +556,7 @@ namespace Chem4Word.Library
 
         private void SaveTagChanges()
         {
-            throw new NotImplementedException();
+            Debugger.Break();
         }
 
         private void SaveChemistryChanges()
