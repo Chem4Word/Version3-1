@@ -1134,6 +1134,14 @@ namespace Chem4Word.ViewModel
                     //{
                     //    foreach (var bond in newBonds)
                     //    {
+                    //        foreach (var atomBond in atom.Bonds.ToList())
+                    //        {
+                    //            if (atomBond.Id.Equals(bond.Id))
+                    //            {
+                    //                atomBond.StartAtom = null;
+                    //                atomBond.EndAtom = null;
+                    //            }
+                    //        }
                     //        atom.Bonds.Remove(bond);
                     //    }
                     //}
@@ -1256,6 +1264,14 @@ namespace Chem4Word.ViewModel
                     //{
                     //    foreach (var bond in targetBonds)
                     //    {
+                    //        foreach (var atomBond in atom.Bonds.ToList())
+                    //        {
+                    //            if (atomBond.Id.Equals(bond.Id))
+                    //            {
+                    //                atomBond.StartAtom = null;
+                    //                atomBond.EndAtom = null;
+                    //            }
+                    //        }
                     //        atom.Bonds.Remove(bond);
                     //    }
                     //}
