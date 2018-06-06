@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,31 +27,39 @@ namespace Chem4Word.ACME.Controls
         {
         }
 
-        //protected override Size MeasureOverride(Size constraint)
-        //{
-        //    Size size = new Size();
+        protected override Size MeasureOverride(Size constraint)
+        {
+            Size size = new Size();
 
-        //    foreach (UIElement element in this.InternalChildren)
-        //    {
-        //        double left = Canvas.GetLeft(element);
-        //        double top = Canvas.GetTop(element);
-        //        left = double.IsNaN(left) ? 0 : left;
-        //        top = double.IsNaN(top) ? 0 : top;
+            try
+            {
+                foreach (UIElement element in this.InternalChildren)
+                {
+                    double left = Canvas.GetLeft(element);
+                    double top = Canvas.GetTop(element);
+                    left = double.IsNaN(left) ? 0 : left;
+                    top = double.IsNaN(top) ? 0 : top;
 
-        //        //measure desired size for each child
-        //        element.Measure(constraint);
+                    //measure desired size for each child
+                    element.Measure(constraint);
 
-        //        Size desiredSize = element.DesiredSize;
-        //        if (!double.IsNaN(desiredSize.Width) && !double.IsNaN(desiredSize.Height))
-        //        {
-        //            size.Width = Math.Max(size.Width, left + desiredSize.Width);
-        //            size.Height = Math.Max(size.Height, top + desiredSize.Height);
-        //        }
-        //    }
-        //    // add margin
-        //    size.Width += 10;
-        //    size.Height += 10;
-        //    return size;
-        //}
+                    Size desiredSize = element.DesiredSize;
+                    if (!double.IsNaN(desiredSize.Width) && !double.IsNaN(desiredSize.Height))
+                    {
+                        size.Width = Math.Max(size.Width, left + desiredSize.Width);
+                        size.Height = Math.Max(size.Height, top + desiredSize.Height);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+
+            // add margin
+            size.Width += 10;
+            size.Height += 10;
+            return size;
+        }
     }
 }
