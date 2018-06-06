@@ -113,8 +113,12 @@ namespace Chem4Word.View
             if (glyphRun != null)
             {
                 var geo = glyphRun.BuildGeometry();
-                geo = geo.GetWidenedPathGeometry(new Pen(Brushes.Wheat, size / 8)).GetOutlinedPathGeometry();
-                var pg = geo.GetFlattenedPathGeometry(0.2, ToleranceType.Relative);
+                // HACK: Commented out as this is causing strange effects
+                //geo = geo.GetWidenedPathGeometry(new Pen(Brushes.Wheat, size / 8)).GetOutlinedPathGeometry();
+
+                // System.Windows.Media.GetFlattenedPathGeometry(double tolerance, ToleranceType type)
+                // tolerance: Smaller values produce more accurate results but cause slower execution
+                var pg = geo.GetFlattenedPathGeometry(0.01, ToleranceType.Relative);
 
                 foreach (var f in pg.Figures)
                 {

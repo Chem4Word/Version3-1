@@ -294,10 +294,11 @@ namespace Chem4Word.View
                 subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
             }
 
-            // Diagnostics
+            // Diag: Show Points
             //ShowPoints(symbolPoints, drawingContext);
             //ShowPoints(hydrogenPoints, drawingContext);
             //ShowPoints(_shapeHull, drawingContext);
+            drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
 
             //stage 6:  draw an isotope label if needed
             if (Isotope != null)
@@ -350,9 +351,12 @@ namespace Chem4Word.View
                 BackgroundColor = SystemColors.WindowBrush;
             }
 
-            drawingContext.DrawGeometry(BackgroundColor,
-                new Pen(BackgroundColor, MaskOffsetWidth),
-                BasicGeometry.BuildPath(shapeHull).Data);
+            var path = BasicGeometry.BuildPath(shapeHull);
+            drawingContext.DrawGeometry(BackgroundColor, new Pen(BackgroundColor, MaskOffsetWidth), path.Data);
+            // ToDo: Try to get this better, was from GlyphUtils.GetOutline()
+            //var geo = path.Data.GetWidenedPathGeometry(new Pen(Brushes.Wheat, SymbolSize / 8)).GetOutlinedPathGeometry();
+            //var geo = path.Data.GetWidenedPathGeometry(new Pen(Brushes.Wheat, SymbolSize / 8), 0.01, ToleranceType.Relative);
+            //drawingContext.DrawGeometry(BackgroundColor, new Pen(BackgroundColor, MaskOffsetWidth), geo);
         }
 
         /// <summary>

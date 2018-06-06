@@ -155,8 +155,8 @@ namespace Chem4Word.View
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
-            // ToDo: Uncomment to see Text BoundingBox
-            //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
+            // Diag: Uncomment to see Text BoundingBox
+            dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
 #endif
             TextRun = groupGlyphRun;
         }
