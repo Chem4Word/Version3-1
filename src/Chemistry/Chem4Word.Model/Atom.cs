@@ -475,20 +475,22 @@ namespace Chem4Word.Model
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
         // ToDo: Duplicated Routine
+        // HACK: Duplicated Routine
 
-        //tries to get a bounding box for each atom symbol
+        //tries to get an estimated bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
             Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
-            double halfSize = fontSize / 2;
+            double halfBoxWidth = fontSize * 0.5;
             Point position = Position;
             Rect baseAtomBox = new Rect(
-                new Point(position.X - halfSize, position.Y - halfSize),
-                new Point(position.X + halfSize, position.Y + halfSize));
+                new Point(position.X - halfBoxWidth, position.Y - halfBoxWidth),
+                new Point(position.X + halfBoxWidth, position.Y + halfBoxWidth));
             if (SymbolText != "")
             {
-                double symbolWidth = SymbolText.Length * fontSize; // * 0.8;
-                Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
+                double symbolWidth = SymbolText.Length * fontSize;
+                Rect mainElementBox = new Rect(
+                    new Point(position.X - halfBoxWidth, position.Y - halfBoxWidth),
                     new Size(symbolWidth, fontSize));
 
                 if (ImplicitHydrogenCount > 0)
