@@ -109,6 +109,11 @@ namespace Chem4Word.Model
 
         #endregion Constructors
 
+        public override string ToString()
+        {
+            return $"Molecule: {Id}";
+        }
+
         /// <summary>
         /// Calculated Molecular Formula
         /// </summary>
@@ -1205,7 +1210,7 @@ namespace Chem4Word.Model
 
         private PathGeometry OverlapArea(List<Point> placements)
         {
-            PathGeometry ringsGeo=null;
+            PathGeometry ringsGeo = null;
             foreach (Ring r in Rings)
             {
                 Path ringHull = BasicGeometry.BuildPath(r.Traverse().Select(a => a.Position).ToList());
@@ -1217,7 +1222,7 @@ namespace Chem4Word.Model
                 {
                     var hull = ringHull.Data;
                     var hullGeo = hull.GetOutlinedPathGeometry();
-                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo,  hullGeo).GetOutlinedPathGeometry();
+                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo, hullGeo).GetOutlinedPathGeometry();
                 }
             }
             Path otherGeo = BasicGeometry.BuildPath(placements);
@@ -1233,7 +1238,6 @@ namespace Chem4Word.Model
 
             return overlap;
         }
-
 
         /// <summary>
         /// Joins another molecule into this one

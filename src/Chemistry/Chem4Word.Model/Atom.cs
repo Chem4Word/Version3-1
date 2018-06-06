@@ -19,7 +19,6 @@ using System.Windows;
 
 namespace Chem4Word.Model
 {
-    [DebuggerDisplay("Id: {Id} Element: {Element.Symbol}")]
     [Serializable]
     public class Atom : INotifyPropertyChanged
     {
@@ -590,6 +589,11 @@ namespace Chem4Word.Model
         }
 
         #endregion Constructors
+
+        public override string ToString()
+        {
+            return $"Atom: {Id} Element: {Element.Symbol}";
+        }
 
         #region INotifyPropertyChanged
 
