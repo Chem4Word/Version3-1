@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 
@@ -41,6 +42,7 @@ namespace Chem4Word.View
         {
             if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
             {
+                Debugger.Break();
                 throw new InvalidOperationException("No glyphtypeface found");
             }
         }
@@ -111,8 +113,9 @@ namespace Chem4Word.View
             if (glyphRun != null)
             {
                 var geo = glyphRun.BuildGeometry();
-                geo = geo.GetWidenedPathGeometry(new Pen(Brushes.Wheat, size / 8)).GetOutlinedPathGeometry();
-                var pg = geo.GetFlattenedPathGeometry(0.2, ToleranceType.Relative);
+                // System.Windows.Media.GetFlattenedPathGeometry(double tolerance, ToleranceType type)
+                // tolerance: Smaller values produce more accurate results but cause slower execution
+                var pg = geo.GetFlattenedPathGeometry(0.01, ToleranceType.Relative);
 
                 foreach (var f in pg.Figures)
                 {

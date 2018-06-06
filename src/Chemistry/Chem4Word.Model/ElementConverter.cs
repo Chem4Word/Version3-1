@@ -7,6 +7,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Chem4Word.Model
@@ -29,7 +30,16 @@ namespace Chem4Word.Model
             try
             {
                 var pt = new PeriodicTable();
-                return pt.Elements[(string)value ?? throw new InvalidOperationException()];
+                var s = value as string;
+                if (string.IsNullOrEmpty(s))
+                {
+                    Debugger.Break();
+                    throw new InvalidOperationException();
+                }
+                else
+                {
+                    return pt.Elements[s];
+                }
             }
             catch
             {

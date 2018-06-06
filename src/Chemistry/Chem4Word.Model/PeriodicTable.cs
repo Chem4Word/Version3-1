@@ -8,6 +8,7 @@
 using Chem4Word.Core.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -243,6 +244,7 @@ namespace Chem4Word.Model
                 catch (Exception ex)
                 {
                     string message = $"Exception {ex.Message} setting properties of Element {data[0]}";
+                    Debugger.Break();
                     throw new NotImplementedException(message);
                 }
             }

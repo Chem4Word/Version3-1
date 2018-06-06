@@ -229,6 +229,9 @@ namespace Chem4Word.View
             //renders the atom complete with charges, hydrogens and labels.
             //this code is *complex*
 
+            List<Point> symbolPoints = new List<Point>();
+            List<Point> hydrogenPoints = new List<Point>();
+
             //private variables used to keep track of onscreen visuals
             AtomTextMetrics hydrogenMetrics = null;
             LabelMetrics isoMetrics = null;
@@ -245,6 +248,7 @@ namespace Chem4Word.View
                 //grab the hull for later
                 if (symbolText.FlattenedPath != null)
                 {
+                    symbolPoints = symbolText.FlattenedPath;
                     _shapeHull.AddRange(symbolText.FlattenedPath);
                 }
             }
@@ -264,6 +268,7 @@ namespace Chem4Word.View
 
                 //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
                 _shapeHull.AddRange(hydrogenMetrics.FlattenedPath);
+                hydrogenPoints = hydrogenMetrics.FlattenedPath;
             }
 
             //stage 4: draw the background mask
@@ -282,11 +287,19 @@ namespace Chem4Word.View
 
             //then do the drawing of the main symbol (again)
             mainAtomMetrics = DrawSelf(drawingContext);
+
             //stage 5:  draw the hydrogens
             if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
                 subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
             }
+
+            // Diag: Show Points
+            //ShowPoints(symbolPoints, drawingContext);
+            //ShowPoints(hydrogenPoints, drawingContext);
+            //ShowPoints(_shapeHull, drawingContext);
+            drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
+
             //stage 6:  draw an isotope label if needed
             if (Isotope != null)
             {
@@ -297,6 +310,33 @@ namespace Chem4Word.View
             {
                 LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, ParentAtom.GetDefaultHOrientation());
             }
+        }
+
+        private void ShowPoints(List<Point> points, DrawingContext drawingContext)
+        {
+            // Show points for debugging
+            SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
+            SolidColorBrush otherPoints = new SolidColorBrush(Colors.Blue);
+            SolidColorBrush lastPoint = new SolidColorBrush(Colors.Green);
+            int i = 0;
+            int max = points.Count - 1;
+            foreach (var point in points)
+            {
+                if (i > 0 && i < max)
+                {
+                    drawingContext.DrawEllipse(otherPoints, null, point, 2, 2);
+                }
+                if (i == 0)
+                {
+                    drawingContext.DrawEllipse(firstPoint, null, point, 2, 2);
+                }
+                if (i == max)
+                {
+                    drawingContext.DrawEllipse(lastPoint, null, point, 2, 2);
+                }
+                i++;
+            }
+
         }
 
         /// <summary>
@@ -311,9 +351,12 @@ namespace Chem4Word.View
                 BackgroundColor = SystemColors.WindowBrush;
             }
 
-            drawingContext.DrawGeometry(BackgroundColor,
-                new Pen(BackgroundColor, MaskOffsetWidth),
-                BasicGeometry.BuildPath(shapeHull).Data);
+            var path = BasicGeometry.BuildPath(shapeHull);
+            drawingContext.DrawGeometry(BackgroundColor, new Pen(BackgroundColor, MaskOffsetWidth), path.Data);
+            // ToDo: Try to get this better, was from GlyphUtils.GetOutline()
+            //var geo = path.Data.GetWidenedPathGeometry(new Pen(Brushes.Wheat, SymbolSize / 8)).GetOutlinedPathGeometry();
+            //var geo = path.Data.GetWidenedPathGeometry(new Pen(Brushes.Wheat, SymbolSize / 8), 0.01, ToleranceType.Relative);
+            //drawingContext.DrawGeometry(BackgroundColor, new Pen(BackgroundColor, MaskOffsetWidth), geo);
         }
 
         /// <summary>

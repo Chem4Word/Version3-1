@@ -22,20 +22,23 @@ namespace Chem4Word.ViewModel
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
         // ToDo: Duplicated Routine
+        // HACK: Duplicated Routine
 
-        //tries to get a bounding box for each atom symbol
+        //tries to get a estimated bounding box for each atom symbol
         public static Rect BoundingBox(this Atom atom)
         {
             //Debug.WriteLine($"ExtensionMethods.BoundingBox() FontSize: {FontSize}");
-            double halfSize = FontSize / 2;
+            double halfBoxSize = FontSize * 0.5;
             Point position = atom.Position;
             Rect baseAtomBox = new Rect(
-                new Point(position.X - halfSize, position.Y - halfSize),
-                new Point(position.X + halfSize, position.Y + halfSize));
+                new Point(position.X - halfBoxSize, position.Y - halfBoxSize),
+                new Point(position.X + halfBoxSize, position.Y + halfBoxSize));
+
             if (atom.SymbolText != "")
             {
-                double symbolWidth = atom.SymbolText.Length * FontSize; // * 0.8;
-                Rect mainElementBox = new Rect(new Point(position.X - halfSize, position.Y - halfSize),
+                double symbolWidth = atom.SymbolText.Length * FontSize;
+                Rect mainElementBox = new Rect(
+                    new Point(position.X - halfBoxSize, position.Y - halfBoxSize),
                     new Size(symbolWidth, FontSize));
 
                 if (atom.ImplicitHydrogenCount > 0)

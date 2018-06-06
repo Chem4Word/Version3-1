@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -91,18 +92,21 @@ namespace Chem4Word.ACME.Controls
             this.zoomThumb = Template.FindName("PART_ZoomThumb", this) as Thumb;
             if (this.zoomThumb == null)
             {
+                Debugger.Break();
                 throw new Exception("PART_ZoomThumb template is missing!");
             }
 
             this.zoomCanvas = Template.FindName("PART_ZoomCanvas", this) as Canvas;
             if (this.zoomCanvas == null)
             {
+                Debugger.Break();
                 throw new Exception("PART_ZoomCanvas template is missing!");
             }
 
             this.zoomSlider = Template.FindName("PART_ZoomSlider", this) as Slider;
             if (this.zoomSlider == null)
             {
+                Debugger.Break();
                 throw new Exception("PART_ZoomSlider template is missing!");
             }
 

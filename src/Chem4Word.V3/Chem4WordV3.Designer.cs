@@ -8,6 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Diagnostics;
+
 #pragma warning disable 414
 namespace Chem4Word {
     
@@ -195,6 +197,7 @@ namespace Chem4Word {
                     _Chem4WordV3 = value;
                 }
                 else {
+                    Debugger.Break();
                     throw new System.NotSupportedException();
                 }
             }

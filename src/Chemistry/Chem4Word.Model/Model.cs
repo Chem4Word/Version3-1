@@ -301,6 +301,11 @@ namespace Chem4Word.Model
                     var atom = AllAtoms[i];
                     modelRect.Union(atom.BoundingBox(FontSize));
                 }
+
+                Point topleft = new Point(modelRect.TopLeft.X - FontSize, modelRect.TopLeft.Y -FontSize); // modelRect.TopLeft;
+                Point bottomRight = new Point(modelRect.BottomRight.X + FontSize, modelRect.BottomRight.Y + FontSize); //modelRect.BottomRight;
+                var bb = new Rect(topleft, bottomRight);
+
                 return modelRect;
             }
         }
