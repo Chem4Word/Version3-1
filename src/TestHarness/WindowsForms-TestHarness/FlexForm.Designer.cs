@@ -84,7 +84,7 @@
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(134, 486);
+            this.ChangeBackground.Location = new System.Drawing.Point(93, 486);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -97,12 +97,13 @@
             this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCarbons.AutoSize = true;
             this.ShowCarbons.Enabled = false;
-            this.ShowCarbons.Location = new System.Drawing.Point(215, 490);
+            this.ShowCarbons.Location = new System.Drawing.Point(465, 490);
             this.ShowCarbons.Name = "ShowCarbons";
             this.ShowCarbons.Size = new System.Drawing.Size(95, 17);
             this.ShowCarbons.TabIndex = 4;
             this.ShowCarbons.Text = "Show Carbons";
             this.ShowCarbons.UseVisualStyleBackColor = true;
+            this.ShowCarbons.Visible = false;
             this.ShowCarbons.CheckedChanged += new System.EventHandler(this.ShowCarbons_CheckedChanged);
             // 
             // RemoveAtom
@@ -142,54 +143,58 @@
             // Serialize
             // 
             this.Serialize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Serialize.Location = new System.Drawing.Point(12, 517);
+            this.Serialize.Location = new System.Drawing.Point(465, 513);
             this.Serialize.Name = "Serialize";
             this.Serialize.Size = new System.Drawing.Size(55, 23);
             this.Serialize.TabIndex = 7;
             this.Serialize.Text = "Serialize";
             this.Serialize.UseVisualStyleBackColor = true;
+            this.Serialize.Visible = false;
             this.Serialize.Click += new System.EventHandler(this.Serialize_Click);
             // 
             // Examine
             // 
             this.Examine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Examine.Location = new System.Drawing.Point(73, 517);
+            this.Examine.Location = new System.Drawing.Point(526, 513);
             this.Examine.Name = "Examine";
             this.Examine.Size = new System.Drawing.Size(55, 23);
             this.Examine.TabIndex = 8;
             this.Examine.Text = "Analyse";
             this.Examine.UseVisualStyleBackColor = true;
+            this.Examine.Visible = false;
             this.Examine.Click += new System.EventHandler(this.Examine_Click);
             // 
             // Hex
             // 
             this.Hex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Hex.Location = new System.Drawing.Point(134, 517);
+            this.Hex.Location = new System.Drawing.Point(587, 513);
             this.Hex.Name = "Hex";
             this.Hex.Size = new System.Drawing.Size(55, 23);
             this.Hex.TabIndex = 9;
             this.Hex.Text = "Hex";
             this.Hex.UseVisualStyleBackColor = true;
+            this.Hex.Visible = false;
             this.Hex.Click += new System.EventHandler(this.Hex_Click);
             // 
             // Timing
             // 
             this.Timing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Timing.Location = new System.Drawing.Point(195, 517);
+            this.Timing.Location = new System.Drawing.Point(648, 513);
             this.Timing.Name = "Timing";
             this.Timing.Size = new System.Drawing.Size(55, 23);
             this.Timing.TabIndex = 10;
             this.Timing.Text = "Timing";
             this.Timing.UseVisualStyleBackColor = true;
+            this.Timing.Visible = false;
             this.Timing.Click += new System.EventHandler(this.Timing_Click);
             // 
             // Undo
             // 
             this.Undo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Undo.Enabled = false;
-            this.Undo.Location = new System.Drawing.Point(302, 517);
+            this.Undo.Location = new System.Drawing.Point(12, 519);
             this.Undo.Name = "Undo";
-            this.Undo.Size = new System.Drawing.Size(55, 23);
+            this.Undo.Size = new System.Drawing.Size(75, 23);
             this.Undo.TabIndex = 11;
             this.Undo.Text = "Undo";
             this.Undo.UseVisualStyleBackColor = true;
@@ -199,9 +204,9 @@
             // 
             this.Redo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Redo.Enabled = false;
-            this.Redo.Location = new System.Drawing.Point(363, 517);
+            this.Redo.Location = new System.Drawing.Point(93, 519);
             this.Redo.Name = "Redo";
-            this.Redo.Size = new System.Drawing.Size(55, 23);
+            this.Redo.Size = new System.Drawing.Size(75, 23);
             this.Redo.TabIndex = 12;
             this.Redo.Text = "Redo";
             this.Redo.UseVisualStyleBackColor = true;
@@ -262,7 +267,7 @@
             // 
             this.Information.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Information.AutoSize = true;
-            this.Information.Location = new System.Drawing.Point(149, 454);
+            this.Information.Location = new System.Drawing.Point(12, 460);
             this.Information.Name = "Information";
             this.Information.Size = new System.Drawing.Size(16, 13);
             this.Information.TabIndex = 14;
