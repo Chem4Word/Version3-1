@@ -5,13 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
 using Chem4Word.Model.Geometry;
 using Chem4Word.ViewModel;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -154,7 +152,7 @@ namespace Chem4Word.View
 
         // Using a DependencyProperty as the backing store for Stereo.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StereoProperty =
-            DependencyProperty.Register("Stereo", typeof(BondStereo), typeof(BondShape), 
+            DependencyProperty.Register("Stereo", typeof(BondStereo), typeof(BondShape),
                 new FrameworkPropertyMetadata(BondStereo.None, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public int OrderValue
@@ -165,10 +163,8 @@ namespace Chem4Word.View
 
         // Using a DependencyProperty as the backing store for OrderValue.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderValueProperty =
-            DependencyProperty.Register("OrderValue", typeof(int), typeof(BondShape), 
+            DependencyProperty.Register("OrderValue", typeof(int), typeof(BondShape),
                 new FrameworkPropertyMetadata(1, FrameworkPropertyMetadataOptions.AffectsRender));
-
-
 
         public string Order
         {
@@ -179,8 +175,6 @@ namespace Chem4Word.View
         // Using a DependencyProperty as the backing store for Order.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderProperty =
             DependencyProperty.Register("Order", typeof(string), typeof(BondShape), new FrameworkPropertyMetadata(Bond.OrderSingle, FrameworkPropertyMetadataOptions.AffectsRender));
-
-
 
         public Geometry GetBondGeometry(Point? startPoint, Point? endPoint)
         {

@@ -8,16 +8,13 @@
 using Chem4Word.View;
 using Chem4Word.ViewModel.Adorners;
 using System.Diagnostics;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class DeleteBehavior: BaseEditBehavior
+    public class DeleteBehavior : BaseEditBehavior
     {
         private bool _lassoVisible;
         private PointCollection _mouseTrack;
@@ -34,7 +31,6 @@ namespace Chem4Word.ACME.Behaviors
             _parent = Application.Current.MainWindow;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
-          
 
             AssociatedObject.IsHitTestVisible = true;
             if (_parent != null)
@@ -53,17 +49,15 @@ namespace Chem4Word.ACME.Behaviors
                 var atomShape = (AtomShape)hitTestResult.VisualHit;
                 var atom = atomShape.ParentAtom;
                 this.ViewModel.DeleteAtom(atom);
-                
             }
             else if (hitTestResult.VisualHit is BondShape)
             {
-                var bondShape= (BondShape)hitTestResult.VisualHit;
+                var bondShape = (BondShape)hitTestResult.VisualHit;
                 var bond = bondShape.ParentBond;
                 this.ViewModel.DeleteBond(bond);
             }
         }
 
-      
         private void AssociatedObjectOnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Debug.WriteLine("AssociatedObjectOnMouseRightButtonDown");

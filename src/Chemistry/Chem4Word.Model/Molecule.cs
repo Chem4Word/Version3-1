@@ -14,7 +14,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -50,7 +49,7 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            if (m!=null & Atoms.Any())
+            if (m != null & Atoms.Any())
             {
                 var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
                 var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
@@ -60,10 +59,9 @@ namespace Chem4Word.Model
 
                 _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
             }
-
             else
             {
-                _boundingBox= new Rect(new Size(0.0, 0.0));
+                _boundingBox = new Rect(new Size(0.0, 0.0));
             }
         }
 
@@ -1182,29 +1180,59 @@ namespace Chem4Word.Model
 
         public bool Overlaps(List<Point> placements)
         {
-            var cg = GetOverlapGeometry(placements);
+            var area = OverlapArea(placements);
 
-            bool overlaps = !cg.IsEmpty();
+            if (area.GetArea() >= 0.01)
+            {
+                return true;
+            }
+            else
+            {
+                var chainAtoms = Atoms.Where(a => !a.Rings.Any()).ToList();
+                var placementsArea = BasicGeometry.BuildPath(placements).Data;
+                foreach (var chainAtom in chainAtoms)
+                {
+                    if (placementsArea.FillContains(chainAtom.Position))
+                    {
+                        return true;
+                    }
+                }
+            }
 
-            return overlaps;
+            return false;
         }
 
-        private CombinedGeometry GetOverlapGeometry(List<Point> placements)
+        private PathGeometry OverlapArea(List<Point> placements)
         {
-            Path hull = BasicGeometry.BuildPath(this.ConvexHull.Select(a => a.Position).ToList());
+            PathGeometry ringsGeo=null;
+            foreach (Ring r in Rings)
+            {
+                Path ringHull = BasicGeometry.BuildPath(r.Traverse().Select(a => a.Position).ToList());
+                if (ringsGeo == null)
+                {
+                    ringsGeo = ringHull.Data.GetOutlinedPathGeometry();
+                }
+                else
+                {
+                    var hull = ringHull.Data;
+                    var hullGeo = hull.GetOutlinedPathGeometry();
+                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo,  hullGeo).GetOutlinedPathGeometry();
+                }
+            }
             Path otherGeo = BasicGeometry.BuildPath(placements);
 
-            System.Windows.Media.Geometry hullgeo = hull.Data;
-            System.Windows.Media.Geometry placementsgeo = otherGeo.Data;
-            hullgeo.Freeze();
-            placementsgeo.Freeze();
+            var val1 = ringsGeo;
+            val1.FillRule = FillRule.EvenOdd;
+            var val2 = otherGeo.Data.GetOutlinedPathGeometry();
+            val2.FillRule = FillRule.EvenOdd;
 
-            var val1 = hullgeo.GetFlattenedPathGeometry();
-            var val2 = placementsgeo.GetFlattenedPathGeometry();
+            var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2).GetOutlinedPathGeometry();
+            //return (id == IntersectionDetail.FullyContains | id == IntersectionDetail.FullyInside |
+            //        id == IntersectionDetail.Intersects);
 
-            CombinedGeometry cg = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2);
-            return cg;
+            return overlap;
         }
+
 
         /// <summary>
         /// Joins another molecule into this one
@@ -1212,8 +1240,8 @@ namespace Chem4Word.Model
         /// <param name="mol">Molecule to merge into this one</param>
         public void Merge(Molecule mol)
         {
-            Debug.Assert(mol!=this);
-            Debug.Assert(mol!=null);
+            Debug.Assert(mol != this);
+            Debug.Assert(mol != null);
             Parent.Molecules.Remove(mol);
             foreach (Atom newAtom in
                mol.Atoms.ToArray())
@@ -1233,6 +1261,7 @@ namespace Chem4Word.Model
                 }
             }
         }
+
         /// <summary>
         /// split a molecule into two
         /// assuming that the bond between a and b has already
@@ -1242,12 +1271,12 @@ namespace Chem4Word.Model
         /// <param name="b">Atom from second molecule</param>
         public void Split(Atom a, Atom b)
         {
-            Debug.Assert(a.BondBetween(b)==null);
+            Debug.Assert(a.BondBetween(b) == null);
 
             b.Parent = null;
             Refresh();
 
-            if(b.Parent==null)//if it's non-null after refresh, then it was part of a ring system
+            if (b.Parent == null)//if it's non-null after refresh, then it was part of a ring system
             {
                 Molecule newmol = new Molecule();
 
@@ -1259,7 +1288,6 @@ namespace Chem4Word.Model
                     Atoms.Remove(oldAtom);
                 }
             }
-          
         }
     }
 }

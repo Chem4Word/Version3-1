@@ -148,7 +148,7 @@ namespace Chem4Word.Model
         /// Use the Tag during editing operations to store state
         /// Not persisted to the model
         /// </summary>
-        public  object Tag { get; set; }
+        public object Tag { get; set; }
 
         /// <summary>
         /// If null, defaults to the most abundant isotope
@@ -391,6 +391,7 @@ namespace Chem4Word.Model
         {
             get { return Bonds.Sum(b => b.OrderValue) ?? 0d; }
         }
+
         /// <summary>
         /// returns the top level model, or null if it's a floating molecule
         /// </summary>
@@ -399,13 +400,14 @@ namespace Chem4Word.Model
             get
             {
                 object currentParent = Parent;
-                while (currentParent!=null && !(currentParent.GetType() == typeof(Model)))
+                while (currentParent != null && !(currentParent.GetType() == typeof(Model)))
                 {
-                    currentParent = ((ChemistryContainer) currentParent).Parent;
+                    currentParent = ((ChemistryContainer)currentParent).Parent;
                 }
                 return (currentParent as Model);
             }
         }
+
         public Atom SelfRef => this;
 
         //atoms go over bonds in a visual display
@@ -419,7 +421,7 @@ namespace Chem4Word.Model
         {
             get
             {
-                Vector vsumVector = new Vector();
+                Vector vsumVector = BasicGeometry.ScreenNorth;
 
                 if (Bonds.Any())
                 {
@@ -467,7 +469,7 @@ namespace Chem4Word.Model
 
         public bool IsIsolated => Degree == 0;
 
-        public bool IsUnsaturated => BondOrders > (double) Degree;
+        public bool IsUnsaturated => BondOrders > (double)Degree;
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
         // ToDo: Duplicated Routine
