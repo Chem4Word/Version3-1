@@ -49,6 +49,8 @@ namespace Chem4WordTests
             int atomBondsCount2 = m.Molecules[0].Atoms[0].Bonds.Count;
             Assert.AreEqual(1, atomBondsCount2, $"Expected 1; got {atomBondsCount2}");
 
+            mol.Bonds[0].StartAtom = null;
+            mol.Bonds[0].EndAtom = null;
             mol.Bonds.Remove(bb);
             mol.Atoms.Remove(aa);
 
