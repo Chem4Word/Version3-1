@@ -30,13 +30,12 @@
         {
             this.LoadStructure = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.EditStructure = new System.Windows.Forms.Button();
+            this.EditWithAcme = new System.Windows.Forms.Button();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.ChangeBackground = new System.Windows.Forms.Button();
             this.ShowCarbons = new System.Windows.Forms.CheckBox();
             this.RemoveAtom = new System.Windows.Forms.Button();
             this.RandomElement = new System.Windows.Forms.Button();
-            this.EditorType = new System.Windows.Forms.ComboBox();
             this.Serialize = new System.Windows.Forms.Button();
             this.Examine = new System.Windows.Forms.Button();
             this.Hex = new System.Windows.Forms.Button();
@@ -51,6 +50,7 @@
             this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
             this.UndoStack = new WinFormsTestHarness.StackViewer();
             this.Information = new System.Windows.Forms.Label();
+            this.EditCml = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,17 +69,17 @@
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // EditStructure
+            // EditWithAcme
             // 
-            this.EditStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.EditStructure.Enabled = false;
-            this.EditStructure.Location = new System.Drawing.Point(1052, 486);
-            this.EditStructure.Name = "EditStructure";
-            this.EditStructure.Size = new System.Drawing.Size(75, 23);
-            this.EditStructure.TabIndex = 2;
-            this.EditStructure.Text = "Edit";
-            this.EditStructure.UseVisualStyleBackColor = true;
-            this.EditStructure.Click += new System.EventHandler(this.EditStructure_Click);
+            this.EditWithAcme.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.EditWithAcme.Enabled = false;
+            this.EditWithAcme.Location = new System.Drawing.Point(1052, 486);
+            this.EditWithAcme.Name = "EditWithAcme";
+            this.EditWithAcme.Size = new System.Drawing.Size(75, 23);
+            this.EditWithAcme.TabIndex = 2;
+            this.EditWithAcme.Text = "ACME";
+            this.EditWithAcme.UseVisualStyleBackColor = true;
+            this.EditWithAcme.Click += new System.EventHandler(this.EditWithAcme_Click);
             // 
             // ChangeBackground
             // 
@@ -129,16 +129,6 @@
             this.RandomElement.Text = "Random Element";
             this.RandomElement.UseVisualStyleBackColor = true;
             this.RandomElement.Click += new System.EventHandler(this.RandomElement_Click);
-            // 
-            // EditorType
-            // 
-            this.EditorType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.EditorType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.EditorType.Enabled = false;
-            this.EditorType.Location = new System.Drawing.Point(1052, 519);
-            this.EditorType.Name = "EditorType";
-            this.EditorType.Size = new System.Drawing.Size(75, 21);
-            this.EditorType.TabIndex = 0;
             // 
             // Serialize
             // 
@@ -273,11 +263,24 @@
             this.Information.TabIndex = 14;
             this.Information.Text = "...";
             // 
+            // EditCml
+            // 
+            this.EditCml.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.EditCml.Enabled = false;
+            this.EditCml.Location = new System.Drawing.Point(1052, 517);
+            this.EditCml.Name = "EditCml";
+            this.EditCml.Size = new System.Drawing.Size(75, 23);
+            this.EditCml.TabIndex = 15;
+            this.EditCml.Text = "CML";
+            this.EditCml.UseVisualStyleBackColor = true;
+            this.EditCml.Click += new System.EventHandler(this.EditCml_Click);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1139, 544);
+            this.Controls.Add(this.EditCml);
             this.Controls.Add(this.Information);
             this.Controls.Add(this.LayoutPanel);
             this.Controls.Add(this.Redo);
@@ -286,10 +289,9 @@
             this.Controls.Add(this.Hex);
             this.Controls.Add(this.Examine);
             this.Controls.Add(this.Serialize);
-            this.Controls.Add(this.EditorType);
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
-            this.Controls.Add(this.EditStructure);
+            this.Controls.Add(this.EditWithAcme);
             this.Controls.Add(this.RandomElement);
             this.Controls.Add(this.RemoveAtom);
             this.Controls.Add(this.LoadStructure);
@@ -307,12 +309,11 @@
         private System.Windows.Forms.Button LoadStructure;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.Integration.ElementHost DisplayHost;
-        private System.Windows.Forms.Button EditStructure;
+        private System.Windows.Forms.Button EditWithAcme;
         private Chem4Word.ACME.Display Display;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.Button ChangeBackground;
         private System.Windows.Forms.CheckBox ShowCarbons;
-        private System.Windows.Forms.ComboBox EditorType;
         private System.Windows.Forms.Button RemoveAtom;
         private System.Windows.Forms.Button RandomElement;
         private System.Windows.Forms.Button Serialize;
@@ -327,6 +328,7 @@
         private System.Windows.Forms.Label Information;
         private StackViewer RedoStack;
         private StackViewer UndoStack;
+        private System.Windows.Forms.Button EditCml;
     }
 }
 

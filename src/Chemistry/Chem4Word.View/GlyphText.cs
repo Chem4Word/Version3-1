@@ -8,6 +8,7 @@
 using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Markup;
@@ -65,6 +66,7 @@ namespace Chem4Word.View
         {
             if (!GlyphUtils.SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
             {
+                Debugger.Break();
                 throw new InvalidOperationException($"No glyph typeface found for the Windows Typeface '{typeface.FaceNames[XmlLanguage.GetLanguage("en-GB")]}'");
             }
             Text = text;
@@ -153,8 +155,8 @@ namespace Chem4Word.View
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, bottomLeft, _glyphTypeface, TypeSize);
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
-            // ToDo: Uncomment to see Text BoundingBox
-            //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
+            // Diag: Uncomment to see Text BoundingBox
+            dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
 #endif
             TextRun = groupGlyphRun;
         }

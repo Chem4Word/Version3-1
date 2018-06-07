@@ -7,18 +7,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model.Annotations;
 
 namespace Chem4Word.Model.Geometry
 {
     public enum ClockDirections
     {
-        Nothing =0,
+        Nothing = 0,
         One,
         Two,
         Three,
@@ -33,7 +32,6 @@ namespace Chem4Word.Model.Geometry
         Twelve
     }
 
-   
     public static class AngleMethods
     {
         public static Vector ToVector(this ClockDirections dir)
@@ -41,12 +39,13 @@ namespace Chem4Word.Model.Geometry
             Matrix rotator = new Matrix();
             rotator.Rotate((int)dir.ToDegrees());
             return BasicGeometry.ScreenNorth * rotator;
-
         }
+
         public static double ToDegrees(this ClockDirections cd)
         {
             return 30 * ((int)cd % 12);
         }
+
         /// <summary>
         /// Splits the angle between two clock directions
         /// </summary>
@@ -55,8 +54,7 @@ namespace Chem4Word.Model.Geometry
         /// <returns>A clock direction pointing to the new direction </returns>
         public static ClockDirections Split(this ClockDirections first, ClockDirections second)
         {
-            return (ClockDirections) ((((int) first + (int) second) % 12) / 2);
-
+            return (ClockDirections)((((int)first + (int)second) % 12) / 2);
         }
 
         public static double ToDegrees(this CompassPoints cp)
@@ -179,6 +177,7 @@ namespace Chem4Word.Model.Geometry
             {
                 if ((point1 - point0).Value.Length < epsilon || (point2 - point2).Value.Length < epsilon)
                 {
+                    Debugger.Break();
                     throw new ArgumentException("coincident points in GetAngle");
                 }
 
@@ -326,7 +325,7 @@ namespace Chem4Word.Model.Geometry
         /// Takes a list of poinst and builds a  Path object from it.
         /// Generally used for constructing masks
         /// </summary>
-        /// <param name="hull">List of points makking up the path </param>
+        /// <param name="hull">List of points making up the path </param>
         /// <returns></returns>
         public static Path BuildPath(List<Point> hull, bool isClosed = true)
         {
@@ -341,10 +340,11 @@ namespace Chem4Word.Model.Geometry
             {
                 return path;
             }
+
             PathSegmentCollection pathSegments = new PathSegmentCollection();
             for (int i = 1; i < points.Length; i++)
             {
-                pathSegments.Add(new LineSegment(points[i], false));
+                pathSegments.Add(new LineSegment(points[i], true));
             }
             path.Data = new PathGeometry
             {
@@ -359,7 +359,7 @@ namespace Chem4Word.Model.Geometry
                     }
                 }
             };
-            
+
             return path;
         }
     }

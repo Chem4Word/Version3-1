@@ -7,6 +7,7 @@
 using Chem4Word.Model.Geometry;
 using Chem4Word.ViewModel;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -34,6 +35,7 @@ namespace Chem4Word.ACME.Utils
             _startPoint = startPoint;
             if (360 % angleIncrement != 0)
             {
+                Debugger.Break();
                 throw new ArgumentException("Angle must divide into 360!");
             }
             _lockAngle = angleIncrement;

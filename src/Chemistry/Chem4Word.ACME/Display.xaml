@@ -37,7 +37,9 @@
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
                     <LinearGradientBrush.RelativeTransform>
-                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
+                        <ScaleTransform
+                            ScaleX="{Binding Path=HatchScaling, Mode=OneWay}"
+                            ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                     </LinearGradientBrush.RelativeTransform>
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
@@ -49,7 +51,9 @@
                     <GradientStop Offset="0.25" Color="Transparent" />
                     <GradientStop Offset="0.30" Color="Transparent" />
                     <LinearGradientBrush.RelativeTransform>
-                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
+                        <ScaleTransform
+                            ScaleX="{Binding Path=HatchScaling, Mode=OneWay}"
+                            ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                     </LinearGradientBrush.RelativeTransform>
                     <LinearGradientBrush.Transform>
                         <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
@@ -179,7 +183,9 @@
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
                                             <Setter.Value>
-                                                <SolidColorBrush Opacity="0.5" Color="{x:Static SystemColors.HighlightColor}" />
+                                                <SolidColorBrush
+                                                    Opacity="0.5"
+                                                    Color="{x:Static SystemColors.HighlightColor}" />
                                             </Setter.Value>
                                         </Setter>
                                     </Trigger>

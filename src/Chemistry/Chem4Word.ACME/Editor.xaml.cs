@@ -47,6 +47,43 @@ namespace Chem4Word.ACME
             InitializeComponent();
         }
 
+        public Editor()
+        {
+            EnsureApplicationResources();
+            InitializeComponent();
+        }
+
+        public bool Dirty
+        {
+            get
+            {
+                if (_activeViewModel == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return _activeViewModel.Dirty;
+                }
+            }
+        }
+
+        public Model.Model Data
+        {
+            get
+            {
+                if (_activeViewModel == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    Model.Model model = _activeViewModel.Model.Clone();
+                    model.RescaleForCml();
+                    return model;
+                }
+            }
+        }
         public bool ShowSave
         {
             get { return (bool)GetValue(ShowSaveProperty); }
@@ -55,7 +92,7 @@ namespace Chem4Word.ACME
 
         // Using a DependencyProperty as the backing store for ShowSave.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowSaveProperty =
-            DependencyProperty.Register("ShowSave", typeof(bool), typeof(Editor), new PropertyMetadata(false));
+            DependencyProperty.Register("ShowSave", typeof(bool), typeof(Editor), new PropertyMetadata(true));
 
         private void EnsureApplicationResources()
         {
@@ -131,24 +168,27 @@ namespace Chem4Word.ACME
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
-            CMLConverter cc = new CMLConverter();
-            Model.Model tempModel = cc.Import(_cml);
+            if (!string.IsNullOrEmpty(_cml))
+            {
+                CMLConverter cc = new CMLConverter();
+                Model.Model tempModel = cc.Import(_cml);
 
-            tempModel.RescaleForXaml(false);
-            var vm = new EditViewModel(tempModel);
-            _activeViewModel = vm;
-            _activeViewModel.Model = tempModel;
-            this.DataContext = vm;
+                tempModel.RescaleForXaml(false);
+                var vm = new EditViewModel(tempModel);
+                _activeViewModel = vm;
+                _activeViewModel.Model = tempModel;
+                this.DataContext = vm;
 
-            Canvas c = LocateCanvas();
-            _activeViewModel.Model.CentreInCanvas(new Size(c.ActualWidth, c.ActualHeight));
+                Canvas c = LocateCanvas();
+                _activeViewModel.Model.CentreInCanvas(new Size(c.ActualWidth, c.ActualHeight));
 
-            ScrollIntoView();
-            BindControls(vm);
-            ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
+                ScrollIntoView();
+                BindControls(vm);
+                ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
 
-            // Hack: Couldn't find a better way to do this
-            _activeViewModel.BondLengthCombo = BondLengthSelector;
+                // Hack: Couldn't find a better way to do this
+                _activeViewModel.BondLengthCombo = BondLengthSelector;
+            }
         }
 
         public static T FindChild<T>(DependencyObject parent)
@@ -304,6 +344,7 @@ namespace Chem4Word.ACME
 
         private void RingButton_OnClick(object sender, RoutedEventArgs e)
         {
+            Debugger.Break();
             throw new NotImplementedException();
         }
     }

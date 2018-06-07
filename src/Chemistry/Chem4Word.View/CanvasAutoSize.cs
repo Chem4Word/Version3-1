@@ -14,7 +14,7 @@ namespace Chem4Word.View
 {
     public class CanvasAutoSize : Canvas
     {
-        protected override System.Windows.Size MeasureOverride(System.Windows.Size constraint)
+        protected override Size MeasureOverride(System.Windows.Size constraint)
 
         {
             base.MeasureOverride(constraint);

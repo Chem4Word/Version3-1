@@ -109,7 +109,7 @@ namespace WinFormsTestHarness
             }
         }
 
-        private void EditStructure_Click(object sender, EventArgs e)
+        private void EditWithAcme_Click(object sender, EventArgs e)
         {
             Model model = Display.Chemistry as Model;
             if (model != null)
@@ -118,7 +118,7 @@ namespace WinFormsTestHarness
                 clone.RescaleForCml();
 
                 CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(clone), EditorType.Text);
+                EditorHost editorHost = new EditorHost(cc.Export(clone), "ACME");
                 editorHost.ShowDialog();
                 if (editorHost.Result == DialogResult.OK)
                 {
@@ -174,11 +174,11 @@ namespace WinFormsTestHarness
         private void EnableNormalButtons()
         {
             ShowCarbons.Checked = false;
-            EditStructure.Enabled = true;
+            EditWithAcme.Enabled = true;
             ShowCarbons.Enabled = true;
             RemoveAtom.Enabled = true;
             RandomElement.Enabled = true;
-            EditorType.Enabled = true;
+            EditCml.Enabled = true;
         }
 
         private List<DisplayViewModel> StackToList(Stack<Model> stack)
@@ -388,10 +388,6 @@ namespace WinFormsTestHarness
 
         private void FlexForm_Load(object sender, EventArgs e)
         {
-            EditorType.Items.Clear();
-            EditorType.Items.Add("ACME");
-            EditorType.Items.Add("CML");
-            EditorType.SelectedIndex = 0;
         }
 
         private void Serialize_Click(object sender, EventArgs e)
@@ -581,6 +577,28 @@ namespace WinFormsTestHarness
                     Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
                 }
             }
+        }
+
+        private void EditCml_Click(object sender, EventArgs e)
+        {
+            Model model = Display.Chemistry as Model;
+            if (model != null)
+            {
+                Model clone = model.Clone();
+                clone.RescaleForCml();
+
+                CMLConverter cc = new CMLConverter();
+                EditorHost editorHost = new EditorHost(cc.Export(clone), "CML");
+                editorHost.ShowDialog();
+                if (editorHost.Result == DialogResult.OK)
+                {
+                    Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                    _undoStack.Push(clone);
+                    Model m = cc.Import(editorHost.OutputValue);
+                    ShowChemistry($"Edited {m.ConciseFormula}", m);
+                }
+            }
+
         }
     }
 }

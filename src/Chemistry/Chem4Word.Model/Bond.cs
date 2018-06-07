@@ -18,7 +18,6 @@ using System.Windows;
 
 namespace Chem4Word.Model
 {
-    [DebuggerDisplay("Id: {Id} From: {StartAtom.Id} To: {EndAtom.Id}")]
     [Serializable]
     public class Bond : INotifyPropertyChanged
     {
@@ -33,7 +32,10 @@ namespace Chem4Word.Model
 
         public bool Processed { get; set; }
 
-        
+        public override string ToString()
+        {
+            return $"Bond: {Id} From: {StartAtom.Id} To: {EndAtom.Id}";
+        }
 
         public Bond SelfRef
         {
@@ -79,6 +81,7 @@ namespace Chem4Word.Model
             {
                 if (StartAtom == null | EndAtom == null)
                 {
+                    Debugger.Break();
                     throw new InvalidOperationException("Both atoms must be assigned");
                 }
                 else
@@ -346,6 +349,7 @@ namespace Chem4Word.Model
             else
             {
                 // ReSharper disable once NotResolvedInText
+                Debugger.Break();
                 throw new ArgumentOutOfRangeException("Atom is not part of this bond.");
             }
         }
@@ -849,6 +853,5 @@ namespace Chem4Word.Model
                 return (currentParent as Model);
             }
         }
-
     }
 }

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -123,6 +124,7 @@ namespace Chem4Word.ViewModel
             
             if ( _transactionLevel < 0)
             {
+                Debugger.Break();
                 throw new IndexOutOfRangeException("Attempted to unwind empty undo stack.");
             }
 
@@ -155,6 +157,7 @@ namespace Chem4Word.ViewModel
             var br = _undoStack.Pop();
             if (br.IsBufferRecord())
             {
+                Debugger.Break();
                 throw new InvalidDataException("First rollback action is a buffer record.");
             }
 
@@ -179,6 +182,7 @@ namespace Chem4Word.ViewModel
             var br = _undoStack.Pop();
             if (!br.IsBufferRecord())
             {
+                Debugger.Break();
                 throw new InvalidDataException("Undo stack is missing buffer record");
             }
             _redoStack.Push(br);
@@ -208,6 +212,7 @@ namespace Chem4Word.ViewModel
             var br = _redoStack.Pop();
             if (!br.IsBufferRecord())
             {
+                Debugger.Break();
                 throw new InvalidDataException("Redo stack is missing buffer record");
             }
             _undoStack.Push(br);
