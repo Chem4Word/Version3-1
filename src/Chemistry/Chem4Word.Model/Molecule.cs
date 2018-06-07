@@ -1232,9 +1232,15 @@ namespace Chem4Word.Model
             Path otherGeo = BasicGeometry.BuildPath(placements);
 
             var val1 = ringsGeo;
-            val1.FillRule = FillRule.EvenOdd;
+            if (val1 != null)
+            {
+                val1.FillRule = FillRule.EvenOdd;
+            }
             var val2 = otherGeo.Data.GetOutlinedPathGeometry();
-            val2.FillRule = FillRule.EvenOdd;
+            if (val2 != null)
+            {
+                val2.FillRule = FillRule.EvenOdd;
+            }
 
             var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2).GetOutlinedPathGeometry();
             //return (id == IntersectionDetail.FullyContains | id == IntersectionDetail.FullyInside |
