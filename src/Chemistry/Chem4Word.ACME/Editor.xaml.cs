@@ -68,6 +68,22 @@ namespace Chem4Word.ACME
             }
         }
 
+        public Model.Model Data
+        {
+            get
+            {
+                if (_activeViewModel == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    Model.Model model = _activeViewModel.Model.Clone();
+                    model.RescaleForCml();
+                    return model;
+                }
+            }
+        }
         public bool ShowSave
         {
             get { return (bool)GetValue(ShowSaveProperty); }

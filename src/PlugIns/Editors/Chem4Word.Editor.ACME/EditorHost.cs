@@ -7,8 +7,11 @@
 
 using System;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using Chem4Word.ACME;
+using Chem4Word.Core;
+using Chem4Word.Model.Converters;
 
 namespace Chem4Word.Editor.ACME
 {
@@ -61,15 +64,40 @@ namespace Chem4Word.Editor.ACME
 
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Chem4Word.ACME.Editor ec = elementHost1.Child as Chem4Word.ACME.Editor;
-            if (ec.Dirty)
+            if (Result != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
             {
-                e.Cancel = true;
-            }
-            else
-            {
-                ec.OnOkButtonClick -= OnWpfOkButtonClick;
-                ec = null;
+                Chem4Word.ACME.Editor ec = elementHost1.Child as Chem4Word.ACME.Editor;
+                if (ec != null)
+                {
+                    if (ec.Dirty)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine("Do you wish to save your changes?");
+                        sb.AppendLine("  Click 'Yes' to save your changes and exit.");
+                        sb.AppendLine("  Click 'No' to discard your changes and exit.");
+                        sb.AppendLine("  Click 'Cancel' to return to the form.");
+                        DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                        switch (dr)
+                        {
+                            case DialogResult.Cancel:
+                                e.Cancel = true;
+                                break;
+
+                            case DialogResult.Yes:
+                                Result = DialogResult.OK;
+                                CMLConverter cc = new CMLConverter();
+                                OutputValue = cc.Export(ec.Data);
+                                Hide();
+                                ec.OnOkButtonClick -= OnWpfOkButtonClick;
+                                ec = null;
+                                break;
+
+                            case DialogResult.No:
+                                ec = null;
+                                break;
+                        }
+                    }
+                }
             }
         }
     }
