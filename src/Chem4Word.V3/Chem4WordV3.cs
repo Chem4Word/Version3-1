@@ -61,7 +61,7 @@ namespace Chem4Word
 
         public C4wAddInInfo AddInInfo = new C4wAddInInfo();
         public Options SystemOptions = null;
-        public TelemetryWriter Telemetry = new TelemetryWriter();
+        public TelemetryWriter Telemetry = new TelemetryWriter(false);
 
         public List<IChem4WordEditor> Editors;
         public List<IChem4WordRenderer> Renderers;
@@ -253,7 +253,7 @@ namespace Chem4Word
                 ConfigWatcher cw = new ConfigWatcher(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath);
 
                 // Changed to Lazy Loading
-                //LoadLibrary();
+                //LoadNamesFromLibrary();
 
                 // Deliberate crash to test Error Reporting
                 //int ii = 2;
@@ -268,20 +268,22 @@ namespace Chem4Word
             }
         }
 
-        public void LoadLibrary()
+        public void LoadNamesFromLibrary()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                string libraryTarget = Path.Combine(Globals.Chem4WordV3.AddInInfo.ProgramDataPath, Constants.LibraryFileName);
-                if (!File.Exists(libraryTarget))
-                {
-                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Copying initial Library database");
-                    ResourceHelper.WriteResource(Assembly.GetExecutingAssembly(), "Data.Library.db", libraryTarget);
-                }
+                // ToDo: Remove before check in
+                //string libraryTarget = Path.Combine(Globals.Chem4WordV3.AddInInfo.ProgramDataPath, Constants.LibraryFileName);
+                //if (!File.Exists(libraryTarget))
+                //{
+                //    Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Copying initial Library database");
+                //    ResourceHelper.WriteResource(Assembly.GetExecutingAssembly(), "Data.Library.db", libraryTarget);
+                //}
 
                 //Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Reading Library database");
-                LibraryNames = LibraryModel.GetLibraryNames();
+                var lib = new Database.Library();
+                LibraryNames = lib.GetLibraryNames();
             }
             catch (Exception ex)
             {
@@ -297,6 +299,9 @@ namespace Chem4Word
 
             try
             {
+                // Initiallize Telemetry with send permission
+                Telemetry = new TelemetryWriter(true);
+
                 // Read in options file
                 string padPath = Globals.Chem4WordV3.AddInInfo.ProductAppDataPath;
                 string fileName = $"{Globals.Chem4WordV3.AddInInfo.ProductName}.json";
@@ -325,6 +330,9 @@ namespace Chem4Word
                         File.WriteAllText(optionsFile, temp);
                     }
                 }
+
+                // Re-Initiallize Telemetry with granted permissions
+                Telemetry = new TelemetryWriter(SystemOptions.TelemetryEnabled);
             }
             catch (Exception ex)
             {
@@ -942,17 +950,9 @@ namespace Chem4Word
                     Debug.WriteLine($"Convert '{ctrl.Tag}' to Chemistry");
                     TargetWord tw = JsonConvert.DeserializeObject<TargetWord>(ctrl.Tag);
 
-                    SQLiteDataReader chemistry = LibraryModel.GetChemistryByID(tw.ChemistryId);
-                    string cml = null;
-                    while (chemistry.Read())
-                    {
-                        var byteArray = (Byte[])chemistry["Chemistry"];
-                        cml = Encoding.UTF8.GetString(byteArray);
-                        break;
-                    }
+                    var lib = new Database.Library();
+                    string cml = lib.GetChemistryByID(tw.ChemistryId);
 
-                    chemistry.Close();
-                    chemistry.Dispose();
 
                     if (cml == null)
                     {
@@ -1001,7 +1001,7 @@ namespace Chem4Word
             {
                 if (LibraryNames == null)
                 {
-                    LoadLibrary();
+                    LoadNamesFromLibrary();
                 }
                 if (LibraryNames != null && LibraryNames.Any())
                 {
@@ -1703,17 +1703,19 @@ namespace Chem4Word
                             ChemistryProhibitedReason = "document is in compatibility mode.";
                         }
 
+
                         try
                         {
-                            if (doc.CoAuthoring.Conflicts.Count > 0)
+                            //if (doc.CoAuthoring.Conflicts.Count > 0) // <-- This clears current selection ???
+                            if (doc.CoAuthoring.Locks.Count > 0)
                             {
                                 allowed = false;
-                                ChemistryProhibitedReason = "document has conflicts which require resolving.";
+                                ChemistryProhibitedReason = "document is in co-authoring mode.";
                             }
                         }
                         catch
                         {
-                            // CoAuthoring or Conflicts may not be initialised!
+                            // CoAuthoring or Conflicts/Locks may not be initialised!
                         }
 
                         Word.Selection sel = Application.Selection;
