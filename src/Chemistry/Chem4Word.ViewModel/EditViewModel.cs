@@ -581,12 +581,9 @@ namespace Chem4Word.ViewModel
             UndoManager.BeginUndoBlock();
             var bondlist = atom.Bonds.ToList();
             var parent = atom.Parent;
-            
+
             Dictionary<Bond, Atom> startAtoms = new Dictionary<Bond, Atom>();
             Dictionary<Bond, Atom> endAtoms = new Dictionary<Bond, Atom>();
-
-
-            
 
             Action undoAction = () =>
             {
@@ -645,7 +642,6 @@ namespace Chem4Word.ViewModel
                 bond.EndAtom = null;
                 parent?.Bonds.Remove(bond);
 
-
                 parent?.Split(a1, a2);
                 if (isTopLevel)
                 {
@@ -659,7 +655,6 @@ namespace Chem4Word.ViewModel
                 bond.EndAtom = a2;
                 a1.Parent.Bonds.Add(bond);
                 //SelectedItems.Add(bond);
-
 
                 if (a2.Parent != a1.Parent)
                 {
