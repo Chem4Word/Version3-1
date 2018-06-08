@@ -67,32 +67,43 @@ namespace Chem4Word.ViewModel
         //used to calculate the bounds of the atom
         public static double FontSize { get; set; }
 
-        public Rect BoundingBox
+        private Rect? _boundingBox;
+
+        public virtual Rect BoundingBox
         {
             get
             {
-                try
+                if (_boundingBox == null)
                 {
-                    if (AllAtoms.Any())
-                    {
-                        var modelRect = AllAtoms[0].BoundingBox(FontSize);
-                        for (int i = 1; i < AllAtoms.Count; i++)
-                        {
-                            var atom = AllAtoms[i];
-                            modelRect.Union(atom.BoundingBox(FontSize));
-                        }
-
-                        return modelRect;
-                    }
-                    else
-                    {
-                        return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
-                    }
+                    _boundingBox = CalcBoundingBox();
                 }
-                catch (NullReferenceException)
+                return _boundingBox.Value;
+            }
+        }
+
+        protected Rect CalcBoundingBox()
+        {
+            try
+            {
+                if (AllAtoms.Any())
+                {
+                    var modelRect = AllAtoms[0].BoundingBox(FontSize);
+                    for (int i = 1; i < AllAtoms.Count; i++)
+                    {
+                        var atom = AllAtoms[i];
+                        modelRect.Union(atom.BoundingBox(FontSize));
+                    }
+
+                    return modelRect;
+                }
+                else
                 {
                     return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
                 }
+            }
+            catch (NullReferenceException)
+            {
+                return new Rect(0, 0, Globals.DefaultFontSize, Globals.DefaultFontSize);
             }
         }
 

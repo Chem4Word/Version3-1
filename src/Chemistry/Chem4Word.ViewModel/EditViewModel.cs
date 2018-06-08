@@ -1295,5 +1295,10 @@ namespace Chem4Word.ViewModel
             }
             SelectedItems.Clear();
         }
+
+        public override Rect BoundingBox
+        {
+            get { return CalcBoundingBox(); }
+        }
     }
 }
