@@ -67,10 +67,10 @@ namespace Chem4Word.ViewModel
         //used to calculate the bounds of the atom
         public static double FontSize { get; set; }
 
-        private Rect? _boundingBox; 
+        private Rect? _boundingBox;
+
         public virtual Rect BoundingBox
         {
-
             get
             {
                 if (_boundingBox == null)
