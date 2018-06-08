@@ -1184,7 +1184,7 @@ namespace Chem4Word.Model
         {
         }
 
-        public bool Overlaps(List<Point> placements)
+        public bool Overlaps(List<Point> placements, List<Atom> excludeAtoms = null)
         {
             var area = OverlapArea(placements);
 
@@ -1195,10 +1195,20 @@ namespace Chem4Word.Model
             else
             {
                 var chainAtoms = Atoms.Where(a => !a.Rings.Any()).ToList();
+                if (excludeAtoms!=null)
+                {
+                    foreach (Atom excludeAtom in excludeAtoms)
+                    {
+                        if (chainAtoms.Contains(excludeAtom))
+                        {
+                            chainAtoms.Remove(excludeAtom);
+                        }
+                    }
+                }
                 var placementsArea = BasicGeometry.BuildPath(placements).Data;
                 foreach (var chainAtom in chainAtoms)
                 {
-                    if (placementsArea.FillContains(chainAtom.Position))
+                    if (placementsArea.FillContains(chainAtom.Position, 0.01, ToleranceType.Relative))
                     {
                         return true;
                     }
@@ -1228,9 +1238,15 @@ namespace Chem4Word.Model
             Path otherGeo = BasicGeometry.BuildPath(placements);
 
             var val1 = ringsGeo;
-            val1.FillRule = FillRule.EvenOdd;
+            if (val1 != null)
+            {
+                val1.FillRule = FillRule.EvenOdd;
+            }
             var val2 = otherGeo.Data.GetOutlinedPathGeometry();
-            val2.FillRule = FillRule.EvenOdd;
+            if (val2 != null)
+            {
+                val2.FillRule = FillRule.EvenOdd;
+            }
 
             var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2).GetOutlinedPathGeometry();
             //return (id == IntersectionDetail.FullyContains | id == IntersectionDetail.FullyInside |
@@ -1245,9 +1261,9 @@ namespace Chem4Word.Model
         /// <param name="mol">Molecule to merge into this one</param>
         public void Merge(Molecule mol)
         {
-            Debug.Assert(mol != this);
-            Debug.Assert(mol != null);
-            Parent.Molecules.Remove(mol);
+            Debug.Assert(mol!=this);
+            Debug.Assert(mol!=null);
+            Parent?.Molecules.Remove(mol);
             foreach (Atom newAtom in
                mol.Atoms.ToArray())
             {
@@ -1276,8 +1292,8 @@ namespace Chem4Word.Model
         /// <param name="b">Atom from second molecule</param>
         public void Split(Atom a, Atom b)
         {
-            Debug.Assert(a.BondBetween(b) == null);
-
+            Debug.Assert(a.BondBetween(b)==null);
+            
             b.Parent = null;
             Refresh();
 

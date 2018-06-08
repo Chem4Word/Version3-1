@@ -94,7 +94,7 @@ namespace Chem4Word.ACME.Behaviors
                 //try to work out exactly where best to place the ring
 
                 preferredPlacements = PaceOut(hitAtom, direction, xamlBondSize, RingSize);
-                if (parentMolecule.Overlaps(preferredPlacements))
+                if (parentMolecule.Overlaps(preferredPlacements, new List<Atom> {hitAtom}))
                 {
                     UserInteractions.AlertUser("No room left to draw any more rings!");
                     return;

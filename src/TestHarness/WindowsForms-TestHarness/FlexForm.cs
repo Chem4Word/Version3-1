@@ -203,15 +203,6 @@ namespace WinFormsTestHarness
             UndoStack.StackList.ItemsSource = StackToList(_undoStack);
             RedoStack.StackList.ItemsSource = StackToList(_redoStack);
 
-            //ListStacks();
-
-            //// Select last item
-            //UndoStack.StackList.SelectedIndex = UndoStack.StackList.Items.Count - 1;
-            //UndoStack.StackList.ScrollIntoView(UndoStack.StackList.SelectedItem);
-
-            //// Select last item
-            //RedoStack.StackList.SelectedIndex = RedoStack.StackList.Items.Count - 1;
-            //RedoStack.StackList.ScrollIntoView(RedoStack.StackList.SelectedItem);
         }
 
         private void SetCarbons(Model model, bool state)

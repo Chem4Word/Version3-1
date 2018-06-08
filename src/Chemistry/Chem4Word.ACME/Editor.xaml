@@ -628,7 +628,7 @@
                 ItemsSource="{Binding AllObjects}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <controls:ChemistryCanvas x:Name="ChemCanvas"
+                        <Canvas x:Name="ChemCanvas"
                             MinWidth="4000"
                             MinHeight="3000"
                             Background="White" />

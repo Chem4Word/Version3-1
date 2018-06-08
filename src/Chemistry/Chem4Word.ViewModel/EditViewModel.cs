@@ -580,30 +580,46 @@ namespace Chem4Word.ViewModel
         {
             UndoManager.BeginUndoBlock();
             var bondlist = atom.Bonds.ToList();
-            foreach (Bond bond in bondlist)
-            {
-                DeleteBond(bond);
-            }
-
-            SelectedItems.Remove(atom);
-
             var parent = atom.Parent;
+
+            Dictionary<Bond, Atom> startAtoms = new Dictionary<Bond, Atom>();
+            Dictionary<Bond, Atom> endAtoms = new Dictionary<Bond, Atom>();
 
             Action undoAction = () =>
             {
                 parent.Atoms.Add(atom);
-                SelectedItems.Clear();
-                SelectedItems.Add(atom);
+                //SelectedItems.Clear();
+                foreach (Bond bond in bondlist)
+                {
+                    bond.StartAtom = startAtoms[bond];
+                    bond.EndAtom = endAtoms[bond];
+                    parent.Bonds.Add(bond);
+                }
+                //if (!SelectedItems.Contains(atom))
+                //{
+                //    SelectedItems.Add(atom);
+                //}
             };
             Action redoAction = () =>
             {
+                foreach (Bond bond in bondlist)
+                {
+                    startAtoms[bond] = bond.StartAtom;
+                    endAtoms[bond] = bond.EndAtom;
+                    bond.StartAtom = null;
+                    bond.EndAtom = null;
+                    parent.Bonds.Remove(bond);
+                }
                 parent.Atoms.Remove(atom);
+                if (SelectedItems.Contains(atom))
+                {
+                    SelectedItems.Remove(atom);
+                }
             };
 
             UndoManager.RecordAction(undoAction, redoAction);
-            atom.Parent.Atoms.Remove(atom);
-
             UndoManager.EndUndoBlock();
+            redoAction();
         }
 
         public void DeleteBond(Bond bond)
@@ -618,9 +634,14 @@ namespace Chem4Word.ViewModel
             bool isTopLevel = UndoManager.TransactionLevel == 1;
             Action redoAction = () =>
             {
+                //if (SelectedItems.Contains(bond))
+                //{
+                //    SelectedItems.Remove(bond);
+                //}
                 bond.StartAtom = null;
                 bond.EndAtom = null;
                 parent?.Bonds.Remove(bond);
+
                 parent?.Split(a1, a2);
                 if (isTopLevel)
                 {
@@ -632,11 +653,9 @@ namespace Chem4Word.ViewModel
             {
                 bond.StartAtom = a1;
                 bond.EndAtom = a2;
-
                 a1.Parent.Bonds.Add(bond);
+                //SelectedItems.Add(bond);
 
-                SelectedItems.Clear();
-                SelectedItems.Add(bond);
                 if (a2.Parent != a1.Parent)
                 {
                     a1.Parent.Merge(a2.Parent);
@@ -989,7 +1008,11 @@ namespace Chem4Word.ViewModel
 
             newAtomPlacements[0].ExistingAtom.Parent.Refresh();
 
-            Action undo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
+            Action undo = () =>
+            {
+                newAtomPlacements[0].ExistingAtom.Parent.Refresh();
+                SelectedItems.Clear();
+            };
             Action redo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
 
             UndoManager.RecordAction(undo, redo, "Molecule refresh");
@@ -1017,7 +1040,7 @@ namespace Chem4Word.ViewModel
             {
                 mol.Parent = theModel;
                 theModel.Molecules.Add(mol);
-                SelectedItems.Add(mol);
+                //SelectedItems.Add(mol);
             };
 
             redoAction();

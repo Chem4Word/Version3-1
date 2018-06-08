@@ -30,35 +30,34 @@ namespace Chem4Word.ViewModel.Commands
                 MyEditViewModel.UndoManager.BeginUndoBlock();
                 //do any bonds remaining:  this is important if only bonds have been selected
 
-                if ((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Molecule) ==
-                     EditViewModel.SelectionTypeCode.Molecule)
+                if (mols.Any())
                 {
                     foreach (Molecule mol in mols)
                     {
                         MyEditViewModel.DeleteMolecule(mol);
                     }
                 }
-
-                if ((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Bond) ==
-                     EditViewModel.SelectionTypeCode.Bond)
+                else
                 {
-                    foreach (Bond bond in bonds)
+                    if (bonds.Any())
                     {
-                        MyEditViewModel.DeleteBond(bond);
+                        foreach (Bond bond in bonds)
+                        {
+                            MyEditViewModel.DeleteBond(bond);
+                        }
+                    }
+
+                    //do the atom and any remaining associated bonds
+                    if (atoms.Any())
+                    {
+                        foreach (Atom atom in atoms)
+                        {
+                            MyEditViewModel.DeleteAtom(atom);
+                        }
                     }
                 }
-
-                //do the atom and any remaining associated bonds
-                if ((MyEditViewModel.SelectionType & EditViewModel.SelectionTypeCode.Atom) ==
-                     EditViewModel.SelectionTypeCode.Atom)
-                {
-                    foreach (Atom atom in atoms)
-                    {
-                        MyEditViewModel.DeleteAtom(atom);
-                    }
-                }
-
                 MyEditViewModel.UndoManager.EndUndoBlock();
+                MyEditViewModel.SelectedItems.Clear();
             }
         }
 

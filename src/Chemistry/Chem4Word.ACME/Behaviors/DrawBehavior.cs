@@ -125,7 +125,15 @@ namespace Chem4Word.ACME.Behaviors
                 // ReSharper disable once PossibleUnintendedReferenceComparison
                 if (landedAtomShape == null)  //no atom hit
                 {
-                    ViewModel.AddAtomChain(_currentAtomShape?.ParentAtom, _lastPos, ClockDirections.Two);
+                    if (_currentAtomShape != null)
+                    {
+                        ViewModel.AddAtomChain(_currentAtomShape.ParentAtom, _angleSnapper.SnapBond(e.GetPosition(AssociatedObject), e), ClockDirections.Two);
+
+                    }
+                    else
+                    {
+                        ViewModel.AddAtomChain(null, e.GetPosition(AssociatedObject), ClockDirections.Two);
+                    }
                 }
                 else if (landedAtomShape == _currentAtomShape) //both are the same atom
                 {
