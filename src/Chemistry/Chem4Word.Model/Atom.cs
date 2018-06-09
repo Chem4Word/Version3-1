@@ -480,7 +480,7 @@ namespace Chem4Word.Model
         //tries to get an estimated bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
-            Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
+            //Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
             double halfBoxWidth = fontSize * 0.5;
             Point position = Position;
             Rect baseAtomBox = new Rect(
