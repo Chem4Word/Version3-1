@@ -60,7 +60,7 @@ namespace Chem4Word.ViewModel
                     {
                         _bondThickness = ((Model.XamlBondLength / sqrt) * (Globals.ScaleFactorForXaml * 3)) + 1.0d;
                     }
-                    Debug.WriteLine($"BondThickness; BondThickness --> {_bondThickness}");
+                    //Debug.WriteLine($"BondThickness; BondThickness --> {_bondThickness}");
                 }
 
                 return _bondThickness.Value;
