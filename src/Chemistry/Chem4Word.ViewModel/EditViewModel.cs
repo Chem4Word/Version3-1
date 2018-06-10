@@ -1321,7 +1321,10 @@ namespace Chem4Word.ViewModel
 
         public override Rect BoundingBox
         {
-            get { return CalcBoundingBox(); }
+            get
+            {
+                return CalcBoundingBox();
+            }
         }
     }
 }
