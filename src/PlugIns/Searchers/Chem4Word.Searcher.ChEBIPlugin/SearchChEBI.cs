@@ -362,6 +362,12 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                         ErrorsAndWarnings.Text = string.Join(Environment.NewLine, lines);
                     }
                     ChebiId = le.chebiId;
+
+                    if (_lastModel.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
+                        || _lastModel.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
+                    {
+                        _lastModel.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
+                    }
                     display1.Chemistry = _lastModel;
                 }
                 else
