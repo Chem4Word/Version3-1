@@ -237,6 +237,7 @@ namespace Chem4Word.ViewModel.Adorners
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
+            _frag.ResetBoundingBox();
             _boundingBox = _frag.BoundingBox;
             _aspectRatio = _boundingBox.Width / _boundingBox.Height;
         }

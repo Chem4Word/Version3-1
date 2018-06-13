@@ -33,6 +33,10 @@ namespace Chem4Word.Model
 
         private Rect _boundingBox = Rect.Empty;
 
+        public void ResetBoundingBox()
+        {
+            _boundingBox = Rect.Empty;
+        }
         public Rect BoundingBox
         {
             get
