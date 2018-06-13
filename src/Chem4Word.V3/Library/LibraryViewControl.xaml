@@ -136,6 +136,7 @@
                 HorizontalAlignment="Stretch"
                 HorizontalContentAlignment="Stretch"
                 VerticalAlignment="Stretch"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                 VirtualizingStackPanel.IsVirtualizing="True"
                 Background="{x:Static SystemColors.WindowBrush}">
             <ListBox.ItemTemplate>
