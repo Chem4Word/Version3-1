@@ -103,7 +103,7 @@ namespace Chem4Word.View
                 if (_subText != null)
                 //get the offset for the subscript
                 {
-                    Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width + _mainText.TrailingBearing + _subText.LeadingBearing,
+                    Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width + _mainText.TrailingBearing  + _subText.LeadingBearing,
                         _subText.TextMetrics.BoundingBox.Height / 2);
                     Point subBottomLeft = _mainText.TextMetrics.TotalBoundingBox.BottomLeft + subscriptOffset;
                     _subText.MeasureAtBottomLeft(subBottomLeft, pixelsPerDip);

@@ -409,8 +409,17 @@ namespace Chem4Word.ViewModel
             {
                 if (SelectionAdorners.ContainsKey(oldObject))
                 {
-                    layer.Remove(SelectionAdorners[oldObject]);
+                    var selectionAdorner = SelectionAdorners[oldObject];
+                    if (selectionAdorner is MoleculeSelectionAdorner)
+                    {
+                        var msAdorner = (MoleculeSelectionAdorner) selectionAdorner;
+
+                        msAdorner.DragResizeCompleted -= MolAdorner_DragResizeCompleted;
+                        msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    }
+                    layer.Remove(selectionAdorner);
                     SelectionAdorners.Remove(oldObject);
+
                 }
             }
         }
@@ -458,7 +467,9 @@ namespace Chem4Word.ViewModel
         {
             //we've completed the drag operation
             //remove the existing molecule adorner
-            var movedMolecule = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+  
+            var moleculeSelectionAdorner = (sender as MoleculeSelectionAdorner);
+            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
             SelectedItems.Remove(movedMolecule);
 
             //and add in a new one
@@ -672,10 +683,10 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir)
+        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir, Element elem = null)
         {
             Atom newAtom = new Atom();
-            newAtom.Element = _selectedElement;
+            newAtom.Element = elem ?? _selectedElement;
             newAtom.Position = newAtomPos;
             object tag = null;
             if (dir != ClockDirections.Nothing)
