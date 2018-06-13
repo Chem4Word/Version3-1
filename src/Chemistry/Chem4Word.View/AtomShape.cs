@@ -298,13 +298,14 @@ namespace Chem4Word.View
             //ShowPoints(symbolPoints, drawingContext);
             //ShowPoints(hydrogenPoints, drawingContext);
             //ShowPoints(_shapeHull, drawingContext);
-            drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
+            //drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
 
             //stage 6:  draw an isotope label if needed
             if (Isotope != null)
             {
                 isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
             }
+
             //stage7:  draw any charges
             if ((Charge ?? 0) != 0)
             {
