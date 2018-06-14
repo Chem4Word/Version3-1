@@ -58,7 +58,7 @@ namespace Chem4Word.ViewModel.Adorners
             }
             else
             {
-                drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox());
+                drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox(_adornedAtom.Model.FontSize));
             }
         }
 

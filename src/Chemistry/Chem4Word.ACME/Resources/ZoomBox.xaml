@@ -41,15 +41,13 @@
                 </VisualBrush.Visual>
             </VisualBrush>
 
-            <Style x:Key="ToggleButtonStyle"
-                TargetType="ToggleButton">
+            <Style x:Key="ToggleButtonStyle" TargetType="ToggleButton">
                 <Setter Property="SnapsToDevicePixels" Value="true" />
                 <Setter Property="OverridesDefaultStyle" Value="true" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ToggleButton">
-                            <Border x:Name="Border"
-                                Background="{StaticResource NormalBrush}">
+                            <Border x:Name="Border" Background="{StaticResource NormalBrush}">
                                 <ContentPresenter />
                             </Border>
                             <ControlTemplate.Triggers>
@@ -171,24 +169,18 @@
                         BorderBrush="DimGray"
                         BorderThickness="1"
                         CornerRadius="1">
-                        <Expander
-                            Background="Transparent"
-                            IsExpanded="True">
+                        <Expander Background="Transparent" IsExpanded="True">
                             <Border
                                 Height="180"
                                 Padding="0"
                                 BorderBrush="DimGray"
                                 BorderThickness="0,1,0,0">
                                 <Grid>
-                                    <Canvas Name="PART_ZoomCanvas"
-                                        Margin="5">
+                                    <Canvas Name="PART_ZoomCanvas" Margin="5">
                                         <Canvas.Background>
-                                            <VisualBrush
-                                                Stretch="Uniform"
-                                                Visual="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ScrollViewer.Content}" />
+                                            <VisualBrush Stretch="Uniform" Visual="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ScrollViewer.Content}" />
                                         </Canvas.Background>
-                                        <Thumb Name="PART_ZoomThumb"
-                                            Cursor="SizeAll">
+                                        <Thumb Name="PART_ZoomThumb" Cursor="SizeAll">
                                             <Thumb.Style>
                                                 <Style TargetType="Thumb">
                                                     <Setter Property="Template">

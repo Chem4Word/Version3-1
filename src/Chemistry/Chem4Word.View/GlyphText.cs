@@ -110,7 +110,7 @@ namespace Chem4Word.View
         {
             get
             {
-                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector;
+                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector + new Vector(LeadingBearing,0.0);
                 return TextRun.GetOutline(TypeSize).Select(p => p + offset).ToList();
             }
         }
@@ -119,7 +119,8 @@ namespace Chem4Word.View
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
-            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, AtomShape.SymbolSize) + new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
+            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, AtomShape.SymbolSize) +
+                                new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
 
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
@@ -156,7 +157,7 @@ namespace Chem4Word.View
             dc.DrawGlyphRun(Fill, groupGlyphRun);
 #if DEBUG
             // Diag: Uncomment to see Text BoundingBox
-            dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
+            //dc.DrawRectangle(null, new Pen(Brushes.Black, 0.5),  TextMetrics.BoundingBox );
 #endif
             TextRun = groupGlyphRun;
         }

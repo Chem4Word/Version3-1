@@ -55,7 +55,7 @@ namespace Chem4Word.View
         /// <returns>Vector to be added to atom pos</returns>
         public static Vector GetOffsetVector(GlyphRun glyphRun, double symbolSize)
         {
-            Rect rect = glyphRun.ComputeInkBoundingBox();
+            Rect rect = glyphRun.ComputeAlignmentBox();
 
             //Vector offset = (rect.BottomLeft - rect.TopRight) / 2;
             Vector offset = new Vector(-rect.Width / 2, glyphRun.GlyphTypeface.CapsHeight * symbolSize / 2);

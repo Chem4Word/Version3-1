@@ -103,7 +103,7 @@ namespace Chem4Word.View
                 if (_subText != null)
                 //get the offset for the subscript
                 {
-                    Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width + _mainText.TrailingBearing + _subText.LeadingBearing,
+                    Vector subscriptOffset = new Vector(_mainText.TextMetrics.TotalBoundingBox.Width + _mainText.TrailingBearing  + _subText.LeadingBearing,
                         _subText.TextMetrics.BoundingBox.Height / 2);
                     Point subBottomLeft = _mainText.TextMetrics.TotalBoundingBox.BottomLeft + subscriptOffset;
                     _subText.MeasureAtBottomLeft(subBottomLeft, pixelsPerDip);
@@ -298,13 +298,14 @@ namespace Chem4Word.View
             //ShowPoints(symbolPoints, drawingContext);
             //ShowPoints(hydrogenPoints, drawingContext);
             //ShowPoints(_shapeHull, drawingContext);
-            drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
+            //drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
 
             //stage 6:  draw an isotope label if needed
             if (Isotope != null)
             {
                 isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
             }
+
             //stage7:  draw any charges
             if ((Charge ?? 0) != 0)
             {
