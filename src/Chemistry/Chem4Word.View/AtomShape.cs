@@ -305,6 +305,7 @@ namespace Chem4Word.View
             {
                 isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
             }
+
             //stage7:  draw any charges
             if ((Charge ?? 0) != 0)
             {
