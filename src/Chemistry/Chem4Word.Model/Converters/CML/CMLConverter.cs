@@ -167,10 +167,10 @@ namespace Chem4Word.Model.Converters
         {
             XElement result = new XElement(CML.cml + "atom",
                 new XAttribute("id", atom.Id),
-                new XAttribute("elementType", atom.Element.ToString()),
+                new XAttribute("elementType", atom.Element.Symbol),
                 new XAttribute("x2", atom.Position.X),
                 new XAttribute("y2", atom.Position.Y)
-               );
+            );
 
             if (atom.FormalCharge != null)
             {
