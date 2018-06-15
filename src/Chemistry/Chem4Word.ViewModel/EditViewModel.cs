@@ -432,27 +432,39 @@ namespace Chem4Word.ViewModel
                 {
                     var atom = (Atom)newObject;
 
-                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
-                    SelectionAdorners[newObject] = atomAdorner;
-                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-
-                    //if all atoms are selected then select the mol
-                    if (AllAtomsSelected(atom.Parent))
+                    if (atom.Singleton)
                     {
-                        RemoveAdorners(atom.Parent);
-                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
-                        SelectionAdorners[newObject] = molAdorner;
+                        SingleAtomSelectionAdorner atomAdorner = new SingleAtomSelectionAdorner(DrawingSurface, atom.Parent, this);
+                        SelectionAdorners[newObject] = atomAdorner;
+                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
                     }
+                    else
+                    {
+                        AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
+                        SelectionAdorners[newObject] = atomAdorner;
+                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
+                        //if all atoms are selected then select the mol
+                        if (AllAtomsSelected(atom.Parent))
+                        {
+                            RemoveAdorners(atom.Parent);
+                            MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
+                            SelectionAdorners[newObject] = molAdorner;
+                        }
+
+                    }
+
                 }
 
-                if (newObject is Bond)
+                else if (newObject is Bond)
                 {
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
                     SelectionAdorners[newObject] = bondAdorner;
                     bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
 
-                if (newObject is Molecule)
+               else if (newObject is Molecule)
                 {
                     MoleculeSelectionAdorner molAdorner =
                         new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
@@ -494,7 +506,11 @@ namespace Chem4Word.ViewModel
                 }
                 else if (sender is MoleculeSelectionAdorner)
                 {
-                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule.Parent as Molecule;
+                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+                }
+                else if (sender is SingleAtomSelectionAdorner)
+                {
+                    Molecule mol = (sender as SingleAtomSelectionAdorner).AdornedMolecule.Parent as Molecule;
                 }
             }
         }
