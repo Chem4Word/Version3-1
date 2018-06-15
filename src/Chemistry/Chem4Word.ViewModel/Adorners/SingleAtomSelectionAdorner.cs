@@ -21,57 +21,42 @@ namespace Chem4Word.ViewModel.Adorners
     public class SingleAtomSelectionAdorner : Adorner
     {
         //static as they need to be set only when the adorner is first created
-  
-        private Point _canvasPos;
-        private readonly Molecule _frag;
 
-        //some things to grab hold of
-        private readonly Thumb _topLeft; //these do the resizing
+        protected readonly Molecule Frag;
 
-        private readonly Thumb _topRight; //these do the resizing
-        private readonly Thumb _bottomLeft; //these do the resizing
-        private readonly Thumb _bottomRight; //these do the resizing
+        protected Thumb BigThumb; //this is the main grab area for the molecule
 
-        private Thumb _bigThumb; //this is the main grab area for the molecule
+        protected readonly VisualCollection VisualChildren;
+        protected TranslateTransform LastTranslation;
 
-  
-        private readonly VisualCollection _visualChildren;
-        private Geometry ghostImage;
-        private TranslateTransform _lastTranslation;
-
-        private Rect _boundingBox;
-
-        private bool _dragging;
+        protected bool Dragging;
      
-        private Point _centroid;
 
-        //private SnapGeometry _rotateSnapper;
-        private readonly Brush _renderBrush;
+        protected readonly Pen BorderPen;
+        protected readonly Brush RenderBrush;
 
-        private readonly Pen _renderPen;
-        private double _dragXTravel;
-        private double _dragYTravel;
+        protected double DragXTravel;
+        protected double DragYTravel;
 
         public readonly EditViewModel CurrentModel;
-        private Brush _bigBrush;
-        private Point _startPos;
+
+        protected Point StartPos;
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
         {
             CurrentModel = currentModel;
 
-            _visualChildren = new VisualCollection(this);
+            VisualChildren = new VisualCollection(this);
            
             BuildBigDragArea();
 
             AttachHandlers();
 
-            _frag = molecule;
+            Frag = molecule;
 
-            _bigBrush = (Brush)FindResource("BigThumbFillBrush");
-            _renderPen = (Pen)FindResource("GrabHandlePen");
-
+            BorderPen = (Pen)FindResource("GrabHandlePen");
+            RenderBrush = (Brush)FindResource("BigThumbFillBrush");
             Focusable = false;
             IsHitTestVisible = true;
             SetBoundingBox();
@@ -80,15 +65,16 @@ namespace Chem4Word.ViewModel.Adorners
             myAdornerLayer.Add(this);
         }
 
+        
+
         private void AttachHandlers()
         {
-
             //wire up the event handling
-            MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
-            KeyDown += MoleculeAdorner_KeyDown;
+            MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
+            KeyDown += ThisAdorner_KeyDown;
         }
 
-        private void MoleculeSelectionAdorner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void BigThumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
@@ -96,7 +82,7 @@ namespace Chem4Word.ViewModel.Adorners
             }
         }
 
-        private void MoleculeAdorner_KeyDown(object sender, KeyEventArgs e)
+        private void ThisAdorner_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.Delete))
             {
@@ -119,41 +105,26 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void AbortDragging()
         {
-            _dragging = false;
+            Dragging = false;
       
-            _lastTranslation = null;
+            LastTranslation = null;
             InvalidateVisual();
         }
 
 
 
-        private void SetCentroid()
-        {
-            _centroid = _frag.Centroid;
-            //create a snapper
-            //_rotateSnapper = new SnapGeometry(_centroid, 15);
-        }
-
-
         private void DragStarted(object sender, DragStartedEventArgs e)
         {
-            _dragging = true;
+            Dragging = true;
             Keyboard.Focus(this);
-            InitializeDragging();
-        }
-
-        private void InitializeDragging()
-        {
-            _dragXTravel = 0.0d;
-            _dragYTravel = 0.0d;
+            DragXTravel = 0.0d;
+            DragYTravel = 0.0d;
         }
 
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            _frag.ResetBoundingBox();
-            _boundingBox = _frag.BoundingBox;
-           
+            Frag.ResetBoundingBox();
         }
 
         /// <summary>
@@ -161,16 +132,16 @@ namespace Chem4Word.ViewModel.Adorners
         /// </summary>
         private void BuildBigDragArea()
         {
-            _bigThumb = new Thumb();
-            _visualChildren.Add(_bigThumb);
-            _bigThumb.IsHitTestVisible = true;
+            BigThumb = new Thumb();
+            VisualChildren.Add(BigThumb);
+            BigThumb.IsHitTestVisible = true;
 
-            _bigThumb.Style = (Style)FindResource("BigThumbStyle");
-            _bigThumb.Cursor = Cursors.Hand;
-            _bigThumb.DragStarted += _bigThumb_DragStarted;
-            _bigThumb.DragCompleted += _bigThumb_DragCompleted;
-            _bigThumb.DragDelta += _bigThumb_DragDelta;
-            _bigThumb.MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
+            BigThumb.Style = (Style)FindResource("BigThumbStyle");
+            BigThumb.Cursor = Cursors.Hand;
+            BigThumb.DragStarted += _bigThumb_DragStarted;
+            BigThumb.DragCompleted += _bigThumb_DragCompleted;
+            BigThumb.DragDelta += _bigThumb_DragDelta;
+            BigThumb.MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
         }
 
         /// <summary>
@@ -186,47 +157,46 @@ namespace Chem4Word.ViewModel.Adorners
 
                 //take a snapshot of the molecule
 
-                var fragImage = _frag.Ghost();
-                Debug.WriteLine(_lastTranslation.ToString());
-                fragImage.Transform = _lastTranslation;
+                var fragImage = Frag.Ghost();
+                Debug.WriteLine(LastTranslation.ToString());
+                fragImage.Transform = LastTranslation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(_renderBrush, _renderPen, fragImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, fragImage);
 
                 base.OnRender(drawingContext);
             }
         }
 
-        private bool IsWorking => _dragging;
+        protected bool IsWorking => Dragging;
 
 
         // Override the VisualChildrenCount and GetVisualChild properties to interface with
         // the adorner's visual collection.
-        protected override int VisualChildrenCount => _visualChildren.Count;
+        protected override int VisualChildrenCount => VisualChildren.Count;
 
-        public Molecule AdornedMolecule => _frag;
+        public Molecule AdornedMolecule => Frag;
 
-        protected override Visual GetVisualChild(int index) => _visualChildren[index];
+        protected override Visual GetVisualChild(int index) => VisualChildren[index];
 
         // Arrange the Adorners.
         protected override Size ArrangeOverride(Size finalSize)
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = _frag.BoundingBox;
+            var bbb = Frag.BoundingBox;
 
-            if (_lastTranslation != null)
+            if (LastTranslation != null)
             {
-                bbb = _lastTranslation.TransformBounds(bbb);
+                bbb = LastTranslation.TransformBounds(bbb);
             }
 
-       
             //put a box right around the entire shebang
 
-            _bigThumb.Arrange(bbb);
-            Canvas.SetLeft(_bigThumb, bbb.Left);
-            Canvas.SetTop(_bigThumb, bbb.Top);
-            _bigThumb.Height = bbb.Height;
-            _bigThumb.Width = bbb.Width;
+            BigThumb.Arrange(bbb);
+            Canvas.SetLeft(BigThumb, bbb.Left);
+            Canvas.SetTop(BigThumb, bbb.Top);
+            BigThumb.Height = bbb.Height;
+            BigThumb.Width = bbb.Width;
 
             //add the rotator
             
@@ -242,31 +212,31 @@ namespace Chem4Word.ViewModel.Adorners
         #endregion Events
 
         #region Dragging
-
-        // Handler for resizing from the bottom-right.
+    
 
         private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
-            _dragging = true;
-            InitializeDragging();
-            _dragging = true;
+            Dragging = true;
 
-            _startPos = new Point(Canvas.GetLeft(_bigThumb), Canvas.GetTop(_bigThumb));
-            _lastTranslation = new TranslateTransform();
+            DragXTravel = 0.0d;
+            DragYTravel = 0.0d;
+            
+
+            StartPos = new Point(Canvas.GetLeft(BigThumb), Canvas.GetTop(BigThumb));
+            LastTranslation = new TranslateTransform();
         }
 
         private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            _dragXTravel += e.HorizontalChange;
-            _dragYTravel += e.VerticalChange;
+            DragXTravel += e.HorizontalChange;
+            DragYTravel += e.VerticalChange;
 
-            _lastTranslation.X = _dragXTravel;
-            _lastTranslation.Y = _dragYTravel;
+            LastTranslation.X = DragXTravel;
+            LastTranslation.Y = DragYTravel;
 
-            Point currentPos = new Point(_dragXTravel, _dragYTravel);
 
-            Canvas.SetLeft(_bigThumb, _startPos.X + _dragXTravel);
-            Canvas.SetTop(_bigThumb, _startPos.Y + _dragYTravel);
+            Canvas.SetLeft(BigThumb, StartPos.X + DragXTravel);
+            Canvas.SetTop(BigThumb, StartPos.Y + DragYTravel);
 
 
 
@@ -282,17 +252,17 @@ namespace Chem4Word.ViewModel.Adorners
         private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
 
-            _lastTranslation.X = e.HorizontalChange;
-            _lastTranslation.Y = e.VerticalChange;
+            LastTranslation.X = DragXTravel;
+            LastTranslation.Y = DragYTravel;
 
 
             SetBoundingBox();
             InvalidateVisual();
 
             //move the molecule
-            CurrentModel.DoOperation(_lastTranslation, AdornedMolecule.Atoms.ToList());
+            CurrentModel.DoOperation(LastTranslation, AdornedMolecule.Atoms.ToList());
             DragResizeCompleted?.Invoke(this, e);
-            _dragging = false;
+            Dragging = false;
         }
 
         #endregion 

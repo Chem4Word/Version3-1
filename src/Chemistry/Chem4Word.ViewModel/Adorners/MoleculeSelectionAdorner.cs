@@ -487,7 +487,8 @@ namespace Chem4Word.ViewModel.Adorners
             IncrementDragging(args);
             if (NotDraggingBackwards())
             {
-                var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
+                var scaleFactor = GetScaleFactor(
+                    _boundingBox.Left + _dragXTravel,
                     _boundingBox.Top + _dragYTravel,
                     _boundingBox.Right,
                     _boundingBox.Bottom);

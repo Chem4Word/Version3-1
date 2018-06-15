@@ -898,8 +898,10 @@ namespace Chem4Word.ViewModel
                     SelectedItems.Clear();
                     (atom as Atom).Position = (Point)newPosition;
                 };
+
                 UndoManager.RecordAction(undo, redo);
-                atom.Position = newPosition;
+
+                redo();
             }
 
             UndoManager.EndUndoBlock();
