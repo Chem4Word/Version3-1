@@ -84,7 +84,6 @@ namespace Chem4Word
         public void RestoreDefaults()
         {
             // User Options
-
             TelemetryEnabled = true;
 
             SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
