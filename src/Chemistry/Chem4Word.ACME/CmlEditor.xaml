@@ -8,9 +8,7 @@
     d:DesignHeight="400"
     d:DesignWidth="600"
     mc:Ignorable="d">
-    <Grid
-        RenderTransformOrigin="0.502,0.685"
-        ShowGridLines="False">
+    <Grid RenderTransformOrigin="0.502,0.685" ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="45" />

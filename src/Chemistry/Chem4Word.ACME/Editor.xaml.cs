@@ -17,6 +17,7 @@ using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Chem4Word.ACME.Behaviors;
+using Chem4Word.Core.UI.Wpf;
 
 namespace Chem4Word.ACME
 {

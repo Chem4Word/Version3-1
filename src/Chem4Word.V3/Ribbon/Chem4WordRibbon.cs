@@ -28,6 +28,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Chem4Word.Telemetry;
+using Chem4Word.UI.WPF;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -349,6 +350,13 @@ namespace Chem4Word
 
                 Globals.Chem4WordV3.EventsEnabled = true;
             }
+        }
+
+        private void OnOptionsWpfClick(object sender, RibbonControlEventArgs e)
+        {
+            WpfLoader f = new WpfLoader("Settings");
+            f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+            DialogResult dr = f.ShowDialog();
         }
 
         private void OnOptionsClick(object sender, RibbonControlEventArgs e)

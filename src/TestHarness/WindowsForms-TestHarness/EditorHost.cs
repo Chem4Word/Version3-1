@@ -9,6 +9,7 @@ using Chem4Word.ACME;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Chem4Word.Core.UI.Wpf;
 
 namespace WinFormsTestHarness
 {

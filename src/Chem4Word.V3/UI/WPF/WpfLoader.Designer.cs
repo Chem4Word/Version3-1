@@ -1,6 +1,6 @@
-﻿namespace WinFormsTestHarness
+﻿namespace Chem4Word.UI.WPF
 {
-    partial class EditorHost
+    partial class WpfLoader
     {
         /// <summary>
         /// Required designer variable.
@@ -28,41 +28,40 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WpfLoader));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.settingsControl1 = new Chem4Word.UI.WPF.SettingsControl();
             this.SuspendLayout();
-            // 
-            // openFileDialog1
-            // 
-            this.openFileDialog1.FileName = "openFileDialog1";
             // 
             // elementHost1
             // 
-            this.elementHost1.BackColor = System.Drawing.Color.White;
             this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost1.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.elementHost1.Location = new System.Drawing.Point(0, 0);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(952, 536);
-            this.elementHost1.TabIndex = 1;
+            this.elementHost1.Size = new System.Drawing.Size(784, 561);
+            this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = null;
+            this.elementHost1.Child = this.settingsControl1;
             // 
-            // EditorHost
+            // WpfLoader
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(952, 536);
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.elementHost1);
-            this.Name = "EditorHost";
-            this.Text = "ACME Editor Host";
-            this.Load += new System.EventHandler(this.EditorHost_Load);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "WpfLoader";
+            this.Text = "WpfLoader";
+            this.Load += new System.EventHandler(this.WpfLoader_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+
         private System.Windows.Forms.Integration.ElementHost elementHost1;
+        private SettingsControl settingsControl1;
     }
 }
-

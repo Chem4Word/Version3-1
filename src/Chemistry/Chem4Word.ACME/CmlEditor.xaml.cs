@@ -7,6 +7,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Core.UI.Wpf;
 
 namespace Chem4Word.ACME
 {

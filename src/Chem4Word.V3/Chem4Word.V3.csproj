@@ -385,6 +385,15 @@
       <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\WaitCursor.cs" />
+    <Compile Include="UI\WPF\SettingsControl.xaml.cs">
+      <DependentUpon>SettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WPF\WpfLoader.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\WPF\WpfLoader.Designer.cs">
+      <DependentUpon>WpfLoader.cs</DependentUpon>
+    </Compile>
     <Compile Include="WebServices\Chemspider.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -423,6 +432,7 @@
     <Content Include="Resources\About Images\C4W Background 512.png" />
     <Content Include="Resources\Button Images\ArrowLeft.png" />
     <Content Include="Resources\Button Images\ArrowRight.png" />
+    <Content Include="Resources\Button Images\Code.png" />
     <Content Include="Resources\Button Images\DocumentFind.png" />
     <Content Include="Resources\Button Images\DocumentMake.png" />
     <Content Include="Resources\Button Images\Export.png" />
@@ -496,6 +506,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\UserControls\UcMoleculeLabelEditor.resx">
       <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\WPF\WpfLoader.resx">
+      <DependentUpon>WpfLoader.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\XmlViewer.resx">
       <DependentUpon>XmlViewer.cs</DependentUpon>
@@ -630,6 +643,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Navigator\NavigatorViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\WPF\SettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

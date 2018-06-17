@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.Core.UI.Wpf
 {
     public class WpfEventArgs : EventArgs
     {

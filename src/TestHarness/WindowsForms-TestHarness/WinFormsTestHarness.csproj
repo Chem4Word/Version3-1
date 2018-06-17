@@ -160,6 +160,10 @@
       <Project>{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}</Project>
       <Name>Chem4Word.ViewModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Common\Chem4Word.Core\Chem4Word.Core.csproj">
+      <Project>{2E7B1308-8149-4B03-9CB9-48E0B7151560}</Project>
+      <Name>Chem4Word.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="StackViewer.xaml">

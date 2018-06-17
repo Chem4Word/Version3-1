@@ -55,12 +55,13 @@ namespace Chem4Word
             this.ChangeOptions = this.Factory.CreateRibbonButton();
             this.HelpMenu = this.Factory.CreateRibbonMenu();
             this.ShowAbout = this.Factory.CreateRibbonButton();
-            this.ButtonsDisabled = this.Factory.CreateRibbonButton();
+            this.ShowHome = this.Factory.CreateRibbonButton();
+            this.CheckNow = this.Factory.CreateRibbonButton();
             this.ReadManual = this.Factory.CreateRibbonButton();
             this.YouTube = this.Factory.CreateRibbonButton();
-            this.CheckNow = this.Factory.CreateRibbonButton();
-            this.ShowHome = this.Factory.CreateRibbonButton();
+            this.ButtonsDisabled = this.Factory.CreateRibbonButton();
             this.Update = this.Factory.CreateRibbonButton();
+            this.OptionsWpf = this.Factory.CreateRibbonButton();
             this.Chem4WordV3.SuspendLayout();
             this.GroupInputOutput.SuspendLayout();
             this.GroupLibrary.SuspendLayout();
@@ -225,6 +226,7 @@ namespace Chem4Word
             // GroupOptions
             // 
             this.GroupOptions.Items.Add(this.ChangeOptions);
+            this.GroupOptions.Items.Add(this.OptionsWpf);
             this.GroupOptions.Items.Add(this.HelpMenu);
             this.GroupOptions.Items.Add(this.Update);
             this.GroupOptions.Label = "System";
@@ -263,13 +265,21 @@ namespace Chem4Word
             this.ShowAbout.ShowImage = true;
             this.ShowAbout.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnShowAboutClick);
             // 
-            // ButtonsDisabled
+            // ShowHome
             // 
-            this.ButtonsDisabled.Image = global::Chem4Word.Properties.Resources.Locked;
-            this.ButtonsDisabled.Label = "Buttons Disabled ...";
-            this.ButtonsDisabled.Name = "ButtonsDisabled";
-            this.ButtonsDisabled.ShowImage = true;
-            this.ButtonsDisabled.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ButtonsDisabled_Click);
+            this.ShowHome.Image = global::Chem4Word.Properties.Resources.Home;
+            this.ShowHome.Label = "Chem4Word Home";
+            this.ShowHome.Name = "ShowHome";
+            this.ShowHome.ShowImage = true;
+            this.ShowHome.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnShowHomeClick);
+            // 
+            // CheckNow
+            // 
+            this.CheckNow.Image = global::Chem4Word.Properties.Resources.SmallTick;
+            this.CheckNow.Label = "Check for Updates";
+            this.CheckNow.Name = "CheckNow";
+            this.CheckNow.ShowImage = true;
+            this.CheckNow.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnCheckForUpdatesClick);
             // 
             // ReadManual
             // 
@@ -288,21 +298,13 @@ namespace Chem4Word
             this.YouTube.ShowImage = true;
             this.YouTube.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnYouTubeClick);
             // 
-            // CheckNow
+            // ButtonsDisabled
             // 
-            this.CheckNow.Image = global::Chem4Word.Properties.Resources.SmallTick;
-            this.CheckNow.Label = "Check for Updates";
-            this.CheckNow.Name = "CheckNow";
-            this.CheckNow.ShowImage = true;
-            this.CheckNow.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnCheckForUpdatesClick);
-            // 
-            // ShowHome
-            // 
-            this.ShowHome.Image = global::Chem4Word.Properties.Resources.Home;
-            this.ShowHome.Label = "Chem4Word Home";
-            this.ShowHome.Name = "ShowHome";
-            this.ShowHome.ShowImage = true;
-            this.ShowHome.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnShowHomeClick);
+            this.ButtonsDisabled.Image = global::Chem4Word.Properties.Resources.Locked;
+            this.ButtonsDisabled.Label = "Buttons Disabled ...";
+            this.ButtonsDisabled.Name = "ButtonsDisabled";
+            this.ButtonsDisabled.ShowImage = true;
+            this.ButtonsDisabled.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ButtonsDisabled_Click);
             // 
             // Update
             // 
@@ -313,6 +315,16 @@ namespace Chem4Word
             this.Update.ScreenTip = "About Chem4Word";
             this.Update.ShowImage = true;
             this.Update.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnUpdateClick);
+            // 
+            // OptionsWpf
+            // 
+            this.OptionsWpf.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.OptionsWpf.Image = global::Chem4Word.Properties.Resources.Code;
+            this.OptionsWpf.Label = "Options";
+            this.OptionsWpf.Name = "OptionsWpf";
+            this.OptionsWpf.ScreenTip = "Set Chem4Word system options";
+            this.OptionsWpf.ShowImage = true;
+            this.OptionsWpf.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnOptionsWpfClick);
             // 
             // CustomRibbon
             // 
@@ -361,6 +373,7 @@ namespace Chem4Word
         internal Microsoft.Office.Tools.Ribbon.RibbonButton ReadManual;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton YouTube;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton ButtonsDisabled;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton OptionsWpf;
     }
 
     partial class ThisRibbonCollection
