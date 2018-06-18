@@ -42,11 +42,11 @@ namespace Chem4Word.UI.WPF
                 SettingsControl sc = new SettingsControl();
                 sc.InitializeComponent();
                 elementHost1.Child = sc;
-                sc.OnOkButtonClick += OnWpfOkButtonClick;
+                sc.OnButtonClick += OnWpfButtonClick;
             }
         }
 
-        private void OnWpfOkButtonClick(object sender, EventArgs e)
+        private void OnWpfButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
             if (args.Button.Equals("OK") || args.Button.Equals("SAVE"))

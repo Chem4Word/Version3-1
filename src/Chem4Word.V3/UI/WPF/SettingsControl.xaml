@@ -13,12 +13,36 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
-            <RowDefinition Height="45" />
+            <RowDefinition Height="55" />
         </Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Margin="10,10,10,0">
+        <TabControl Grid.Row="0" Margin="10,10,10,0" Background="{DynamicResource {x:Static SystemColors.ControlColor}}">
             <TabItem Header="Plug Ins">
                 <Grid>
-                    <Label Content="Describe the tab" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="3*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="350*"></ColumnDefinition>
+                            <ColumnDefinition Width="37*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Searcher" />
+                        <ComboBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,0,0,0">
+                            <ComboBoxItem>XX</ComboBoxItem>
+                            <ComboBoxItem>YY</ComboBoxItem>
+                        </ComboBox>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Describe the searcher" />
+                        <Button Grid.Row="1" Grid.Column="1" Width="36" Height="36">
+                            <Image Source="/Resources/Button Images/Preferences.png"></Image>
+                            </Button>
+                    </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="Web Services">
@@ -42,15 +66,17 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name="OkButton"
-            Grid.Row="1"
-            Width="75"
-            Height="26"
-            Margin="0,10,10,0"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Top"
-            Click="OkButton_Click"
-            Content="OK"
-            RenderTransformOrigin="0.638,0.771" />
+        <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button x:Name="OkButton"
+                    Width="75"
+                    Click="OkButton_Click"
+                    Margin="0,10,10,10"
+                    Content="OK" />
+            <Button x:Name="CancelButton"
+                    Width="75"
+                    Margin="0,10,10,0"
+                    Click="CancelButton_OnClickButton_Click"
+                    Content="Cancel" Height="35" VerticalAlignment="Top" />
+        </StackPanel>
     </Grid>
 </UserControl>

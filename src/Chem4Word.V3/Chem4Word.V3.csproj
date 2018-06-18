@@ -558,7 +558,7 @@
     <Content Include="Resources\Button Images\Label.png" />
     <Content Include="Resources\Button Images\LabelAdd.png" />
     <Content Include="Resources\Button Images\Options.png" />
-    <Content Include="Resources\Button Images\Preferences.png" />
+    <EmbeddedResource Include="Resources\Button Images\Preferences.png" />
     <Content Include="Resources\Button Images\Search.png" />
     <Content Include="Resources\Button Images\Show.png" />
     <Content Include="Resources\Button Images\SmallTick.png" />

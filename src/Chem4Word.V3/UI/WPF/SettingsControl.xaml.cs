@@ -23,7 +23,7 @@ namespace Chem4Word.UI.WPF
     /// </summary>
     public partial class SettingsControl : UserControl
     {
-        public event EventHandler OnOkButtonClick;
+        public event EventHandler OnButtonClick;
 
         public SettingsControl()
         {
@@ -33,10 +33,19 @@ namespace Chem4Word.UI.WPF
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
+            args.Button = "Ok";
             args.OutputValue = "";
-            args.Button = "OK";
 
-            OnOkButtonClick?.Invoke(this, args);
+            OnButtonClick?.Invoke(this, args);
+        }
+
+        private void CancelButton_OnClickButton_Click(object sender, RoutedEventArgs e)
+        {
+            WpfEventArgs args = new WpfEventArgs();
+            args.Button = "Cancel";
+            args.OutputValue = "";
+
+            OnButtonClick?.Invoke(this, args);
         }
     }
 }
