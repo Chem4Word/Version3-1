@@ -43,13 +43,14 @@ namespace Chem4Word.UI.WPF
                 sc.InitializeComponent();
                 elementHost1.Child = sc;
                 sc.OnButtonClick += OnWpfButtonClick;
+                Text = "Chem4Word Settings";
             }
         }
 
         private void OnWpfButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
-            if (args.Button.Equals("OK") || args.Button.Equals("SAVE"))
+            if (args.Button.Equals("Ok"))
             {
                 Result = DialogResult.OK;
                 OutputValue = args.OutputValue;
