@@ -36,21 +36,24 @@
                         </GroupBox.Header>
                         <DockPanel>
                             <DockPanel Dock="Top">
-                                <Button
+                                <Button Name="SelectedEditorSettings"
                                     Width="36"
                                     Height="36"
                                     Margin="5,5,10,5"
+                                    Click="SelectedEditorSettings_OnClick"
                                     DockPanel.Dock="Right">
                                     <Image x:Name="EditorSettingsButtonImage"
                                         Margin="1,1,1,1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox Margin="10,5,5,5">
+                                <ComboBox x:Name="SelectEditorPlugIn" Margin="10,5,5,5">
                                     <ComboBoxItem>XX</ComboBoxItem>
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <Label Margin="10,5" Content="Description of the editor ..." />
+                            <Label x:Name="EditorPlugInDescription"
+                                Margin="10,5"
+                                Content="Description of the editor ..." />
                         </DockPanel>
                     </GroupBox>
                     <GroupBox
@@ -62,21 +65,24 @@
                         </GroupBox.Header>
                         <DockPanel>
                             <DockPanel Dock="Top">
-                                <Button
+                                <Button x:Name="SelectedRendererSettings"
                                     Width="36"
                                     Height="36"
                                     Margin="5,5,10,5"
+                                    Click="SelectedRendererSettings_OnClick"
                                     DockPanel.Dock="Right">
                                     <Image x:Name="RendererSettingsButtonImage"
                                         Margin="1,1,1,1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox Margin="10,5,5,5">
+                                <ComboBox x:Name="SelectRenderer" Margin="10,5,5,5">
                                     <ComboBoxItem>XX</ComboBoxItem>
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <Label Margin="10,5" Content="Description of the renderer ..." />
+                            <Label x:Name="SelectedRendererDescription"
+                                Margin="10,5"
+                                Content="Description of the renderer ..." />
                         </DockPanel>
                     </GroupBox>
                     <GroupBox
@@ -88,21 +94,24 @@
                         </GroupBox.Header>
                         <DockPanel>
                             <DockPanel Dock="Top">
-                                <Button
+                                <Button x:Name="SelectedSearcherSettings"
                                     Width="36"
                                     Height="36"
                                     Margin="5,5,10,5"
+                                    Click="SelectedSearcherSettings_OnClick"
                                     DockPanel.Dock="Right">
                                     <Image x:Name="SearcherSettingsButtonImage"
                                         Margin="1,1,1,1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox Margin="10,5,5,5">
+                                <ComboBox x:Name="SelectSearcher" Margin="10,5,5,5">
                                     <ComboBoxItem>XX</ComboBoxItem>
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <Label Margin="10,5" Content="Description of the renderer ..." />
+                            <Label x:Name="SelectedSearcherDescription"
+                                Margin="10,5"
+                                Content="Description of the renderer ..." />
                         </DockPanel>
                     </GroupBox>
                 </Grid>

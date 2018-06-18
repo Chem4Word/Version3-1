@@ -71,6 +71,8 @@ namespace Chem4Word.UI.WPF
                     Top = (int)TopLeft.Y;
                 }
 
+                MinimumSize = new Size(800, 600);
+
                 // Do something here ...
             }
             catch (Exception ex)

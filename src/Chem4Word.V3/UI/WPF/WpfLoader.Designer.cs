@@ -30,7 +30,6 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WpfLoader));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.settingsControl1 = new Chem4Word.UI.WPF.SettingsControl();
             this.SuspendLayout();
             // 
             // elementHost1
@@ -42,7 +41,7 @@
             this.elementHost1.Size = new System.Drawing.Size(784, 561);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.settingsControl1;
+            this.elementHost1.Child = null;
             // 
             // WpfLoader
             // 
@@ -62,6 +61,5 @@
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private SettingsControl settingsControl1;
     }
 }

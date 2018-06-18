@@ -8,6 +8,7 @@
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,6 +62,21 @@ namespace Chem4Word.UI.WPF
                 RendererSettingsButtonImage.Source = bitmap;
                 SearcherSettingsButtonImage.Source = bitmap;
             }
+        }
+
+        private void SelectedEditorSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void SelectedRendererSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void SelectedSearcherSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
         }
     }
 }
