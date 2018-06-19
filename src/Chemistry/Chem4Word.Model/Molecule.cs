@@ -56,7 +56,7 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            if (m != null & Atoms.Any())
+            if (m != null & Atoms.Count>1)
             {
                 var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
                 var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
@@ -65,6 +65,10 @@ namespace Chem4Word.Model
                 var yMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Top).Min();
 
                 _boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            }
+            else if (m != null & Atoms.Count == 1)
+            {
+                _boundingBox = Atoms[0].BoundingBox(Model.FontSize);
             }
             else
             {
