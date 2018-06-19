@@ -27,7 +27,7 @@ namespace Chem4Word.ViewModel.Adorners
         protected Thumb BigThumb; //this is the main grab area for the molecule
 
         protected readonly VisualCollection VisualChildren;
-        protected TranslateTransform LastTranslation;
+        protected Transform LastOperation;
 
         protected bool Dragging;
      
@@ -67,7 +67,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         
 
-        private void AttachHandlers()
+        protected virtual void AttachHandlers()
         {
             //wire up the event handling
             MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
@@ -82,7 +82,7 @@ namespace Chem4Word.ViewModel.Adorners
             }
         }
 
-        private void ThisAdorner_KeyDown(object sender, KeyEventArgs e)
+        protected void ThisAdorner_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.Delete))
             {
@@ -103,17 +103,17 @@ namespace Chem4Word.ViewModel.Adorners
             }
         }
 
-        private void AbortDragging()
+        protected virtual void AbortDragging()
         {
             Dragging = false;
       
-            LastTranslation = null;
+            LastOperation = null;
             InvalidateVisual();
         }
 
 
 
-        private void DragStarted(object sender, DragStartedEventArgs e)
+        protected virtual void DragStarted(object sender, DragStartedEventArgs e)
         {
             Dragging = true;
             Keyboard.Focus(this);
@@ -158,8 +158,8 @@ namespace Chem4Word.ViewModel.Adorners
                 //take a snapshot of the molecule
 
                 var fragImage = Frag.Ghost();
-                Debug.WriteLine(LastTranslation.ToString());
-                fragImage.Transform = LastTranslation;
+                Debug.WriteLine(LastOperation.ToString());
+                fragImage.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
                 drawingContext.DrawGeometry(RenderBrush, BorderPen, fragImage);
 
@@ -185,9 +185,9 @@ namespace Chem4Word.ViewModel.Adorners
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
             var bbb = Frag.BoundingBox;
 
-            if (LastTranslation != null)
+            if (LastOperation != null)
             {
-                bbb = LastTranslation.TransformBounds(bbb);
+                bbb = LastOperation.TransformBounds(bbb);
             }
 
             //put a box right around the entire shebang
@@ -223,7 +223,7 @@ namespace Chem4Word.ViewModel.Adorners
             
 
             StartPos = new Point(Canvas.GetLeft(BigThumb), Canvas.GetTop(BigThumb));
-            LastTranslation = new TranslateTransform();
+            LastOperation = new TranslateTransform();
         }
 
         private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -231,8 +231,10 @@ namespace Chem4Word.ViewModel.Adorners
             DragXTravel += e.HorizontalChange;
             DragYTravel += e.VerticalChange;
 
-            LastTranslation.X = DragXTravel;
-            LastTranslation.Y = DragYTravel;
+            var lastTranslation = (TranslateTransform) LastOperation;
+
+            lastTranslation.X = DragXTravel;
+            lastTranslation.Y = DragYTravel;
 
 
             Canvas.SetLeft(BigThumb, StartPos.X + DragXTravel);
@@ -251,16 +253,17 @@ namespace Chem4Word.ViewModel.Adorners
         /// <param name="e"></param>
         private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-
-            LastTranslation.X = DragXTravel;
-            LastTranslation.Y = DragYTravel;
+            //wire up the event handling
+            var lastTranslation = (TranslateTransform)LastOperation;
+            lastTranslation.X = DragXTravel;
+            lastTranslation.Y = DragYTravel;
 
 
             SetBoundingBox();
             InvalidateVisual();
 
             //move the molecule
-            CurrentModel.DoOperation(LastTranslation, AdornedMolecule.Atoms.ToList());
+            CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.ToList());
             DragResizeCompleted?.Invoke(this, e);
             Dragging = false;
         }
