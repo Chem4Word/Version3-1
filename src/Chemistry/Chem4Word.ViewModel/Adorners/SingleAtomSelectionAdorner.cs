@@ -51,7 +51,7 @@ namespace Chem4Word.ViewModel.Adorners
            
             BuildBigDragArea();
 
-            AttachHandlers();
+            AttachHandler();
 
             Frag = molecule;
 
@@ -67,7 +67,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         
 
-        protected virtual void AttachHandlers()
+        protected void AttachHandler()
         {
             //wire up the event handling
             MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;

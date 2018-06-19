@@ -18,7 +18,7 @@ using System.Windows.Media;
 
 namespace Chem4Word.ViewModel.Adorners
 {
-    public class MoleculeSelectionAdorner : Adorner
+    public class MoleculeSelectionAdorner2 : Adorner
     {
         //static as they need to be set only when the adorner is first created
         private static double? _thumbWidth;
@@ -62,7 +62,7 @@ namespace Chem4Word.ViewModel.Adorners
         private Brush _bigBrush;
         private Point _startPos;
 
-        public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
+        public MoleculeSelectionAdorner2(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
         {
             CurrentModel = currentModel;

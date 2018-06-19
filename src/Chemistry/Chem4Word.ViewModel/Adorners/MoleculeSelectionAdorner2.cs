@@ -18,7 +18,7 @@ using System.Windows.Media;
 
 namespace Chem4Word.ViewModel.Adorners
 {
-    public class MoleculeSelectionAdorner2 : SingleAtomSelectionAdorner
+    public class MoleculeSelectionAdorner : SingleAtomSelectionAdorner
     {
         //static as they need to be set only when the adorner is first created
         private static double? _thumbWidth;
@@ -48,7 +48,7 @@ namespace Chem4Word.ViewModel.Adorners
         private readonly Brush _renderBrush;
 
 
-        public MoleculeSelectionAdorner2(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
+        public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement, molecule, currentModel)
         {
 
@@ -71,9 +71,9 @@ namespace Chem4Word.ViewModel.Adorners
             //no need to add the adroner in at this point as the base has already done it
         }
 
-        protected override void AttachHandlers()
+        protected  void AttachHandlers()
         {
-            base.AttachHandlers();
+            AttachHandler();
             //wire up the event handling
 
             TopLeftHandle.DragStarted += ResizeStarted;
@@ -171,14 +171,15 @@ namespace Chem4Word.ViewModel.Adorners
 
         /// <summary>
      
-
-     
+            
         /// <summary>
         /// Override this to
         /// </summary>
         /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
         {
+            base.OnRender(drawingContext);
+
             if (IsWorking)
             {
                 object elem = AdornedElement;
@@ -192,7 +193,6 @@ namespace Chem4Word.ViewModel.Adorners
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
                 drawingContext.DrawGeometry(RenderBrush, BorderPen, fragImage);
 
-                base.OnRender(drawingContext);
             }
         }
 
@@ -225,6 +225,8 @@ namespace Chem4Word.ViewModel.Adorners
         // Arrange the Adorners.
         protected override Size ArrangeOverride(Size finalSize)
         {
+           
+
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
             var bbb = Frag.BoundingBox;
@@ -233,6 +235,8 @@ namespace Chem4Word.ViewModel.Adorners
             {
                 bbb = LastOperation.TransformBounds(bbb);
             }
+
+            
 
             TopLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
             TopRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value,
@@ -251,7 +255,10 @@ namespace Chem4Word.ViewModel.Adorners
             RotateHandle.Arrange(new Rect(xplacement, yplacement, RotateHandle.Width, RotateHandle.Height));
             // Return the final size.
             //BoundingBox = bbb;
+            base.ArrangeOverride(finalSize);
             return finalSize;
+
+            
         }
 
         #region Events
