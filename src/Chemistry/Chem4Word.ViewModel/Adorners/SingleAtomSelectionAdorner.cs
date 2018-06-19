@@ -22,7 +22,7 @@ namespace Chem4Word.ViewModel.Adorners
     {
         //static as they need to be set only when the adorner is first created
 
-        protected readonly Molecule Frag;
+
 
         protected Thumb BigThumb; //this is the main grab area for the molecule
 
@@ -53,7 +53,7 @@ namespace Chem4Word.ViewModel.Adorners
 
             AttachHandler();
 
-            Frag = molecule;
+            AdornedMolecule = molecule;
 
             BorderPen = (Pen)FindResource("GrabHandlePen");
             RenderBrush = (Brush)FindResource("BigThumbFillBrush");
@@ -124,7 +124,7 @@ namespace Chem4Word.ViewModel.Adorners
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            Frag.ResetBoundingBox();
+            AdornedMolecule.ResetBoundingBox();
         }
 
         /// <summary>
@@ -157,11 +157,11 @@ namespace Chem4Word.ViewModel.Adorners
 
                 //take a snapshot of the molecule
 
-                var fragImage = Frag.Ghost();
+                var AdornedMoleculeImage = AdornedMolecule.Ghost();
                 Debug.WriteLine(LastOperation.ToString());
-                fragImage.Transform = LastOperation;
+                AdornedMoleculeImage.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, fragImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
 
                 base.OnRender(drawingContext);
             }
@@ -174,7 +174,8 @@ namespace Chem4Word.ViewModel.Adorners
         // the adorner's visual collection.
         protected override int VisualChildrenCount => VisualChildren.Count;
 
-        public Molecule AdornedMolecule => Frag;
+        public Molecule AdornedMolecule { get; set; }
+    
 
         protected override Visual GetVisualChild(int index) => VisualChildren[index];
 
@@ -183,7 +184,7 @@ namespace Chem4Word.ViewModel.Adorners
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = Frag.BoundingBox;
+            var bbb = AdornedMolecule.BoundingBox;
 
             if (LastOperation != null)
             {

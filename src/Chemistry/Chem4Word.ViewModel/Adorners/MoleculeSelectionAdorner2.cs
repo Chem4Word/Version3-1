@@ -94,6 +94,7 @@ namespace Chem4Word.ViewModel.Adorners
             Resizing=true;
             Dragging = false;
             Keyboard.Focus(this);
+            BoundingBox = AdornedMolecule.BoundingBox;
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
         }
@@ -133,7 +134,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void SetCentroid()
         {
-            _centroid = Frag.Centroid;
+            _centroid = AdornedMolecule.Centroid;
             //create a snapper
             //_rotateSnapper = new SnapGeometry(_centroid, 15);
         }
@@ -146,7 +147,7 @@ namespace Chem4Word.ViewModel.Adorners
             {
                 _rotateAngle = ((RotateTransform)LastOperation).Angle;
 
-                Frag.Move(LastOperation);
+                AdornedMolecule.Move(LastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
                 DragResizeCompleted?.Invoke(this, dragCompletedEventArgs);
@@ -160,8 +161,8 @@ namespace Chem4Word.ViewModel.Adorners
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            Frag.ResetBoundingBox();
-            BoundingBox = Frag.BoundingBox;
+            AdornedMolecule.ResetBoundingBox();
+            BoundingBox = AdornedMolecule.BoundingBox;
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
@@ -187,11 +188,11 @@ namespace Chem4Word.ViewModel.Adorners
 
                 //take a snapshot of the molecule
 
-                var fragImage = Frag.Ghost();
+                var AdornedMoleculeImage = AdornedMolecule.Ghost();
                 Debug.WriteLine(LastOperation.ToString());
-                fragImage.Transform = LastOperation;
+                AdornedMoleculeImage.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, fragImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
 
             }
         }
@@ -218,8 +219,6 @@ namespace Chem4Word.ViewModel.Adorners
         // the adorner's visual collection.
         protected override int VisualChildrenCount => VisualChildren.Count;
 
-        public Molecule AdornedMolecule => Frag;
-
         protected override Visual GetVisualChild(int index) => VisualChildren[index];
 
         // Arrange the Adorners.
@@ -229,7 +228,7 @@ namespace Chem4Word.ViewModel.Adorners
 
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = Frag.BoundingBox;
+            var bbb = AdornedMolecule.BoundingBox;
 
             if (LastOperation != null)
             {
@@ -263,7 +262,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         #region Events
 
-        public event DragCompletedEventHandler DragResizeCompleted;
+        public new event DragCompletedEventHandler DragResizeCompleted;
 
         #endregion Events
 
@@ -277,9 +276,9 @@ namespace Chem4Word.ViewModel.Adorners
             DragYTravel += args.VerticalChange;
         }
 
-        private void ResizeFrag(Molecule frag, double left, double top, double right, double bottom)
+        private void ResizeAdornedMolecule(Molecule AdornedMolecule, double left, double top, double right, double bottom)
         {
-            //work out the centroid of where we want to place the fragment
+            //work out the centroid of where we want to place the AdornedMoleculement
             var centreX = left + right / 2;
             var centreY = top + bottom / 2;
             Debug.WriteLine("CenterX={0}, CenterY ={1}, Right={2}, Left={3}, Top={4}, Bottom={5}", centreX, centreY, right, left, top, bottom);
