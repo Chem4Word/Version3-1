@@ -134,7 +134,8 @@
                                 DockPanel.Dock="Left" />
                             <TextBox x:Name="ChemSpiderWebServiceUri"
                                 Margin="5,0,0,0"
-                                Text="https://www.chemspider.com" />
+                                Text="https://www.chemspider.com"
+                                TextChanged="ChemSpiderWebServiceUri_OnTextChanged" />
                         </DockPanel>
                         <DockPanel Margin="0,5,5,0">
                             <Label
@@ -144,7 +145,8 @@
                                 Content="ChemSpider Rdf Service Uri:" />
                             <TextBox x:Name="ChemSpiderRdfServiceUri"
                                 Margin="5,0,0,0"
-                                Text="https://rdf.chemspider.com" />
+                                Text="https://rdf.chemspider.com"
+                                TextChanged="ChemSpiderRdfServiceUri_OnTextChanged" />
                         </DockPanel>
                     </StackPanel>
                 </Grid>
@@ -336,17 +338,26 @@
             Grid.Row="1"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
+            <Button x:Name="DefaultsButton"
+                Width="80"
+                Height="32"
+                Margin="5"
+                VerticalAlignment="Center"
+                Click="DefaultsButton_OnClick"
+                Content="Defaults" />
             <Button x:Name="OkButton"
-                Width="75"
-                Margin="0,10,10,10"
+                Width="80"
+                Height="32"
+                Margin="5"
+                VerticalAlignment="Center"
                 Click="OkButton_Click"
                 Content="OK" />
             <Button x:Name="CancelButton"
-                Width="75"
-                Height="35"
-                Margin="0,10,10,0"
-                VerticalAlignment="Top"
-                Click="CancelButton_OnClickButton_Click"
+                Width="80"
+                Height="32"
+                Margin="5"
+                VerticalAlignment="Center"
+                Click="CancelButton_OnClick"
                 Content="Cancel" />
         </StackPanel>
     </Grid>

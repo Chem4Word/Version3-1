@@ -29,6 +29,8 @@ namespace Chem4Word.UI.WPF
             InitializeComponent();
         }
 
+        #region Bottom Buttons
+
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
@@ -38,7 +40,7 @@ namespace Chem4Word.UI.WPF
             OnButtonClick?.Invoke(this, args);
         }
 
-        private void CancelButton_OnClickButton_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
             args.Button = "Cancel";
@@ -47,18 +49,14 @@ namespace Chem4Word.UI.WPF
             OnButtonClick?.Invoke(this, args);
         }
 
-        private BitmapImage CreateImageFromStream(Stream stream)
+        private void DefaultsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var bitmap = new BitmapImage();
-
-            bitmap.BeginInit();
-            bitmap.StreamSource = stream;
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            bitmap.Freeze();
-
-            return bitmap;
+            Debugger.Break();
         }
+
+        #endregion Bottom Buttons
+
+        #region Form Load
 
         private void SettingsControl_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -104,6 +102,27 @@ namespace Chem4Word.UI.WPF
             }
         }
 
+        #endregion Form Load
+
+        #region Private methods
+
+        private BitmapImage CreateImageFromStream(Stream stream)
+        {
+            var bitmap = new BitmapImage();
+
+            bitmap.BeginInit();
+            bitmap.StreamSource = stream;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            return bitmap;
+        }
+
+        #endregion Private methods
+
+        #region Tab 1 Events
+
         private void SelectedEditorSettings_OnClick(object sender, RoutedEventArgs e)
         {
             Debugger.Break();
@@ -118,6 +137,33 @@ namespace Chem4Word.UI.WPF
         {
             Debugger.Break();
         }
+
+        #endregion Tab 1 Events
+
+        #region Tab 2 Events
+
+        private void ChemSpiderWebServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void ChemSpiderRdfServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        #endregion Tab 2 Events
+
+        #region Tab 3 Events
+
+        private void TelemetryEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        #endregion Tab 3 Events
+
+        #region Tab 4 Events
 
         private void ImportIntoLibrary_OnClick(object sender, RoutedEventArgs e)
         {
@@ -134,6 +180,10 @@ namespace Chem4Word.UI.WPF
             Debugger.Break();
         }
 
+        #endregion Tab 4 Events
+
+        #region Tab 5 Events
+
         private void SelectEditorPlugIn_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Debugger.Break();
@@ -145,11 +195,6 @@ namespace Chem4Word.UI.WPF
         }
 
         private void SelectSearcher_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Debugger.Break();
-        }
-
-        private void TelemetryEnabled_OnClick(object sender, RoutedEventArgs e)
         {
             Debugger.Break();
         }
@@ -168,5 +213,7 @@ namespace Chem4Word.UI.WPF
         {
             Debugger.Break();
         }
+
+        #endregion Tab 5 Events
     }
 }
