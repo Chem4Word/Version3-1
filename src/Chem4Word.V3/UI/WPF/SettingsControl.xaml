@@ -2,6 +2,7 @@
     x:Class="Chem4Word.UI.WPF.SettingsControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:System="clr-namespace:System;assembly=mscorlib"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Chem4Word.UI.WPF"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,6 +12,11 @@
     FontSize="18"
     Loaded="SettingsControl_OnLoaded"
     mc:Ignorable="d">
+    <!--
+        Need to style the tops of th tabs
+        This site should help
+        https://www.codeproject.com/Tips/485099/Styling-WPF-TabControl-Borders
+    -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -136,7 +142,6 @@
                                 Margin="0,0,5,0"
                                 HorizontalContentAlignment="Right"
                                 Content="ChemSpider Rdf Service Uri:" />
-
                             <TextBox x:Name="ChemSpiderRdfServiceUri"
                                 Margin="5,0,0,0"
                                 Text="https://rdf.chemspider.com" />

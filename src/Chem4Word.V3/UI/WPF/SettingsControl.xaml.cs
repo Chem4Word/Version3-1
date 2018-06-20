@@ -102,7 +102,6 @@ namespace Chem4Word.UI.WPF
                 SettingsFolderButtonImage.Source = bitmap;
                 PlugInsFolderButtonImage.Source = bitmap;
             }
-
         }
 
         private void SelectedEditorSettings_OnClick(object sender, RoutedEventArgs e)
