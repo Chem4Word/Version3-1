@@ -154,7 +154,7 @@
                         Grid.Row="0"
                         HorizontalAlignment="Left"
                         VerticalContentAlignment="Center"
-                               Click="TelemetryEnabled_OnClick"
+                        Click="TelemetryEnabled_OnClick"
                         Content="Telemetry Enabled" />
                     <TextBlock
                         Grid.Row="1"
@@ -172,6 +172,7 @@
                                     Width="120"
                                     Margin="5"
                                     VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Left"
                                     Click="ImportIntoLibrary_OnClick"
                                     DockPanel.Dock="Left">
                                     <StackPanel Orientation="Horizontal">
@@ -196,6 +197,7 @@
                                     Width="120"
                                     Margin="5"
                                     VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Left"
                                     Click="ExportFromLibrary_OnClick"
                                     DockPanel.Dock="Left">
                                     <StackPanel Orientation="Horizontal">
@@ -214,12 +216,13 @@
                                     TextWrapping="Wrap" />
                             </DockPanel>
                         </GroupBox>
-                        <GroupBox BorderThickness="2" Header="Erase">
+                        <GroupBox BorderThickness="2" Header="Clear">
                             <DockPanel>
                                 <Button x:Name="EraseLibrary"
                                     Width="120"
                                     Margin="5"
                                     VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Left"
                                     Click="EraseLibrary_OnClick"
                                     DockPanel.Dock="Left">
                                     <StackPanel Orientation="Horizontal">
@@ -228,7 +231,7 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/Gallery-Delete.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Erase" />
+                                        <Label VerticalContentAlignment="Center" Content="Clear" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock
@@ -242,8 +245,85 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Maintenance">
-                <Grid>
-                    <Label Content="This is the Maintenance Tab" />
+                <Grid Margin="5">
+                    <StackPanel>
+                        <Label Content="You should back up the contents of these folders regularily." />
+                        <GroupBox BorderThickness="2" Header="Settings">
+                            <DockPanel>
+                                <Button x:Name="SettingsFolder"
+                                    Width="120"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Left"
+                                    Click="SettingsFolder_OnClick"
+                                    DockPanel.Dock="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="SettingsFolderButtonImage"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="5"
+                                            Source="/Resources/Button Images/Office-2016/File-Open.png" />
+                                        <Label VerticalContentAlignment="Center" Content="Open" />
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Text="This folder is where Chem4Word stores your personal settings."
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+                        </GroupBox>
+                        <GroupBox BorderThickness="2" Header="Library">
+                            <DockPanel>
+                                <Button x:Name="LibraryFolder"
+                                    Width="120"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Left"
+                                    Click="LibraryFolder_OnClick"
+                                    DockPanel.Dock="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="LibraryFolderButtonImage"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="5"
+                                            Source="/Resources/Button Images/Office-2016/File-Open.png" />
+                                        <Label VerticalContentAlignment="Center" Content="Open" />
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Text="This folder is where Chem4Word stores your library."
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+                        </GroupBox>
+                        <GroupBox BorderThickness="2" Header="Plug-Ins">
+                            <DockPanel>
+                                <Button x:Name="PlugInsFolder"
+                                    Width="120"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    HorizontalContentAlignment="Left"
+                                    Click="PlugInsFolder_OnClick"
+                                    DockPanel.Dock="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="PlugInsFolderButtonImage"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="5"
+                                            Source="/Resources/Button Images/Office-2016/File-Open.png" />
+                                        <Label VerticalContentAlignment="Center" Content="Open" />
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Text="This folder is where the Chem4Word Plug-Ins are installed."
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+                        </GroupBox>
+                    </StackPanel>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -92,6 +92,17 @@ namespace Chem4Word.UI.WPF
                 var bitmap = CreateImageFromStream(imageStream);
                 EraseLibraryButtonImage.Source = bitmap;
             }
+
+            // Tab 5 Maintenance
+            imageStream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "File-Open.png");
+            if (imageStream != null)
+            {
+                var bitmap = CreateImageFromStream(imageStream);
+                LibraryFolderButtonImage.Source = bitmap;
+                SettingsFolderButtonImage.Source = bitmap;
+                PlugInsFolderButtonImage.Source = bitmap;
+            }
+
         }
 
         private void SelectedEditorSettings_OnClick(object sender, RoutedEventArgs e)
@@ -140,6 +151,21 @@ namespace Chem4Word.UI.WPF
         }
 
         private void TelemetryEnabled_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void SettingsFolder_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void LibraryFolder_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void PlugInsFolder_OnClick(object sender, RoutedEventArgs e)
         {
             Debugger.Break();
         }
