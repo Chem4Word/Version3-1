@@ -118,7 +118,47 @@
             </TabItem>
             <TabItem Header="Web Services">
                 <Grid>
-                    <Label Content="Describe the tab" />
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100*" />
+                        <RowDefinition Height="100*" />
+                        <RowDefinition Height="400*" />
+                    </Grid.RowDefinitions>
+                    <Label
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Content="ChemSpider Web Service Uri:" />
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="0,0,5,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Content="ChemSpider Rdf Service Uri:" />
+                    <TextBox x:Name="ChemSpiderWebServiceUri"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Width="500"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Text="https://www.chemspider.com"
+                        TextWrapping="Wrap" />
+                    <TextBox x:Name="ChemSpiderRdfServiceUri"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Width="500"
+                        Margin="5,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Text="https://rdf.chemspider.com"
+                        TextWrapping="Wrap" />
                 </Grid>
             </TabItem>
             <TabItem Header="Privacy">
