@@ -86,9 +86,15 @@ namespace Chem4Word.ViewModel.Adorners
             BottomLeftHandle.DragDelta += BottomLeftHandleDragDelta;
             BottomRightHandle.DragDelta += BottomRightHandleDragDelta;
 
-            
+            TopLeftHandle.DragCompleted += ResizeCompleted;
+            TopRightHandle.DragCompleted += ResizeCompleted; ;
+            BottomLeftHandle.DragCompleted += ResizeCompleted; 
+            BottomRightHandle.DragCompleted += ResizeCompleted; ;
+
+
         }
 
+    
         private void ResizeStarted(object sender, DragStartedEventArgs e)
         {
             Resizing=true;
@@ -156,7 +162,23 @@ namespace Chem4Word.ViewModel.Adorners
             }
         }
 
-  
+
+        private void ResizeCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
+        {
+            Resizing = false;
+
+            if (LastOperation != null && LastOperation is ScaleTransform)
+            {
+                var atomList = AdornedMolecule.Atoms.ToList();
+                CurrentModel.DoOperation(LastOperation, atomList);
+                SetBoundingBox();
+                InvalidateVisual();
+                DragResizeCompleted?.Invoke(this, dragCompletedEventArgs);
+
+                SetCentroid();
+            }
+        }
+
 
         private void SetBoundingBox()
         {
