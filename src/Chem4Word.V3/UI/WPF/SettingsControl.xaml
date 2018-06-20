@@ -21,7 +21,7 @@
             Margin="10,10,10,0"
             Background="{DynamicResource {x:Static SystemColors.ControlColor}}">
             <TabItem Header="Plug Ins">
-                <Grid>
+                <Grid Margin="5">
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
@@ -29,95 +29,95 @@
                     </Grid.RowDefinitions>
                     <GroupBox
                         Grid.Row="0"
-                        Margin="5"
-                        BorderThickness="2">
-                        <GroupBox.Header>
-                            <Label Content="Editor" />
-                        </GroupBox.Header>
+                        BorderThickness="2"
+                        Header="Editor">
                         <DockPanel>
                             <DockPanel Dock="Top">
                                 <Button Name="SelectedEditorSettings"
-                                    Width="36"
-                                    Height="36"
-                                    Margin="5,5,10,5"
+                                    Width="34"
+                                    Height="34"
+                                    Margin="5"
                                     Click="SelectedEditorSettings_OnClick"
                                     DockPanel.Dock="Right">
                                     <Image x:Name="EditorSettingsButtonImage"
-                                        Margin="1,1,1,1"
+                                        Margin="1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox x:Name="SelectEditorPlugIn" Margin="10,5,5,5">
+                                <ComboBox x:Name="SelectEditorPlugIn"
+                                    Margin="5"
+                                    SelectionChanged="SelectEditorPlugIn_OnSelectionChanged">
                                     <ComboBoxItem>XX</ComboBoxItem>
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <Label x:Name="EditorPlugInDescription"
-                                Margin="10,5"
-                                Content="Description of the editor ..." />
+                            <TextBlock x:Name="EditorPlugInDescription"
+                                Margin="5"
+                                Text="Description of the editor ..."
+                                TextWrapping="Wrap" />
                         </DockPanel>
                     </GroupBox>
                     <GroupBox
                         Grid.Row="1"
-                        Margin="5"
-                        BorderThickness="2">
-                        <GroupBox.Header>
-                            <Label Content="Renderer" />
-                        </GroupBox.Header>
+                        BorderThickness="2"
+                        Header="Renderer">
                         <DockPanel>
                             <DockPanel Dock="Top">
                                 <Button x:Name="SelectedRendererSettings"
-                                    Width="36"
-                                    Height="36"
-                                    Margin="5,5,10,5"
+                                    Width="34"
+                                    Height="34"
+                                    Margin="5"
                                     Click="SelectedRendererSettings_OnClick"
                                     DockPanel.Dock="Right">
                                     <Image x:Name="RendererSettingsButtonImage"
-                                        Margin="1,1,1,1"
+                                        Margin="1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox x:Name="SelectRenderer" Margin="10,5,5,5">
+                                <ComboBox x:Name="SelectRenderer"
+                                    Margin="5"
+                                    SelectionChanged="SelectRenderer_OnSelectionChanged">
                                     <ComboBoxItem>XX</ComboBoxItem>
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <Label x:Name="SelectedRendererDescription"
-                                Margin="10,5"
-                                Content="Description of the renderer ..." />
+                            <TextBlock x:Name="SelectedRendererDescription"
+                                Margin="5"
+                                Text="Description of the renderer ..."
+                                TextWrapping="Wrap" />
                         </DockPanel>
                     </GroupBox>
                     <GroupBox
                         Grid.Row="2"
-                        Margin="5"
-                        BorderThickness="2">
-                        <GroupBox.Header>
-                            <Label Content="Searcher" />
-                        </GroupBox.Header>
+                        BorderThickness="2"
+                        Header="Searcher">
                         <DockPanel>
                             <DockPanel Dock="Top">
                                 <Button x:Name="SelectedSearcherSettings"
-                                    Width="36"
-                                    Height="36"
-                                    Margin="5,5,10,5"
+                                    Width="34"
+                                    Height="34"
+                                    Margin="5"
                                     Click="SelectedSearcherSettings_OnClick"
                                     DockPanel.Dock="Right">
                                     <Image x:Name="SearcherSettingsButtonImage"
-                                        Margin="1,1,1,1"
+                                        Margin="1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox x:Name="SelectSearcher" Margin="10,5,5,5">
+                                <ComboBox x:Name="SelectSearcher"
+                                    Margin="5"
+                                    SelectionChanged="SelectSearcher_OnSelectionChanged">
                                     <ComboBoxItem>XX</ComboBoxItem>
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <Label x:Name="SelectedSearcherDescription"
-                                Margin="10,5"
-                                Content="Description of the renderer ..." />
+                            <TextBlock x:Name="SelectedSearcherDescription"
+                                Margin="5"
+                                Text="Description of the renderer ..."
+                                TextWrapping="Wrap" />
                         </DockPanel>
                     </GroupBox>
                 </Grid>
             </TabItem>
             <TabItem Header="Web Services">
-                <Grid>
+                <Grid Margin="5">
                     <StackPanel>
                         <DockPanel Margin="0,10,5,0">
                             <Label
@@ -142,18 +142,103 @@
                                 Text="https://rdf.chemspider.com" />
                         </DockPanel>
                     </StackPanel>
-
-
                 </Grid>
             </TabItem>
             <TabItem Header="Privacy">
-                <Grid>
-                    <Label Content="This is the Privacy Tab" />
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="90*" />
+                    </Grid.RowDefinitions>
+                    <CheckBox x:Name="TelemetryEnabled"
+                        Grid.Row="0"
+                        HorizontalAlignment="Left"
+                        VerticalContentAlignment="Center"
+                               Click="TelemetryEnabled_OnClick"
+                        Content="Telemetry Enabled" />
+                    <TextBlock
+                        Grid.Row="1"
+                        Margin="25,0,0,0"
+                        Text="When you check this box, you are helping to improve the quality, reliability, and performance of this software. Chem4Word automatically collects information from your computer, including error messages and hardware and software information. Any information that is sent to us is anonymous. This information isn't used in advertising or sales in any way."
+                        TextWrapping="Wrap" />
                 </Grid>
             </TabItem>
             <TabItem Header="Library">
-                <Grid>
-                    <Label Content="This is the Libaray Tab" />
+                <Grid Margin="5">
+                    <StackPanel>
+                        <GroupBox BorderThickness="2" Header="Import">
+                            <DockPanel>
+                                <Button x:Name="ImportIntoLibrary"
+                                    Width="120"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Click="ImportIntoLibrary_OnClick"
+                                    DockPanel.Dock="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="ImportIntoLibraryButtonImage"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="5"
+                                            Source="/Resources/Button Images/Office-2016/Gallery-Toggle.png" />
+                                        <Label VerticalContentAlignment="Center" Content="Import" />
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Text="The Library replaces the Gallery from previous versions of Chem4Word. You can import structures from your old Gallery (or any other folder of cml files) into the Library."
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+                        </GroupBox>
+                        <GroupBox BorderThickness="2" Header="Export">
+                            <DockPanel>
+                                <Button x:Name="ExportFromLibrary"
+                                    Width="120"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Click="ExportFromLibrary_OnClick"
+                                    DockPanel.Dock="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="ExportFromLibraryButtonImage"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="5"
+                                            Source="/Resources/Button Images/Office-2016/Gallery-Save.png" />
+                                        <Label VerticalContentAlignment="Center" Content="Export" />
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Text="You can export all of your structures to cml files in a folder."
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+                        </GroupBox>
+                        <GroupBox BorderThickness="2" Header="Erase">
+                            <DockPanel>
+                                <Button x:Name="EraseLibrary"
+                                    Width="120"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Click="EraseLibrary_OnClick"
+                                    DockPanel.Dock="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image x:Name="EraseLibraryButtonImage"
+                                            Width="32"
+                                            Height="32"
+                                            Margin="5"
+                                            Source="/Resources/Button Images/Office-2016/Gallery-Delete.png" />
+                                        <Label VerticalContentAlignment="Center" Content="Erase" />
+                                    </StackPanel>
+                                </Button>
+                                <TextBlock
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    Text="If you wish to start again with a clean slate, you can erase all the structures in your library."
+                                    TextWrapping="Wrap" />
+                            </DockPanel>
+                        </GroupBox>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Maintenance">

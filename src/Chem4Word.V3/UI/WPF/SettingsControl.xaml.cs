@@ -9,6 +9,7 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,21 +47,50 @@ namespace Chem4Word.UI.WPF
             OnButtonClick?.Invoke(this, args);
         }
 
+        private BitmapImage CreateImageFromStream(Stream stream)
+        {
+            var bitmap = new BitmapImage();
+
+            bitmap.BeginInit();
+            bitmap.StreamSource = stream;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            return bitmap;
+        }
+
         private void SettingsControl_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // Tab 1 - Plug Ins
             var imageStream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "Preferences.png");
             if (imageStream != null)
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = imageStream;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
+                var bitmap = CreateImageFromStream(imageStream);
 
                 EditorSettingsButtonImage.Source = bitmap;
                 RendererSettingsButtonImage.Source = bitmap;
                 SearcherSettingsButtonImage.Source = bitmap;
+            }
+
+            // Tab 4 - Libaray
+            imageStream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "Gallery-Toggle.png");
+            if (imageStream != null)
+            {
+                var bitmap = CreateImageFromStream(imageStream);
+                ImportIntoLibraryButtonImage.Source = bitmap;
+            }
+            imageStream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "Gallery-Save.png");
+            if (imageStream != null)
+            {
+                var bitmap = CreateImageFromStream(imageStream);
+                ExportFromLibraryButtonImage.Source = bitmap;
+            }
+            imageStream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "Gallery-Delete.png");
+            if (imageStream != null)
+            {
+                var bitmap = CreateImageFromStream(imageStream);
+                EraseLibraryButtonImage.Source = bitmap;
             }
         }
 
@@ -75,6 +105,41 @@ namespace Chem4Word.UI.WPF
         }
 
         private void SelectedSearcherSettings_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void ImportIntoLibrary_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void ExportFromLibrary_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void EraseLibrary_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void SelectEditorPlugIn_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void SelectRenderer_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void SelectSearcher_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        private void TelemetryEnabled_OnClick(object sender, RoutedEventArgs e)
         {
             Debugger.Break();
         }
