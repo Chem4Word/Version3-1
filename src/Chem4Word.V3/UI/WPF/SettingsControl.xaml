@@ -118,62 +118,47 @@
             </TabItem>
             <TabItem Header="Web Services">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="2*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="100*" />
-                        <RowDefinition Height="100*" />
-                        <RowDefinition Height="400*" />
-                    </Grid.RowDefinitions>
-                    <Label
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Margin="0,0,5,0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Content="ChemSpider Web Service Uri:" />
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Margin="0,0,5,0"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Content="ChemSpider Rdf Service Uri:" />
-                    <TextBox x:Name="ChemSpiderWebServiceUri"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Width="500"
-                        Margin="5,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Text="https://www.chemspider.com"
-                        TextWrapping="Wrap" />
-                    <TextBox x:Name="ChemSpiderRdfServiceUri"
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Width="500"
-                        Margin="5,0,0,0"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Text="https://rdf.chemspider.com"
-                        TextWrapping="Wrap" />
+                    <StackPanel>
+                        <DockPanel Margin="0,10,5,0">
+                            <Label
+                                Width="250"
+                                Margin="0,0,5,0"
+                                HorizontalContentAlignment="Right"
+                                Content="ChemSpider Web Service Uri:"
+                                DockPanel.Dock="Left" />
+                            <TextBox x:Name="ChemSpiderWebServiceUri"
+                                Margin="5,0,0,0"
+                                Text="https://www.chemspider.com" />
+                        </DockPanel>
+                        <DockPanel Margin="0,5,5,0">
+                            <Label
+                                Width="250"
+                                Margin="0,0,5,0"
+                                HorizontalContentAlignment="Right"
+                                Content="ChemSpider Rdf Service Uri:" />
+
+                            <TextBox x:Name="ChemSpiderRdfServiceUri"
+                                Margin="5,0,0,0"
+                                Text="https://rdf.chemspider.com" />
+                        </DockPanel>
+                    </StackPanel>
+
+
                 </Grid>
             </TabItem>
             <TabItem Header="Privacy">
                 <Grid>
-                    <Label Content="Describe the tab" />
+                    <Label Content="This is the Privacy Tab" />
                 </Grid>
             </TabItem>
             <TabItem Header="Library">
                 <Grid>
-                    <Label Content="Describe the tab" />
+                    <Label Content="This is the Libaray Tab" />
                 </Grid>
             </TabItem>
             <TabItem Header="Maintenance">
                 <Grid>
-                    <Label Content="Describe the tab" />
+                    <Label Content="This is the Maintenance Tab" />
                 </Grid>
             </TabItem>
         </TabControl>
