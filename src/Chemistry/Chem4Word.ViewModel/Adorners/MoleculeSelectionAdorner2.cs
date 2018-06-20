@@ -86,10 +86,10 @@ namespace Chem4Word.ViewModel.Adorners
             BottomLeftHandle.DragDelta += BottomLeftHandleDragDelta;
             BottomRightHandle.DragDelta += BottomRightHandleDragDelta;
 
-            TopLeftHandle.DragCompleted += ResizeCompleted;
-            TopRightHandle.DragCompleted += ResizeCompleted; ;
-            BottomLeftHandle.DragCompleted += ResizeCompleted; 
-            BottomRightHandle.DragCompleted += ResizeCompleted; ;
+            TopLeftHandle.DragCompleted += HandleResizeCompleted;
+            TopRightHandle.DragCompleted += HandleResizeCompleted; ;
+            BottomLeftHandle.DragCompleted += HandleResizeCompleted; 
+            BottomRightHandle.DragCompleted += HandleResizeCompleted; ;
 
 
         }
@@ -156,14 +156,16 @@ namespace Chem4Word.ViewModel.Adorners
                 AdornedMolecule.Move(LastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
-                DragResizeCompleted?.Invoke(this, dragCompletedEventArgs);
+                DragCompleted?.Invoke(this, dragCompletedEventArgs);
 
                 SetCentroid();
             }
         }
 
+        public event DragCompletedEventHandler ResizeCompleted;
 
-        private void ResizeCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
+
+        private void HandleResizeCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
         {
             Resizing = false;
 
@@ -172,10 +174,9 @@ namespace Chem4Word.ViewModel.Adorners
                 var atomList = AdornedMolecule.Atoms.ToList();
                 CurrentModel.DoOperation(LastOperation, atomList);
                 SetBoundingBox();
-                InvalidateVisual();
-                DragResizeCompleted?.Invoke(this, dragCompletedEventArgs);
-
+                ResizeCompleted?.Invoke(this, dragCompletedEventArgs);
                 SetCentroid();
+                InvalidateVisual();
             }
         }
 
@@ -284,7 +285,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         #region Events
 
-        public new event DragCompletedEventHandler DragResizeCompleted;
+        public new event DragCompletedEventHandler DragCompleted;
 
         #endregion Events
 
@@ -315,7 +316,7 @@ namespace Chem4Word.ViewModel.Adorners
             var newAspectRatio = Math.Abs(right - left) / Math.Abs(bottom - top);
             if (newAspectRatio > AspectRatio) //it's wider now than it is deep
             {
-                scaleFactor = Math.Abs(right - left) / BoundingBox.Width;
+                scaleFactor = Math.Abs(top - bottom) / BoundingBox.Height;
             }
             else //it's deeper than it's wide
             {
@@ -345,7 +346,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         private bool NotDraggingBackwards()
         {
-            return BoundingBox.Width + DragXTravel > 10 && BoundingBox.Height + DragYTravel > 10;
+            return BigThumb.Height >=10 && BigThumb.Width >=10;
         }
 
         // Handler for resizing from the top-left.

@@ -208,7 +208,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         #region Events
 
-        public event DragCompletedEventHandler DragResizeCompleted;
+        public event DragCompletedEventHandler DragCompleted;
 
         #endregion Events
 
@@ -265,10 +265,15 @@ namespace Chem4Word.ViewModel.Adorners
 
             //move the molecule
             CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.ToList());
-            DragResizeCompleted?.Invoke(this, e);
+            
             Dragging = false;
         }
 
-        #endregion 
+        #endregion
+
+        protected void RaiseDRCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
+        {
+            DragCompleted?.Invoke(sender, dragCompletedEventArgs);
+        }
     }
 }
