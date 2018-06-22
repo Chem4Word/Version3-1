@@ -935,7 +935,14 @@ namespace Chem4Word.Model
             }
         }
 
-        public Point Centroid => new Point(0, 0);
+        public Point Centroid
+        {
+            get
+            {
+                // ReSharper disable once ArrangeAccessorOwnerBody
+                return new Point((BoundingBox.Right + BoundingBox.Left)/2.0, (BoundingBox.Bottom + BoundingBox.Top)/2.0);
+            }
+        }
 
         public List<Atom> ConvexHull
         {

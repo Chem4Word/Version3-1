@@ -54,6 +54,8 @@
             Command="{Binding RedoCommand}"
             Modifiers="Control" />
         <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
+        <KeyBinding Key="H" Modifiers="Control" Command="{Binding FlipHorizontalCommand}"/>
+        
     </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
@@ -455,7 +457,7 @@
                 </Button>
 
                 <Button x:Name="FlipButton"
-                    Command="{Binding FlipCommand}"
+                    Command="{Binding FlipHorizontalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Horizontal">
                     <Viewbox Width="24" Height="24">

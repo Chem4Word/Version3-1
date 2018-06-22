@@ -282,7 +282,7 @@ namespace Chem4Word.ViewModel
         public CutCommand CutCommand { get; }
         public PasteCommand PasteCommand { get; }
         public MirrorCommand MirrorCommand { get; }
-        public FlipCommand FlipCommand { get; }
+        public FlipHorizontalCommand FlipHorizontalCommand { get; }
         public AddHydrogensCommand AddHydrogensCommand { get; }
         public RemoveHydrogensCommand RemoveHydrogensCommand { get; }
         public FuseCommand FuseCommand { get; }
@@ -310,7 +310,7 @@ namespace Chem4Word.ViewModel
             CutCommand = new CutCommand(this);
             PasteCommand = new PasteCommand(this);
             MirrorCommand = new MirrorCommand(this);
-            FlipCommand = new FlipCommand(this);
+            FlipHorizontalCommand = new FlipHorizontalCommand(this);
             AddHydrogensCommand = new AddHydrogensCommand(this);
             RemoveHydrogensCommand = new RemoveHydrogensCommand(this);
             FuseCommand = new FuseCommand(this);
@@ -389,6 +389,8 @@ namespace Chem4Word.ViewModel
             CopyCommand.RaiseCanExecChanged();
             CutCommand.RaiseCanExecChanged();
             DeleteCommand.RaiseCanExecChanged();
+            FlipHorizontalCommand.RaiseCanExecChanged();
+            
         }
 
         public void RemoveAllAdorners()
@@ -480,6 +482,7 @@ namespace Chem4Word.ViewModel
         {
             if (e.ClickCount == 2)
             {
+                SelectedItems.Clear();
                 if (sender is AtomSelectionAdorner)
                 {
                     Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent as Molecule;
@@ -1336,6 +1339,49 @@ namespace Chem4Word.ViewModel
             {
                 return CalcBoundingBox();
             }
+        }
+
+        public bool SingleMolSelected
+        {
+            get { return SelectedItems.Count == 1 && SelectedItems[0] is Molecule; }
+        }
+
+        public void FlipMolecule(Molecule selMolecule, bool flipVertically, bool flipStereo)
+        {
+            Point centroid = selMolecule.Centroid;
+            int scaleX = 1, scaleY = 1;
+
+            if (flipVertically)
+            {
+                scaleY = -1;
+            }
+            else
+            {
+                scaleX = -1;
+            }
+            ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, centroid.X, centroid.Y);
+
+            UndoManager.BeginUndoBlock();
+
+            foreach (Atom atomToFlip in selMolecule.Atoms)
+            {
+                Point currentPos = atomToFlip.Position;
+                Point newPos = flipTransform.Transform(currentPos);
+                Action undo = () =>
+                {
+                    atomToFlip.Position = currentPos;
+                };
+                Action redo = () =>
+                {
+                    atomToFlip.Position = newPos;
+                };
+                atomToFlip.Position = newPos;
+
+                UndoManager.RecordAction(undo, redo, "Flip Atom");
+            }
+
+            UndoManager.EndUndoBlock();
+
         }
     }
 }
