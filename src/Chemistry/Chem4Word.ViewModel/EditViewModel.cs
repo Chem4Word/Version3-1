@@ -416,6 +416,7 @@ namespace Chem4Word.ViewModel
 
                         msAdorner.DragCompleted -= MolAdorner_ResizeCompleted;
                         msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                        (msAdorner as SingleAtomSelectionAdorner).DragCompleted -= MolAdorner_DragCompleted;
                     }
                     layer.Remove(selectionAdorner);
                     SelectionAdorners.Remove(oldObject);
@@ -471,17 +472,15 @@ namespace Chem4Word.ViewModel
                         new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
                     SelectionAdorners[newObject] = molAdorner;
                     molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
-                    molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                    (molAdorner as SingleAtomSelectionAdorner).DragCompleted += MolAdorner_DragCompleted;
                 }
             }
         }
 
-        private void AtomAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {  
-            //we've completed the drag operation
-            //remove the existing molecule adorner
-
-            var moleculeSelectionAdorner = (sender as SingleAtomSelectionAdorner);
+        private void MolAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner) sender);
             var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
             SelectedItems.Remove(movedMolecule);
 
@@ -489,12 +488,25 @@ namespace Chem4Word.ViewModel
             SelectedItems.Add(movedMolecule);
         }
 
+        private void AtomAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {  
+            //we've completed the drag operation
+            //remove the existing molecule adorner
+
+            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
+            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
+            SelectedItems.Remove(movedMolecule);
+
+            //and add in a new one
+            SelectedItems.Add(movedMolecule.Atoms[0]);
+        }
+
         private void MolAdorner_ResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             //we've completed the drag operation
             //remove the existing molecule adorner
   
-            var moleculeSelectionAdorner = (sender as MoleculeSelectionAdorner);
+            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner) sender);
             var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
             SelectedItems.Remove(movedMolecule);
 

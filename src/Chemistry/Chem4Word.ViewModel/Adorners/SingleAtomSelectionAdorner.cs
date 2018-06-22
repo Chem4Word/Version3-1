@@ -265,7 +265,7 @@ namespace Chem4Word.ViewModel.Adorners
 
             //move the molecule
             CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.ToList());
-            
+            RaiseDRCompleted(sender,e);
             Dragging = false;
         }
 
@@ -273,7 +273,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         protected void RaiseDRCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
         {
-            DragCompleted?.Invoke(sender, dragCompletedEventArgs);
+            DragCompleted?.Invoke(this, dragCompletedEventArgs);
         }
     }
 }
