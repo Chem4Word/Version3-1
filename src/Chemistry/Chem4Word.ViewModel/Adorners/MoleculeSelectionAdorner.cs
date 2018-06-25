@@ -18,7 +18,7 @@ using System.Windows.Media;
 
 namespace Chem4Word.ViewModel.Adorners
 {
-    public class MoleculeSelectionAdorner2 : Adorner
+    public class MoleculeSelectionAdorner : SingleAtomSelectionAdorner
     {
         //static as they need to be set only when the adorner is first created
         private static double? _thumbWidth;
@@ -27,26 +27,19 @@ namespace Chem4Word.ViewModel.Adorners
         private static double _rotateThumbWidth;
 
         private Point _canvasPos;
-        private readonly Molecule _frag;
 
         //some things to grab hold of
-        private readonly Thumb _topLeft; //these do the resizing
+        protected readonly Thumb TopLeftHandle; //these do the resizing
 
-        private readonly Thumb _topRight; //these do the resizing
-        private readonly Thumb _bottomLeft; //these do the resizing
-        private readonly Thumb _bottomRight; //these do the resizing
+        protected readonly Thumb TopRightHandle; //these do the resizing
+        protected readonly Thumb BottomLeftHandle; //these do the resizing
+        protected readonly Thumb BottomRightHandle; //these do the resizing
+        protected readonly Thumb RotateHandle;  //Grab hold of this to rotate the molecule
+       
+        //flags
 
-        private Thumb _bigThumb; //this is the main grab area for the molecule
-
-        private readonly Thumb _rotateThumb;  //Grab hold of this to rotate the molecule
-        private readonly VisualCollection _visualChildren;
-        private Transform _lastOperation;
-        private double _aspectRatio;
-        private Rect _boundingBox;
-
-        private bool _dragging;
-        private bool _resizing;
-        private bool _rotating;
+        protected bool Resizing;
+        protected bool Rotating;
 
         private double _rotateAngle;
         private Point _centroid;
@@ -54,128 +47,89 @@ namespace Chem4Word.ViewModel.Adorners
         //private SnapGeometry _rotateSnapper;
         private readonly Brush _renderBrush;
 
-        private readonly Pen _renderPen;
-        private double _dragXTravel;
-        private double _dragYTravel;
 
-        public readonly EditViewModel CurrentModel;
-        private Brush _bigBrush;
-        private Point _startPos;
-
-        public MoleculeSelectionAdorner2(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
-            : base(adornedElement)
+        public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
+            : base(adornedElement, molecule, currentModel)
         {
-            CurrentModel = currentModel;
 
-            _visualChildren = new VisualCollection(this);
             if (_thumbWidth == null)
             {
                 _thumbWidth = (int)CurrentModel.Model.XamlBondLength / 10;
                 _halfThumbWidth = _thumbWidth.Value / 2;
                 _rotateThumbWidth = CurrentModel.Model.XamlBondLength / 7.5;
             }
-            BuildBigDragArea();
 
-            BuildAdornerCorner(ref _topLeft, Cursors.SizeNWSE);
-            BuildAdornerCorner(ref _topRight, Cursors.SizeNESW);
-            BuildAdornerCorner(ref _bottomLeft, Cursors.SizeNESW);
-            BuildAdornerCorner(ref _bottomRight, Cursors.SizeNWSE);
+            BuildAdornerCorner(ref TopLeftHandle, Cursors.SizeNWSE);
+            BuildAdornerCorner(ref TopRightHandle, Cursors.SizeNESW);
+            BuildAdornerCorner(ref BottomLeftHandle, Cursors.SizeNESW);
+            BuildAdornerCorner(ref BottomRightHandle, Cursors.SizeNWSE);
 
-            BuildRotateThumb(ref _rotateThumb, Cursors.Hand);
+            BuildRotateThumb(ref RotateHandle, Cursors.Hand);
 
             AttachHandlers();
 
-            _frag = molecule;
-
-            _renderBrush = (Brush)FindResource("GrabHandleFillBrush");
-            _bigBrush = (Brush)FindResource("BigThumbFillBrush");
-            _renderPen = (Pen)FindResource("GrabHandlePen");
-
-            Focusable = false;
-            IsHitTestVisible = true;
-            SetBoundingBox();
-
-            var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
-            myAdornerLayer.Add(this);
+            //no need to add the adroner in at this point as the base has already done it
         }
 
-        private void AttachHandlers()
+        protected  void AttachHandlers()
         {
-            _topLeft.DragStarted += DragStarted;
-            _topRight.DragStarted += DragStarted;
-            _bottomLeft.DragStarted += DragStarted;
-            _bottomRight.DragStarted += DragStarted;
-
-            _topLeft.DragDelta += _topLeft_DragDelta;
-            _topRight.DragDelta += _topRight_DragDelta;
-            _bottomLeft.DragDelta += _bottomLeft_DragDelta;
-            _bottomRight.DragDelta += _bottomRight_DragDelta;
-
-            _bottomRight.DragCompleted += _bigThumb_DragCompleted;
-            _topRight.DragCompleted += _bigThumb_DragCompleted;
-            _topLeft.DragCompleted += _bigThumb_DragCompleted;
-            _bottomLeft.DragCompleted += _bigThumb_DragCompleted;
+            AttachHandler();
             //wire up the event handling
-            MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
-            KeyDown += MoleculeAdorner_KeyDown;
+
+            TopLeftHandle.DragStarted += ResizeStarted;
+            TopRightHandle.DragStarted += ResizeStarted;
+            BottomLeftHandle.DragStarted += ResizeStarted;
+            BottomRightHandle.DragStarted += ResizeStarted;
+
+            TopLeftHandle.DragDelta += TopLeftHandleDragDelta;
+            TopRightHandle.DragDelta += TopRightHandleDragDelta;
+            BottomLeftHandle.DragDelta += BottomLeftHandleDragDelta;
+            BottomRightHandle.DragDelta += BottomRightHandleDragDelta;
+
+            TopLeftHandle.DragCompleted += HandleResizeCompleted;
+            TopRightHandle.DragCompleted += HandleResizeCompleted; ;
+            BottomLeftHandle.DragCompleted += HandleResizeCompleted; 
+            BottomRightHandle.DragCompleted += HandleResizeCompleted; ;
+
+
         }
 
-        private void MoleculeSelectionAdorner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    
+        private void ResizeStarted(object sender, DragStartedEventArgs e)
         {
-            if (e.ClickCount == 2)
-            {
-                RaiseEvent(e);
-            }
+            Resizing=true;
+            Dragging = false;
+            Keyboard.Focus(this);
+            BoundingBox = AdornedMolecule.BoundingBox;
+            DragXTravel = 0.0d;
+            DragYTravel = 0.0d;
         }
 
-        private void MoleculeAdorner_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (Keyboard.IsKeyDown(Key.Delete))
-            {
-                //bubble it up
-                e.Handled = false;
-            }
-            else if ((Keyboard.IsKeyDown(Key.Z) | (Keyboard.IsKeyDown(Key.Y)) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control))
-            {
-                e.Handled = false;
-            }  
-            else if (Keyboard.IsKeyDown(Key.Escape))
-            {
-                e.Handled = true;
-                if (IsWorking)
-                {
-                    AbortDragging();                    
-                }
-            }
-        }
 
-        private void AbortDragging()
+        protected override void AbortDragging()
         {
-            _dragging = false;
-            _resizing = false;
-            _rotating = false;
-            _lastOperation = null;
-            InvalidateVisual();
+            Dragging = false;
+            Resizing = false;
+            base.AbortDragging();
         }
 
         private void BuildRotateThumb(ref Thumb rotateThumb, Cursor hand)
         {
             rotateThumb = new Thumb();
 
-            _rotateThumb.Width = _rotateThumbWidth;
-            _rotateThumb.Height = _rotateThumbWidth;
+            RotateHandle.Width = _rotateThumbWidth;
+            RotateHandle.Height = _rotateThumbWidth;
             rotateThumb.Style = (Style)FindResource("RotateThumb");
             rotateThumb.DragStarted += RotateThumb_DragStarted;
             rotateThumb.DragCompleted += RotateThumb_DragCompleted;
             //rotateThumb.DragDelta += RotateThumb_DragDelta;
-            rotateThumb.KeyDown += MoleculeAdorner_KeyDown;
 
-            _visualChildren.Add(rotateThumb);
+            VisualChildren.Add(rotateThumb);
         }
 
         private void RotateThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
-            _rotating = true;
+            Rotating = true;
             if (_rotateAngle == 0.0d)
             {
                 //we have not yet rotated anything
@@ -186,122 +140,70 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void SetCentroid()
         {
-            _centroid = _frag.Centroid;
+            _centroid = AdornedMolecule.Centroid;
             //create a snapper
             //_rotateSnapper = new SnapGeometry(_centroid, 15);
         }
 
         private void RotateThumb_DragCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
         {
-            _rotating = false;
+            Rotating = false;
 
-            if (_lastOperation != null && _lastOperation is RotateTransform)
+            if (LastOperation != null && LastOperation is RotateTransform)
             {
-                _rotateAngle = ((RotateTransform)_lastOperation).Angle;
+                _rotateAngle = ((RotateTransform)LastOperation).Angle;
 
-                _frag.Move(_lastOperation);
+                AdornedMolecule.Move(LastOperation);
                 SetBoundingBox();
                 InvalidateVisual();
-                DragResizeCompleted?.Invoke(this, dragCompletedEventArgs);
+                DragCompleted?.Invoke(this, dragCompletedEventArgs);
 
                 SetCentroid();
             }
         }
 
-        private void DragStarted(object sender, DragStartedEventArgs e)
+        public event DragCompletedEventHandler ResizeCompleted;
+
+
+        private void HandleResizeCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
         {
-            _resizing = true;
-            Keyboard.Focus(this);
-            InitializeDragging();
+            Resizing = false;
+
+            if (LastOperation != null && LastOperation is ScaleTransform)
+            {
+                var atomList = AdornedMolecule.Atoms.ToList();
+                CurrentModel.DoOperation(LastOperation, atomList);
+                SetBoundingBox();
+                ResizeCompleted?.Invoke(this, dragCompletedEventArgs);
+                SetCentroid();
+                InvalidateVisual();
+            }
         }
 
-        private void InitializeDragging()
-        {
-            _dragXTravel = 0.0d;
-            _dragYTravel = 0.0d;
-        }
 
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            _frag.ResetBoundingBox();
-            _boundingBox = _frag.BoundingBox;
-            _aspectRatio = _boundingBox.Width / _boundingBox.Height;
+            AdornedMolecule.ResetBoundingBox();
+            BoundingBox = AdornedMolecule.BoundingBox;
+            AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
+
+        public double AspectRatio { get; set; }
+
+        public Rect BoundingBox { get; set; }
 
         /// <summary>
-        /// Creates the big thumb that allows dragging a molecule around the canvas
-        /// </summary>
-        private void BuildBigDragArea()
-        {
-            _bigThumb = new Thumb();
-            _visualChildren.Add(_bigThumb);
-            _bigThumb.IsHitTestVisible = true;
-
-            _bigThumb.Style = (Style)FindResource("BigThumbStyle");
-            _bigThumb.Cursor = Cursors.Hand;
-            _bigThumb.DragStarted += _bigThumb_DragStarted;
-            _bigThumb.DragCompleted += _bigThumb_DragCompleted;
-            _bigThumb.DragDelta += _bigThumb_DragDelta;
-            _bigThumb.MouseLeftButtonDown += MoleculeSelectionAdorner_MouseLeftButtonDown;
-        }
-
-        private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            IncrementDragging(e);
-
-            Point currentPos = new Point(_dragXTravel, _dragYTravel);
-
-            Canvas.SetLeft(_bigThumb, _startPos.X + _dragXTravel);
-            Canvas.SetTop(_bigThumb, _startPos.Y + _dragYTravel);
-
-            _canvasPos = currentPos;
-            Vector displacement = _canvasPos - _startPos;
-            _lastOperation = new TranslateTransform(displacement.X, displacement.Y);
-
-            InvalidateVisual();
-        }
-
-        /// <summary>
-        /// Handles all drag events from all thumbs.
-        /// The actual transformation is set duing other code
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            if (_lastOperation != null)
-            {
-                SetBoundingBox();
-                InvalidateVisual();
-
-                SetCentroid();
-                //move the molecule
-                CurrentModel.DoOperation(_lastOperation, AdornedMolecule.Atoms.ToList());
-                _frag.ResetBoundingBox();
-                DragResizeCompleted?.Invoke(this, e);
-
-                _dragging = false;
-                _resizing = false;
-            }
-            _dragging = false;
-        }
-
-        private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
-        {
-            _dragging = true;
-            InitializeDragging();
-            _dragging = true;
-
-            _startPos = new Point(Canvas.GetLeft(_bigThumb), Canvas.GetTop(_bigThumb));
-        }
-
+     
+            
         /// <summary>
         /// Override this to
         /// </summary>
         /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
         {
+            base.OnRender(drawingContext);
+
             if (IsWorking)
             {
                 object elem = AdornedElement;
@@ -309,17 +211,16 @@ namespace Chem4Word.ViewModel.Adorners
 
                 //take a snapshot of the molecule
 
-                var fragImage = _frag.Ghost();
-                Debug.WriteLine(_lastOperation.ToString());
-                fragImage.Transform = _lastOperation;
+                var AdornedMoleculeImage = AdornedMolecule.Ghost();
+                Debug.WriteLine(LastOperation.ToString());
+                AdornedMoleculeImage.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(_renderBrush, _renderPen, fragImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
 
-                base.OnRender(drawingContext);
             }
         }
 
-        private bool IsWorking => _dragging | _resizing | _rotating;
+        private bool IsWorking => Dragging | Resizing | Rotating;
 
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {
@@ -333,59 +234,58 @@ namespace Chem4Word.ViewModel.Adorners
             // Set some arbitrary visual characteristics.
             cornerThumb.Cursor = customizedCursor;
             cornerThumb.Style = (Style)FindResource("GrabHandleStyle");
-            cornerThumb.KeyDown += MoleculeAdorner_KeyDown;
-            _visualChildren.Add(cornerThumb);
+            cornerThumb.KeyDown += ThisAdorner_KeyDown;
+            VisualChildren.Add(cornerThumb);
         }
 
         // Override the VisualChildrenCount and GetVisualChild properties to interface with
         // the adorner's visual collection.
-        protected override int VisualChildrenCount => _visualChildren.Count;
+        protected override int VisualChildrenCount => VisualChildren.Count;
 
-        public Molecule AdornedMolecule => _frag;
-
-        protected override Visual GetVisualChild(int index) => _visualChildren[index];
+        protected override Visual GetVisualChild(int index) => VisualChildren[index];
 
         // Arrange the Adorners.
         protected override Size ArrangeOverride(Size finalSize)
         {
+           
+
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = _frag.BoundingBox;
+            var bbb = AdornedMolecule.BoundingBox;
 
-            if (_lastOperation != null)
+            if (LastOperation != null)
             {
-                bbb = _lastOperation.TransformBounds(bbb);
+                bbb = LastOperation.TransformBounds(bbb);
             }
 
-            _topLeft.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
-            _topRight.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value,
-                _thumbWidth.Value));
-            _bottomLeft.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top + bbb.Height - _halfThumbWidth,
-                _thumbWidth.Value, _thumbWidth.Value));
-            _bottomRight.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth,
-                bbb.Height + bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
-            //put a box right around the entire shebang
+            
 
-            _bigThumb.Arrange(bbb);
-            Canvas.SetLeft(_bigThumb, bbb.Left);
-            Canvas.SetTop(_bigThumb, bbb.Top);
-            _bigThumb.Height = bbb.Height;
-            _bigThumb.Width = bbb.Width;
+            TopLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
+            TopRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value,
+                _thumbWidth.Value));
+            BottomLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top + bbb.Height - _halfThumbWidth,
+                _thumbWidth.Value, _thumbWidth.Value));
+            BottomRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth,
+                bbb.Height + bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
+       
 
             //add the rotator
             double xplacement, yplacement;
-            xplacement = (bbb.Left + bbb.Right) / 2 - _rotateThumb.Width / 2;
-            yplacement = bbb.Top - _rotateThumb.Width;// - ThumbWidth * 3;
+            xplacement = (bbb.Left + bbb.Right) / 2 - RotateHandle.Width / 2;
+            yplacement = bbb.Top - RotateHandle.Width;// - ThumbWidth * 3;
 
-            _rotateThumb.Arrange(new Rect(xplacement, yplacement, _rotateThumb.Width, _rotateThumb.Height));
+            RotateHandle.Arrange(new Rect(xplacement, yplacement, RotateHandle.Width, RotateHandle.Height));
             // Return the final size.
-            //_boundingBox = bbb;
+            //BoundingBox = bbb;
+            base.ArrangeOverride(finalSize);
             return finalSize;
+
+            
         }
 
         #region Events
 
-        public event DragCompletedEventHandler DragResizeCompleted;
+        public new event DragCompletedEventHandler DragCompleted;
 
         #endregion Events
 
@@ -395,56 +295,50 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void IncrementDragging(DragDeltaEventArgs args)
         {
-            _dragXTravel += args.HorizontalChange;
-            _dragYTravel += args.VerticalChange;
+            DragXTravel += args.HorizontalChange;
+            DragYTravel += args.VerticalChange;
         }
 
-        private void ResizeFrag(Molecule frag, double left, double top, double right, double bottom)
+        private void ResizeAdornedMolecule(Molecule AdornedMolecule, double left, double top, double right, double bottom)
         {
-            //work out the centroid of where we want to place the fragment
+            //work out the centroid of where we want to place the AdornedMoleculement
             var centreX = left + right / 2;
             var centreY = top + bottom / 2;
             Debug.WriteLine("CenterX={0}, CenterY ={1}, Right={2}, Left={3}, Top={4}, Bottom={5}", centreX, centreY, right, left, top, bottom);
             var scaleFactor = GetScaleFactor(left, top, right, bottom);
 
-            _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, left, top);
+            LastOperation = new ScaleTransform(scaleFactor, scaleFactor, left, top);
         }
 
         private double GetScaleFactor(double left, double top, double right, double bottom)
         {
             double scaleFactor;
             var newAspectRatio = Math.Abs(right - left) / Math.Abs(bottom - top);
-            if (newAspectRatio > _aspectRatio) //it's wider now than it is deep
+            if (newAspectRatio > AspectRatio) //it's wider now than it is deep
             {
-                scaleFactor = Math.Abs(right - left) / _boundingBox.Width;
+                scaleFactor = Math.Abs(top - bottom) / BoundingBox.Height;
             }
             else //it's deeper than it's wide
             {
-                scaleFactor = Math.Abs(right - left) / _boundingBox.Width;
+                scaleFactor = Math.Abs(right - left) / BoundingBox.Width;
             }
             return scaleFactor;
         }
 
         // Handler for resizing from the top-right.
-        private void _topRight_DragDelta(object sender, DragDeltaEventArgs args)
+        private void TopRightHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
-            Thumb hitThumb = sender as Thumb;
-
-            if (hitThumb == null)
-            {
-                return;
-            }
-
+          
             IncrementDragging(args);
 
             if (NotDraggingBackwards())
             {
-                var scaleFactor = GetScaleFactor(_boundingBox.Left,
-                    _boundingBox.Top + _dragYTravel,
-                    _boundingBox.Right + _dragXTravel,
-                    _boundingBox.Bottom);
+                var scaleFactor = GetScaleFactor(BoundingBox.Left,
+                    BoundingBox.Top + DragYTravel,
+                    BoundingBox.Right + DragYTravel,
+                    BoundingBox.Bottom);
 
-                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Left, _boundingBox.Bottom);
+                LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Left, BoundingBox.Bottom);
 
                 InvalidateVisual();
             }
@@ -452,76 +346,59 @@ namespace Chem4Word.ViewModel.Adorners
 
         private bool NotDraggingBackwards()
         {
-            return _boundingBox.Width + _dragXTravel > 10 && _boundingBox.Height + _dragYTravel > 10;
+            return BigThumb.Height >=10 && BigThumb.Width >=10;
         }
 
         // Handler for resizing from the top-left.
-        private void _topLeft_DragDelta(object sender, DragDeltaEventArgs args)
+        private void TopLeftHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
             Thumb hitThumb = sender as Thumb;
-
-            if (hitThumb == null)
-            {
-                return;
-            }
 
             IncrementDragging(args);
             if (NotDraggingBackwards())
             {
                 var scaleFactor = GetScaleFactor(
-                    _boundingBox.Left + _dragXTravel,
-                    _boundingBox.Top + _dragYTravel,
-                    _boundingBox.Right,
-                    _boundingBox.Bottom);
+                    BoundingBox.Left + DragXTravel,
+                    BoundingBox.Top + DragYTravel,
+                    BoundingBox.Right,
+                    BoundingBox.Bottom);
 
-                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Bottom);
+                LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Right, BoundingBox.Bottom);
 
                 InvalidateVisual();
             }
         }
 
         // Handler for resizing from the bottom-left.
-        private void _bottomLeft_DragDelta(object sender, DragDeltaEventArgs args)
+        private void BottomLeftHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
-            Thumb hitThumb = sender as Thumb;
-
-            if (hitThumb == null)
-            {
-                return;
-            }
-
+          
             IncrementDragging(args);
             if (NotDraggingBackwards())
             {
-                var scaleFactor = GetScaleFactor(_boundingBox.Left + _dragXTravel,
-                    _boundingBox.Top + _dragYTravel,
-                    _boundingBox.Right,
-                    _boundingBox.Bottom);
+                var scaleFactor = GetScaleFactor(BoundingBox.Left + DragXTravel,
+                    BoundingBox.Top + DragYTravel,
+                    BoundingBox.Right,
+                    BoundingBox.Bottom);
 
-                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Right, _boundingBox.Top);
+                LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Right, BoundingBox.Top);
 
                 InvalidateVisual();
             }
         }
 
-        private void _bottomRight_DragDelta(object sender, DragDeltaEventArgs args)
+        private void BottomRightHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
-            Thumb hitThumb = sender as Thumb;
-
-            if (hitThumb == null)
-            {
-                return;
-            }
-
+          
             IncrementDragging(args);
             if (NotDraggingBackwards())
             {
-                var scaleFactor = GetScaleFactor(_boundingBox.Left,
-                    _boundingBox.Top,
-                    _boundingBox.Right + _dragXTravel,
-                    _boundingBox.Bottom + _dragYTravel);
+                var scaleFactor = GetScaleFactor(BoundingBox.Left,
+                    BoundingBox.Top,
+                    BoundingBox.Right + DragXTravel,
+                    BoundingBox.Bottom + DragYTravel);
 
-                _lastOperation = new ScaleTransform(scaleFactor, scaleFactor, _boundingBox.Left, _boundingBox.Top);
+                LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Left, BoundingBox.Top);
 
                 InvalidateVisual();
             }
