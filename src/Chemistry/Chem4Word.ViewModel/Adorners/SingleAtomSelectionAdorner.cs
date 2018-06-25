@@ -20,26 +20,24 @@ namespace Chem4Word.ViewModel.Adorners
 {
     public class SingleAtomSelectionAdorner : Adorner
     {
-        //static as they need to be set only when the adorner is first created
-
-
-
         protected Thumb BigThumb; //this is the main grab area for the molecule
 
         protected readonly VisualCollection VisualChildren;
+        //tracks the last operation performed
         protected Transform LastOperation;
 
+        //status flag
         protected bool Dragging;
      
-
+        //rendering variables
         protected readonly Pen BorderPen;
         protected readonly Brush RenderBrush;
-
+        //tracks the amount of travel during drag operations
         protected double DragXTravel;
         protected double DragYTravel;
 
         public readonly EditViewModel CurrentModel;
-
+        //where the dragging starts
         protected Point StartPos;
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
