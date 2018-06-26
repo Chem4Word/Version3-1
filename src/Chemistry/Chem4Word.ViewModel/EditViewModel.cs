@@ -281,7 +281,7 @@ namespace Chem4Word.ViewModel
         public CopyCommand CopyCommand { get; }
         public CutCommand CutCommand { get; }
         public PasteCommand PasteCommand { get; }
-        public MirrorCommand MirrorCommand { get; }
+        public FlipVerticalCommand FlipVerticalCommand { get; }
         public FlipHorizontalCommand FlipHorizontalCommand { get; }
         public AddHydrogensCommand AddHydrogensCommand { get; }
         public RemoveHydrogensCommand RemoveHydrogensCommand { get; }
@@ -309,7 +309,7 @@ namespace Chem4Word.ViewModel
             CopyCommand = new CopyCommand(this);
             CutCommand = new CutCommand(this);
             PasteCommand = new PasteCommand(this);
-            MirrorCommand = new MirrorCommand(this);
+            FlipVerticalCommand = new FlipVerticalCommand(this);
             FlipHorizontalCommand = new FlipHorizontalCommand(this);
             AddHydrogensCommand = new AddHydrogensCommand(this);
             RemoveHydrogensCommand = new RemoveHydrogensCommand(this);
@@ -386,11 +386,16 @@ namespace Chem4Word.ViewModel
             OnPropertyChanged(nameof(SelectedBondOptionId));
             OnPropertyChanged(nameof(SelectionType));
 
+            UpdateCommandStatuses();
+        }
+
+        private void UpdateCommandStatuses()
+        {
             CopyCommand.RaiseCanExecChanged();
             CutCommand.RaiseCanExecChanged();
             DeleteCommand.RaiseCanExecChanged();
             FlipHorizontalCommand.RaiseCanExecChanged();
-            
+            FlipVerticalCommand.RaiseCanExecChanged();
         }
 
         public void RemoveAllAdorners()

@@ -456,8 +456,8 @@
                     </Viewbox>
                 </Button>
 
-                <Button x:Name="FlipverticalButton"
-                    Command="{Binding MirrorCommand}"
+                <Button x:Name="FlipVerticalButton"
+                    Command="{Binding FlipVerticalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Horizontal">
                     <Viewbox Width="24" Height="24">

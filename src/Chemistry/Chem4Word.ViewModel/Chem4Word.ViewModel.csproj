@@ -82,7 +82,7 @@
     <Compile Include="Commands\FlipHorizontalCommand.cs" />
     <Compile Include="Commands\FuseCommand.cs" />
     <Compile Include="Commands\GroupCommand.cs" />
-    <Compile Include="Commands\MirrorCommand.cs" />
+    <Compile Include="Commands\FlipVerticalCommand.cs" />
     <Compile Include="Commands\PasteCommand.cs" />
     <Compile Include="Commands\RedoCommand.cs" />
     <Compile Include="Commands\RemoveHydrogensCommand.cs" />

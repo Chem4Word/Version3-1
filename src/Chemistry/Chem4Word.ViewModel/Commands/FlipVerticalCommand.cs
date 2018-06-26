@@ -7,23 +7,25 @@
 
 using System;
 using System.Diagnostics;
+using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Commands
 {
-    public class MirrorCommand : BaseCommand
+    public class FlipVerticalCommand : FlipCommand
     {
-        public MirrorCommand(EditViewModel vm) : base(vm)
+        public FlipVerticalCommand(EditViewModel vm) : base(vm)
         {
         }
 
-        public override bool CanExecute(object parameter)
-        {
-            return false;
-        }
+      
+
 
         public override void Execute(object parameter)
         {
-            Debugger.Break();
+            Debug.Assert(MyEditViewModel.SelectedItems[0] is Molecule);
+            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
+
+            MyEditViewModel.FlipMolecule(selMolecule, true, false);
         }
     }
 }
