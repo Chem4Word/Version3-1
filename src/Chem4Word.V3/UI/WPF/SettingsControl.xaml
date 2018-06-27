@@ -56,7 +56,7 @@
                                     <ComboBoxItem>YY</ComboBoxItem>
                                 </ComboBox>
                             </DockPanel>
-                            <TextBlock x:Name="EditorPlugInDescription"
+                            <TextBlock x:Name="SelectedEditorPlugInDescription"
                                 Margin="5"
                                 Text="Description of the editor ..."
                                 TextWrapping="Wrap" />
@@ -78,7 +78,7 @@
                                         Margin="1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox x:Name="SelectRenderer"
+                                <ComboBox x:Name="SelectRendererPlugIn"
                                     Margin="5"
                                     SelectionChanged="SelectRenderer_OnSelectionChanged">
                                     <ComboBoxItem>XX</ComboBoxItem>
@@ -107,7 +107,7 @@
                                         Margin="1"
                                         Source="/Resources/Button Images/Preferences.png" />
                                 </Button>
-                                <ComboBox x:Name="SelectSearcher"
+                                <ComboBox x:Name="SelectSearcherPlugIn"
                                     Margin="5"
                                     SelectionChanged="SelectSearcher_OnSelectionChanged">
                                     <ComboBoxItem>XX</ComboBoxItem>

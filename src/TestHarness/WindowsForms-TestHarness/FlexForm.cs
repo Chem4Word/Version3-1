@@ -589,7 +589,6 @@ namespace WinFormsTestHarness
                     ShowChemistry($"Edited {m.ConciseFormula}", m);
                 }
             }
-
         }
     }
 }

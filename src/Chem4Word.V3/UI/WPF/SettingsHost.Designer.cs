@@ -1,6 +1,6 @@
 ﻿namespace Chem4Word.UI.WPF
 {
-    partial class WpfLoader
+    partial class SettingsHost
     {
         /// <summary>
         /// Required designer variable.
@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WpfLoader));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsHost));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.settingsControl1 = new Chem4Word.UI.WPF.SettingsControl();
             this.SuspendLayout();
             // 
             // elementHost1
@@ -41,9 +42,9 @@
             this.elementHost1.Size = new System.Drawing.Size(784, 561);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = null;
+            this.elementHost1.Child = this.settingsControl1;
             // 
-            // WpfLoader
+            // SettingsHost
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -51,9 +52,10 @@
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.elementHost1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "WpfLoader";
-            this.Text = "WpfLoader";
-            this.Load += new System.EventHandler(this.WpfLoader_Load);
+            this.Name = "SettingsHost";
+            this.Text = "Chem4Word Settings";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SettingsHost_FormClosing);
+            this.Load += new System.EventHandler(this.SettingsHost_Load);
             this.ResumeLayout(false);
 
         }
@@ -61,5 +63,6 @@
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
+        private SettingsControl settingsControl1;
     }
 }

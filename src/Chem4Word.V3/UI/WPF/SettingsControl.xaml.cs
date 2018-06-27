@@ -7,9 +7,11 @@
 
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
+using IChem4Word.Contracts;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,8 +26,15 @@ namespace Chem4Word.UI.WPF
     {
         public event EventHandler OnButtonClick;
 
+        public Options SystemOptions { get; set; }
+        public bool Dirty { get; set; }
+
+        private bool _loading;
+
         public SettingsControl()
         {
+            _loading = true;
+
             InitializeComponent();
         }
 
@@ -76,10 +85,18 @@ namespace Chem4Word.UI.WPF
                 PlugInsFolderButtonImage.Source = bitmap;
             }
 
-            #endregion
+            #endregion Load Images
 
             #region Set Current Values
-            #endregion
+
+            if (SystemOptions != null)
+            {
+                LoadSettings();
+            }
+
+            #endregion Set Current Values
+
+            _loading = false;
         }
 
         #endregion Form Load
@@ -128,18 +145,62 @@ namespace Chem4Word.UI.WPF
             Debugger.Break();
         }
 
+        private void SelectEditorPlugIn_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loading)
+            {
+                PlugInComboItem pci = SelectEditorPlugIn.SelectedItem as PlugInComboItem;
+                SystemOptions.SelectedEditorPlugIn = pci?.Name;
+                SelectedEditorPlugInDescription.Text = pci?.Description;
+                IChem4WordEditor editor = Globals.Chem4WordV3.GetEditorPlugIn(pci.Name);
+                SelectedEditorSettings.IsEnabled = editor.HasSettings;
+                Dirty = true;
+            }
+        }
+
+        private void SelectRenderer_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loading)
+            {
+                PlugInComboItem pci = SelectRendererPlugIn.SelectedItem as PlugInComboItem;
+                SystemOptions.SelectedRendererPlugIn = pci?.Name;
+                SelectedRendererDescription.Text = pci?.Description;
+                IChem4WordRenderer renderer = Globals.Chem4WordV3.GetRendererPlugIn(pci.Name);
+                SelectedRendererSettings.IsEnabled = renderer.HasSettings;
+                Dirty = true;
+            }
+        }
+
+        private void SelectSearcher_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_loading)
+            {
+                PlugInComboItem pci = SelectSearcherPlugIn.SelectedItem as PlugInComboItem;
+                SelectedSearcherDescription.Text = pci?.Description;
+                IChem4WordSearcher searcher = Globals.Chem4WordV3.GetSearcherPlugIn(pci.Name);
+                SelectedSearcherSettings.IsEnabled = searcher.HasSettings;
+                Dirty = true;
+            }
+        }
+
         #endregion Tab 1 Events
 
         #region Tab 2 Events
 
         private void ChemSpiderWebServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Debugger.Break();
+            if (!_loading)
+            {
+                Debugger.Break();
+            }
         }
 
         private void ChemSpiderRdfServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            Debugger.Break();
+            if (!_loading)
+            {
+                Debugger.Break();
+            }
         }
 
         #endregion Tab 2 Events
@@ -148,7 +209,10 @@ namespace Chem4Word.UI.WPF
 
         private void TelemetryEnabled_OnClick(object sender, RoutedEventArgs e)
         {
-            Debugger.Break();
+            if (!_loading)
+            {
+                Debugger.Break();
+            }
         }
 
         #endregion Tab 3 Events
@@ -174,21 +238,6 @@ namespace Chem4Word.UI.WPF
 
         #region Tab 5 Events
 
-        private void SelectEditorPlugIn_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Debugger.Break();
-        }
-
-        private void SelectRenderer_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Debugger.Break();
-        }
-
-        private void SelectSearcher_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Debugger.Break();
-        }
-
         private void SettingsFolder_OnClick(object sender, RoutedEventArgs e)
         {
             Debugger.Break();
@@ -207,6 +256,83 @@ namespace Chem4Word.UI.WPF
         #endregion Tab 5 Events
 
         #region Private methods
+
+        private void LoadSettings()
+        {
+            #region Tab 1
+
+            SelectEditorPlugIn.Items.Clear();
+            SelectRendererPlugIn.Items.Clear();
+            SelectSearcherPlugIn.Items.Clear();
+            SelectedEditorSettings.IsEnabled = false;
+            SelectedRendererSettings.IsEnabled = false;
+            SelectedSearcherSettings.IsEnabled = false;
+
+            string selectedEditor = SystemOptions.SelectedEditorPlugIn;
+            foreach (IChem4WordEditor editor in Globals.Chem4WordV3.Editors)
+            {
+                PlugInComboItem pci = new PlugInComboItem()
+                {
+                    Name = editor.Name,
+                    Description = editor.Description
+                };
+                int item = SelectEditorPlugIn.Items.Add(pci);
+                if (editor.Name.Equals(selectedEditor))
+                {
+                    SelectedEditorSettings.IsEnabled = editor.HasSettings;
+                    SelectedEditorPlugInDescription.Text = editor.Description;
+                    SelectEditorPlugIn.SelectedIndex = item;
+                }
+            }
+
+            string selectedRenderer = SystemOptions.SelectedRendererPlugIn;
+            foreach (IChem4WordRenderer renderer in Globals.Chem4WordV3.Renderers)
+            {
+                PlugInComboItem pci = new PlugInComboItem()
+                {
+                    Name = renderer.Name,
+                    Description = renderer.Description
+                };
+                int item = SelectRendererPlugIn.Items.Add(pci);
+                if (renderer.Name.Equals(selectedRenderer))
+                {
+                    SelectedRendererSettings.IsEnabled = renderer.HasSettings;
+                    SelectedRendererDescription.Text = renderer.Description;
+                    SelectRendererPlugIn.SelectedIndex = item;
+                }
+            }
+
+            foreach (IChem4WordSearcher searcher in Globals.Chem4WordV3.Searchers.OrderBy(s => s.DisplayOrder))
+            {
+                PlugInComboItem pci = new PlugInComboItem()
+                {
+                    Name = searcher.Name,
+                    Description = searcher.Description
+                };
+                int item = SelectSearcherPlugIn.Items.Add(pci);
+                if (SelectSearcherPlugIn.Items.Count == 1)
+                {
+                    SelectedSearcherSettings.IsEnabled = searcher.HasSettings;
+                    SelectedSearcherDescription.Text = searcher.Description;
+                    SelectSearcherPlugIn.SelectedIndex = item;
+                }
+            }
+
+            #endregion Tab 1
+
+            #region Tab 2
+
+            ChemSpiderWebServiceUri.Text = SystemOptions.ChemSpiderWebServiceUri;
+            ChemSpiderRdfServiceUri.Text = SystemOptions.ChemSpiderRdfServiceUri;
+
+            #endregion Tab 2
+
+            #region Tab 3
+
+            TelemetryEnabled.IsChecked = SystemOptions.TelemetryEnabled;
+
+            #endregion Tab 3
+        }
 
         private BitmapImage CreateImageFromStream(Stream stream)
         {

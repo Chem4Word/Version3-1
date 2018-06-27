@@ -354,9 +354,20 @@ namespace Chem4Word
 
         private void OnOptionsWpfClick(object sender, RibbonControlEventArgs e)
         {
-            WpfLoader f = new WpfLoader("Settings");
+            if (Globals.Chem4WordV3.SystemOptions == null)
+            {
+                Globals.Chem4WordV3.LoadOptions();
+            }
+
+            SettingsHost f = new SettingsHost(true);
+            f.SystemOptions = Globals.Chem4WordV3.SystemOptions.Clone();
             f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
             DialogResult dr = f.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                Globals.Chem4WordV3.SystemOptions = f.SystemOptions.Clone();
+                Globals.Chem4WordV3.Telemetry = new TelemetryWriter(Globals.Chem4WordV3.SystemOptions.TelemetryEnabled);
+            }
         }
 
         private void OnOptionsClick(object sender, RibbonControlEventArgs e)

@@ -29,7 +29,7 @@ namespace Chem4Word.UI
     public partial class Settings : Form
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public Options SystemOptions;
 
@@ -648,17 +648,6 @@ namespace Chem4Word.UI
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
-        }
-    }
-
-    public class PlugInComboItem
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-
-        public override string ToString()
-        {
-            return Name;
         }
     }
 }

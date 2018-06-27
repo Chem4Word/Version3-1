@@ -360,6 +360,7 @@
     <Compile Include="UI\ImportErrors.Designer.cs">
       <DependentUpon>ImportErrors.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\PlugInComboItem.cs" />
     <Compile Include="UI\UpdateFailure.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -388,11 +389,11 @@
     <Compile Include="UI\WPF\SettingsControl.xaml.cs">
       <DependentUpon>SettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\WPF\WpfLoader.cs">
+    <Compile Include="UI\WPF\SettingsHost.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\WPF\WpfLoader.Designer.cs">
-      <DependentUpon>WpfLoader.cs</DependentUpon>
+    <Compile Include="UI\WPF\SettingsHost.Designer.cs">
+      <DependentUpon>SettingsHost.cs</DependentUpon>
     </Compile>
     <Compile Include="WebServices\Chemspider.cs" />
     <Compile Include="Options.cs" />
@@ -507,8 +508,8 @@
     <EmbeddedResource Include="UI\UserControls\UcMoleculeLabelEditor.resx">
       <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\WPF\WpfLoader.resx">
-      <DependentUpon>WpfLoader.cs</DependentUpon>
+    <EmbeddedResource Include="UI\WPF\SettingsHost.resx">
+      <DependentUpon>SettingsHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\XmlViewer.resx">
       <DependentUpon>XmlViewer.cs</DependentUpon>
