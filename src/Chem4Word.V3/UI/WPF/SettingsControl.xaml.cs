@@ -29,37 +29,12 @@ namespace Chem4Word.UI.WPF
             InitializeComponent();
         }
 
-        #region Bottom Buttons
-
-        private void OkButton_Click(object sender, RoutedEventArgs e)
-        {
-            WpfEventArgs args = new WpfEventArgs();
-            args.Button = "Ok";
-            args.OutputValue = "";
-
-            OnButtonClick?.Invoke(this, args);
-        }
-
-        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            WpfEventArgs args = new WpfEventArgs();
-            args.Button = "Cancel";
-            args.OutputValue = "";
-
-            OnButtonClick?.Invoke(this, args);
-        }
-
-        private void DefaultsButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            Debugger.Break();
-        }
-
-        #endregion Bottom Buttons
-
         #region Form Load
 
         private void SettingsControl_OnLoaded(object sender, RoutedEventArgs e)
         {
+            #region Load Images
+
             // Tab 1 - Plug Ins
             var imageStream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "Preferences.png");
             if (imageStream != null)
@@ -100,26 +75,41 @@ namespace Chem4Word.UI.WPF
                 SettingsFolderButtonImage.Source = bitmap;
                 PlugInsFolderButtonImage.Source = bitmap;
             }
+
+            #endregion
+
+            #region Set Current Values
+            #endregion
         }
 
         #endregion Form Load
 
-        #region Private methods
+        #region Bottom Buttons
 
-        private BitmapImage CreateImageFromStream(Stream stream)
+        private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            var bitmap = new BitmapImage();
+            WpfEventArgs args = new WpfEventArgs();
+            args.Button = "Ok";
+            args.OutputValue = "";
 
-            bitmap.BeginInit();
-            bitmap.StreamSource = stream;
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            bitmap.Freeze();
-
-            return bitmap;
+            OnButtonClick?.Invoke(this, args);
         }
 
-        #endregion Private methods
+        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            WpfEventArgs args = new WpfEventArgs();
+            args.Button = "Cancel";
+            args.OutputValue = "";
+
+            OnButtonClick?.Invoke(this, args);
+        }
+
+        private void DefaultsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
+        }
+
+        #endregion Bottom Buttons
 
         #region Tab 1 Events
 
@@ -215,5 +205,22 @@ namespace Chem4Word.UI.WPF
         }
 
         #endregion Tab 5 Events
+
+        #region Private methods
+
+        private BitmapImage CreateImageFromStream(Stream stream)
+        {
+            var bitmap = new BitmapImage();
+
+            bitmap.BeginInit();
+            bitmap.StreamSource = stream;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            return bitmap;
+        }
+
+        #endregion Private methods
     }
 }
