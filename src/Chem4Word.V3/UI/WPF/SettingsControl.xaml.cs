@@ -132,17 +132,23 @@ namespace Chem4Word.UI.WPF
 
         private void SelectedEditorSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            Debugger.Break();
+            IChem4WordEditor editor = Globals.Chem4WordV3.GetEditorPlugIn(SelectEditorPlugIn.SelectedItem.ToString());
+            editor.ProductAppDataPath = Globals.Chem4WordV3.AddInInfo.ProductAppDataPath;
+            editor.ChangeSettings(new Point(SystemOptions.WordTopLeft.X + Constants.TopLeftOffset * 2, SystemOptions.WordTopLeft.Y + Constants.TopLeftOffset * 2));
         }
 
         private void SelectedRendererSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            Debugger.Break();
+            IChem4WordRenderer renderer = Globals.Chem4WordV3.GetRendererPlugIn(SelectRendererPlugIn.SelectedItem.ToString());
+            renderer.ProductAppDataPath = Globals.Chem4WordV3.AddInInfo.ProductAppDataPath;
+            renderer.ChangeSettings(new Point(SystemOptions.WordTopLeft.X + Constants.TopLeftOffset * 2, SystemOptions.WordTopLeft.Y + Constants.TopLeftOffset * 2));
         }
 
         private void SelectedSearcherSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            Debugger.Break();
+            IChem4WordSearcher searcher = Globals.Chem4WordV3.GetSearcherPlugIn(SelectSearcherPlugIn.SelectedItem.ToString());
+            searcher.ProductAppDataPath = Globals.Chem4WordV3.AddInInfo.ProductAppDataPath;
+            searcher.ChangeSettings(new Point(SystemOptions.WordTopLeft.X + Constants.TopLeftOffset * 2, SystemOptions.WordTopLeft.Y + Constants.TopLeftOffset * 2));
         }
 
         private void SelectEditorPlugIn_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
