@@ -264,6 +264,9 @@ namespace Chem4Word.Library
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
                 ChemistryItems = new ObservableCollection<Chemistry>();
                 ChemistryItems.CollectionChanged += ChemistryItems_CollectionChanged;
 
@@ -277,6 +280,9 @@ namespace Chem4Word.Library
                 AssignUserTags();
 
                 GalleryItems = new ObservableCollection<LibraryItem>();
+
+                sw.Stop();
+                Debug.WriteLine($"LibraryViewModel() took {sw.ElapsedMilliseconds}ms");
             }
             catch (Exception ex)
             {

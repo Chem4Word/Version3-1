@@ -63,6 +63,8 @@ namespace Chem4Word.Model
         {
         }
 
+        public override string Colour => "#000000";
+
         public sealed override double AtomicWeight
         {
             get

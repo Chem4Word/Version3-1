@@ -412,10 +412,18 @@ namespace Chem4Word.ViewModel
             {
                 if (SelectionAdorners.ContainsKey(oldObject))
                 {
-                    var oldAdorner = SelectionAdorners[oldObject];
-                    oldAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
-                    layer.Remove(oldAdorner);
+                    var selectionAdorner = SelectionAdorners[oldObject];
+                    if (selectionAdorner is MoleculeSelectionAdorner)
+                    {
+                        var msAdorner = (MoleculeSelectionAdorner) selectionAdorner;
+
+                        msAdorner.DragCompleted -= MolAdorner_ResizeCompleted;
+                        msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                        (msAdorner as SingleAtomSelectionAdorner).DragCompleted -= MolAdorner_DragCompleted;
+                    }
+                    layer.Remove(selectionAdorner);
                     SelectionAdorners.Remove(oldObject);
+
                 }
             }
         }
@@ -428,30 +436,75 @@ namespace Chem4Word.ViewModel
                 {
                     var atom = (Atom)newObject;
 
-                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
-                    SelectionAdorners[newObject] = atomAdorner;
-                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                    if (atom.Singleton)
+                    {
+                        SingleAtomSelectionAdorner atomAdorner = new SingleAtomSelectionAdorner(DrawingSurface, atom.Parent, this);
+                        SelectionAdorners[newObject] = atomAdorner;
+                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                        atomAdorner.DragCompleted+= AtomAdorner_DragCompleted; 
+
+                    }
+                    else
+                    {
+                        AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
+                        SelectionAdorners[newObject] = atomAdorner;
+                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
+                        //if all atoms are selected then select the mol
+                        if (AllAtomsSelected(atom.Parent))
+                        {
+                            RemoveAdorners(atom.Parent);
+                            MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
+                            SelectionAdorners[newObject] = molAdorner;
+                        }
+
+                    }
+
                 }
 
-                if (newObject is Bond)
+                else if (newObject is Bond)
                 {
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
                     SelectionAdorners[newObject] = bondAdorner;
                     bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
 
-                if (newObject is Molecule)
+               else if (newObject is Molecule)
                 {
                     MoleculeSelectionAdorner molAdorner =
                         new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
                     SelectionAdorners[newObject] = molAdorner;
-                    molAdorner.DragResizeCompleted += MolAdorner_DragResizeCompleted;
-                    molAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
+                    molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                    (molAdorner as SingleAtomSelectionAdorner).DragCompleted += MolAdorner_DragCompleted;
                 }
             }
         }
 
-        private void MolAdorner_DragResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        private void MolAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner) sender);
+            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
+            SelectedItems.Remove(movedMolecule);
+
+            //and add in a new one
+            SelectedItems.Add(movedMolecule);
+        }
+
+        private void AtomAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {  
+            //we've completed the drag operation
+            //remove the existing molecule adorner
+
+            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
+            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
+            SelectedItems.Remove(movedMolecule);
+
+            //and add in a new one
+            SelectedItems.Add(movedMolecule.Atoms[0]);
+        }
+
+        private void MolAdorner_ResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
             //we've completed the drag operation
             //remove the existing molecule adorner
@@ -480,7 +533,11 @@ namespace Chem4Word.ViewModel
                 }
                 else if (sender is MoleculeSelectionAdorner)
                 {
-                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule.Parent as Molecule;
+                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+                }
+                else if (sender is SingleAtomSelectionAdorner)
+                {
+                    Molecule mol = (sender as SingleAtomSelectionAdorner).AdornedMolecule.Parent as Molecule;
                 }
             }
         }
@@ -669,10 +726,10 @@ namespace Chem4Word.ViewModel
             UndoManager.EndUndoBlock();
         }
 
-        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir)
+        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir, Element elem = null)
         {
             Atom newAtom = new Atom();
-            newAtom.Element = _selectedElement;
+            newAtom.Element = elem ?? _selectedElement;
             newAtom.Position = newAtomPos;
             object tag = null;
             if (dir != ClockDirections.Nothing)
@@ -868,8 +925,10 @@ namespace Chem4Word.ViewModel
                     SelectedItems.Clear();
                     (atom as Atom).Position = (Point)newPosition;
                 };
+
                 UndoManager.RecordAction(undo, redo);
-                atom.Position = newPosition;
+
+                redo();
             }
 
             UndoManager.EndUndoBlock();
@@ -1318,7 +1377,10 @@ namespace Chem4Word.ViewModel
 
         public override Rect BoundingBox
         {
-            get { return CalcBoundingBox(); }
+            get
+            {
+                return CalcBoundingBox();
+            }
         }
 
         public void AddToSelection(object thingToAdd)

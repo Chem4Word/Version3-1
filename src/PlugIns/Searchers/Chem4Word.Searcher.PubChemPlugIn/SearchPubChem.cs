@@ -22,6 +22,7 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Chem4Word.Model;
 
 namespace Chem4Word.Searcher.PubChemPlugIn
 {
@@ -391,6 +392,11 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                                 lastMolfile = new StreamReader(resStream).ReadToEnd();
                                 SdFileConverter sdFileConverter = new SdFileConverter();
                                 Model.Model model = sdFileConverter.Import(lastMolfile);
+                                if (model.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
+                                    || model.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
+                                {
+                                    model.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
+                                }
                                 this.display1.Chemistry = model;
                                 if (model.AllWarnings.Count > 0 || model.AllErrors.Count > 0)
                                 {

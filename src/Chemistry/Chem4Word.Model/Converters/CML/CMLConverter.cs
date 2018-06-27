@@ -167,10 +167,10 @@ namespace Chem4Word.Model.Converters
         {
             XElement result = new XElement(CML.cml + "atom",
                 new XAttribute("id", atom.Id),
-                new XAttribute("elementType", atom.Element.ToString()),
+                new XAttribute("elementType", atom.Element.Symbol),
                 new XAttribute("x2", atom.Position.X),
                 new XAttribute("y2", atom.Position.Y)
-               );
+            );
 
             if (atom.FormalCharge != null)
             {
@@ -191,10 +191,30 @@ namespace Chem4Word.Model.Converters
             {
                 if (bond.Stereo == BondStereo.Cis || bond.Stereo == BondStereo.Trans)
                 {
-                    Debugger.Break();
-                    // Hack: Fix 1st and last atomRefs
+                    Atom firstAtom = bond.StartAtom;
+                    Atom lastAtom = bond.EndAtom;
+
+                    // Hack: To find first and last atomRefs
+                    foreach (var atomBond in bond.StartAtom.Bonds)
+                    {
+                        if (!bond.Id.Equals(atomBond.Id))
+                        {
+                            firstAtom = atomBond.OtherAtom(bond.StartAtom);
+                            break;
+                        }
+                    }
+
+                    foreach (var atomBond in bond.EndAtom.Bonds)
+                    {
+                        if (!bond.Id.Equals(atomBond.Id))
+                        {
+                            lastAtom = atomBond.OtherAtom(bond.EndAtom);
+                            break;
+                        }
+                    }
+
                     result = new XElement(CML.cml + "bondStereo",
-                                new XAttribute("atomRefs4", $"{bond.StartAtom.Id} {bond.StartAtom.Id} {bond.EndAtom.Id} {bond.EndAtom.Id}"),
+                                new XAttribute("atomRefs4", $"{firstAtom.Id} {bond.StartAtom.Id} {bond.EndAtom.Id} {lastAtom.Id}"),
                                 GetStereoString(bond.Stereo));
                 }
                 else
