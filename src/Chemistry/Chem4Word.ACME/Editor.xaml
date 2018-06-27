@@ -148,7 +148,7 @@
                             Stretch="Fill" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:SelectorBehavior ViewModel="{Binding}" />
+                        <behaviors:LassoBehavior ViewModel="{Binding}" />
                     </RadioButton.Tag>
                 </RadioButton>
 

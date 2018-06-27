@@ -103,11 +103,11 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (selAtom != null)
                             {
-                                ViewModel.SelectedItems.Add(selAtom);
+                                ViewModel.AddToSelection(selAtom);
                             }
                             if (selBond != null)
                             {
-                                ViewModel.SelectedItems.Add(selBond);
+                                ViewModel.AddToSelection(selBond);
                             }
                         }
                         return HitTestResultBehavior.Continue;
@@ -120,11 +120,11 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (selAtom != null)
                             {
-                                ViewModel.SelectedItems.Remove(selAtom);
+                                ViewModel.RemoveFromSelection(selAtom);
                             }
                             if (selBond != null)
                             {
-                                ViewModel.SelectedItems.Remove(selBond);
+                                ViewModel.RemoveFromSelection(selBond);
                             }
                         }
                         return HitTestResultBehavior.Continue;
