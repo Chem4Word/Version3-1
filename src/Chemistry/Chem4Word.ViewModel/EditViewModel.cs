@@ -453,7 +453,7 @@ namespace Chem4Word.ViewModel
                         //if all atoms are selected then select the mol
                         if (AllAtomsSelected(atom.Parent))
                         {
-                            RemoveAdorners(atom.Parent);
+                            RemoveAtomBondAdorners(atom.Parent);
                             MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
                             SelectionAdorners[newObject] = molAdorner;
                         }
@@ -485,7 +485,7 @@ namespace Chem4Word.ViewModel
         {
             var moleculeSelectionAdorner = ((MoleculeSelectionAdorner) sender);
             var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
-            SelectedItems.Remove(movedMolecule);
+            RemoveFromSelection(movedMolecule);
 
             //and add in a new one
             SelectedItems.Add(movedMolecule);
@@ -498,7 +498,7 @@ namespace Chem4Word.ViewModel
 
             var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
             var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
-            SelectedItems.Remove(movedMolecule);
+            RemoveFromSelection(movedMolecule);
 
             //and add in a new one
             SelectedItems.Add(movedMolecule.Atoms[0]);
