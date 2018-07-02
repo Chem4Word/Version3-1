@@ -22,10 +22,8 @@ namespace Chem4Word.ViewModel.Commands
 
         public override void Execute(object parameter)
         {
-            Debug.Assert(MyEditViewModel.SelectedItems[0] is Molecule);
-            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
-
-            MyEditViewModel.FlipMolecule(selMolecule, true, false);
+           var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
+           MyEditViewModel.FlipMolecule(selMolecule, true, false);
         }
     }
 }

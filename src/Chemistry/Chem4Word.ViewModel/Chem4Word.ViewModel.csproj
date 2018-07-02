@@ -78,7 +78,7 @@
     <Compile Include="Commands\CutCommand.cs" />
     <Compile Include="Commands\CopyCommand.cs" />
     <Compile Include="Commands\DeleteCommand.cs" />
-    <Compile Include="Commands\FlipHorCommand.cs" />
+    <Compile Include="Commands\FlipCommand.cs" />
     <Compile Include="Commands\FlipHorizontalCommand.cs" />
     <Compile Include="Commands\FuseCommand.cs" />
     <Compile Include="Commands\GroupCommand.cs" />
