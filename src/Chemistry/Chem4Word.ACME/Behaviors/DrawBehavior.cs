@@ -5,17 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model;
+using Chem4Word.Model.Enums;
+using Chem4Word.Model.Geometry;
 using Chem4Word.View;
 using Chem4Word.ViewModel.Adorners;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model.Enums;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -30,7 +29,7 @@ namespace Chem4Word.ACME.Behaviors
         private DrawBondAdorner _adorner;
         private Point _lastPos;
         private AtomShape _lastAtomShape;
-        private Atom _lastAtom;
+        //private Atom _lastAtom;
 
         public DrawBehavior()
         {
@@ -41,8 +40,6 @@ namespace Chem4Word.ACME.Behaviors
             base.OnAttached();
 
             ViewModel.SelectedItems?.Clear();
-
-          
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
@@ -72,11 +69,9 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         lastPos = e.GetPosition(AssociatedObject);
 
-                       var angleBetween = Vector.AngleBetween((_lastAtomShape?.ParentAtom?.BalancingVector)?? BasicGeometry.ScreenNorth, BasicGeometry.ScreenNorth);
+                        var angleBetween = Vector.AngleBetween((_lastAtomShape?.ParentAtom?.BalancingVector) ?? BasicGeometry.ScreenNorth, BasicGeometry.ScreenNorth);
 
-                       lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
-                       
-                        
+                        lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
                     }
 
                     if (_adorner == null)
@@ -91,7 +86,6 @@ namespace Chem4Word.ACME.Behaviors
                     _adorner.EndPoint = lastPos;
                     _lastPos = lastPos;
                 }
-               
             }
         }
 
@@ -110,8 +104,8 @@ namespace Chem4Word.ACME.Behaviors
 
             if (landedBondShape != null)
             {
-                if (landedBondShape.Stereo == BondStereo.Hatch & ViewModel.CurrentStereo ==BondStereo.Hatch | 
-                    landedBondShape.Stereo == BondStereo.Wedge & ViewModel.CurrentStereo ==BondStereo.Wedge)
+                if (landedBondShape.Stereo == BondStereo.Hatch & ViewModel.CurrentStereo == BondStereo.Hatch |
+                    landedBondShape.Stereo == BondStereo.Wedge & ViewModel.CurrentStereo == BondStereo.Wedge)
                 {
                     ViewModel.SwapBondDirection(landedBondShape.ParentBond);
                 }
@@ -128,7 +122,6 @@ namespace Chem4Word.ACME.Behaviors
                     if (_currentAtomShape != null)
                     {
                         ViewModel.AddAtomChain(_currentAtomShape.ParentAtom, _angleSnapper.SnapBond(e.GetPosition(AssociatedObject), e), ClockDirections.Two);
-
                     }
                     else
                     {
@@ -156,7 +149,6 @@ namespace Chem4Word.ACME.Behaviors
                     }
                 }
             }
-           
 
             if (_adorner != null)
             {
@@ -175,7 +167,7 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="lastAtomShape"></param>
         /// <returns></returns>
@@ -185,7 +177,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 double bondAngle = Vector.AngleBetween(BasicGeometry.ScreenNorth, bondVector);
 
-                ClockDirections hour = (ClockDirections) BasicGeometry.SnapToClock(bondAngle);
+                ClockDirections hour = (ClockDirections)BasicGeometry.SnapToClock(bondAngle);
                 return hour;
             }
 
@@ -193,7 +185,6 @@ namespace Chem4Word.ACME.Behaviors
             Vector newDirection;
 
             ClockDirections newTag;
-
 
             if (lastAtom.Degree == 0) //isolated atom
             {
@@ -214,7 +205,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else //it has sprouted, so where to put the new branch?
                 {
-                    var vecA = ((ClockDirections) lastAtom.Tag).ToVector();
+                    var vecA = ((ClockDirections)lastAtom.Tag).ToVector();
                     vecA.Normalize();
                     var vecB = -bondVector;
                     vecB.Normalize();
@@ -229,9 +220,8 @@ namespace Chem4Word.ACME.Behaviors
             {
                 newDirection = lastAtom.BalancingVector * ViewModel.Model.XamlBondLength;
                 newTag = GetGeneralDir(newDirection);
-
             }
-            return (newDirection+lastAtom.Position, newTag);
+            return (newDirection + lastAtom.Position, newTag);
         }
 
         private bool VirginAtom(Atom lastAtom)
@@ -247,36 +237,47 @@ namespace Chem4Word.ACME.Behaviors
                 case ClockDirections.One:
                     newTag = ClockDirections.Four;
                     break;
+
                 case ClockDirections.Two:
                     newTag = ClockDirections.Four;
                     break;
+
                 case ClockDirections.Three:
                     newTag = ClockDirections.Two;
                     break;
+
                 case ClockDirections.Four:
                     newTag = ClockDirections.Two;
                     break;
+
                 case ClockDirections.Five:
                     newTag = ClockDirections.Two;
                     break;
+
                 case ClockDirections.Six:
                     newTag = ClockDirections.Eight;
                     break;
+
                 case ClockDirections.Seven:
                     newTag = ClockDirections.Nine;
                     break;
+
                 case ClockDirections.Eight:
                     newTag = ClockDirections.Ten;
                     break;
+
                 case ClockDirections.Nine:
                     newTag = ClockDirections.Ten;
                     break;
+
                 case ClockDirections.Ten:
                     newTag = ClockDirections.Eight;
                     break;
+
                 case ClockDirections.Twelve:
                     newTag = ClockDirections.Two;
                     break;
+
                 default:
                     newTag = ClockDirections.Two;
                     break;
@@ -316,8 +317,6 @@ namespace Chem4Word.ACME.Behaviors
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
             return (result?.VisualHit as BondShape);
         }
-
-
 
         private HitTestResult GetTarget(Point p)
         {

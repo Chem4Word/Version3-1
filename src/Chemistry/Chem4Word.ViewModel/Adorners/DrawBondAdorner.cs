@@ -3,7 +3,8 @@
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
-//
+// ---------------------------------------------------------------------------
+
 using Chem4Word.Model;
 using Chem4Word.Model.Annotations;
 using Chem4Word.Model.Enums;
@@ -16,8 +17,9 @@ namespace Chem4Word.ViewModel.Adorners
 {
     public class DrawBondAdorner : Adorner
     {
-        private StreamGeometry _outline;
+        //private StreamGeometry _outline;
         private SolidColorBrush _solidColorBrush;
+
         private Pen _dashPen;
 
         public BondStereo Stereo { get; set; }
@@ -49,7 +51,7 @@ namespace Chem4Word.ViewModel.Adorners
             _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
             _solidColorBrush.Opacity = 0.5;
 
-            _dashPen = new Pen(SystemColors.HighlightBrush, bondThickness );
+            _dashPen = new Pen(SystemColors.HighlightBrush, bondThickness);
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);

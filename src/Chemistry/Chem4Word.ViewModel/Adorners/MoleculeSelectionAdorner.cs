@@ -10,9 +10,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -26,7 +24,7 @@ namespace Chem4Word.ViewModel.Adorners
         private static double _halfThumbWidth;
         private static double _rotateThumbWidth;
 
-        private Point _canvasPos;
+        //private Point _canvasPos;
 
         //some things to grab hold of
         protected readonly Thumb TopLeftHandle; //these do the resizing
@@ -35,7 +33,7 @@ namespace Chem4Word.ViewModel.Adorners
         protected readonly Thumb BottomLeftHandle; //these do the resizing
         protected readonly Thumb BottomRightHandle; //these do the resizing
         protected readonly Thumb RotateHandle;  //Grab hold of this to rotate the molecule
-       
+
         //flags
 
         protected bool Resizing;
@@ -45,13 +43,11 @@ namespace Chem4Word.ViewModel.Adorners
         private Point _centroid;
 
         //private SnapGeometry _rotateSnapper;
-        private readonly Brush _renderBrush;
-
+        //private readonly Brush _renderBrush;
 
         public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement, molecule, currentModel)
         {
-
             if (_thumbWidth == null)
             {
                 _thumbWidth = (int)CurrentModel.Model.XamlBondLength / 10;
@@ -71,7 +67,7 @@ namespace Chem4Word.ViewModel.Adorners
             //no need to add the adroner in at this point as the base has already done it
         }
 
-        protected  void AttachHandlers()
+        protected void AttachHandlers()
         {
             AttachHandler();
             //wire up the event handling
@@ -88,23 +84,19 @@ namespace Chem4Word.ViewModel.Adorners
 
             TopLeftHandle.DragCompleted += HandleResizeCompleted;
             TopRightHandle.DragCompleted += HandleResizeCompleted; ;
-            BottomLeftHandle.DragCompleted += HandleResizeCompleted; 
+            BottomLeftHandle.DragCompleted += HandleResizeCompleted;
             BottomRightHandle.DragCompleted += HandleResizeCompleted; ;
-
-
         }
 
-    
         private void ResizeStarted(object sender, DragStartedEventArgs e)
         {
-            Resizing=true;
+            Resizing = true;
             Dragging = false;
             Keyboard.Focus(this);
             BoundingBox = AdornedMolecule.BoundingBox;
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
         }
-
 
         protected override void AbortDragging()
         {
@@ -164,7 +156,6 @@ namespace Chem4Word.ViewModel.Adorners
 
         public event DragCompletedEventHandler ResizeCompleted;
 
-
         private void HandleResizeCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
         {
             Resizing = false;
@@ -180,7 +171,6 @@ namespace Chem4Word.ViewModel.Adorners
             }
         }
 
-
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
@@ -194,8 +184,7 @@ namespace Chem4Word.ViewModel.Adorners
         public Rect BoundingBox { get; set; }
 
         /// <summary>
-     
-            
+
         /// <summary>
         /// Override this to
         /// </summary>
@@ -216,7 +205,6 @@ namespace Chem4Word.ViewModel.Adorners
                 AdornedMoleculeImage.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
                 drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
-
             }
         }
 
@@ -247,8 +235,6 @@ namespace Chem4Word.ViewModel.Adorners
         // Arrange the Adorners.
         protected override Size ArrangeOverride(Size finalSize)
         {
-           
-
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
             var bbb = AdornedMolecule.BoundingBox;
@@ -258,8 +244,6 @@ namespace Chem4Word.ViewModel.Adorners
                 bbb = LastOperation.TransformBounds(bbb);
             }
 
-            
-
             TopLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
             TopRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value,
                 _thumbWidth.Value));
@@ -267,7 +251,6 @@ namespace Chem4Word.ViewModel.Adorners
                 _thumbWidth.Value, _thumbWidth.Value));
             BottomRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth,
                 bbb.Height + bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
-       
 
             //add the rotator
             double xplacement, yplacement;
@@ -279,8 +262,6 @@ namespace Chem4Word.ViewModel.Adorners
             //BoundingBox = bbb;
             base.ArrangeOverride(finalSize);
             return finalSize;
-
-            
         }
 
         #region Events
@@ -328,7 +309,6 @@ namespace Chem4Word.ViewModel.Adorners
         // Handler for resizing from the top-right.
         private void TopRightHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
-          
             IncrementDragging(args);
 
             if (NotDraggingBackwards())
@@ -346,7 +326,7 @@ namespace Chem4Word.ViewModel.Adorners
 
         private bool NotDraggingBackwards()
         {
-            return BigThumb.Height >=10 && BigThumb.Width >=10;
+            return BigThumb.Height >= 10 && BigThumb.Width >= 10;
         }
 
         // Handler for resizing from the top-left.
@@ -372,7 +352,6 @@ namespace Chem4Word.ViewModel.Adorners
         // Handler for resizing from the bottom-left.
         private void BottomLeftHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
-          
             IncrementDragging(args);
             if (NotDraggingBackwards())
             {
@@ -389,7 +368,6 @@ namespace Chem4Word.ViewModel.Adorners
 
         private void BottomRightHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
-          
             IncrementDragging(args);
             if (NotDraggingBackwards())
             {
