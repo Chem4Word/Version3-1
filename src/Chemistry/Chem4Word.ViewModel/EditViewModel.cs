@@ -1139,99 +1139,6 @@ namespace Chem4Word.ViewModel
                 }
             }
 
-            //if (targetAtoms.Any())
-            //{
-            //    List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
-            //    foreach (var atom in targetAtoms)
-            //    {
-            //        double seperation = 90.0;
-            //        if (atom.Bonds.Count > 1)
-            //        {
-            //            seperation = 30.0;
-            //        }
-
-            //        int hydrogenCount = atom.ImplicitHydrogenCount;
-            //        var vector = atom.BalancingVector;
-            //        switch (hydrogenCount)
-            //        {
-            //            case 1:
-            //                // Use balancing vector as is
-            //                break;
-
-            //            case 2:
-            //                Matrix matrix1 = new Matrix();
-            //                matrix1.Rotate(-seperation / 2);
-            //                vector = vector * matrix1;
-            //                break;
-
-            //            case 3:
-            //                Matrix matrix2 = new Matrix();
-            //                matrix2.Rotate(-seperation);
-            //                vector = vector * matrix2;
-            //                break;
-
-            //            case 4:
-            //                // Use default balancing vector (Screen.North) as is
-            //                break;
-            //        }
-
-            //        Matrix matrix3 = new Matrix();
-            //        matrix3.Rotate(seperation);
-
-            //        for (int i = 0; i < hydrogenCount; i++)
-            //        {
-            //            if (i > 0)
-            //            {
-            //                vector = vector * matrix3;
-            //            }
-
-            //            var x = new NewAtomPlacement();
-            //            x.ExistingAtom = atom;
-            //            x.Position = atom.Position +
-            //                         vector * (Model.XamlBondLength * Globals.ExplicitHydrogenBondPercentage);
-            //            newAtomPlacements.Add(x);
-            //        }
-            //    }
-
-            //    //UndoManager.BeginUndoBlock();
-
-            //    //List<Atom> addedAtoms = new List<Atom>();
-            //    //List<Molecule> parents = new List<Molecule>();
-
-            //    //Action undoAction = () =>
-            //    //{
-            //    //    foreach (var atom in addedAtoms)
-            //    //    {
-            //    //        foreach (var parent in parents)
-            //    //        {
-            //    //            if (parent.Atoms.Contains(atom))
-            //    //            {
-            //    //                parent.Atoms.Remove(atom);
-            //    //            }
-            //    //        }
-            //    //    }
-            //    //};
-
-            //    //Action redoAction = () =>
-            //    //{
-            //    //    int idx = 0;
-            //    //    foreach (var placement in newAtomPlacements)
-            //    //    {
-            //    //        if (!parents.Contains(placement.ExistingAtom.Parent))
-            //    //        {
-            //    //            parents.Add(placement.ExistingAtom.Parent);
-            //    //        }
-            //    //        addedAtoms.Add(AddAtomChain(placement.ExistingAtom, placement.Position, ClockDirections.Nothing, Globals.PeriodicTable.H));
-            //    //    }
-            //    //};
-
-            //    //UndoManager.RecordAction(undoAction, redoAction, "Add Explicit Hydrogens");
-
-            //    //redoAction();
-
-            //    //UndoManager.EndUndoBlock();
-            //}
-
             if (targetAtoms.Any())
             {
                 List<Atom> newAtoms = new List<Atom>();
@@ -1309,26 +1216,11 @@ namespace Chem4Word.ViewModel
 
                 Action undoAction = () =>
                 {
-                    //foreach (var atom in newAtoms)
-                    //{
-                    //    foreach (var bond in newBonds)
-                    //    {
-                    //        foreach (var atomBond in atom.Bonds.ToList())
-                    //        {
-                    //            if (atomBond.Id.Equals(bond.Id))
-                    //            {
-                    //                atomBond.StartAtom = null;
-                    //                atomBond.EndAtom = null;
-                    //            }
-                    //        }
-                    //        atom.Bonds.Remove(bond);
-                    //    }
-                    //}
                     foreach (var bond in newBonds)
                     {
-                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
                         bond.Parent.Bonds.Remove(bond);
                     }
+                    // BUG: Removing a bond does not remove it from an Atom's Bonds Collection so we have to remove them manually
                     foreach (var atom in targetAtoms)
                     {
                         foreach (var bond in newBonds)
@@ -1355,6 +1247,21 @@ namespace Chem4Word.ViewModel
                     foreach (var bond in newBonds)
                     {
                         parents[bond.Id].Bonds.Add(bond);
+                    }
+                    // HACK: Add bonds into each target atom's bonds collection if not already present
+                    // HACK: This is only required in redo (from undo manager)
+                    foreach (var atom in targetAtoms)
+                    {
+                        foreach (var bond in newBonds)
+                        {
+                            if (bond.StartAtom == atom)
+                            {
+                                if (!atom.Bonds.Contains(bond))
+                                {
+                                    atom.Bonds.Add(bond);
+                                }
+                            }
+                        }
                     }
                     SelectedItems.Clear();
                 };
@@ -1447,44 +1354,38 @@ namespace Chem4Word.ViewModel
                     {
                         parents[bond.Id].Bonds.Add(bond);
                     }
+                    // HACK: Add bonds into each target bond's start atom's bonds collection if not already present
+                    // HACK: This is only required in undo (from undo manager)
+                    foreach (var bond in targetBonds)
+                    {
+                        var atom = bond.StartAtom;
+                        if (!atom.Bonds.Contains(bond))
+                        {
+                            atom.Bonds.Add(bond);
+                        }
+                    }
+                    SelectedItems.Clear();
                 };
 
                 Action redoAction = () =>
                 {
-                    //foreach (var atom in targetAtoms)
-                    //{
-                    //    foreach (var bond in targetBonds)
-                    //    {
-                    //        foreach (var atomBond in atom.Bonds.ToList())
-                    //        {
-                    //            if (atomBond.Id.Equals(bond.Id))
-                    //            {
-                    //                atomBond.StartAtom = null;
-                    //                atomBond.EndAtom = null;
-                    //            }
-                    //        }
-                    //        atom.Bonds.Remove(bond);
-                    //    }
-                    //}
                     foreach (var bond in targetBonds)
                     {
-                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
-                        bond.StartAtom = null;
-                        bond.EndAtom = null;
                         bond.Parent.Bonds.Remove(bond);
+                        bond.StartAtom.Bonds.Remove(bond);
                     }
                     foreach (var atom in targetAtoms)
                     {
                         atom.Parent.Atoms.Remove(atom);
                     }
+                    SelectedItems.Clear();
                 };
 
                 UndoManager.RecordAction(undoAction, redoAction);
-                UndoManager.EndUndoBlock();
-
                 redoAction();
+
+                UndoManager.EndUndoBlock();
             }
-            SelectedItems.Clear();
         }
 
         public override Rect BoundingBox
