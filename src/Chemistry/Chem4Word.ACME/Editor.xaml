@@ -148,7 +148,7 @@
                             Stretch="Fill" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:SelectorBehavior ViewModel="{Binding}" />
+                        <behaviors:LassoBehavior ViewModel="{Binding}" />
                     </RadioButton.Tag>
                 </RadioButton>
 
@@ -439,8 +439,8 @@
                 Height="40"
                 BandIndex="3">
 
-                <Button x:Name="MirrorButton"
-                    Command="{Binding MirrorCommand}"
+                <Button x:Name="FlipHorizontalButton"
+                    Command="{Binding FlipHorizontalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Vertical">
                     <Viewbox Width="24" Height="24">
@@ -454,8 +454,8 @@
                     </Viewbox>
                 </Button>
 
-                <Button x:Name="FlipButton"
-                    Command="{Binding FlipCommand}"
+                <Button x:Name="FlipVerticalButton"
+                    Command="{Binding FlipVerticalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Horizontal">
                     <Viewbox Width="24" Height="24">
@@ -644,7 +644,7 @@
                             <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                         </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
-                            <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
+                            <RotateTransform Angle="{Binding Path=Angle}" />
                         </LinearGradientBrush.Transform>
                     </LinearGradientBrush>
                     <LinearGradientBrush x:Key="HighlightHatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
@@ -656,7 +656,7 @@
                             <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
                         </LinearGradientBrush.RelativeTransform>
                         <LinearGradientBrush.Transform>
-                            <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
+                            <RotateTransform Angle="{Binding Path=Angle}" />
                         </LinearGradientBrush.Transform>
                     </LinearGradientBrush>
                     <DataTemplate DataType="{x:Type model:Bond}">

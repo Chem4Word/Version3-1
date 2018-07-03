@@ -5,25 +5,23 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.Diagnostics;
+using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Commands
 {
-    public class MirrorCommand : BaseCommand
+    public class FlipHorizontalCommand : FlipCommand
     {
-        public MirrorCommand(EditViewModel vm) : base(vm)
+        public FlipHorizontalCommand(EditViewModel vm) : base(vm)
         {
         }
 
-        public override bool CanExecute(object parameter)
-        {
-            return false;
-        }
 
         public override void Execute(object parameter)
         {
-            Debugger.Break();
+            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
+
+            MyEditViewModel.FlipMolecule(selMolecule, false, false);
         }
     }
 }

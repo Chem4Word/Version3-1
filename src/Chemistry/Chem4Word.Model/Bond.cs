@@ -107,6 +107,7 @@ namespace Chem4Word.Model
                 if (_startAtom != null)
                 {
                     _startAtom.Bonds.Remove(this);
+                    _startAtom.PropertyChanged -= _startAtom_PropertyChanged;
                 }
 
                 ;
@@ -114,8 +115,17 @@ namespace Chem4Word.Model
                 if (_startAtom != null)
                 {
                     _startAtom.Bonds.Add(this);
+                    _startAtom.PropertyChanged += _startAtom_PropertyChanged;
                 }
                 OnPropertyChanged();
+            }
+        }
+
+        private void _startAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName==nameof(Atom.Position))
+            {
+                OnPropertyChanged("Angle");
             }
         }
 
@@ -133,14 +143,24 @@ namespace Chem4Word.Model
                 if (_endAtom != null)
                 {
                     _endAtom.Bonds.Remove(this);
+                    _endAtom.PropertyChanged -= _endAtom_PropertyChanged;
                 }
 
                 _endAtom = value;
                 if (_endAtom != null)
                 {
                     _endAtom.Bonds.Add(this);
+                    _endAtom.PropertyChanged += _endAtom_PropertyChanged;
                 }
                 OnPropertyChanged();
+            }
+        }
+
+        private void _endAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Atom.Position))
+            {
+                OnPropertyChanged("Angle");
             }
         }
 
