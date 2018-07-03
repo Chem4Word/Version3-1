@@ -1324,6 +1324,11 @@ namespace Chem4Word.ViewModel
                     //        atom.Bonds.Remove(bond);
                     //    }
                     //}
+                    foreach (var bond in newBonds)
+                    {
+                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
+                        bond.Parent.Bonds.Remove(bond);
+                    }
                     foreach (var atom in targetAtoms)
                     {
                         foreach (var bond in newBonds)
@@ -1333,11 +1338,6 @@ namespace Chem4Word.ViewModel
                                 atom.Bonds.Remove(bond);
                             }
                         }
-                    }
-                    foreach (var bond in newBonds)
-                    {
-                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
-                        bond.Parent.Bonds.Remove(bond);
                     }
                     foreach (var atom in newAtoms)
                     {
