@@ -10,7 +10,6 @@ using Chem4Word.ViewModel.Adorners;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -19,13 +18,14 @@ namespace Chem4Word.ACME.Behaviors
 {
     public class LassoBehavior : BaseEditBehavior
     {
-        private bool _lassoVisible;
+        //private bool _lassoVisible;
         private PointCollection _mouseTrack;
+
         private Point _startpoint;
         private Window _parent;
         private bool _flag;
         private LassoAdorner _lassoAdorner;
-        private MoleculeSelectionAdorner _molAdorner;
+        //private MoleculeSelectionAdorner _molAdorner;
 
         protected override void OnAttached()
         {
@@ -47,8 +47,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-
-        
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
@@ -93,7 +91,6 @@ namespace Chem4Word.ACME.Behaviors
                 var pos = Mouse.GetPosition(AssociatedObject);
                 _mouseTrack.Add(pos);
                 var outline = GetPolyGeometry();
-
 
                 if (_lassoAdorner == null)
                 {

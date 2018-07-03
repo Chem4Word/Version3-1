@@ -372,12 +372,9 @@ namespace Chem4Word.ViewModel
             if (oldObject != null)
             {
                 RemoveSelectionAdorners(oldObject);
-
             }
             switch (e.Action)
             {
-                
-
                 case NotifyCollectionChangedAction.Reset:
                     RemoveAllAdorners();
                     break;
@@ -397,6 +394,8 @@ namespace Chem4Word.ViewModel
             DeleteCommand.RaiseCanExecChanged();
             FlipHorizontalCommand.RaiseCanExecChanged();
             FlipVerticalCommand.RaiseCanExecChanged();
+            AddHydrogensCommand.RaiseCanExecChanged();
+            RemoveHydrogensCommand.RaiseCanExecChanged();
         }
 
         public void RemoveAllAdorners()
@@ -420,7 +419,7 @@ namespace Chem4Word.ViewModel
                     var selectionAdorner = SelectionAdorners[oldObject];
                     if (selectionAdorner is MoleculeSelectionAdorner)
                     {
-                        var msAdorner = (MoleculeSelectionAdorner) selectionAdorner;
+                        var msAdorner = (MoleculeSelectionAdorner)selectionAdorner;
 
                         msAdorner.DragCompleted -= MolAdorner_ResizeCompleted;
                         msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
@@ -428,7 +427,6 @@ namespace Chem4Word.ViewModel
                     }
                     layer.Remove(selectionAdorner);
                     SelectionAdorners.Remove(oldObject);
-
                 }
             }
         }
@@ -441,72 +439,69 @@ namespace Chem4Word.ViewModel
                 {
                     var atom = (Atom)newObject;
 
-                    if (atom.Singleton)
+                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
+                    SelectionAdorners[newObject] = atomAdorner;
+                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
+                    //if all atoms are selected then select the mol
+                    if (AllAtomsSelected(atom.Parent))
                     {
-                        SingleAtomSelectionAdorner atomAdorner = new SingleAtomSelectionAdorner(DrawingSurface, atom.Parent, this);
-                        SelectionAdorners[newObject] = atomAdorner;
-                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-                        atomAdorner.DragCompleted+= AtomAdorner_DragCompleted; 
-
+                        RemoveAtomBondAdorners(atom.Parent);
+                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
+                        SelectionAdorners[newObject] = molAdorner;
                     }
-                    else
-                    {
-                        AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
-                        SelectionAdorners[newObject] = atomAdorner;
-                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-
-                        //if all atoms are selected then select the mol
-                        if (AllAtomsSelected(atom.Parent))
-                        {
-                            RemoveAtomBondAdorners(atom.Parent);
-                            MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
-                            SelectionAdorners[newObject] = molAdorner;
-                        }
-
-                    }
-
                 }
-
                 else if (newObject is Bond)
                 {
                     BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
                     SelectionAdorners[newObject] = bondAdorner;
                     bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
-
-               else if (newObject is Molecule)
+                else if (newObject is Molecule)
                 {
-                    MoleculeSelectionAdorner molAdorner =
-                        new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
-                    SelectionAdorners[newObject] = molAdorner;
-                    molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
-                    molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-                    (molAdorner as SingleAtomSelectionAdorner).DragCompleted += MolAdorner_DragCompleted;
+                    Molecule mol = (Molecule)newObject;
+                    if (mol.Atoms.Count == 1)
+                    {
+                        SingleAtomSelectionAdorner atomAdorner =
+                            new SingleAtomSelectionAdorner(DrawingSurface, mol, this);
+                        SelectionAdorners[newObject] = atomAdorner;
+                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                        atomAdorner.DragCompleted += AtomAdorner_DragCompleted;
+                    }
+                    else
+                    {
+                        MoleculeSelectionAdorner molAdorner =
+                            new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
+                        SelectionAdorners[newObject] = molAdorner;
+                        molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
+                        molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                        (molAdorner as SingleAtomSelectionAdorner).DragCompleted += MolAdorner_DragCompleted;
+                    }
                 }
             }
         }
 
         private void MolAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
         {
-            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner) sender);
+            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner)sender);
             var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
             RemoveFromSelection(movedMolecule);
 
             //and add in a new one
-            SelectedItems.Add(movedMolecule);
+            AddToSelection(movedMolecule);
         }
 
         private void AtomAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {  
+        {
             //we've completed the drag operation
             //remove the existing molecule adorner
 
-            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
+            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner)sender);
             var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
             RemoveFromSelection(movedMolecule);
 
             //and add in a new one
-            SelectedItems.Add(movedMolecule.Atoms[0]);
+            AddToSelection(movedMolecule.Atoms[0]);
         }
 
         private void MolAdorner_ResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
@@ -1046,9 +1041,11 @@ namespace Chem4Word.ViewModel
                 {
                     Atom insertAtom = null;
 
-                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position,
-                        ClockDirections.Nothing);
-                    Debug.Assert(insertAtom != null);
+                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position, ClockDirections.Nothing);
+                    if (insertAtom == null)
+                    {
+                        Debugger.Break();
+                    }
                     currentPlacement.ExistingAtom = insertAtom;
                 }
                 else if (previousAtom != null && previousAtom.BondBetween(currentAtom) == null)
@@ -1075,7 +1072,10 @@ namespace Chem4Word.ViewModel
                 newAtomPlacements[0].ExistingAtom.Parent.Refresh();
                 SelectedItems.Clear();
             };
-            Action redo = () => { newAtomPlacements[0].ExistingAtom.Parent.Refresh(); };
+            Action redo = () =>
+            {
+                newAtomPlacements[0].ExistingAtom.Parent.Refresh();
+            };
 
             UndoManager.RecordAction(undo, redo, "Molecule refresh");
             UndoManager.EndUndoBlock();
@@ -1213,32 +1213,29 @@ namespace Chem4Word.ViewModel
                 }
 
                 UndoManager.BeginUndoBlock();
+
                 Action undoAction = () =>
                 {
-                    //foreach (var atom in newAtoms)
-                    //{
-                    //    foreach (var bond in newBonds)
-                    //    {
-                    //        foreach (var atomBond in atom.Bonds.ToList())
-                    //        {
-                    //            if (atomBond.Id.Equals(bond.Id))
-                    //            {
-                    //                atomBond.StartAtom = null;
-                    //                atomBond.EndAtom = null;
-                    //            }
-                    //        }
-                    //        atom.Bonds.Remove(bond);
-                    //    }
-                    //}
                     foreach (var bond in newBonds)
                     {
-                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
                         bond.Parent.Bonds.Remove(bond);
+                    }
+                    // BUG: Removing a bond does not remove it from an Atom's Bonds Collection so we have to remove them manually
+                    foreach (var atom in targetAtoms)
+                    {
+                        foreach (var bond in newBonds)
+                        {
+                            if (atom.Bonds.Contains(bond))
+                            {
+                                atom.Bonds.Remove(bond);
+                            }
+                        }
                     }
                     foreach (var atom in newAtoms)
                     {
                         atom.Parent.Atoms.Remove(atom);
                     }
+                    SelectedItems.Clear();
                 };
 
                 Action redoAction = () =>
@@ -1251,14 +1248,30 @@ namespace Chem4Word.ViewModel
                     {
                         parents[bond.Id].Bonds.Add(bond);
                     }
+                    // HACK: Add bonds into each target atom's bonds collection if not already present
+                    // HACK: This is only required in redo (from undo manager)
+                    foreach (var atom in targetAtoms)
+                    {
+                        foreach (var bond in newBonds)
+                        {
+                            if (bond.StartAtom == atom)
+                            {
+                                if (!atom.Bonds.Contains(bond))
+                                {
+                                    atom.Bonds.Add(bond);
+                                }
+                            }
+                        }
+                    }
+                    SelectedItems.Clear();
                 };
 
                 UndoManager.RecordAction(undoAction, redoAction);
-                UndoManager.EndUndoBlock();
 
                 redoAction();
+
+                UndoManager.EndUndoBlock();
             }
-            SelectedItems.Clear();
         }
 
         public void RemoveHydrogens()
@@ -1341,44 +1354,38 @@ namespace Chem4Word.ViewModel
                     {
                         parents[bond.Id].Bonds.Add(bond);
                     }
+                    // HACK: Add bonds into each target bond's start atom's bonds collection if not already present
+                    // HACK: This is only required in undo (from undo manager)
+                    foreach (var bond in targetBonds)
+                    {
+                        var atom = bond.StartAtom;
+                        if (!atom.Bonds.Contains(bond))
+                        {
+                            atom.Bonds.Add(bond);
+                        }
+                    }
+                    SelectedItems.Clear();
                 };
 
                 Action redoAction = () =>
                 {
-                    //foreach (var atom in targetAtoms)
-                    //{
-                    //    foreach (var bond in targetBonds)
-                    //    {
-                    //        foreach (var atomBond in atom.Bonds.ToList())
-                    //        {
-                    //            if (atomBond.Id.Equals(bond.Id))
-                    //            {
-                    //                atomBond.StartAtom = null;
-                    //                atomBond.EndAtom = null;
-                    //            }
-                    //        }
-                    //        atom.Bonds.Remove(bond);
-                    //    }
-                    //}
                     foreach (var bond in targetBonds)
                     {
-                        // BUG: Removing a bond does not remove it from an Atom's Bond Collection
-                        bond.StartAtom = null;
-                        bond.EndAtom = null;
                         bond.Parent.Bonds.Remove(bond);
+                        bond.StartAtom.Bonds.Remove(bond);
                     }
                     foreach (var atom in targetAtoms)
                     {
                         atom.Parent.Atoms.Remove(atom);
                     }
+                    SelectedItems.Clear();
                 };
 
                 UndoManager.RecordAction(undoAction, redoAction);
-                UndoManager.EndUndoBlock();
-
                 redoAction();
+
+                UndoManager.EndUndoBlock();
             }
-            SelectedItems.Clear();
         }
 
         public override Rect BoundingBox
@@ -1429,22 +1436,21 @@ namespace Chem4Word.ViewModel
             }
 
             UndoManager.EndUndoBlock();
-
         }
 
         public void AddToSelection(object thingToAdd)
         {
             var parent = (thingToAdd as Atom)?.Parent ?? (thingToAdd as Bond)?.Parent;
 
-            if(!SelectedItems.Contains(parent))
+            if (!SelectedItems.Contains(parent))
             {
-                AddToSelection(new List<object> {thingToAdd});
+                AddToSelection(new List<object> { thingToAdd });
             }
         }
 
         public void RemoveFromSelection(object thingToRemove)
         {
-            RemoveFromSelection(new List<object> {thingToRemove});
+            RemoveFromSelection(new List<object> { thingToRemove });
         }
 
         public void AddToSelection(List<object> thingsToAdd)
@@ -1454,13 +1460,16 @@ namespace Chem4Word.ViewModel
                 .Select((dynamic obj) => obj.Parent as Molecule).Distinct());
             foreach (object o in thingsToAdd)
             {
-                if (o is Atom)
+                if (o is Atom atom)
                 {
-                    var atom = ((Atom)o);
-                    if (molsInSelection.Contains(atom.Parent))
-                    {
-                        Molecule parent = atom.Parent;
+                    Molecule parent = atom.Parent;
 
+                    if (atom.Singleton)
+                    {
+                        SelectedItems.Add(parent);
+                    }
+                    else if (molsInSelection.Contains(atom.Parent))
+                    {
                         if (SelectedItems.Contains(parent))
                         {
                             return;//the molecule itself is selected
@@ -1469,24 +1478,19 @@ namespace Chem4Word.ViewModel
                         var allObjects = new HashSet<object>(parent.Atoms);
                         allObjects.Add(parent.Bonds);
 
-
                         var selobjects =
-                            new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) {atom};
+                            new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) { atom };
                         selobjects.Add(parent.Bonds);
                         if (allObjects.SetEquals(selobjects))
                         {
-                          
-
                             foreach (Atom a in parent.Atoms)
                             {
                                 SelectedItems.Remove(a);
-                          
                             }
 
                             foreach (Bond b in parent.Bonds)
                             {
                                 SelectedItems.Remove(b);
-                          
                             }
 
                             SelectedItems.Add(parent);
@@ -1495,16 +1499,14 @@ namespace Chem4Word.ViewModel
                         {
                             SelectedItems.Add(atom);
                         }
-
                     }
                     else
                     {
                         SelectedItems.Add(atom);
                     }
                 }
-                else if (o is Bond)
+                else if (o is Bond bond)
                 {
-                    var bond = (Bond) o;
                     if (molsInSelection.Contains(bond.Parent))
                     {
                         Molecule parent = bond.Parent;
@@ -1516,7 +1518,6 @@ namespace Chem4Word.ViewModel
 
                         var allObjects = new HashSet<object>(parent.Atoms);
                         allObjects.Add(parent.Bonds);
-
 
                         var selobjects =
                             new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) { bond };
@@ -1541,19 +1542,16 @@ namespace Chem4Word.ViewModel
                         {
                             SelectedItems.Add(bond);
                         }
-
                     }
                     else
                     {
                         SelectedItems.Add(bond);
                     }
-
                 }
                 else if (o is Molecule)
                 {
                     SelectedItems.Add(o);
                 }
-
             }
         }
 
@@ -1564,9 +1562,12 @@ namespace Chem4Word.ViewModel
                 .Select((dynamic obj) => obj.Parent as Molecule).Distinct();
             foreach (object o in thingsToAdd)
             {
-                if (o is Atom)
+                if (o is Atom atom)
                 {
-                    var atom = ((Atom)o);
+                    if (atom.Singleton)
+                    {
+                        SelectedItems.Remove(atom.Parent);
+                    }
                     if (SelectedItems.Contains(atom))
                     {
                         SelectedItems.Remove(atom);
@@ -1579,17 +1580,14 @@ namespace Chem4Word.ViewModel
                     {
                         SelectedItems.Remove(bond);
                     }
-
                 }
-                else if (o is Molecule)
+                else if (o is Molecule mol)
                 {
-                    var mol = (Molecule)o;
                     if (SelectedItems.Contains(mol))
                     {
                         SelectedItems.Remove(mol);
                     }
                 }
-
             }
         }
     }
