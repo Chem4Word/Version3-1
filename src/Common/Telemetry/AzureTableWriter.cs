@@ -18,8 +18,8 @@ namespace Chem4Word.Telemetry
 {
     public class AzureTableWriter
     {
-        private static string accountName = "c4wtelemetry";
-        private static string accountKey = "60KaUHLXdj9sh4x3h1qgBRS3BMM2UbAAoeMChrp9xMBPutpB27feYMbUfcsqZb1PTu0rkJhruhkUD1ytuWjUoQ==";
+        private static readonly string AccountName = "c4wtelemetry";
+        private static readonly string AccountKey = "60KaUHLXdj9sh4x3h1qgBRS3BMM2UbAAoeMChrp9xMBPutpB27feYMbUfcsqZb1PTu0rkJhruhkUD1ytuWjUoQ==";
         private CloudTable _cloudTable = null;
 
         private readonly object _queueLock = new object();
@@ -30,7 +30,7 @@ namespace Chem4Word.Telemetry
         {
             try
             {
-                CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(new StorageCredentials(accountName, accountKey), true);
+                CloudStorageAccount cloudStorageAccount = new CloudStorageAccount(new StorageCredentials(AccountName, AccountKey), true);
                 CloudTableClient cloudTableClient = cloudStorageAccount.CreateCloudTableClient();
                 string tableName = "LoggingV31";
 #if DEBUG
@@ -110,12 +110,6 @@ namespace Chem4Word.Telemetry
             {
                 if (_cloudTable != null)
                 {
-                    // Fill in remaining properties
-                    //messageEntity.PartitionKey = messageEntity.MachineId; // Better storage, but slower retrieval times for mixed environment
-                    messageEntity.PartitionKey = "Chem4Word";
-
-                    messageEntity.RowKey = string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks);
-
                     TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(messageEntity);
                     _cloudTable.Execute(insertOrMergeOperation);
                 }
