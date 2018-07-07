@@ -158,6 +158,10 @@
         <File Id="Chem4Word.View.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.View.dll" />
         <File Id="Chem4Word.View.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.View.pdb" />
       </Component>
+      <Component Id="Chem4Word.ViewModel">
+        <File Id="Chem4Word.ViewModel.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ViewModel.dll" />
+        <File Id="Chem4Word.ViewModel.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ViewModel.pdb" />
+      </Component>
       <Component Id="Chem4Word.Core">
         <File Id="Chem4Word.Core.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.dll" />
         <File Id="Chem4Word.Core.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.pdb" />
@@ -171,9 +175,17 @@
   <!-- Standard Plug Ins -->
   <Fragment>
     <ComponentGroup Id="PlugIns" Directory="PLUGINSFOLDER">
+      <Component Id="Chem4Word.Editor.ACME">
+        <File Id="Chem4Word.Editor.ACME.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ACME.dll" />
+        <File Id="Chem4Word.Editor.ACME.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ACME.pdb" />
+      </Component>
       <Component Id="Chem4Word.Editor.ChemDoodleWeb.702">
         <File Id="Chem4Word.Editor.ChemDoodleWeb702.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb702.dll" />
         <File Id="Chem4Word.Editor.ChemDoodleWeb702.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb702.pdb" />
+      </Component>
+      <Component Id="Chem4Word.Editor.ChemDoodleWeb.800">
+        <File Id="Chem4Word.Editor.ChemDoodleWeb800.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb800.dll" />
+        <File Id="Chem4Word.Editor.ChemDoodleWeb800.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb800.pdb" />
       </Component>
       <Component Id="Chem4Word.Renderer.OoXmlV3">
         <File Id="Chem4Word.Renderer.OoXmlV3.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Renderer.OoXmlV3.dll" />
@@ -282,6 +294,11 @@
       <Component Id="Microsoft.Data.Services.Client">
         <File Id="Microsoft.Data.Services.Client.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Data.Services.Client.dll" />
         <!--<File Id="Microsoft.Data.Services.Client.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Data.Services.Client.xml" />-->
+      </Component>
+      <Component Id="Microsoft.ServiceBus">
+        <File Id="Microsoft.ServiceBus.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.ServiceBus.dll" />
+        <!--<File Id="Microsoft.ServiceBus.pdb" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.ServiceBus.pdb" />-->
+        <File Id="Microsoft.ServiceBus.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.ServiceBus.xml" />
       </Component>
       <Component Id="Microsoft.WindowsAzure.Storage">
         <File Id="Microsoft.WindowsAzure.Storage.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.WindowsAzure.Storage.dll" />
