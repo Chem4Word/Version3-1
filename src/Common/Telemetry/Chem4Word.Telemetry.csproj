@@ -104,6 +104,7 @@
     <Compile Include="..\..\Shared\OfficeHelper.cs">
       <Link>OfficeHelper.cs</Link>
     </Compile>
+    <Compile Include="AzureServiceBusWriter.cs" />
     <Compile Include="AzureTableWriter.cs" />
     <Compile Include="MessageEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
