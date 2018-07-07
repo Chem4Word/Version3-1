@@ -18,6 +18,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Telemetry;
 using Chem4Word.ViewModel;
 
 namespace WinFormsTestHarness
@@ -26,6 +27,8 @@ namespace WinFormsTestHarness
     {
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
+
+        private TelemetryWriter _telemetry = new TelemetryWriter(true);
 
         public FlexForm()
         {
@@ -94,6 +97,7 @@ namespace WinFormsTestHarness
                     {
                         model.ScaleToAverageBondLength(20);
                     }
+                    _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
                     ShowChemistry(filename, model);
                 }
             }
