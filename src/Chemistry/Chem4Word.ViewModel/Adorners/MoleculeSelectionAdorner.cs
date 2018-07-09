@@ -83,9 +83,9 @@ namespace Chem4Word.ViewModel.Adorners
             BottomRightHandle.DragDelta += BottomRightHandleDragDelta;
 
             TopLeftHandle.DragCompleted += HandleResizeCompleted;
-            TopRightHandle.DragCompleted += HandleResizeCompleted; ;
+            TopRightHandle.DragCompleted += HandleResizeCompleted;
             BottomLeftHandle.DragCompleted += HandleResizeCompleted;
-            BottomRightHandle.DragCompleted += HandleResizeCompleted; ;
+            BottomRightHandle.DragCompleted += HandleResizeCompleted;
         }
 
         private void ResizeStarted(object sender, DragStartedEventArgs e)
@@ -182,8 +182,6 @@ namespace Chem4Word.ViewModel.Adorners
         public double AspectRatio { get; set; }
 
         public Rect BoundingBox { get; set; }
-
-        /// <summary>
 
         /// <summary>
         /// Override this to
