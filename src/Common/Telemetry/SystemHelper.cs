@@ -336,6 +336,16 @@ namespace Chem4Word.Telemetry
                                     CultureInfo.InvariantCulture.DateTimeFormat, DateTimeStyles.AdjustToUniversal);
                                 var systemDate = DateTime.UtcNow;
                                 UtcOffset = systemDate.Ticks - serverUtcTime.Ticks;
+                                if (UtcOffset > 0)
+                                {
+                                    TimeSpan delta = TimeSpan.FromTicks(UtcOffset);
+                                    Debug.WriteLine($"System time is {delta} ahead of Server time");
+                                }
+                                if (UtcOffset < 0)
+                                {
+                                    TimeSpan delta = TimeSpan.FromTicks(0 - UtcOffset);
+                                    Debug.WriteLine($"System time is {delta} behind Server time");
+                                }
                                 Debug.WriteLine($"UTC Offset {UtcOffset}");
                                 Debug.WriteLine($"{systemDate.ToString("yyyy-MM-dd HH:mm:ss.fff")} {serverUtcTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
                                 Debug.WriteLine($"{systemDate.Ticks} {serverUtcTime.Ticks} {systemDate.Ticks - UtcOffset}");
