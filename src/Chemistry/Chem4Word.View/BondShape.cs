@@ -57,14 +57,14 @@ namespace Chem4Word.View
 
         // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point?), typeof(BondShape), new FrameworkPropertyMetadata(null, _everyOption, StartPointChanged));
+            DependencyProperty.Register("StartPoint", typeof(Point?), typeof(BondShape), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, StartPointChanged));
 
         private static void StartPointChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
         {
         }
 
         internal static readonly DependencyPropertyKey AngleKey = DependencyProperty.RegisterReadOnly("Angle",
-                    typeof(double), typeof(BondShape), new FrameworkPropertyMetadata(0.0, _everyOption));
+                    typeof(double), typeof(BondShape), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public static readonly DependencyProperty AngleProperty = AngleKey.DependencyProperty;
 
@@ -88,7 +88,7 @@ namespace Chem4Word.View
         // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndPointProperty =
             DependencyProperty.Register("EndPoint", typeof(Point?), typeof(BondShape),
-                new FrameworkPropertyMetadata(null, _everyOption,
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender,
                     EndPointChanged));
 
         private static void EndPointChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)

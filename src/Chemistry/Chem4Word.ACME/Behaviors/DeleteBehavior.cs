@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.View;
-using Chem4Word.ViewModel.Adorners;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
@@ -16,13 +15,14 @@ namespace Chem4Word.ACME.Behaviors
 {
     public class DeleteBehavior : BaseEditBehavior
     {
-        private bool _lassoVisible;
-        private PointCollection _mouseTrack;
-        private Point _startpoint;
+        //private bool _lassoVisible;
+        //private PointCollection _mouseTrack;
+        //private Point _startpoint;
         private Window _parent;
-        private bool _flag;
-        private LassoAdorner _lassoAdorner;
-        private MoleculeSelectionAdorner _molAdorner;
+
+        //private bool _flag;
+        //private LassoAdorner _lassoAdorner;
+        //private MoleculeSelectionAdorner _molAdorner;
 
         protected override void OnAttached()
         {
@@ -103,11 +103,11 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (selAtom != null)
                             {
-                                ViewModel.SelectedItems.Add(selAtom);
+                                ViewModel.AddToSelection(selAtom);
                             }
                             if (selBond != null)
                             {
-                                ViewModel.SelectedItems.Add(selBond);
+                                ViewModel.AddToSelection(selBond);
                             }
                         }
                         return HitTestResultBehavior.Continue;
@@ -120,11 +120,11 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (selAtom != null)
                             {
-                                ViewModel.SelectedItems.Remove(selAtom);
+                                ViewModel.RemoveFromSelection(selAtom);
                             }
                             if (selBond != null)
                             {
-                                ViewModel.SelectedItems.Remove(selBond);
+                                ViewModel.RemoveFromSelection(selBond);
                             }
                         }
                         return HitTestResultBehavior.Continue;

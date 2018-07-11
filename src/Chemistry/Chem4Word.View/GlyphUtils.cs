@@ -57,7 +57,7 @@ namespace Chem4Word.View
         {
             Rect rect = glyphRun.ComputeAlignmentBox();
 
-            //Vector offset = (rect.BottomLeft - rect.TopRight) / 2;
+            //Vector offset = (rect.BottomLeftHandle - rect.TopRightHandle) / 2;
             Vector offset = new Vector(-rect.Width / 2, glyphRun.GlyphTypeface.CapsHeight * symbolSize / 2);
             return offset;
         }

@@ -20,11 +20,10 @@ namespace Chem4Word.ViewModel
     /// packaged as a pair of actions, for both undo and redo
     /// Every set of actions MUST be nested between
     /// BeginUndoBlock() and EndUndoBlock() calls
-    /// 
+    ///
     /// </summary>
     public class UndoHandler
     {
-
         private struct UndoRecord
         {
             public int Level;
@@ -39,6 +38,7 @@ namespace Chem4Word.ViewModel
                     UndoAction();
                 }
             }
+
             public void Redo()
             {
                 if (!IsBufferRecord())
@@ -64,10 +64,10 @@ namespace Chem4Word.ViewModel
         private int _transactionLevel = 0;
 
         public int TransactionLevel => _transactionLevel;
-        public bool CanRedo => _redoStack.Any(rr => rr.Level!=0);
+        public bool CanRedo => _redoStack.Any(rr => rr.Level != 0);
 
         public bool CanUndo => _undoStack.Any(ur => ur.Level != 0);
-        
+
         public UndoHandler(EditViewModel vm)
         {
             _editViewModel = vm;
@@ -83,6 +83,7 @@ namespace Chem4Word.ViewModel
 
             Initialize();
         }
+
         public void Initialize()
         {
             _undoStack = new Stack<UndoRecord>();
@@ -97,23 +98,24 @@ namespace Chem4Word.ViewModel
                 _undoStack.Push(_bufferRecord);
             }
             _transactionLevel++;
-
         }
 
-        public void RecordAction(Action  undoAction, Action  redoAction, [CallerMemberName] string desc = null)
-        { 
+        public void RecordAction(Action undoAction, Action redoAction, [CallerMemberName] string desc = null)
+        {
             //performing a new action should clear the redo
             if (_redoStack.Any())
             {
                 _redoStack.Clear();
             }
 
-            _undoStack.Push(new UndoRecord {Level = _transactionLevel,
-                Description = desc, UndoAction = undoAction,
+            _undoStack.Push(new UndoRecord
+            {
+                Level = _transactionLevel,
+                Description = desc,
+                UndoAction = undoAction,
                 RedoAction = redoAction
-                });
+            });
         }
-
 
         /// <summary>
         /// Ends a transaction block.  Transactions may be nested
@@ -121,13 +123,12 @@ namespace Chem4Word.ViewModel
         public void EndUndoBlock()
         {
             _transactionLevel--;
-            
-            if ( _transactionLevel < 0)
+
+            if (_transactionLevel < 0)
             {
                 Debugger.Break();
                 throw new IndexOutOfRangeException("Attempted to unwind empty undo stack.");
             }
-
 
             //we've concluded a transaction block so terminated it
             if (_transactionLevel == 0)
@@ -141,7 +142,6 @@ namespace Chem4Word.ViewModel
                 {
                     _undoStack.Push(_bufferRecord);
                 }
-                
             }
             //tell the parent viewmodel the command status has changed
             _editViewModel.UndoCommand.RaiseCanExecChanged();
@@ -187,7 +187,7 @@ namespace Chem4Word.ViewModel
             }
             _redoStack.Push(br);
 
-            while(true)
+            while (true)
             {
                 br = _undoStack.Pop();
                 _redoStack.Push(br);
@@ -196,7 +196,7 @@ namespace Chem4Word.ViewModel
                     break;
                 }
                 br.Undo();
-            } 
+            }
         }
 
         public void Redo()
@@ -226,8 +226,7 @@ namespace Chem4Word.ViewModel
                     break;
                 }
                 br.Redo();
-               
-            } 
+            }
         }
     }
 }

@@ -1,20 +1,12 @@
-﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2018, The .NET Foundation.
-//  This software is released under the Apache License, Version 2.0.
-//  The license and further copyright text can be found in the file LICENSE.md
-//  at the root directory of the distribution.
-// ---------------------------------------------------------------------------
-
-using System;
-using Microsoft.WindowsAzure.Storage.Table;
+﻿using System;
 
 namespace Chem4Word.Telemetry
 {
-    public class MessageEntity : TableEntity
+    public class ServiceBusMessage
     {
         private static long _order;
 
-        public MessageEntity()
+        public ServiceBusMessage()
         {
             PartitionKey = "Chem4Word";
             // First Part of RowKey is to enable "default" sort of time descending
@@ -23,6 +15,9 @@ namespace Chem4Word.Telemetry
             RowKey = rowKey;
         }
 
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+        public string AssemblyVersionNumber { get; set; }
         public string MachineId { get; set; }
         public string Operation { get; set; }
         public string Level { get; set; }
