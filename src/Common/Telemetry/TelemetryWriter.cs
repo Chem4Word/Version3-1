@@ -151,14 +151,14 @@ namespace Chem4Word.Telemetry
 
         private void WritePrivate(string operation, string level, string message)
         {
-            //MessageEntity me = new MessageEntity();
+            //MessageEntity me = new MessageEntity(_helper.UtcOffset);
             //me.MachineId = _helper.MachineId;
             //me.Operation = operation;
             //me.Level = level;
             //me.Message = message;
             //AzureTableWriter.QueueMessage(me);
 
-            ServiceBusMessage sbm = new ServiceBusMessage();
+            ServiceBusMessage sbm = new ServiceBusMessage(_helper.UtcOffset);
             sbm.MachineId = _helper.MachineId;
             sbm.Operation = operation;
             sbm.Level = level;

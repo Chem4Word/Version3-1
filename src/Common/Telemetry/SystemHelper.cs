@@ -50,6 +50,8 @@ namespace Chem4Word.Telemetry
 
         public string Screens { get; set; }
 
+        public long UtcOffset { get; set; }
+
         private static int _retryCount;
 
         public SystemHelper()
@@ -326,6 +328,22 @@ namespace Chem4Word.Telemetry
                             request.UserAgent = "Chem4Word Add-In";
                             request.Timeout = 2000; // 2 seconds
                             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                            try
+                            {
+                                // Get Server Date header i.e. "Wed, 11 Jul 2018 19:52:46 GMT"
+                                var serverTime = response.Headers["date"];
+                                var serverUtcTime = DateTime.ParseExact(serverTime, "ddd, dd MMM yyyy HH:mm:ss GMT",
+                                    CultureInfo.InvariantCulture.DateTimeFormat, DateTimeStyles.AdjustToUniversal);
+                                var systemDate = DateTime.UtcNow;
+                                UtcOffset = systemDate.Ticks - serverUtcTime.Ticks;
+                                Debug.WriteLine($"UTC Offset {UtcOffset}");
+                                Debug.WriteLine($"{systemDate.ToString("yyyy-MM-dd HH:mm:ss.fff")} {serverUtcTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+                                Debug.WriteLine($"{systemDate.Ticks} {serverUtcTime.Ticks} {systemDate.Ticks - UtcOffset}");
+                            }
+                            catch
+                            {
+                                // Do Nothing
+                            }
                             if (HttpStatusCode.OK.Equals(response.StatusCode))
                             {
                                 using (var reader = new StreamReader(response.GetResponseStream()))
