@@ -472,6 +472,7 @@ namespace Chem4Word.Model
         public bool IsIsolated => Degree == 0;
 
         public bool IsUnsaturated => BondOrders > (double)Degree;
+        public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms[0] == this;
 
         // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
         // ToDo: Duplicated Routine

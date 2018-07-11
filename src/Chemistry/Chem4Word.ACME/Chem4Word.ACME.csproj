@@ -34,6 +34,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Setup|AnyCPU'">
     <OutputPath>bin\Setup\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Vso-Ci|AnyCPU'">
     <OutputPath>bin\Vso-Ci\</OutputPath>
@@ -70,7 +75,7 @@
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
-    <Compile Include="Behaviors\SelectorBehavior.cs" />
+    <Compile Include="Behaviors\LassoBehavior.cs" />
     <Compile Include="Controls\ChemistryCanvas.cs" />
     <Compile Include="Controls\ZoomBox.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />

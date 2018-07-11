@@ -25,6 +25,6 @@ namespace Chem4Word.Model
         // How much to magnify CML by for rendering in Display or Editor
         public const double ScaleFactorForXaml = 5.0d;
         // Percentage of Average bond length for any added Explicit Hydrogens
-        public const double ExplicitHydrogenBondPercentage = 0.666;
+        public const double ExplicitHydrogenBondPercentage = 1.0;
     }
 }

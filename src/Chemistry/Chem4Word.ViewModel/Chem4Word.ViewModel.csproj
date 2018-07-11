@@ -35,6 +35,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Setup|AnyCPU'">
     <OutputPath>bin\Setup\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -67,6 +72,7 @@
     <Compile Include="Adorners\DrawBondAdorner.cs" />
     <Compile Include="Adorners\LassoAdorner.cs" />
     <Compile Include="Adorners\MoleculeSelectionAdorner.cs" />
+    <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />
     <Compile Include="AtomOption.cs" />
     <Compile Include="BondGeometry.cs" />
     <Compile Include="BondLengthOption.cs" />
@@ -78,9 +84,10 @@
     <Compile Include="Commands\CopyCommand.cs" />
     <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\FlipCommand.cs" />
+    <Compile Include="Commands\FlipHorizontalCommand.cs" />
     <Compile Include="Commands\FuseCommand.cs" />
     <Compile Include="Commands\GroupCommand.cs" />
-    <Compile Include="Commands\MirrorCommand.cs" />
+    <Compile Include="Commands\FlipVerticalCommand.cs" />
     <Compile Include="Commands\PasteCommand.cs" />
     <Compile Include="Commands\RedoCommand.cs" />
     <Compile Include="Commands\RemoveHydrogensCommand.cs" />

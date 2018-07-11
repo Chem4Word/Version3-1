@@ -10,22 +10,22 @@ using Chem4Word.ViewModel.Adorners;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class SelectorBehavior : BaseEditBehavior
+    public class LassoBehavior : BaseEditBehavior
     {
-        private bool _lassoVisible;
+        //private bool _lassoVisible;
         private PointCollection _mouseTrack;
+
         private Point _startpoint;
         private Window _parent;
         private bool _flag;
         private LassoAdorner _lassoAdorner;
-        private MoleculeSelectionAdorner _molAdorner;
+        //private MoleculeSelectionAdorner _molAdorner;
 
         protected override void OnAttached()
         {
@@ -47,8 +47,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-
-        
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
@@ -93,7 +91,6 @@ namespace Chem4Word.ACME.Behaviors
                 var pos = Mouse.GetPosition(AssociatedObject);
                 _mouseTrack.Add(pos);
                 var outline = GetPolyGeometry();
-
 
                 if (_lassoAdorner == null)
                 {
@@ -194,14 +191,14 @@ namespace Chem4Word.ACME.Behaviors
                 var atom = (AtomShape)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
-                ViewModel.SelectedItems.Add(atom.ParentAtom.Parent);
+                ViewModel.AddToSelection(atom.ParentAtom.Parent);
             }
             else if (hitTestResult.VisualHit is BondShape)
             {
                 var bond = (BondShape)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
-                ViewModel.SelectedItems.Add(bond.ParentBond.Parent);
+                ViewModel.AddToSelection(bond.ParentBond.Parent);
             }
             else
             {
@@ -219,14 +216,14 @@ namespace Chem4Word.ACME.Behaviors
                 var atom = (AtomShape)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
-                ViewModel.SelectedItems.Add(atom.ParentAtom);
+                ViewModel.AddToSelection(atom.ParentAtom);
             }
             else if (hitTestResult.VisualHit is BondShape)
             {
                 var bond = (BondShape)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
-                ViewModel.SelectedItems.Add(bond.ParentBond);
+                ViewModel.AddToSelection(bond.ParentBond);
             }
             else
             {
@@ -258,11 +255,11 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (selAtom != null)
                             {
-                                ViewModel.SelectedItems.Add(selAtom);
+                                ViewModel.AddToSelection(selAtom);
                             }
                             if (selBond != null)
                             {
-                                ViewModel.SelectedItems.Add(selBond);
+                                ViewModel.AddToSelection(selBond);
                             }
                         }
                         return HitTestResultBehavior.Continue;
@@ -275,11 +272,11 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (selAtom != null)
                             {
-                                ViewModel.SelectedItems.Remove(selAtom);
+                                ViewModel.RemoveFromSelection(selAtom);
                             }
                             if (selBond != null)
                             {
-                                ViewModel.SelectedItems.Remove(selBond);
+                                ViewModel.RemoveFromSelection(selBond);
                             }
                         }
                         return HitTestResultBehavior.Continue;

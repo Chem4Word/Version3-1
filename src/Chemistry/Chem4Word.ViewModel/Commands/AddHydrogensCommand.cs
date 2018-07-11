@@ -21,8 +21,9 @@ namespace Chem4Word.ViewModel.Commands
             var mols = MyEditViewModel.SelectedItems.OfType<Molecule>().ToList();
             var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
             var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
+            var nothingSelected = MyEditViewModel.SelectedItems.Count == 0;
 
-            return true;
+            return nothingSelected || mols.Any() && !atoms.Any() && !bonds.Any();
         }
 
         public override void Execute(object parameter)

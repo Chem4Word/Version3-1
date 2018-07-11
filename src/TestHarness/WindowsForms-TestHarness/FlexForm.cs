@@ -18,6 +18,7 @@ using System.Text;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Telemetry;
 using Chem4Word.ViewModel;
 
 namespace WinFormsTestHarness
@@ -27,6 +28,8 @@ namespace WinFormsTestHarness
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
 
+        private TelemetryWriter _telemetry = new TelemetryWriter(true);
+
         public FlexForm()
         {
             InitializeComponent();
@@ -34,68 +37,77 @@ namespace WinFormsTestHarness
 
         private void LoadStructure_Click(object sender, EventArgs e)
         {
-            Model model = null;
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
-            sb.Append("|CML molecule files (*.cml)|*.cml");
-            sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
-
-            openFileDialog1.Title = "Open Structure";
-            openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
-            openFileDialog1.Filter = sb.ToString();
-            openFileDialog1.FileName = "";
-            openFileDialog1.ShowHelp = false;
-
-            DialogResult dr = openFileDialog1.ShowDialog();
-
-            if (dr == DialogResult.OK)
+            try
             {
-                string fileType = Path.GetExtension(openFileDialog1.FileName).ToLower();
-                string filename = Path.GetFileName(openFileDialog1.FileName);
-                string mol = File.ReadAllText(openFileDialog1.FileName);
-                string cml = "";
+                Model model = null;
 
-                CMLConverter cmlConvertor = new CMLConverter();
-                SdFileConverter sdFileConverter = new SdFileConverter();
+                StringBuilder sb = new StringBuilder();
+                sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
+                sb.Append("|CML molecule files (*.cml)|*.cml");
+                sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
-                switch (fileType)
+                openFileDialog1.Title = "Open Structure";
+                openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
+                openFileDialog1.Filter = sb.ToString();
+                openFileDialog1.FileName = "";
+                openFileDialog1.ShowHelp = false;
+
+                DialogResult dr = openFileDialog1.ShowDialog();
+
+                if (dr == DialogResult.OK)
                 {
-                    case ".mol":
-                    case ".sdf":
-                        model = sdFileConverter.Import(mol);
-                        model.RefreshMolecules();
-                        model.Relabel();
-                        cml = cmlConvertor.Export(model);
-                        break;
+                    string fileType = Path.GetExtension(openFileDialog1.FileName).ToLower();
+                    string filename = Path.GetFileName(openFileDialog1.FileName);
+                    string mol = File.ReadAllText(openFileDialog1.FileName);
+                    string cml = "";
 
-                    case ".cml":
-                    case ".xml":
-                        model = cmlConvertor.Import(mol);
-                        model.RefreshMolecules();
-                        model.Relabel();
-                        cml = cmlConvertor.Export(model);
-                        break;
-                }
+                    CMLConverter cmlConvertor = new CMLConverter();
+                    SdFileConverter sdFileConverter = new SdFileConverter();
 
-                if (model != null)
-                {
-                    Model existing = Display.Chemistry as Model;
-                    if (existing != null)
+                    switch (fileType)
                     {
-                        Model clone = existing.Clone();
-                        clone.RescaleForCml();
+                        case ".mol":
+                        case ".sdf":
+                            model = sdFileConverter.Import(mol);
+                            model.RefreshMolecules();
+                            model.Relabel();
+                            cml = cmlConvertor.Export(model);
+                            break;
 
-                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
-                        _undoStack.Push(clone);
+                        case ".cml":
+                        case ".xml":
+                            model = cmlConvertor.Import(mol);
+                            model.RefreshMolecules();
+                            model.Relabel();
+                            cml = cmlConvertor.Export(model);
+                            break;
                     }
 
-                    if (model.MeanBondLength < 2.5 || model.MeanBondLength > 97.5)
+                    if (model != null)
                     {
-                        model.ScaleToAverageBondLength(20);
+                        Model existing = Display.Chemistry as Model;
+                        if (existing != null)
+                        {
+                            Model clone = existing.Clone();
+                            clone.RescaleForCml();
+
+                            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                            _undoStack.Push(clone);
+                        }
+
+                        if (model.MeanBondLength < 2.5 || model.MeanBondLength > 97.5)
+                        {
+                            model.ScaleToAverageBondLength(20);
+                        }
+                        _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
+                        ShowChemistry(filename, model);
                     }
-                    ShowChemistry(filename, model);
                 }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write("FlexForm.LoadStructure()", "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write("FlexForm.LoadStructure()", "Exception(Data)", $"Exception: {exception}");
             }
         }
 
@@ -111,22 +123,30 @@ namespace WinFormsTestHarness
 
         private void EditWithAcme_Click(object sender, EventArgs e)
         {
-            Model model = Display.Chemistry as Model;
-            if (model != null)
+            try
             {
-                Model clone = model.Clone();
-                clone.RescaleForCml();
-
-                CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(clone), "ACME");
-                editorHost.ShowDialog();
-                if (editorHost.Result == DialogResult.OK)
+                Model model = Display.Chemistry as Model;
+                if (model != null)
                 {
-                    Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
-                    _undoStack.Push(clone);
-                    Model m = cc.Import(editorHost.OutputValue);
-                    ShowChemistry($"Edited {m.ConciseFormula}", m);
+                    Model clone = model.Clone();
+                    clone.RescaleForCml();
+
+                    CMLConverter cc = new CMLConverter();
+                    EditorHost editorHost = new EditorHost(cc.Export(clone), "ACME");
+                    editorHost.ShowDialog();
+                    if (editorHost.Result == DialogResult.OK)
+                    {
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                        _undoStack.Push(clone);
+                        Model m = cc.Import(editorHost.OutputValue);
+                        ShowChemistry($"Edited {m.ConciseFormula}", m);
+                    }
                 }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write("FlexForm.EditWithAcme_Click()", "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write("FlexForm.EditWithAcme_Click()", "Exception(Data)", $"Exception: {exception}");
             }
         }
 
@@ -572,22 +592,30 @@ namespace WinFormsTestHarness
 
         private void EditCml_Click(object sender, EventArgs e)
         {
-            Model model = Display.Chemistry as Model;
-            if (model != null)
+            try
             {
-                Model clone = model.Clone();
-                clone.RescaleForCml();
-
-                CMLConverter cc = new CMLConverter();
-                EditorHost editorHost = new EditorHost(cc.Export(clone), "CML");
-                editorHost.ShowDialog();
-                if (editorHost.Result == DialogResult.OK)
+                Model model = Display.Chemistry as Model;
+                if (model != null)
                 {
-                    Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
-                    _undoStack.Push(clone);
-                    Model m = cc.Import(editorHost.OutputValue);
-                    ShowChemistry($"Edited {m.ConciseFormula}", m);
+                    Model clone = model.Clone();
+                    clone.RescaleForCml();
+
+                    CMLConverter cc = new CMLConverter();
+                    EditorHost editorHost = new EditorHost(cc.Export(clone), "CML");
+                    editorHost.ShowDialog();
+                    if (editorHost.Result == DialogResult.OK)
+                    {
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                        _undoStack.Push(clone);
+                        Model m = cc.Import(editorHost.OutputValue);
+                        ShowChemistry($"Edited {m.ConciseFormula}", m);
+                    }
                 }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write("FlexForm.EditCml_Click()", "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write("FlexForm.EditCml_Click()", "Exception(Data)", $"Exception: {exception}");
             }
         }
     }
