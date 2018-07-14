@@ -120,6 +120,8 @@ namespace Chem4Word.Telemetry
             WritePrivate("StartUp", "Information", $"Debug - AddIn Location: {_helper.AddInLocation}");
             WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
             WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitProcess: {Environment.Is64BitProcess}");
+
+            WritePrivate("StartUp", "Information", _helper.GitStatus);
 #endif
 
             // Log Wmi Gathered Data

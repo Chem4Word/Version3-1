@@ -50,6 +50,8 @@ namespace Chem4Word.Telemetry
 
         public string Screens { get; set; }
 
+        public string GitStatus { get; set; }
+
         public long UtcOffset { get; set; }
 
         private static int _retryCount;
@@ -163,6 +165,48 @@ namespace Chem4Word.Telemetry
             GetDotNetVersionFromRegistry();
 
             GetScreens();
+
+#if DEBUG
+            GetGitStatus();
+#endif
+        }
+
+        private void GetGitStatus()
+        {
+            var result = new List<string>();
+            result.Add("Git Branch");
+            // git rev-parse --abbrev-ref HEAD == Current Branch
+            result.AddRange(RunCommand("git.exe", "rev-parse --abbrev-ref HEAD", AddInLocation));
+
+            result.Add("Changed Files");
+            // git status --porcelain == Get List of changed files
+            result.AddRange(RunCommand("git.exe", "status --porcelain", AddInLocation));
+            GitStatus = string.Join(Environment.NewLine, result.ToArray());
+        }
+
+        private List<string> RunCommand(string exeName, string args, string folder)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo(exeName);
+
+            startInfo.UseShellExecute = false;
+            startInfo.WorkingDirectory = folder;
+            startInfo.RedirectStandardInput = true;
+            startInfo.RedirectStandardOutput = true;
+            startInfo.Arguments = args;
+
+            Process process = new Process();
+            process.StartInfo = startInfo;
+            process.Start();
+
+            //return process.StandardOutput.ReadLine();
+
+            var results = new List<string>();
+            while (!process.StandardOutput.EndOfStream)
+            {
+                results.Add(process.StandardOutput.ReadLine());
+            }
+
+            return results;
         }
 
         private void GetScreens()
