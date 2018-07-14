@@ -32,6 +32,8 @@ namespace Chem4Word.UI.WPF
         public DialogResult Result = DialogResult.Cancel;
         private bool _closedInCode = false;
 
+        public System.Windows.Point TopLeft { get; set; }
+
         public Options SystemOptions {
             get
             {
@@ -65,6 +67,7 @@ namespace Chem4Word.UI.WPF
             {
                 if (elementHost1.Child is SettingsControl sc)
                 {
+                    sc.TopLeft = TopLeft;
                     sc.OnButtonClick += OnWpfButtonClick;
                 }
             }
@@ -91,8 +94,6 @@ namespace Chem4Word.UI.WPF
                     break;
             }
         }
-
-        public System.Windows.Point TopLeft { get; set; }
 
         private void SettingsHost_Load(object sender, EventArgs e)
         {
