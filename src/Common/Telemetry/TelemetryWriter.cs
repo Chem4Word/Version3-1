@@ -16,7 +16,6 @@ namespace Chem4Word.Telemetry
     public class TelemetryWriter : IChem4WordTelemetry
     {
         private static int Counter;
-        //private static AzureTableWriter AzureTableWriter;
         private static AzureServiceBusWriter AzureServiceBusWriter;
         private static bool _systemInfoSent;
 
@@ -37,7 +36,6 @@ namespace Chem4Word.Telemetry
             {
                 _wmihelper = new WmiHelper();
             }
-            //AzureTableWriter = new AzureTableWriter();
             AzureServiceBusWriter = new AzureServiceBusWriter();
         }
 
@@ -153,13 +151,6 @@ namespace Chem4Word.Telemetry
 
         private void WritePrivate(string operation, string level, string message)
         {
-            //MessageEntity me = new MessageEntity(_helper.UtcOffset);
-            //me.MachineId = _helper.MachineId;
-            //me.Operation = operation;
-            //me.Level = level;
-            //me.Message = message;
-            //AzureTableWriter.QueueMessage(me);
-
             ServiceBusMessage sbm = new ServiceBusMessage(_helper.UtcOffset);
             sbm.MachineId = _helper.MachineId;
             sbm.Operation = operation;
