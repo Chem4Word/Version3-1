@@ -146,8 +146,11 @@ namespace Chem4Word.UI.WPF
                 Forms.DialogResult dr = UserInteractions.AskUserOkCancel("Restore default settings");
                 if (dr == Forms.DialogResult.OK)
                 {
+                    _loading = true;
+                    Dirty = true;
                     SystemOptions.RestoreDefaults();
                     LoadSettings();
+                    _loading = false;
                 }
             }
             catch (Exception ex)
@@ -248,8 +251,8 @@ namespace Chem4Word.UI.WPF
             if (!_loading)
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-                Debugger.Break();
+                SystemOptions.ChemSpiderWebServiceUri = ChemSpiderWebServiceUri.Text;
+                Dirty = true;
             }
         }
 
@@ -259,8 +262,8 @@ namespace Chem4Word.UI.WPF
             if (!_loading)
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-                Debugger.Break();
+                SystemOptions.ChemSpiderRdfServiceUri = ChemSpiderRdfServiceUri.Text;
+                Dirty = true;
             }
         }
 
@@ -274,8 +277,8 @@ namespace Chem4Word.UI.WPF
             if (!_loading)
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-                Debugger.Break();
+                SystemOptions.TelemetryEnabled = TelemetryEnabled.IsChecked.Value;
+                Dirty = true;
             }
         }
 
@@ -410,7 +413,15 @@ namespace Chem4Word.UI.WPF
 
             #region Tab 3
 
-            TelemetryEnabled.IsChecked = SystemOptions.TelemetryEnabled;
+            string betaValue = Globals.Chem4WordV3.ThisVersion.Root?.Element("IsBeta")?.Value;
+            bool isBeta = betaValue != null && bool.Parse(betaValue);
+
+            TelemetryEnabled.IsChecked = isBeta || SystemOptions.TelemetryEnabled;
+            TelemetryEnabled.IsEnabled = !isBeta;
+            if (!isBeta)
+            {
+                BetaInformation.Visibility = Visibility.Hidden;
+            }
 
             #endregion Tab 3
         }

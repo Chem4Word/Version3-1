@@ -153,21 +153,23 @@
             </TabItem>
             <TabItem Header="Privacy">
                 <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="10*" />
-                        <RowDefinition Height="90*" />
-                    </Grid.RowDefinitions>
-                    <CheckBox x:Name="TelemetryEnabled"
-                        Grid.Row="0"
-                        HorizontalAlignment="Left"
-                        VerticalContentAlignment="Center"
-                        Click="TelemetryEnabled_OnClick"
-                        Content="Telemetry Enabled" />
-                    <TextBlock
-                        Grid.Row="1"
-                        Margin="25,0,0,0"
-                        Text="When you check this box, you are helping to improve the quality, reliability, and performance of this software. Chem4Word automatically collects information from your computer, including error messages and hardware and software information. Any information that is sent to us is anonymous. This information isn't used in advertising or sales in any way."
-                        TextWrapping="Wrap" />
+                    <StackPanel>
+                        <CheckBox x:Name="TelemetryEnabled"
+                            Margin="10,10,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalContentAlignment="Center"
+                            Click="TelemetryEnabled_OnClick"
+                            Content="Telemetry Enabled" />
+                        <TextBlock
+                            Margin="32,10,0,0"
+                            Text="When you check this box, you are helping to improve the quality, reliability, and performance of this software. Chem4Word automatically collects information from your computer, including error messages and hardware and software information. Any information that is sent to us is anonymous. This information isn't used in advertising or sales in any way."
+                            TextWrapping="Wrap" />
+                        <TextBlock x:Name="BetaInformation"
+                            Margin="32,10,0,0"
+                            FontWeight="SemiBold"
+                            Text="NB: Telemetry is always on for Beta Releases."
+                            TextWrapping="Wrap" />
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Library">
@@ -336,22 +338,16 @@
         </TabControl>
         <StackPanel
             Grid.Row="1"
+            Margin="10,0,10,0"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
             <Button x:Name="DefaultsButton"
                 Width="80"
                 Height="32"
-                Margin="5"
+                Margin="5,5,30,5"
                 VerticalAlignment="Center"
                 Click="DefaultsButton_OnClick"
                 Content="Defaults" />
-            <Button x:Name="OkButton"
-                Width="80"
-                Height="32"
-                Margin="5"
-                VerticalAlignment="Center"
-                Click="OkButton_Click"
-                Content="OK" />
             <Button x:Name="CancelButton"
                 Width="80"
                 Height="32"
@@ -359,6 +355,13 @@
                 VerticalAlignment="Center"
                 Click="CancelButton_OnClick"
                 Content="Cancel" />
+            <Button x:Name="OkButton"
+                Width="80"
+                Height="32"
+                Margin="5"
+                VerticalAlignment="Center"
+                Click="OkButton_Click"
+                Content="OK" />
         </StackPanel>
     </Grid>
 </UserControl>

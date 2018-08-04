@@ -362,6 +362,7 @@ namespace Chem4Word
             SettingsHost f = new SettingsHost(true);
             f.SystemOptions = Globals.Chem4WordV3.SystemOptions.Clone();
             f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+            f.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
             DialogResult dr = f.ShowDialog();
             if (dr == DialogResult.OK)
             {

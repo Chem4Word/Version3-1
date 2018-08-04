@@ -205,6 +205,8 @@ namespace Chem4Word
 
             try
             {
+                UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
+
                 Word.Application app = Globals.Chem4WordV3.Application;
 
                 // Hook in Global Application level events

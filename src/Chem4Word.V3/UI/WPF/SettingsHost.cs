@@ -84,6 +84,7 @@ namespace Chem4Word.UI.WPF
                     {
                         SystemOptions = sc.SystemOptions;
                         SaveChanges();
+                        sc.Dirty = false;
                         Hide();
                     }
                     break;
