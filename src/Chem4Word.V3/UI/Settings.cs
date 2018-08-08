@@ -74,7 +74,7 @@ namespace Chem4Word.UI
 
         private void SaveChanges()
         {
-            SystemOptions.ChemSpiderRdfServiceUri = EnsureTrailingSlash(SystemOptions.ChemSpiderRdfServiceUri);
+            SystemOptions.ResolverServiceUri = EnsureTrailingSlash(SystemOptions.ResolverServiceUri);
             SystemOptions.ChemSpiderWebServiceUri = EnsureTrailingSlash(SystemOptions.ChemSpiderWebServiceUri);
 
             string json = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
@@ -204,7 +204,7 @@ namespace Chem4Word.UI
             }
 
             chkUseWebServices.Checked = SystemOptions.UseWebServices;
-            txtChemSpiderRdfUri.Text = SystemOptions.ChemSpiderRdfServiceUri;
+            txtResolverServiceUri.Text = SystemOptions.ResolverServiceUri;
             txtChemSpiderWsUri.Text = SystemOptions.ChemSpiderWebServiceUri;
 
             chkTelemetryEnabled.Checked = SystemOptions.TelemetryEnabled;
@@ -379,12 +379,12 @@ namespace Chem4Word.UI
             }
         }
 
-        private void txtChemSpiderRdfUri_TextChanged(object sender, EventArgs e)
+        private void txtResolverServiceUri_TextChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                SystemOptions.ChemSpiderRdfServiceUri = txtChemSpiderRdfUri.Text;
+                SystemOptions.ResolverServiceUri = txtResolverServiceUri.Text;
                 _dirty = true;
             }
             catch (Exception ex)

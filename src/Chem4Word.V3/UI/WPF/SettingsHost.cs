@@ -130,7 +130,7 @@ namespace Chem4Word.UI.WPF
 
         private void SaveChanges()
         {
-            SystemOptions.ChemSpiderRdfServiceUri = EnsureTrailingSlash(SystemOptions.ChemSpiderRdfServiceUri);
+            SystemOptions.ResolverServiceUri = EnsureTrailingSlash(SystemOptions.ResolverServiceUri);
             SystemOptions.ChemSpiderWebServiceUri = EnsureTrailingSlash(SystemOptions.ChemSpiderWebServiceUri);
 
             string json = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);

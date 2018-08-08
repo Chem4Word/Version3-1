@@ -13,7 +13,7 @@
     Loaded="SettingsControl_OnLoaded"
     mc:Ignorable="d">
     <!--
-        Need to style the tops of th tabs
+        Need to style the tops of the tabs
         This site should help
         https://www.codeproject.com/Tips/485099/Styling-WPF-TabControl-Borders
     -->
@@ -142,11 +142,11 @@
                                 Width="250"
                                 Margin="0,0,5,0"
                                 HorizontalContentAlignment="Right"
-                                Content="ChemSpider Rdf Service Uri:" />
-                            <TextBox x:Name="ChemSpiderRdfServiceUri"
+                                Content="Resolver Service Uri:" />
+                            <TextBox x:Name="ResolverServiceUri"
                                 Margin="5,0,0,0"
-                                Text="https://rdf.chemspider.com"
-                                TextChanged="ChemSpiderRdfServiceUri_OnTextChanged" />
+                                Text="https://cactus.nci.nih.gov/chemical/structure/"
+                                TextChanged="ResolverServiceUri_OnTextChanged" />
                         </DockPanel>
                     </StackPanel>
                 </Grid>

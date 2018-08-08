@@ -256,13 +256,13 @@ namespace Chem4Word.UI.WPF
             }
         }
 
-        private void ChemSpiderRdfServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
+        private void ResolverServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-                SystemOptions.ChemSpiderRdfServiceUri = ChemSpiderRdfServiceUri.Text;
+                SystemOptions.ResolverServiceUri = ResolverServiceUri.Text;
                 Dirty = true;
             }
         }
@@ -407,7 +407,7 @@ namespace Chem4Word.UI.WPF
             #region Tab 2
 
             ChemSpiderWebServiceUri.Text = SystemOptions.ChemSpiderWebServiceUri;
-            ChemSpiderRdfServiceUri.Text = SystemOptions.ChemSpiderRdfServiceUri;
+            ResolverServiceUri.Text = SystemOptions.ResolverServiceUri;
 
             #endregion Tab 2
 

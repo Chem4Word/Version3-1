@@ -45,7 +45,7 @@ namespace Chem4Word.UI
             this.cboRenderers = new System.Windows.Forms.ComboBox();
             this.cboEditors = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.txtChemSpiderRdfUri = new System.Windows.Forms.TextBox();
+            this.txtResolverServiceUri = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtChemSpiderWsUri = new System.Windows.Forms.TextBox();
             this.chkUseWebServices = new System.Windows.Forms.CheckBox();
@@ -219,19 +219,19 @@ namespace Chem4Word.UI
             this.label6.Location = new System.Drawing.Point(15, 50);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(167, 16);
+            this.label6.Size = new System.Drawing.Size(123, 16);
             this.label6.TabIndex = 26;
-            this.label6.Text = "ChemSpider Rdf Service Uri";
+            this.label6.Text = "Resolver Service Uri";
             // 
-            // txtChemSpiderRdfUri
+            // txtResolverServiceUri
             // 
-            this.txtChemSpiderRdfUri.Location = new System.Drawing.Point(206, 47);
-            this.txtChemSpiderRdfUri.Margin = new System.Windows.Forms.Padding(4);
-            this.txtChemSpiderRdfUri.Name = "txtChemSpiderRdfUri";
-            this.txtChemSpiderRdfUri.Size = new System.Drawing.Size(290, 23);
-            this.txtChemSpiderRdfUri.TabIndex = 25;
-            this.txtChemSpiderRdfUri.Text = "https://rdf.chemspider.com/";
-            this.txtChemSpiderRdfUri.TextChanged += new System.EventHandler(this.txtChemSpiderRdfUri_TextChanged);
+            this.txtResolverServiceUri.Location = new System.Drawing.Point(206, 47);
+            this.txtResolverServiceUri.Margin = new System.Windows.Forms.Padding(4);
+            this.txtResolverServiceUri.Name = "txtResolverServiceUri";
+            this.txtResolverServiceUri.Size = new System.Drawing.Size(290, 23);
+            this.txtResolverServiceUri.TabIndex = 25;
+            this.txtResolverServiceUri.Text = "https://cactus.nci.nih.gov/chemical/structure/";
+            this.txtResolverServiceUri.TextChanged += new System.EventHandler(this.txtResolverServiceUri_TextChanged);
             // 
             // label2
             // 
@@ -403,7 +403,7 @@ namespace Chem4Word.UI
             this.tabWebServices.Controls.Add(this.chkUseWebServices);
             this.tabWebServices.Controls.Add(this.label6);
             this.tabWebServices.Controls.Add(this.txtChemSpiderWsUri);
-            this.tabWebServices.Controls.Add(this.txtChemSpiderRdfUri);
+            this.tabWebServices.Controls.Add(this.txtResolverServiceUri);
             this.tabWebServices.Location = new System.Drawing.Point(0, 23);
             this.tabWebServices.Name = "tabWebServices";
             this.tabWebServices.Padding = new System.Windows.Forms.Padding(3);
@@ -669,7 +669,7 @@ namespace Chem4Word.UI
         private System.Windows.Forms.Button btnOk;
         private System.Windows.Forms.Button btnSetDefaults;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtChemSpiderRdfUri;
+        private System.Windows.Forms.TextBox txtResolverServiceUri;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox txtChemSpiderWsUri;
         private System.Windows.Forms.CheckBox chkUseWebServices;

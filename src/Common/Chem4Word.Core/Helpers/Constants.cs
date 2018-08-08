@@ -19,7 +19,7 @@ namespace Chem4Word.Core.Helpers
 
         public static string DefaultChemSpiderWebServiceUri = "https://www.chemspider.com/";
         //public static string DefaultChemSpiderRdfServiceUri = "https://rdf.chemspider.com/";
-        public static string DefaultChemSpiderRdfServiceUri = "https://cactus.nci.nih.gov/chemical/structure/";
+        public static string DefaultResolverServiceUri = "https://cactus.nci.nih.gov/chemical/structure/";
 
         public static string DefaultEditorPlugIn = "ChemDoodle Web Structure Editor V7.0.2";
         public static string DefaultRendererPlugIn = "Open Office Xml Renderer V3";

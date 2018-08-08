@@ -23,7 +23,7 @@ namespace Chem4Word
         public string ChemSpiderWebServiceUri { get; set; }
 
         [JsonProperty]
-        public string ChemSpiderRdfServiceUri { get; set; }
+        public string ResolverServiceUri { get; set; }
 
         #endregion Web Services
 
@@ -67,8 +67,8 @@ namespace Chem4Word
             Options clone = new Options();
 
             clone.UseWebServices = UseWebServices;
-            clone.ChemSpiderRdfServiceUri = ChemSpiderRdfServiceUri;
             clone.ChemSpiderWebServiceUri = ChemSpiderWebServiceUri;
+            clone.ResolverServiceUri = ResolverServiceUri;
 
             clone.TelemetryEnabled = TelemetryEnabled;
 
@@ -92,7 +92,7 @@ namespace Chem4Word
 
             UseWebServices = true;
             ChemSpiderWebServiceUri = Constants.DefaultChemSpiderWebServiceUri;
-            ChemSpiderRdfServiceUri = Constants.DefaultChemSpiderRdfServiceUri;
+            ResolverServiceUri = Constants.DefaultResolverServiceUri;
 
             AutoUpdateEnabled = true;
             AutoUpdateFrequency = 7;

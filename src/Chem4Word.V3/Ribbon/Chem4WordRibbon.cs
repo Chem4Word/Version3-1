@@ -1054,9 +1054,9 @@ namespace Chem4Word
                                     string inchiKey = cs.GetInchiKey(afterMolFile);
 
                                     pb.Increment(1);
-                                    pb.Message = $"Fetching Synonyms from ChemSpider for molecule {mol.Id}";
+                                    pb.Message = $"Fetching Synonyms from Resolver Service for molecule {mol.Id}";
 
-                                    if (Globals.Chem4WordV3.SystemOptions.ChemSpiderRdfServiceUri.Contains("chemspider"))
+                                    if (Globals.Chem4WordV3.SystemOptions.ResolverServiceUri.Contains("chemspider"))
                                     {
                                         synonyms = cs.GetSynonyms(inchiKey);
                                     }
@@ -1065,6 +1065,7 @@ namespace Chem4Word
                                         CactusCir cir = new CactusCir(Globals.Chem4WordV3.Telemetry);
                                         synonyms = cir.GetSynonyms(inchiKey);
                                     }
+
                                     if (string.IsNullOrEmpty(inchiKey))
                                     {
                                         synonyms.Add(Constants.ChemspiderInchiKeyName, "Unknown");

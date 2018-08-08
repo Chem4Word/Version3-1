@@ -46,7 +46,7 @@ namespace Chem4Word.WebServices
                 {
                     Globals.Chem4WordV3.LoadOptions();
                 }
-                url = $"{Globals.Chem4WordV3.SystemOptions.ChemSpiderRdfServiceUri}InChIKey={inchiKey}/{convertTo}";
+                url = $"{Globals.Chem4WordV3.SystemOptions.ResolverServiceUri}InChIKey={inchiKey}/{convertTo}";
 
                 HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
                 request.Timeout = 5000;
