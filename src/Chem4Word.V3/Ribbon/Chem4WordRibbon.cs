@@ -1056,7 +1056,15 @@ namespace Chem4Word
                                     pb.Increment(1);
                                     pb.Message = $"Fetching Synonyms from ChemSpider for molecule {mol.Id}";
 
-                                    synonyms = cs.GetSynonyms(inchiKey);
+                                    if (Globals.Chem4WordV3.SystemOptions.ChemSpiderRdfServiceUri.Contains("chemspider"))
+                                    {
+                                        synonyms = cs.GetSynonyms(inchiKey);
+                                    }
+                                    else
+                                    {
+                                        CactusCir cir = new CactusCir(Globals.Chem4WordV3.Telemetry);
+                                        synonyms = cir.GetSynonyms(inchiKey);
+                                    }
                                     if (string.IsNullOrEmpty(inchiKey))
                                     {
                                         synonyms.Add(Constants.ChemspiderInchiKeyName, "Unknown");
@@ -1074,6 +1082,8 @@ namespace Chem4Word
                                     {
                                         case Constants.ChemspiderFormulaName:
                                         case Constants.ChemSpiderSmilesName:
+                                        case Constants.CactusResolverFormulaName:
+                                        case Constants.CactusResolverSmilesName:
                                             updated = false;
                                             foreach (var formula in mol.Formulas)
                                             {
@@ -1096,6 +1106,7 @@ namespace Chem4Word
                                         case Constants.ChemspiderIdName:
                                         case Constants.ChemSpiderSynonymName:
                                         case Constants.ChemspiderInchiKeyName:
+                                        case Constants.CactusResolverIupacName:
                                             updated = false;
                                             foreach (var name in mol.ChemicalNames)
                                             {

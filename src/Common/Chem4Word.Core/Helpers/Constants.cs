@@ -18,7 +18,8 @@ namespace Chem4Word.Core.Helpers
         public const string LibraryFileName = "Library.db";
 
         public static string DefaultChemSpiderWebServiceUri = "https://www.chemspider.com/";
-        public static string DefaultChemSpiderRdfServiceUri = "https://rdf.chemspider.com/";
+        //public static string DefaultChemSpiderRdfServiceUri = "https://rdf.chemspider.com/";
+        public static string DefaultChemSpiderRdfServiceUri = "https://cactus.nci.nih.gov/chemical/structure/";
 
         public static string DefaultEditorPlugIn = "ChemDoodle Web Structure Editor V7.0.2";
         public static string DefaultRendererPlugIn = "Open Office Xml Renderer V3";
@@ -34,6 +35,10 @@ namespace Chem4Word.Core.Helpers
         public const string ChemSpiderSynonymName = "chemspider:Synonym";
         public const string ChemspiderFormulaName = "chemspider:Formula";
         public const string ChemSpiderSmilesName = "chemspider:Smiles";
+
+        public const string CactusResolverIupacName = "cactus:Iupacname";
+        public const string CactusResolverSmilesName = "cactus:Smiles";
+        public const string CactusResolverFormulaName = "cactus:Formula";
 
         public const string Chem4WordUserFormula = "chem4word:Formula";
         public const string Chem4WordUserSynonym = "chem4word:Synonym";

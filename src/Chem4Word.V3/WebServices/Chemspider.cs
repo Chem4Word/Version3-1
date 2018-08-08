@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 
@@ -21,6 +22,9 @@ namespace Chem4Word.WebServices
 {
     public class Chemspider
     {
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         private IChem4WordTelemetry Telemetry { get; set; }
 
         public Chemspider(IChem4WordTelemetry telemetry)
@@ -30,7 +34,8 @@ namespace Chem4Word.WebServices
 
         public string GetInchiKey(string molfile)
         {
-            string module = "GetInchiKey()";
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             string result = null;
             DateTime started = DateTime.Now;
 
@@ -70,9 +75,10 @@ namespace Chem4Word.WebServices
             return result;
         }
 
+        //[Obsolete("Use CactusCir.GetSynonyms(string molfile)")]
         public Dictionary<string, string> GetSynonyms(string inchiKey)
         {
-            string module = "GetSynonyms()";
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             Dictionary<string, string> result = new Dictionary<string, string>();
 
@@ -175,9 +181,11 @@ namespace Chem4Word.WebServices
             return result;
         }
 
+        [Obsolete]
         public string GetSynonym(string inchiKey)
         {
-            string module = "GetSynonym()";
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             string result = null;
             DateTime started = DateTime.Now;
 
@@ -243,6 +251,8 @@ namespace Chem4Word.WebServices
 
         private string StreamToString(Stream stream)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             stream.Position = 0;
             using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
             {
@@ -252,6 +262,8 @@ namespace Chem4Word.WebServices
 
         private Stream StringToStream(string src)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             byte[] byteArray = Encoding.UTF8.GetBytes(src);
             return new MemoryStream(byteArray);
         }

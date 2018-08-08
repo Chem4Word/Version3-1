@@ -392,6 +392,7 @@
     <Compile Include="UI\WPF\SettingsHost.Designer.cs">
       <DependentUpon>SettingsHost.cs</DependentUpon>
     </Compile>
+    <Compile Include="WebServices\CactusCir.cs" />
     <Compile Include="WebServices\Chemspider.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
