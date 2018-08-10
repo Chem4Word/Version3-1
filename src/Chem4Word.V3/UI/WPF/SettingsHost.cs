@@ -5,22 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Core.UI.Wpf;
 using Newtonsoft.Json;
+using System;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 
 namespace Chem4Word.UI.WPF
 {
@@ -29,12 +23,12 @@ namespace Chem4Word.UI.WPF
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        public DialogResult Result = DialogResult.Cancel;
         private bool _closedInCode = false;
 
         public System.Windows.Point TopLeft { get; set; }
 
-        public Options SystemOptions {
+        public Options SystemOptions
+        {
             get
             {
                 if (elementHost1.Child is SettingsControl sc)
@@ -79,7 +73,7 @@ namespace Chem4Word.UI.WPF
             switch (args.Button.ToLower())
             {
                 case "ok":
-                    Result = DialogResult.OK;
+                    DialogResult = DialogResult.OK;
                     if (elementHost1.Child is SettingsControl sc)
                     {
                         SystemOptions = sc.SystemOptions;
@@ -88,8 +82,9 @@ namespace Chem4Word.UI.WPF
                         Hide();
                     }
                     break;
+
                 case "cancel":
-                    Result = DialogResult.Cancel;
+                    DialogResult = DialogResult.Cancel;
                     _closedInCode = true;
                     Hide();
                     break;
@@ -113,7 +108,6 @@ namespace Chem4Word.UI.WPF
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
-
         }
 
         private string EnsureTrailingSlash(string input)

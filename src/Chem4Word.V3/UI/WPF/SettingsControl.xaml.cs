@@ -17,8 +17,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using Forms = System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using Forms = System.Windows.Forms;
 
 namespace Chem4Word.UI.WPF
 {
@@ -157,7 +157,6 @@ namespace Chem4Word.UI.WPF
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
-
         }
 
         #endregion Bottom Buttons
