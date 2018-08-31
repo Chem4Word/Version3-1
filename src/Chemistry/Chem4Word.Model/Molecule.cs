@@ -644,11 +644,13 @@ namespace Chem4Word.Model
         /// </summary>
         public void RebuildRings3()
         {
-            var pidMatrixOld = new KeyMatrix<Atom, EdgeList>();
-            var pidMatrix = new KeyMatrix<Atom, EdgeList>();
+            var pidMatrixPlus = new KeyMatrix<Atom, List<EdgeList>>();  //stores shortest path +1
+            var pidMatrix = new KeyMatrix<Atom, List< EdgeList>>(); //stores shortest paths
 
             var distanceMatrix = new KeyMatrix<Atom, int>();
 
+            // ReSharper disable once InconsistentNaming
+            //local function for caluclating the PID matrices
             void CalculatePIDMatrices(Dictionary<Atom, int> workingSet)
             {
                 var workingSetKeys = workingSet.Keys;
@@ -660,77 +662,82 @@ namespace Chem4Word.Model
                     {
                         foreach (Atom b in workingSetKeys)
                         {
-                            pidMatrix[a, b] = new EdgeList();
+                            pidMatrix[a, b] = new List< EdgeList>();
                             
                             if (a.NeighbourSet.Contains(b))
                             {
                                 distanceMatrix[a, b] = 1;
-                                pidMatrix[a, b].Add(a.BondBetween(b));
-
-
+                                pidMatrix[a, b].Add(new EdgeList{ a.BondBetween(b)});
                             }
                             else
                             {
                                 distanceMatrix[a, b] = int.MaxValue;
                             }
-
-                          
-                            
                         }
                     }
                 }
 
-
                 InitialiseMatrices();
 
                 bool firstTime = true;
-
+                Atom lastAtom = null;
+                KeyMatrix<Atom, int> prevDistanceMatrix;
                 foreach (Atom k in workingSetKeys)
                 {
                     if (firstTime)
                     {
                         dmList[k] = distanceMatrix;
+                        prevDistanceMatrix = distanceMatrix;
+                    }
+                    else
+                    {
+                        prevDistanceMatrix = dmList[k];
                     }
 
                     if (!dmList.ContainsKey(k))
                     {
                         dmList[k] = new KeyMatrix<Atom, int>();
                     }
+
+
                     foreach (Atom i in workingSetKeys)
                     {
                         foreach (Atom j in workingSetKeys)
                         {
-                            if (dmList[k][i, j] > dmList[k][i, k] + dmList[k][k, j])
+                            if (prevDistanceMatrix[i, j] > prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j])
                             {
-                                if (dmList[k][i, j] == dmList[k][i, k] + dmList[k][k, j] + 1)
+                                if (prevDistanceMatrix[i, j] == prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j] + 1)
                                 {
-                                    pidMatrixOld[i, j] = pidMatrix[i, j];
+                                    pidMatrixPlus[i,j].Clear();
+
+                                    pidMatrixPlus[i, j].Add(pidMatrix[i, j].Last());
                                 }
                                 else
                                 {
-                                    pidMatrixOld[i, j] = null;
+                                    pidMatrixPlus[i, j].Clear();
                                 }
-                                dmList[k][i, j] = dmList[k][i, k] + dmList[k][k, j];
-                                pidMatrix[i, j] = pidMatrix[i, k] + pidMatrix[k, j];
+  
+                                dmList[k][i, j] = prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j];
+                                pidMatrix[i,j].Clear();
+                                pidMatrix[i, j].Add(pidMatrix[i, k].Last() + pidMatrix[k, j].Last());
                             }
 
-                            else if (dmList[k][i, j] == dmList[k][i, k] + dmList[k][k, j])
+                            else if (prevDistanceMatrix[i, j] == prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j])
                             {
-                                pidMatrix[i, j] = pidMatrix[i, k] + pidMatrix[k, j];
+                                pidMatrix[i, j].Add(pidMatrix[i, k].Last() + pidMatrix[k, j].Last());
                             }
-                            else if (dmList[k][i, j] == dmList[k][i, k] + dmList[k][k, j] -1)
+                            else if (prevDistanceMatrix[i, j] == prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j] -1)
                             {
-                                pidMatrixOld[i,j] = pidMatrix[i, k] + pidMatrix[k, j];
+                                pidMatrixPlus[i,j].Add(pidMatrix[i, k].Last()+ pidMatrix[k, j].Last());
                             }
                             else
                             {
-
+                                dmList[k][i, j] = prevDistanceMatrix[i, j];
                             }
                         }
                     }
+                    prevDistanceMatrix = dmList[k];
                 }
-
-
             }
             if (HasRings)
             {

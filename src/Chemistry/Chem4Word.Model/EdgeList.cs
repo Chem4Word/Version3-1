@@ -23,5 +23,10 @@ namespace Chem4Word.Model
             copy.UnionWith(b);
             return copy;
         }
+
+        public override string ToString()
+        {
+            return $"[{string.Join(",", this)} ]";
+        }
     }
 }
