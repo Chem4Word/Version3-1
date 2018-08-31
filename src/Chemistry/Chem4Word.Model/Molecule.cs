@@ -650,6 +650,8 @@ namespace Chem4Word.Model
 
             var distanceMatrix = new KeyMatrix<Atom, int>();
             Dictionary<Atom, KeyMatrix<Atom, int>> distancesList = new Dictionary<Atom, KeyMatrix<Atom, int>>();
+
+            var candidateSets = new List<(double, EdgeList, EdgeList)>();
             // ReSharper disable once InconsistentNaming
             //local function for caluclating the PID matrices
             void CalculatePIDMatrices(Dictionary<Atom, int> workingSet)
@@ -733,28 +735,30 @@ namespace Chem4Word.Model
                 }
             }
 
-            //void MakeCSet(Dictionary<Atom, int> workingSet)
-            //{
-            //    double cnum;
-            //    foreach (Atom i in workingSet.Keys)
-            //    {
-            //        foreach (Atom j in workingSet.Keys)
-            //        {
-            //            if (!(distancesList.Values.Last()[i, j] == 0 ||
-            //                  (pidMatrix[i, j].Count == 1 & pidMatrixPlus[i, j].Count == 0)))
-            //            {
-            //                if (pidMatrixPlus[i, j].Count != 0)
-            //                {
-            //                    cnum = 2 * (distancesList.Values.Last()[i, j] + 0.5);
-            //                }
-            //                else
-            //                {
-            //                    cnum = 2 * (distancesList.Values.Last()[i, j]);
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+            void MakeCSet(Dictionary<Atom, int> workingSet)
+            {
+                double cnum;
+                foreach (Atom i in workingSet.Keys)
+                {
+                    foreach (Atom j in workingSet.Keys)
+                    {
+                        if (!(distancesList.Values.Last()[i, j] == 0 ||
+                              (pidMatrix[i, j].Count == 1 & pidMatrixPlus[i, j].Count == 0)))
+                        {
+                            if (pidMatrixPlus[i, j].Count != 0)
+                            {
+                                cnum = 2 * (distancesList.Values.Last()[i, j] + 0.5);
+                            }
+                            else
+                            {
+                                cnum = 2 * (distancesList.Values.Last()[i, j]);
+                            }
+                            (double, EdgeList, EdgeList) candidate = (cnum, pidMatrix[i, j].Last(), pidMatrixPlus[i, j].Last());
+                            candidateSets.Add(candidate);
+                        }
+                    }
+                }
+            }
             if (HasRings)
             {
                 WipeMoleculeRings();
