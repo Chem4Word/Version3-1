@@ -187,6 +187,61 @@ namespace Chem4Word.Model
             return result.Trim();
         }
 
+        private void Refresh(Atom seed, Model model = null)
+        {
+            //keep a list of the atoms to refer to later when rebuilding
+            HashSet<Atom> checklist = new HashSet<Atom>();
+
+            //set the parent to null but keep a list of all atoms
+            foreach (Atom atom in Atoms)
+            {
+                atom.Parent = null;
+                checklist.Add(atom);
+            }
+
+            checklist.Add(seed);
+
+            var startingMol = this;
+
+            Trash(startingMol);
+            while (checklist.Any())
+            {
+                Queue<Atom> feed = new Queue<Atom>();
+                feed.Enqueue(seed);
+                while (feed.Any())
+                {
+                    Atom toDo = feed.Dequeue();
+                    checklist.Remove(toDo);
+                    startingMol.Atoms.Add(toDo);
+                    toDo.Parent = startingMol;
+
+                    foreach (Bond bond in toDo.Bonds)
+                    {
+                        if (bond.Parent == null || bond.Parent != startingMol)
+                        {
+                            startingMol.Bonds.Add(bond);
+                        }
+                    }
+
+                    foreach (Atom neighbour in toDo.Neighbours.Where(n => (n.Parent == null || n.Parent != startingMol) & !feed.Contains(n)))
+                    {
+                        feed.Enqueue(neighbour);
+                    }
+                }
+                startingMol.RebuildRings();
+                Debug.Assert(!startingMol.Atoms.Any(a => a.Parent == null));
+                Debug.Assert(!startingMol.Bonds.Any(b => b.Parent == null));
+                if (checklist.Any()) //there are still some atoms unaccounted for after the search
+                                     //therefore disconnected from the first graph
+                {
+                    seed = checklist.First();
+                    startingMol = new Molecule();
+                    startingMol.Parent = model;
+                    startingMol.Refresh(seed);
+                    model.Molecules.Add(startingMol);
+                }
+            }
+        }
         /// <summary>
         /// Rebuilds the molecule without trashing it totally
         /// </summary>
