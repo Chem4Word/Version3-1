@@ -152,6 +152,7 @@
     <Compile Include="Converters\MDL\SdFileBase.cs" />
     <Compile Include="Converters\MDL\SdFileConverter.cs" />
     <Compile Include="Converters\MDL\SdfState.cs" />
+    <Compile Include="EdgeList.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="ElementBase.cs" />
     <Compile Include="ElementConverter.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Geometry\Packer.cs" />
     <Compile Include="Geometry\Seperator.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="KeyMatrix.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Molecule.cs" />
     <Compile Include="MoleculeUtils.cs" />

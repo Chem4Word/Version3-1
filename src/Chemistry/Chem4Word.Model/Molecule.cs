@@ -639,6 +639,118 @@ namespace Chem4Word.Model
             Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
         }
+        /// <summary>
+        /// Inplements RP Path
+        /// </summary>
+        public void RebuildRings3()
+        {
+            var pidMatrixOld = new KeyMatrix<Atom, EdgeList>();
+            var pidMatrix = new KeyMatrix<Atom, EdgeList>();
+
+            var distanceMatrix = new KeyMatrix<Atom, int>();
+
+            void CalculatePIDMatrices(Dictionary<Atom, int> workingSet)
+            {
+                var workingSetKeys = workingSet.Keys;
+                Dictionary<Atom, KeyMatrix<Atom, int>> dmList = new Dictionary<Atom, KeyMatrix<Atom, int>>();
+
+                void InitialiseMatrices()
+                {
+                    foreach (Atom a in workingSetKeys)
+                    {
+                        foreach (Atom b in workingSetKeys)
+                        {
+                            pidMatrix[a, b] = new EdgeList();
+                            
+                            if (a.NeighbourSet.Contains(b))
+                            {
+                                distanceMatrix[a, b] = 1;
+                                pidMatrix[a, b].Add(a.BondBetween(b));
+
+
+                            }
+                            else
+                            {
+                                distanceMatrix[a, b] = int.MaxValue;
+                            }
+
+                          
+                            
+                        }
+                    }
+                }
+
+
+                InitialiseMatrices();
+
+                bool firstTime = true;
+
+                foreach (Atom k in workingSetKeys)
+                {
+                    if (firstTime)
+                    {
+                        dmList[k] = distanceMatrix;
+                    }
+
+                    if (!dmList.ContainsKey(k))
+                    {
+                        dmList[k] = new KeyMatrix<Atom, int>();
+                    }
+                    foreach (Atom i in workingSetKeys)
+                    {
+                        foreach (Atom j in workingSetKeys)
+                        {
+                            if (dmList[k][i, j] > dmList[k][i, k] + dmList[k][k, j])
+                            {
+                                if (dmList[k][i, j] == dmList[k][i, k] + dmList[k][k, j] + 1)
+                                {
+                                    pidMatrixOld[i, j] = pidMatrix[i, j];
+                                }
+                                else
+                                {
+                                    pidMatrixOld[i, j] = null;
+                                }
+                                dmList[k][i, j] = dmList[k][i, k] + dmList[k][k, j];
+                                pidMatrix[i, j] = pidMatrix[i, k] + pidMatrix[k, j];
+                            }
+
+                            else if (dmList[k][i, j] == dmList[k][i, k] + dmList[k][k, j])
+                            {
+                                pidMatrix[i, j] = pidMatrix[i, k] + pidMatrix[k, j];
+                            }
+                            else if (dmList[k][i, j] == dmList[k][i, k] + dmList[k][k, j] -1)
+                            {
+                                pidMatrixOld[i,j] = pidMatrix[i, k] + pidMatrix[k, j];
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            if (HasRings)
+            {
+                WipeMoleculeRings();
+
+                Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
+                //lop off any terminal branches
+                PruneSideChains(workingSet);
+
+             
+
+                //set up the PID matrices and the distance matrix
+            
+                CalculatePIDMatrices(workingSet);
+
+            }
+
+        }
+
+        
 
         private List<Ring> _sortedRings = null;
 
