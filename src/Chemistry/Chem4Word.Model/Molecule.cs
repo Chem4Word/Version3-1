@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -648,13 +649,13 @@ namespace Chem4Word.Model
             var pidMatrix = new KeyMatrix<Atom, List< EdgeList>>(); //stores shortest paths
 
             var distanceMatrix = new KeyMatrix<Atom, int>();
-
+            Dictionary<Atom, KeyMatrix<Atom, int>> distancesList = new Dictionary<Atom, KeyMatrix<Atom, int>>();
             // ReSharper disable once InconsistentNaming
             //local function for caluclating the PID matrices
             void CalculatePIDMatrices(Dictionary<Atom, int> workingSet)
             {
                 var workingSetKeys = workingSet.Keys;
-                Dictionary<Atom, KeyMatrix<Atom, int>> dmList = new Dictionary<Atom, KeyMatrix<Atom, int>>();
+                
 
                 void InitialiseMatrices()
                 {
@@ -664,15 +665,7 @@ namespace Chem4Word.Model
                         {
                             pidMatrix[a, b] = new List< EdgeList>();
                             
-                            if (a.NeighbourSet.Contains(b))
-                            {
-                                distanceMatrix[a, b] = 1;
-                                pidMatrix[a, b].Add(new EdgeList{ a.BondBetween(b)});
-                            }
-                            else
-                            {
-                                distanceMatrix[a, b] = int.MaxValue;
-                            }
+                            distanceMatrix[a, b] = a.NeighbourSet.Contains(b) ? 1 : int.MaxValue;
                         }
                     }
                 }
@@ -686,17 +679,17 @@ namespace Chem4Word.Model
                 {
                     if (firstTime)
                     {
-                        dmList[k] = distanceMatrix;
+                        distancesList[k] = distanceMatrix;
                         prevDistanceMatrix = distanceMatrix;
                     }
                     else
                     {
-                        prevDistanceMatrix = dmList[k];
+                        prevDistanceMatrix = distancesList[k];
                     }
 
-                    if (!dmList.ContainsKey(k))
+                    if (!distancesList.ContainsKey(k))
                     {
-                        dmList[k] = new KeyMatrix<Atom, int>();
+                        distancesList[k] = new KeyMatrix<Atom, int>();
                     }
 
 
@@ -717,7 +710,7 @@ namespace Chem4Word.Model
                                     pidMatrixPlus[i, j].Clear();
                                 }
   
-                                dmList[k][i, j] = prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j];
+                                distancesList[k][i, j] = prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j];
                                 pidMatrix[i,j].Clear();
                                 pidMatrix[i, j].Add(pidMatrix[i, k].Last() + pidMatrix[k, j].Last());
                             }
@@ -732,13 +725,36 @@ namespace Chem4Word.Model
                             }
                             else
                             {
-                                dmList[k][i, j] = prevDistanceMatrix[i, j];
+                                distancesList[k][i, j] = prevDistanceMatrix[i, j];
                             }
                         }
                     }
-                    prevDistanceMatrix = dmList[k];
+                    prevDistanceMatrix = distancesList[k];
                 }
             }
+
+            //void MakeCSet(Dictionary<Atom, int> workingSet)
+            //{
+            //    double cnum;
+            //    foreach (Atom i in workingSet.Keys)
+            //    {
+            //        foreach (Atom j in workingSet.Keys)
+            //        {
+            //            if (!(distancesList.Values.Last()[i, j] == 0 ||
+            //                  (pidMatrix[i, j].Count == 1 & pidMatrixPlus[i, j].Count == 0)))
+            //            {
+            //                if (pidMatrixPlus[i, j].Count != 0)
+            //                {
+            //                    cnum = 2 * (distancesList.Values.Last()[i, j] + 0.5);
+            //                }
+            //                else
+            //                {
+            //                    cnum = 2 * (distancesList.Values.Last()[i, j]);
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
             if (HasRings)
             {
                 WipeMoleculeRings();
@@ -752,6 +768,7 @@ namespace Chem4Word.Model
                 //set up the PID matrices and the distance matrix
             
                 CalculatePIDMatrices(workingSet);
+                //MakeCSet();
 
             }
 
