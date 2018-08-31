@@ -187,60 +187,65 @@ namespace Chem4Word.Model
             return result.Trim();
         }
 
-        private void Refresh(Atom seed, Model model = null)
+        private void Refresh(Atom seed, HashSet<Atom> checklist=null)
         {
             //keep a list of the atoms to refer to later when rebuilding
-            HashSet<Atom> checklist = new HashSet<Atom>();
 
             //set the parent to null but keep a list of all atoms
-            foreach (Atom atom in Atoms)
+            if (checklist == null)
             {
-                atom.Parent = null;
-                checklist.Add(atom);
+                checklist=new HashSet<Atom>();
+                
+                foreach (Atom atom in Atoms)
+                {
+                    atom.Parent = null;
+                    checklist.Add(atom);
+                }
+                checklist.Add(seed);
             }
 
-            checklist.Add(seed);
 
             var startingMol = this;
 
             Trash(startingMol);
-            while (checklist.Any())
+           
+            Queue<Atom> feed = new Queue<Atom>();
+            feed.Enqueue(seed);
+            while (feed.Any())
             {
-                Queue<Atom> feed = new Queue<Atom>();
-                feed.Enqueue(seed);
-                while (feed.Any())
+                Atom toDo = feed.Dequeue();
+                checklist.Remove(toDo);
+                startingMol.Atoms.Add(toDo);
+                toDo.Parent = startingMol;
+
+                foreach (Bond bond in toDo.Bonds)
                 {
-                    Atom toDo = feed.Dequeue();
-                    checklist.Remove(toDo);
-                    startingMol.Atoms.Add(toDo);
-                    toDo.Parent = startingMol;
-
-                    foreach (Bond bond in toDo.Bonds)
+                    if (bond.Parent == null || bond.Parent != startingMol)
                     {
-                        if (bond.Parent == null || bond.Parent != startingMol)
-                        {
-                            startingMol.Bonds.Add(bond);
-                        }
-                    }
-
-                    foreach (Atom neighbour in toDo.Neighbours.Where(n => (n.Parent == null || n.Parent != startingMol) & !feed.Contains(n)))
-                    {
-                        feed.Enqueue(neighbour);
+                        startingMol.Bonds.Add(bond);
                     }
                 }
-                startingMol.RebuildRings();
-                Debug.Assert(!startingMol.Atoms.Any(a => a.Parent == null));
-                Debug.Assert(!startingMol.Bonds.Any(b => b.Parent == null));
-                if (checklist.Any()) //there are still some atoms unaccounted for after the search
-                                     //therefore disconnected from the first graph
+
+                foreach (Atom neighbour in toDo.Neighbours.Where(n => (n.Parent == null || n.Parent != startingMol) & !feed.Contains(n)))
                 {
-                    seed = checklist.First();
-                    startingMol = new Molecule();
-                    startingMol.Parent = model;
-                    startingMol.Refresh(seed);
-                    model.Molecules.Add(startingMol);
+                    feed.Enqueue(neighbour);
                 }
             }
+            startingMol.RebuildRings();
+            Debug.Assert(!startingMol.Atoms.Any(a => a.Parent == null));
+            Debug.Assert(!startingMol.Bonds.Any(b => b.Parent == null));
+
+            if (checklist.Any()) //there are still some atoms unaccounted for after the search
+                                    //therefore disconnected from the first graph
+            {
+                seed = checklist.First();
+                //checklist.Remove(seed);
+                startingMol = new Molecule();
+                startingMol.Parent = Parent;
+                startingMol.Refresh(seed, checklist);
+                Parent.Molecules.Add(startingMol);
+            }
+           
         }
         private static void Trash(Molecule startingMol)
         {
@@ -375,31 +380,7 @@ namespace Chem4Word.Model
             }
         }
 
-        /// <summary>
-        /// Traverses a molecular graph applying an operation to each and every atom.
-        /// Does not require that the atoms be already part of a Molecule.
-        /// </summary>
-        /// <param name="startAtom">start atom</param>
-        /// <param name="operation">delegate pointing to operation to perform</param>
-        /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
-        private void BreadthFirstTraversal(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed)
-        {
-            operation(startAtom);
-
-            Queue<Atom> toDo = new Queue<Atom>();
-
-            toDo.Enqueue(startAtom);
-
-            while (toDo.Count > 0)
-            {
-                var nextAtom = toDo.Dequeue();
-                operation(nextAtom);
-                foreach (Atom neighbour in nextAtom.UnprocessedNeighbours(isntProcessed))
-                {
-                    toDo.Enqueue(neighbour);
-                }
-            }
-        }
+      
 
         /// <summary>
         /// Cleaves off a degree 1 atom from the working set.
