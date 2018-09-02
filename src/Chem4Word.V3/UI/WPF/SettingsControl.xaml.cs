@@ -15,10 +15,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using Forms = System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using Chem4Word.Library;
+using Ookii.Dialogs;
+using Forms = System.Windows.Forms;
 
 namespace Chem4Word.UI.WPF
 {
@@ -157,7 +160,6 @@ namespace Chem4Word.UI.WPF
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
-
         }
 
         #endregion Bottom Buttons
@@ -292,6 +294,117 @@ namespace Chem4Word.UI.WPF
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
 
             Debugger.Break();
+
+            try
+            {
+                if (Globals.Chem4WordV3.LibraryNames == null)
+                {
+                    Globals.Chem4WordV3.LoadNamesFromLibrary();
+                }
+                int fileCount = 0;
+                StringBuilder sb;
+
+                // Start with V2 Add-In data path
+                string importFolder = Path.Combine(Globals.Chem4WordV3.AddInInfo.AppDataPath, @"Chemistry Add-In for Word");
+                if (Directory.Exists(importFolder))
+                {
+                    if (Directory.Exists(Path.Combine(importFolder, "Chemistry Gallery")))
+                    {
+                        importFolder = Path.Combine(importFolder, "Chemistry Gallery");
+                    }
+                }
+                else
+                {
+                    importFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                }
+
+                if (Directory.Exists(importFolder))
+                {
+                    // Fix scrolling to selected item by using code from https://social.msdn.microsoft.com/Forums/expression/en-US/1257aebc-22a6-44f6-975b-74f5067728bc/autoposition-showfolder-dialog?forum=vbgeneral
+
+                    VistaFolderBrowserDialog browser = new VistaFolderBrowserDialog();
+
+                    browser.Description = "Select a folder to import cml files from";
+                    browser.UseDescriptionForTitle = true;
+                    browser.RootFolder = Environment.SpecialFolder.Desktop;
+                    browser.ShowNewFolderButton = false;
+                    browser.SelectedPath = importFolder;
+                    Forms.DialogResult dr = browser.ShowDialog();
+
+                    if (dr == Forms.DialogResult.OK)
+                    {
+                        string selectedFolder = browser.SelectedPath;
+                        string doneFile = Path.Combine(selectedFolder, "library-import-done.txt");
+
+                        sb = new StringBuilder();
+                        sb.AppendLine("Do you want to import the Gallery structures into the Library?");
+                        sb.AppendLine("(This cannot be undone.)");
+                        dr = UserInteractions.AskUserYesNo(sb.ToString());
+                        if (dr == Forms.DialogResult.Yes)
+                        {
+                            if (File.Exists(doneFile))
+                            {
+                                sb = new StringBuilder();
+                                sb.AppendLine($"All files have been imported already from '{selectedFolder}'");
+                                sb.AppendLine("Do you want to rerun the import?");
+                                dr = UserInteractions.AskUserYesNo(sb.ToString());
+                                if (dr == Forms.DialogResult.Yes)
+                                {
+                                    File.Delete(doneFile);
+                                }
+                            }
+                        }
+
+                        if (dr == Forms.DialogResult.Yes)
+                        {
+                            Progress pb = new Progress();
+
+                            try
+                            {
+                                var xmlFiles = Directory.GetFiles(selectedFolder, "*.cml");
+
+                                pb.Maximum = xmlFiles.Length;
+                                pb.TopLeft = new Point(TopLeft.X + Constants.TopLeftOffset, TopLeft.Y + Constants.TopLeftOffset);
+                                pb.Show();
+
+                                foreach (string cmlFile in xmlFiles)
+                                {
+                                    pb.Message = cmlFile.Replace(selectedFolder, ".");
+                                    pb.Increment(1);
+
+                                    var cml = File.ReadAllText(cmlFile);
+                                    var lib = new Database.Library();
+                                    if (lib.ImportCml(cml))
+                                    {
+                                        fileCount++;
+                                    }
+                                }
+
+                                pb.Hide();
+                                pb.Close();
+
+                                File.WriteAllText(doneFile, $"{fileCount} cml files imported into library");
+                                FileInfo fi = new FileInfo(doneFile);
+                                fi.Attributes = FileAttributes.Hidden;
+
+                                Globals.Chem4WordV3.LoadNamesFromLibrary();
+
+                                UserInteractions.InformUser($"Successfully imported {fileCount} structures from '{selectedFolder}'.");
+                            }
+                            catch (Exception ex)
+                            {
+                                pb.Hide();
+                                pb.Close();
+                                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
         }
 
         private void ExportFromLibrary_OnClick(object sender, RoutedEventArgs e)
@@ -304,7 +417,49 @@ namespace Chem4Word.UI.WPF
 
         private void EraseLibrary_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+
             Debugger.Break();
+
+            try
+            {
+                if (Globals.Chem4WordV3.LibraryNames == null)
+                {
+                    Globals.Chem4WordV3.LoadNamesFromLibrary();
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("This will delete all the structures from the Library");
+                sb.AppendLine("It will not delete any tags.");
+                sb.AppendLine("");
+                sb.AppendLine("Do you want to proceed?");
+                sb.AppendLine("This cannot be undone.");
+                Forms.DialogResult dr =
+                    UserInteractions.AskUserYesNo(sb.ToString(), Forms.MessageBoxDefaultButton.Button2);
+                if (dr == Forms.DialogResult.Yes)
+                {
+                    var lib = new Database.Library();
+                    lib.DeleteAllChemistry();
+                    Globals.Chem4WordV3.LoadNamesFromLibrary();
+
+                    // Close the existing Library Pane
+                    Debugger.Break();
+                    //var app = Globals.Chem4WordV3.Application;
+                    //foreach (CustomTaskPane taskPane in Globals.Chem4WordV3.CustomTaskPanes)
+                    //{
+                    //    if (app.ActiveWindow == taskPane.Window && taskPane.Title == Constants.LibraryTaskPaneTitle)
+                    //    {
+                    //        var custTaskPane = taskPane;
+                    //        (custTaskPane.Control as LibraryHost)?.Refresh();
+                    //    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
         }
 
         #endregion Tab 4 Events
