@@ -133,7 +133,9 @@
       <DependentUpon>ControlTestForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\cyclopropane.xml" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\Benzene.xml" />
     <EmbeddedResource Include="Resources\MDL\Benzene.txt" />

@@ -16,6 +16,7 @@ namespace Chem4Word.Model
             return copy;
         }
 
+
         public static EdgeList operator + (EdgeList a, EdgeList b)
         {
             var copy = new EdgeList();

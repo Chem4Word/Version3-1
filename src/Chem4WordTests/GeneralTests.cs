@@ -57,5 +57,13 @@ namespace Chem4WordTests
             int atomBondsCount3 = m.Molecules[0].Atoms[0].Bonds.Count;
             Assert.AreEqual(0, atomBondsCount3, $"Expected 0; got {atomBondsCount3}");
         }
+
+        [TestMethod]
+        public void TestRPPath()
+        {
+            CMLConverter mc = new CMLConverter();
+            Model m = mc.Import(ResourceHelper.GetStringResource("Benzene.xml"));
+            m.Molecules[0].RebuildRings3();
+        }
     }
 }

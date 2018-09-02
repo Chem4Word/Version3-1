@@ -14,7 +14,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -38,6 +37,7 @@ namespace Chem4Word.Model
         {
             _boundingBox = Rect.Empty;
         }
+
         public Rect BoundingBox
         {
             get
@@ -57,7 +57,7 @@ namespace Chem4Word.Model
         private void CalculateBoundingBox()
         {
             Model m = this.Model;
-            if (m != null & Atoms.Count>1)
+            if (m != null & Atoms.Count > 1)
             {
                 var xMax = Atoms.Select(a => a.BoundingBox(m.FontSize).Right).Max();
                 var xMin = Atoms.Select(a => a.BoundingBox(m.FontSize).Left).Min();
@@ -640,144 +640,176 @@ namespace Chem4Word.Model
             Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
 #endif
         }
+
         /// <summary>
         /// Inplements RP Path
         /// </summary>
         public void RebuildRings3()
         {
-            var pidMatrixPlus = new KeyMatrix<Atom, List<EdgeList>>();  //stores shortest path +1
-            var pidMatrix = new KeyMatrix<Atom, List< EdgeList>>(); //stores shortest paths
 
-            var distanceMatrix = new KeyMatrix<Atom, int>();
-            Dictionary<Atom, KeyMatrix<Atom, int>> distancesList = new Dictionary<Atom, KeyMatrix<Atom, int>>();
-
-            var candidateSets = new List<(double, EdgeList, EdgeList)>();
             // ReSharper disable once InconsistentNaming
             //local function for caluclating the PID matrices
-            void CalculatePIDMatrices(Dictionary<Atom, int> workingSet)
+           
+            if (HasRings)
             {
-                var workingSetKeys = workingSet.Keys;
+                //WipeMoleculeRings();
+
+                Dictionary<Atom, int> currentSet = Projection(a => a.Degree);
+                //lop off any terminal branches
+                PruneSideChains(currentSet);
+                int maxSeparation =10000000;
+                var currentSetCount = currentSet.Count;
+                List<EdgeList>[,] pidMatrix = new List<EdgeList>[currentSetCount, currentSetCount];
+                List<EdgeList> [,] pidMatrixPlus = new List<EdgeList>[currentSetCount,currentSetCount];
+
+                double[,] distances = new double[currentSetCount, currentSetCount];
                 
+                //double[,,] distancesList = new double[currentSetCount+1,currentSetCount,currentSetCount];
 
-                void InitialiseMatrices()
+                var candidateSets = new List<(double count, EdgeList pathA, EdgeList pathB)>();
+                //store the atoms in an array for now - makes it easier
+                var workingAtoms = currentSet.Keys.ToArray();
+                //initialise the D0 matrix and the PID matrix
+
+                for (long i = 0; i < currentSetCount; i++)
                 {
-                    foreach (Atom a in workingSetKeys)
+                    for (long j = 0; j < currentSetCount; j++)
                     {
-                        foreach (Atom b in workingSetKeys)
+                        Atom a = workingAtoms[i];
+                        Atom b = workingAtoms[j];
+                        if (i != j)
                         {
-                            pidMatrix[a, b] = new List< EdgeList>();
+                            distances[i, j] = a.BondBetween(b) != null ? 1 : double.PositiveInfinity;
+                        }
+                        else
+                        {
+                            distances[i, i] = double.PositiveInfinity;
+                        }
+                        pidMatrix[i, j] = a.BondBetween(b) != null ? new List<EdgeList>{new EdgeList {a.BondBetween(b)}}: new List<EdgeList>();
+                        pidMatrixPlus[i,j] = new List<EdgeList>();
+                    }
+                }
+
+               
+
+                //now calculate the PID matrices
+
+                for (long k =0; k < currentSetCount; k++)
+                {
+                    //for (int i = 0; i < currentSetCount; i++)
+                    //{
+                    //    for (int j = 0; j < currentSetCount; j++)
+                    //    {
                             
-                            distanceMatrix[a, b] = a.NeighbourSet.Contains(b) ? 1 : int.MaxValue;
-                        }
-                    }
-                }
+                    //        distancesList[k + 1,i,j] = distancesList[k,i,j];
+                    //    }
+                    //}
 
-                InitialiseMatrices();
-
-                bool firstTime = true;
-                Atom lastAtom = null;
-                KeyMatrix<Atom, int> prevDistanceMatrix;
-                foreach (Atom k in workingSetKeys)
-                {
-                    if (firstTime)
-                    {
-                        distancesList[k] = distanceMatrix;
-                        prevDistanceMatrix = distanceMatrix;
-                    }
-                    else
-                    {
-                        prevDistanceMatrix = distancesList[k];
-                    }
-
-                    if (!distancesList.ContainsKey(k))
-                    {
-                        distancesList[k] = new KeyMatrix<Atom, int>();
-                    }
-
-
-                    foreach (Atom i in workingSetKeys)
-                    {
-                        foreach (Atom j in workingSetKeys)
+                    for (long i = 0; i < currentSetCount; i++)
                         {
-                            if (prevDistanceMatrix[i, j] > prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j])
+                            for (long j = 0; j < currentSetCount; j++)
                             {
-                                if (prevDistanceMatrix[i, j] == prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j] + 1)
-                                {
-                                    pidMatrixPlus[i,j].Clear();
 
-                                    pidMatrixPlus[i, j].Add(pidMatrix[i, j].Last());
-                                }
-                                else
+                                EdgeList pathA = pidMatrix[i, k].Any() ? pidMatrix[i, k].Last() : new EdgeList();
+                                EdgeList pathB = pidMatrix[k, j].Any() ? pidMatrix[k, j].Last() : new EdgeList();
+                                if (i != j & j != k & k != i)
                                 {
-                                    pidMatrixPlus[i, j].Clear();
-                                }
-  
-                                distancesList[k][i, j] = prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j];
-                                pidMatrix[i,j].Clear();
-                                pidMatrix[i, j].Add(pidMatrix[i, k].Last() + pidMatrix[k, j].Last());
-                            }
+                                    if (distances[i, j] > distances[i, k] + distances[k, j]) //a new shortest path
+                                    {
+                                        if (Math.Abs(distances[i, j] -
+                                                     (distances[i, k] + distances[k, j] + 1)) <
+                                            0.01) //which is equal to the previous path -1
+                                        {
+                                            pidMatrixPlus[i, j].Clear();
 
-                            else if (prevDistanceMatrix[i, j] == prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j])
-                            {
-                                pidMatrix[i, j].Add(pidMatrix[i, k].Last() + pidMatrix[k, j].Last());
-                            }
-                            else if (prevDistanceMatrix[i, j] == prevDistanceMatrix[i, k] + prevDistanceMatrix[k, j] -1)
-                            {
-                                pidMatrixPlus[i,j].Add(pidMatrix[i, k].Last()+ pidMatrix[k, j].Last());
-                            }
-                            else
-                            {
-                                distancesList[k][i, j] = prevDistanceMatrix[i, j];
+                                            pidMatrixPlus[i, j].Add(pidMatrix[i, j].Last()); //change the old path
+                                        }
+                                        else
+                                        {
+                                            pidMatrixPlus[i, j].Clear();
+                                        }
+
+                                        distances[i, j] = distances[i, k] + distances[k, j];
+                                        pidMatrix[i, j].Clear();
+
+                                        pidMatrix[i, j].Add(pathA + pathB);
+                                    }
+                                    else if (Math.Abs(distances[i, j] -
+                                                      (distances[i, k] + distances[k, j])) <
+                                             0.01) //another shortest path
+                                    {
+                                        pidMatrix[i, j].Add(pathA + pathB); //so append the path to the list
+                                    }
+                                    else if (Math.Abs(distances[i, j] -
+                                                      (distances[i, k] + distances[k, j] - 1)) <
+                                             0.01) //shortest plus on path
+                                    {
+                                        pidMatrixPlus[i, j].Add(pathA + pathB); //append the path
+                                    }
+
+
+                                }
                             }
                         }
                     }
-                    prevDistanceMatrix = distancesList[k];
-                }
-            }
 
-            void MakeCSet(Dictionary<Atom, int> workingSet)
-            {
-                double cnum;
-                foreach (Atom i in workingSet.Keys)
+                //now do the ring candidate search
+             
+
+                int cycleNum = 0;
+
+                HashSet<(int cyclenum, List<EdgeList> pathA, List<EdgeList> pathB) > candidates = 
+                    new HashSet<(int cyclenum, List<EdgeList> pathA, List<EdgeList> pathB)>();
+
+                for (long i = 0; i < currentSetCount; i++)
                 {
-                    foreach (Atom j in workingSet.Keys)
+                    for (long j = 0; j < currentSetCount; j++)
                     {
-                        if (!(distancesList.Values.Last()[i, j] == 0 ||
-                              (pidMatrix[i, j].Count == 1 & pidMatrixPlus[i, j].Count == 0)))
+                        if (distances[i, j] != 0 && !double.IsPositiveInfinity(distances[i,j])  
+                                  && !(pidMatrix[i, j].Count == 1 & pidMatrixPlus[i, j].Count == 0))
                         {
                             if (pidMatrixPlus[i, j].Count != 0)
                             {
-                                cnum = 2 * (distancesList.Values.Last()[i, j] + 0.5);
+                                cycleNum = Convert.ToInt32(2 * (distances[ i, j] + 0.5));
                             }
                             else
                             {
-                                cnum = 2 * (distancesList.Values.Last()[i, j]);
+                                cycleNum = Convert.ToInt32(2 * distances[i, j]);
                             }
-                            (double, EdgeList, EdgeList) candidate = (cnum, pidMatrix[i, j].Last(), pidMatrixPlus[i, j].Last());
-                            candidateSets.Add(candidate);
+                            candidates.Add((cycleNum, pidMatrix[i, j], pidMatrixPlus[i, j]));
+                        }
+                    }
+                }
+                //construct the ring and find the SSSR
+
+                int nRingIndex = 0;
+                foreach (var candidate in candidates)
+                {
+                    if (candidate.cyclenum % 2 != 0) //it's odd
+                    {
+                        for (int j=0; j<candidate.pathB.Count; j++)
+                        {
+                            var c = candidate.pathA[0] ^ candidate.pathA[j];
+
+                        }
+                    }
+
+                    if (candidate.cyclenum % 2 == 0) //it's even
+                    {
+                        for (int j = 0; j < candidate.pathA.Count-1; j++)
+                        {
+                            var c = candidate.pathA[j+1] ^ candidate.pathA[j];
+
                         }
                     }
                 }
             }
-            if (HasRings)
-            {
-                WipeMoleculeRings();
 
-                Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
-                //lop off any terminal branches
-                PruneSideChains(workingSet);
+           
 
-             
 
-                //set up the PID matrices and the distance matrix
-            
-                CalculatePIDMatrices(workingSet);
-                //MakeCSet();
-
-            }
 
         }
-
         
 
         private List<Ring> _sortedRings = null;
@@ -1080,7 +1112,7 @@ namespace Chem4Word.Model
             get
             {
                 // ReSharper disable once ArrangeAccessorOwnerBody
-                return new Point((BoundingBox.Right + BoundingBox.Left)/2.0, (BoundingBox.Bottom + BoundingBox.Top)/2.0);
+                return new Point((BoundingBox.Right + BoundingBox.Left) / 2.0, (BoundingBox.Bottom + BoundingBox.Top) / 2.0);
             }
         }
 
@@ -1353,7 +1385,7 @@ namespace Chem4Word.Model
             else
             {
                 var chainAtoms = Atoms.Where(a => !a.Rings.Any()).ToList();
-                if (excludeAtoms!=null)
+                if (excludeAtoms != null)
                 {
                     foreach (Atom excludeAtom in excludeAtoms)
                     {
@@ -1419,8 +1451,8 @@ namespace Chem4Word.Model
         /// <param name="mol">Molecule to merge into this one</param>
         public void Merge(Molecule mol)
         {
-            Debug.Assert(mol!=this);
-            Debug.Assert(mol!=null);
+            Debug.Assert(mol != this);
+            Debug.Assert(mol != null);
             Parent?.Molecules.Remove(mol);
             foreach (Atom newAtom in
                mol.Atoms.ToArray())
@@ -1450,8 +1482,8 @@ namespace Chem4Word.Model
         /// <param name="b">Atom from second molecule</param>
         public void Split(Atom a, Atom b)
         {
-            Debug.Assert(a.BondBetween(b)==null);
-            
+            Debug.Assert(a.BondBetween(b) == null);
+
             b.Parent = null;
             Refresh();
 
