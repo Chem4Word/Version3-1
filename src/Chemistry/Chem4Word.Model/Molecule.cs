@@ -643,6 +643,12 @@ namespace Chem4Word.Model
 
         /// <summary>
         /// Inplements RP Path
+        /// see Lee, C. J., Kang, Y.-M., Cho, K.-H., & No, K. T. (2009).
+        ///  A robust method for searching the smallest set of smallest rings 
+        /// with a path-included distance matrix. Proceedings of the National Academy 
+        /// of Sciences of the United States of America, 106(41), 17355–17358. 
+        
+        /// https://doi.org/10.1073/pnas.0813040106
         /// </summary>
         public void RebuildRings3()
         {
@@ -781,7 +787,9 @@ namespace Chem4Word.Model
                     }
                 }
                 //construct the ring and find the SSSR
-
+                //see Dyott, T. M., & Wipke, W. T. (1975). Use of Ring Assemblies in 
+                //Ring Perception Algorithm. Journal of Chemical Information and Computer Sciences, 
+                //15(3), 140–147. https://doi.org/10.1021/ci60003a003
                 int nRingIndex = 0;
                 foreach (var candidate in candidates)
                 {
