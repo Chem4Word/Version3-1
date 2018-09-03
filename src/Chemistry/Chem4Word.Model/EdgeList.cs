@@ -27,7 +27,20 @@ namespace Chem4Word.Model
 
         public override string ToString()
         {
-            return $"[{string.Join(",", this.OrderBy(b=>b.Id))} ]";
+            return $"[{string.Join("", this.OrderBy(b=>b.Id).Select(b=>b.Id))}]";
+        }
+    }
+
+    internal class EdgeListComparer : IEqualityComparer<EdgeList>
+    {
+        public bool Equals(EdgeList x, EdgeList y)
+        {
+            return x.ToString() == y.ToString();
+        }
+
+        public int GetHashCode(EdgeList obj)
+        {
+            return obj?.GetHashCode()??0;
         }
     }
 }

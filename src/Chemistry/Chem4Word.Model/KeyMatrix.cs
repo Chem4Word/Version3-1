@@ -8,6 +8,11 @@ using System.Threading.Tasks;
 
 namespace Chem4Word.Model
 {
+    /// <summary>
+    /// This provides 2-dimensional disctionary support
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
     internal class KeyMatrix<TKey, TValue>
     {
         private readonly Dictionary<(TKey, TKey), TValue> internalMatrix;

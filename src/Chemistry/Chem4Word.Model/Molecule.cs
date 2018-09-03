@@ -689,7 +689,7 @@ namespace Chem4Word.Model
                         }
                         else
                         {
-                            distances[i, i] = double.PositiveInfinity;
+                            distances[i, i] = 0d;
                         }
                         pidMatrix[i, j] = a.BondBetween(b) != null ? new List<EdgeList>{new EdgeList {a.BondBetween(b)}}: new List<EdgeList>();
                         pidMatrixPlus[i,j] = new List<EdgeList>();
@@ -726,9 +726,12 @@ namespace Chem4Word.Model
                                                      (distances[i, k] + distances[k, j] + 1)) <
                                             0.01) //which is equal to the previous path -1
                                         {
-                                            pidMatrixPlus[i, j].Clear();
+                                            pidMatrixPlus[i, j].Clear();//change the old path
 
-                                            pidMatrixPlus[i, j].Add(pidMatrix[i, j].Last()); //change the old path
+                                            foreach (var edgelist in pidMatrix[i, j])
+                                            {
+                                                pidMatrixPlus[i, j].Add(edgelist);
+                                            }
                                         }
                                         else
                                         {
@@ -737,7 +740,6 @@ namespace Chem4Word.Model
 
                                         distances[i, j] = distances[i, k] + distances[k, j];
                                         pidMatrix[i, j].Clear();
-
                                         pidMatrix[i, j].Add(pathA + pathB);
                                     }
                                     else if (Math.Abs(distances[i, j] -
@@ -748,12 +750,10 @@ namespace Chem4Word.Model
                                     }
                                     else if (Math.Abs(distances[i, j] -
                                                       (distances[i, k] + distances[k, j] - 1)) <
-                                             0.01) //shortest plus on path
+                                             0.01) //shortest + 1 path
                                     {
                                         pidMatrixPlus[i, j].Add(pathA + pathB); //append the path
                                     }
-
-
                                 }
                             }
                         }
@@ -763,7 +763,7 @@ namespace Chem4Word.Model
              
 
                 int cycleNum = 0;
-
+                //list of candidate ring sets
                 HashSet<(int cyclenum, List<EdgeList> pathA, List<EdgeList> pathB) > candidates = 
                     new HashSet<(int cyclenum, List<EdgeList> pathA, List<EdgeList> pathB)>();
 
@@ -776,7 +776,7 @@ namespace Chem4Word.Model
                         {
                             if (pidMatrixPlus[i, j].Count != 0)
                             {
-                                cycleNum = Convert.ToInt32(2 * (distances[ i, j] + 0.5));
+                                cycleNum = Convert.ToInt32(2 * (distances[i, j] + 0.5));
                             }
                             else
                             {
@@ -786,28 +786,68 @@ namespace Chem4Word.Model
                         }
                     }
                 }
+                Debug.WriteLine("Distance Matrix");
+                PrintDistanceMatrix(distances);
+
+                Debug.WriteLine("PID matrix");
+                PrintPIDMatrix(pidMatrix);
+                Debug.WriteLine("PID+ matrix");
+                PrintPIDMatrix(pidMatrixPlus);
                 //construct the ring and find the SSSR
                 //see Dyott, T. M., & Wipke, W. T. (1975). Use of Ring Assemblies in 
                 //Ring Perception Algorithm. Journal of Chemical Information and Computer Sciences, 
                 //15(3), 140–147. https://doi.org/10.1021/ci60003a003
+
+                //first, sort the candidate ringsets by ascending length
+
+                var sortedCandidates = candidates.OrderBy(c => c.cyclenum);
+
+                //make a hashset of edgelists to hold the SSSR
+
+                HashSet<EdgeList> cSSSR = new HashSet<EdgeList>(new EdgeListComparer());
+
                 int nRingIndex = 0;
-                foreach (var candidate in candidates)
+
+                void AddRing(EdgeList tempring)
+                {
+                    if (!cSSSR.Contains(tempring))
+                    {
+                        foreach (var ring in cSSSR)
+                        {
+                            var newring = ring ^ tempring;
+                            if (!cSSSR.Contains(tempring))
+                            {
+                                cSSSR.Add(tempring);
+                                nRingIndex += 1;
+                               
+                            }
+                        }
+                    }
+                }
+                foreach (var candidate in sortedCandidates)
                 {
                     if (candidate.cyclenum % 2 != 0) //it's odd
                     {
+                        EdgeList ringbonds;
                         for (int j=0; j<candidate.pathB.Count; j++)
                         {
-                            var c = candidate.pathA[0] ^ candidate.pathA[j];
-
+                            var tempring  = candidate.pathA[0] + candidate.pathA[j];
+                            AddRing(tempring);
+                            if (nRingIndex == TheoreticalRings)
+                                break;
                         }
                     }
-
-                    if (candidate.cyclenum % 2 == 0) //it's even
+                    if (nRingIndex != TheoreticalRings)
                     {
-                        for (int j = 0; j < candidate.pathA.Count-1; j++)
+                        if (candidate.cyclenum % 2 == 0) //it's even
                         {
-                            var c = candidate.pathA[j+1] ^ candidate.pathA[j];
-
+                            for (int j = 0; j < candidate.pathA.Count - 1; j++)
+                            {
+                                var tempring = candidate.pathA[j + 1] + candidate.pathA[j];
+                                AddRing(tempring);
+                                if (nRingIndex == TheoreticalRings)
+                                    break;
+                            }
                         }
                     }
                 }
@@ -818,7 +858,48 @@ namespace Chem4Word.Model
 
 
         }
-        
+
+        private void PrintDistanceMatrix(double[,] dm)
+        {
+            Debug.WriteLine("---------------------------------------------------------");
+            for (int i = 0; i <= dm.GetUpperBound(0); i++)
+            {
+
+                for (int j = 0; j <= dm.GetUpperBound(1); j++)
+                {
+                    Debug.Write($"({dm[i, j]})");
+                    Debug.Write("\t");
+                }
+                Debug.WriteLine("");
+            }
+            Debug.WriteLine("---------------------------------------------------------");
+        }
+
+        private void PrintPIDMatrix(List<EdgeList>[,] pm)
+        {
+            Debug.WriteLine("---------------------------------------------------------");
+            for (int i=0; i<= pm.GetUpperBound(0); i++)
+            {
+
+                for (int j = 0; j <= pm.GetUpperBound(1); j++)
+                {
+                    Debug.Write("(");
+                    for (int k = 0; k < pm[i,j].Count; k++)
+                    {
+                        if (k != 0)
+                        {
+                            Debug.Write(",");
+                        }
+                        Debug.Write(pm[i,j][k].ToString());
+                    }
+                    Debug.Write(")");
+                    Debug.Write("\t");
+                }
+                Debug.WriteLine("");
+            }
+            Debug.WriteLine("---------------------------------------------------------");
+        }
+
 
         private List<Ring> _sortedRings = null;
 
