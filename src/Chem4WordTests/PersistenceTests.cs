@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using Chem4Word.Model;
 using Chem4Word.Model.Converters;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4WordTests
 {

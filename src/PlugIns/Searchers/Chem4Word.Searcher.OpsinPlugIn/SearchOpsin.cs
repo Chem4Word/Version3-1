@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.Model.Converters;
+using Chem4Word.Model.Converters.CML;
 
 namespace Chem4Word.Searcher.OpsinPlugIn
 {

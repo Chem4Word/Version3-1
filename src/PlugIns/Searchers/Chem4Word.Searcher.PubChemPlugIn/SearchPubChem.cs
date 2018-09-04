@@ -23,6 +23,8 @@ using System.Windows.Media;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Chem4Word.Model;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4Word.Searcher.PubChemPlugIn
 {

@@ -27,6 +27,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 using Chem4Word.Telemetry;
 using Chem4Word.UI.WPF;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;

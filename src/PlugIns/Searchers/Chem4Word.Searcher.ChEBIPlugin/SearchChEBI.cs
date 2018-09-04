@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4Word.Searcher.ChEBIPlugin
 {
