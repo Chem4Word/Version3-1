@@ -1033,8 +1033,8 @@ namespace Chem4Word
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
                                 // ChemSpider InChiKey (1.03) generator does not support 0 bonds or Elements > 104
-                                List<Bond> nullBonds = mol.Bonds.Where(b => b.OrderValue != null && b.OrderValue.Value < 1).ToList();
-                                int max = mol.Atoms.Max(x => ((Element)x.Element).AtomicNumber);
+                                List<Bond> nullBonds = mol.AllBonds.Where(b => b.OrderValue != null && b.OrderValue.Value < 1).ToList();
+                                int max = mol.AllAtoms.Max(x => ((Element)x.Element).AtomicNumber);
                                 if (nullBonds.Any() || max >= 104)
                                 {
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to ChemSpider; Null Bonds: {nullBonds?.Count} Max Atomic Number: {max}");
