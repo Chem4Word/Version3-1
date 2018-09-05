@@ -62,7 +62,9 @@ namespace Chem4WordTests
         public void TestRPPath()
         {
             CMLConverter mc = new CMLConverter();
-            Model m = mc.Import(ResourceHelper.GetStringResource("tworings.xml"));
+            Model m = mc.Import(ResourceHelper.GetStringResource("cyclopropane.xml"));
+            m.Molecules[0].RebuildRings3();
+            m = mc.Import(ResourceHelper.GetStringResource("Benzene.xml"));
             m.Molecules[0].RebuildRings3();
         }
     }

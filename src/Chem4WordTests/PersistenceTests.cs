@@ -204,7 +204,7 @@ namespace Chem4WordTests
             Assert.IsTrue(m.AllBonds.Count == 42, $"Expected 42 Bonds; Got {m.AllBonds.Count}");
 
             // Check that we got two rings
-            Assert.IsTrue(m.Molecules.SelectMany(m1 => m1.Rings).Count() == 3, $"Expected 2 Rings; Got {m.Molecules.SelectMany(m1 => m1.Rings).Count()}");
+            Assert.IsTrue(m.Molecules.SelectMany(m1 => m1.Rings).Count() == 3, $"Expected 3 Rings; Got {m.Molecules.SelectMany(m1 => m1.Rings).Count()}");
 
             string molstring = mc.Export(m);
             mc = new SdFileConverter();

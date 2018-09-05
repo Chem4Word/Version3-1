@@ -672,7 +672,7 @@ namespace Chem4Word.Model
                 
                 //double[,,] distancesList = new double[currentSetCount+1,currentSetCount,currentSetCount];
 
-                var candidateSets = new List<(double count, EdgeList pathA, EdgeList pathB)>();
+                var candidateSets = new List<(double count, EdgeList shortPath, EdgeList longPath)>();
                 //store the atoms in an array for now - makes it easier
                 var workingAtoms = currentSet.Keys.ToArray();
                 //initialise the D0 matrix and the PID matrix
@@ -716,8 +716,8 @@ namespace Chem4Word.Model
                             for (long j = 0; j < currentSetCount; j++)
                             {
 
-                                EdgeList pathA = pidMatrix[i, k].Any() ? pidMatrix[i, k].Last() : new EdgeList();
-                                EdgeList pathB = pidMatrix[k, j].Any() ? pidMatrix[k, j].Last() : new EdgeList();
+                                EdgeList shortPath = pidMatrix[i, k].Any() ? pidMatrix[i, k].Last() : new EdgeList();
+                                EdgeList longPath = pidMatrix[k, j].Any() ? pidMatrix[k, j].Last() : new EdgeList();
                                 if (i != j & j != k & k != i)
                                 {
                                     if (distances[i, j] > distances[i, k] + distances[k, j]) //a new shortest path
@@ -740,19 +740,19 @@ namespace Chem4Word.Model
 
                                         distances[i, j] = distances[i, k] + distances[k, j];
                                         pidMatrix[i, j].Clear();
-                                        pidMatrix[i, j].Add(pathA + pathB);
+                                        pidMatrix[i, j].Add(shortPath + longPath);
                                     }
                                     else if (Math.Abs(distances[i, j] -
                                                       (distances[i, k] + distances[k, j])) <
                                              0.01) //another shortest path
                                     {
-                                        pidMatrix[i, j].Add(pathA + pathB); //so append the path to the list
+                                        pidMatrix[i, j].Add(shortPath + longPath); //so append the path to the list
                                     }
                                     else if (Math.Abs(distances[i, j] -
                                                       (distances[i, k] + distances[k, j] - 1)) <
                                              0.01) //shortest + 1 path
                                     {
-                                        pidMatrixPlus[i, j].Add(pathA + pathB); //append the path
+                                        pidMatrixPlus[i, j].Add(shortPath + longPath); //append the path
                                     }
                                 }
                             }
@@ -764,8 +764,8 @@ namespace Chem4Word.Model
 
                 int cycleNum = 0;
                 //list of candidate ring sets
-                HashSet<(int cyclenum, List<EdgeList> pathA, List<EdgeList> pathB) > candidates = 
-                    new HashSet<(int cyclenum, List<EdgeList> pathA, List<EdgeList> pathB)>();
+                HashSet<(int cyclenum, List<EdgeList> shortPath, List<EdgeList> longPath) > candidates = 
+                    new HashSet<(int cyclenum, List<EdgeList> shortPath, List<EdgeList> longPath)>();
 
                 for (long i = 0; i < currentSetCount; i++)
                 {
@@ -818,7 +818,7 @@ namespace Chem4Word.Model
                             if (!cSSSR.Contains(tempring))
                             {
                                 cSSSR.Add(tempring);
-                                nRingIndex += 1;
+
                                
                             }
                         }
@@ -829,10 +829,11 @@ namespace Chem4Word.Model
                     if (candidate.cyclenum % 2 != 0) //it's odd
                     {
                         EdgeList ringbonds;
-                        for (int j=0; j<candidate.pathB.Count; j++)
+                        for (int j=0; j<candidate.longPath.Count; j++)
                         {
-                            var tempring  = candidate.pathA[0] + candidate.pathA[j];
+                            var tempring  = candidate.shortPath[0] + candidate.longPath[j];
                             AddRing(tempring);
+                            nRingIndex += 1;
                             if (nRingIndex == TheoreticalRings)
                                 break;
                         }
@@ -841,10 +842,11 @@ namespace Chem4Word.Model
                     {
                         if (candidate.cyclenum % 2 == 0) //it's even
                         {
-                            for (int j = 0; j < candidate.pathA.Count - 1; j++)
+                            for (int j = 0; j < candidate.shortPath.Count - 1; j++)
                             {
-                                var tempring = candidate.pathA[j + 1] + candidate.pathA[j];
+                                var tempring = candidate.shortPath[j + 1] + candidate.shortPath[j];
                                 AddRing(tempring);
+                                nRingIndex += 1;
                                 if (nRingIndex == TheoreticalRings)
                                     break;
                             }
