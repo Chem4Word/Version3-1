@@ -171,6 +171,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\tworings.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\C60.xml" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
