@@ -473,7 +473,7 @@ namespace Chem4Word.Model
             }
         }//have we calculated the rings yet?
 
-        public void RebuildRings()
+        public void RebuildRingsA()
         {
 #if DEBUG
             //Stopwatch sw = new Stopwatch();
@@ -619,7 +619,7 @@ namespace Chem4Word.Model
 
         /// https://doi.org/10.1073/pnas.0813040106
         /// </summary>
-        public void RebuildRings3()
+        public void RebuildRings()
         {
 
             // ReSharper disable once InconsistentNaming
@@ -627,7 +627,8 @@ namespace Chem4Word.Model
 
             Stopwatch sw = new Stopwatch();
             Stopwatch sw1, sw2, sw3;
-            Debug.WriteLine($"Recalculating rings for {ChemicalNames.Last().Name}");
+            var s = (ChemicalNames.Any()?ChemicalNames.Last().Name:"[no name]");
+            Debug.WriteLine($"Recalculating rings for {s}");
             sw.Start();
             if (HasRings)
             {
@@ -639,8 +640,8 @@ namespace Chem4Word.Model
                 sw1.Start();
                 PruneSideChains(currentSet);
                 var currentSetCount = currentSet.Count;
-                HashSet<EdgeList>[,] pidMatrix = new HashSet<EdgeList>[currentSetCount, currentSetCount];
-                HashSet<EdgeList>[,] pidMatrixPlus = new HashSet<EdgeList>[currentSetCount, currentSetCount];
+                EdgeList[,][] pidMatrix = new EdgeList[currentSetCount, currentSetCount][];
+                EdgeList[,][] pidMatrixPlus = new EdgeList[currentSetCount, currentSetCount][];
 
                 double[,] distances = new double[currentSetCount, currentSetCount];
 
@@ -666,9 +667,9 @@ namespace Chem4Word.Model
                             distances[i, i] = 0d;
                         }
                         pidMatrix[i, j] = a.BondBetween(b) != null
-                            ? new HashSet<EdgeList> {new EdgeList {a.BondBetween(b)}}
-                            : new HashSet<EdgeList>();
-                        pidMatrixPlus[i, j] = new HashSet<EdgeList>();
+                            ? new EdgeList[1] {new EdgeList {a.BondBetween(b)}}
+                            : Array.Empty<EdgeList>();
+                        pidMatrixPlus[i, j] = Array.Empty<EdgeList>();
                     }
                 }
 
@@ -684,8 +685,8 @@ namespace Chem4Word.Model
                         for (long j = 0; j < currentSetCount; j++)
                         {
 
-                            EdgeList shortPath = pidMatrix[i, k].Any() ? pidMatrix[i, k].Last() : new EdgeList();
-                            EdgeList longPath = pidMatrix[k, j].Any() ? pidMatrix[k, j].Last() : new EdgeList();
+                            EdgeList shortPath = pidMatrix[i, k].Length>0 ? pidMatrix[i, k].Last() : new EdgeList();
+                            EdgeList longPath = pidMatrix[k, j].Length>0 ? pidMatrix[k, j].Last() : new EdgeList();
                             if (i != j & j != k & k != i)
                             {
                                 if (distances[i, j] > distances[i, k] + distances[k, j]) //a new shortest path
@@ -694,33 +695,52 @@ namespace Chem4Word.Model
                                                  (distances[i, k] + distances[k, j] + 1)) <
                                         0.01) //which is equal to the previous path -1
                                     {
-                                        pidMatrixPlus[i, j].Clear(); //change the old path
+                                        pidMatrixPlus[i, j] = Array.Empty<EdgeList>(); //change the old path
 
-                                        foreach (var edgelist in pidMatrix[i, j])
+                                        pidMatrixPlus[i,j] = new EdgeList[pidMatrix[i,j].Length];
+                                        for (int z = 0; z < pidMatrix[i, j].Length; z++)
                                         {
-                                            pidMatrixPlus[i, j].Add(edgelist);
+
+                                            pidMatrixPlus[i, j][z] = pidMatrix[i, j][z];
                                         }
                                     }
                                     else
                                     {
-                                        pidMatrixPlus[i, j].Clear();
+                                        pidMatrixPlus[i, j] = Array.Empty<EdgeList>();
                                     }
 
                                     distances[i, j] = distances[i, k] + distances[k, j];
-                                    pidMatrix[i, j].Clear();
-                                    pidMatrix[i, j].Add(shortPath + longPath);
+                                    pidMatrix[i, j]=new EdgeList[1];
+                                    pidMatrix[i, j][0]=(shortPath + longPath);
                                 }
                                 else if (Math.Abs(distances[i, j] -
                                                   (distances[i, k] + distances[k, j])) <
                                          0.01) //another shortest path
                                 {
-                                    pidMatrix[i, j].Add(shortPath + longPath); //so append the path to the list
+                                    //so append the path to the list
+                                    var newlist = new EdgeList[2];
+                                    pidMatrix[i,j]?.CopyTo(newlist,0);
+                                    newlist[1]= (shortPath + longPath); 
+                                    pidMatrix[i, j] = newlist;
                                 }
                                 else if (Math.Abs(distances[i, j] -
                                                   (distances[i, k] + distances[k, j] - 1)) <
                                          0.01) //shortest + 1 path
                                 {
-                                    pidMatrixPlus[i, j].Add(shortPath + longPath); //append the path
+                                    EdgeList[] newlist = Array.Empty<EdgeList>();
+                                    //append the path
+                                    if (pidMatrixPlus[i,j].Length>0 && pidMatrixPlus[i, j].Length > 0)
+                                    {
+                                        newlist = new EdgeList[2];
+                                        pidMatrixPlus[i, j]?.CopyTo(newlist, 0);
+                                        newlist[1] = (shortPath + longPath);
+                                    }
+                                    else
+                                    {
+                                        newlist = new EdgeList[1];
+                                        newlist[0] = (shortPath + longPath);
+                                    }
+                                    pidMatrixPlus[i, j] = newlist;
                                 }
                             }
                         }
@@ -734,17 +754,17 @@ namespace Chem4Word.Model
 
                 int cycleNum = 0;
                 //list of candidate ring sets
-                HashSet<(int cyclenum, HashSet<EdgeList> shortPath, HashSet<EdgeList> longPath)> candidates =
-                    new HashSet<(int cyclenum, HashSet<EdgeList> shortPath, HashSet<EdgeList> longPath)>();
+                HashSet<(int cyclenum, EdgeList[] shortPath, EdgeList[] longPath)> candidates =
+                    new HashSet<(int cyclenum, EdgeList[] shortPath, EdgeList[] longPath)>();
 
                 for (long i = 0; i < currentSetCount; i++)
                 {
                     for (long j = 0; j < currentSetCount; j++)
                     {
                         if (distances[i, j] != 0 && !double.IsPositiveInfinity(distances[i, j])
-                            && !(pidMatrix[i, j].Count == 1 & pidMatrixPlus[i, j].Count == 0))
+                            && !(pidMatrix[i, j].Length == 1 & pidMatrixPlus[i, j].Length == 0))
                         {
-                            if (pidMatrixPlus[i, j].Count != 0)
+                            if (pidMatrixPlus[i, j].Length != 0)
                             {
                                 cycleNum = Convert.ToInt32(2 * (distances[i, j] + 0.5));
                             }
@@ -824,7 +844,7 @@ namespace Chem4Word.Model
                     if (candidate.cyclenum % 2 != 0) //it's odd
                     {
                         EdgeList ringbonds;
-                        for (int j = 0; j < candidate.longPath.Count; j++)
+                        for (int j = 0; j < candidate.longPath.Length; j++)
                         {
 
                             var tempring = sp[0] + lp[j];
@@ -845,7 +865,7 @@ namespace Chem4Word.Model
                     {
                         if (candidate.cyclenum % 2 == 0) //it's even
                         {
-                            for (int j = 0; j < candidate.shortPath.Count - 1; j++)
+                            for (int j = 0; j < candidate.shortPath.Length - 1; j++)
                             {
                                 var tempring = sp[j + 1] + sp[j];
                                 AddRing(tempring);
@@ -872,14 +892,14 @@ namespace Chem4Word.Model
 
                 double totalTime = sw1.ElapsedMilliseconds + sw2.ElapsedMilliseconds + sw3.ElapsedMilliseconds;
 
-                Debug.WriteLine($"{ChemicalNames.Last().Name} Phase 1: {sw1.ElapsedMilliseconds/totalTime}");
-                Debug.WriteLine($"{ChemicalNames.Last().Name} Phase 2: {sw2.ElapsedMilliseconds / totalTime}");
-                Debug.WriteLine($"{ChemicalNames.Last().Name} Phase 3: {sw3.ElapsedMilliseconds / totalTime}");
+                Debug.WriteLine($"{s} Phase 1: {sw1.ElapsedMilliseconds / totalTime}");
+                Debug.WriteLine($"{s} Phase 2: {sw2.ElapsedMilliseconds / totalTime}");
+                Debug.WriteLine($"{s} Phase 3: {sw3.ElapsedMilliseconds / totalTime}");
             }
            
         
             sw.Stop();
-            Debug.WriteLine($"Elapsed time for {ChemicalNames.Last().Name}  = {sw.ElapsedMilliseconds} ms");
+            Debug.WriteLine($"Elapsed time for {s}  = {sw.ElapsedMilliseconds} ms");
         }
 
         private void PrintDistanceMatrix(double[,] dm)

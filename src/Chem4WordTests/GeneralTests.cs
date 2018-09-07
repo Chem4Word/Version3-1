@@ -64,40 +64,51 @@ namespace Chem4WordTests
             int ringcount, ringcount2, ringcount3;
             CMLConverter mc = new CMLConverter();
             Model m = mc.Import(ResourceHelper.GetStringResource("tworings.xml"));
-            m.Molecules[0].ChemicalNames.Add(new ChemicalName{Name = "tworings"});
-
+           
+            Debug.WriteLine("tworings");
+            Debug.WriteLine("-------------------------");
             ringcount = m.Molecules[0].Rings.Count;
-            
-            m.Molecules[0].RebuildRings3();
-            Debug.WriteLine($"Molecule {m.Molecules[0].ChemicalNames[0].Name} has {m.Molecules[0].Rings.Count} rings.");
+
+            Debug.WriteLine($"Molecule tworings has {m.Molecules[0].Rings.Count} rings.");
+
+            Debug.WriteLine("++++++++++++++++++++++++++");
+
 
             m = mc.Import(ResourceHelper.GetStringResource("C60.xml"));
-            m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "C60" });
+
+            Debug.WriteLine("C60");
+            Debug.WriteLine("-------------------------");
             ringcount2 = m.Molecules[0].Rings.Count;
 
- 
-
             //m = mc.Import(ResourceHelper.GetStringResource("Benzene.xml"));
-            m.Molecules[0].RebuildRings3();
-            Debug.WriteLine($"Molecule {m.Molecules[0].ChemicalNames[0].Name} has {m.Molecules[0].Rings.Count} rings.");
 
+            Debug.WriteLine($"Molecule c60 has {m.Molecules[0].Rings.Count} rings.");
+            Debug.WriteLine("++++++++++++++++++++++++++");
+
+
+            Debug.WriteLine("testosterone");
+            Debug.WriteLine("-------------------------");
             m = mc.Import(ResourceHelper.GetStringResource("Testosterone.xml"));
             m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "testosterone" });
             ringcount3 = m.Molecules[0].Rings.Count;
-            m.Molecules[0].RebuildRings3();
-            Debug.WriteLine($"Molecule {m.Molecules[0].ChemicalNames[0].Name} has {m.Molecules[0].Rings.Count} rings.");
 
-            m = mc.Import(ResourceHelper.GetStringResource("ParafuchsinCarbol.xml"));
-            m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "ParafuchsinCarbol" });
-            int  ringcount4 = m.Molecules[0].Rings.Count;
-            m.Molecules[0].RebuildRings3();
-            Debug.WriteLine($"Molecule {m.Molecules[0].ChemicalNames[0].Name} has {m.Molecules[0].Rings.Count} rings.");
+            Debug.WriteLine($"Molecule testosterone has {m.Molecules[0].Rings.Count} rings.");
+            Debug.WriteLine("++++++++++++++++++++++++++");
 
+
+            //m = mc.Import(ResourceHelper.GetStringResource("ParafuchsinCarbol.xml"));
+            //m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "ParafuchsinCarbol" });
+            //int  ringcount4 = m.Molecules[0].Rings.Count;
+            //m.Molecules[0].RebuildRings();
+            //Debug.WriteLine($"Molecule {m.Molecules[0].ChemicalNames[0].Name} has {m.Molecules[0].Rings.Count} rings.");
+
+            Debug.WriteLine("Insulin");
+            Debug.WriteLine("-------------------------");
             m = mc.Import(ResourceHelper.GetStringResource("Insulin.xml"));
             m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "Insulin" });
             int ringcount5 = m.Molecules[0].Rings.Count;
-            m.Molecules[0].RebuildRings3();
-            Debug.WriteLine($"Molecule {m.Molecules[0].ChemicalNames[0].Name} has {m.Molecules[0].Rings.Count} rings.");
+            Debug.WriteLine($"Molecule insulin  has {m.Molecules[0].Rings.Count} rings.");
+            Debug.WriteLine("++++++++++++++++++++++++++");
         }
     }
 }
