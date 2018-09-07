@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Chem4Word.Model
 {
-    internal class EdgeList :HashSet<Bond>
+    public class EdgeList :HashSet<Bond>
     {
         public static EdgeList operator ^(EdgeList a, EdgeList b)
         {
@@ -27,11 +27,11 @@ namespace Chem4Word.Model
 
         public override string ToString()
         {
-            return $"[{string.Join("", this.OrderBy(b=>b.Id).Select(b=>b.Id))}]";
+            return $"{string.Join("", this.OrderBy(b=>b.Id).Select(b=>b.Id))}";
         }
     }
 
-    internal class EdgeListComparer : IEqualityComparer<EdgeList>
+    public class EdgeListComparer : IEqualityComparer<EdgeList>
     {
         public bool Equals(EdgeList x, EdgeList y)
         {
@@ -40,7 +40,7 @@ namespace Chem4Word.Model
 
         public int GetHashCode(EdgeList obj)
         {
-            return obj?.GetHashCode()??0;
+            return (obj?.ToString().GetHashCode())??0;
         }
     }
 }
