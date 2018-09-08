@@ -650,6 +650,8 @@ namespace Chem4Word.Model
                 var candidateSets = new List<(double count, EdgeList shortPath, EdgeList longPath)>();
                 //store the atoms in an array for now - makes it easier
                 var workingAtoms = currentSet.Keys.ToArray();
+                
+                //Phase 0
                 //initialise the D0 matrix and the PID matrix
 
                 for (long i = 0; i < currentSetCount; i++)
@@ -674,7 +676,7 @@ namespace Chem4Word.Model
                 }
 
 
-
+                //Phase 1
                 //now calculate the PID matrices
 
                 for (long k = 0; k < currentSetCount; k++)
@@ -695,7 +697,7 @@ namespace Chem4Word.Model
                                                  (distances[i, k] + distances[k, j] + 1)) <
                                         0.01) //which is equal to the previous path -1
                                     {
-                                        pidMatrixPlus[i, j] = Array.Empty<EdgeList>(); //change the old path
+                                        //pidMatrixPlus[i, j] = Array.Empty<EdgeList>(); //change the old path
 
                                         pidMatrixPlus[i,j] = new EdgeList[pidMatrix[i,j].Length];
                                         for (int z = 0; z < pidMatrix[i, j].Length; z++)
@@ -711,7 +713,7 @@ namespace Chem4Word.Model
 
                                     distances[i, j] = distances[i, k] + distances[k, j];
                                     pidMatrix[i, j]=new EdgeList[1];
-                                    pidMatrix[i, j][0]=(shortPath + longPath);
+                                    pidMatrix[i, j][0]=shortPath + longPath;
                                 }
                                 else if (Math.Abs(distances[i, j] -
                                                   (distances[i, k] + distances[k, j])) <
@@ -747,7 +749,7 @@ namespace Chem4Word.Model
                     }
                 }
                 sw1.Stop();
-
+                //Phase 2
                 //now do the ring candidate search
                 sw2 = new Stopwatch();
                 sw2.Start();
@@ -786,6 +788,7 @@ namespace Chem4Word.Model
                 //PrintPIDMatrix(pidMatrixPlus);
 
 
+                //Phase 3
                 //construct the ring and find the SSSR
                 //see Dyott, T. M., & Wipke, W. T. (1975). Use of Ring Assemblies in 
                 //Ring Perception Algorithm. Journal of Chemical Information and Computer Sciences, 

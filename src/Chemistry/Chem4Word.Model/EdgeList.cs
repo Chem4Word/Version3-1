@@ -27,7 +27,10 @@ namespace Chem4Word.Model
 
         public override string ToString()
         {
-            return $"{string.Join("", this.OrderBy(b=>b.Id).Select(b=>b.Id))}";
+            var ids = this.Select(b=>b.Id).ToArray();
+            Array.Sort(ids);
+
+            return string.Join("", ids);
         }
     }
 
