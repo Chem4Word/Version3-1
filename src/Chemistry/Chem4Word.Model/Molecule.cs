@@ -8,12 +8,14 @@
 using Chem4Word.Model.Enums;
 using Chem4Word.Model.Geometry;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -473,7 +475,7 @@ namespace Chem4Word.Model
             }
         }//have we calculated the rings yet?
 
-        public void RebuildRingsA()
+        public void RebuildRingsFigueras()
         {
 #if DEBUG
             //Stopwatch sw = new Stopwatch();
@@ -539,6 +541,11 @@ namespace Chem4Word.Model
             }
         }
 
+        public void RebuildRings()
+        {
+            RebuildRingsFigueras();
+        }
+
         /// <summary>
         /// Modified Figueras top-level algorithm:
         /// 1. choose the lowest degree atom
@@ -546,7 +553,7 @@ namespace Chem4Word.Model
         /// 3. If it belongs to a ring and that ring hasn't been calculated before, then add it to the set
         /// 4. delete the atom from the projection, reduce the degree of neighbouring atoms and prune away the side chains
         /// </summary>
-        public void RebuildRings2()
+        private void RebuildRingsFiguerasAlt()
         {
 #if DEBUG
             Stopwatch sw = new Stopwatch();
@@ -619,7 +626,7 @@ namespace Chem4Word.Model
 
         /// https://doi.org/10.1073/pnas.0813040106
         /// </summary>
-        public void RebuildRings()
+        private void RebuildRingsRPPath()
         {
 
             // ReSharper disable once InconsistentNaming
@@ -640,19 +647,53 @@ namespace Chem4Word.Model
                 sw1.Start();
                 PruneSideChains(currentSet);
                 var currentSetCount = currentSet.Count;
-                EdgeList[,][] pidMatrix = new EdgeList[currentSetCount, currentSetCount][];
-                EdgeList[,][] pidMatrixPlus = new EdgeList[currentSetCount, currentSetCount][];
+                List<BitArray>[,] pidMatrix = new List<BitArray>[currentSetCount, currentSetCount];
+                List<BitArray>[,] pidMatrixPlus = new List<BitArray>[currentSetCount, currentSetCount];
 
-                double[,] distances = new double[currentSetCount, currentSetCount];
+                float[,] distances = new float[currentSetCount, currentSetCount];
 
-                //double[,,] distancesList = new double[currentSetCount+1,currentSetCount,currentSetCount];
+                //float[,,] distancesList = new float[currentSetCount+1,currentSetCount,currentSetCount];
 
-                var candidateSets = new List<(double count, EdgeList shortPath, EdgeList longPath)>();
+                var candidateSets = new List<(float count, EdgeList shortPath, EdgeList longPath)>();
                 //store the atoms in an array for now - makes it easier
                 var workingAtoms = currentSet.Keys.ToArray();
-                
+
                 //Phase 0
                 //initialise the D0 matrix and the PID matrix
+
+                //first, create an array of bonds which we can use to convert bit arrays to later
+
+                var workingBonds = this.Bonds.ToArray();
+                var bondCount = this.Bonds.Count;
+
+#region local help functions for phase 0
+                int lookupBondIndex(Bond val)
+                {
+                    return Array.IndexOf(workingBonds, val);
+                }
+
+                EdgeList[] ToEdgeList(List<BitArray> pm)
+                {
+                    var listEdgeList = new List<EdgeList>();
+
+                    foreach (var bitArray in pm)
+                    {
+                        var edgeList = new EdgeList();
+                        listEdgeList.Add(edgeList);
+                        for (int i = 0; i < bitArray.Length; i++)
+                        {
+                            if (bitArray[i])
+                            {
+                                edgeList.Add(workingBonds[i]);
+                            }
+                        }
+                    }
+                    return listEdgeList.ToArray();
+                }
+#endregion
+
+                
+            
 
                 for (long i = 0; i < currentSetCount; i++)
                 {
@@ -660,18 +701,30 @@ namespace Chem4Word.Model
                     {
                         Atom a = workingAtoms[i];
                         Atom b = workingAtoms[j];
+
+                        var bondBetween = a.BondBetween(b);
+
                         if (i != j)
                         {
-                            distances[i, j] = a.BondBetween(b) != null ? 1 : double.PositiveInfinity;
+                            distances[i, j] = bondBetween != null ? 1 : float.PositiveInfinity;
                         }
                         else
                         {
-                            distances[i, i] = 0d;
+                            distances[i, i] = 0f;
                         }
-                        pidMatrix[i, j] = a.BondBetween(b) != null
-                            ? new EdgeList[1] {new EdgeList {a.BondBetween(b)}}
-                            : Array.Empty<EdgeList>();
-                        pidMatrixPlus[i, j] = Array.Empty<EdgeList>();
+                        if (bondBetween != null)
+                        {
+                            BitArray bondFlags = new BitArray(bondCount);
+                            bondFlags[lookupBondIndex(bondBetween)] = true;//set the bit corresponding to the bond
+                            pidMatrix[i, j] = new List<BitArray> {bondFlags};
+
+                        }
+                        else
+                        {
+                           pidMatrix[i,j] = new List<BitArray>();
+                        }
+
+                        pidMatrixPlus[i, j] = new List<BitArray>();
                     }
                 }
 
@@ -679,75 +732,66 @@ namespace Chem4Word.Model
                 //Phase 1
                 //now calculate the PID matrices
 
-                for (long k = 0; k < currentSetCount; k++)
+                for(int k=0; k<currentSetCount; k++)
                 {
-
-                    for (long i = 0; i < currentSetCount; i++)
-                    {
-                        for (long j = 0; j < currentSetCount; j++)
+                    Parallel.For(0, currentSetCount, i =>
                         {
-
-                            EdgeList shortPath = pidMatrix[i, k].Length>0 ? pidMatrix[i, k].Last() : new EdgeList();
-                            EdgeList longPath = pidMatrix[k, j].Length>0 ? pidMatrix[k, j].Last() : new EdgeList();
-                            if (i != j & j != k & k != i)
-                            {
-                                if (distances[i, j] > distances[i, k] + distances[k, j]) //a new shortest path
+                            Parallel.For(0, currentSetCount, j =>
                                 {
-                                    if (Math.Abs(distances[i, j] -
-                                                 (distances[i, k] + distances[k, j] + 1)) <
-                                        0.01) //which is equal to the previous path -1
+                                    BitArray shortPath = pidMatrix[i, k].Count > 0
+                                        ? pidMatrix[i, k].Last()
+                                        : new BitArray(bondCount);
+                                    BitArray longPath = pidMatrix[k, j].Count > 0
+                                        ? pidMatrix[k, j].Last()
+                                        : new BitArray(bondCount);
+                                    if (i != j & j != k & k != i)
                                     {
-                                        //pidMatrixPlus[i, j] = Array.Empty<EdgeList>(); //change the old path
-
-                                        pidMatrixPlus[i,j] = new EdgeList[pidMatrix[i,j].Length];
-                                        for (int z = 0; z < pidMatrix[i, j].Length; z++)
+                                        float dfull = distances[i, j];
+                                        float dFirst = distances[i, k];
+                                        float d3 = distances[k, j];
+                                        if (dfull > dFirst + d3) //a new shortest path
                                         {
+                                            if (dfull ==dFirst + d3 + 1) 
+                                            //which is equal to the previous path -1
+                                            {
+                                                //pidMatrixPlus[i, j] = Array.Empty<EdgeList>(); //change the old path
 
-                                            pidMatrixPlus[i, j][z] = pidMatrix[i, j][z];
+                                                pidMatrixPlus[i, j] = new List<BitArray>();
+                                                foreach (var bitArray in pidMatrix[i, j])
+                                                {
+                                                    pidMatrixPlus[i, j].Add(bitArray);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                pidMatrixPlus[i, j].Clear();
+                                            }
+                                            distances[i, j] = dFirst + d3;
+                                            BitArray tempPath = (BitArray) longPath.Clone();
+                                            tempPath.Or(shortPath);
+                                            pidMatrix[i, j] = new List<BitArray> {tempPath};
+                                        }
+                                        else if (dfull == dFirst + d3) //another shortest path
+                                        {
+                                            //so append the path to the list
+                                            BitArray tempPath = (BitArray) longPath.Clone();
+                                            tempPath.Or(shortPath);
+                                            pidMatrix[i, j].Add(tempPath);
+                                        }
+                                        else if (dfull == dFirst + d3 - 1) //shortest + 1 path
+                                        {
+                                            //append the path
+                                            BitArray tempPath = (BitArray) longPath.Clone();
+                                            tempPath.Or(shortPath);
+                                            pidMatrixPlus[i, j].Add(tempPath);
                                         }
                                     }
-                                    else
-                                    {
-                                        pidMatrixPlus[i, j] = Array.Empty<EdgeList>();
-                                    }
-
-                                    distances[i, j] = distances[i, k] + distances[k, j];
-                                    pidMatrix[i, j]=new EdgeList[1];
-                                    pidMatrix[i, j][0]=shortPath + longPath;
                                 }
-                                else if (Math.Abs(distances[i, j] -
-                                                  (distances[i, k] + distances[k, j])) <
-                                         0.01) //another shortest path
-                                {
-                                    //so append the path to the list
-                                    var newlist = new EdgeList[2];
-                                    pidMatrix[i,j]?.CopyTo(newlist,0);
-                                    newlist[1]= (shortPath + longPath); 
-                                    pidMatrix[i, j] = newlist;
-                                }
-                                else if (Math.Abs(distances[i, j] -
-                                                  (distances[i, k] + distances[k, j] - 1)) <
-                                         0.01) //shortest + 1 path
-                                {
-                                    EdgeList[] newlist = Array.Empty<EdgeList>();
-                                    //append the path
-                                    if (pidMatrixPlus[i,j].Length>0 && pidMatrixPlus[i, j].Length > 0)
-                                    {
-                                        newlist = new EdgeList[2];
-                                        pidMatrixPlus[i, j]?.CopyTo(newlist, 0);
-                                        newlist[1] = (shortPath + longPath);
-                                    }
-                                    else
-                                    {
-                                        newlist = new EdgeList[1];
-                                        newlist[0] = (shortPath + longPath);
-                                    }
-                                    pidMatrixPlus[i, j] = newlist;
-                                }
-                            }
+                            );
                         }
-                    }
+                    );
                 }
+               
                 sw1.Stop();
                 //Phase 2
                 //now do the ring candidate search
@@ -763,10 +807,10 @@ namespace Chem4Word.Model
                 {
                     for (long j = 0; j < currentSetCount; j++)
                     {
-                        if (distances[i, j] != 0 && !double.IsPositiveInfinity(distances[i, j])
-                            && !(pidMatrix[i, j].Length == 1 & pidMatrixPlus[i, j].Length == 0))
+                        if (distances[i, j] != 0 && !float.IsPositiveInfinity(distances[i, j])
+                            && !(pidMatrix[i, j].Any() & !pidMatrixPlus[i, j].Any()))
                         {
-                            if (pidMatrixPlus[i, j].Length != 0)
+                            if (pidMatrixPlus[i, j].Count != 0)
                             {
                                 cycleNum = Convert.ToInt32(2 * (distances[i, j] + 0.5));
                             }
@@ -774,12 +818,56 @@ namespace Chem4Word.Model
                             {
                                 cycleNum = Convert.ToInt32(2 * distances[i, j]);
                             }
-                            candidates.Add((cycleNum, pidMatrix[i, j], pidMatrixPlus[i, j]));
+                            candidates.Add((cycleNum, ToEdgeList(pidMatrix[i, j]), ToEdgeList(pidMatrixPlus[i, j])));
                         }
                     }
                 }
                 sw2.Stop();
-                //Debug.WriteLine("Distance Matrix");
+                Debug.WriteLine("Distance Matrix");
+
+                void PrintDistanceMatrix(float[,] dm)
+                {
+                    Debug.WriteLine("---------------------------------------------------------");
+                    for (int i = 0; i <= dm.GetUpperBound(0); i++)
+                    {
+
+                        for (int j = 0; j <= dm.GetUpperBound(1); j++)
+                        {
+                            Debug.Write($"({dm[i, j]})");
+                            Debug.Write("\t");
+                        }
+                        Debug.WriteLine("");
+                    }
+                    Debug.WriteLine("---------------------------------------------------------");
+                }
+
+                void PrintPIDMatrix(List<BitArray>[,] pm)
+                {
+                    Debug.WriteLine("---------------------------------------------------------");
+                    for (int i = 0; i <= pm.GetUpperBound(0); i++)
+                    {
+
+                        for (int j = 0; j <= pm.GetUpperBound(1); j++)
+                        {
+                            List<BitArray> elist = pm[i, j];
+                            EdgeList[] el = ToEdgeList(elist);
+                            Debug.Write("(");
+                            for (int k = 0; k < elist.Count; k++)
+                            {
+                                if (k != 0)
+                                {
+                                    Debug.Write(",");
+                                }
+                                Debug.Write(el[k].ToString());
+                            }
+                            Debug.Write(")");
+                            Debug.Write("\t");
+                        }
+                        Debug.WriteLine("");
+                    }
+                    Debug.WriteLine("---------------------------------------------------------");
+                }
+
                 //PrintDistanceMatrix(distances);
 
                 //Debug.WriteLine("PID matrix");
@@ -816,6 +904,7 @@ namespace Chem4Word.Model
                             if (cSSSR.Count == 0)
                             {
                                 cSSSR.Add(tempring);
+                                Debug.WriteLine(tempring.ToString());
                                 allBonds.UnionWith(tempring);
                                 nRingIndex += 1;
                             }
@@ -827,6 +916,7 @@ namespace Chem4Word.Model
                                     if (!cSSSR.Contains(tempring))
                                     {
                                         cSSSR.Add(tempring);
+                                        Debug.WriteLine(tempring.ToString());
                                         allBonds.UnionWith(tempring);
                                         nRingIndex += 1;
                                         break;
@@ -893,7 +983,7 @@ namespace Chem4Word.Model
                 }
                 sw3.Stop();
 
-                double totalTime = sw1.ElapsedMilliseconds + sw2.ElapsedMilliseconds + sw3.ElapsedMilliseconds;
+                float totalTime = sw1.ElapsedMilliseconds + sw2.ElapsedMilliseconds + sw3.ElapsedMilliseconds;
 
                 Debug.WriteLine($"{s} Phase 1: {sw1.ElapsedMilliseconds / totalTime}");
                 Debug.WriteLine($"{s} Phase 2: {sw2.ElapsedMilliseconds / totalTime}");
@@ -905,48 +995,9 @@ namespace Chem4Word.Model
             Debug.WriteLine($"Elapsed time for {s}  = {sw.ElapsedMilliseconds} ms");
         }
 
-        private void PrintDistanceMatrix(double[,] dm)
-        {
-            Debug.WriteLine("---------------------------------------------------------");
-            for (int i = 0; i <= dm.GetUpperBound(0); i++)
-            {
+       
 
-                for (int j = 0; j <= dm.GetUpperBound(1); j++)
-                {
-                    Debug.Write($"({dm[i, j]})");
-                    Debug.Write("\t");
-                }
-                Debug.WriteLine("");
-            }
-            Debug.WriteLine("---------------------------------------------------------");
-        }
-
-        private void PrintPIDMatrix(HashSet<EdgeList>[,] pm)
-        {
-            Debug.WriteLine("---------------------------------------------------------");
-            for (int i=0; i<= pm.GetUpperBound(0); i++)
-            {
-
-                for (int j = 0; j <= pm.GetUpperBound(1); j++)
-                {
-                    var elist = pm[i, j].ToArray();
-                    Debug.Write("(");
-                    for (int k = 0; k < elist.Length; k++)
-                    {
-                        if (k != 0)
-                        {
-                            Debug.Write(",");
-                        }
-                        Debug.Write(elist[k].ToString());
-                    }
-                    Debug.Write(")");
-                    Debug.Write("\t");
-                }
-                Debug.WriteLine("");
-            }
-            Debug.WriteLine("---------------------------------------------------------");
-        }
-
+      
 
         private List<Ring> _sortedRings = null;
 

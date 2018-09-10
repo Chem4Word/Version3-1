@@ -30,7 +30,7 @@ namespace Chem4Word.Model
             var ids = this.Select(b=>b.Id).ToArray();
             Array.Sort(ids);
 
-            return string.Join("", ids);
+            return "[" + string.Join(",", ids) + "]";
         }
     }
 
