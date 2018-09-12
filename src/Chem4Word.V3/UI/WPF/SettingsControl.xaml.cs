@@ -9,8 +9,11 @@ using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Database;
 using IChem4Word.Contracts;
+using Ookii.Dialogs;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,8 +22,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using Chem4Word.Library;
-using Ookii.Dialogs;
 using Forms = System.Windows.Forms;
 
 namespace Chem4Word.UI.WPF
@@ -247,24 +248,13 @@ namespace Chem4Word.UI.WPF
 
         #region Tab 2 Events
 
-        private void ChemSpiderWebServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
+        private void Chem4WordWebServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-                SystemOptions.ChemSpiderWebServiceUri = ChemSpiderWebServiceUri.Text;
-                Dirty = true;
-            }
-        }
-
-        private void ResolverServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-                SystemOptions.ResolverServiceUri = ResolverServiceUri.Text;
+                SystemOptions.Chem4WordWebServiceUri = Chem4WordWebServiceUri.Text;
                 Dirty = true;
             }
         }
@@ -292,8 +282,6 @@ namespace Chem4Word.UI.WPF
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-            Debugger.Break();
 
             try
             {
@@ -412,15 +400,65 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
 
-            Debugger.Break();
+            try
+            {
+                string exportFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                VistaFolderBrowserDialog browser = new VistaFolderBrowserDialog();
+
+                browser.Description = "Select a folder to export your Library's structures as cml files";
+                browser.UseDescriptionForTitle = true;
+                browser.RootFolder = Environment.SpecialFolder.Desktop;
+                browser.ShowNewFolderButton = false;
+                browser.SelectedPath = exportFolder;
+                Forms.DialogResult dr = browser.ShowDialog();
+
+                if (dr == Forms.DialogResult.OK)
+                {
+                    exportFolder = browser.SelectedPath;
+
+                    if (Directory.Exists(exportFolder))
+                    {
+                        Forms.DialogResult doExport = Forms.DialogResult.Yes;
+                        string[] existingCmlFiles = Directory.GetFiles(exportFolder, "*.cml");
+                        if (existingCmlFiles.Length > 0)
+                        {
+                            StringBuilder sb = new StringBuilder();
+                            sb.AppendLine($"This folder contains {existingCmlFiles.Length} cml files.");
+                            sb.AppendLine($"Do you wish to continue?");
+                            doExport = UserInteractions.AskUserYesNo(sb.ToString(), Forms.MessageBoxDefaultButton.Button2);
+                        }
+                        if (doExport == Forms.DialogResult.Yes)
+                        {
+                            Database.Library lib = new Database.Library();
+
+                            int exported = 0;
+
+                            List<ChemistryDTO> dto = lib.GetAllChemistry(null);
+                            foreach (var obj in dto)
+                            {
+                                var filename = Path.Combine(browser.SelectedPath, $"Chem4Word-{obj.Id:000000000}.cml");
+                                File.WriteAllText(filename, obj.Cml);
+                                exported++;
+                            }
+
+                            if (exported > 0)
+                            {
+                                UserInteractions.InformUser($"Exported {exported} structures to {browser.SelectedPath}");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
         }
 
         private void EraseLibrary_OnClick(object sender, RoutedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-
-            Debugger.Break();
 
             try
             {
@@ -444,7 +482,9 @@ namespace Chem4Word.UI.WPF
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
 
                     // Close the existing Library Pane
+#if DEBUG
                     Debugger.Break();
+#endif
                     //var app = Globals.Chem4WordV3.Application;
                     //foreach (CustomTaskPane taskPane in Globals.Chem4WordV3.CustomTaskPanes)
                     //{
@@ -471,7 +511,14 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
 
-            Debugger.Break();
+            try
+            {
+                Process.Start(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath);
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
         }
 
         private void LibraryFolder_OnClick(object sender, RoutedEventArgs e)
@@ -479,7 +526,14 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
 
-            Debugger.Break();
+            try
+            {
+                Process.Start(Globals.Chem4WordV3.AddInInfo.ProgramDataPath);
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
         }
 
         private void PlugInsFolder_OnClick(object sender, RoutedEventArgs e)
@@ -487,7 +541,14 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
 
-            Debugger.Break();
+            try
+            {
+                Process.Start(Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, "PlugIns"));
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
+            }
         }
 
         #endregion Tab 5 Events
@@ -561,8 +622,7 @@ namespace Chem4Word.UI.WPF
 
             #region Tab 2
 
-            ChemSpiderWebServiceUri.Text = SystemOptions.ChemSpiderWebServiceUri;
-            ResolverServiceUri.Text = SystemOptions.ResolverServiceUri;
+            Chem4WordWebServiceUri.Text = SystemOptions.Chem4WordWebServiceUri;
 
             #endregion Tab 2
 

@@ -31,7 +31,8 @@ namespace Chem4Word.UI.WPF
         {
             get
             {
-                if (elementHost1.Child is SettingsControl sc)
+                var sc = elementHost1.Child as SettingsControl;
+                if (sc != null)
                 {
                     return sc.SystemOptions;
                 }
@@ -42,7 +43,8 @@ namespace Chem4Word.UI.WPF
             }
             set
             {
-                if (elementHost1.Child is SettingsControl sc)
+                var sc = elementHost1.Child as SettingsControl;
+                if (sc != null)
                 {
                     sc.SystemOptions = value;
                 }
@@ -59,7 +61,8 @@ namespace Chem4Word.UI.WPF
             InitializeComponent();
             if (runtime)
             {
-                if (elementHost1.Child is SettingsControl sc)
+                SettingsControl sc = elementHost1.Child as SettingsControl;
+                if (sc != null)
                 {
                     sc.TopLeft = TopLeft;
                     sc.OnButtonClick += OnWpfButtonClick;
@@ -74,7 +77,8 @@ namespace Chem4Word.UI.WPF
             {
                 case "ok":
                     DialogResult = DialogResult.OK;
-                    if (elementHost1.Child is SettingsControl sc)
+                    SettingsControl sc = elementHost1.Child as SettingsControl;
+                    if (sc != null)
                     {
                         SystemOptions = sc.SystemOptions;
                         SaveChanges();
@@ -121,11 +125,19 @@ namespace Chem4Word.UI.WPF
 
             return output;
         }
+        private string StripTrailingSlash(string uri)
+        {
+            if (uri.EndsWith("/"))
+            {
+                uri = uri.Remove(uri.Length - 1);
+            }
+
+            return uri;
+        }
 
         private void SaveChanges()
         {
-            SystemOptions.ResolverServiceUri = EnsureTrailingSlash(SystemOptions.ResolverServiceUri);
-            SystemOptions.ChemSpiderWebServiceUri = EnsureTrailingSlash(SystemOptions.ChemSpiderWebServiceUri);
+            SystemOptions.Chem4WordWebServiceUri = StripTrailingSlash(SystemOptions.Chem4WordWebServiceUri);
 
             string json = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
 
@@ -139,7 +151,8 @@ namespace Chem4Word.UI.WPF
         {
             if (!_closedInCode)
             {
-                if (elementHost1.Child is SettingsControl sc)
+                SettingsControl sc = elementHost1.Child as SettingsControl;
+                if (sc != null)
                 {
                     if (sc.Dirty)
                     {

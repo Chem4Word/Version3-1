@@ -61,7 +61,6 @@ namespace Chem4Word
             this.YouTube = this.Factory.CreateRibbonButton();
             this.ButtonsDisabled = this.Factory.CreateRibbonButton();
             this.Update = this.Factory.CreateRibbonButton();
-            this.OptionsWpf = this.Factory.CreateRibbonButton();
             this.Chem4WordV3.SuspendLayout();
             this.GroupInputOutput.SuspendLayout();
             this.GroupLibrary.SuspendLayout();
@@ -226,7 +225,6 @@ namespace Chem4Word
             // GroupOptions
             // 
             this.GroupOptions.Items.Add(this.ChangeOptions);
-            this.GroupOptions.Items.Add(this.OptionsWpf);
             this.GroupOptions.Items.Add(this.HelpMenu);
             this.GroupOptions.Items.Add(this.Update);
             this.GroupOptions.Label = "System";
@@ -316,16 +314,6 @@ namespace Chem4Word
             this.Update.ShowImage = true;
             this.Update.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnUpdateClick);
             // 
-            // OptionsWpf
-            // 
-            this.OptionsWpf.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-            this.OptionsWpf.Image = global::Chem4Word.Properties.Resources.Code;
-            this.OptionsWpf.Label = "Options";
-            this.OptionsWpf.Name = "OptionsWpf";
-            this.OptionsWpf.ScreenTip = "Set Chem4Word system options";
-            this.OptionsWpf.ShowImage = true;
-            this.OptionsWpf.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnOptionsWpfClick);
-            // 
             // CustomRibbon
             // 
             this.Name = "CustomRibbon";
@@ -373,7 +361,6 @@ namespace Chem4Word
         internal Microsoft.Office.Tools.Ribbon.RibbonButton ReadManual;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton YouTube;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton ButtonsDisabled;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton OptionsWpf;
     }
 
     partial class ThisRibbonCollection
