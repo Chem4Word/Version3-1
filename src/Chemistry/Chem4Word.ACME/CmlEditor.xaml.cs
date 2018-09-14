@@ -18,7 +18,7 @@ namespace Chem4Word.ACME
     {
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
-        public event EventHandler OnOkButtonClick;
+        public event EventHandler OnButtonClick;
 
         public CmlEditor()
         {
@@ -37,7 +37,7 @@ namespace Chem4Word.ACME
             args.OutputValue = cmlText.Text;
             args.Button = "OK";
 
-            OnOkButtonClick?.Invoke(this, args);
+            OnButtonClick?.Invoke(this, args);
         }
     }
 }

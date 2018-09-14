@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditorHost));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.wpfChemDoodle2 = new Chem4Word.Editor.ChemDoodleWeb800.WpfChemDoodle();
             this.SuspendLayout();
@@ -48,9 +49,10 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Controls.Add(this.elementHost1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "EditorHost";
-            this.Text = "ChemDoodleHost";
+            this.Text = "ChemDoodle Structure Editor";
             this.ResumeLayout(false);
 
         }

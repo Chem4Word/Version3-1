@@ -30,14 +30,14 @@ namespace WinFormsTestHarness
                 ec.InitializeComponent();
                 elementHost1.Child = ec;
                 ec.ShowSave = true;
-                ec.OnOkButtonClick += OnWpfOkButtonClick;
+                ec.OnOkButtonClick += OnWpfButtonClick;
             }
             else
             {
                 CmlEditor ec = new CmlEditor(cml);
                 ec.InitializeComponent();
                 elementHost1.Child = ec;
-                ec.OnOkButtonClick += OnWpfOkButtonClick;
+                ec.OnButtonClick += OnWpfButtonClick;
             }
         }
 
@@ -46,7 +46,7 @@ namespace WinFormsTestHarness
 
         }
 
-        private void OnWpfOkButtonClick(object sender, EventArgs e)
+        private void OnWpfButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
             if (args.Button.Equals("OK") || args.Button.Equals("SAVE"))

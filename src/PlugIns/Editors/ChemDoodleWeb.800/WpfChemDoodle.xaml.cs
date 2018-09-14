@@ -24,6 +24,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Chem4Word.Core.UI.Wpf;
 using Control = System.Windows.Forms.Control;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -42,6 +43,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         private bool _loading;
 
         public string Cml;
+
+        public delegate void EventHandler(object sender, WpfEventArgs args);
+
+        public event EventHandler OnButtonClick;
 
         public WpfChemDoodle()
         {
@@ -219,11 +224,21 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void Ok_OnClick(object sender, RoutedEventArgs e)
         {
+            WpfEventArgs args = new WpfEventArgs();
+            args.OutputValue = "";
+            args.Button = "OK";
+
+            OnButtonClick?.Invoke(this, args);
             throw new NotImplementedException();
         }
 
         private void Cancel_OnClick(object sender, RoutedEventArgs e)
         {
+            WpfEventArgs args = new WpfEventArgs();
+            args.OutputValue = "";
+            args.Button = "Cancel";
+
+            OnButtonClick?.Invoke(this, args);
             throw new NotImplementedException();
         }
 
