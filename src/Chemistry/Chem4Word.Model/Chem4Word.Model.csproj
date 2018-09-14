@@ -164,7 +164,6 @@
     <Compile Include="Geometry\Packer.cs" />
     <Compile Include="Geometry\Seperator.cs" />
     <Compile Include="Globals.cs" />
-    <Compile Include="KeyMatrix.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Molecule.cs" />
     <Compile Include="MoleculeUtils.cs" />
