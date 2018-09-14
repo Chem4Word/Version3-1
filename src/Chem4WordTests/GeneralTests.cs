@@ -67,6 +67,7 @@ namespace Chem4WordTests
            
             Debug.WriteLine("tworings");
             Debug.WriteLine("-------------------------");
+            m.Molecules[0].RebuildRingsRPPath();
             ringcount = m.Molecules[0].Rings.Count;
 
             Debug.WriteLine($"Molecule tworings has {m.Molecules[0].Rings.Count} rings.");
@@ -78,6 +79,7 @@ namespace Chem4WordTests
 
             Debug.WriteLine("C60");
             Debug.WriteLine("-------------------------");
+            m.Molecules[0].RebuildRingsRPPath();
             ringcount2 = m.Molecules[0].Rings.Count;
 
             //m = mc.Import(ResourceHelper.GetStringResource("Benzene.xml"));
@@ -90,6 +92,7 @@ namespace Chem4WordTests
             Debug.WriteLine("-------------------------");
             m = mc.Import(ResourceHelper.GetStringResource("Testosterone.xml"));
             m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "testosterone" });
+            m.Molecules[0].RebuildRingsRPPath();
             ringcount3 = m.Molecules[0].Rings.Count;
 
             Debug.WriteLine($"Molecule testosterone has {m.Molecules[0].Rings.Count} rings.");
@@ -106,6 +109,7 @@ namespace Chem4WordTests
             Debug.WriteLine("-------------------------");
             m = mc.Import(ResourceHelper.GetStringResource("Insulin.xml"));
             m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "Insulin" });
+            m.Molecules[0].RebuildRingsRPPath();
             int ringcount5 = m.Molecules[0].Rings.Count;
             Debug.WriteLine($"Molecule insulin  has {m.Molecules[0].Rings.Count} rings.");
             Debug.WriteLine("++++++++++++++++++++++++++");

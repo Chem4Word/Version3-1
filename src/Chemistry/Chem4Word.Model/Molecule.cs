@@ -626,7 +626,7 @@ namespace Chem4Word.Model
 
         /// https://doi.org/10.1073/pnas.0813040106
         /// </summary>
-        private void RebuildRingsRPPath()
+        public void RebuildRingsRPPath()
         {
 
             // ReSharper disable once InconsistentNaming
