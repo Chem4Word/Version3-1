@@ -80,7 +80,7 @@
             this.btnCancel.TabIndex = 1;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.OnCancel_Click);
             // 
             // btnOk
             // 
@@ -91,7 +91,7 @@
             this.btnOk.TabIndex = 2;
             this.btnOk.Text = "OK";
             this.btnOk.UseVisualStyleBackColor = true;
-            this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
+            this.btnOk.Click += new System.EventHandler(this.OnOk_Click);
             // 
             // groupBoxExplicit
             // 
@@ -136,7 +136,7 @@
             this.btnRemoveExplicitHydrogens.Text = "-";
             this.toolTip1.SetToolTip(this.btnRemoveExplicitHydrogens, "Convert explicit Hydrogens to implicit");
             this.btnRemoveExplicitHydrogens.UseVisualStyleBackColor = true;
-            this.btnRemoveExplicitHydrogens.Click += new System.EventHandler(this.btnRemoveExplicitHydrogens_Click);
+            this.btnRemoveExplicitHydrogens.Click += new System.EventHandler(this.OnRemoveExplicitHydrogens_Click);
             // 
             // btnAddExplicitHydrogens
             // 
@@ -149,7 +149,7 @@
             this.btnAddExplicitHydrogens.Text = "+";
             this.toolTip1.SetToolTip(this.btnAddExplicitHydrogens, "Convert implicit Hydrogens to explicit");
             this.btnAddExplicitHydrogens.UseVisualStyleBackColor = true;
-            this.btnAddExplicitHydrogens.Click += new System.EventHandler(this.btnAddExplicitHydrogens_Click);
+            this.btnAddExplicitHydrogens.Click += new System.EventHandler(this.OnAddExplicitHydrogens_Click);
             // 
             // groupBoxImplicit
             // 
@@ -174,7 +174,7 @@
             this.chkToggleShowCarbons.Text = "Show All Carbons";
             this.toolTip1.SetToolTip(this.chkToggleShowCarbons, "Check to show implicit Hydrogens");
             this.chkToggleShowCarbons.UseVisualStyleBackColor = true;
-            this.chkToggleShowCarbons.CheckedChanged += new System.EventHandler(this.chkToggleShowCarbons_CheckedChanged);
+            this.chkToggleShowCarbons.CheckedChanged += new System.EventHandler(this.OnToggleShowCarbons_CheckedChanged);
             // 
             // chkColouredAtoms
             // 
@@ -188,7 +188,7 @@
             this.chkColouredAtoms.Text = "Coloured Atoms";
             this.toolTip1.SetToolTip(this.chkColouredAtoms, "Check to show implicit Hydrogens");
             this.chkColouredAtoms.UseVisualStyleBackColor = true;
-            this.chkColouredAtoms.CheckedChanged += new System.EventHandler(this.chkColouredAtoms_CheckedChanged);
+            this.chkColouredAtoms.CheckedChanged += new System.EventHandler(this.OnColouredAtoms_CheckedChanged);
             // 
             // chkToggleShowHydrogens
             // 
@@ -202,7 +202,7 @@
             this.chkToggleShowHydrogens.Text = "Show Implicit H";
             this.toolTip1.SetToolTip(this.chkToggleShowHydrogens, "Check to show implicit Hydrogens");
             this.chkToggleShowHydrogens.UseVisualStyleBackColor = true;
-            this.chkToggleShowHydrogens.CheckedChanged += new System.EventHandler(this.chkToggleShowHydrogens_CheckedChanged);
+            this.chkToggleShowHydrogens.CheckedChanged += new System.EventHandler(this.OnToggleShowHydrogens_CheckedChanged);
             // 
             // nudBondLength
             // 
@@ -231,7 +231,7 @@
             0,
             0,
             0});
-            this.nudBondLength.ValueChanged += new System.EventHandler(this.nudBondLength_ValueChanged);
+            this.nudBondLength.ValueChanged += new System.EventHandler(this.OnBondLength_ValueChanged);
             // 
             // btnFlip
             // 
@@ -243,7 +243,7 @@
             this.btnFlip.TabIndex = 16;
             this.toolTip1.SetToolTip(this.btnFlip, "Flip drawing");
             this.btnFlip.UseVisualStyleBackColor = true;
-            this.btnFlip.Click += new System.EventHandler(this.btnFlip_Click);
+            this.btnFlip.Click += new System.EventHandler(this.OnFlip_Click);
             // 
             // btnMirror
             // 
@@ -255,7 +255,7 @@
             this.btnMirror.TabIndex = 18;
             this.toolTip1.SetToolTip(this.btnMirror, "Mirror drawing");
             this.btnMirror.UseVisualStyleBackColor = true;
-            this.btnMirror.Click += new System.EventHandler(this.btnMirror_Click);
+            this.btnMirror.Click += new System.EventHandler(this.OnMirror_Click);
             // 
             // chkSingleOrMany
             // 
@@ -270,7 +270,7 @@
             this.chkSingleOrMany.TabIndex = 20;
             this.toolTip1.SetToolTip(this.chkSingleOrMany, "Change to Multiple molecules mode");
             this.chkSingleOrMany.UseVisualStyleBackColor = true;
-            this.chkSingleOrMany.CheckedChanged += new System.EventHandler(this.chkSingleOrMany_CheckedChanged);
+            this.chkSingleOrMany.CheckedChanged += new System.EventHandler(this.OnSingleOrMany_CheckedChanged);
             // 
             // imageList1
             // 

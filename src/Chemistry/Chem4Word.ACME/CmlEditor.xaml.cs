@@ -31,7 +31,7 @@ namespace Chem4Word.ACME
             cmlText.Text = cml;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
             args.OutputValue = cmlText.Text;

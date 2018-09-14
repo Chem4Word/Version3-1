@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model.Converters.CML;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
 {
@@ -23,9 +24,13 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
     {
         public System.Windows.Point TopLeft { get; set; }
 
-        public Size FormSize { get; set; }
-
         public DialogResult Result = DialogResult.Cancel;
+
+        public IChem4WordTelemetry Telemetry { get; set; }
+
+        public string ProductAppDataPath { get; set; }
+
+        public Options UserOptions { get; set; }
 
         public string OutputValue { get; set; }
 
@@ -33,12 +38,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         {
             InitializeComponent();
 
-            WpfChemDoodle editor = elementHost1.Child as WpfChemDoodle;
-            if (editor != null)
-            {
-                editor.Cml = cml;
-                editor.OnButtonClick += OnWpfButtonClick;
-            }
+            WpfChemDoodle editor = new WpfChemDoodle(Telemetry, UserOptions, cml);
+            editor.InitializeComponent();
+            elementHost1.Child = editor;
+            editor.OnButtonClick += OnWpfButtonClick;
         }
 
         private void OnWpfButtonClick(object sender, EventArgs e)

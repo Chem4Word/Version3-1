@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditorHost));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.wpfChemDoodle2 = new Chem4Word.Editor.ChemDoodleWeb800.WpfChemDoodle();
+            this.wpfChemDoodle1 = new Chem4Word.Editor.ChemDoodleWeb800.WpfChemDoodle();
             this.SuspendLayout();
             // 
             // elementHost1
@@ -41,7 +41,7 @@
             this.elementHost1.Size = new System.Drawing.Size(784, 561);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.wpfChemDoodle2;
+            this.elementHost1.Child = this.wpfChemDoodle1;
             // 
             // EditorHost
             // 
@@ -58,8 +58,7 @@
         }
 
         #endregion
-        private WpfChemDoodle wpfChemDoodle1;
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private WpfChemDoodle wpfChemDoodle2;
+        private WpfChemDoodle wpfChemDoodle1;
     }
 }

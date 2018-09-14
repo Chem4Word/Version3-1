@@ -23,7 +23,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
     public class Editor : IChem4WordEditor
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public string Name => "ChemDoodle Web Structure Editor V8.0.0";
 
@@ -129,26 +129,32 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                 JSONConverter jsonConverter = new JSONConverter();
                 string json = jsonConverter.Export(model);
 
-                ChemDoodleWeb cdwEditor = new ChemDoodleWeb();
-                cdwEditor.TopLeft = TopLeft;
-                cdwEditor.Telemetry = Telemetry;
-                cdwEditor.ProductAppDataPath = ProductAppDataPath;
-                cdwEditor.UserOptions = _editorOptions;
-                cdwEditor.Before_JSON = json;
-                cdwEditor.IsSingleMolecule = model.Molecules.Count == 1;
-                cdwEditor.AverageBondLength = model.MeanBondLength;
+                EditorHost host = new EditorHost(json);
+                host.TopLeft = TopLeft;
+                host.Telemetry = Telemetry;
+                host.ProductAppDataPath = ProductAppDataPath;
+                host.UserOptions = _editorOptions;
 
-                result = cdwEditor.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    Properties = new Dictionary<string, string>();
-                    Properties.Add("Before_Formula", cdwEditor.Before_Formula);
-                    Properties.Add("After_Formula", cdwEditor.After_Formula);
-                    json = cdwEditor.After_JSON;
-                    cdwEditor.Close();
-                    model = jsonConverter.Import(json);
-                    Cml = cmlConverter.Export(model);
-                }
+                //ChemDoodleWeb cdwEditor = new ChemDoodleWeb();
+                //cdwEditor.TopLeft = TopLeft;
+                //cdwEditor.Telemetry = Telemetry;
+                //cdwEditor.ProductAppDataPath = ProductAppDataPath;
+                //cdwEditor.UserOptions = _editorOptions;
+                //cdwEditor.Before_JSON = json;
+                //cdwEditor.IsSingleMolecule = model.Molecules.Count == 1;
+                //cdwEditor.AverageBondLength = model.MeanBondLength;
+
+                //result = cdwEditor.ShowDialog();
+                //if (result == DialogResult.OK)
+                //{
+                //    Properties = new Dictionary<string, string>();
+                //    Properties.Add("Before_Formula", cdwEditor.Before_Formula);
+                //    Properties.Add("After_Formula", cdwEditor.After_Formula);
+                //    json = cdwEditor.After_JSON;
+                //    cdwEditor.Close();
+                //    model = jsonConverter.Import(json);
+                //    Cml = cmlConverter.Export(model);
+                //}
             }
             catch (Exception ex)
             {

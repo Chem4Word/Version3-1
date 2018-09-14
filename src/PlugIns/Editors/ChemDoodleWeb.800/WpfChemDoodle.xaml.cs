@@ -25,6 +25,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Chem4Word.Core.UI.Wpf;
+using IChem4Word.Contracts;
 using Control = System.Windows.Forms.Control;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -42,15 +43,27 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         private string _currentMode = "Single";
         private bool _loading;
 
-        public string Cml;
-
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
         public event EventHandler OnButtonClick;
 
+        private IChem4WordTelemetry _telemetry;
+        private Options _userOptions;
+        private string _cml;
+
         public WpfChemDoodle()
         {
             _loading = true;
+            InitializeComponent();
+        }
+
+        public WpfChemDoodle(IChem4WordTelemetry telemetry, Options userOptions, string cml)
+        {
+            _loading = true;
+            _telemetry = telemetry;
+            _userOptions = userOptions;
+            _cml = cml;
+
             InitializeComponent();
         }
 
@@ -225,6 +238,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         private void Ok_OnClick(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
+            // ToDo: Return cml
             args.OutputValue = "";
             args.Button = "OK";
 
