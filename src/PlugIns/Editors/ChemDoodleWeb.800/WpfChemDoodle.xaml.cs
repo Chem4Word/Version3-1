@@ -27,19 +27,21 @@ using System.Windows.Shapes;
 using Chem4Word.Core.UI.Wpf;
 using IChem4Word.Contracts;
 using Control = System.Windows.Forms.Control;
+using Cursors = System.Windows.Forms.Cursors;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
 {
-
-    // https://stopbyte.com/t/free-wpf-numeric-spinner-numericupdown/499
-    // https://www.codeproject.com/Articles/509824/Creating-a-NumericUpDown-control-from-scratch
-
     /// <summary>
     /// Interaction logic for WpfChemDoodle.xaml
     /// </summary>
     public partial class WpfChemDoodle : UserControl
     {
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
+        private string AppTitle = "Chem4Word Editor - Powered By ChemDoodle Web V";
+
         private string _currentMode = "Single";
         private bool _loading;
 
@@ -50,26 +52,34 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         private IChem4WordTelemetry _telemetry;
         private Options _userOptions;
         private string _cml;
+        private string _productAppDataPath;
 
         public WpfChemDoodle()
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             _loading = true;
             InitializeComponent();
         }
 
-        public WpfChemDoodle(IChem4WordTelemetry telemetry, Options userOptions, string cml)
+        public WpfChemDoodle(IChem4WordTelemetry telemetry, string productAppDataPath, Options userOptions, string cml)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             _loading = true;
+
             _telemetry = telemetry;
             _userOptions = userOptions;
             _cml = cml;
+            _productAppDataPath = productAppDataPath;
 
             InitializeComponent();
         }
 
         private void WpfChemDoodle_OnLoaded(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             _loading = true;
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+
             string file = $@"{Environment.CurrentDirectory}\ChemDoodle\{_currentMode}.html";
             if (File.Exists(file))
             {
@@ -80,6 +90,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void WebBrowser_OnLoadCompleted(object sender, NavigationEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             var version = ExecuteJavaScript("GetVersion");
             var source = (HwndSource)PresentationSource.FromDependencyObject(Browser);
             if (source != null)
@@ -88,14 +99,17 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                 var form = (Form) host?.TopLevelControl;
                 if (form != null)
                 {
-                    form.Text = $"ChemDoodle Web {version}";
+                    form.Text = AppTitle + version;
                 }
             }
+
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
             _loading = false;
         }
 
         private void AddHydrogens_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("AddExplicitHydrogens");
@@ -104,6 +118,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void RemoveHydrogens_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("RemoveHydrogens");
@@ -112,6 +127,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void SwitchMode_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 if (_currentMode.Equals("Single"))
@@ -138,6 +154,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void ShowHydrogens_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("ShowHydrogens", ShowHydrogens.IsChecked.Value);
@@ -146,6 +163,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void ShowColour_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("AtomsInColour", ShowColour.IsChecked.Value);
@@ -154,6 +172,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void FlipStructures_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("Flip");
@@ -162,6 +181,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void MirrorStructures_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("Mirror");
@@ -170,6 +190,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void ShowCarbons_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 ExecuteJavaScript("ShowCarbons", ShowCarbons.IsChecked);
@@ -178,12 +199,14 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void SetBondLength(int value)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             ExecuteJavaScript("ReScale", value);
             BondLength.Text = $"{value}";
         }
 
         private void BondLength_OnTextChanged(object sender, TextChangedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 int bondLength;
@@ -205,6 +228,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void IncreaseButton_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 int bondLength;
@@ -221,6 +245,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void DecreaseButton_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 int bondLength;
@@ -237,6 +262,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void Ok_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             WpfEventArgs args = new WpfEventArgs();
             // ToDo: Return cml
             args.OutputValue = "";
@@ -248,6 +274,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void Cancel_OnClick(object sender, RoutedEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             WpfEventArgs args = new WpfEventArgs();
             args.OutputValue = "";
             args.Button = "Cancel";
@@ -258,6 +285,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private object ExecuteJavaScript(string functionName, params object[] args)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             return Browser.InvokeScript(functionName, args);
         }
     }

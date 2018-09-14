@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +23,9 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 {
     public partial class EditorHost : Form
     {
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         public System.Windows.Point TopLeft { get; set; }
 
         public DialogResult Result = DialogResult.Cancel;
@@ -32,13 +36,28 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         public Options UserOptions { get; set; }
 
+        private string _cml;
+
         public string OutputValue { get; set; }
 
         public EditorHost(string cml)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            _cml = cml;
             InitializeComponent();
+        }
 
-            WpfChemDoodle editor = new WpfChemDoodle(Telemetry, UserOptions, cml);
+        private void EditorHost_Load(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            {
+                Left = (int)TopLeft.X;
+                Top = (int)TopLeft.Y;
+            }
+
+            WpfChemDoodle editor = new WpfChemDoodle(Telemetry, ProductAppDataPath, UserOptions, _cml);
             editor.InitializeComponent();
             elementHost1.Child = editor;
             editor.OnButtonClick += OnWpfButtonClick;
@@ -46,6 +65,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private void OnWpfButtonClick(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             WpfEventArgs args = (WpfEventArgs)e;
             if (args.Button.ToUpper().Equals("OK"))
             {

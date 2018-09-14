@@ -53,6 +53,7 @@
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "EditorHost";
             this.Text = "ChemDoodle Structure Editor";
+            this.Load += new System.EventHandler(this.EditorHost_Load);
             this.ResumeLayout(false);
 
         }
