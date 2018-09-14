@@ -5,13 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-
-namespace Chem4Word.ACME
+namespace Chem4Word.UI
 {
-    public class WpfEventArgs : EventArgs
+    public class PlugInComboItem
     {
-        public string Button { get; set; }
-        public string OutputValue { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

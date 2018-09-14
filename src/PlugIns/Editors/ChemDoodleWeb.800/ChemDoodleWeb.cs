@@ -24,7 +24,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
     public partial class ChemDoodleWeb : Form, IMessageFilter
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private const int WM_KEYDOWN = 0x0100;
 
@@ -311,7 +311,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             return browser.Document.InvokeScript(p_FunctionName, p_Args);
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void OnOk_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -354,7 +354,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void OnCancel_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -399,7 +399,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             File.WriteAllText(optionsFile, json);
         }
 
-        private void chkToggleShowHydrogens_CheckedChanged(object sender, EventArgs e)
+        private void OnToggleShowHydrogens_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -427,7 +427,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void btnAddExplicitHydrogens_Click(object sender, EventArgs e)
+        private void OnAddExplicitHydrogens_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -445,7 +445,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void btnRemoveExplicitHydrogens_Click(object sender, EventArgs e)
+        private void OnRemoveExplicitHydrogens_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -463,7 +463,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void nudBondLength_ValueChanged(object sender, EventArgs e)
+        private void OnBondLength_ValueChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -482,7 +482,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void btnFlip_Click(object sender, EventArgs e)
+        private void OnFlip_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -500,7 +500,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void btnMirror_Click(object sender, EventArgs e)
+        private void OnMirror_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -518,7 +518,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void chkSingleOrMany_CheckedChanged(object sender, EventArgs e)
+        private void OnSingleOrMany_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -575,7 +575,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void chkColouredAtoms_CheckedChanged(object sender, EventArgs e)
+        private void OnColouredAtoms_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -603,7 +603,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             }
         }
 
-        private void chkToggleShowCarbons_CheckedChanged(object sender, EventArgs e)
+        private void OnToggleShowCarbons_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 

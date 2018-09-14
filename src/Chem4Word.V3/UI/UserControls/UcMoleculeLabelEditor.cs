@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Model.Converters.CML;
 
 namespace Chem4Word.UI.UserControls
 {

@@ -8,9 +8,7 @@
     d:DesignHeight="400"
     d:DesignWidth="600"
     mc:Ignorable="d">
-    <Grid
-        RenderTransformOrigin="0.502,0.685"
-        ShowGridLines="False">
+    <Grid RenderTransformOrigin="0.502,0.685" ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="45" />
@@ -31,7 +29,7 @@
             Margin="0,10,10,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Click="button_Click"
+            Click="Button_Click"
             Content="OK"
             RenderTransformOrigin="0.638,0.771" />
     </Grid>

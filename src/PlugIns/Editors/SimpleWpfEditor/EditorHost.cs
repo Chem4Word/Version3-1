@@ -9,6 +9,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Chem4Word.ACME;
+using Chem4Word.Core.UI.Wpf;
 
 namespace Chem4Word.Editor.SimpleWpfEditor
 {
@@ -28,13 +29,13 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
             this.MinimumSize = new Size(300, 200);
 
-            CmlEditor ec = new CmlEditor(cml);
-            ec.InitializeComponent();
-            elementHost1.Child = ec;
-            ec.OnOkButtonClick += OnWpfOkButtonClick;
+            CmlEditor editor = new CmlEditor(cml);
+            editor.InitializeComponent();
+            elementHost1.Child = editor;
+            editor.OnButtonClick += OnWpfButtonClick;
         }
 
-        private void OnWpfOkButtonClick(object sender, EventArgs e)
+        private void OnWpfButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
             if (args.Button.Equals("OK"))
@@ -62,7 +63,7 @@ namespace Chem4Word.Editor.SimpleWpfEditor
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
             CmlEditor ec = elementHost1.Child as CmlEditor;
-            ec.OnOkButtonClick -= OnWpfOkButtonClick;
+            ec.OnButtonClick -= OnWpfButtonClick;
             ec = null;
         }
     }

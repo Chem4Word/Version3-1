@@ -13,6 +13,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 using ChemistryModel = Chem4Word.Model.Model;
 
 namespace Chem4Word.ACME

@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Chem4Word.Model.Converters.CML;
 using Microsoft.Office.Tools;
 
 namespace Chem4Word.Navigator

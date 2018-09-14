@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Windows;
 using Chem4Word.Model;
 using Chem4Word.Model.Converters;
+using Chem4Word.Model.Converters.CML;
 using Chem4Word.Model.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -22,7 +22,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
     public class Searcher : IChem4WordSearcher
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private Options _searcherOptions = new Options();
 
@@ -30,7 +30,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
 
         public string ShortName => "Opsin";
         public string Name => "Opsin Search PlugIn";
-        public string Description => "Searches the PubChem public database";
+        public string Description => "Searches the Opsin public database";
         public Image Image => Resources.Opsin_Logo;
 
         public int DisplayOrder

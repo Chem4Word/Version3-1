@@ -16,7 +16,6 @@ namespace Chem4Word.Telemetry
     public class TelemetryWriter : IChem4WordTelemetry
     {
         private static int Counter;
-        //private static AzureTableWriter AzureTableWriter;
         private static AzureServiceBusWriter AzureServiceBusWriter;
         private static bool _systemInfoSent;
 
@@ -37,7 +36,6 @@ namespace Chem4Word.Telemetry
             {
                 _wmihelper = new WmiHelper();
             }
-            //AzureTableWriter = new AzureTableWriter();
             AzureServiceBusWriter = new AzureServiceBusWriter();
         }
 
@@ -120,6 +118,8 @@ namespace Chem4Word.Telemetry
             WritePrivate("StartUp", "Information", $"Debug - AddIn Location: {_helper.AddInLocation}");
             WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
             WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitProcess: {Environment.Is64BitProcess}");
+
+            WritePrivate("StartUp", "Information", _helper.GitStatus);
 #endif
 
             // Log Wmi Gathered Data
@@ -151,14 +151,7 @@ namespace Chem4Word.Telemetry
 
         private void WritePrivate(string operation, string level, string message)
         {
-            //MessageEntity me = new MessageEntity();
-            //me.MachineId = _helper.MachineId;
-            //me.Operation = operation;
-            //me.Level = level;
-            //me.Message = message;
-            //AzureTableWriter.QueueMessage(me);
-
-            ServiceBusMessage sbm = new ServiceBusMessage();
+            ServiceBusMessage sbm = new ServiceBusMessage(_helper.UtcOffset);
             sbm.MachineId = _helper.MachineId;
             sbm.Operation = operation;
             sbm.Level = level;
