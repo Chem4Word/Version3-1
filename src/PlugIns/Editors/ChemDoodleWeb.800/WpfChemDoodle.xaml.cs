@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,10 +25,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.Json;
 using IChem4Word.Contracts;
+using Ionic.Zip;
 using Control = System.Windows.Forms.Control;
 using Cursors = System.Windows.Forms.Cursors;
+using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
@@ -44,6 +50,9 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private string _currentMode = "Single";
         private bool _loading;
+
+        private Model.Model _model;
+        private Stopwatch _sw;
 
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
@@ -77,15 +86,92 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         private void WpfChemDoodle_OnLoaded(object sender, RoutedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            _loading = true;
-            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
 
-            string file = $@"{Environment.CurrentDirectory}\ChemDoodle\{_currentMode}.html";
-            if (File.Exists(file))
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+            _loading = true;
+            _sw.Start();
+
+            var converter = new CMLConverter();
+            _model = converter.Import(_cml);
+
+            bool singleMolecule = _model.Molecules.Count == 1;
+
+            DeployCdw800();
+            SetupControls(singleMolecule);
+            ShowCdw(singleMolecule);
+        }
+
+        private void ShowCdw(bool singleMolecule)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            string htmlfile = "";
+            if (singleMolecule)
             {
-                _loading = true;
-                Browser.Navigate(new Uri("file:///" + file.Replace(@"\", "/")));
+                htmlfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Single.html");
             }
+            else
+            {
+                htmlfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Multi.html");
+            }
+            File.WriteAllText(Path.Combine(_productAppDataPath, "Editor.html"), htmlfile);
+
+            long sofar = sw.ElapsedMilliseconds;
+
+            _telemetry.Write(module, "Timing", $"Writing resources to disk took {sofar}ms");
+
+            _telemetry.Write(module, "Information", "Starting browser");
+            Browser.Navigate(Path.Combine(_productAppDataPath, "Editor.html"));
+        }
+
+        private void SetupControls(bool singleMolecule)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+        }
+
+        private void DeployCdw800()
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            string otherVersion = Path.Combine(_productAppDataPath, "ChemDoodle-Web-702.txt");
+            if (File.Exists(otherVersion))
+            {
+                _telemetry.Write(module, "Information", "Deleting CDW 702 resources from disk");
+                File.Delete(otherVersion);
+                DelTree(Path.Combine(_productAppDataPath, "ChemDoodleWeb"));
+            }
+
+            string markerFile = Path.Combine(_productAppDataPath, "ChemDoodle-Web-800.txt");
+            if (!File.Exists(markerFile))
+            {
+                _telemetry.Write(module, "Information", "Writing resources to disk");
+                File.WriteAllText(markerFile, "Delete this file to refresh ChemDoodle Web");
+
+                Stream stream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.ChemDoodleWeb_800.zip");
+
+                // NB: Top level of zip file must be the folder ChemDoodleWeb
+                using (ZipFile zip = ZipFile.Read(stream))
+                {
+                    zip.ExtractAll(_productAppDataPath, ExtractExistingFileAction.OverwriteSilently);
+                }
+
+                string cssfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Chem4Word.css");
+                File.WriteAllText(Path.Combine(_productAppDataPath, "Chem4Word.css"), cssfile);
+
+                string jsfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Chem4Word.js");
+                File.WriteAllText(Path.Combine(_productAppDataPath, "Chem4Word.js"), jsfile);
+            }
+
+            sw.Stop();
+            long sofar = sw.ElapsedMilliseconds;
+
+            _telemetry.Write(module, "Timing", $"Writing resources to disk took {sofar}ms");
         }
 
         private void WebBrowser_OnLoadCompleted(object sender, NavigationEventArgs e)
@@ -102,6 +188,16 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                     form.Text = AppTitle + version;
                 }
             }
+
+            // Send JSON to ChemDoodle ...
+            // ExecuteJavaScript("SetJSON", _tempJson, AverageBondLength);
+            // ExecuteJavaScript("ReScale", nudBondLength.Value);
+            // ExecuteJavaScript("ShowHydrogens", true);
+            // ExecuteJavaScript("AtomsInColour", true);
+            // ExecuteJavaScript("ShowCarbons", true);
+
+            long sofar2 = _sw.ElapsedMilliseconds;
+            _telemetry.Write(module, "Timing", $"ChemDoodle Web ready in {sofar2.ToString("#,##0", CultureInfo.InvariantCulture)}ms");
 
             Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
             _loading = false;
@@ -287,6 +383,35 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             return Browser.InvokeScript(functionName, args);
+        }
+        private void DelTree(string sPath)
+        {
+            DelTree(sPath, null);
+        }
+
+        private void DelTree(string sPath, List<string> listOfFilesToIgnore)
+        {
+            DirectoryInfo di = new DirectoryInfo(sPath);
+            DirectoryInfo[] subdirs = di.GetDirectories();
+            FileInfo[] filesList = di.GetFiles();
+            foreach (FileInfo f in filesList)
+            {
+                if (listOfFilesToIgnore == null)
+                {
+                    File.Delete(f.FullName);
+                }
+                else
+                {
+                    if (!listOfFilesToIgnore.Contains(f.FullName))
+                    {
+                        File.Delete(f.FullName);
+                    }
+                }
+            }
+            foreach (DirectoryInfo subdir in subdirs)
+            {
+                DelTree(Path.Combine(sPath, subdir.ToString()), listOfFilesToIgnore);
+            }
         }
     }
 }

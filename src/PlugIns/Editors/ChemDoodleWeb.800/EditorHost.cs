@@ -51,11 +51,16 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
+            Cursor.Current = Cursors.WaitCursor;
+
             if (TopLeft.X != 0 && TopLeft.Y != 0)
             {
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;
             }
+
+            this.Show();
+            Application.DoEvents();
 
             WpfChemDoodle editor = new WpfChemDoodle(Telemetry, ProductAppDataPath, UserOptions, _cml);
             editor.InitializeComponent();
