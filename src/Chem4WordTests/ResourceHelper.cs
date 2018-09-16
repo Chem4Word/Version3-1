@@ -31,7 +31,7 @@ namespace Chem4WordTests
                     count++;
                     fullName = s;
                 }
-                Debug.WriteLine(s);
+                //Debug.WriteLine(s);
             }
 
             if (!string.IsNullOrEmpty(fullName))
