@@ -363,7 +363,7 @@ namespace Chem4Word.Model.Converters.CML
                 newModel.RefreshMolecules();
                 foreach (Molecule molecule in newModel.Molecules)
                 {
-                    molecule.RebuildRings();
+                    //molecule.RebuildRings();
                     // Force ConciseFormula to be calculated
                     molecule.ConciseFormula = molecule.CalculatedFormula();
                 }

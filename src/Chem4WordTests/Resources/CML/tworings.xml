@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<cml:cml xmlns:conventions="http://www.xml-cml.org/convention/" xmlns:cml="http://www.xml-cml.org/schema" xmlns:cmlDict="http://www.xml-cml.org/dictionary/cml/" xmlns:nameDict="http://www.xml-cml.org/dictionary/cml/name/" xmlns:c4w="http://www.chem4word.com/cml" conventions="convention:molecular">
+  <cml:molecule id="m1">
+    <cml:formula id="m1.f0" concise="C 7 H 12" />
+    <cml:name id="m1.n1" dictRef="chemspider:Inchikey">RGSFGYAAUTVSQA-UHFFFAOYSA-N</cml:name>
+    <cml:name id="m1.n2" dictRef="chemspider:Synonym">Cyclopentane</cml:name>
+    <cml:atomArray>
+      <cml:atom id="a1" elementType="C" x2="21.374047175545183" y2="5.1937072880461983" />
+      <cml:atom id="a2" elementType="C" x2="37.554387063044167" y2="16.949412333895225" />
+      <cml:atom id="a3" elementType="C" x2="31.374047175545137" y2="35.970542659799179" />
+      <cml:atom id="a4" elementType="C" x2="11.374047175545183" y2="35.970542659799179" />
+      <cml:atom id="a5" elementType="C" x2="5.1937072880461983" y2="16.949412333895225" />
+      <cml:atom id="a6" elementType="C" x2="57.554387063044437" y2="36.949412333895495" />
+      <cml:atom id="a7" elementType="C" x2="57.554387063044437" y2="16.949412333895225" />
+    </cml:atomArray>
+    <cml:bondArray>
+      <cml:bond id="b1" atomRefs2="a1 a2" order="S" />
+      <cml:bond id="b2" atomRefs2="a5 a1" order="S" />
+      <cml:bond id="b3" atomRefs2="a2 a3" order="S" />
+      <cml:bond id="b4" atomRefs2="a2 a7" order="S" />
+      <cml:bond id="b5" atomRefs2="a3 a4" order="S" />
+      <cml:bond id="b6" atomRefs2="a6 a3" order="S" />
+      <cml:bond id="b7" atomRefs2="a4 a5" order="S" />
+      <cml:bond id="b8" atomRefs2="a7 a6" order="S" />
+    </cml:bondArray>
+  </cml:molecule>
+</cml:cml>

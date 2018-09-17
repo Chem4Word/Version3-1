@@ -133,7 +133,9 @@
       <DependentUpon>ControlTestForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\cyclopropane.xml" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\Benzene.xml" />
     <EmbeddedResource Include="Resources\MDL\Benzene.txt" />
@@ -165,6 +167,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\Carbon.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\tworings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\C60.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Insulin.xml" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
