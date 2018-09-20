@@ -124,11 +124,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                     LoadSettings();
                 }
 
-                EditorHost host = new EditorHost(Cml);
-                host.TopLeft = TopLeft;
-                host.Telemetry = Telemetry;
-                host.ProductAppDataPath = ProductAppDataPath;
-                host.UserOptions = _editorOptions;
+                CMLConverter cmlConverter = new CMLConverter();
+                Model.Model model = cmlConverter.Import(Cml);
+                JSONConverter jsonConverter = new JSONConverter();
+                string json = jsonConverter.Export(model);
 
                 EditorHost host = new EditorHost(json);
                 host.TopLeft = TopLeft;
@@ -136,26 +135,6 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                 host.ProductAppDataPath = ProductAppDataPath;
                 host.UserOptions = _editorOptions;
 
-                //ChemDoodleWeb cdwEditor = new ChemDoodleWeb();
-                //cdwEditor.TopLeft = TopLeft;
-                //cdwEditor.Telemetry = Telemetry;
-                //cdwEditor.ProductAppDataPath = ProductAppDataPath;
-                //cdwEditor.UserOptions = _editorOptions;
-                //cdwEditor.Before_JSON = json;
-                //cdwEditor.IsSingleMolecule = model.Molecules.Count == 1;
-                //cdwEditor.AverageBondLength = model.MeanBondLength;
-
-                //result = cdwEditor.ShowDialog();
-                //if (result == DialogResult.OK)
-                //{
-                //    Properties = new Dictionary<string, string>();
-                //    Properties.Add("Before_Formula", cdwEditor.Before_Formula);
-                //    Properties.Add("After_Formula", cdwEditor.After_Formula);
-                //    json = cdwEditor.After_JSON;
-                //    cdwEditor.Close();
-                //    model = jsonConverter.Import(json);
-                //    Cml = cmlConverter.Export(model);
-                //}
                 result = host.ShowDialog();
                 if (result == DialogResult.OK)
                 {
