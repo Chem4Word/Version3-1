@@ -5,34 +5,27 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model.Converters.CML;
 using Chem4Word.Model.Converters.Json;
 using IChem4Word.Contracts;
 using Ionic.Zip;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Forms;
+using System.Windows.Input;
+using System.Windows.Interop;
+using System.Windows.Navigation;
+using Chem4Word.Core.UI.Forms;
+using Newtonsoft.Json;
 using Control = System.Windows.Forms.Control;
-using Cursors = System.Windows.Forms.Cursors;
 using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -48,20 +41,28 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private string AppTitle = "Chem4Word Editor - Powered By ChemDoodle Web V";
 
-        private string _currentMode = "Single";
         private bool _loading;
+        private bool _saveSettings;
 
-        private Model.Model _model;
-        private Stopwatch _sw;
+        private Stopwatch _sw = new Stopwatch();
 
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
         public event EventHandler OnButtonClick;
 
-        private IChem4WordTelemetry _telemetry;
-        private Options _userOptions;
-        private string _cml;
-        private string _productAppDataPath;
+        public Point TopLeft { get; set; }
+
+        public IChem4WordTelemetry Telemetry { get; set; }
+
+        public string ProductAppDataPath { get; set; }
+
+        public Options UserOptions { get; set; }
+
+        public bool IsSingleMolecule { get; set; }
+
+        public double AverageBondLength { get; set; }
+
+        public string StructureJson { get; set; }
 
         public WpfChemDoodle()
         {
@@ -70,38 +71,389 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             InitializeComponent();
         }
 
-        public WpfChemDoodle(IChem4WordTelemetry telemetry, string productAppDataPath, Options userOptions, string cml)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            _loading = true;
-
-            _telemetry = telemetry;
-            _userOptions = userOptions;
-            _cml = cml;
-            _productAppDataPath = productAppDataPath;
-
-            InitializeComponent();
-        }
-
         private void WpfChemDoodle_OnLoaded(object sender, RoutedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
-            _loading = true;
-            _sw.Start();
+            try
+            {
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                _loading = true;
+                _sw.Start();
 
-            var converter = new CMLConverter();
-            _model = converter.Import(_cml);
+                _sw.Start();
 
-            bool singleMolecule = _model.Molecules.Count == 1;
-
-            DeployCdw800();
-            SetupControls(singleMolecule);
-            ShowCdw(singleMolecule);
+                DeployCdw800();
+                SetupControls();
+                LoadCdw();
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+            }
         }
 
-        private void ShowCdw(bool singleMolecule)
+        private void WebBrowser_OnLoadCompleted(object sender, NavigationEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            var version = ExecuteJavaScript("GetVersion");
+            var source = (HwndSource)PresentationSource.FromDependencyObject(WebBrowser);
+            if (source != null)
+            {
+                var host = (System.Windows.Forms.Integration.ElementHost)Control.FromChildHandle(source.Handle);
+                var form = (Form)host?.TopLevelControl;
+                if (form != null)
+                {
+                    form.Text = AppTitle + version;
+                }
+            }
+
+            // Send JSON to ChemDoodle before we do anything else
+            ExecuteJavaScript("SetJSON", StructureJson, AverageBondLength);
+
+            ExecuteJavaScript("ShowHydrogens", UserOptions.ShowHydrogens);
+            ExecuteJavaScript("AtomsInColour", UserOptions.ColouredAtoms);
+            ExecuteJavaScript("ShowCarbons", UserOptions.ShowCarbons);
+
+            ExecuteJavaScript("ReScale", BondLength.Text);
+
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+
+            _sw.Stop();
+
+            Telemetry.Write(module, "Timing", $"ChemDoodle Web ready in {SafeDouble.Duration(_sw.ElapsedMilliseconds)}ms");
+
+            _loading = false;
+        }
+
+        private void AddHydrogens_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("AddExplicitHydrogens");
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void RemoveHydrogens_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("RemoveHydrogens");
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void ShowHydrogens_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("ShowHydrogens", ShowHydrogens.IsChecked.Value);
+                    _saveSettings = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void ShowColour_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("AtomsInColour", ShowColour.IsChecked.Value);
+                    _saveSettings = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void FlipStructures_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("Flip");
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void MirrorStructures_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("Mirror");
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void ShowCarbons_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    ExecuteJavaScript("ShowCarbons", ShowCarbons.IsChecked);
+                    _saveSettings = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void BondLength_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    int bondLength;
+                    if (int.TryParse(BondLength.Text, out bondLength))
+                    {
+                        bondLength = (int)Math.Round(bondLength / 5.0) * 5;
+
+                        if (bondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
+                            || bondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
+                        {
+                            bondLength = (int)Constants.StandardBondLength;
+                        }
+
+                        AverageBondLength = bondLength;
+                        SetBondLength(bondLength);
+                    }
+                    else
+                    {
+                        AverageBondLength = Constants.StandardBondLength;
+                        SetBondLength((int)AverageBondLength);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void IncreaseButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    int bondLength;
+                    if (int.TryParse(BondLength.Text, out bondLength))
+                    {
+                        if (bondLength < Constants.MaximumBondLength)
+                        {
+                            bondLength += 5;
+                            AverageBondLength = bondLength;
+                            SetBondLength(bondLength);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void DecreaseButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    int bondLength;
+                    if (int.TryParse(BondLength.Text, out bondLength))
+                    {
+                        if (bondLength > Constants.MinimumBondLength)
+                        {
+                            bondLength -= 5;
+                            AverageBondLength = bondLength;
+                            SetBondLength(bondLength);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void Ok_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (_saveSettings)
+                {
+                    SaveSettings();
+                }
+
+                WpfEventArgs args = new WpfEventArgs();
+
+                // Set defaults if fetch fails
+                args.OutputValue = "";
+                args.Button = "Cancel";
+
+                object obj = ExecuteJavaScript("GetJSON");
+                if (obj != null)
+                {
+                    string mol = obj.ToString();
+                    if (!string.IsNullOrEmpty(mol))
+                    {
+                        args.OutputValue = mol;
+                        args.Button = "OK";
+                    }
+                }
+
+                OnButtonClick?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void Cancel_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            try
+            {
+                WpfEventArgs args = new WpfEventArgs();
+                args.OutputValue = "";
+                args.Button = "Cancel";
+
+                OnButtonClick?.Invoke(this, args);
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void SwitchToMulti_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    object obj = ExecuteJavaScript("GetJSON");
+                    if (obj != null)
+                    {
+                        string mol = obj.ToString();
+                        if (!string.IsNullOrEmpty(mol))
+                        {
+                            JSONConverter jc = new JSONConverter();
+                            Model.Model model = jc.Import(mol);
+                            StructureJson = jc.Export(model);
+                            SwapMode();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void SwitchToSingle_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!_loading)
+                {
+                    object obj1 = ExecuteJavaScript("GetJSON");
+                    object obj2 = ExecuteJavaScript("GetFirstMolJSON");
+                    if (obj1 != null && obj2 != null)
+                    {
+                        string mol1 = obj1.ToString();
+                        string mol2 = obj2.ToString();
+                        if (!string.IsNullOrEmpty(mol1) && !string.IsNullOrEmpty(mol2))
+                        {
+                            JSONConverter jc = new JSONConverter();
+                            Model.Model model1 = jc.Import(mol1);
+                            Model.Model model2 = jc.Import(mol2);
+
+                            if (model1.Molecules.Count == 1)
+                            {
+                                StructureJson = jc.Export(model1);
+                                SwapMode();
+                            }
+                            else
+                            {
+                                StringBuilder sb = new StringBuilder();
+                                sb.AppendLine($"Warning your structure '{model1.ConciseFormula}' contains more than one molecule.");
+                                sb.AppendLine($"Only the first molecule '{model2.ConciseFormula}' will be retained.");
+                                sb.AppendLine("    Do you wish to continue?");
+                                DialogResult dr = UserInteractions.AskUserYesNo(sb.ToString());
+                                if (dr == DialogResult.Yes)
+                                {
+                                    StructureJson = jc.Export(model2);
+                                    SwapMode();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void LoadCdw()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -109,7 +461,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             sw.Start();
 
             string htmlfile = "";
-            if (singleMolecule)
+            if (IsSingleMolecule)
             {
                 htmlfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Single.html");
             }
@@ -117,19 +469,44 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             {
                 htmlfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Multi.html");
             }
-            File.WriteAllText(Path.Combine(_productAppDataPath, "Editor.html"), htmlfile);
+            File.WriteAllText(Path.Combine(ProductAppDataPath, "Editor.html"), htmlfile);
 
-            long sofar = sw.ElapsedMilliseconds;
+            Telemetry.Write(module, "Timing", $"Writing resources to disk took {SafeDouble.Duration(sw.ElapsedMilliseconds)}ms");
 
-            _telemetry.Write(module, "Timing", $"Writing resources to disk took {sofar}ms");
-
-            _telemetry.Write(module, "Information", "Starting browser");
-            Browser.Navigate(Path.Combine(_productAppDataPath, "Editor.html"));
+            Telemetry.Write(module, "Information", "Starting browser");
+            WebBrowser.Navigate(Path.Combine(ProductAppDataPath, "Editor.html"));
         }
 
-        private void SetupControls(bool singleMolecule)
+        private void SetupControls()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            ShowHydrogens.IsChecked = UserOptions.ShowHydrogens;
+            ShowColour.IsChecked = UserOptions.ColouredAtoms;
+            ShowCarbons.IsChecked = UserOptions.ShowCarbons;
+
+            if (AverageBondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
+                || AverageBondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
+            {
+                BondLength.Text = Constants.StandardBondLength.ToString("0");
+                AverageBondLength = Constants.StandardBondLength;
+            }
+            else
+            {
+                AverageBondLength = Math.Round(AverageBondLength / 5.0) * 5;
+                BondLength.Text = AverageBondLength.ToString("0");
+            }
+
+            if (IsSingleMolecule)
+            {
+                SwitchToMulti.Visibility = Visibility.Visible;
+                SwitchToSingle.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                SwitchToMulti.Visibility = Visibility.Collapsed;
+                SwitchToSingle.Visibility = Visibility.Visible;
+            }
         }
 
         private void DeployCdw800()
@@ -139,18 +516,18 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            string otherVersion = Path.Combine(_productAppDataPath, "ChemDoodle-Web-702.txt");
+            string otherVersion = Path.Combine(ProductAppDataPath, "ChemDoodle-Web-702.txt");
             if (File.Exists(otherVersion))
             {
-                _telemetry.Write(module, "Information", "Deleting CDW 702 resources from disk");
+                Telemetry.Write(module, "Information", "Deleting CDW 702 resources from disk");
                 File.Delete(otherVersion);
-                DelTree(Path.Combine(_productAppDataPath, "ChemDoodleWeb"));
+                DelTree(Path.Combine(ProductAppDataPath, "ChemDoodleWeb"));
             }
 
-            string markerFile = Path.Combine(_productAppDataPath, "ChemDoodle-Web-800.txt");
+            string markerFile = Path.Combine(ProductAppDataPath, "ChemDoodle-Web-800.txt");
             if (!File.Exists(markerFile))
             {
-                _telemetry.Write(module, "Information", "Writing resources to disk");
+                Telemetry.Write(module, "Information", "Writing resources to disk");
                 File.WriteAllText(markerFile, "Delete this file to refresh ChemDoodle Web");
 
                 Stream stream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.ChemDoodleWeb_800.zip");
@@ -158,139 +535,37 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                 // NB: Top level of zip file must be the folder ChemDoodleWeb
                 using (ZipFile zip = ZipFile.Read(stream))
                 {
-                    zip.ExtractAll(_productAppDataPath, ExtractExistingFileAction.OverwriteSilently);
+                    zip.ExtractAll(ProductAppDataPath, ExtractExistingFileAction.OverwriteSilently);
                 }
 
                 string cssfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Chem4Word.css");
-                File.WriteAllText(Path.Combine(_productAppDataPath, "Chem4Word.css"), cssfile);
+                File.WriteAllText(Path.Combine(ProductAppDataPath, "Chem4Word.css"), cssfile);
 
                 string jsfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Chem4Word.js");
-                File.WriteAllText(Path.Combine(_productAppDataPath, "Chem4Word.js"), jsfile);
+                File.WriteAllText(Path.Combine(ProductAppDataPath, "Chem4Word.js"), jsfile);
             }
 
             sw.Stop();
-            long sofar = sw.ElapsedMilliseconds;
 
-            _telemetry.Write(module, "Timing", $"Writing resources to disk took {sofar}ms");
+            Telemetry.Write(module, "Timing", $"Writing resources to disk took {SafeDouble.Duration(sw.ElapsedMilliseconds)}ms");
         }
 
-        private void WebBrowser_OnLoadCompleted(object sender, NavigationEventArgs e)
+        private void SwapMode()
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            var version = ExecuteJavaScript("GetVersion");
-            var source = (HwndSource)PresentationSource.FromDependencyObject(Browser);
-            if (source != null)
+            if (IsSingleMolecule)
             {
-                var host = (System.Windows.Forms.Integration.ElementHost)Control.FromChildHandle(source.Handle);
-                var form = (Form) host?.TopLevelControl;
-                if (form != null)
-                {
-                    form.Text = AppTitle + version;
-                }
+                SwitchToMulti.Visibility = Visibility.Collapsed;
+                SwitchToSingle.Visibility = Visibility.Visible;
+                IsSingleMolecule = false;
+            }
+            else
+            {
+                SwitchToMulti.Visibility = Visibility.Visible;
+                SwitchToSingle.Visibility = Visibility.Collapsed;
+                IsSingleMolecule = true;
             }
 
-            // Send JSON to ChemDoodle ...
-            // ExecuteJavaScript("SetJSON", _tempJson, AverageBondLength);
-            // ExecuteJavaScript("ReScale", nudBondLength.Value);
-            // ExecuteJavaScript("ShowHydrogens", true);
-            // ExecuteJavaScript("AtomsInColour", true);
-            // ExecuteJavaScript("ShowCarbons", true);
-
-            long sofar2 = _sw.ElapsedMilliseconds;
-            _telemetry.Write(module, "Timing", $"ChemDoodle Web ready in {sofar2.ToString("#,##0", CultureInfo.InvariantCulture)}ms");
-
-            Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
-            _loading = false;
-        }
-
-        private void AddHydrogens_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("AddExplicitHydrogens");
-            }
-        }
-
-        private void RemoveHydrogens_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("RemoveHydrogens");
-            }
-        }
-
-        private void SwitchMode_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                if (_currentMode.Equals("Single"))
-                {
-                    _currentMode = "Multi";
-                    SwitchMode.Content = "Single";
-                    SwitchMode.ToolTip = "Switch to single molecule mode";
-                }
-                else
-                {
-                    _currentMode = "Single";
-                    SwitchMode.Content = "Multi";
-                    SwitchMode.ToolTip = "Switch to multi molecule mode";
-                }
-
-                string file = $@"{Environment.CurrentDirectory}\ChemDoodle\{_currentMode}.html";
-                if (File.Exists(file))
-                {
-                    _loading = true;
-                    Browser.Navigate(new Uri("file:///" + file.Replace(@"\", "/")));
-                }
-            }
-        }
-
-        private void ShowHydrogens_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("ShowHydrogens", ShowHydrogens.IsChecked.Value);
-            }
-        }
-
-        private void ShowColour_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("AtomsInColour", ShowColour.IsChecked.Value);
-            }
-        }
-
-        private void FlipStructures_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("Flip");
-            }
-        }
-
-        private void MirrorStructures_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("Mirror");
-            }
-        }
-
-        private void ShowCarbons_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                ExecuteJavaScript("ShowCarbons", ShowCarbons.IsChecked);
-            }
+            LoadCdw();
         }
 
         private void SetBondLength(int value)
@@ -300,90 +575,23 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             BondLength.Text = $"{value}";
         }
 
-        private void BondLength_OnTextChanged(object sender, TextChangedEventArgs e)
+        private void SaveSettings()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                int bondLength;
-                if (int.TryParse(BondLength.Text, out bondLength))
-                {
-                    bondLength = (int)Math.Round(bondLength / 5.0) * 5;
-                    if (bondLength < 5 || bondLength > 95)
-                    {
-                        bondLength = 20;
-                    }
-                    SetBondLength(bondLength);
-                }
-                else
-                {
-                    SetBondLength(20);
-                }
-            }
-        }
 
-        private void IncreaseButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                int bondLength;
-                if (int.TryParse(BondLength.Text, out bondLength))
-                {
-                    if (bondLength < 95)
-                    {
-                        bondLength += 5;
-                        SetBondLength(bondLength);
-                    }
-                }
-            }
-        }
+            string json = JsonConvert.SerializeObject(UserOptions, Formatting.Indented);
 
-        private void DecreaseButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (!_loading)
-            {
-                int bondLength;
-                if (int.TryParse(BondLength.Text, out bondLength))
-                {
-                    if (bondLength > 5)
-                    {
-                        bondLength -= 5;
-                        SetBondLength(bondLength);
-                    }
-                }
-            }
-        }
-
-        private void Ok_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            WpfEventArgs args = new WpfEventArgs();
-            // ToDo: Return cml
-            args.OutputValue = "";
-            args.Button = "OK";
-
-            OnButtonClick?.Invoke(this, args);
-            throw new NotImplementedException();
-        }
-
-        private void Cancel_OnClick(object sender, RoutedEventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            WpfEventArgs args = new WpfEventArgs();
-            args.OutputValue = "";
-            args.Button = "Cancel";
-
-            OnButtonClick?.Invoke(this, args);
-            throw new NotImplementedException();
+            string fileName = $"{_product}.json";
+            string optionsFile = Path.Combine(ProductAppDataPath, fileName);
+            File.WriteAllText(optionsFile, json);
         }
 
         private object ExecuteJavaScript(string functionName, params object[] args)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            return Browser.InvokeScript(functionName, args);
+            return WebBrowser.InvokeScript(functionName, args);
         }
+
         private void DelTree(string sPath)
         {
             DelTree(sPath, null);

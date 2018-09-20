@@ -5,19 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.Json;
 using IChem4Word.Contracts;
+using System;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
 {
@@ -59,23 +53,47 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                 Top = (int)TopLeft.Y;
             }
 
-            this.Show();
-            Application.DoEvents();
+            CMLConverter cc = new CMLConverter();
+            JSONConverter jc = new JSONConverter();
+            Model.Model model = cc.Import(_cml);
 
-            WpfChemDoodle editor = new WpfChemDoodle(Telemetry, ProductAppDataPath, UserOptions, _cml);
+            WpfChemDoodle editor = new WpfChemDoodle();
+            editor.Telemetry = Telemetry;
+            editor.ProductAppDataPath = ProductAppDataPath;
+            editor.UserOptions = UserOptions;
+            editor.TopLeft = TopLeft;
+
+            editor.StructureJson = jc.Export(model);
+            editor.IsSingleMolecule = model.Molecules.Count == 1;
+            editor.AverageBondLength = model.MeanBondLength;
+
             editor.InitializeComponent();
             elementHost1.Child = editor;
             editor.OnButtonClick += OnWpfButtonClick;
+
+            this.Show();
+            Application.DoEvents();
         }
 
         private void OnWpfButtonClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             WpfEventArgs args = (WpfEventArgs)e;
+
             if (args.Button.ToUpper().Equals("OK"))
             {
-                Result = DialogResult.OK;
-                OutputValue = args.OutputValue;
+                DialogResult = DialogResult.OK;
+                CMLConverter cc = new CMLConverter();
+                JSONConverter jc = new JSONConverter();
+                Model.Model model = jc.Import(args.OutputValue);
+                OutputValue = cc.Export(model);
+                Hide();
+            }
+
+            if (args.Button.ToUpper().Equals("CANCEL"))
+            {
+                DialogResult = DialogResult.Cancel;
+                OutputValue = "";
                 Hide();
             }
         }
