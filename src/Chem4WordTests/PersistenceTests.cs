@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using Chem4Word.Model;
 using Chem4Word.Model.Converters;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4WordTests
 {
@@ -171,6 +173,56 @@ namespace Chem4WordTests
             molecule = model.Molecules[0].Molecules[0].Molecules[0];
             Assert.IsTrue(molecule.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule.Molecules.Count}");
             Assert.IsTrue(molecule.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule.Atoms.Count}");
+        }
+
+        [TestMethod]
+        public void CmlImportExportNested()
+        {
+            CMLConverter mc = new CMLConverter();
+            Model model_1 = mc.Import(ResourceHelper.GetStringResource("NestedMolecules.xml"));
+
+            model_1.RefreshMolecules();
+
+            // Basic Sanity Checks
+            Assert.IsTrue(model_1.Molecules.Count == 1, $"Expected 1 Molecule; Got {model_1.Molecules.Count}");
+            // Check molecule m0 has 4 child molecules and no atoms
+            Molecule molecule_1 = model_1.Molecules[0];
+            Assert.IsTrue(molecule_1.Molecules.Count == 4, $"Expected 4 Molecule; Got {molecule_1.Molecules.Count}");
+            Assert.IsTrue(molecule_1.Atoms.Count == 0, $"Expected 0 Atoms; Got {molecule_1.Atoms.Count}");
+            // Check molecule m2 has no child molecules and 6 atoms
+            molecule_1 = model_1.Molecules[0].Molecules[1];
+            Assert.IsTrue(molecule_1.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule_1.Molecules.Count}");
+            Assert.IsTrue(molecule_1.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule_1.Atoms.Count}");
+            // Check molecule m1 has 1 child molecules and no atoms
+            molecule_1 = model_1.Molecules[0].Molecules[0];
+            Assert.IsTrue(molecule_1.Molecules.Count == 1, $"Expected 1 Molecule; Got {molecule_1.Molecules.Count}");
+            Assert.IsTrue(molecule_1.Atoms.Count == 0, $"Expected 0 Atoms; Got {molecule_1.Atoms.Count}");
+            // Check molecule m5 has 1 child molecules and 6 atoms
+            molecule_1 = model_1.Molecules[0].Molecules[0].Molecules[0];
+            Assert.IsTrue(molecule_1.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule_1.Molecules.Count}");
+            Assert.IsTrue(molecule_1.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule_1.Atoms.Count}");
+
+            var exported = mc.Export(model_1);
+            Model model_2 = mc.Import(exported);
+
+            // Basic Sanity Checks
+            Assert.IsTrue(model_2.Molecules.Count == 1, $"Expected 1 Molecule; Got {model_2.Molecules.Count}");
+            // Check molecule m0 has 4 child molecules and no atoms
+            Molecule molecule_2 = model_2.Molecules[0];
+            Assert.IsTrue(molecule_2.Molecules.Count == 4, $"Expected 4 Molecule; Got {molecule_2.Molecules.Count}");
+            Assert.IsTrue(molecule_2.Atoms.Count == 0, $"Expected 0 Atoms; Got {molecule_2.Atoms.Count}");
+            // Check molecule m2 has no child molecules and 6 atoms
+            molecule_2 = model_2.Molecules[0].Molecules[1];
+            Assert.IsTrue(molecule_2.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule_2.Molecules.Count}");
+            Assert.IsTrue(molecule_2.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule_2.Atoms.Count}");
+            // Check molecule m1 has 1 child molecules and no atoms
+            molecule_2 = model_2.Molecules[0].Molecules[0];
+            Assert.IsTrue(molecule_2.Molecules.Count == 1, $"Expected 1 Molecule; Got {molecule_2.Molecules.Count}");
+            Assert.IsTrue(molecule_2.Atoms.Count == 0, $"Expected 0 Atoms; Got {molecule_2.Atoms.Count}");
+            // Check molecule m5 has 1 child molecules and 6 atoms
+            molecule_2 = model_2.Molecules[0].Molecules[0].Molecules[0];
+            Assert.IsTrue(molecule_2.Molecules.Count == 0, $"Expected 0 Molecule; Got {molecule_2.Molecules.Count}");
+            Assert.IsTrue(molecule_2.Atoms.Count == 6, $"Expected 6 Atoms; Got {molecule_2.Atoms.Count}");
         }
 
         [TestMethod]

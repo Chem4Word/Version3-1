@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Chem4Word.Model.Converters.CML;
 using Microsoft.Office.Tools;
 
 namespace Chem4Word.Navigator
@@ -25,7 +26,7 @@ namespace Chem4Word.Navigator
     internal class NavigatorSupport
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public static void SelectNavigatorItem(string guid)
         {

@@ -17,13 +17,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Model.Converters.CML;
 
 namespace Chem4Word.UI
 {
     public partial class EditLabels : Form
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public System.Windows.Point TopLeft { get; set; }
 

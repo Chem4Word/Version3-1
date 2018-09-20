@@ -22,6 +22,7 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Chem4Word.Model.Converters.CML;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Helpers
@@ -30,7 +31,7 @@ namespace Chem4Word.Helpers
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
 
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public static DialogResult UpgradeIsRequired(Word.Document doc)
         {

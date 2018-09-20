@@ -16,13 +16,14 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Model.Converters.CML;
 
 namespace Chem4Word.UI.UserControls
 {
     public partial class UcMoleculeLabelEditor : UserControl
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private int _maxFormulaId;
         private int _maxNameId;
