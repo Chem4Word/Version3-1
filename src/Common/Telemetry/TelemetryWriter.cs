@@ -131,9 +131,27 @@ namespace Chem4Word.Telemetry
             // Log screen sizes
             WritePrivate("StartUp", "Information", $"Screens: {_helper.Screens}");
 
-            // Log Sysytem
+            // Log System
             WritePrivate("StartUp", "Information", _helper.SystemOs);
             WritePrivate("StartUp", "Information", _helper.DotNetVersion);
+
+            // Log UtcOffset
+            if (Math.Abs(_helper.UtcOffset) > TimeSpan.FromMinutes(15).Ticks)
+            {
+                var systemDate = DateTime.UtcNow;
+                WritePrivate("StartUp", "Information", $"Systen UTC Time {systemDate.ToString("yyyy-MM-dd HH:mm:ss.fff")}");
+                WritePrivate("StartUp", "Information", $"UTC Offset {_helper.UtcOffset}");
+                if (_helper.UtcOffset > 0)
+                {
+                    TimeSpan delta = TimeSpan.FromTicks(_helper.UtcOffset);
+                    WritePrivate("StartUp", "Information", $"System time is {delta} ahead of Server time");
+                }
+                if (_helper.UtcOffset < 0)
+                {
+                    TimeSpan delta = TimeSpan.FromTicks(0 - _helper.UtcOffset);
+                    WritePrivate("StartUp", "Information", $"System time is {delta} behind Server time");
+                }
+            }
 
             // Log IP Address
             WritePrivate("StartUp", "Information", _helper.IpAddress);
