@@ -124,12 +124,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                     LoadSettings();
                 }
 
-                CMLConverter cmlConverter = new CMLConverter();
-                Model.Model model = cmlConverter.Import(Cml);
-                JSONConverter jsonConverter = new JSONConverter();
-                string json = jsonConverter.Export(model);
-
-                EditorHost host = new EditorHost(json);
+                EditorHost host = new EditorHost(Cml);
                 host.TopLeft = TopLeft;
                 host.Telemetry = Telemetry;
                 host.ProductAppDataPath = ProductAppDataPath;
