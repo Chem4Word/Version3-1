@@ -630,7 +630,7 @@ namespace Chem4Word.Model
         {
 
             // ReSharper disable once InconsistentNaming
-            //local function for caluclating the PID matrices
+            //local function for calculating the PID matrices
 
             Stopwatch sw = new Stopwatch();
             Stopwatch sw1, sw2, sw3;
@@ -650,9 +650,9 @@ namespace Chem4Word.Model
                 List<BitArray>[,] pidMatrix = new List<BitArray>[currentSetCount, currentSetCount];
                 List<BitArray>[,] pidMatrixPlus = new List<BitArray>[currentSetCount, currentSetCount];
 
-                float[,] distances = new float[currentSetCount, currentSetCount];
+                int[,] distances = new int[currentSetCount, currentSetCount];
 
-                //float[,,] distancesList = new float[currentSetCount+1,currentSetCount,currentSetCount];
+                //int[,,] distancesList = new int[currentSetCount+1,currentSetCount,currentSetCount];
 
                 var candidateSets = new List<(float count, EdgeList shortPath, EdgeList longPath)>();
                 //store the atoms in an array for now - makes it easier
@@ -692,12 +692,14 @@ namespace Chem4Word.Model
                 }
 #endregion
 
-                
-            
 
-                for (long i = 0; i < currentSetCount; i++)
+                //the maximum possible distance between two atoms is the 
+                //number of bonds in the molecule
+                int maxDistance =2 * Bonds.Count + 1;
+
+                for (int i = 0; i < currentSetCount; i++)
                 {
-                    for (long j = 0; j < currentSetCount; j++)
+                    for (int j = 0; j < currentSetCount; j++)
                     {
                         Atom a = workingAtoms[i];
                         Atom b = workingAtoms[j];
@@ -706,11 +708,11 @@ namespace Chem4Word.Model
 
                         if (i != j)
                         {
-                            distances[i, j] = bondBetween != null ? 1 : float.PositiveInfinity;
+                            distances[i, j] = bondBetween != null ? 1 : maxDistance;
                         }
                         else
                         {
-                            distances[i, i] = 0f;
+                            distances[i, i] = 0;
                         }
                         if (bondBetween != null)
                         {
@@ -746,9 +748,9 @@ namespace Chem4Word.Model
                                         : new BitArray(bondCount);
                                     if (i != j & j != k & k != i)
                                     {
-                                        float dfull = distances[i, j];
-                                        float dFirst = distances[i, k];
-                                        float d3 = distances[k, j];
+                                        int dfull = distances[i, j];
+                                        int dFirst = distances[i, k];
+                                        int d3 = distances[k, j];
                                         if (dfull > dFirst + d3) //a new shortest path
                                         {
                                             if (dfull ==dFirst + d3 + 1) 
@@ -803,11 +805,11 @@ namespace Chem4Word.Model
                 HashSet<(int cyclenum, EdgeList[] shortPath, EdgeList[] longPath)> candidates =
                     new HashSet<(int cyclenum, EdgeList[] shortPath, EdgeList[] longPath)>();
 
-                for (long i = 0; i < currentSetCount; i++)
+                for (int i = 0; i < currentSetCount; i++)
                 {
-                    for (long j = 0; j < currentSetCount; j++)
+                    for (int j = 0; j < currentSetCount; j++)
                     {
-                        if (distances[i, j] != 0 && !float.IsPositiveInfinity(distances[i, j])
+                        if (distances[i, j] != 0 && distances[i, j]!=maxDistance
                             && !(pidMatrix[i, j].Any() & !pidMatrixPlus[i, j].Any()))
                         {
                             if (pidMatrixPlus[i, j].Count != 0)

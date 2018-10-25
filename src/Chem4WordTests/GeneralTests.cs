@@ -112,7 +112,7 @@ namespace Chem4WordTests
             m.Molecules[0].RebuildRingsRPPath();
             int ringcount5 = m.Molecules[0].Rings.Count;
             Debug.WriteLine($"Molecule insulin  has {m.Molecules[0].Rings.Count} rings.");
-            Debug.WriteLine("++++++++++++++++++++++++++");
+            Debug.WriteLine("+++++++++++++++++++++++++");
         }
     }
 }
