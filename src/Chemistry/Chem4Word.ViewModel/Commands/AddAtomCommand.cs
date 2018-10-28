@@ -24,6 +24,14 @@ namespace Chem4Word.ViewModel.Commands
             Debugger.Break();
         }
 
+        public override void RaiseCanExecChanged()
+        {
+            if (CanExecuteChanged != null)
+            {
+                CanExecuteChanged.Invoke(this, new EventArgs());
+            }
+        }
+
         public override event EventHandler CanExecuteChanged;
 
         #endregion ICommand Implementation

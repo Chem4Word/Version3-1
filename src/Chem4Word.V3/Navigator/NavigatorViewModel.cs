@@ -18,6 +18,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Model.Converters.CML;
 using ContentControl = Microsoft.Office.Interop.Word.ContentControl;
 
 namespace Chem4Word.Navigator
@@ -25,7 +26,7 @@ namespace Chem4Word.Navigator
     public class NavigatorViewModel : DependencyObject
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         //used for XAML data binding
         public ObservableCollection<NavigatorItem> NavigatorItems { get; }

@@ -17,12 +17,12 @@ using System.Windows.Data;
 namespace Chem4Word.Library
 {
     /// <summary>
-    /// Interaction logic for GalleryViewControl.xaml
+    /// Interaction logic for LibraryViewControl.xaml
     /// </summary>
     public partial class LibraryViewControl : UserControl
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public LibraryViewControl()
         {
@@ -36,7 +36,7 @@ namespace Chem4Word.Library
         }
 
         /// <summary>
-        /// Handles filterihng of the library list
+        /// Handles filtering of the library list
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

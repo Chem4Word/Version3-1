@@ -13,18 +13,16 @@ namespace Chem4Word.Core.Helpers
         public static string LegacyContentControlTitle = "chemistry";
         public static string NavigatorTaskPaneTitle = "Navigator";
         public static string LibraryTaskPaneTitle = "Library";
-        public static double TopLeftOffset = 24;
 
+        public static double TopLeftOffset = 24;
+        public static string OoXmlBookmarkPrefix = "C4W_";
         public const string LibraryFileName = "Library.db";
 
-        public static string DefaultChemSpiderWebServiceUri = "https://www.chemspider.com/";
-        public static string DefaultChemSpiderRdfServiceUri = "https://rdf.chemspider.com/";
+        public static string DefaultChem4WordWebServiceUri = "https://chemicalservices.azurewebsites.net/api/Resolve";
 
         public static string DefaultEditorPlugIn = "ChemDoodle Web Structure Editor V7.0.2";
         public static string DefaultRendererPlugIn = "Open Office Xml Renderer V3";
 
-        // Task 336
-        // CML constants
         public static string CmlNameSpaceCode = "cml";
 
         public static string CmlElementMolecule = "molecule";
@@ -34,6 +32,11 @@ namespace Chem4Word.Core.Helpers
         public const string ChemSpiderSynonymName = "chemspider:Synonym";
         public const string ChemspiderFormulaName = "chemspider:Formula";
         public const string ChemSpiderSmilesName = "chemspider:Smiles";
+
+        public const string Chem4WordInchiKeyName = "chem4word:CalculatedInchikey";
+        public const string Chem4WordResolverIupacName = "chem4word:ResolvedIupacname";
+        public const string Chem4WordResolverSmilesName = "chem4word:ResolvedSmiles";
+        public const string Chem4WordResolverFormulaName = "chem4word:ResolvedFormula";
 
         public const string Chem4WordUserFormula = "chem4word:Formula";
         public const string Chem4WordUserSynonym = "chem4word:Synonym";

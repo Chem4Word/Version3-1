@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Chem4Word.Shared
@@ -71,7 +70,6 @@ namespace Chem4Word.Shared
             }
             else
             {
-                Debugger.Break();
                 throw new ExternalException("Unable to retrieve the known folder path. It may not "
                     + "be available on this system.", result);
             }

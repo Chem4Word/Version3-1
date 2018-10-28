@@ -1,4 +1,15 @@
 {
+  "*": {
+    "Symbol": "*",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "R",
+        "Count": 1
+      }
+    ]
+  },
   "R#": {
     "Symbol": "R#",
     "ShowAsSymbol": true,

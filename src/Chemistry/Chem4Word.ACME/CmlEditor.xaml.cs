@@ -7,6 +7,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Core.UI.Wpf;
 
 namespace Chem4Word.ACME
 {
@@ -17,7 +18,7 @@ namespace Chem4Word.ACME
     {
         public delegate void EventHandler(object sender, WpfEventArgs args);
 
-        public event EventHandler OnOkButtonClick;
+        public event EventHandler OnButtonClick;
 
         public CmlEditor()
         {
@@ -30,13 +31,13 @@ namespace Chem4Word.ACME
             cmlText.Text = cml;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
             args.OutputValue = cmlText.Text;
             args.Button = "OK";
 
-            OnOkButtonClick?.Invoke(this, args);
+            OnButtonClick?.Invoke(this, args);
         }
     }
 }

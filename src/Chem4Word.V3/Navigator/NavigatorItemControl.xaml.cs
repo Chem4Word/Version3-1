@@ -24,7 +24,7 @@ namespace Chem4Word.Navigator
     public partial class NavigatorItemControl : UserControl
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public NavigatorItemControl()
         {
@@ -45,7 +45,7 @@ namespace Chem4Word.Navigator
                     {
                         if (ActiveDocument?.ActiveWindow?.Selection != null)
                         {
-                            NavigatorSupport.InsertChemistry(false, ActiveDocument.Application, Display);
+                            TaskPaneHelper.InsertChemistry(false, ActiveDocument.Application, Display);
                         }
                     }
                     Globals.Chem4WordV3.EventsEnabled = true;
@@ -72,7 +72,7 @@ namespace Chem4Word.Navigator
                     {
                         if (ActiveDocument?.ActiveWindow?.Selection != null)
                         {
-                            NavigatorSupport.InsertChemistry(true, ActiveDocument.Application, Display);
+                            TaskPaneHelper.InsertChemistry(true, ActiveDocument.Application, Display);
                         }
                     }
                     Globals.Chem4WordV3.EventsEnabled = true;

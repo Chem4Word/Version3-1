@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
 
 namespace Chem4Word.Searcher.ChEBIPlugin
 {
@@ -21,7 +23,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
     {
         #region Fields
 
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType.Name;
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private Entity _allResults;
         private Model.Model _lastModel;
