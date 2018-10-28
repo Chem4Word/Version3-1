@@ -10,11 +10,9 @@ using Chem4Word.Model.Annotations;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Data;
 
 namespace Chem4Word.ViewModel
 {
@@ -22,11 +20,25 @@ namespace Chem4Word.ViewModel
     {
         #region Properties
 
-        public CompositeCollection AllObjects { get; set; }
+        public ObservableCollection<Atom> AllAtoms
+        {
+            get => _allAtoms;
+            set
+            {
+                _allAtoms = value;
+                this.OnPropertyChanged();
+            }
+        }
 
-        public ObservableCollection<Atom> AllAtoms { get; set; }
-
-        public ObservableCollection<Bond> AllBonds { get; set; }
+        public ObservableCollection<Bond> AllBonds
+        {
+            get => _allBonds;
+            set
+            {
+                _allBonds = value; 
+                this.OnPropertyChanged();
+            }
+        }
 
         public Model.Model Model { get; set; }
 
@@ -78,6 +90,8 @@ namespace Chem4Word.ViewModel
         public static double FontSize { get; set; }
 
         private Rect? _boundingBox;
+        private ObservableCollection<Atom> _allAtoms = new ObservableCollection<Atom>();
+        private ObservableCollection<Bond> _allBonds = new ObservableCollection<Bond>();
 
         public virtual Rect BoundingBox
         {
@@ -135,8 +149,6 @@ namespace Chem4Word.ViewModel
             {
                 FontSize = model.XamlBondLength * Globals.FontSizePercentageBond;
             }
-            AllObjects = model.AllObjects;
-
             AllAtoms = model.AllAtoms;
             AllAtoms.CollectionChanged += AllAtoms_CollectionChanged;
 
