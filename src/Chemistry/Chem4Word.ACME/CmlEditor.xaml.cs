@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using Chem4Word.Core.UI.Wpf;
@@ -16,9 +17,7 @@ namespace Chem4Word.ACME
     /// </summary>
     public partial class CmlEditor : UserControl
     {
-        public delegate void EventHandler(object sender, WpfEventArgs args);
-
-        public event EventHandler OnButtonClick;
+        public event EventHandler<WpfEventArgs> OnButtonClick;
 
         public CmlEditor()
         {
