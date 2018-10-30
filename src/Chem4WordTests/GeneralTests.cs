@@ -14,6 +14,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chem4WordTests
 {
+    using System.Runtime.InteropServices.ComTypes;
+
     [TestClass]
     public class GeneralTests
     {
@@ -59,13 +61,14 @@ namespace Chem4WordTests
         }
 
         [TestMethod]
+        [TestMethod]
         public void TestRPPath()
         {
             CMLConverter mc = new CMLConverter();
             string[] names = { 
                 "tworings", 
                 "C60", 
-                "testosterone", 
+                "Testosterone", 
                 // "ParafuchsinCarbol",
                 "Insulin" };
             foreach (var name in names)
