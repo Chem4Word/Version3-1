@@ -61,7 +61,6 @@ namespace Chem4WordTests
         }
 
         [TestMethod]
-        [TestMethod]
         public void TestRPPath()
         {
             CMLConverter mc = new CMLConverter();
