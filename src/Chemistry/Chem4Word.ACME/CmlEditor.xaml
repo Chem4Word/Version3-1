@@ -8,7 +8,7 @@
     d:DesignHeight="400"
     d:DesignWidth="600"
     mc:Ignorable="d">
-    <Grid ShowGridLines="False">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition Height="45" />
@@ -30,6 +30,7 @@
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
             Click="Button_Click"
-            Content="OK" />
+            Content="OK"
+            IsDefault="True" />
     </Grid>
 </UserControl>

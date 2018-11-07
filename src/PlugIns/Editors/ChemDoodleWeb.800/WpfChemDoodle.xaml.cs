@@ -46,9 +46,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         private Stopwatch _sw = new Stopwatch();
 
-        public delegate void EventHandler(object sender, WpfEventArgs args);
-
-        public event EventHandler OnButtonClick;
+        public event EventHandler<WpfEventArgs> OnButtonClick;
 
         public Point TopLeft { get; set; }
 

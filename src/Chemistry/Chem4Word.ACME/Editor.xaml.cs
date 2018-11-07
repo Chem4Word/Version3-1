@@ -31,9 +31,7 @@ namespace Chem4Word.ACME
 
         public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
 
-        public delegate void EventHandler(object sender, WpfEventArgs args);
-
-        public event EventHandler OnOkButtonClick;
+        public event EventHandler<WpfEventArgs> OnOkButtonClick;
 
         // This is used to store the cml until the editor is Loaded
         private string _cml;
