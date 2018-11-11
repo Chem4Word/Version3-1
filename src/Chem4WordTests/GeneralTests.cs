@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 //  Copyright (c) 2018, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
@@ -8,13 +8,14 @@
 using System.Diagnostics;
 using System.Windows;
 using Chem4Word.Model;
-using Chem4Word.Model.Converters;
 using Chem4Word.Model.Converters.CML;
 using Chem4Word.Model.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chem4WordTests
 {
+    using System.Runtime.InteropServices.ComTypes;
+
     [TestClass]
     public class GeneralTests
     {
@@ -62,11 +63,25 @@ namespace Chem4WordTests
         [TestMethod]
         public void TestRPPath()
         {
-            int ringcount, ringcount2, ringcount3;
             CMLConverter mc = new CMLConverter();
-            Model m = mc.Import(ResourceHelper.GetStringResource("tworings.xml"));
-           
-            Debug.WriteLine("tworings");
+            string[] names = { 
+                "tworings", 
+                "C60", 
+                "Testosterone", 
+                // "ParafuchsinCarbol",
+                "Insulin" };
+            foreach (var name in names)
+            {
+                RebuildRingsRpPath(mc, name);
+            }
+        }
+
+        private static void RebuildRingsRpPath(CMLConverter converter, string name)
+        {
+            string resource = ResourceHelper.GetStringResource($"{name}.xml");
+            Model model = converter.Import(resource);
+            model.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = name });
+            Debug.WriteLine(name);
             Debug.WriteLine("-------------------------");
             m.Molecules[0].RebuildRingsRPPath();
             ringcount = m.Molecules[0].Rings.Count;

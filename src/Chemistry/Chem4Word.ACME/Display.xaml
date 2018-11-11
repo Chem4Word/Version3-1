@@ -27,35 +27,33 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.Resources>
                 <!--<local:DoNothingConverter x:Key="DoNothingConverter" />-->
-                <LinearGradientBrush 
-                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-
-                    x:Key="HatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
-                    
-                    <GradientStop Offset="0.00" Color="Black" />
-                    <GradientStop Offset="0.25" Color="Black" />
-                    <GradientStop Offset="0.25" Color="Transparent" />
-                    <GradientStop Offset="0.30" Color="Transparent" />
-                    <LinearGradientBrush.RelativeTransform>
-                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
-                    </LinearGradientBrush.RelativeTransform>
-                    <LinearGradientBrush.Transform>
-                        <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
-                    </LinearGradientBrush.Transform>
-                </LinearGradientBrush>
-                <LinearGradientBrush x:Key="HighlightHatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
-                    <GradientStop Offset="0.00" Color="{x:Static SystemColors.HighlightColor}" />
-                    <GradientStop Offset="0.25" Color="{x:Static SystemColors.HighlightColor}" />
-                    <GradientStop Offset="0.25" Color="Transparent" />
-                    <GradientStop Offset="0.30" Color="Transparent" />
-                    <LinearGradientBrush.RelativeTransform>
-                        <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
-                    </LinearGradientBrush.RelativeTransform>
-                    <LinearGradientBrush.Transform>
-                        <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
-                    </LinearGradientBrush.Transform>
-                </LinearGradientBrush>
                 <DataTemplate DataType="{x:Type model:Bond}">
+                    <DataTemplate.Resources>
+                        <LinearGradientBrush xmlns:d="http://schemas.microsoft.com/expression/blend/2008" x:Key="HatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+                            <GradientStop Offset="0.00" Color="Black" />
+                            <GradientStop Offset="0.25" Color="Black" />
+                            <GradientStop Offset="0.25" Color="Transparent" />
+                            <GradientStop Offset="0.30" Color="Transparent" />
+                            <LinearGradientBrush.RelativeTransform>
+                                <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
+                            </LinearGradientBrush.RelativeTransform>
+                            <LinearGradientBrush.Transform>
+                                <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
+                            </LinearGradientBrush.Transform>
+                        </LinearGradientBrush>
+                        <LinearGradientBrush x:Key="HighlightHatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+                            <GradientStop Offset="0.00" Color="{x:Static SystemColors.HighlightColor}" />
+                            <GradientStop Offset="0.25" Color="{x:Static SystemColors.HighlightColor}" />
+                            <GradientStop Offset="0.25" Color="Transparent" />
+                            <GradientStop Offset="0.30" Color="Transparent" />
+                            <LinearGradientBrush.RelativeTransform>
+                                <ScaleTransform ScaleX="{Binding Path=HatchScaling, Mode=OneWay}" ScaleY="{Binding Path=HatchScaling, Mode=OneWay}" />
+                            </LinearGradientBrush.RelativeTransform>
+                            <LinearGradientBrush.Transform>
+                                <RotateTransform Angle="{Binding Path=Angle, Mode=OneWay}" />
+                            </LinearGradientBrush.Transform>
+                        </LinearGradientBrush>
+                    </DataTemplate.Resources>
                     <view:BondShape Name="BondShape"
                         DrawingCanvas="{Binding ElementName=ChemCanvas, Mode=OneTime}"
                         Order="{Binding Path=Order, Mode=OneWay}"

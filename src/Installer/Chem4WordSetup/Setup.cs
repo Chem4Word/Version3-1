@@ -54,6 +54,10 @@ namespace Chem4WordSetup
 
         private void Setup_Load(object sender, EventArgs e)
         {
+            // Move up and left by half the form size
+            Left = Left - Width / 2;
+            Top = Top - Height / 2;
+
             Show();
             Application.DoEvents();
 

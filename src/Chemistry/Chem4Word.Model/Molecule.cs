@@ -190,15 +190,15 @@ namespace Chem4Word.Model
             return result.Trim();
         }
 
-        private void Refresh(Atom seed, HashSet<Atom> checklist=null)
+        private void Refresh(Atom seed, HashSet<Atom> checklist = null)
         {
             //keep a list of the atoms to refer to later when rebuilding
 
             //set the parent to null but keep a list of all atoms
             if (checklist == null)
             {
-                checklist=new HashSet<Atom>();
-                
+                checklist = new HashSet<Atom>();
+
                 foreach (Atom atom in Atoms)
                 {
                     atom.Parent = null;
@@ -207,11 +207,10 @@ namespace Chem4Word.Model
                 checklist.Add(seed);
             }
 
-
             var startingMol = this;
 
             Trash(startingMol);
-           
+
             Queue<Atom> feed = new Queue<Atom>();
             feed.Enqueue(seed);
             while (feed.Any())
@@ -239,7 +238,7 @@ namespace Chem4Word.Model
             Debug.Assert(!startingMol.Bonds.Any(b => b.Parent == null));
 
             if (checklist.Any()) //there are still some atoms unaccounted for after the search
-                                    //therefore disconnected from the first graph
+                                 //therefore disconnected from the first graph
             {
                 seed = checklist.First();
                 //checklist.Remove(seed);
@@ -248,8 +247,8 @@ namespace Chem4Word.Model
                 startingMol.Refresh(seed, checklist);
                 Parent.Molecules.Add(startingMol);
             }
-           
         }
+
         private static void Trash(Molecule startingMol)
         {
             //clear the associated collections
@@ -263,7 +262,6 @@ namespace Chem4Word.Model
             startingMol.AllBonds.RemoveAll();
             startingMol.Rings.RemoveAll();
         }
-    
 
         /// <summary>
         /// rebuilds the molecule without trashing it
@@ -383,8 +381,6 @@ namespace Chem4Word.Model
             }
         }
 
-      
-
         /// <summary>
         /// Cleaves off a degree 1 atom from the working set.
         /// Reduces the adjacent atoms' degree by one
@@ -485,8 +481,6 @@ namespace Chem4Word.Model
 
             if (HasRings)
             {
-                
-
                 //working set of atoms
                 //it's a dictionary, because we initially store the degree of each atom against it
                 //this will change as the pruning operation kicks in
@@ -620,21 +614,20 @@ namespace Chem4Word.Model
         /// <summary>
         /// Inplements RP Path
         /// see Lee, C. J., Kang, Y.-M., Cho, K.-H., & No, K. T. (2009).
-        ///  A robust method for searching the smallest set of smallest rings 
-        /// with a path-included distance matrix. Proceedings of the National Academy 
-        /// of Sciences of the United States of America, 106(41), 17355–17358. 
+        ///  A robust method for searching the smallest set of smallest rings
+        /// with a path-included distance matrix. Proceedings of the National Academy
+        /// of Sciences of the United States of America, 106(41), 17355–17358.
 
         /// https://doi.org/10.1073/pnas.0813040106
         /// </summary>
         public void RebuildRingsRPPath()
         {
-
             // ReSharper disable once InconsistentNaming
             //local function for caluclating the PID matrices
 
             Stopwatch sw = new Stopwatch();
             Stopwatch sw1, sw2, sw3;
-            var s = (ChemicalNames.Any()?ChemicalNames.Last().Name:"[no name]");
+            var s = (ChemicalNames.Any() ? ChemicalNames.Last().Name : "[no name]");
             Debug.WriteLine($"Recalculating rings for {s}");
             sw.Start();
             if (HasRings)
@@ -666,7 +659,8 @@ namespace Chem4Word.Model
                 var workingBonds = this.Bonds.ToArray();
                 var bondCount = this.Bonds.Count;
 
-#region local help functions for phase 0
+                #region local help functions for phase 0
+
                 int lookupBondIndex(Bond val)
                 {
                     return Array.IndexOf(workingBonds, val);
@@ -690,10 +684,8 @@ namespace Chem4Word.Model
                     }
                     return listEdgeList.ToArray();
                 }
-#endregion
 
-                
-            
+                #endregion local help functions for phase 0
 
                 for (long i = 0; i < currentSetCount; i++)
                 {
@@ -716,23 +708,21 @@ namespace Chem4Word.Model
                         {
                             BitArray bondFlags = new BitArray(bondCount);
                             bondFlags[lookupBondIndex(bondBetween)] = true;//set the bit corresponding to the bond
-                            pidMatrix[i, j] = new List<BitArray> {bondFlags};
-
+                            pidMatrix[i, j] = new List<BitArray> { bondFlags };
                         }
                         else
                         {
-                           pidMatrix[i,j] = new List<BitArray>();
+                            pidMatrix[i, j] = new List<BitArray>();
                         }
 
                         pidMatrixPlus[i, j] = new List<BitArray>();
                     }
                 }
 
-
                 //Phase 1
                 //now calculate the PID matrices
 
-                for(int k=0; k<currentSetCount; k++)
+                for (int k = 0; k < currentSetCount; k++)
                 {
                     Parallel.For(0, currentSetCount, i =>
                         {
@@ -751,7 +741,7 @@ namespace Chem4Word.Model
                                         float d3 = distances[k, j];
                                         if (dfull > dFirst + d3) //a new shortest path
                                         {
-                                            if (dfull ==dFirst + d3 + 1) 
+                                            if (dfull == dFirst + d3 + 1)
                                             //which is equal to the previous path -1
                                             {
                                                 //pidMatrixPlus[i, j] = Array.Empty<EdgeList>(); //change the old path
@@ -767,21 +757,21 @@ namespace Chem4Word.Model
                                                 pidMatrixPlus[i, j].Clear();
                                             }
                                             distances[i, j] = dFirst + d3;
-                                            BitArray tempPath = (BitArray) longPath.Clone();
+                                            BitArray tempPath = (BitArray)longPath.Clone();
                                             tempPath.Or(shortPath);
-                                            pidMatrix[i, j] = new List<BitArray> {tempPath};
+                                            pidMatrix[i, j] = new List<BitArray> { tempPath };
                                         }
                                         else if (dfull == dFirst + d3) //another shortest path
                                         {
                                             //so append the path to the list
-                                            BitArray tempPath = (BitArray) longPath.Clone();
+                                            BitArray tempPath = (BitArray)longPath.Clone();
                                             tempPath.Or(shortPath);
                                             pidMatrix[i, j].Add(tempPath);
                                         }
                                         else if (dfull == dFirst + d3 - 1) //shortest + 1 path
                                         {
                                             //append the path
-                                            BitArray tempPath = (BitArray) longPath.Clone();
+                                            BitArray tempPath = (BitArray)longPath.Clone();
                                             tempPath.Or(shortPath);
                                             pidMatrixPlus[i, j].Add(tempPath);
                                         }
@@ -791,7 +781,7 @@ namespace Chem4Word.Model
                         }
                     );
                 }
-               
+
                 sw1.Stop();
                 //Phase 2
                 //now do the ring candidate search
@@ -830,7 +820,6 @@ namespace Chem4Word.Model
                     Debug.WriteLine("---------------------------------------------------------");
                     for (int i = 0; i <= dm.GetUpperBound(0); i++)
                     {
-
                         for (int j = 0; j <= dm.GetUpperBound(1); j++)
                         {
                             Debug.Write($"({dm[i, j]})");
@@ -1072,7 +1061,6 @@ namespace Chem4Word.Model
                     Debug.WriteLine("---------------------------------------------------------");
                     for (int i = 0; i <= pm.GetUpperBound(0); i++)
                     {
-
                         for (int j = 0; j <= pm.GetUpperBound(1); j++)
                         {
                             List<BitArray> elist = pm[i, j];
@@ -1101,11 +1089,10 @@ namespace Chem4Word.Model
                 //Debug.WriteLine("PID+ matrix");
                 //PrintPIDMatrix(pidMatrixPlus);
 
-
                 //Phase 3
                 //construct the ring and find the SSSR
-                //see Dyott, T. M., & Wipke, W. T. (1975). Use of Ring Assemblies in 
-                //Ring Perception Algorithm. Journal of Chemical Information and Computer Sciences, 
+                //see Dyott, T. M., & Wipke, W. T. (1975). Use of Ring Assemblies in
+                //Ring Perception Algorithm. Journal of Chemical Information and Computer Sciences,
                 //15(3), 140–147. https://doi.org/10.1021/ci60003a003
 
                 //first, sort the candidate ringsets by ascending length
@@ -1165,7 +1152,6 @@ namespace Chem4Word.Model
                         EdgeList ringbonds;
                         for (int j = 0; j < candidate.longPath.Length; j++)
                         {
-
                             var tempring = sp[0] + lp[j];
                             AddRing(tempring);
                             if (nRingIndex == TheoreticalRings)
@@ -1215,15 +1201,10 @@ namespace Chem4Word.Model
                 Debug.WriteLine($"{s} Phase 2: {sw2.ElapsedMilliseconds / totalTime}");
                 Debug.WriteLine($"{s} Phase 3: {sw3.ElapsedMilliseconds / totalTime}");
             }
-           
-        
+
             sw.Stop();
             Debug.WriteLine($"Elapsed time for {s}  = {sw.ElapsedMilliseconds} ms");
         }
-
-       
-
-      
 
         private List<Ring> _sortedRings = null;
 
