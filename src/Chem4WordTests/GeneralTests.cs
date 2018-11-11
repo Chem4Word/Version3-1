@@ -63,25 +63,11 @@ namespace Chem4WordTests
         [TestMethod]
         public void TestRPPath()
         {
+            int ringcount, ringcount2, ringcount3;
             CMLConverter mc = new CMLConverter();
-            string[] names = { 
-                "tworings", 
-                "C60", 
-                "Testosterone", 
-                // "ParafuchsinCarbol",
-                "Insulin" };
-            foreach (var name in names)
-            {
-                RebuildRingsRpPath(mc, name);
-            }
-        }
+            Model m = mc.Import(ResourceHelper.GetStringResource("tworings.xml"));
 
-        private static void RebuildRingsRpPath(CMLConverter converter, string name)
-        {
-            string resource = ResourceHelper.GetStringResource($"{name}.xml");
-            Model model = converter.Import(resource);
-            model.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = name });
-            Debug.WriteLine(name);
+            Debug.WriteLine("tworings");
             Debug.WriteLine("-------------------------");
             m.Molecules[0].RebuildRingsRPPath();
             ringcount = m.Molecules[0].Rings.Count;
