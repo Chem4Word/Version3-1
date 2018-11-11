@@ -75,9 +75,11 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
             try
             {
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+                System.Windows.Forms.Application.DoEvents();
+
                 if (!string.IsNullOrEmpty(StructureJson))
                 {
-                    Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
                     _loading = true;
                     _sw.Start();
 
