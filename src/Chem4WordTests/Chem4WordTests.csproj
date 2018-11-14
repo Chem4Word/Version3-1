@@ -162,6 +162,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\Insulin.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\NoAtoms.xml" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

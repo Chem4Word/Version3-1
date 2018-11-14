@@ -222,15 +222,7 @@ namespace Chem4Word.Model
         {
             foreach (Molecule molecule in Molecules.ToList())
             {
-                if (molecule.Molecules.Count == 0 && molecule.Atoms.Count == 0)
-                {
-                    //it's empty, trash it
-                    Molecules.Remove(molecule);
-                }
-                else
-                {
-                    molecule.Refresh();
-                }
+                molecule.Refresh();
             }
             AddNewMols();
         }
@@ -239,7 +231,7 @@ namespace Chem4Word.Model
         {
             Model clone = new Model();
 
-            // Strictly speaking this is modifiing the original object.
+            // Strictly speaking this is modifying the original object.
             //  but it is required to allow re-connecting of atoms with the correct bonds.
             Relabel();
 

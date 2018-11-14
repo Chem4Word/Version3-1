@@ -1,5 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<cml:cml id='2f32cee477524c249c61a8fe33e4602f' convention='conventions:molecular' xmlns:cml='http://www.xml-cml.org/schema' xmlns:conventions='http://www.xml-cml.org/convention/' xmlns:cmlDict='http://www.xml-cml.org/dictionary/cml/' xmlns:nameDict='http://www.xml-cml.org/dictionary/cml/name/'>
+<cml:cml convention='conventions:molecular'
+         xmlns:cml='http://www.xml-cml.org/schema'
+         xmlns:conventions='http://www.xml-cml.org/convention/'
+         xmlns:cmlDict='http://www.xml-cml.org/dictionary/cml/'
+         xmlns:nameDict='http://www.xml-cml.org/dictionary/cml/name/'>
 	<molecule xmlns = 'http://www.xml-cml.org/schema' >
 		<atomArray>
 			<atom id='a1' x2='140.818079927863' y2='442.135731132731' elementType='C' />
