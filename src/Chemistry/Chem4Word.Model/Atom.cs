@@ -474,10 +474,6 @@ namespace Chem4Word.Model
         public bool IsUnsaturated => BondOrders > (double)Degree;
         public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms[0] == this;
 
-        // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
-        // ToDo: Duplicated Routine
-        // HACK: Duplicated Routine
-
         //tries to get an estimated bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {

@@ -541,9 +541,13 @@ namespace Chem4Word
             {
                 this.RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
             }
-            catch (Exception ex)
+            //catch (Exception ex)
+            //{
+            //    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+            //}
+            catch
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                // Do Nothing
             }
         }
 

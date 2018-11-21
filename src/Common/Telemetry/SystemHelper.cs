@@ -60,6 +60,7 @@ namespace Chem4Word.Telemetry
         public string ServerDateHeader { get; set; }
         public string ServerUtcDateRaw { get; set; }
         public DateTime ServerUtcDateTime { get; set; }
+        public string BrowserVersion { get; set; }
 
         private static int _retryCount;
 
@@ -180,6 +181,15 @@ namespace Chem4Word.Telemetry
             #endregion Get IpAddress
 
             GetDotNetVersionFromRegistry();
+
+            try
+            {
+                BrowserVersion = new WebBrowser().Version.ToString();
+            }
+            catch
+            {
+                BrowserVersion = "?";
+            }
 
             GetScreens();
 
