@@ -39,7 +39,7 @@
     <Condition Message="This application is only supported on Windows 7, Windows Server 2008 R2, or higher."><![CDATA[Installed OR (VersionNT >= 601)]]></Condition>
     <!-- https://msdn.microsoft.com/en-us/library/ee942965(v=vs.110).aspx#detect_net -->
     <PropertyRef Id="NETFRAMEWORK45" />
-    <Condition Message="This application requires .NET Framework 4.5.2. Please install the .NET Framework then run this installer again."><![CDATA[Installed OR NETFRAMEWORK45 >= "#379893"]]></Condition>
+    <Condition Message="This application requires .NET Framework 4.6.2. Please install the .NET Framework then run this installer again."><![CDATA[Installed OR NETFRAMEWORK45 >= "#394802"]]></Condition>
     <!-- https://blogs.msdn.microsoft.com/jschaffe/2012/10/23/creating-wix-custom-actions-in-c-and-passing-parameters/ -->
     <!-- https://www.codeproject.com/Articles/132918/Creating-Custom-Action-for-WIX-Written-in-Managed -->
     <Binary Id="WiX.CustomAction.dll" SourceFile="..\Wix.CustomAction\bin\x86\$(var.Configuration)\WiX.CustomAction.CA.dll" />
