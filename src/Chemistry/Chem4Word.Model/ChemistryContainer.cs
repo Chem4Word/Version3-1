@@ -198,9 +198,6 @@ namespace Chem4Word.Model
 
         public void CheckForMerge(Molecule mol2)
         {
-            
         }
-
-        
     }
 }

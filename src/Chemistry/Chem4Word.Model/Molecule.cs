@@ -12,7 +12,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +23,7 @@ namespace Chem4Word.Model
 {
     /// <summary>
     /// Represents a single molecule.
-    /// *Please* do not persist moclecule references
+    /// *Please* do not persist molecule references
     /// between editing operations.  We cannot promise
     /// that the references will stay current
     /// </summary>
@@ -52,9 +51,6 @@ namespace Chem4Word.Model
                 return _boundingBox;
             }
         }
-
-        /// <summary>
-        /// returns the top level model, or null if it's a floating molecule
 
         private void CalculateBoundingBox()
         {
@@ -107,9 +103,7 @@ namespace Chem4Word.Model
             Warnings = new List<string>();
             Errors = new List<string>();
 
-            var g = Guid.NewGuid();
-            var gc = new GuidConverter();
-            this.Id = gc.ConvertToString(g);
+            this.Id = Guid.NewGuid().ToString("D");
         }
 
         /// <summary>

@@ -194,7 +194,6 @@
                     <Viewbox Stretch="Uniform">
                         <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
-
                 </Button>
                 <!--  Print Toggle Button Popup  -->
                 <Popup x:Name="RingPopup"
@@ -431,7 +430,6 @@
                             Stretch="Fill" />
                     </Viewbox>
                 </Button>
-
             </ToolBar>
             <ToolBar x:Name="ManipulationsToolbar"
                 Height="40"

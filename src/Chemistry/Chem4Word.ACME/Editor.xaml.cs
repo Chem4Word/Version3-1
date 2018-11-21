@@ -5,8 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model;
-using Chem4Word.Model.Converters;
+using Chem4Word.Model.Converters.CML;
 using Chem4Word.ViewModel;
 using System;
 using System.Diagnostics;
@@ -16,9 +17,6 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.ACME.Behaviors;
-using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model.Converters.CML;
 
 namespace Chem4Word.ACME
 {
@@ -84,6 +82,7 @@ namespace Chem4Word.ACME
                 }
             }
         }
+
         public bool ShowSave
         {
             get { return (bool)GetValue(ShowSaveProperty); }
@@ -317,7 +316,6 @@ namespace Chem4Word.ACME
 
             OnOkButtonClick?.Invoke(this, args);
         }
-
 
         /// <summary>
         /// Sets the current behaviour of the editor to the

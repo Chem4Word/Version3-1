@@ -10,8 +10,8 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -25,6 +25,7 @@ namespace Chem4Word.ACME.Controls
         #region DPs
 
         #region ScrollViewer
+
         public ScrollViewer ScrollViewer
         {
             get { return (ScrollViewer)GetValue(ScrollViewerProperty); }
@@ -33,23 +34,21 @@ namespace Chem4Word.ACME.Controls
 
         public static readonly DependencyProperty ScrollViewerProperty =
             DependencyProperty.Register("ScrollViewer", typeof(ScrollViewer), typeof(ZoomBox));
-        #endregion
+
+        #endregion ScrollViewer
 
         #region ChemistryCanvas
-
 
         public static readonly DependencyProperty ChemistryCanvasProperty =
             DependencyProperty.Register("ChemistryCanvas", typeof(ChemistryCanvas), typeof(ZoomBox),
                 new FrameworkPropertyMetadata(null,
                     new PropertyChangedCallback(OnDesignerCanvasChanged)));
 
-
         public ChemistryCanvas ChemistryCanvas
         {
             get { return (ChemistryCanvas)GetValue(ChemistryCanvasProperty); }
             set { SetValue(ChemistryCanvasProperty, value); }
         }
-
 
         private static void OnDesignerCanvasChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -58,7 +57,6 @@ namespace Chem4Word.ACME.Controls
             ChemistryCanvas newDesignerCanvas = target.ChemistryCanvas;
             target.OnDesignerCanvasChanged(oldDesignerCanvas, newDesignerCanvas);
         }
-
 
         protected virtual void OnDesignerCanvasChanged(ChemistryCanvas oldDesignerCanvas, ChemistryCanvas newDesignerCanvas)
         {
@@ -76,9 +74,9 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-        #endregion
+        #endregion ChemistryCanvas
 
-        #endregion
+        #endregion DPs
 
         public override void OnApplyTemplate()
         {

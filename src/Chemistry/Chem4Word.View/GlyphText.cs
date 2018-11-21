@@ -110,7 +110,7 @@ namespace Chem4Word.View
         {
             get
             {
-                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector + new Vector(LeadingBearing,0.0);
+                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector + new Vector(LeadingBearing, 0.0);
                 return TextRun.GetOutline(TypeSize).Select(p => p + offset).ToList();
             }
         }

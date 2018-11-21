@@ -181,7 +181,6 @@ namespace Chem4Word.ACME.Graphics
         /// <returns>Simple path figure of arrow head, oriented appropriately </returns>
         public PathFigure ArrowHeadGeometry(PathFigure line, bool reverse = false)
         {
-
             Matrix matx = new Matrix();
 
             //work out how far back the arrowhead extends
@@ -189,7 +188,7 @@ namespace Chem4Word.ACME.Graphics
 
             var length = GetPathFigureLength(line);
 
-            double progress = reverse ? (offset/length) : 1.0 -(offset/length);  //if we're going for the start or end of line
+            double progress = reverse ? (offset / length) : 1.0 - (offset / length);  //if we're going for the start or end of line
             //Vector headVector = pt1 - pt2;
 
             //create a simple geometry so we can use a wpf trick to determine the length
@@ -207,7 +206,7 @@ namespace Chem4Word.ACME.Graphics
             //and then the very last point on the line
             if (reverse)
             {
-                tempPG.GetPointAtFractionLength(0.0, out tempPoint, out garbage );
+                tempPG.GetPointAtFractionLength(0.0, out tempPoint, out garbage);
             }
             else
             {

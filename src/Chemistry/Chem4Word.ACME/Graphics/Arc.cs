@@ -11,10 +11,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-
 namespace Chem4Word.ACME.Graphics
 {
-
     public sealed class Arc : Shape
     {
         public Point Center
@@ -27,7 +25,6 @@ namespace Chem4Word.ACME.Graphics
         public static readonly DependencyProperty CenterProperty =
             DependencyProperty.Register("Center", typeof(Point), typeof(Arc)
             , new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
-
 
         public double StartAngle
         {
@@ -62,8 +59,6 @@ namespace Chem4Word.ACME.Graphics
             DependencyProperty.Register("Radius", typeof(double), typeof(Arc)
             , new FrameworkPropertyMetadata(10.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
-
-
         public bool SmallAngle
         {
             get { return (bool)GetValue(SmallAngleProperty); }
@@ -75,7 +70,6 @@ namespace Chem4Word.ACME.Graphics
             DependencyProperty.Register("SmallAngle", typeof(bool), typeof(Arc)
             , new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
 
-
         static Arc()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Arc), new FrameworkPropertyMetadata(typeof(Arc)));
@@ -85,7 +79,6 @@ namespace Chem4Word.ACME.Graphics
         {
             get
             {
-
                 var a0 = StartAngle < 0 ? StartAngle + 2 * Math.PI : StartAngle;
                 var a1 = EndAngle < 0 ? EndAngle + 2 * Math.PI : EndAngle;
 
@@ -109,8 +102,6 @@ namespace Chem4Word.ACME.Graphics
                     {
                         d = SweepDirection.Clockwise;
                     }
-
-
                 }
                 else
                 {
@@ -119,7 +110,6 @@ namespace Chem4Word.ACME.Graphics
 
                 Point p0 = Center + new Vector(Math.Cos(a0), Math.Sin(a0)) * Radius;
                 Point p1 = Center + new Vector(Math.Cos(a1), Math.Sin(a1)) * Radius;
-
 
                 List<PathSegment> segments = new List<PathSegment>(1);
                 segments.Add(new ArcSegment(p1, new Size(Radius, Radius), 0.0, large, d, true));

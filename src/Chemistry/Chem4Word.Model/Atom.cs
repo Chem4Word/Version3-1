@@ -491,7 +491,7 @@ namespace Chem4Word.Model
             {
                 double symbolWidth = SymbolText.Length * fontSize;
                 Rect mainElementBox = new Rect(
-                    new Point(position.X - symbolWidth/2, position.Y - halfBoxWidth),
+                    new Point(position.X - symbolWidth / 2, position.Y - halfBoxWidth),
                     new Size(symbolWidth, fontSize));
 
                 if (ImplicitHydrogenCount > 0)
@@ -545,9 +545,7 @@ namespace Chem4Word.Model
             FormalCharge = null;
             DoubletRadical = false;
 
-            var g = Guid.NewGuid();
-            var gc = new GuidConverter();
-            Id = gc.ConvertToString(g);
+            Id = Guid.NewGuid().ToString("D");
         }
 
         private void SetupCollections()

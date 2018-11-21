@@ -5,14 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
 using Chem4Word.Model;
+using System.Diagnostics;
 
 namespace Chem4Word.ViewModel.Commands
 {
     public class FlipCommand : BaseCommand
     {
-         
         public FlipCommand(EditViewModel vm) : base(vm)
         {
         }
@@ -28,7 +27,6 @@ namespace Chem4Word.ViewModel.Commands
             var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
 
             MyEditViewModel.FlipMolecule(selMolecule, false, false);
-
         }
     }
 }

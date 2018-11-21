@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
 using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Commands
@@ -15,7 +14,6 @@ namespace Chem4Word.ViewModel.Commands
         public FlipHorizontalCommand(EditViewModel vm) : base(vm)
         {
         }
-
 
         public override void Execute(object parameter)
         {

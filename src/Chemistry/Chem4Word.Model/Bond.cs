@@ -57,9 +57,7 @@ namespace Chem4Word.Model
 
         public Bond()
         {
-            var g = Guid.NewGuid();
-            var gc = new GuidConverter();
-            this.Id = gc.ConvertToString(g);
+            this.Id = Guid.NewGuid().ToString("D");
         }
 
         private void Rings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -123,7 +121,7 @@ namespace Chem4Word.Model
 
         private void _startAtom_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName==nameof(Atom.Position))
+            if (e.PropertyName == nameof(Atom.Position))
             {
                 OnPropertyChanged("Angle");
             }
