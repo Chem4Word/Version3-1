@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using Chem4Word.Model.Geometry;
 
 namespace Chem4Word.Model
 {
@@ -361,7 +360,5 @@ namespace Chem4Word.Model
         }
 
         #endregion Chirality
-
-      
     }
 }

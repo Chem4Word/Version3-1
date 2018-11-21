@@ -14,16 +14,22 @@ namespace Chem4Word.Model
 
         // LineThickness of Bond if all else fails
         public const double DefaultBondLineFactor = 1.0;
+
         // Font Size to use if all else fails
         public const double DefaultFontSize = 20.0d;
+
         // Imaginary Bond Size for Single Atom
         public const double SingleAtomPseudoBondLength = 40.0d;
+
         // Calculate Font size as bond length * FontSizePercentageBond
         public const double FontSizePercentageBond = 0.5d;
+
         // Double Bond Offset as %age of bond length
         public const double BondOffsetPecentage = 0.1d;
+
         // How much to magnify CML by for rendering in Display or Editor
         public const double ScaleFactorForXaml = 5.0d;
+
         // Percentage of Average bond length for any added Explicit Hydrogens
         public const double ExplicitHydrogenBondPercentage = 1.0;
     }

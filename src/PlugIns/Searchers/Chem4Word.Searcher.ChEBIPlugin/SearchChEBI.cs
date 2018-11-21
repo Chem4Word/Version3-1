@@ -237,7 +237,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     if (itemUnderCursor != null)
                     {
                         UpdateDisplay();
-                        if (display1.Chemistry != null)
+                        if (_lastModel != null && _lastModel.AllErrors.Count + _lastModel.AllWarnings.Count == 0)
                         {
                             ResultsListView.SelectedItems.Clear();
                             itemUnderCursor.Selected = true;
@@ -306,7 +306,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;
                 }
-                display1.Background = Brushes.White;
+
                 ResultsListView.Enabled = false;
                 ResultsListView.Items.Clear();
 
@@ -364,7 +364,6 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                         ErrorsAndWarnings.Text = string.Join(Environment.NewLine, lines);
                     }
                     ChebiId = le.chebiId;
-
                     if (_lastModel.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
                         || _lastModel.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
                     {

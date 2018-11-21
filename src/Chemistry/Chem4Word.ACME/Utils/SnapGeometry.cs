@@ -29,7 +29,7 @@ namespace Chem4Word.ACME.Utils
         /// </summary>
         /// <param name="startPoint">location of the angle where the bond swings from.</param>
         /// <param name="angleIncrement">Angle in degrees - must be a factor of 360</param>
-        public SnapGeometry(Point startPoint, EditViewModel viewModel,  int angleIncrement = 15)
+        public SnapGeometry(Point startPoint, EditViewModel viewModel, int angleIncrement = 15)
         {
             ViewModel = viewModel;
             _startPoint = startPoint;
@@ -68,7 +68,6 @@ namespace Chem4Word.ACME.Utils
 
         public double SnapAngle(double startAngle, Vector originalDisplacement, bool holdingDownControl = false)
         {
-
             int originalAngle =
                 (int)GetBondAngle(startAngle, originalDisplacement);
             double angleInRads = 0.0;
@@ -79,11 +78,10 @@ namespace Chem4Word.ACME.Utils
                 //unlock the bond angle
                 angleInRads = 2 * Math.PI * (originalAngle + startAngle) / 360;
             }
-
             else
             {
-                 double newangle = NormalizeBondAngle(originalAngle, _lockAngle) + startAngle;
-                 angleInRads = 2 * Math.PI * newangle / 360;
+                double newangle = NormalizeBondAngle(originalAngle, _lockAngle) + startAngle;
+                angleInRads = 2 * Math.PI * newangle / 360;
             }
             return angleInRads;
         }

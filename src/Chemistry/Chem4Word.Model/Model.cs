@@ -283,7 +283,7 @@ namespace Chem4Word.Model
 
         public double XamlBondLength;
 
-        Rect _boundingBox = Rect.Empty;
+        private Rect _boundingBox = Rect.Empty;
 
         public Rect BoundingBox
         {
@@ -303,7 +303,6 @@ namespace Chem4Word.Model
                     var bb = new Rect(topleft, bottomRight);
 
                     _boundingBox = modelRect;
-
                 }
 
                 return _boundingBox;

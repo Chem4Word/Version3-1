@@ -217,7 +217,6 @@ namespace Chem4Word.Navigator
 
         private void Display_Loaded()
         {
-
         }
     }
 }

@@ -7,20 +7,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
 namespace Chem4Word.ACME.Graphics
 {
     /// <summary>
-    /// ArcArrow draws an arrow of a specifed radius, 
+    /// ArcArrow draws an arrow of a specifed radius,
     /// centered on a point, that has a start and end angle
     /// Designed to be used directly from XAML
     /// </summary>
-    public class ArcArrow :ArrowBase
+    public class ArcArrow : ArrowBase
     {
         public Point Center
         {
@@ -34,7 +31,7 @@ namespace Chem4Word.ACME.Graphics
             , new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
 
         /// <summary>
-        /// Measured relative to Compass East 
+        /// Measured relative to Compass East
         /// </summary>
         public double StartAngle
         {
@@ -48,7 +45,7 @@ namespace Chem4Word.ACME.Graphics
             , new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
         /// <summary>
-        /// Measured relative to Compass East 
+        /// Measured relative to Compass East
         /// </summary>
         public double EndAngle
         {
@@ -71,8 +68,6 @@ namespace Chem4Word.ACME.Graphics
         public static readonly DependencyProperty RadiusProperty =
             DependencyProperty.Register("Radius", typeof(double), typeof(Arc)
             , new FrameworkPropertyMetadata(10.0, FrameworkPropertyMetadataOptions.AffectsRender));
-
-
 
         public bool SmallAngle
         {
@@ -120,7 +115,6 @@ namespace Chem4Word.ACME.Graphics
             }
             Point p0 = Center + new Vector(Math.Cos(a0), Math.Sin(a0)) * Radius;
             Point p1 = Center + new Vector(Math.Cos(a1), Math.Sin(a1)) * Radius;
-
 
             List<PathSegment> segments = new List<PathSegment>(1);
             segments.Add(new ArcSegment(p1, new Size(Radius, Radius), 0.0, large, d, true));

@@ -474,10 +474,6 @@ namespace Chem4Word.Model
         public bool IsUnsaturated => BondOrders > (double)Degree;
         public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms[0] == this;
 
-        // ToDo: Clyde - Why does this exist in TWO places, but with different signatures ???
-        // ToDo: Duplicated Routine
-        // HACK: Duplicated Routine
-
         //tries to get an estimated bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
@@ -491,7 +487,7 @@ namespace Chem4Word.Model
             {
                 double symbolWidth = SymbolText.Length * fontSize;
                 Rect mainElementBox = new Rect(
-                    new Point(position.X - symbolWidth/2, position.Y - halfBoxWidth),
+                    new Point(position.X - symbolWidth / 2, position.Y - halfBoxWidth),
                     new Size(symbolWidth, fontSize));
 
                 if (ImplicitHydrogenCount > 0)
@@ -545,9 +541,7 @@ namespace Chem4Word.Model
             FormalCharge = null;
             DoubletRadical = false;
 
-            var g = Guid.NewGuid();
-            var gc = new GuidConverter();
-            Id = gc.ConvertToString(g);
+            Id = Guid.NewGuid().ToString("D");
         }
 
         private void SetupCollections()

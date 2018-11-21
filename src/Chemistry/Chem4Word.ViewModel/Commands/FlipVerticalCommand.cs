@@ -5,8 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Diagnostics;
 using Chem4Word.Model;
 
 namespace Chem4Word.ViewModel.Commands
@@ -17,13 +15,10 @@ namespace Chem4Word.ViewModel.Commands
         {
         }
 
-      
-
-
         public override void Execute(object parameter)
         {
-           var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
-           MyEditViewModel.FlipMolecule(selMolecule, true, false);
+            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
+            MyEditViewModel.FlipMolecule(selMolecule, true, false);
         }
     }
 }
