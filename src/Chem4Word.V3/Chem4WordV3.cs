@@ -930,7 +930,7 @@ namespace Chem4Word
             }
         }
 
-        public void SelectChemistry(Word.Selection sel)
+        public void SelectChemistry(Word.Selection sel, bool onDocumentChange)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -941,25 +941,35 @@ namespace Chem4Word
             try
             {
                 Word.Document doc = sel.Application.ActiveDocument;
+                Debug.WriteLine($"Document: {doc.Name} Selection From {sel.Range.Start} to {sel.Range.End}");
 
                 foreach (Word.ContentControl cc in doc.ContentControls)
                 {
-                    if (cc.Range.Start <= sel.Range.Start && cc.Range.End >= sel.Range.End)
+                    Debug.WriteLine($"CC {cc.Tag} Selection From {cc.Range.Start} to {cc.Range.End}");
+                    if (onDocumentChange)
                     {
-                        if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                        // Allow for selection to be bigger on both sides by one on document change
+                        if (sel.Range.Start - 1 <= cc.Range.Start && cc.Range.End >= sel.Range.End - 1)
                         {
-                            if (cc.Tag != null)
+                            if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                             {
-                                string guid = CustomXmlPartHelper.GuidFromTag(cc.Tag);
-                                Guid g;
-                                if (Guid.TryParse(guid, out g))
-                                {
-                                    Debug.WriteLine($"  Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
-                                    NavigatorSupport.SelectNavigatorItem(guid);
-                                    doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
-                                    chemistrySelected = true;
-                                    break;
-                                }
+                                Debug.WriteLine($"  Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
+                                doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
+                                chemistrySelected = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (cc.Range.Start <= sel.Range.Start && cc.Range.End >= sel.Range.End)
+                        {
+                            if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                            {
+                                Debug.WriteLine($"  Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
+                                doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
+                                chemistrySelected = true;
+                                break;
                             }
                         }
                     }
@@ -1611,12 +1621,15 @@ namespace Chem4Word
 
                         if (docxMode)
                         {
-                            SetButtonStates(ButtonState.CanInsert);
+                            SetButtonStates(ButtonState.NoDocument);
+                            EvaluateChemistryAllowed();
+                            SelectChemistry(doc.Application.Selection, true);
                         }
                         else
                         {
                             SetButtonStates(ButtonState.NoDocument);
                         }
+
                     }
                 }
             }
@@ -1810,7 +1823,7 @@ namespace Chem4Word
                     EvaluateChemistryAllowed();
                     if (ChemistryAllowed)
                     {
-                        SelectChemistry(sel);
+                        SelectChemistry(sel, false);
                     }
                     else
                     {
@@ -2244,6 +2257,8 @@ namespace Chem4Word
             try
             {
                 Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
+
+                EvaluateChemistryAllowed();
 
                 // Deliberate crash to test Error Reporting
                 //int ii = 2;
