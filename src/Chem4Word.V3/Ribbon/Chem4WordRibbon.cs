@@ -457,7 +457,6 @@ namespace Chem4Word
                                 dr = DialogResult.OK;
                                 if (model.AllErrors.Count > 0 || model.AllWarnings.Count > 0)
                                 {
-                                    //Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", mol);
                                     if (model.AllErrors.Count > 0)
                                     {
                                         Globals.Chem4WordV3.Telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, model.AllErrors));
@@ -469,6 +468,7 @@ namespace Chem4Word
 
                                     ImportErrors f = new ImportErrors();
                                     f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+                                    model.ScaleToAverageBondLength(40);
                                     f.Model = model;
                                     dr = f.ShowDialog();
                                 }
