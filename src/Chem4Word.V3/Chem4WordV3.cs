@@ -941,27 +941,39 @@ namespace Chem4Word
             try
             {
                 Word.Document doc = sel.Application.ActiveDocument;
+                int ccCount = sel.ContentControls.Count;
+                Debug.WriteLine($"SelectChemistry() Document: {doc.Name} Selection from {sel.Range.Start} to {sel.Range.End}");
+                Debug.WriteLine($"SelectChemistry() Document: {doc.Name} Selection has {sel.ContentControls.Count} CCs");
 
                 foreach (Word.ContentControl cc in doc.ContentControls)
                 {
-                    if (cc.Range.Start <= sel.Range.Start && cc.Range.End >= sel.Range.End)
+                    Debug.WriteLine($"CC '{cc.Tag}' Range from {cc.Range.Start} to {cc.Range.End}");
+
+                    // Already Selected
+                    if (sel.Range.Start == cc.Range.Start -1 && sel.Range.End == cc.Range.End + 1)
                     {
                         if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                         {
-                            if (cc.Tag != null)
-                            {
-                                string guid = CustomXmlPartHelper.GuidFromTag(cc.Tag);
-                                Guid g;
-                                if (Guid.TryParse(guid, out g))
-                                {
-                                    Debug.WriteLine($"  Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
-                                    NavigatorSupport.SelectNavigatorItem(guid);
-                                    doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
-                                    chemistrySelected = true;
-                                    break;
-                                }
-                            }
+                            Debug.WriteLine($"  Existing Selected Chemistry");
+                            chemistrySelected = true;
                         }
+                        break;
+                    }
+
+                    // Inside CC
+                    if (sel.Range.Start >= cc.Range.Start && sel.Range.End <= cc.Range.End)
+                    {
+                        if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                        {
+                            Debug.WriteLine($"  SelectChemistry() Selecting CC at {cc.Range.Start - 1} to {cc.Range.End + 1}");
+                            doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
+#if DEBUG
+                            Word.Selection s = doc.Application.Selection;
+                            Debug.WriteLine($"  SelectChemistry() New Selected Range is {s.Range.Start - 1} to {s.Range.End + 1}");
+#endif
+                            chemistrySelected = true;
+                        }
+                        break;
                     }
                 }
 
@@ -972,7 +984,14 @@ namespace Chem4Word
                 }
                 else
                 {
-                    SetButtonStates(ButtonState.CanInsert);
+                    if (ccCount == 0)
+                    {
+                        SetButtonStates(ButtonState.CanInsert);
+                    }
+                    else
+                    {
+                        SetButtonStates(ButtonState.NoDocument);
+                    }
                 }
 
                 _chemistrySelected = chemistrySelected;
@@ -1611,12 +1630,15 @@ namespace Chem4Word
 
                         if (docxMode)
                         {
-                            SetButtonStates(ButtonState.CanInsert);
+                            SetButtonStates(ButtonState.NoDocument);
+                            EvaluateChemistryAllowed();
+                            SelectChemistry(doc.Application.Selection);
                         }
                         else
                         {
                             SetButtonStates(ButtonState.NoDocument);
                         }
+
                     }
                 }
             }
@@ -1796,7 +1818,7 @@ namespace Chem4Word
                     if (sel != null)
                     {
                         Debug.WriteLine($"{module.Replace("()", $"({sel.Document.Name})")}");
-                        Debug.WriteLine("  Selection: from " + sel.Range.Start + " to " + sel.Range.End);
+                        Debug.WriteLine($"  OnWindowSelectionChange() Selection from {sel.Range.Start} to {sel.Range.End} CC's {sel.ContentControls.Count}");
                     }
                 }
                 catch
@@ -1926,6 +1948,29 @@ namespace Chem4Word
 
                         if (allowed)
                         {
+                            int ccCount = sel.ContentControls.Count;
+                            if (ccCount > 1)
+                            {
+                                allowed = false;
+                                ChemistryProhibitedReason = "more than one ContentControl is selected";
+                            }
+                        }
+
+                        if (allowed)
+                        {
+                            foreach (Word.ContentControl ccd in doc.ContentControls)
+                            {
+                                if (sel.Range.Start <= ccd.Range.Start - 1 && sel.Range.End >= ccd.Range.End + 1)
+                                {
+                                    allowed = false;
+                                    ChemistryProhibitedReason = "selection contains more than just a ContentControl";
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (allowed)
+                        {
                             Word.WdContentControlType? contentControlType = null;
                             string title = "";
                             foreach (Word.ContentControl ccd in doc.ContentControls)
@@ -1934,6 +1979,7 @@ namespace Chem4Word
                                 {
                                     contentControlType = ccd.Type;
                                     title = ccd.Title;
+                                    break;
                                 }
                             }
 
@@ -2245,6 +2291,8 @@ namespace Chem4Word
             {
                 Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
 
+                EvaluateChemistryAllowed();
+
                 // Deliberate crash to test Error Reporting
                 //int ii = 2;
                 //int dd = 0;
@@ -2431,10 +2479,12 @@ namespace Chem4Word
                 if (EventsEnabled)
                 {
                     EventsEnabled = false;
+#if DEBUG
                     Word.Document doc = contentControl.Application.ActiveDocument;
                     Word.Selection sel = doc.Application.Selection;
-                    Debug.WriteLine("  Selection: from " + sel.Range.Start + " to " + sel.Range.End);
-
+                    Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection from {sel.Range.Start} to {sel.Range.End}");
+                    Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection has {sel.ContentControls.Count} CCs");
+#endif
                     EvaluateChemistryAllowed();
                     EventsEnabled = true;
                 }

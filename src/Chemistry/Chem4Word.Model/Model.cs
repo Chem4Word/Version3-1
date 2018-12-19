@@ -27,6 +27,11 @@ namespace Chem4Word.Model
     {
         public string CustomXmlPartGuid { get; set; }
 
+        public Model()
+        {
+            GeneralErrors = new List<string>();
+        }
+
         public string ConciseFormula
         {
             get
@@ -71,6 +76,8 @@ namespace Chem4Word.Model
             }
         }
 
+        public List<string> GeneralErrors { get; set; }
+
         public List<string> AllWarnings
         {
             get
@@ -83,7 +90,10 @@ namespace Chem4Word.Model
         {
             get
             {
-                return Molecules.SelectMany(m => m.Errors).ToList();
+                var result = new List<string>();
+                result.AddRange(GeneralErrors);
+                result.AddRange(Molecules.SelectMany(m => m.Errors));
+                return result;
             }
         }
 
