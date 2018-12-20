@@ -9,24 +9,18 @@
     xmlns:release="condition:!DEBUG"
     xmlns:view="clr-namespace:Chem4Word.View;assembly=Chem4Word.View"
     xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel"
+    xmlns:controls="clr-namespace:Chem4Word.ACME.Controls"
     d:DataContext="{d:DesignInstance viewModel:DisplayViewModel}"
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d debug release">
     <Viewbox Name="Placeholder">
-        <ItemsControl Name="ChemicalObjects"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            ItemsSource="{Binding AllObjects}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas x:Name="ChemCanvas"
-                        Width="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Width}"
-                        Height="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Height}" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.Resources>
-                <!--<local:DoNothingConverter x:Key="DoNothingConverter" />-->
+        <controls:ChemistryCanvas x:Name="ChemCanvas"
+                Width="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Width}"
+                Height="{Binding ElementName=Placeholder, Path=DataContext.BoundingBox.Height}" />
+    </Viewbox>
+<!--<local:DoNothingConverter x:Key="DoNothingConverter" />-->
+    <!--
                 <DataTemplate DataType="{x:Type model:Bond}">
                     <DataTemplate.Resources>
                         <LinearGradientBrush xmlns:d="http://schemas.microsoft.com/expression/blend/2008" x:Key="HatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
@@ -108,7 +102,7 @@
                                         <Setter Property="Fill" Value="{StaticResource HatchBrush}" />
                                         <Setter Property="Stroke" Value="Transparent" />
                                     </Trigger>
-                                    <!--  highlights the bonds on mouseover  -->
+                                    highlights the bonds on mouseover 
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Fill">
                                             <Setter.Value>
@@ -188,5 +182,6 @@
                 </DataTemplate>
             </ItemsControl.Resources>
         </ItemsControl>
-    </Viewbox>
+    
+    </Viewbox> -->
 </UserControl>
