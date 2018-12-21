@@ -97,41 +97,36 @@ namespace Chem4Word.ACME.Controls
 
             foreach (Molecule molecule in vm.Model.Molecules)
             {
-                DrawMolecule(molecule);
+                DrawMolecule(molecule, Rect.Empty);
 
             }
             InvalidateMeasure();
         }
 
-        private Rect? DrawMolecule(Molecule molecule, Rect? moleculeBounds = null)
+        private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
         {
-
+            var bounds = moleculeBounds;
             foreach (Bond moleculeBond in molecule.Bonds)
             {
-                moleculeBounds = DrawBond(moleculeBond, moleculeBounds);
+                bounds = DrawBond(moleculeBond, bounds);
             }
 
             foreach (Atom moleculeAtom in molecule.Atoms)
             {
-                moleculeBounds= DrawAtom(moleculeAtom, moleculeBounds);
+                bounds= DrawAtom(moleculeAtom, bounds);
             }
 
-
+            //check to see if we have child molecules
             if (molecule.Molecules.Any())
             {
-                Rect? groupRect = null;
+                Rect groupRect = Rect.Empty;
                 foreach (Molecule child in molecule.Molecules)
                 {
 
-                    var childRect = DrawMolecule(child, moleculeBounds);
-                    if (groupRect == null)
-                    {
-                        groupRect = childRect;
-                    }
-                    else
-                    {
-                        groupRect.Value.Union(childRect.Value);
-                    }
+                    var childRect = DrawMolecule(child, bounds);
+                  
+                    groupRect.Union(childRect);
+                  
                 }
 
                 var groupBox = new DrawingVisual();
@@ -140,60 +135,44 @@ namespace Chem4Word.ACME.Controls
                     Brush bracketBrush =new SolidColorBrush(Colors.Gray);
                     Pen bracketPen = new Pen(bracketBrush, 1d);
                     //bracketPen.DashStyle = new DashStyle(new double[]{2,2});
-                    dc.DrawRectangle(null,bracketPen,groupRect.Value);
-
+                    dc.DrawRectangle(null,bracketPen,groupRect);
                     dc.Close();
-
                 }
                 AddVisualChild(groupBox);
                 AddLogicalChild(groupBox);
                 chemicalVisuals.Add(molecule,groupBox);
-                if (moleculeBounds == null)
-                {
-                    moleculeBounds = groupBox.ContentBounds;
-                }
-                else
-                {
-                    moleculeBounds.Value.Union(groupBox.ContentBounds);
-                }
+             
+                bounds.Union(groupBox.ContentBounds);
+                
             }
-            return moleculeBounds;
+            return bounds;
         }
 
-        private Rect DrawAtom(Atom moleculeAtom,Rect? moleculeBounds)
+        private Rect DrawAtom(Atom moleculeAtom,Rect moleculeBounds)
         {
+            var bounds = moleculeBounds;
             var atomVisual = new AtomVisual(moleculeAtom);
             atomVisual.Render();
             chemicalVisuals.Add(moleculeAtom, atomVisual);
             AddVisual(atomVisual);
-            if (moleculeBounds == null)
-            {
-                moleculeBounds = atomVisual.ContentBounds;
-            }
-            else
-            {
-                moleculeBounds.Value.Union(atomVisual.ContentBounds);
-            }
+           
+            bounds.Union(atomVisual.ContentBounds);
+           
 
-            return moleculeBounds.Value;
+            return bounds;
         }
 
-        private Rect DrawBond(Bond moleculeBond, Rect? moleculeBounds)
+        private Rect DrawBond(Bond moleculeBond, Rect moleculeBounds)
         {
+            var bounds = moleculeBounds;
             var bondVisual = new BondVisual(moleculeBond);
             bondVisual.Render();
             chemicalVisuals.Add(moleculeBond, bondVisual);
             AddVisual(bondVisual);
-            if (moleculeBounds == null)
-            {
-                moleculeBounds = bondVisual.ContentBounds;
-            }
-            else
-            {
-                moleculeBounds.Value.Union(bondVisual.ContentBounds);
-            }
-
-            return moleculeBounds.Value;
+          
+            bounds.Union(bondVisual.ContentBounds);
+            
+            return bounds;
         }
 
         public void Clear()
