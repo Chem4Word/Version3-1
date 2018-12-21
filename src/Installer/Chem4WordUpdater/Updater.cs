@@ -75,7 +75,7 @@ namespace Chem4WordUpdater
                 else
                 {
                     RegistryHelper.WriteAction($"Declined to download {args[0]}");
-                    Information.Text = $"Error staring download of Chem4Word update";
+                    Information.Text = "Error staring download of Chem4Word update";
                 }
             }
             else

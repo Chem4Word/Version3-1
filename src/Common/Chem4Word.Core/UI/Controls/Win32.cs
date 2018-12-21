@@ -15,8 +15,8 @@ namespace Chem4Word.Core.UI.Controls
     internal class Win32
     {
         /*
-		 * GetWindow() Constants
-		 */
+         * GetWindow() Constants
+         */
         public const int GW_HWNDFIRST = 0;
         public const int GW_HWNDLAST = 1;
         public const int GW_HWNDNEXT = 2;
