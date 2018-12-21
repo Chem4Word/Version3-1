@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.Helpers;
 using Chem4Word.Shared;
 using Microsoft.Win32;
 using System;
@@ -13,6 +14,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -26,7 +28,7 @@ namespace Chem4Word.Telemetry
         private static string CryptoRoot = @"SOFTWARE\Microsoft\Cryptography";
         private string DotNetVersionKey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
 
-        private const string DetectionFile = "files3-1/client-ip-date.php";
+        private static readonly string DetectionFile = $"{Constants.Chem4WordVersionFiles}/client-ip-date.php";
         private static readonly string[] Domains = { "https://www.chem4word.co.uk", "https://chem4word.azurewebsites.net", "http://www.chem4word.com" };
 
         public string MachineId { get; set; }
