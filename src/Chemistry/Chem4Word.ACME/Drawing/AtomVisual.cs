@@ -19,7 +19,8 @@ namespace Chem4Word.ACME.Drawing
 
         private static double MaskOffsetWidth = 0;
         private Geometry _hullGeometry;
-        private Pen _widepen = new Pen(Brushes.Black, 20d);
+        
+        public double BondThickness { get; set; }
 
         #endregion
 
@@ -509,10 +510,16 @@ namespace Chem4Word.ACME.Drawing
 
         public PathGeometry WidenedGeometry
         {
-            get { return HullGeometry.GetWidenedPathGeometry(_widepen); }
+
+            get
+            {
+                Pen _widepen = new Pen(Brushes.Black, BondThickness);
+                return HullGeometry.GetWidenedPathGeometry(_widepen);
+            }
         }
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
+            Pen _widepen = new Pen(Brushes.Black, BondThickness);
             if (HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
@@ -529,6 +536,7 @@ namespace Chem4Word.ACME.Drawing
         /// <returns></returns>
         public Point? GetIntersection(Point pointA, Point pointB)
         {
+            Pen _widepen = new Pen(Brushes.Black, BondThickness);
             Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(_widepen);
             //
             Point? p;

@@ -128,8 +128,10 @@ namespace Chem4Word.ACME.Drawing
             endPoint = ParentBond.EndAtom.Position;
             Geometry bondGeometry = null;
             Vector bondVector = endPoint - startPoint;
-            
-            if(ParentBond.StartAtom.SymbolText !="")
+
+            bondGeometry = GetBondGeometry(startPoint, endPoint);
+
+            if (ParentBond.StartAtom.SymbolText !="")
             {
                 var startAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.StartAtom]).WidenedGeometry;
                 for (double d = 1d; d<100d; d++)
