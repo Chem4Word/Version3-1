@@ -609,11 +609,11 @@ namespace Chem4Word.Model
         /// <summary>
         /// Converts a CML element to a point object
         /// </summary>
-        /// <param name="atom">XEelement describing the atom</param>
+        /// <param name="atom">Element describing the atom</param>
         /// <returns></returns>
 
         /// <summary>
-        /// returns all borderign atoms except the one listed
+        /// returns all borderin atoms except the one listed
         /// </summary>
         /// <param name="toIgnore"></param>
         /// <returns></returns>
