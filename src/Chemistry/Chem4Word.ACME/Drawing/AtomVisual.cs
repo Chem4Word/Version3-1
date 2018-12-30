@@ -18,7 +18,8 @@ namespace Chem4Word.ACME.Drawing
         #region private fields
 
         private static double MaskOffsetWidth = 0;
-
+        private Geometry _widenedHull;
+        private Pen widepen = new Pen(Brushes.Black, 20.0);
 
         #endregion
 
@@ -504,6 +505,48 @@ namespace Chem4Word.ACME.Drawing
         #endregion
         #endregion
 
+        public Geometry HullGeometry => _widenedHull ?? (_widenedHull = BasicGeometry.BuildPath(Hull).Data);
 
+        public Geometry WidenedGeometry
+        {
+            get { return HullGeometry.GetWidenedPathGeometry(widepen); }
+        }
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+        {
+            if (HullGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
+                {
+                    return new PointHitTestResult(this, hitTestParameters.HitPoint);
+                }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns a point indicating where the bond line intersects the atom label;
+        /// </summary>
+        /// <param name="pointA"></param>
+        /// <param name="pointB"></param>
+        /// <returns></returns>
+        public Point? GetIntersection(Point pointA, Point pointB)
+        {
+            //Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(widepen);
+            //CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedGeometry,lg);
+            Point? p;
+
+          
+
+            for (int i = 0; i < Hull.Count; i++)
+            {
+                var hullPointA = Hull[i];
+                var hullPointB = Hull[(i + 1) % Hull.Count];
+
+                p = BasicGeometry.LineSegmentsIntersect(pointA, pointB, hullPointA, hullPointB);
+                if (p!=null)
+                {
+                    return p;
+                }
+            }
+            return null;
+        }
     }
 }
