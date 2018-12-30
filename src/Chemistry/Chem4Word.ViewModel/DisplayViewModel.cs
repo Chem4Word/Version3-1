@@ -94,7 +94,7 @@ namespace Chem4Word.ViewModel
         {
             try
             {
-                if (AllAtoms?.Any()??false)
+                if (AllAtoms != null && AllAtoms.Any())
                 {
                     var modelRect = AllAtoms[0].BoundingBox(FontSize);
                     for (int i = 1; i < AllAtoms.Count; i++)
