@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2018, The .NET Foundation.
+//  Copyright (c) 2019, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -420,7 +420,7 @@ namespace Chem4Word.Telemetry
 
                             try
                             {
-                                // Get Server Date header i.e. "Wed, 11 Jul 2018 19:52:46 GMT"
+                                // Get Server Date header i.e. "Tue, 01 Jan 2019 19:52:46 GMT"
                                 ServerDateHeader = response.Headers["date"];
                             }
                             catch

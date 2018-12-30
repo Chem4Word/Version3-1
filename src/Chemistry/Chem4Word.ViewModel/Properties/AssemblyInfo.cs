@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2018, The .NET Foundation.
+//  Copyright (c) 2019, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -14,10 +14,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Chem4Word.ViewModel")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Chem4Word")]
 [assembly: AssemblyProduct("Chem4Word.ViewModel")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("© Chem4Word 2019. All rights reserved.")]
+[assembly: AssemblyTrademark("Chem4Word")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -37,6 +37,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("3.1.0.6605")]
-[assembly: AssemblyFileVersion("3.1.0.6605")]
+// [assembly: AssemblyVersion("3.1.0.6940")]
+[assembly: AssemblyVersion("3.1.0.6940")]
+[assembly: AssemblyFileVersion("3.1.0.6940")]
