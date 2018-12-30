@@ -153,6 +153,7 @@ namespace Chem4Word.ACME.Controls
         {
             var bounds = moleculeBounds;
             var atomVisual = new AtomVisual(moleculeAtom);
+            atomVisual.ChemicalVisuals = chemicalVisuals;
             atomVisual.BackgroundColor = Background;
 
             atomVisual.Render();
@@ -169,6 +170,8 @@ namespace Chem4Word.ACME.Controls
         {
             var bounds = moleculeBounds;
             var bondVisual = new BondVisual(moleculeBond);
+            bondVisual.ChemicalVisuals = chemicalVisuals;
+            bondVisual.BondThickness = Chemistry.BondThickness;
             bondVisual.Render();
             chemicalVisuals.Add(moleculeBond, bondVisual);
             AddVisual(bondVisual);
