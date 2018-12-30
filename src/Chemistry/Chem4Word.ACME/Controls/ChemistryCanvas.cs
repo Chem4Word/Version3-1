@@ -107,14 +107,16 @@ namespace Chem4Word.ACME.Controls
         private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
         {
             var bounds = moleculeBounds;
-            foreach (Bond moleculeBond in molecule.Bonds)
-            {
-                bounds = DrawBond(moleculeBond, bounds);
-            }
+           
 
             foreach (Atom moleculeAtom in molecule.Atoms)
             {
                 bounds= DrawAtom(moleculeAtom, bounds);
+            }
+
+            foreach (Bond moleculeBond in molecule.Bonds)
+            {
+                bounds = DrawBond(moleculeBond, bounds);
             }
 
             //check to see if we have child molecules

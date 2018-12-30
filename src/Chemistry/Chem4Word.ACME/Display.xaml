@@ -23,7 +23,8 @@
     <!--
                 <DataTemplate DataType="{x:Type model:Bond}">
                     <DataTemplate.Resources>
-                        <LinearGradientBrush xmlns:d="http://schemas.microsoft.com/expression/blend/2008" x:Key="HatchBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
+                        <LinearGradientBrush xmlns:d="http://schemas.microsoft.com/expression/blend/2008" x:Key="HatchBrush" 
+                        MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
                             <GradientStop Offset="0.00" Color="Black" />
                             <GradientStop Offset="0.25" Color="Black" />
                             <GradientStop Offset="0.25" Color="Transparent" />

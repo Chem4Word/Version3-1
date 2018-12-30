@@ -18,8 +18,8 @@ namespace Chem4Word.ACME.Drawing
         #region private fields
 
         private static double MaskOffsetWidth = 0;
-        private Geometry _widenedHull;
-        private Pen widepen = new Pen(Brushes.Black, 20.0);
+        private Geometry _hullGeometry;
+        private Pen _widepen = new Pen(Brushes.Black, 20d);
 
         #endregion
 
@@ -505,15 +505,15 @@ namespace Chem4Word.ACME.Drawing
         #endregion
         #endregion
 
-        public Geometry HullGeometry => _widenedHull ?? (_widenedHull = BasicGeometry.BuildPath(Hull).Data);
+        public Geometry HullGeometry => _hullGeometry ?? (_hullGeometry = BasicGeometry.BuildPath(Hull).Data);
 
-        public Geometry WidenedGeometry
+        public PathGeometry WidenedGeometry
         {
-            get { return HullGeometry.GetWidenedPathGeometry(widepen); }
+            get { return HullGeometry.GetWidenedPathGeometry(_widepen); }
         }
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
-            if (HullGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
+            if (HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }
@@ -529,23 +529,18 @@ namespace Chem4Word.ACME.Drawing
         /// <returns></returns>
         public Point? GetIntersection(Point pointA, Point pointB)
         {
-            //Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(widepen);
-            //CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedGeometry,lg);
+            Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(_widepen);
+            //
             Point? p;
 
-          
+            CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedGeometry, lg);
 
-            for (int i = 0; i < Hull.Count; i++)
+            Rect bounds =combinedGeometry.Bounds;
+            if (!bounds.IsEmpty)
             {
-                var hullPointA = Hull[i];
-                var hullPointB = Hull[(i + 1) % Hull.Count];
-
-                p = BasicGeometry.LineSegmentsIntersect(pointA, pointB, hullPointA, hullPointB);
-                if (p!=null)
-                {
-                    return p;
-                }
+                return new Point((bounds.Left + bounds.Right)/2, (bounds.Bottom+bounds.Top)/2);
             }
+          
             return null;
         }
     }
