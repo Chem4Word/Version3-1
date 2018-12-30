@@ -1,9 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 using Chem4Word.Model;
-using Chem4Word.ViewModel;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Drawing
 {
     public class BondVisual: ChemicalVisual
     {

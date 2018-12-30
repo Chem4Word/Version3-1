@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
 using Chem4Word.Model.Converters.CML;
 using Chem4Word.Model.Converters.MDL;
 using Chem4Word.ViewModel;

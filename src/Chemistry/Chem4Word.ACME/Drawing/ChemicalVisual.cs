@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Drawing
 {
     public abstract class ChemicalVisual: DrawingVisual
     {

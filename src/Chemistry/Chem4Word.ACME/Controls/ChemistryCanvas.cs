@@ -18,6 +18,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Xml;
 using System.Linq;
+using Chem4Word.ACME.Drawing;
 using Chem4Word.Model;
 using Chem4Word.ViewModel;
 
@@ -152,6 +153,8 @@ namespace Chem4Word.ACME.Controls
         {
             var bounds = moleculeBounds;
             var atomVisual = new AtomVisual(moleculeAtom);
+            atomVisual.BackgroundColor = Background;
+
             atomVisual.Render();
             chemicalVisuals.Add(moleculeAtom, atomVisual);
             AddVisual(atomVisual);

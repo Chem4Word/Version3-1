@@ -19,7 +19,7 @@ using static Chem4Word.View.GlyphUtils;
 namespace Chem4Word.View
 {
     /// <summary>
-    /// Replcacement for existing AtomShape.  uses glyph based rendering
+    /// Replacement for existing AtomShape.  uses glyph based rendering
     /// </summary>
     public class AtomShape : Shape
     {

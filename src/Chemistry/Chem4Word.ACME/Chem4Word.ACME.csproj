@@ -70,15 +70,15 @@
     <Compile Include="AtomPicker.xaml.cs">
       <DependentUpon>AtomPicker.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AtomVisual.cs" />
+    <Compile Include="Drawing\AtomVisual.cs" />
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="Behaviors\LassoBehavior.cs" />
-    <Compile Include="BondVisual.cs" />
-    <Compile Include="ChemicalVisual.cs" />
+    <Compile Include="Drawing\BondVisual.cs" />
+    <Compile Include="Drawing\ChemicalVisual.cs" />
     <Compile Include="Controls\ChemistryCanvas.cs" />
     <Compile Include="Controls\ZoomBox.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
@@ -169,7 +169,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Commands\" />
-    <Folder Include="NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\xcc.1.0.9\build\Xcc.targets" Condition="Exists('..\..\packages\xcc.1.0.9\build\Xcc.targets')" />
