@@ -23,27 +23,83 @@ namespace Chem4Word.ViewModel
     /// </summary>
     public static class BondGeometry
     {
-        public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, Point endPoint, double bondLength)
+        public static Geometry WedgeBondGeometry(Point startPoint, Point endPoint, double bondLength,
+            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
         {
+            void ComputeWedge(StreamGeometry streamGeometry, Point start, Point end, Vector vector)
+            {
+                Point pointA;
+                Point pointB;
+                using (StreamGeometryContext sgc = streamGeometry.Open())
+                {
+                    sgc.BeginFigure(start, true, true);
+                    pointA = end + vector;
+                    pointB = end - vector;
+                    sgc.LineTo(pointA, true, true);
+                    sgc.LineTo(pointB, true, true);
+                    sgc.Close();
+                }
+            }
+
+
+
             Vector bondVector = endPoint - startPoint;
             Vector perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
             perpVector *= bondLength * Globals.BondOffsetPecentage;
-            Point point2 = endPoint + perpVector;
-            Point point3 = endPoint - perpVector;
+           
 
             StreamGeometry sg = new StreamGeometry();
 
-            using (StreamGeometryContext sgc = sg.Open())
-            {
-                sgc.BeginFigure(startPoint, true, true);
-                sgc.LineTo(point2, true, true);
-                sgc.LineTo(point3, true, true);
-                sgc.Close();
-            }
+            ComputeWedge(sg,startPoint,endPoint, perpVector);
+
             sg.Freeze();
 
-            return sg;
+
+            if (startAtomGeometry == null & endAtomGeometry == null)
+            {
+                return sg;
+            }
+            else //adjust the start and end points of the bond
+            {
+                var start = startPoint;
+                var end = endPoint;
+                Vector offset = bondVector * (1d / 100d);
+
+                if (startAtomGeometry != null)
+                {
+                    var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, startAtomGeometry);
+                    while (!overlap.IsEmpty())
+                    {
+                        start += offset;
+                        sg = new StreamGeometry();
+
+                        ComputeWedge(sg, start, end, perpVector);
+
+                        overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, startAtomGeometry);
+                    }
+                }
+
+                if (endAtomGeometry != null)
+                {
+                    var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, endAtomGeometry);
+                    while (!overlap.IsEmpty())
+                    {
+                        end -= offset;
+                        sg = new StreamGeometry();
+
+                        ComputeWedge(sg, start, end, perpVector);
+
+                        overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, endAtomGeometry);
+                    }
+                }
+
+               
+
+                sg.Freeze();
+
+                return sg;
+            }
         }
 
         /// <summary>
@@ -98,8 +154,12 @@ namespace Chem4Word.ViewModel
         /// <param name="endPoint">Where it ends</param>
         /// <param name="bondLength"></param>
         /// <param name="enclosingPoly"></param>
+        /// <param name="startAtomGeometry"></param>
+        /// <param name="endAtomGeometry"></param>
         /// <returns></returns>
-        public static System.Windows.Media.Geometry TripleBondGeometry(Point startPoint, Point endPoint, double bondLength, ref List<Point> enclosingPoly)
+        public static Geometry TripleBondGeometry(Point startPoint, Point endPoint,
+            double bondLength, ref List<Point> enclosingPoly, 
+            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
         {
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
@@ -112,8 +172,23 @@ namespace Chem4Word.ViewModel
             Point point3 = startPoint - normal * distance;
             Point point4 = point3 + v;
 
-            enclosingPoly = new List<Point>() { point1, point2, point4, point3 };
+            
 
+            if (startAtomGeometry != null)
+            {
+                AdjustStartPoint(ref startPoint, endPoint, startAtomGeometry);
+                AdjustStartPoint(ref point1, point2, startAtomGeometry);
+                AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+            }
+
+            if (endAtomGeometry != null)
+            {
+                AdjustStartPoint(ref endPoint, startPoint, endAtomGeometry);
+                AdjustStartPoint(ref point2, point1, endAtomGeometry);
+                AdjustStartPoint(ref point4, point3, endAtomGeometry);
+                enclosingPoly = new List<Point>() { point1, point2, point4, point3 };
+            }
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
@@ -142,7 +217,8 @@ namespace Chem4Word.ViewModel
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
         public static System.Windows.Media.Geometry DoubleBondGeometry(Point startPoint, Point endPoint, double bondLength,
-            BondDirection doubleBondPlacement, ref List<Point> enclosingPoly, Point? ringCentroid = null)
+            BondDirection doubleBondPlacement, ref List<Point> enclosingPoly, Point? ringCentroid = null, 
+            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
 
         {
             Point point1;
@@ -150,7 +226,19 @@ namespace Chem4Word.ViewModel
             Point point3;
             Point point4;
             enclosingPoly = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid, out point1, out point2, out point3, out point4);
+            if (startAtomGeometry != null)
+            {
+                AdjustStartPoint(ref point1, point4, startAtomGeometry);
+                AdjustStartPoint(ref point2, point3, startAtomGeometry);
+                enclosingPoly = new List<Point> {point1, point2, point3, point4};
+            }
 
+            if (endAtomGeometry != null)
+            {
+                AdjustStartPoint(ref point4, point1, endAtomGeometry);
+                AdjustStartPoint(ref point3, point2, endAtomGeometry);
+                enclosingPoly = new List<Point> { point1, point2, point3, point4 };
+            }
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
@@ -279,7 +367,8 @@ namespace Chem4Word.ViewModel
         /// <param name="endPoint"></param>
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, double bondLength, ref List<Point> enclosingPoly)
+        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, double bondLength, 
+            ref List<Point> enclosingPoly, Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
@@ -295,8 +384,23 @@ namespace Chem4Word.ViewModel
             point3 = startPoint - normal * distance;
             point4 = point3 + v;
 
-            enclosingPoly = new List<Point>() { point1, point2, point4, point3 };
+           
+            enclosingPoly = new List<Point> { point1, point2, point4, point3 };
 
+            if (startAtomGeometry != null)
+            {
+                
+                AdjustStartPoint(ref point1, point2, startAtomGeometry);
+                AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+            }
+
+            if (endAtomGeometry != null)
+            {
+                AdjustStartPoint(ref point2, point1, endAtomGeometry);
+                AdjustStartPoint(ref point4, point3, endAtomGeometry);
+                enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+            }
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
@@ -310,17 +414,45 @@ namespace Chem4Word.ViewModel
             return sg;
         }
 
-        public static Geometry SingleBondGeometry(Point startPoint, Point endPoint)
+        public static Geometry SingleBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
         {
+            var start = startPoint;
+            var end = endPoint;
+
             StreamGeometry sg = new StreamGeometry();
+            if (startAtomGeometry != null)
+            {
+                AdjustStartPoint(ref start, end, startAtomGeometry);
+            }
+
+            if (endAtomGeometry != null)
+            {
+                AdjustStartPoint(ref end, start, endAtomGeometry);
+            }
             using (StreamGeometryContext sgc = sg.Open())
             {
-                sgc.BeginFigure(startPoint, false, false);
-                sgc.LineTo(endPoint, true, false);
+                sgc.BeginFigure(start, false, false);
+                sgc.LineTo(end, true, false);
                 sgc.Close();
             }
             sg.Freeze();
             return sg;
+        }
+
+        private static void AdjustStartPoint(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
+        {
+            Vector bondVector = endPoint - startPoint;
+
+            Point tempStartPoint = startPoint;
+            Vector offset = bondVector * (1d / 100d);
+
+            while (startAtomGeometry.FillContains(tempStartPoint))
+            {
+                tempStartPoint += offset;
+            }
+
+            startPoint = tempStartPoint;
+
         }
 
         private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)

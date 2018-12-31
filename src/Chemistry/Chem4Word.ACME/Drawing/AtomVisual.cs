@@ -473,7 +473,7 @@ namespace Chem4Word.ACME.Drawing
             Point centre = ParentAtom.Position;
             using (DrawingContext dc = RenderOpen())
             {
-                GlyphText.SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
+                 GlyphText.SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
                 //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
                 GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
                 GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
@@ -488,7 +488,20 @@ namespace Chem4Word.ACME.Drawing
 
                 if (GlyphText.SymbolSize > 0)
                 {
+
                     RenderAtom(dc);
+#if DEBUG
+                    if (AtomSymbol != "")
+
+                    {
+                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
+                        areaBrush.Opacity = 0.33;
+                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
+                    }
+#endif
+
+                   
+
                 }
             }
         }
@@ -506,15 +519,40 @@ namespace Chem4Word.ACME.Drawing
         #endregion
         #endregion
 
-        public Geometry HullGeometry => _hullGeometry ?? (_hullGeometry = BasicGeometry.BuildPath(Hull).Data);
+        public Geometry HullGeometry
+        {
+            get
+            {
+                if (_hullGeometry == null)
+                {
+                    if (Hull == null || Hull.Count == 0)
+                    {
+                        _hullGeometry= null;
+                    }
+                    else
+                    {
+                        Geometry geo1 = BasicGeometry.BuildPolyPath(Hull);
+                        CombinedGeometry cg = new CombinedGeometry(geo1, geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness)));
+                        _hullGeometry = cg;
+                    }
+                }
 
-        public PathGeometry WidenedGeometry
+                return _hullGeometry;
+            }
+        }
+
+        public Geometry WidenedHullGeometry
         {
 
             get
             {
-                Pen _widepen = new Pen(Brushes.Black, BondThickness);
-                return HullGeometry.GetWidenedPathGeometry(_widepen);
+                if (!string.IsNullOrEmpty(AtomSymbol))
+                {
+                    //Pen _widepen = new Pen(Brushes.Black, BondThickness);
+                    return HullGeometry;
+                }
+
+                return null;
             }
         }
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
@@ -541,7 +579,7 @@ namespace Chem4Word.ACME.Drawing
             //
             Point? p;
 
-            CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedGeometry, lg);
+            CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedHullGeometry, lg);
 
             Rect bounds =combinedGeometry.Bounds;
             if (!bounds.IsEmpty)

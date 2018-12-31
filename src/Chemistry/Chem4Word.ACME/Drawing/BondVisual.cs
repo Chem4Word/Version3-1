@@ -31,7 +31,8 @@ namespace Chem4Word.ACME.Drawing
             ParentBond = bond;
         }
 
-        public Geometry GetBondGeometry(Point startPoint, Point endPoint)
+        public Geometry GetBondGeometry(Point startPoint, Point endPoint, 
+            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
@@ -41,8 +42,7 @@ namespace Chem4Word.ACME.Drawing
             //check to see if it's a wedge or a hatch yet
             if (ParentBond.Stereo == BondStereo.Wedge | ParentBond.Stereo == BondStereo.Hatch)
             {
-               
-                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength);
+                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength,startAtomGeometry,endAtomGeometry);
             }
 
             if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
@@ -53,7 +53,7 @@ namespace Chem4Word.ACME.Drawing
             //single or dotted bond
             if (ParentBond.OrderValue <= 1)
             {
-                return BondGeometry.SingleBondGeometry(startPoint, endPoint);
+                return BondGeometry.SingleBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
             }
 
             if (ParentBond.OrderValue == 1.5)
@@ -69,7 +69,7 @@ namespace Chem4Word.ACME.Drawing
                 if (ParentBond.Stereo == BondStereo.Indeterminate)
                 {
                     return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, modelXamlBondLength,
-                        ref _enclosingPoly);
+                        ref _enclosingPoly, startAtomGeometry, endAtomGeometry);
                 }
 
                 Point? centroid = null;
@@ -80,14 +80,14 @@ namespace Chem4Word.ACME.Drawing
 
                 return BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
                     ParentBond.Placement,
-                    ref _enclosingPoly, centroid);
+                    ref _enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
             }
 
             //tripe bond
             if (ParentBond.OrderValue == 3)
             {
                 return BondGeometry.TripleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                    ref _enclosingPoly);
+                    ref _enclosingPoly, startAtomGeometry, endAtomGeometry);
             }
 
             return null;
@@ -128,45 +128,12 @@ namespace Chem4Word.ACME.Drawing
             endPoint = ParentBond.EndAtom.Position;
             Geometry bondGeometry = null;
             Vector bondVector = endPoint - startPoint;
+            var startAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
+            var endAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
 
-            bondGeometry = GetBondGeometry(startPoint, endPoint);
+            bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
 
-            if (ParentBond.StartAtom.SymbolText !="")
-            {
-                var startAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.StartAtom]).WidenedGeometry;
-                for (double d = 1d; d<100d; d++)
-                {
-                    Vector offset = bondVector * (d / 100);
-                    startPoint = ParentBond.StartAtom.Position + offset;
-                    
-                    bondGeometry = GetBondGeometry(startPoint, endPoint);
-                    var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, bondGeometry,startAtomGeometry);
-                    if (overlap.IsEmpty())
-                    {
-                      
-                        break;
-                    }
-                }
-
-            }
-
-            if (ParentBond.EndAtom.SymbolText != "")
-            {
-                var endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedGeometry;
-                for (double d = 1d; d < 100d; d++)
-                {
-                    Vector offset = bondVector * (d / 100);
-                    endPoint = ParentBond.EndAtom.Position - offset;
-
-                    bondGeometry = GetBondGeometry(startPoint, endPoint);
-                    var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, bondGeometry, endAtomGeometry);
-                    if (overlap.IsEmpty())
-                    {
-                        break;
-                    }
-                }
-
-            }
+            
 
 
 
@@ -195,7 +162,6 @@ namespace Chem4Word.ACME.Drawing
 
 
                 dc.DrawGeometry(bondBrush, _bondPen, bondGeometry);
-                
                 dc.Close();
             }
         }
