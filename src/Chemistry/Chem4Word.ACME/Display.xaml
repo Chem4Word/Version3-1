@@ -4,6 +4,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:Chem4Word.ACME.Controls">
     <Viewbox Name="Placeholder">
-        <controls:ChemistryCanvas x:Name="ChemCanvas"/>
+        <controls:ChemistryCanvas x:Name="ChemCanvas" Margin="20"/>
     </Viewbox>
 </UserControl>
