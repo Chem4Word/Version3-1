@@ -1,4 +1,12 @@
-﻿using System.Collections.Generic;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2018, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+
+using System.Collections.Generic;   
 using System.Net;
 using System.Windows;
 using System.Windows.Automation.Peers;
@@ -20,15 +28,18 @@ namespace Chem4Word.ACME.Drawing
         #endregion
 
         #region Fields
-            private Pen _bondPen;
+            private Pen _mainBondPen;
+            private Pen _subsidiaryBondPen;
             private List<Point> _enclosingPoly = new List<Point>();
         #endregion
       
 
         public BondVisual(Bond bond)
         {
-            
+           
+
             ParentBond = bond;
+           
         }
 
         public Geometry GetBondGeometry(Point startPoint, Point endPoint, 
@@ -58,7 +69,8 @@ namespace Chem4Word.ACME.Drawing
 
             if (ParentBond.OrderValue == 1.5)
             {
-                //it's a resonance bond, so we deal with this in OnRender
+                //it's a resonance bond, so we deal with this in Render
+                //as we can't return a single geometry
                 //return BondGeometry.SingleBondGeometry(startPoint.Value, endPoint.Value);
                 return new StreamGeometry();
             }
@@ -133,36 +145,76 @@ namespace Chem4Word.ACME.Drawing
 
             bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
 
-            
+            _mainBondPen = new Pen(Brushes.Black, BondThickness);
+            _mainBondPen.Thickness = BondThickness;
 
+            _mainBondPen.StartLineCap = PenLineCap.Round;
+            _mainBondPen.EndLineCap = PenLineCap.Round;
+            _subsidiaryBondPen = _mainBondPen.Clone();
 
-
-
-            using (DrawingContext dc = RenderOpen())
+            if (ParentBond.OrderValue < 1.0d)
             {
-                _bondPen = new Pen(Brushes.Black, BondThickness);
-                _bondPen.Thickness = BondThickness;
-
-                _bondPen.StartLineCap = PenLineCap.Round;
-                _bondPen.EndLineCap = PenLineCap.Round;
-
-                Brush bondBrush = Brushes.Black;
-                if (ParentBond.Stereo == BondStereo.Hatch || ParentBond.Stereo==BondStereo.Wedge)
-                {
-                    _bondPen.Thickness = 0; //don't draw around the bonds
-                    if (ParentBond.Stereo == BondStereo.Wedge)
+                _mainBondPen.DashStyle = DashStyles.Dash;
+            }
+            else if (ParentBond.OrderValue < 2.0)
+            {
+                _subsidiaryBondPen.DashStyle = DashStyles.Dash;
+            }
+            if (ParentBond.OrderValue!=1.5)
+            {
+                using (DrawingContext dc = RenderOpen())
+                {                    
+                    Brush bondBrush = Brushes.Black;
+                    if (ParentBond.Stereo == BondStereo.Hatch || ParentBond.Stereo==BondStereo.Wedge)
                     {
-                      bondBrush=  GetHatchBrush();
+                        _mainBondPen.Thickness = 0; //don't draw around the bonds
+                        if (ParentBond.Stereo == BondStereo.Wedge)
+                        {
+                          bondBrush=  GetHatchBrush();
+                        }
                     }
+                    else
+                    {
+                        bondBrush = new SolidColorBrush(Colors.Black);
+                    }
+                    dc.DrawGeometry(bondBrush, _mainBondPen, bondGeometry);
+                    dc.Close();
                 }
-                else
+            }
+            else
+            {
+                Point point1, point2, point3, point4;
+
+                Point? centroid = null;
+                if (ParentBond.IsCyclic())
                 {
-                    bondBrush = new SolidColorBrush(Colors.Black);
+                    centroid = ParentBond.PrimaryRing?.Centroid;
                 }
 
+                var bondLength = ParentBond.Model.XamlBondLength;
+                _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
+                    ParentBond.Placement, centroid, out point1,
+                    out point2, out point3, out point4);
+                if (startAtomGeometry != null)
+                {
+                    BondGeometry.AdjustStartPoint(ref point1, point2, startAtomGeometry);
+                    BondGeometry.AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                    _enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+                }
 
-                dc.DrawGeometry(bondBrush, _bondPen, bondGeometry);
-                dc.Close();
+                if (endAtomGeometry != null)
+                {
+                    BondGeometry.AdjustStartPoint(ref point4, point3, endAtomGeometry);
+                    BondGeometry.AdjustStartPoint(ref point2, point1, endAtomGeometry);
+                    _enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+                }
+
+                using (DrawingContext dc = RenderOpen())
+                {
+                    dc.DrawLine(_mainBondPen, point1, point2);
+                    dc.DrawLine(_subsidiaryBondPen, point3, point4);
+                    dc.Close();
+                }
             }
         }
     }

@@ -397,7 +397,7 @@ namespace Chem4Word.ViewModel
             return sg;
         }
 
-        private static void AdjustStartPoint(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
+        public static void AdjustStartPoint(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
         {
             Vector bondVector = endPoint - startPoint;
 

@@ -31,24 +31,24 @@ namespace Chem4Word.ACME.Controls
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
         }
 
+
+        /// <summary>
+        /// called during WPF layout phase
+        /// </summary>
+        /// <param name="constraint"></param>
+        /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
             Size size = new Size();
 
             Rect currentbounds = new Rect(new Size(0, 0));
 
-
             try
             {
-                
                 foreach (DrawingVisual element in chemicalVisuals.Values)
                 {
-
                     var bounds = element.ContentBounds;
-
                     currentbounds.Union(bounds);
-                    //measure desired size for each child
-                 
                 }
             }
             catch (Exception e)
@@ -68,8 +68,9 @@ namespace Chem4Word.ACME.Controls
 
         #region Drawing
 
-        //properties
+        #region Properties
 
+        //properties
         private DisplayViewModel _mychemistry;
 
         public DisplayViewModel Chemistry
@@ -81,6 +82,9 @@ namespace Chem4Word.ACME.Controls
                 DrawChemistry(_mychemistry);
             }
         }
+        #endregion
+
+       
 
         //overrides 
         protected override Visual GetVisualChild(int index)
@@ -92,6 +96,10 @@ namespace Chem4Word.ACME.Controls
 
         //bookkeeping collection
         private Dictionary<object, DrawingVisual> chemicalVisuals { get; }
+        /// <summary>
+        /// Draws the chemistry
+        /// </summary>
+        /// <param name="vm"></param>
         private void DrawChemistry(DisplayViewModel vm)
         {
             Clear();
@@ -103,7 +111,12 @@ namespace Chem4Word.ACME.Controls
             }
             InvalidateMeasure();
         }
-
+        /// <summary>
+        /// Draws a single molecule - and its children
+        /// </summary>
+        /// <param name="molecule"></param>
+        /// <param name="moleculeBounds"></param>
+        /// <returns></returns>
         private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
         {
             var bounds = moleculeBounds;
@@ -132,23 +145,28 @@ namespace Chem4Word.ACME.Controls
                   
                 }
 
-                var groupBox = new DrawingVisual();
-                using (DrawingContext dc = groupBox.RenderOpen())
-                {
-                    Brush bracketBrush =new SolidColorBrush(Colors.Gray);
-                    Pen bracketPen = new Pen(bracketBrush, 1d);
-                    //bracketPen.DashStyle = new DashStyle(new double[]{2,2});
-                    dc.DrawRectangle(null,bracketPen,groupRect);
-                    dc.Close();
-                }
-                AddVisualChild(groupBox);
-                AddLogicalChild(groupBox);
-                chemicalVisuals.Add(molecule,groupBox);
-             
-                bounds.Union(groupBox.ContentBounds);
-                
+                DrawGroupBox(molecule, groupRect, ref bounds);
             }
             return bounds;
+        }
+
+        private void DrawGroupBox(Molecule molecule, Rect groupRect, ref Rect bounds)
+        {
+            var groupBox = new DrawingVisual();
+            using (DrawingContext dc = groupBox.RenderOpen())
+            {
+                Brush bracketBrush = new SolidColorBrush(Colors.Gray);
+                Pen bracketPen = new Pen(bracketBrush, 1d);
+                //bracketPen.DashStyle = new DashStyle(new double[]{2,2});
+                dc.DrawRectangle(null, bracketPen, groupRect);
+                dc.Close();
+            }
+
+            AddVisualChild(groupBox);
+            AddLogicalChild(groupBox);
+            chemicalVisuals.Add(molecule, groupBox);
+
+            bounds.Union(groupBox.ContentBounds);
         }
 
         private Rect DrawAtom(Atom moleculeAtom,Rect moleculeBounds)
