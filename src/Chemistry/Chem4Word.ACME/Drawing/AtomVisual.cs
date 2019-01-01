@@ -345,6 +345,7 @@ namespace Chem4Word.ACME.Drawing
             isotopeOffsetVector = isotopeOffsetVector * rotator;
             Point isoCenter = mainAtomMetrics.Geocenter + isotopeOffsetVector;
             isotopeText.MeasureAtCenter(isoCenter);
+            isotopeText.Fill = Fill;
             isotopeText.DrawAtBottomLeft(isotopeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
             return isotopeText.TextMetrics;
         }
