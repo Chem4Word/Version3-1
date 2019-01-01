@@ -68,29 +68,30 @@ namespace Chem4Word.ViewModel
 
                 if (startAtomGeometry != null)
                 {
-                    var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, startAtomGeometry);
-                    while (!overlap.IsEmpty())
+                    var overlap = startAtomGeometry.FillContainsWithDetail(sg);
+                    
+                    while (overlap == IntersectionDetail.Intersects)
                     {
                         start += offset;
                         sg = new StreamGeometry();
 
                         ComputeWedge(sg, start, end, perpVector);
 
-                        overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, startAtomGeometry);
+                        overlap = startAtomGeometry.FillContainsWithDetail(sg);
                     }
                 }
 
                 if (endAtomGeometry != null)
                 {
-                    var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, endAtomGeometry);
-                    while (!overlap.IsEmpty())
+                    var overlap = endAtomGeometry.FillContainsWithDetail(sg);
+                    while (overlap == IntersectionDetail.Intersects)
                     {
                         end -= offset;
                         sg = new StreamGeometry();
 
                         ComputeWedge(sg, start, end, perpVector);
 
-                        overlap = new CombinedGeometry(GeometryCombineMode.Intersect, sg, endAtomGeometry);
+                        overlap = endAtomGeometry.FillContainsWithDetail(sg);
                     }
                 }
 
@@ -102,50 +103,7 @@ namespace Chem4Word.ViewModel
             }
         }
 
-        /// <summary>
-        /// Common to both edge and hatch bonds.  The filling of this shape
-        /// is done purely in XAML through styles
-        /// </summary>
-        /// <param name="startPoint">Point object where the bond starts</param>
-        /// <param name="angle">The angle from ScreenNorth:  clockwise +ve, anticlockwise -ve</param>
-        /// <param name="bondlength">How long the bond is in pixels</param>
-        /// <returns></returns>
-        public static System.Windows.Media.Geometry WedgeBondGeometry(Point startPoint, double angle, double bondlength)
-        {
-            //List<PathSegment> wedgesegments = new List<PathSegment>(4);
-
-            //get a right sized vector first
-            Vector bondVector = BasicGeometry.ScreenNorth;
-
-            bondVector.Normalize();
-            bondVector = bondVector * bondlength;
-
-            //then rotate it to the proper angle
-            Matrix rotator = new Matrix();
-            rotator.Rotate(angle);
-            bondVector = bondVector * rotator;
-
-            //then work out the points at the thick end of the wedge
-            var perpVector = bondVector.Perpendicular();
-            perpVector.Normalize();
-            perpVector *= bondVector.Length * Globals.BondOffsetPecentage;
-
-            Point point2 = startPoint + bondVector + perpVector;
-            Point point3 = startPoint + bondVector - perpVector;
-            //and draw it
-            StreamGeometry sg = new StreamGeometry();
-
-            using (StreamGeometryContext sgc = sg.Open())
-            {
-                sgc.BeginFigure(startPoint, true, true);
-                sgc.LineTo(point2, true, true);
-                sgc.LineTo(point3, true, true);
-                sgc.Close();
-            }
-            sg.Freeze();
-
-            return sg;
-        }
+        
 
         /// <summary>
         /// Defines the three parallel lines of a Triple bond.
@@ -228,16 +186,16 @@ namespace Chem4Word.ViewModel
             enclosingPoly = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid, out point1, out point2, out point3, out point4);
             if (startAtomGeometry != null)
             {
-                AdjustStartPoint(ref point1, point4, startAtomGeometry);
-                AdjustStartPoint(ref point2, point3, startAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point3, point4};
+                AdjustStartPoint(ref point1, point2, startAtomGeometry);
+                AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                enclosingPoly = new List<Point> {point1, point2, point4, point3};
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustStartPoint(ref point4, point1, endAtomGeometry);
-                AdjustStartPoint(ref point3, point2, endAtomGeometry);
-                enclosingPoly = new List<Point> { point1, point2, point3, point4 };
+                AdjustStartPoint(ref point4, point3, endAtomGeometry);
+                AdjustStartPoint(ref point2, point1, endAtomGeometry);
+                enclosingPoly = new List<Point> { point1, point2, point4, point3};
             }
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())

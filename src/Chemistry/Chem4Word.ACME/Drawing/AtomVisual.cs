@@ -490,15 +490,16 @@ namespace Chem4Word.ACME.Drawing
                 {
 
                     RenderAtom(dc);
-#if DEBUG
-                    if (AtomSymbol != "")
+                    //debugging code - uncomment to show the convex hull
+//#if DEBUG
+//                    if (AtomSymbol != "")
 
-                    {
-                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
-                        areaBrush.Opacity = 0.33;
-                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
-                    }
-#endif
+//                    {
+//                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
+//                        areaBrush.Opacity = 0.33;
+//                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
+//                    }
+//#endif
 
                    
 
