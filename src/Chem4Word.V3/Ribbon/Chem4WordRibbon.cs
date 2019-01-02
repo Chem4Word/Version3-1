@@ -30,6 +30,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.View;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -253,9 +254,15 @@ namespace Chem4Word
                             CMLConverter conv = new CMLConverter();
                             Model.Model model = conv.Import(cml);
 
-                            if (model.Molecules.Count > 1)
+                            if (model.Molecules.Count > 0)
                             {
-                                if (model.AllAtoms.Count > 0)
+                                int allAtomsCount = 0;
+                                foreach (var mol in model.Molecules)
+                                {
+                                    allAtomsCount = mol.Atoms.Count;
+                                }
+
+                                if (allAtomsCount > 0)
                                 {
                                     // Add 2D menu Item
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
@@ -288,7 +295,7 @@ namespace Chem4Word
                                 RibbonSeparator separator = this.Factory.CreateRibbonSeparator();
                                 ShowAsMenu.Items.Add(separator);
 
-                                if (mol.AllAtoms.Count > 0)
+                                if (mol.Atoms.Count > 0)
                                 {
                                     // Concise Formula
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
