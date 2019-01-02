@@ -104,10 +104,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.ViewModel", "Chem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Editor.ACME", "PlugIns\Editors\Chem4Word.Editor.ACME\Chem4Word.Editor.ACME.csproj", "{D81EFA27-A4EF-4F75-B5D8-9BB06AB76091}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{53F5ADDD-80C3-4FE4-88A1-B04239474E4B}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\DeepClean.ps1 = Scripts\DeepClean.ps1
+		Scripts\Install-Dev-Certificate.ps1 = Scripts\Install-Dev-Certificate.ps1
+		Scripts\SetAssemblyVersion.ps1 = Scripts\SetAssemblyVersion.ps1
+		Scripts\SignAssembly.ps1 = Scripts\SignAssembly.ps1
+		Scripts\SignFiles.cmd = Scripts\SignFiles.cmd
+	EndProjectSection
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
