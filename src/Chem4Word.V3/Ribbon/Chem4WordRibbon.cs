@@ -275,17 +275,20 @@ namespace Chem4Word
                                     ribbonButton.Click += OnRenderAsButtonClick;
                                     ShowAsMenu.Items.Add(ribbonButton);
 
-                                    // Concise Formula
-                                    ribbonButton = Factory.CreateRibbonButton();
-                                    ribbonButton.Tag = "c0";
-                                    if (prefix.Equals(ribbonButton.Tag))
+                                    if (model.Molecules.Count > 1)
                                     {
-                                        ribbonButton.Image = Properties.Resources.SmallTick;
+                                        // Overall Concise Formula
+                                        ribbonButton = Factory.CreateRibbonButton();
+                                        ribbonButton.Tag = "c0";
+                                        if (prefix.Equals(ribbonButton.Tag))
+                                        {
+                                            ribbonButton.Image = Properties.Resources.SmallTick;
+                                        }
+                                        ribbonButton.Label = model.ConciseFormula;
+                                        ribbonButton.SuperTip = "Render as overall concise formula";
+                                        ribbonButton.Click += OnRenderAsButtonClick;
+                                        ShowAsMenu.Items.Add(ribbonButton);
                                     }
-                                    ribbonButton.Label = model.ConciseFormula;
-                                    ribbonButton.SuperTip = "Render as concise formula";
-                                    ribbonButton.Click += OnRenderAsButtonClick;
-                                    ShowAsMenu.Items.Add(ribbonButton);
                                 }
                             }
 
