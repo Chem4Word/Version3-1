@@ -97,8 +97,14 @@ namespace Chem4Word.ACME
 
         public double ChemistryHeight
         {
-            get { return (double)GetValue(ChemistryHeightProperty); }
-            set { SetValue(ChemistryHeightProperty, value); }
+            get
+            {
+                return (double)GetValue(ChemistryHeightProperty);
+            }
+            set
+            {
+                SetValue(ChemistryHeightProperty, value);
+            }
         }
 
         public static readonly DependencyProperty ChemistryHeightProperty = DependencyProperty.Register(
