@@ -34,28 +34,14 @@ namespace Chem4Word.ACME.Controls
         {
             Size size = new Size();
 
-            Rect currentbounds = new Rect(new Size(0, 0));
-
-            try
-            {
-                foreach (DrawingVisual element in chemicalVisuals.Values)
-                {
-                    var bounds = element.ContentBounds;
-                    currentbounds.Union(bounds);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-
-            size = currentbounds.Size;
+            size = GetOverhang();
 
             // add margin
-            size.Width += 10;
-            size.Height += 10;
+            //size.Width += 10;
+            //size.Height += 10;
             return size;
         }
+
 
         #region Drawing
 
@@ -76,6 +62,49 @@ namespace Chem4Word.ACME.Controls
 
         #endregion Properties
 
+        #region DPs
+
+        public Thickness Overhang
+        {
+            get { return (Thickness)GetValue(OverhangProperty); }
+            set { SetValue(OverhangProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Overhang.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty OverhangProperty =
+            DependencyProperty.Register("Overhang", typeof(Thickness), typeof(Display), new PropertyMetadata(default(Thickness)));
+
+        #endregion
+        #region Methods
+
+
+        private Size GetOverhang()
+        {
+            var currentbounds = GetBoundingBox();
+            return currentbounds.Size;
+        }
+
+        private Rect GetBoundingBox()
+        {
+            Rect currentbounds = new Rect(new Size(0, 0));
+
+            try
+            {
+                foreach (DrawingVisual element in chemicalVisuals.Values)
+                {
+                    var bounds = element.ContentBounds;
+                    currentbounds.Union(bounds);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
+
+            return currentbounds;
+        }
+
+        #endregion
         //overrides
         protected override Visual GetVisualChild(int index)
         {
@@ -99,6 +128,9 @@ namespace Chem4Word.ACME.Controls
             {
                 DrawMolecule(molecule, Rect.Empty);
             }
+
+            var bb = GetBoundingBox();
+            Overhang = new Thickness(-Math.Min(0d, bb.Left),Math.Min(0d, bb.Top),0d, 0d);
             InvalidateMeasure();
         }
 
