@@ -5,8 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Drawing;
 using Chem4Word.Core;
-using Chem4Word.Model.Converters;
+using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model.Converters.MDL;
+using Chem4Word.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,10 +17,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.MDL;
-using Chem4Word.ViewModel;
 using ChemistryModel = Chem4Word.Model.Model;
 
 namespace Chem4Word.ACME
@@ -144,8 +143,8 @@ namespace Chem4Word.ACME
                 {
                     chemistryModel.RescaleForXaml(true);
 
-                      CurrentViewModel=  new ViewModel.DisplayViewModel(chemistryModel);
-                      DrawChemistry(CurrentViewModel);
+                    CurrentViewModel = new ViewModel.DisplayViewModel(chemistryModel);
+                    DrawChemistry(CurrentViewModel);
                 }
                 else
                 {
@@ -186,7 +185,6 @@ namespace Chem4Word.ACME
 
         // collection to keep track of the visuals
         private Dictionary<object, ChemicalVisual> chemicalVisuals;
-
 
         #endregion Drawing Code
     }

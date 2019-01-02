@@ -5,22 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Media;
-using System.Xml;
-using System.Linq;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model;
 using Chem4Word.ViewModel;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -30,7 +24,6 @@ namespace Chem4Word.ACME.Controls
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
         }
-
 
         /// <summary>
         /// called during WPF layout phase
@@ -57,14 +50,12 @@ namespace Chem4Word.ACME.Controls
             }
 
             size = currentbounds.Size;
-            
+
             // add margin
             size.Width += 10;
             size.Height += 10;
             return size;
         }
-
-
 
         #region Drawing
 
@@ -78,24 +69,24 @@ namespace Chem4Word.ACME.Controls
             get { return _mychemistry; }
             set
             {
-                _mychemistry = value; 
+                _mychemistry = value;
                 DrawChemistry(_mychemistry);
             }
         }
-        #endregion
 
-       
+        #endregion Properties
 
-        //overrides 
+        //overrides
         protected override Visual GetVisualChild(int index)
         {
             return chemicalVisuals.ElementAt(index).Value;
         }
-      
+
         protected override int VisualChildrenCount => chemicalVisuals.Count;
 
         //bookkeeping collection
         private Dictionary<object, DrawingVisual> chemicalVisuals { get; }
+
         /// <summary>
         /// Draws the chemistry
         /// </summary>
@@ -107,10 +98,10 @@ namespace Chem4Word.ACME.Controls
             foreach (Molecule molecule in vm.Model.Molecules)
             {
                 DrawMolecule(molecule, Rect.Empty);
-
             }
             InvalidateMeasure();
         }
+
         /// <summary>
         /// Draws a single molecule - and its children
         /// </summary>
@@ -120,11 +111,10 @@ namespace Chem4Word.ACME.Controls
         private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
         {
             var bounds = moleculeBounds;
-           
 
             foreach (Atom moleculeAtom in molecule.Atoms)
             {
-                bounds= DrawAtom(moleculeAtom, bounds);
+                bounds = DrawAtom(moleculeAtom, bounds);
             }
 
             foreach (Bond moleculeBond in molecule.Bonds)
@@ -138,11 +128,9 @@ namespace Chem4Word.ACME.Controls
                 Rect groupRect = Rect.Empty;
                 foreach (Molecule child in molecule.Molecules)
                 {
-
                     var childRect = DrawMolecule(child, bounds);
-                  
+
                     groupRect.Union(childRect);
-                  
                 }
 
                 DrawGroupBox(molecule, groupRect, ref bounds);
@@ -169,7 +157,7 @@ namespace Chem4Word.ACME.Controls
             bounds.Union(groupBox.ContentBounds);
         }
 
-        private Rect DrawAtom(Atom moleculeAtom,Rect moleculeBounds)
+        private Rect DrawAtom(Atom moleculeAtom, Rect moleculeBounds)
         {
             var bounds = moleculeBounds;
             var atomVisual = new AtomVisual(moleculeAtom);
@@ -180,9 +168,8 @@ namespace Chem4Word.ACME.Controls
             atomVisual.Render();
             chemicalVisuals.Add(moleculeAtom, atomVisual);
             AddVisual(atomVisual);
-           
+
             bounds.Union(atomVisual.ContentBounds);
-           
 
             return bounds;
         }
@@ -196,9 +183,9 @@ namespace Chem4Word.ACME.Controls
             bondVisual.Render();
             chemicalVisuals.Add(moleculeBond, bondVisual);
             AddVisual(bondVisual);
-          
+
             bounds.Union(bondVisual.ContentBounds);
-            
+
             return bounds;
         }
 
@@ -224,5 +211,6 @@ namespace Chem4Word.ACME.Controls
             AddLogicalChild(visual);
         }
     }
-    #endregion
+
+    #endregion Drawing
 }

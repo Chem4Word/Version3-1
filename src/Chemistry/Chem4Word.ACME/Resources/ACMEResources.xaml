@@ -9,11 +9,13 @@
         <ResourceDictionary Source="Brushes.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
+    <SolidColorBrush x:Key="Chem4WordBrush"
+        Color="#2A579A" />
 
     <model:ElementConverter x:Key="ElementConverter" />
 
-    <Style x:Key="TripleBondStyle" TargetType="Path">
+    <Style x:Key="TripleBondStyle"
+        TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
         <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
@@ -21,7 +23,8 @@
         <Setter Property="Data" Value="M 0,10 h 25 M 0,4 h 25 M 0,7 h 25 Z" />
     </Style>
 
-    <Style x:Key="DoubleBondStyle" TargetType="Path">
+    <Style x:Key="DoubleBondStyle"
+        TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
         <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
@@ -29,7 +32,8 @@
         <Setter Property="Data" Value="M 0,9 h 25 M 0,5 h 25 Z" />
     </Style>
 
-    <Style x:Key="SingleBondStyle" TargetType="Path">
+    <Style x:Key="SingleBondStyle"
+        TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
         <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
@@ -37,7 +41,8 @@
         <Setter Property="Data" Value="M 0,7 h 25 Z" />
     </Style>
 
-    <Style x:Key="WedgeBondStyle" TargetType="Path">
+    <Style x:Key="WedgeBondStyle"
+        TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
         <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
@@ -70,7 +75,8 @@
         <Setter Property="Stroke" Value="{x:Null}" />
     </Style>
 
-    <Style x:Key="BenzeneStyle" TargetType="Path">
+    <Style x:Key="BenzeneStyle"
+        TargetType="Path">
         <Setter Property="Tag" Value="Benzene" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
@@ -78,7 +84,8 @@
         <Setter Property="Data" Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z M 5.50480947161671,8.25 L 12,4.5 M 18.4951905283833,8.25 L 18.4951905283833,15.75 M 12,19.5 L 5.50480947161671, 15.75" />
     </Style>
 
-    <Style x:Key="CyclohexStyle" TargetType="Path">
+    <Style x:Key="CyclohexStyle"
+        TargetType="Path">
         <Setter Property="Tag" Value="Cyclohexane" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
@@ -86,7 +93,8 @@
         <Setter Property="Data" Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z" />
     </Style>
 
-    <Style x:Key="CyclopentStyle" TargetType="Path">
+    <Style x:Key="CyclopentStyle"
+        TargetType="Path">
         <Setter Property="Tag" Value="Cyclopentane" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
@@ -94,7 +102,8 @@
         <Setter Property="Data" Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z" />
     </Style>
 
-    <Style x:Key="CyclopentadieneStyle" TargetType="Path">
+    <Style x:Key="CyclopentadieneStyle"
+        TargetType="Path">
         <Setter Property="Tag" Value="Cyclopentadiene" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
@@ -107,7 +116,8 @@
     <graphics:RegularPolygon x:Key="Octagon"
         PointCount="8"
         SideLength="8.0" />
-    <Style x:Key="CycloheptaneStyle" TargetType="Path">
+    <Style x:Key="CycloheptaneStyle"
+        TargetType="Path">
         <Setter Property="Tag" Value="Cycloheptane" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
@@ -120,7 +130,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="CyclooctaneStyle" TargetType="Path">
+    <Style x:Key="CyclooctaneStyle"
+        TargetType="Path">
         <Setter Property="Tag" Value="Cyclooctane" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
@@ -132,7 +143,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style x:Key="ChainStyle" TargetType="Path">
+    <Style x:Key="ChainStyle"
+        TargetType="Path">
         <Setter Property="Height" Value="25" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
         <Setter Property="Width" Value="25" />
@@ -140,7 +152,8 @@
     </Style>
 
     <!--  used to populate the bond dropdown combo  -->
-    <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
+    <x:Array x:Key="BondItems"
+        Type="{x:Type viewModel:BondOption}">
         <!--  modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs  -->
         <viewModel:BondOption
             DisplayStyle="{StaticResource SingleBondStyle}"
@@ -169,37 +182,60 @@
             Stereo="Hatch" />
     </x:Array>
 
-    <x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
-        <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">
+    <x:Array x:Key="AtomItems"
+        Type="{x:Type viewModel:AtomOption}">
+        <viewModel:AtomOption
+            Element="C"
+            Foreground="{StaticResource CBrush}">
             C
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">
+        <viewModel:AtomOption
+            Element="H"
+            Foreground="{StaticResource HBrush}">
             H
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">
+        <viewModel:AtomOption
+            Element="N"
+            Foreground="{StaticResource NBrush}">
             N
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">
+        <viewModel:AtomOption
+            Element="O"
+            Foreground="{StaticResource OBrush}">
             O
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">
+        <viewModel:AtomOption
+            Element="P"
+            Foreground="{StaticResource PBrush}">
             P
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">
+        <viewModel:AtomOption
+            Element="S"
+            Foreground="{StaticResource SBrush}">
             S
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">
+        <viewModel:AtomOption
+            Element="Cl"
+            Foreground="{StaticResource ClBrush}">
             Cl
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">
+        <viewModel:AtomOption
+            Element="Br"
+            Foreground="{StaticResource BrBrush}">
             Br
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">
+        <viewModel:AtomOption
+            Element="I"
+            Foreground="{StaticResource IBrush}">
             I
         </viewModel:AtomOption>
-        <viewModel:AtomOption Element="R" Foreground="Black">
+        <viewModel:AtomOption
+            Element="R"
+            Foreground="Black">
             <TextBlock>
-                R<Run BaselineAlignment="Subscript" FontSize="8">
+                R<Run
+                    BaselineAlignment="Subscript"
+                    FontSize="8">
                     1
                 </Run>
             </TextBlock>
@@ -207,12 +243,16 @@
     </x:Array>
     <!--  button paths  -->
 
-    <Geometry x:Key="SelectPath" xml:space="preserve">F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z </Geometry>
-    <Geometry x:Key="DrawPath" xml:space="preserve">F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
+    <Geometry x:Key="SelectPath"
+        xml:space="preserve">F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z </Geometry>
+    <Geometry x:Key="DrawPath"
+        xml:space="preserve">F1 M 21.5367,46.0076L 19,57L 29.3932,54.6016C 28.0768,50.6411 25.8696,47.0904 21.5367,46.0076 Z M 39,53L 69.4259,22.5741C 67.0871,17.8183
                               63.7005,13.6708 59.5673,10.4327L 31,39L 31,45L 39,45L 39,53 Z M 29,38L 57.8385,9.1615C 56.438,8.19625 54.9638,7.33038 53.4259,6.57407L 24,36L 24,38L 29,38 Z </Geometry>
-    <Geometry x:Key="DeletePath" xml:space="preserve">M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
+    <Geometry x:Key="DeletePath"
+        xml:space="preserve">M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95
                               2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z</Geometry>
-    <Geometry x:Key="CutPath" xml:space="preserve">F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
+    <Geometry x:Key="CutPath"
+        xml:space="preserve">F1 M 26,42C 27.1737,42 28.2799,42.3095 29.2514,42.8564L
                                 33.538,38.5699L 36.9626,42.1932L 32.4905,46.6858C 32.8191,47.5548 33,48.5048 33,49.5C 33,53.6421 29.866,57 26,57C 22.134,57 19,53.6421
                                 19,49.5C 19,45.3579 22.134,42 26,42 Z M 26,45C 23.7908,45 22,47.0147 22,49.5C 22,51.9853 23.7908,54 26,54C 28.2091,54 30,51.9853
                                 30,49.5C 30,47.0147 28.2091,45 26,45 Z M 50,42C 53.866,42 57,45.3579 57,49.5C 57,53.6421 53.866,57 50,57C 46.134,57 43,53.6421 43,49.5C
@@ -222,17 +262,20 @@
                                 45.5581,31.9333 46.8205,30.213C 49.9109,26.0015 50.51,23.7154 50.8952,21.2126L 52,20.1079C 51.6047,22.8602 51.2095,25.6125 47.8643,30.1361 Z
                                 M 39.0074,33.1005L 50.2564,21.8515C 49.8163,23.9301 48.9562,26.0005 46.4256,29.4492C 45.0997,31.2561 43.5411,33.3404 41.5003,35.5935L 39.0074,33.1005 Z
                                 M 35.8034,42.4922L 35.3653,42.0251L 31.9263,45.5067C 32.0391,45.6984 32.1441,45.8961 32.2406,46.099L 35.8034,42.4922 Z </Geometry>
-    <Geometry x:Key="CopyPath" xml:space="preserve">F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
+    <Geometry x:Key="CopyPath"
+        xml:space="preserve">F1 M 27,20L 38.75,20L 37.75,19L 24,19L 24,50L 27,50L 27,20 Z M 46.25,20L 59,32.75L
                               59,59L 27,59L 27,54L 20,54L 20,15L 39.25,15L 44.25,20L 46.25,20 Z M 31,24L 31,55L 55,55L 55,37L 42,37L 42,24L 31,24 Z M 46,25.25L 46,33L 53.75,33L
                               46,25.25 Z </Geometry>
-    <Geometry x:Key="PastePath" xml:space="preserve">F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001
+    <Geometry x:Key="PastePath"
+        xml:space="preserve">F1 M 34.0001,60C 32.3433,60 31.0001,58.6569 31.0001,57L 31.0001,54.0001L 23,54.0001C 21.3431,54.0001
                                 20,52.6569 20,51.0001L 20,24.0001C 20,22.3432 21.3431,21.0001 23,21.0001L 26.5001,20.9999C 26.5001,20.9999
                                 27.4999,20.8807 27.4999,19.5C 27.4999,18.1193 29.1191,17 30.4999,17L 38.4998,17.0001C 39.8798,17.0001 41.4988,18.6176 41.5,19.9979L
                                 41.4998,19.5024C 41.5009,20.881 42.5,21 42.5,21L 46,21.0001C 47.6569,21.0001 49,22.3432 49,24.0001L 49,31L 56,38L 56.0001,57C
                                 56.0001,58.6569 54.657,60 53.0001,60L 34.0001,60 Z M 33.9999,31.0001L 33.9999,57.0001L 53.0001,57L 53.0001,43L 42.0002,43L 42.0001,31L 33.9999,31.0001 Z
                                 M 53,40.0001L 45,32.0001L 45.0001,40L 53,40.0001 Z M 28.5,25L 40.5,25C 40.5,25 39.4998,23.8809 39.4998,22.5002C 39.4998,21.1194
                                 38.3805,20.0002 36.9998,20.0002L 31.9998,20.0002C 30.6191,20.0002 29.4998,21.1194 29.4998,22.5002C 29.4998,23.8809 28.5,25 28.5,25 Z </Geometry>
-    <Geometry x:Key="UndoPath" xml:space="preserve">F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
+    <Geometry x:Key="UndoPath"
+        xml:space="preserve">F1 M 52.7514,25.076C 53.4111,25.7534 54.0258,26.4933 54.5953,
                               27.296C 55.1649,28.0987 55.6564,28.9607 56.0698,29.8821C 56.4832,30.8035 56.8065,31.7766 57.0396,32.8014C 57.2727,33.8262 57.3892,
                               34.8883 57.3892,35.9878C 57.3892,37.0566 57.276,38.1517 57.0495,39.2733C 56.823,40.3948 56.4491,41.5394 55.928,42.7071C 55.4068,
                               43.8748 54.713,45.07 53.8465,46.2927C 52.9801,47.5154 51.9069,48.7601 50.6271,50.0267C 50.2137,50.4358 49.7431,50.902 49.2153,
@@ -248,7 +291,8 @@
                               24.8275 33.6194,24.1194C 34.6926,23.4113 35.7646,22.8616 36.8356,22.4701C 37.9065,22.0787 38.972,21.8148 40.0319,
                               21.6785C 41.0919,21.5421 42.1079,21.474 43.0799,21.474C 44.087,21.474 45.0579,21.563 45.9925,21.7411C 46.9271,21.9193 47.8068,22.17
                               48.6314,22.4932C 49.4561,22.8165 50.2148,23.198 50.9075,23.6378C 51.6002,24.0777 52.2148,24.5571 52.7514,25.076 Z </Geometry>
-    <Geometry x:Key="RedoPath" xml:space="preserve">F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
+    <Geometry x:Key="RedoPath"
+        xml:space="preserve">F1 M 23.2486,25.076C 22.5889,25.7534 21.9742,26.4933 21.4047,27.296C 20.8351,28.0987 20.3436,28.9607 19.9302,
                               29.8821C 19.5168,30.8035 19.1935,31.7766 18.9604,32.8014C 18.7273,33.8262 18.6107,34.8883 18.6107,35.9878C 18.6107,
                               37.0566 18.724,38.1517 18.9505,39.2733C 19.177,40.3948 19.5508,41.5394 20.072,42.7071C 20.5932,43.8748 21.287,
                               45.07 22.1535,46.2927C 23.0199,47.5154 24.093,48.7601 25.3729,50.0267C 25.7863,50.4358 26.2569,50.902 26.7847,51.4253C
@@ -264,7 +308,8 @@
                               44.4916,25.7446 43.4537,24.8275 42.3805,24.1194C 41.3074,23.4113 40.2353,22.8616 39.1644,22.4701C 38.0934,22.0787 37.028,21.8148
                               35.968,21.6785C 34.9081,21.5421 33.8921,21.474 32.9201,21.474C 31.9129,21.474 30.942,21.563 30.0074,21.7411C 29.0728,21.9193 28.1932,22.17
                               27.3686,22.4932C 26.5439,22.8165 25.7852,23.198 25.0925,23.6378C 24.3998,24.0777 23.7852,24.5571 23.2486,25.076 Z </Geometry>
-    <Geometry x:Key="SavePath" xml:space="preserve">M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
+    <Geometry x:Key="SavePath"
+        xml:space="preserve">M7.9999928,17.00001L7.9999928,30 23.999993,30 23.999993,17.00001z M11.999978,2.0000334L11.999978,10.000033
                               23.999978,10.000033 23.999978,2.0000334 20.999978,2.0000334 20.999978,8.0000334 18.999978,8.0000334
                               18.999978,2.0000334z M2.5,2C2.224,2,2,2.2249994,2,2.5L2,29.5C2,29.775,2.224,30,2.5,30L5.9999927,30
                               5.9999927,15.000011 25.999993,15.000011 25.999993,30 29.5,30C29.776,30,30,29.775,30,29.5L30,4.566
@@ -282,7 +327,8 @@
         Opacity="0.8"
         Color="{Binding Source={x:Static SystemColors.HighlightBrush}, Path=Color}" />
 
-    <Style x:Key="GrabHandleStyle" TargetType="Thumb">
+    <Style x:Key="GrabHandleStyle"
+        TargetType="Thumb">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
@@ -291,7 +337,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Rectangle Fill="{StaticResource GrabHandleFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" />
+                    <Rectangle
+                        Fill="{StaticResource GrabHandleFillBrush}"
+                        Stroke="{StaticResource GrabHandleBorderBrush}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -303,7 +351,8 @@
         <Setter Property="Opacity" Value="0.15" />
     </Style>
 
-    <Style x:Key="RotateThumb" TargetType="Thumb">
+    <Style x:Key="RotateThumb"
+        TargetType="Thumb">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />

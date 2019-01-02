@@ -5,55 +5,48 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-
-using System.Collections.Generic;   
-using System.Net;
-using System.Windows;
-using System.Windows.Automation.Peers;
-using System.Windows.Media;
 using Chem4Word.Model;
 using Chem4Word.Model.Enums;
 using Chem4Word.ViewModel;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Drawing
 {
-    public class BondVisual: ChemicalVisual
+    public class BondVisual : ChemicalVisual
     {
         #region Properties
 
-            public Bond ParentBond { get; }
-            public double BondThickness { get; set; }
+        public Bond ParentBond { get; }
+        public double BondThickness { get; set; }
 
-
-        #endregion
+        #endregion Properties
 
         #region Fields
-            private Pen _mainBondPen;
-            private Pen _subsidiaryBondPen;
-            private List<Point> _enclosingPoly = new List<Point>();
-        #endregion
-      
+
+        private Pen _mainBondPen;
+        private Pen _subsidiaryBondPen;
+        private List<Point> _enclosingPoly = new List<Point>();
+
+        #endregion Fields
 
         public BondVisual(Bond bond)
         {
-           
-
             ParentBond = bond;
-           
         }
 
-        public Geometry GetBondGeometry(Point startPoint, Point endPoint, 
-            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
+        public Geometry GetBondGeometry(Point startPoint, Point endPoint,
+            Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
             var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
 
-       
             //check to see if it's a wedge or a hatch yet
             if (ParentBond.Stereo == BondStereo.Wedge | ParentBond.Stereo == BondStereo.Hatch)
             {
-                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength,startAtomGeometry,endAtomGeometry);
+                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength, startAtomGeometry, endAtomGeometry);
             }
 
             if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
@@ -104,34 +97,36 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
-        Brush GetHatchBrush()
+
+        private Brush GetHatchBrush()
+        {
+            Brush bondBrush;
+            bondBrush = new LinearGradientBrush
             {
-                Brush bondBrush;
-                bondBrush = new LinearGradientBrush
-                {
-                    MappingMode = BrushMappingMode.Absolute,
-                    SpreadMethod = GradientSpreadMethod.Repeat,
-                    StartPoint = new Point(50, 0),
-                    EndPoint = new Point(50, 5),
-                    GradientStops = new GradientStopCollection()
+                MappingMode = BrushMappingMode.Absolute,
+                SpreadMethod = GradientSpreadMethod.Repeat,
+                StartPoint = new Point(50, 0),
+                EndPoint = new Point(50, 5),
+                GradientStops = new GradientStopCollection()
                     {
                         new GradientStop {Offset = 0d, Color = Colors.Black},
                         new GradientStop {Offset = 0.25d, Color = Colors.Black},
                         new GradientStop {Offset = 0.25d, Color = Colors.Transparent},
                         new GradientStop {Offset = 0.30, Color = Colors.Transparent}
                     },
-                    RelativeTransform = new ScaleTransform
-                    {
-                        ScaleX = ParentBond.HatchScaling,
-                        ScaleY = ParentBond.HatchScaling
-                    },
-                    Transform = new RotateTransform
-                    {
-                        Angle = ParentBond.Angle
-                    }
-                };
-                return bondBrush;
-            }
+                RelativeTransform = new ScaleTransform
+                {
+                    ScaleX = ParentBond.HatchScaling,
+                    ScaleY = ParentBond.HatchScaling
+                },
+                Transform = new RotateTransform
+                {
+                    Angle = ParentBond.Angle
+                }
+            };
+            return bondBrush;
+        }
+
         public override void Render()
         {
             Point startPoint, endPoint;
@@ -140,8 +135,8 @@ namespace Chem4Word.ACME.Drawing
             endPoint = ParentBond.EndAtom.Position;
             Geometry bondGeometry = null;
             Vector bondVector = endPoint - startPoint;
-            var startAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
-            var endAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
+            var startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
+            var endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
 
             bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
 
@@ -160,17 +155,17 @@ namespace Chem4Word.ACME.Drawing
             {
                 _subsidiaryBondPen.DashStyle = DashStyles.Dash;
             }
-            if (ParentBond.OrderValue!=1.5)
+            if (ParentBond.OrderValue != 1.5)
             {
                 using (DrawingContext dc = RenderOpen())
-                {                    
+                {
                     Brush bondBrush = Brushes.Black;
-                    if (ParentBond.Stereo == BondStereo.Hatch || ParentBond.Stereo==BondStereo.Wedge)
+                    if (ParentBond.Stereo == BondStereo.Hatch || ParentBond.Stereo == BondStereo.Wedge)
                     {
                         _mainBondPen.Thickness = 0; //don't draw around the bonds
                         if (ParentBond.Stereo == BondStereo.Wedge)
                         {
-                          bondBrush=  GetHatchBrush();
+                            bondBrush = GetHatchBrush();
                         }
                     }
                     else

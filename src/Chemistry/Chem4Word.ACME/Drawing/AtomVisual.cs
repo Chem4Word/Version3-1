@@ -5,21 +5,20 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-
+using Chem4Word.Model;
+using Chem4Word.Model.Geometry;
+using Chem4Word.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
-using Chem4Word.View;
 using static Chem4Word.View.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
 {
-    public class AtomVisual:  ChemicalVisual
+    public class AtomVisual : ChemicalVisual
     {
         #region Fields
 
@@ -27,22 +26,24 @@ namespace Chem4Word.ACME.Drawing
 
         private static double MaskOffsetWidth = 0;
         private Geometry _hullGeometry;
-        
+
         public double BondThickness { get; set; }
 
-        #endregion
+        #endregion private fields
 
         #region Collections
+
         //list of points that make up the hull of the shape
         private List<Point> _shapeHull;
 
+        #endregion Collections
 
-        #endregion
-        #endregion
+        #endregion Fields
 
         #region Nested Classes
 
         #region Text Classes
+
         private class SubscriptedGroup
         {
             //how many atoms in the group
@@ -187,22 +188,19 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
+        #endregion Text Classes
 
-        #endregion
+        #endregion Nested Classes
 
-        #endregion
-      
         public AtomVisual(Atom atom)
         {
             ParentAtom = atom;
-
-
         }
 
         #region Properties
 
-        public Atom ParentAtom { get;  }
-       
+        public Atom ParentAtom { get; }
+
         #region Visual Properties
 
         public Point Position { get; set; }
@@ -215,13 +213,14 @@ namespace Chem4Word.ACME.Drawing
 
         public List<Point> Hull => _shapeHull;
 
-        #endregion
+        #endregion Visual Properties
 
-        #endregion
+        #endregion Properties
 
         #region Methods
 
         #region Rendering
+
         /// <summary>
         /// Draws a background mask for the atom symbol
         /// </summary>
@@ -385,9 +384,7 @@ namespace Chem4Word.ACME.Drawing
                         {boundingBox.BottomLeft, boundingBox.TopLeft, boundingBox.TopRight, boundingBox.BottomRight}
                 };
             }
-
         }
-
 
         private void RenderAtom(DrawingContext drawingContext)
         {
@@ -419,7 +416,7 @@ namespace Chem4Word.ACME.Drawing
             }
 
             //stage 2.  grab the main atom metrics br drawing it
-         
+
             var mainAtomMetrics = DrawSelf(drawingContext);
 
             //stage 3:  measure up the hydrogens
@@ -431,21 +428,15 @@ namespace Chem4Word.ACME.Drawing
                 subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", GlyphText.SymbolSize);
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
-                subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
+                subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
                 hydrogenPoints = hydrogenMetrics.FlattenedPath;
                 _shapeHull.AddRange(hydrogenPoints);
-                
             }
-
-   
-            
-           
 
             //then do the drawing of the main symbol (again)
             //mainAtomMetrics = DrawSelf(drawingContext);
 
             //stage 5:  draw the hydrogens
-          
 
             // Diag: Show Points
             //ShowPoints(symbolPoints, drawingContext);
@@ -471,18 +462,45 @@ namespace Chem4Word.ACME.Drawing
             {
                 //sort the points properly before doing a hull calculation
                 var sortedHull = (from Point p in _shapeHull
-                    orderby p.X, p.Y descending
-                    select p).ToList();
+                                  orderby p.X, p.Y descending
+                                  select p).ToList();
 
                 _shapeHull = Geometry<Point>.GetHull(sortedHull, p => p);
             }
         }
+
+        private void ShowPoints(List<Point> points, DrawingContext drawingContext)
+        {
+            // Show points for debugging
+            SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
+            SolidColorBrush otherPoints = new SolidColorBrush(Colors.Blue);
+            SolidColorBrush lastPoint = new SolidColorBrush(Colors.Green);
+            int i = 0;
+            int max = points.Count - 1;
+            foreach (var point in points)
+            {
+                if (i > 0 && i < max)
+                {
+                    drawingContext.DrawEllipse(otherPoints, null, point, 2, 2);
+                }
+                if (i == 0)
+                {
+                    drawingContext.DrawEllipse(firstPoint, null, point, 2, 2);
+                }
+                if (i == max)
+                {
+                    drawingContext.DrawEllipse(lastPoint, null, point, 2, 2);
+                }
+                i++;
+            }
+        }
+
         public override void Render()
         {
             Point centre = ParentAtom.Position;
             using (DrawingContext dc = RenderOpen())
             {
-                 GlyphText.SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
+                GlyphText.SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
                 //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
                 GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
                 GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
@@ -497,37 +515,33 @@ namespace Chem4Word.ACME.Drawing
 
                 if (GlyphText.SymbolSize > 0)
                 {
-
                     RenderAtom(dc);
                     //debugging code - uncomment to show the convex hull
-//#if DEBUG
-//                    if (AtomSymbol != "")
+                    //#if DEBUG
+                    //                    if (AtomSymbol != "")
 
-//                    {
-//                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
-//                        areaBrush.Opacity = 0.33;
-//                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
-//                    }
-//#endif
-
-                   
-
+                    //                    {
+                    //                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
+                    //                        areaBrush.Opacity = 0.33;
+                    //                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
+                    //                    }
+                    //#endif
                 }
             }
         }
 
-        #endregion
-      
+        #endregion Rendering
 
         #region Helpers
 
-         public float PixelsPerDip()
+        public float PixelsPerDip()
         {
             return (float)VisualTreeHelper.GetDpi(this).PixelsPerDip;
         }
 
-        #endregion
-        #endregion
+        #endregion Helpers
+
+        #endregion Methods
 
         public Geometry HullGeometry
         {
@@ -537,7 +551,7 @@ namespace Chem4Word.ACME.Drawing
                 {
                     if (Hull == null || Hull.Count == 0)
                     {
-                        _hullGeometry= null;
+                        _hullGeometry = null;
                     }
                     else
                     {
@@ -553,7 +567,6 @@ namespace Chem4Word.ACME.Drawing
 
         public Geometry WidenedHullGeometry
         {
-
             get
             {
                 if (!string.IsNullOrEmpty(AtomSymbol))
@@ -565,13 +578,14 @@ namespace Chem4Word.ACME.Drawing
                 return null;
             }
         }
+
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
             Pen _widepen = new Pen(Brushes.Black, BondThickness);
             if (HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
-                {
-                    return new PointHitTestResult(this, hitTestParameters.HitPoint);
-                }
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
+            }
 
             return null;
         }
@@ -591,12 +605,12 @@ namespace Chem4Word.ACME.Drawing
 
             CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedHullGeometry, lg);
 
-            Rect bounds =combinedGeometry.Bounds;
+            Rect bounds = combinedGeometry.Bounds;
             if (!bounds.IsEmpty)
             {
-                return new Point((bounds.Left + bounds.Right)/2, (bounds.Bottom+bounds.Top)/2);
+                return new Point((bounds.Left + bounds.Right) / 2, (bounds.Bottom + bounds.Top) / 2);
             }
-          
+
             return null;
         }
     }
