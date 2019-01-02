@@ -30,7 +30,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.View;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -327,7 +326,6 @@ namespace Chem4Word
                                 }
 
                                 // Chemical Names
-
                                 foreach (ChemicalName n in mol.ChemicalNames)
                                 {
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
