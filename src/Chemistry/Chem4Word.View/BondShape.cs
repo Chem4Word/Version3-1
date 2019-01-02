@@ -240,19 +240,15 @@ namespace Chem4Word.View
             {
                 return base.HitTestCore(hitTestParameters);
             }
-            else
-            {
-                Pen widepen = new Pen(Brushes.Black, 20.0);
 
-                if (DefiningGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
-                {
-                    return new PointHitTestResult(this, hitTestParameters.HitPoint);
-                }
-                else
-                {
-                    return null;
-                }
+            Pen widepen = new Pen(Brushes.Black, 20.0);
+
+            if (DefiningGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
             }
+
+            return null;
         }
 
         protected override void OnRender(DrawingContext drawingContext)

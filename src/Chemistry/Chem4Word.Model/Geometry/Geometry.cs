@@ -362,5 +362,19 @@ namespace Chem4Word.Model.Geometry
 
             return path;
         }
+
+        public static StreamGeometry BuildPolyPath(List<Point> hull, bool isClosed = true)
+        {
+            var points = hull.ToArray();
+            StreamGeometry geo = new StreamGeometry();
+            using (StreamGeometryContext c = geo.Open())
+            {
+                c.BeginFigure(points[0], true, isClosed);
+                c.PolyLineTo(points.Skip(1).ToArray(), true, true);
+                c.Close();
+            }
+
+            return geo;
+        }
     }
 }
