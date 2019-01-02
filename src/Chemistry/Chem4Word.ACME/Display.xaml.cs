@@ -76,8 +76,14 @@ namespace Chem4Word.ACME
 
         public double ChemistryWidth
         {
-            get { return (double)GetValue(ChemistryWidthProperty); }
-            set { SetValue(ChemistryWidthProperty, value); }
+            get
+            {
+                return (double)GetValue(ChemistryWidthProperty);
+            }
+            set
+            {
+                SetValue(ChemistryWidthProperty, value);
+            }
         }
 
         public static readonly DependencyProperty ChemistryWidthProperty = DependencyProperty.Register(
@@ -101,16 +107,6 @@ namespace Chem4Word.ACME
                 FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         #endregion ChemistryHeight (DependencyProperty)
-
-
-        /// <summary>
-        /// 
-        /// </summary>      
-
-
-       
-
-
 
         #endregion Public Properties
 
