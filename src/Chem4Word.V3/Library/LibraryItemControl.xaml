@@ -21,11 +21,14 @@
 
             <ControlTemplate x:Key="NameValTemplate">
                 <DockPanel>
-                    <TextBlock FontSize="20" Foreground="Red"><Bold>!</Bold></TextBlock>
+                    <TextBlock
+                        FontSize="20"
+                        Foreground="Red"><Bold>!</Bold></TextBlock>
                     <AdornedElementPlaceholder />
                 </DockPanel>
             </ControlTemplate>
-            <Style x:Key="TextBoxInError" TargetType="{x:Type TextBox}">
+            <Style x:Key="TextBoxInError"
+                TargetType="{x:Type TextBox}">
                 <Style.Triggers>
                     <Trigger Property="Validation.HasError" Value="true">
                         <Setter Property="ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}" />
@@ -37,7 +40,8 @@
     <UserControl.Background>
         <SolidColorBrush Color="{x:Static SystemColors.WindowColor}" />
     </UserControl.Background>
-    <Grid Name="MainGrid" Margin="20,0,0,0">
+    <Grid Name="MainGrid"
+        Margin="20,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -59,11 +63,7 @@
                     Converter="{StaticResource NameConverter}"
                     Mode="TwoWay"
                     Path="Name"
-                    UpdateSourceTrigger="LostFocus">
-                    <Binding.ValidationRules>
-                        <!--<local:NameValidationRule />-->
-                    </Binding.ValidationRules>
-                </Binding>
+                    UpdateSourceTrigger="LostFocus" />
             </TextBox.Text>
         </TextBox>
         <Expander
@@ -75,7 +75,11 @@
             IsExpanded="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}"
             IsHitTestVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}">
             <Expander.Header>
-                <TextBlock Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=Background}" Foreground="{StaticResource Chem4WordBlue}">Other Names</TextBlock>
+                <TextBlock
+                    Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=Background}"
+                    Foreground="{StaticResource Chem4WordBlue}">
+                    Other Names
+                </TextBlock>
             </Expander.Header>
             <ListBox Name="OtherNameList"
                 Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=Background}"

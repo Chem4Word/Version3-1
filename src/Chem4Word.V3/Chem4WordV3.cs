@@ -965,6 +965,7 @@ namespace Chem4Word
                         if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                         {
                             //Debug.WriteLine($"  Existing Selected Chemistry");
+                            NavigatorSupport.SelectNavigatorItem(CustomXmlPartHelper.GuidFromTag(cc.Tag));
                             chemistrySelected = true;
                         }
                         break;
@@ -981,6 +982,7 @@ namespace Chem4Word
                             //Word.Selection s = doc.Application.Selection;
                             //Debug.WriteLine($"  SelectChemistry() New Selected Range is {s.Range.Start - 1} to {s.Range.End + 1}");
 #endif
+                            NavigatorSupport.SelectNavigatorItem(CustomXmlPartHelper.GuidFromTag(cc.Tag));
                             chemistrySelected = true;
                         }
                         break;

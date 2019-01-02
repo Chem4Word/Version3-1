@@ -253,9 +253,15 @@ namespace Chem4Word
                             CMLConverter conv = new CMLConverter();
                             Model.Model model = conv.Import(cml);
 
-                            if (model.Molecules.Count > 1)
+                            if (model.Molecules.Count > 0)
                             {
-                                if (model.AllAtoms.Count > 0)
+                                int allAtomsCount = 0;
+                                foreach (var mol in model.Molecules)
+                                {
+                                    allAtomsCount = mol.Atoms.Count;
+                                }
+
+                                if (allAtomsCount > 0)
                                 {
                                     // Add 2D menu Item
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
@@ -269,17 +275,20 @@ namespace Chem4Word
                                     ribbonButton.Click += OnRenderAsButtonClick;
                                     ShowAsMenu.Items.Add(ribbonButton);
 
-                                    // Concise Formula
-                                    ribbonButton = Factory.CreateRibbonButton();
-                                    ribbonButton.Tag = "c0";
-                                    if (prefix.Equals(ribbonButton.Tag))
+                                    if (model.Molecules.Count > 1)
                                     {
-                                        ribbonButton.Image = Properties.Resources.SmallTick;
+                                        // Overall Concise Formula
+                                        ribbonButton = Factory.CreateRibbonButton();
+                                        ribbonButton.Tag = "c0";
+                                        if (prefix.Equals(ribbonButton.Tag))
+                                        {
+                                            ribbonButton.Image = Properties.Resources.SmallTick;
+                                        }
+                                        ribbonButton.Label = model.ConciseFormula;
+                                        ribbonButton.SuperTip = "Render as overall concise formula";
+                                        ribbonButton.Click += OnRenderAsButtonClick;
+                                        ShowAsMenu.Items.Add(ribbonButton);
                                     }
-                                    ribbonButton.Label = model.ConciseFormula;
-                                    ribbonButton.SuperTip = "Render as concise formula";
-                                    ribbonButton.Click += OnRenderAsButtonClick;
-                                    ShowAsMenu.Items.Add(ribbonButton);
                                 }
                             }
 
@@ -288,7 +297,7 @@ namespace Chem4Word
                                 RibbonSeparator separator = this.Factory.CreateRibbonSeparator();
                                 ShowAsMenu.Items.Add(separator);
 
-                                if (mol.AllAtoms.Count > 0)
+                                if (mol.Atoms.Count > 0)
                                 {
                                     // Concise Formula
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
@@ -320,7 +329,6 @@ namespace Chem4Word
                                 }
 
                                 // Chemical Names
-
                                 foreach (ChemicalName n in mol.ChemicalNames)
                                 {
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
