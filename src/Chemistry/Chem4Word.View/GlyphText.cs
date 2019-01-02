@@ -28,6 +28,53 @@ namespace Chem4Word.View
 
         public double TypeSize { get; }
 
+        private static double? _symbolSize;
+
+        public static double SymbolSize
+        {
+            get
+            {
+                if (_symbolSize == null)
+                {
+                    return AtomShape.SymbolSize;
+
+                }
+                return _symbolSize.Value;
+            }
+            set { _symbolSize = value; }
+        }
+
+        private static double? _scriptSize;
+
+        public static double ScriptSize
+        {
+            get
+            {
+                if (_scriptSize == null)
+                {
+                    return AtomShape.ScriptSize;
+
+                }
+                return _scriptSize.Value;
+            }
+            set { _scriptSize = value; }
+        }
+
+        private static double? _isotopeSize;
+
+        public static double IsotopeSize
+        {
+            get
+            {
+                if (_isotopeSize == null)
+                {
+                    return AtomShape.IsotopeSize;
+
+                }
+                return _isotopeSize.Value;
+            }
+            set { _isotopeSize = value; }
+        }
         public float PixelsPerDip { get; }
 
         protected GlyphTypeface _glyphTypeface;
@@ -119,7 +166,7 @@ namespace Chem4Word.View
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
-            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, AtomShape.SymbolSize) +
+            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, SymbolSize) +
                                 new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
 
             TextRun = groupGlyphRun;
@@ -186,28 +233,28 @@ namespace Chem4Word.View
     public class MainLabelText : GlyphText
     {
         public MainLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, AtomShape.SymbolSize, pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, SymbolSize, pixelsPerDip)
         { }
     }
 
     public class SubLabelText : GlyphText
     {
         public SubLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, AtomShape.ScriptSize, pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, ScriptSize, pixelsPerDip)
         { }
     }
 
     public class IsotopeLabelText : GlyphText
     {
         public IsotopeLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, IsotopeSize, pixelsPerDip)
         { }
     }
 
     public class ChargeLabelText : GlyphText
     {
         public ChargeLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, AtomShape.IsotopeSize, pixelsPerDip)
+            : base(text, GlyphUtils.SymbolTypeface, IsotopeSize, pixelsPerDip)
         {
         }
     }
@@ -237,7 +284,7 @@ namespace Chem4Word.View
             }
         }
 
-        public List<Point> FlattenedPath { get; set; }
+
         public Vector OffsetVector { get; set; }
     }
 
@@ -264,5 +311,7 @@ namespace Chem4Word.View
                 return corners;
             }
         }
+
+        public List<Point> FlattenedPath { get; set; }
     }
 }

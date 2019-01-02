@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2019, The .NET Foundation.
+//  Copyright (c) 2018, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -7,46 +7,43 @@
 
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
+using Chem4Word.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using static Chem4Word.View.GlyphUtils;
 
-namespace Chem4Word.View
+namespace Chem4Word.ACME.Drawing
 {
-    /// <summary>
-    /// Replacement for existing AtomShape.  uses glyph based rendering
-    /// </summary>
-    public class AtomShape : Shape
+    public class AtomVisual : ChemicalVisual
     {
-        private static double MaskOffsetWidth = 0;
-        public static double SymbolSize = 0;
-        public static double ScriptSize = 0;
-        public static double IsotopeSize = 0;
+        #region Fields
 
-        #region Members
+        #region private fields
+
+        private static double MaskOffsetWidth = 0;
+        private Geometry _hullGeometry;
+
+        public double BondThickness { get; set; }
+
+        #endregion private fields
+
+        #region Collections
 
         //list of points that make up the hull of the shape
         private List<Point> _shapeHull;
 
-        #endregion Members
+        #endregion Collections
 
-        #region Constructors
+        #endregion Fields
 
-        //needs a default constructor to be used in XAML
-        public AtomShape()
-        {
-        }
+        #region Nested Classes
 
-        #endregion Constructors
+        #region Text Classes
 
-        /// <summary>
-        /// Defines a subscripted group of atoms eg H_3
-        /// </summary>
         private class SubscriptedGroup
         {
             //how many atoms in the group
@@ -61,13 +58,13 @@ namespace Chem4Word.View
             //holds the text of the subscript
             private SubLabelText _subText;
 
-            private static double FontSize;
+            private static double _fontSize;
 
             public SubscriptedGroup(int count, string text, double fontSize)
             {
                 Count = count;
                 Text = text;
-                FontSize = fontSize;
+                _fontSize = fontSize;
             }
 
             /// <summary>
@@ -82,7 +79,7 @@ namespace Chem4Word.View
 
                 List<Point> mainOutline;
                 //first, get some initial size measurements
-                _mainText = new GlyphText(Text, SymbolTypeface, FontSize, pixelsPerDip);
+                _mainText = new GlyphText(Text, SymbolTypeface, _fontSize, pixelsPerDip);
                 _mainText.Premeasure();
 
                 //measure up the subscript (if we have one)
@@ -142,19 +139,19 @@ namespace Chem4Word.View
             }
 
             /// <summary>
-            /// Gets the centerpoint of an atom adjunct (like an implicit hydrogen plus subscripts)
+            /// Gets the center point of an atom adjunct (like an implicit hydrogen plus subscripts)
             /// The Adjunct in NH2 is H2
             /// </summary>
             /// <param name="parentMetrics">Metrics of the parent atom</param>
             /// <param name="direction">NESW direction of the adjunct respective to the atom</param>
-            /// <param name="adjunctGlyphInfo">Intial measurements of the adjunct</param>
+            /// <param name="adjunctGlyphInfo">Initial measurements of the adjunct</param>
             /// <param name="subscriptInfo">Initial measurements of the subscript (can be null for no subscripts)</param>
             /// <returns></returns>
             private static Point GetAdjunctCenter(AtomTextMetrics parentMetrics, CompassPoints direction,
                 GlyphInfo adjunctGlyphInfo, GlyphInfo? subscriptInfo = null)
             {
                 Point adjunctCenter;
-                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * FontSize);
+                double charHeight = (GlyphUtils.GlyphTypeface.Baseline * _fontSize);
                 double adjunctWidth = (parentMetrics.BoundingBox.Width + adjunctGlyphInfo.Width) / 2;
                 switch (direction)
                 {
@@ -191,153 +188,38 @@ namespace Chem4Word.View
             }
         }
 
-        #region Overrides
+        #endregion Text Classes
 
-        protected override void OnRender(DrawingContext drawingContext)
+        #endregion Nested Classes
+
+        public AtomVisual(Atom atom)
         {
-            SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
-            //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
-            ScriptSize = SymbolSize * 0.6;
-            IsotopeSize = SymbolSize * 0.8;
-            MaskOffsetWidth = SymbolSize * 0.1;
-
-            if (SymbolSize > 0)
-            {
-                RenderAtom(drawingContext);
-            }
+            ParentAtom = atom;
         }
 
-        #endregion Overrides
+        #region Properties
+
+        public Atom ParentAtom { get; }
+
+        #region Visual Properties
+
+        public Point Position { get; set; }
+        public string AtomSymbol { get; set; }
+        public Brush BackgroundColor { get; set; }
+        public Brush Fill { get; set; }
+        public int? Charge { get; set; }
+        public int? Isotope { get; set; }
+        public int ImplicitHydrogenCount { get; set; }
+
+        public List<Point> Hull => _shapeHull;
+
+        #endregion Visual Properties
+
+        #endregion Properties
 
         #region Methods
 
-        /// <summary>
-        /// used for device independent rendering
-        /// </summary>
-        /// <returns></returns>
-        public float PixelsPerDip()
-        {
-            return (float)VisualTreeHelper.GetDpi(this).PixelsPerDip;
-        }
-
-        /// <summary>
-        /// Rebders an atom plus charges and labels to the drawing context
-        /// </summary>
-        /// <param name="drawingContext"></param>
-        private void RenderAtom(DrawingContext drawingContext)
-        {
-            //renders the atom complete with charges, hydrogens and labels.
-            //this code is *complex*
-
-            List<Point> symbolPoints = new List<Point>();
-            List<Point> hydrogenPoints = new List<Point>();
-
-            //private variables used to keep track of onscreen visuals
-            AtomTextMetrics hydrogenMetrics = null;
-            LabelMetrics isoMetrics = null;
-            SubscriptedGroup subscriptedGroup = null;
-            _shapeHull = new List<Point>();
-
-            //stage 1:  measure up the main atom symbol in position
-            //we need the metrics first
-            if (AtomSymbol != "")
-            {
-                var symbolText = new GlyphText(AtomSymbol,
-                    SymbolTypeface, SymbolSize, PixelsPerDip());
-                symbolText.MeasureAtCenter(Position);
-                //grab the hull for later
-                if (symbolText.FlattenedPath != null)
-                {
-                    symbolPoints = symbolText.FlattenedPath;
-                    _shapeHull.AddRange(symbolText.FlattenedPath);
-                }
-            }
-
-            //stage 2.  grab the main atom metrics br drawing it
-            //need to draw the atom twice as it will be obscured by the mask
-            var mainAtomMetrics = DrawSelf(drawingContext, true);
-
-            //stage 3:  measure up the hydrogens
-            //if we have implicit hydrogens and we have an explicit label, draw them
-            if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
-            {
-                var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
-
-                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", SymbolSize);
-                hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
-
-                //subscriptedGroup.DrawSelf(drawingContext,hydrogenMetrics , PixelsPerDip(), Fill);
-                _shapeHull.AddRange(hydrogenMetrics.FlattenedPath);
-                hydrogenPoints = hydrogenMetrics.FlattenedPath;
-            }
-
-            //stage 4: draw the background mask
-            //recalculate the hull, which is a hotchpotch of points by now
-            if (_shapeHull.Any())
-            {
-                //sort the points properly before doing a hull calculation
-                var sortedHull = (from Point p in _shapeHull
-                                  orderby p.X, p.Y descending
-                                  select p).ToList();
-
-                _shapeHull = Geometry<Point>.GetHull(sortedHull, p => p);
-
-                DrawMask(_shapeHull, drawingContext);
-            }
-
-            //then do the drawing of the main symbol (again)
-            mainAtomMetrics = DrawSelf(drawingContext);
-
-            //stage 5:  draw the hydrogens
-            if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
-            {
-                subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
-            }
-
-            // Diag: Show Points
-            //ShowPoints(symbolPoints, drawingContext);
-            //ShowPoints(hydrogenPoints, drawingContext);
-            //ShowPoints(_shapeHull, drawingContext);
-            //drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
-
-            //stage 6:  draw an isotope label if needed
-            if (Isotope != null)
-            {
-                isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
-            }
-
-            //stage7:  draw any charges
-            if ((Charge ?? 0) != 0)
-            {
-                LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, ParentAtom.GetDefaultHOrientation());
-            }
-        }
-
-        private void ShowPoints(List<Point> points, DrawingContext drawingContext)
-        {
-            // Show points for debugging
-            SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
-            SolidColorBrush otherPoints = new SolidColorBrush(Colors.Blue);
-            SolidColorBrush lastPoint = new SolidColorBrush(Colors.Green);
-            int i = 0;
-            int max = points.Count - 1;
-            foreach (var point in points)
-            {
-                if (i > 0 && i < max)
-                {
-                    drawingContext.DrawEllipse(otherPoints, null, point, 2, 2);
-                }
-                if (i == 0)
-                {
-                    drawingContext.DrawEllipse(firstPoint, null, point, 2, 2);
-                }
-                if (i == max)
-                {
-                    drawingContext.DrawEllipse(lastPoint, null, point, 2, 2);
-                }
-                i++;
-            }
-        }
+        #region Rendering
 
         /// <summary>
         /// Draws a background mask for the atom symbol
@@ -373,6 +255,7 @@ namespace Chem4Word.View
             Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
             var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill, defaultHOrientation);
+            chargeText.TextMetrics.FlattenedPath = chargeText.TextRun.GetOutline(chargeText.TypeSize);
             return chargeText.TextMetrics;
         }
 
@@ -396,7 +279,7 @@ namespace Chem4Word.View
             ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth * SymbolSize * 0.9;
+            Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphText.SymbolSize * 0.9;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter, defaultHOrientation);
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
@@ -455,12 +338,13 @@ namespace Chem4Word.View
             string isoLabel = Isotope.ToString();
             var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
 
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * SymbolSize;
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphText.SymbolSize;
             Matrix rotator = new Matrix();
             rotator.Rotate(ClockDirections.Ten.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;
             Point isoCenter = mainAtomMetrics.Geocenter + isotopeOffsetVector;
             isotopeText.MeasureAtCenter(isoCenter);
+            isotopeText.Fill = Fill;
             isotopeText.DrawAtBottomLeft(isotopeText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
             return isotopeText.TextMetrics;
         }
@@ -468,14 +352,27 @@ namespace Chem4Word.View
         //draws the main atom symbol, or an ellipse if necessary
         private AtomTextMetrics DrawSelf(DrawingContext drawingContext, bool measureOnly = false)
         {
-            if (AtomSymbol == "") //implicit carbon
+            if (AtomSymbol != "")
             {
-                //so draw a circle
-                double radiusX = SymbolSize / 3;
+                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
+                symbolText.Fill = Fill;
+                symbolText.MeasureAtCenter(Position);
                 if (!measureOnly)
                 {
-                    drawingContext.DrawEllipse(Fill, null, Position, radiusX, radiusX);
+                    symbolText.DrawAtBottomLeft(symbolText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
                 }
+
+                return symbolText.TextMetrics;
+            }
+            else
+            {
+                //so draw a circle
+                double radiusX = GlyphText.SymbolSize / 3;
+                if (!measureOnly)
+                {
+                    //drawingContext.DrawEllipse(Fill, null, Position, radiusX, radiusX);
+                }
+
                 Rect boundingBox = new Rect(new Point(Position.X - radiusX, Position.Y - radiusX),
                     new Point(Position.X + radiusX, Position.Y + radiusX));
                 return new AtomTextMetrics
@@ -483,147 +380,238 @@ namespace Chem4Word.View
                     BoundingBox = boundingBox,
                     Geocenter = Position,
                     TotalBoundingBox = boundingBox,
-                    FlattenedPath = new List<Point> { boundingBox.BottomLeft, boundingBox.TopLeft, boundingBox.TopRight, boundingBox.BottomRight }
+                    FlattenedPath = new List<Point>
+                        {boundingBox.BottomLeft, boundingBox.TopLeft, boundingBox.TopRight, boundingBox.BottomRight}
                 };
             }
-            else
+        }
+
+        private void RenderAtom(DrawingContext drawingContext)
+        {
+            //renders the atom complete with charges, hydrogens and labels.
+            //this code is *complex*
+
+            List<Point> symbolPoints = new List<Point>();
+            List<Point> hydrogenPoints = new List<Point>();
+
+            //private variables used to keep track of onscreen visuals
+            AtomTextMetrics hydrogenMetrics = null;
+            LabelMetrics isoMetrics = null;
+            SubscriptedGroup subscriptedGroup = null;
+            _shapeHull = new List<Point>();
+
+            //stage 1:  measure up the main atom symbol in position
+            //we need the metrics first
+            if (AtomSymbol != "")
             {
-                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, SymbolSize, PixelsPerDip());
-                symbolText.Fill = Fill;
+                var symbolText = new GlyphText(AtomSymbol,
+                    SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
-                if (!measureOnly)
+                //grab the hull for later
+                if (symbolText.FlattenedPath != null)
                 {
-                    symbolText.DrawAtBottomLeft(symbolText.TextMetrics.BoundingBox.BottomLeft, drawingContext);
+                    symbolPoints = symbolText.FlattenedPath;
+                    _shapeHull.AddRange(symbolText.FlattenedPath);
                 }
-                return symbolText.TextMetrics;
+            }
+
+            //stage 2.  grab the main atom metrics br drawing it
+
+            var mainAtomMetrics = DrawSelf(drawingContext);
+
+            //stage 3:  measure up the hydrogens
+            //if we have implicit hydrogens and we have an explicit label, draw them
+            if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
+            {
+                var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
+
+                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", GlyphText.SymbolSize);
+                hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
+
+                subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
+                hydrogenPoints = hydrogenMetrics.FlattenedPath;
+                _shapeHull.AddRange(hydrogenPoints);
+            }
+
+            //then do the drawing of the main symbol (again)
+            //mainAtomMetrics = DrawSelf(drawingContext);
+
+            //stage 5:  draw the hydrogens
+
+            // Diag: Show Points
+            //ShowPoints(symbolPoints, drawingContext);
+            //ShowPoints(hydrogenPoints, drawingContext);
+            //ShowPoints(_shapeHull, drawingContext);
+            //drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
+
+            //stage 6:  draw an isotope label if needed
+            if (Isotope != null)
+            {
+                isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
+                _shapeHull.AddRange(isoMetrics.Corners);
+            }
+
+            //stage7:  draw any charges
+            if ((Charge ?? 0) != 0)
+            {
+                LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, ParentAtom.GetDefaultHOrientation());
+                _shapeHull.AddRange(cMetrics.FlattenedPath);
+            }
+            //stage 8:  recalculate the hull
+            if (_shapeHull.Any())
+            {
+                //sort the points properly before doing a hull calculation
+                var sortedHull = (from Point p in _shapeHull
+                                  orderby p.X, p.Y descending
+                                  select p).ToList();
+
+                _shapeHull = Geometry<Point>.GetHull(sortedHull, p => p);
             }
         }
+
+        private void ShowPoints(List<Point> points, DrawingContext drawingContext)
+        {
+            // Show points for debugging
+            SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
+            SolidColorBrush otherPoints = new SolidColorBrush(Colors.Blue);
+            SolidColorBrush lastPoint = new SolidColorBrush(Colors.Green);
+            int i = 0;
+            int max = points.Count - 1;
+            foreach (var point in points)
+            {
+                if (i > 0 && i < max)
+                {
+                    drawingContext.DrawEllipse(otherPoints, null, point, 2, 2);
+                }
+                if (i == 0)
+                {
+                    drawingContext.DrawEllipse(firstPoint, null, point, 2, 2);
+                }
+                if (i == max)
+                {
+                    drawingContext.DrawEllipse(lastPoint, null, point, 2, 2);
+                }
+                i++;
+            }
+        }
+
+        public override void Render()
+        {
+            Point centre = ParentAtom.Position;
+            using (DrawingContext dc = RenderOpen())
+            {
+                GlyphText.SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
+                //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
+                GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
+                GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
+                MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
+
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(ParentAtom.Element.Colour));
+                AtomSymbol = ParentAtom.SymbolText;
+                Charge = ParentAtom.FormalCharge;
+                ImplicitHydrogenCount = ParentAtom.ImplicitHydrogenCount;
+                Isotope = ParentAtom.IsotopeNumber;
+                Position = ParentAtom.Position;
+
+                if (GlyphText.SymbolSize > 0)
+                {
+                    RenderAtom(dc);
+                    //debugging code - uncomment to show the convex hull
+                    //#if DEBUG
+                    //                    if (AtomSymbol != "")
+
+                    //                    {
+                    //                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
+                    //                        areaBrush.Opacity = 0.33;
+                    //                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
+                    //                    }
+                    //#endif
+                }
+            }
+        }
+
+        #endregion Rendering
+
+        #region Helpers
+
+        public float PixelsPerDip()
+        {
+            return (float)VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        }
+
+        #endregion Helpers
 
         #endregion Methods
 
-        #region Dependency Properties
-
-        #region Positioning DPs
-
-        public Point Position
-        {
-            get { return (Point)GetValue(PositionProperty); }
-            set { SetValue(PositionProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Position.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty PositionProperty =
-            DependencyProperty.Register("Position", typeof(Point), typeof(AtomShape),
-                new FrameworkPropertyMetadata(new Point(0, 0),
-                    FrameworkPropertyMetadataOptions.AffectsRender));
-
-        #endregion Positioning DPs
-
-        #region Atom DPs
-
-        public string AtomSymbol
-        {
-            get { return (string)GetValue(AtomSymbolProperty); }
-            set { SetValue(AtomSymbolProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for AtomSymbol.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty AtomSymbolProperty =
-            DependencyProperty.Register("AtomSymbol", typeof(string), typeof(AtomShape),
-                new FrameworkPropertyMetadata("",
-                    FrameworkPropertyMetadataOptions.AffectsArrange
-                    | FrameworkPropertyMetadataOptions.AffectsMeasure
-                    | FrameworkPropertyMetadataOptions.AffectsRender,
-                    AtomSymbolChangedCallback));
-
-        private static void AtomSymbolChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-        }
-
-        public Atom ParentAtom
-        {
-            get { return (Atom)GetValue(ParentAtomProperty); }
-            set { SetValue(ParentAtomProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ParentAtom.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ParentAtomProperty =
-            DependencyProperty.Register("ParentAtom", typeof(Atom), typeof(AtomShape), new PropertyMetadata(null));
-
-        #endregion Atom DPs
-
-        public Brush BackgroundColor
-        {
-            get { return (Brush)GetValue(BackgroundColorProperty); }
-            set { SetValue(BackgroundColorProperty, value); }
-        }
-
-        public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor",
-                typeof(Brush),
-                typeof(AtomShape),
-                new FrameworkPropertyMetadata(SystemColors.WindowBrush, FrameworkPropertyMetadataOptions.AffectsRender));
-
-        #region Charge DP
-
-        public int? Charge
-        {
-            get { return (int?)GetValue(ChargeProperty); }
-            set { SetValue(ChargeProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Charge.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ChargeProperty =
-            DependencyProperty.Register("Charge",
-                typeof(int?),
-                typeof(AtomShape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
-
-        #endregion Charge DP
-
-        protected override Geometry DefiningGeometry
+        public Geometry HullGeometry
         {
             get
             {
-                //so draw a circle
-                double radiusX = SymbolSize / 3;
+                if (_hullGeometry == null)
+                {
+                    if (Hull == null || Hull.Count == 0)
+                    {
+                        _hullGeometry = null;
+                    }
+                    else
+                    {
+                        Geometry geo1 = BasicGeometry.BuildPolyPath(Hull);
+                        CombinedGeometry cg = new CombinedGeometry(geo1, geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness)));
+                        _hullGeometry = cg;
+                    }
+                }
 
-                return new EllipseGeometry(Position, radiusX, radiusX);
+                return _hullGeometry;
             }
         }
 
-        public int? Isotope
+        public Geometry WidenedHullGeometry
         {
-            get { return (int?)GetValue(IsotopeProperty); }
-            set { SetValue(IsotopeProperty, value); }
+            get
+            {
+                if (!string.IsNullOrEmpty(AtomSymbol))
+                {
+                    //Pen _widepen = new Pen(Brushes.Black, BondThickness);
+                    return HullGeometry;
+                }
+
+                return null;
+            }
         }
 
-        // Using a DependencyProperty as the backing store for Isotope.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty IsotopeProperty =
-            DependencyProperty.Register("Isotope", typeof(int?), typeof(AtomShape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, IsotopeChangedCallback));
-
-        private static void IsotopeChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
-            var changedAtomShape = (AtomShape)d;
-            var newval = (int?)args.NewValue;
+            Pen _widepen = new Pen(Brushes.Black, BondThickness);
+            if (HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
+            }
+
+            return null;
         }
 
-        public int ImplicitHydrogenCount
+        /// <summary>
+        /// Returns a point indicating where the bond line intersects the atom label;
+        /// </summary>
+        /// <param name="pointA"></param>
+        /// <param name="pointB"></param>
+        /// <returns></returns>
+        public Point? GetIntersection(Point pointA, Point pointB)
         {
-            get { return (int)GetValue(ImplicitHydrogenCountProperty); }
-            set { SetValue(ImplicitHydrogenCountProperty, value); }
+            Pen _widepen = new Pen(Brushes.Black, BondThickness);
+            Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(_widepen);
+            //
+            Point? p;
+
+            CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedHullGeometry, lg);
+
+            Rect bounds = combinedGeometry.Bounds;
+            if (!bounds.IsEmpty)
+            {
+                return new Point((bounds.Left + bounds.Right) / 2, (bounds.Bottom + bounds.Top) / 2);
+            }
+
+            return null;
         }
-
-        // Using a DependencyProperty as the backing store for ImplicitHydrogenCount.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ImplicitHydrogenCountProperty =
-            DependencyProperty.Register("ImplicitHydrogenCount", typeof(int), typeof(AtomShape),
-                new FrameworkPropertyMetadata(0, FrameworkPropertyMetadataOptions.AffectsRender, ImplicitHCallback));
-
-        private static void ImplicitHCallback(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-        }
-
-        #endregion Dependency Properties
     }
 }

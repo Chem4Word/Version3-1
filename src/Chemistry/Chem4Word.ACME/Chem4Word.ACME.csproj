@@ -70,12 +70,15 @@
     <Compile Include="AtomPicker.xaml.cs">
       <DependentUpon>AtomPicker.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Drawing\AtomVisual.cs" />
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="Behaviors\LassoBehavior.cs" />
+    <Compile Include="Drawing\BondVisual.cs" />
+    <Compile Include="Drawing\ChemicalVisual.cs" />
     <Compile Include="Controls\ChemistryCanvas.cs" />
     <Compile Include="Controls\ZoomBox.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
