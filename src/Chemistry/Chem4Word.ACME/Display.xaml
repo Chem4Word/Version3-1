@@ -5,6 +5,6 @@
     xmlns:controls="clr-namespace:Chem4Word.ACME.Controls">
     <Viewbox Name="Placeholder">
         <controls:ChemistryCanvas x:Name="ChemCanvas"
-            Margin="20" />
+            Margin="{Binding RelativeSource={RelativeSource Self}, Path=Overhang}" />
     </Viewbox>
 </UserControl>

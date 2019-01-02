@@ -102,6 +102,16 @@ namespace Chem4Word.ACME
 
         #endregion ChemistryHeight (DependencyProperty)
 
+
+        /// <summary>
+        /// 
+        /// </summary>      
+
+
+       
+
+
+
         #endregion Public Properties
 
         #region Private Methods
