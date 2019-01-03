@@ -130,7 +130,11 @@ namespace Chem4Word.ACME.Controls
             }
 
             var bb = GetBoundingBox();
-            Overhang = new Thickness(-Math.Min(0d, bb.Left),Math.Min(0d, bb.Top),0d, 0d);
+            var leftOverhang = -Math.Min(0d, bb.Left);
+            var topOverhang = Math.Min(0d, bb.Top);
+
+
+            Overhang = new Thickness(leftOverhang, topOverhang, leftOverhang, topOverhang);
             InvalidateMeasure();
         }
 
