@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Chem4Word.ACME.Controls">
-    <Viewbox Name="Placeholder">
-        <controls:ChemistryCanvas x:Name="ChemCanvas"
-            Margin="{Binding RelativeSource={RelativeSource Self}, Path=Overhang}" />
+    <Viewbox Name="Placeholder" >
+        <controls:ChemistryCanvas  Margin="20,22,20,20"  x:Name="ChemCanvas"/>
     </Viewbox>
 </UserControl>

@@ -63,7 +63,8 @@ namespace Chem4Word.ACME.Drawing
             if (ParentBond.OrderValue == 1.5)
             {
                 //it's a resonance bond, so we deal with this in Render
-                //as we can't return a single geometry
+                //as we can't return a single geometry that can be
+                //stroked with two different brushes
                 //return BondGeometry.SingleBondGeometry(startPoint.Value, endPoint.Value);
                 return new StreamGeometry();
             }

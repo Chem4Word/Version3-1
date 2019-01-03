@@ -213,6 +213,7 @@ namespace Chem4Word.ACME.Drawing
 
         public List<Point> Hull => _shapeHull;
 
+        private double Standoff => GlyphText.SymbolSize / 4;
         #endregion Visual Properties
 
         #endregion Properties
@@ -250,7 +251,11 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="isoMetrics"></param>
         /// <param name="defaultHOrientation"></param>
         /// <returns></returns>
-        private LabelMetrics DrawCharges(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, CompassPoints defaultHOrientation)
+        private LabelMetrics DrawCharges(DrawingContext drawingContext, 
+            AtomTextMetrics mainAtomMetrics, 
+            AtomTextMetrics hMetrics, 
+            LabelMetrics isoMetrics, 
+            CompassPoints defaultHOrientation)
         {
             Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
@@ -565,8 +570,10 @@ namespace Chem4Word.ACME.Drawing
                     }
                     else
                     {
+                        //need to combine the actually filled atom area
+                        //with a stroked outline of it, to give a sufficient margin
                         Geometry geo1 = BasicGeometry.BuildPolyPath(Hull);
-                        CombinedGeometry cg = new CombinedGeometry(geo1, geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness)));
+                        CombinedGeometry cg = new CombinedGeometry(geo1, geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, Standoff)));
                         _hullGeometry = cg;
                     }
                 }

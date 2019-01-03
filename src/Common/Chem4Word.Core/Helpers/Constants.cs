@@ -10,7 +10,7 @@ namespace Chem4Word.Core.Helpers
     public static class Constants
     {
         public static string Chem4WordVersion = "3.1";
-        public static string Chem4WordVersionFiles = "files31";
+        public static string Chem4WordVersionFiles = "files3-1";
         public static string ContentControlTitle = "Chemistry";
         public static string LegacyContentControlTitle = "chemistry";
         public static string NavigatorTaskPaneTitle = "Navigator";
