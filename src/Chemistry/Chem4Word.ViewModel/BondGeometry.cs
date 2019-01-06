@@ -11,6 +11,7 @@ using Chem4Word.Model.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -23,6 +24,17 @@ namespace Chem4Word.ViewModel
     /// </summary>
     public static class BondGeometry
     {
+
+        /// <summary>
+        /// Returns the geometry of a wedge bond.  Hatch bonds use the same geometry
+        /// but a different brush.
+        /// </summary>
+        /// <param name="startPoint">Position of starting atom</param>
+        /// <param name="endPoint">Position of ending atom </param>
+        /// <param name="bondLength"></param>
+        /// <param name="startAtomGeometry"></param>
+        /// <param name="endAtomGeometry"></param>
+        /// <returns></returns>
         public static Geometry WedgeBondGeometry(Point startPoint, Point endPoint, double bondLength,
             Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
         {
@@ -134,17 +146,17 @@ namespace Chem4Word.ViewModel
 
             if (startAtomGeometry != null)
             {
-                AdjustStartPoint(ref startPoint, endPoint, startAtomGeometry);
-                AdjustStartPoint(ref point1, point2, startAtomGeometry);
-                AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
+                AdjustTerminus(ref point1, point2, startAtomGeometry);
+                AdjustTerminus(ref point3, point4, startAtomGeometry);
                 enclosingPoly = new List<Point> { point1, point2, point4, point3 };
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustStartPoint(ref endPoint, startPoint, endAtomGeometry);
-                AdjustStartPoint(ref point2, point1, endAtomGeometry);
-                AdjustStartPoint(ref point4, point3, endAtomGeometry);
+                AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
+                AdjustTerminus(ref point2, point1, endAtomGeometry);
+                AdjustTerminus(ref point4, point3, endAtomGeometry);
                 enclosingPoly = new List<Point>() { point1, point2, point4, point3 };
             }
             StreamGeometry sg = new StreamGeometry();
@@ -186,15 +198,15 @@ namespace Chem4Word.ViewModel
             enclosingPoly = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid, out point1, out point2, out point3, out point4);
             if (startAtomGeometry != null)
             {
-                AdjustStartPoint(ref point1, point2, startAtomGeometry);
-                AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                AdjustTerminus(ref point1, point2, startAtomGeometry);
+                AdjustTerminus(ref point3, point4, startAtomGeometry);
                 enclosingPoly = new List<Point> {point1, point2, point4, point3};
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustStartPoint(ref point4, point3, endAtomGeometry);
-                AdjustStartPoint(ref point2, point1, endAtomGeometry);
+                AdjustTerminus(ref point4, point3, endAtomGeometry);
+                AdjustTerminus(ref point2, point1, endAtomGeometry);
                 enclosingPoly = new List<Point> { point1, point2, point4, point3};
             }
             StreamGeometry sg = new StreamGeometry();
@@ -348,15 +360,15 @@ namespace Chem4Word.ViewModel
             if (startAtomGeometry != null)
             {
                 
-                AdjustStartPoint(ref point1, point2, startAtomGeometry);
-                AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                AdjustTerminus(ref point1, point2, startAtomGeometry);
+                AdjustTerminus(ref point3, point4, startAtomGeometry);
                 enclosingPoly = new List<Point> { point1, point2, point4, point3 };
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustStartPoint(ref point2, point1, endAtomGeometry);
-                AdjustStartPoint(ref point4, point3, endAtomGeometry);
+                AdjustTerminus(ref point2, point1, endAtomGeometry);
+                AdjustTerminus(ref point4, point3, endAtomGeometry);
                 enclosingPoly = new List<Point> { point1, point2, point4, point3 };
             }
             StreamGeometry sg = new StreamGeometry();
@@ -380,12 +392,12 @@ namespace Chem4Word.ViewModel
             StreamGeometry sg = new StreamGeometry();
             if (startAtomGeometry != null)
             {
-                AdjustStartPoint(ref start, end, startAtomGeometry);
+                AdjustTerminus(ref start, end, startAtomGeometry);
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustStartPoint(ref end, start, endAtomGeometry);
+                AdjustTerminus(ref end, start, endAtomGeometry);
             }
             using (StreamGeometryContext sgc = sg.Open())
             {
@@ -397,7 +409,7 @@ namespace Chem4Word.ViewModel
             return sg;
         }
 
-        public static void AdjustStartPoint(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
+        public static void AdjustTerminus(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
         {
             Vector bondVector = endPoint - startPoint;
 
@@ -423,55 +435,69 @@ namespace Chem4Word.ViewModel
             return figures;
         }
 
-        public static Geometry WavyBondGeometry(Point startPoint, Point endPoint, double bondLength)
+        public static Geometry WavyBondGeometry(Point startPoint, Point endPoint, double standardBondLength,
+            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
         {
+            Point newStart = startPoint;
+            Point newEnd = endPoint;
             StreamGeometry sg = new StreamGeometry();
+
+            if (startAtomGeometry != null)
+            {
+                AdjustTerminus(ref newStart, newEnd, startAtomGeometry);
+            }
+
+            if (endAtomGeometry != null)
+            {
+                AdjustTerminus(ref newEnd, newStart, endAtomGeometry);
+            }
             using (StreamGeometryContext sgc = sg.Open())
             {
-                Vector bondVector = endPoint - startPoint;
-                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / bondLength * Globals.BondOffsetPecentage);
-                if (noOfWiggles < 1)
+                Vector bondVector = newEnd - newStart;
+                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / standardBondLength * Globals.BondOffsetPecentage);
+                if (noOfWiggles < 3)
                 {
-                    noOfWiggles = 1;
+                    noOfWiggles = 3;
                 }
 
-                double wiggleLength = bondLength / noOfWiggles;
-                Debug.WriteLine($"bondLength: {bondLength} noOfWiggles: {noOfWiggles}");
+                double wiggleLength = bondVector.Length / noOfWiggles;
+                Debug.WriteLine($"standardBondLength: {standardBondLength} noOfWiggles: {noOfWiggles}");
 
-                Vector originalWigglePortion = bondVector;
-                originalWigglePortion.Normalize();
-                originalWigglePortion *= wiggleLength / 2;
+                Vector halfAWiggle = bondVector;
+                halfAWiggle.Normalize();
+                halfAWiggle *= wiggleLength / 2;
 
                 Matrix toLeft = new Matrix();
                 toLeft.Rotate(-60);
                 Matrix toRight = new Matrix();
                 toRight.Rotate(60);
-                Vector leftVector = originalWigglePortion * toLeft;
-                Vector rightVector = originalWigglePortion * toRight;
+                Vector leftVector = halfAWiggle * toLeft;
+                Vector rightVector = halfAWiggle * toRight;
 
                 List<Point> allpoints = new List<Point>();
-                List<List<Point>> allTriangles = new List<List<Point>>();
-                List<Point> triangle = new List<Point>();
 
-                Point lastPoint = startPoint;
-                allpoints.Add(lastPoint);
-                triangle.Add(lastPoint);
+
+
+               
+                allpoints.Add(newStart);
+
+                Point lastPoint = newStart;
                 for (int i = 0; i < noOfWiggles; i++)
                 {
                     Point leftPoint = lastPoint + leftVector;
                     allpoints.Add(leftPoint);
 
-                    Point rightPoint = lastPoint + originalWigglePortion + rightVector;
+                    Point rightPoint = lastPoint + halfAWiggle + rightVector;
                     allpoints.Add(rightPoint);
 
-                    lastPoint += originalWigglePortion * 2;
+                    lastPoint += halfAWiggle * 2;
                 }
-
-                sgc.BeginFigure(startPoint, false, false);
-                sgc.PolyLineTo(allpoints, true, true);
-
+                allpoints.Add(newEnd);
+                sgc.BeginFigure(allpoints[0], false, false);
+                sgc.PolyLineTo(allpoints.Skip(1).ToArray(), true, true);
                 sgc.Close();
             }
+            sg.Freeze();
             return sg;
         }
     }
