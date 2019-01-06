@@ -493,12 +493,17 @@ namespace Chem4Word.ViewModel
                     allpoints.Add(lastPoint);
                 }
                 allpoints.Add(newEnd);
-                sgc.BeginFigure(allpoints[0], false, false);
-                sgc.PolyQuadraticBezierTo(allpoints.Skip(1).ToArray(), true, true);
+                MakePathFromPoints(sgc, allpoints);
                 sgc.Close();
             }
             sg.Freeze();
             return sg;
+        }
+
+        private static void MakePathFromPoints(StreamGeometryContext sgc, List<Point> allpoints)
+        {
+            sgc.BeginFigure(allpoints[0], false, false);
+            sgc.PolyQuadraticBezierTo(allpoints.Skip(1).ToArray(), true, true);
         }
     }
 }
