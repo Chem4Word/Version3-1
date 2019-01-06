@@ -486,15 +486,15 @@ namespace Chem4Word.ViewModel
                 {
                     Point leftPoint = lastPoint + leftVector;
                     allpoints.Add(leftPoint);
-
+                    allpoints.Add(lastPoint + halfAWiggle);
                     Point rightPoint = lastPoint + halfAWiggle + rightVector;
                     allpoints.Add(rightPoint);
-
                     lastPoint += halfAWiggle * 2;
+                    allpoints.Add(lastPoint);
                 }
                 allpoints.Add(newEnd);
                 sgc.BeginFigure(allpoints[0], false, false);
-                sgc.PolyLineTo(allpoints.Skip(1).ToArray(), true, true);
+                sgc.PolyQuadraticBezierTo(allpoints.Skip(1).ToArray(), true, true);
                 sgc.Close();
             }
             sg.Freeze();
