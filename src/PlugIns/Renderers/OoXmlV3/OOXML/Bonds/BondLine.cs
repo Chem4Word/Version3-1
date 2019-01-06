@@ -74,6 +74,6 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Bonds
         Dashed,
         Wavy,
         Wedge,
-        Hash
+        Hatch
     }
 }
