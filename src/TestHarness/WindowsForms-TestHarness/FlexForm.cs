@@ -264,46 +264,9 @@ namespace WinFormsTestHarness
             Model model = Display.Chemistry as Model;
             if (model != null)
             {
-                Model clone = model.Clone();
-                clone.RescaleForCml();
-                _undoStack.Push(clone);
-                EnableUndoRedoButtons();
-
-                //Model clone = null;
-                //if (_cloneViaCml)
-                //{
-                //    // This works ...
-                //    CMLConverter cc = new CMLConverter();
-                //    clone = cc.Import(cc.Export(model));
-                //}
-                //else
-                //{
-                //    // This is not right ...
-                //    int beforeAtoms = model.AllAtoms.Count;
-                //    int beforeBonds = model.AllBonds.Count;
-                //    Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-
-                //    clone = model.Clone();
-                //    int afterAtoms = model.AllAtoms.Count;
-                //    int afterBonds = model.AllBonds.Count;
-
-                //    if (beforeAtoms != afterAtoms
-                //        || beforeBonds != afterBonds
-                //        || clone.AllAtoms.Count != model.AllAtoms.Count
-                //        || clone.AllBonds.Count != model.AllBonds.Count)
-                //    {
-                //        Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-                //        Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
-                //        int cloneAtoms = clone.AllAtoms.Count;
-                //        int cloneBonds = clone.AllBonds.Count;
-                //        Debugger.Break();
-                //    }
-                //}
-
-                Model clone2 = clone.Clone();
-                if (clone2.AllAtoms.Any())
+                if (model.AllAtoms.Any())
                 {
-                    Molecule modelMolecule = clone2.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
+                    Molecule modelMolecule = model.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
                     var atom = modelMolecule.Atoms[0];
                     foreach (var neighbouringBond in atom.Bonds)
                     {
@@ -314,14 +277,13 @@ namespace WinFormsTestHarness
                     modelMolecule.Atoms.Remove(atom);
                 }
 
-                foreach (var mol in clone2.Molecules)
+                foreach (var mol in model.Molecules)
                 {
                     mol.ConciseFormula = "";
                 }
 
-                clone2.RefreshMolecules();
-                //display1.Chemistry = model;
-                ShowChemistry("Remove Atom", clone2);
+                model.RefreshMolecules();
+                Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
             }
         }
 
@@ -330,47 +292,12 @@ namespace WinFormsTestHarness
             Model model = Display.Chemistry as Model;
             if (model != null)
             {
-                Model clone = model.Clone();
-                clone.RescaleForCml();
-                _undoStack.Push(clone);
-                EnableUndoRedoButtons();
 
-                //if (_cloneViaCml)
-                //{
-                //    // This works ...
-                //    CMLConverter cc = new CMLConverter();
-                //    clone = cc.Import(cc.Export(model));
-                //}
-                //else
-                //{
-                //    // This is not right ...
-                //    int beforeAtoms = model.AllAtoms.Count;
-                //    int beforeBonds = model.AllBonds.Count;
-                //    Debug.WriteLine($"Before Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-
-                //    clone = model.Clone();
-                //    int afterAtoms = model.AllAtoms.Count;
-                //    int afterBonds = model.AllBonds.Count;
-
-                //    if (beforeAtoms != afterAtoms
-                //        || beforeBonds != afterBonds
-                //        || clone.AllAtoms.Count != model.AllAtoms.Count
-                //        || clone.AllBonds.Count != model.AllBonds.Count)
-                //    {
-                //        Debug.WriteLine($"After Clone {model.AllAtoms.Count} {model.AllBonds.Count}");
-                //        Debug.WriteLine($"Clone {clone.AllAtoms.Count} {clone.AllBonds.Count}");
-                //        int cloneAtoms = clone.AllAtoms.Count;
-                //        int cloneBonds = clone.AllBonds.Count;
-                //        Debugger.Break();
-                //    }
-                //}
-
-                Model clone2 = clone.Clone();
-                if (clone2.AllAtoms.Any())
+                if (model.AllAtoms.Any())
                 {
                     var rnd = new Random(DateTime.Now.Millisecond);
 
-                    var maxAtoms = clone2.AllAtoms.Count;
+                    var maxAtoms = model.AllAtoms.Count;
                     int targetAtom = rnd.Next(0, maxAtoms);
 
                     var elements = Globals.PeriodicTable.Elements;
@@ -381,21 +308,19 @@ namespace WinFormsTestHarness
                     {
                         Debugger.Break();
                     }
-                    clone2.AllAtoms[targetAtom].Element = x as ElementBase;
+                    model.AllAtoms[targetAtom].Element = x as ElementBase;
                     if (x.Symbol.Equals("C"))
                     {
-                        clone2.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                        model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
                     }
 
-                    foreach (var mol in clone2.Molecules)
+                    foreach (var mol in model.Molecules)
                     {
                         mol.ConciseFormula = "";
                     }
-                    clone2.RefreshMolecules();
+                    model.RefreshMolecules();
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
                 }
-
-                //display1.Chemistry = model;
-                ShowChemistry("Random Element", clone2);
             }
         }
 
@@ -403,144 +328,6 @@ namespace WinFormsTestHarness
         {
         }
 
-        private void Serialize_Click(object sender, EventArgs e)
-        {
-            Model model = Display.Chemistry as Model;
-            if (model != null)
-            {
-                string filename = $"{DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss")}.bin";
-                string targetFile = Path.Combine(@"C:\Temp", filename);
-
-                Debug.WriteLine("Serialising model as binary.");
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-
-                MemoryStream ms1 = new MemoryStream();
-                BinaryFormatter bf = new BinaryFormatter();
-                bf.Serialize(ms1, model);
-
-                ms1.Position = 0;
-                using (FileStream file = new FileStream(targetFile, FileMode.Create, FileAccess.Write))
-                {
-                    byte[] bytes = new byte[ms1.Length];
-                    ms1.Read(bytes, 0, (int)ms1.Length);
-                    file.Write(bytes, 0, bytes.Length);
-                    ms1.Close();
-                }
-                sw.Stop();
-
-                Debug.WriteLine($" Binary serialisation took {sw.ElapsedMilliseconds} milliseconds.");
-
-                Debug.WriteLine("Serialising model as CML to file.");
-                sw.Reset();
-                sw.Start();
-                CMLConverter cc = new CMLConverter();
-                cc.Compressed = true;
-                File.WriteAllText(targetFile.Replace(".bin", ".cml"), cc.Export(model));
-                sw.Stop();
-                Debug.WriteLine($" Writing CML file took {sw.ElapsedMilliseconds} milliseconds.");
-
-                MemoryStream ms2 = new MemoryStream();
-                using (FileStream file = new FileStream(targetFile, FileMode.Open, FileAccess.Read))
-                {
-                    byte[] bytes = new byte[file.Length];
-                    file.Read(bytes, 0, (int)file.Length);
-                    ms2.Write(bytes, 0, (int)file.Length);
-                }
-
-                ms2.Position = 0;
-                Model x = new BinaryFormatter().Deserialize(ms2) as Model;
-                x.RebuildMolecules();
-                Display.Chemistry = x;
-            }
-        }
-
-        private void Examine_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string[] files = Directory.GetFiles(@"C:\Temp", "*.bin");
-                MemoryStream memoryStream = new MemoryStream();
-                using (FileStream file = new FileStream(files.Last(), FileMode.Open, FileAccess.Read))
-                {
-                    byte[] bytes = new byte[file.Length];
-                    file.Read(bytes, 0, (int)file.Length);
-                    memoryStream.Write(bytes, 0, (int)file.Length);
-                }
-
-                memoryStream.Position = 0;
-                BinarySerializationStreamAnalyzer analyzer = new BinarySerializationStreamAnalyzer();
-                analyzer.Read(memoryStream);
-
-                Dumper dumper = new Dumper(analyzer.Analyze());
-                dumper.ShowDialog();
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception);
-            }
-        }
-
-        private void Hex_Click(object sender, EventArgs e)
-        {
-            string[] files = Directory.GetFiles(@"C:\Temp", "*.bin");
-            HexViewer hexViewer = new HexViewer(files.Last());
-            hexViewer.ShowDialog();
-        }
-
-        private void Timing_Click(object sender, EventArgs e)
-        {
-            Model x = Display.Chemistry as Model;
-            if (x != null)
-            {
-                int max = 1000;
-                Stopwatch sw = new Stopwatch();
-                CMLConverter cc = new CMLConverter();
-                string type = "model";
-
-                switch (type)
-                {
-                    case "model":
-                        Stack<Model> models = new Stack<Model>();
-
-                        sw.Start();
-
-                        for (int i = 0; i < max; i++)
-                        {
-                            Model model = Display.Chemistry as Model;
-                            models.Push(model.Clone());
-                        }
-                        for (int i = 0; i < max; i++)
-                        {
-                            Model model = models.Pop();
-                            Display.Chemistry = model;
-                        }
-
-                        sw.Stop();
-                        break;
-
-                    case "cml":
-                        Stack<string> cmlModels = new Stack<string>();
-
-                        sw.Start();
-
-                        for (int i = 0; i < max; i++)
-                        {
-                            Model model = Display.Chemistry as Model;
-                            cmlModels.Push(cc.Export(model));
-                        }
-                        for (int i = 0; i < max; i++)
-                        {
-                            Model model = cc.Import(cmlModels.Pop());
-                            Display.Chemistry = model;
-                        }
-
-                        sw.Stop();
-                        break;
-                }
-                Debug.WriteLine($"Push/Pop {max} operations took {sw.ElapsedMilliseconds} milliseconds.");
-            }
-        }
 
         private void Undo_Click(object sender, EventArgs e)
         {

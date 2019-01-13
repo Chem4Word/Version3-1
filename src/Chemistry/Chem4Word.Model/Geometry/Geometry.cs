@@ -177,7 +177,6 @@ namespace Chem4Word.Model.Geometry
             {
                 if ((point1 - point0).Value.Length < epsilon || (point2 - point2).Value.Length < epsilon)
                 {
-                    Debugger.Break();
                     throw new ArgumentException("coincident points in GetAngle");
                 }
 

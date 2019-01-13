@@ -36,21 +36,17 @@
             this.ShowCarbons = new System.Windows.Forms.CheckBox();
             this.RemoveAtom = new System.Windows.Forms.Button();
             this.RandomElement = new System.Windows.Forms.Button();
-            this.Serialize = new System.Windows.Forms.Button();
-            this.Examine = new System.Windows.Forms.Button();
-            this.Hex = new System.Windows.Forms.Button();
-            this.Timing = new System.Windows.Forms.Button();
             this.Undo = new System.Windows.Forms.Button();
             this.Redo = new System.Windows.Forms.Button();
             this.LayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.DisplayHost = new System.Windows.Forms.Integration.ElementHost();
             this.Display = new Chem4Word.ACME.Display();
-            this.Information = new System.Windows.Forms.Label();
-            this.EditCml = new System.Windows.Forms.Button();
             this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
             this.RedoStack = new WinFormsTestHarness.StackViewer();
             this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
             this.UndoStack = new WinFormsTestHarness.StackViewer();
+            this.Information = new System.Windows.Forms.Label();
+            this.EditCml = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -130,54 +126,6 @@
             this.RandomElement.UseVisualStyleBackColor = true;
             this.RandomElement.Click += new System.EventHandler(this.RandomElement_Click);
             // 
-            // Serialize
-            // 
-            this.Serialize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Serialize.Location = new System.Drawing.Point(465, 531);
-            this.Serialize.Name = "Serialize";
-            this.Serialize.Size = new System.Drawing.Size(55, 23);
-            this.Serialize.TabIndex = 7;
-            this.Serialize.Text = "Serialize";
-            this.Serialize.UseVisualStyleBackColor = true;
-            this.Serialize.Visible = false;
-            this.Serialize.Click += new System.EventHandler(this.Serialize_Click);
-            // 
-            // Examine
-            // 
-            this.Examine.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Examine.Location = new System.Drawing.Point(526, 531);
-            this.Examine.Name = "Examine";
-            this.Examine.Size = new System.Drawing.Size(55, 23);
-            this.Examine.TabIndex = 8;
-            this.Examine.Text = "Analyse";
-            this.Examine.UseVisualStyleBackColor = true;
-            this.Examine.Visible = false;
-            this.Examine.Click += new System.EventHandler(this.Examine_Click);
-            // 
-            // Hex
-            // 
-            this.Hex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Hex.Location = new System.Drawing.Point(587, 531);
-            this.Hex.Name = "Hex";
-            this.Hex.Size = new System.Drawing.Size(55, 23);
-            this.Hex.TabIndex = 9;
-            this.Hex.Text = "Hex";
-            this.Hex.UseVisualStyleBackColor = true;
-            this.Hex.Visible = false;
-            this.Hex.Click += new System.EventHandler(this.Hex_Click);
-            // 
-            // Timing
-            // 
-            this.Timing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Timing.Location = new System.Drawing.Point(648, 531);
-            this.Timing.Name = "Timing";
-            this.Timing.Size = new System.Drawing.Size(55, 23);
-            this.Timing.TabIndex = 10;
-            this.Timing.Text = "Timing";
-            this.Timing.UseVisualStyleBackColor = true;
-            this.Timing.Visible = false;
-            this.Timing.Click += new System.EventHandler(this.Timing_Click);
-            // 
             // Undo
             // 
             this.Undo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -233,6 +181,26 @@
             this.DisplayHost.Text = "centreHost";
             this.DisplayHost.Child = this.Display;
             // 
+            // RedoHost
+            // 
+            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RedoHost.Location = new System.Drawing.Point(841, 3);
+            this.RedoHost.Name = "RedoHost";
+            this.RedoHost.Size = new System.Drawing.Size(269, 447);
+            this.RedoHost.TabIndex = 2;
+            this.RedoHost.Text = "rightHost";
+            this.RedoHost.Child = this.RedoStack;
+            // 
+            // UndoHost
+            // 
+            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UndoHost.Location = new System.Drawing.Point(3, 3);
+            this.UndoHost.Name = "UndoHost";
+            this.UndoHost.Size = new System.Drawing.Size(269, 447);
+            this.UndoHost.TabIndex = 3;
+            this.UndoHost.Text = "leftHost";
+            this.UndoHost.Child = this.UndoStack;
+            // 
             // Information
             // 
             this.Information.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -255,26 +223,6 @@
             this.EditCml.UseVisualStyleBackColor = true;
             this.EditCml.Click += new System.EventHandler(this.EditCml_Click);
             // 
-            // RedoHost
-            // 
-            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(841, 3);
-            this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(269, 447);
-            this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "rightHost";
-            this.RedoHost.Child = this.RedoStack;
-            // 
-            // UndoHost
-            // 
-            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UndoHost.Location = new System.Drawing.Point(3, 3);
-            this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(269, 447);
-            this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "leftHost";
-            this.UndoHost.Child = this.UndoStack;
-            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -285,10 +233,6 @@
             this.Controls.Add(this.LayoutPanel);
             this.Controls.Add(this.Redo);
             this.Controls.Add(this.Undo);
-            this.Controls.Add(this.Timing);
-            this.Controls.Add(this.Hex);
-            this.Controls.Add(this.Examine);
-            this.Controls.Add(this.Serialize);
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.EditWithAcme);
@@ -316,10 +260,6 @@
         private System.Windows.Forms.CheckBox ShowCarbons;
         private System.Windows.Forms.Button RemoveAtom;
         private System.Windows.Forms.Button RandomElement;
-        private System.Windows.Forms.Button Serialize;
-        private System.Windows.Forms.Button Examine;
-        private System.Windows.Forms.Button Hex;
-        private System.Windows.Forms.Button Timing;
         private System.Windows.Forms.Button Undo;
         private System.Windows.Forms.Button Redo;
         private System.Windows.Forms.TableLayoutPanel LayoutPanel;

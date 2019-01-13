@@ -201,7 +201,6 @@ namespace Chem4Word.ViewModel
             OnPropertyChanged(nameof(BoundingBox));
         }
 
-        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

@@ -9,7 +9,6 @@ using System;
 
 namespace Chem4Word.Model
 {
-    [Serializable]
     public class ChemicalName
     {
         public string Id { get; set; }

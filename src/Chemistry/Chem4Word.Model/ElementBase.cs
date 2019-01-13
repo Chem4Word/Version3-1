@@ -10,8 +10,6 @@ using System.ComponentModel;
 
 namespace Chem4Word.Model
 {
-    [TypeConverter(typeof(ElementConverter))]
-    [Serializable]
     public abstract class ElementBase
     {
         public virtual double AtomicWeight { get; set; }

@@ -78,7 +78,6 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinarySerializationStreamAnalyzer.cs" />
     <Compile Include="Dumper.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -19,7 +19,6 @@ using System.Windows;
 
 namespace Chem4Word.Model
 {
-    [Serializable]
     public class Atom : INotifyPropertyChanged
     {
         #region Properties
@@ -568,7 +567,6 @@ namespace Chem4Word.Model
 
         #region INotifyPropertyChanged
 
-        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
