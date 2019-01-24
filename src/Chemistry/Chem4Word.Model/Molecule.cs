@@ -27,7 +27,6 @@ namespace Chem4Word.Model
     /// between editing operations.  We cannot promise
     /// that the references will stay current
     /// </summary>
-    [Serializable]
     public partial class Molecule : ChemistryContainer
     {
         #region Fields

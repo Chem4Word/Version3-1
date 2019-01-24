@@ -19,7 +19,6 @@ using System.Windows;
 
 namespace Chem4Word.Model
 {
-    [Serializable]
     public class Atom : INotifyPropertyChanged
     {
         #region Properties
@@ -188,59 +187,33 @@ namespace Chem4Word.Model
         {
             get
             {
-                if (this.Element is Element)
+                switch (Element)
                 {
-                    if ((Element)Element == Globals.PeriodicTable.C)
-                    {
-                        if (IsotopeNumber != null)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return _explicitC;
-                        }
-                    }
-                    else
-                    {
+                    case Element e when (e ==Globals.PeriodicTable.C & IsotopeNumber != null | (FormalCharge ?? 0) != 0):
                         return true;
-                    }
-                }
-                else if (this.Element is FunctionalGroup)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
+                    case Element e when (e == Globals.PeriodicTable.C):
+                        return _explicitC;
+                    case FunctionalGroup fg:
+                        return true;
+                    default:
+                        return false;
                 }
             }
             set
             {
-                if (this.Element is Element)
+                switch (Element)
                 {
-                    if ((Element)Element == Globals.PeriodicTable.C)
-                    {
+                    case Element e when (e == Globals.PeriodicTable.C):
                         _explicitC = value;
                         OnPropertyChanged();
-                        OnPropertyChanged("SymbolText");
-                    }
-                    else
-                    {
+                        OnPropertyChanged(nameof(SymbolText));
+                        break;
+                    default:
                         Debugger.Break();
                         throw new ArgumentOutOfRangeException("ShowSymbol", Resources.ExplicitCError);
-                    }
                 }
-                else if (this.Element is FunctionalGroup)
-                {
-                    Debugger.Break();
-                    throw new ArgumentOutOfRangeException("ShowSymbol", Resources.ExplicitCError);
-                }
-                else
-                {
-                    Debugger.Break();
-                    throw new ArgumentOutOfRangeException("ShowSymbol", Resources.ExplicitCError);
-                }
+
+
             }
         }
 
@@ -594,7 +567,6 @@ namespace Chem4Word.Model
 
         #region INotifyPropertyChanged
 
-        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

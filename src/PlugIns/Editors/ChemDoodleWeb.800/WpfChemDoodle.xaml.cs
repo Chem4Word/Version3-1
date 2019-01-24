@@ -573,7 +573,8 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
                 if (!File.Exists(markerFile))
                 {
-                    Telemetry.Write(module, "Information", "Writing resources to disk");
+                    Telemetry.Write(module, "Information", "Writing CDW 800 resources to disk");
+
                     File.WriteAllText(markerFile, "Delete this file to refresh ChemDoodle Web");
 
                     Stream stream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.ChemDoodleWeb_800.zip");

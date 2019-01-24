@@ -20,7 +20,6 @@ namespace Chem4Word.Model
     /// This allows changes in the atoms and bonds membership to bubble up
     /// the molecule hierarchy
     /// </summary>
-    [Serializable]
     public abstract class ChemistryContainer : INotifyPropertyChanged
     {
         public ObservableCollection<Bond> AllBonds { get; protected set; }
@@ -187,7 +186,6 @@ namespace Chem4Word.Model
             }
         }
 
-        [field: NonSerialized()]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

@@ -51,7 +51,7 @@ namespace Chem4Word.ACME.Drawing
 
             if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
             {
-                return BondGeometry.WavyBondGeometry(startPoint, endPoint, modelXamlBondLength);
+                return BondGeometry.WavyBondGeometry(startPoint, endPoint, modelXamlBondLength, startAtomGeometry, endAtomGeometry);
             }
 
             //single or dotted bond
@@ -156,6 +156,13 @@ namespace Chem4Word.ACME.Drawing
             {
                 _subsidiaryBondPen.DashStyle = DashStyles.Dash;
             }
+
+            if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
+            {
+                //it's a wavy bond
+                
+            }
+
             if (ParentBond.OrderValue != 1.5)
             {
                 using (DrawingContext dc = RenderOpen())
@@ -164,7 +171,7 @@ namespace Chem4Word.ACME.Drawing
                     if (ParentBond.Stereo == BondStereo.Hatch || ParentBond.Stereo == BondStereo.Wedge)
                     {
                         _mainBondPen.Thickness = 0; //don't draw around the bonds
-                        if (ParentBond.Stereo == BondStereo.Wedge)
+                        if (ParentBond.Stereo == BondStereo.Hatch)
                         {
                             bondBrush = GetHatchBrush();
                         }
@@ -193,15 +200,15 @@ namespace Chem4Word.ACME.Drawing
                     out point2, out point3, out point4);
                 if (startAtomGeometry != null)
                 {
-                    BondGeometry.AdjustStartPoint(ref point1, point2, startAtomGeometry);
-                    BondGeometry.AdjustStartPoint(ref point3, point4, startAtomGeometry);
+                    BondGeometry.AdjustTerminus(ref point1, point2, startAtomGeometry);
+                    BondGeometry.AdjustTerminus(ref point3, point4, startAtomGeometry);
                     _enclosingPoly = new List<Point> { point1, point2, point4, point3 };
                 }
 
                 if (endAtomGeometry != null)
                 {
-                    BondGeometry.AdjustStartPoint(ref point4, point3, endAtomGeometry);
-                    BondGeometry.AdjustStartPoint(ref point2, point1, endAtomGeometry);
+                    BondGeometry.AdjustTerminus(ref point4, point3, endAtomGeometry);
+                    BondGeometry.AdjustTerminus(ref point2, point1, endAtomGeometry);
                     _enclosingPoly = new List<Point> { point1, point2, point4, point3 };
                 }
 

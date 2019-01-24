@@ -11,7 +11,6 @@ using System.Reflection;
 
 namespace Chem4Word.Model
 {
-    [Serializable]
     public class Element : ElementBase
     {
         public Element()
@@ -25,7 +24,6 @@ namespace Chem4Word.Model
 
                 if (!callingClass.Equals("PeriodicTable"))
                 {
-                    Debugger.Break();
                     throw new NotSupportedException("You are not allowed to create Elements!");
                 }
             }

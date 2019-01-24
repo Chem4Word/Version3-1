@@ -79,6 +79,8 @@ namespace Chem4Word.Telemetry
 
             if (_permissionGranted)
             {
+                WritePrivate(operation, level, message);
+
                 if (!_systemInfoSent)
                 {
                     if (!_helper.IpAddress.Contains("0.0.0.0"))
@@ -86,55 +88,26 @@ namespace Chem4Word.Telemetry
                         WriteStartUpInfo();
                     }
                 }
-
-                WritePrivate(operation, level, message);
             }
         }
 
         private void WriteStartUpInfo()
         {
-            string userDomainName = Environment.UserDomainName;
-            string userName = Environment.UserName;
-            string machineName = Environment.MachineName;
-            string userSummary;
+            // Log Add-In Version
+            WritePrivate("StartUp", "Information", _helper.AddInVersion);
 
-            if (userDomainName.Equals(machineName))
-            {
-                // Local account
-                userSummary = $"Local user {userName} on PC {machineName}";
-            }
-            else
-            {
-                // Domain account
-                userSummary = $@"Domain user {userDomainName}\{userName} on PC {machineName}";
-            }
-#if DEBUG
-            WritePrivate("StartUp", "Information", $"Debug - Environment.OSVersion: {Environment.OSVersion}");
-            WritePrivate("StartUp", "Information", $"Debug - Environment.Version: {Environment.Version}");
-
-            WritePrivate("StartUp", "Information", $"Debug - {userSummary}");
-
-            WritePrivate("StartUp", "Information", $"Debug - Environment.CommandLine: {Environment.CommandLine}");
-            WritePrivate("StartUp", "Information", $"Debug - AddIn Location: {_helper.AddInLocation}");
-            WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
-            WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitProcess: {Environment.Is64BitProcess}");
-
-            WritePrivate("StartUp", "Information", _helper.GitStatus);
-#endif
-
-            // Log Wmi Gathered Data
-            WritePrivate("StartUp", "Information", $"CPU: {_wmiHelper.CpuName}");
-            WritePrivate("StartUp", "Information", $"CPU Cores: {_wmiHelper.LogicalProcessors}");
-            WritePrivate("StartUp", "Information", $"CPU Speed: {_wmiHelper.CpuSpeed}");
-            WritePrivate("StartUp", "Information", $"Physical Memory: {_wmiHelper.PhysicalMemory}");
-
-            // Log screen sizes
-            WritePrivate("StartUp", "Information", $"Screens: {_helper.Screens}");
+            // Log Word
+            WritePrivate("StartUp", "Information", _helper.WordProduct);
+            WritePrivate("StartUp", "Information", Environment.GetCommandLineArgs()[0]);
 
             // Log System
             WritePrivate("StartUp", "Information", _helper.SystemOs);
-            WritePrivate("StartUp", "Information", $"Browser Version: {_helper.BrowserVersion}");
             WritePrivate("StartUp", "Information", _helper.DotNetVersion);
+            WritePrivate("StartUp", "Information", $"Browser Version: {_helper.BrowserVersion}");
+
+            // Log IP Address
+            WritePrivate("StartUp", "Information", _helper.IpAddress);
+            WritePrivate("StartUp", "Information", _helper.IpObtainedFrom);
 
             // Log UtcOffset
             WritePrivate("StartUp", "Information", $"Server UTC DateTime is {_helper.ServerUtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
@@ -155,16 +128,44 @@ namespace Chem4Word.Telemetry
                 WritePrivate("StartUp", "Information", $"System UTC DateTime is {delta} behind Server time");
             }
 
-            // Log IP Address
-            WritePrivate("StartUp", "Information", _helper.IpAddress);
-            WritePrivate("StartUp", "Information", _helper.IpObtainedFrom);
+            // Log Wmi Gathered Data
+            WritePrivate("StartUp", "Information", $"CPU: {_wmiHelper.CpuName}");
+            WritePrivate("StartUp", "Information", $"CPU Cores: {_wmiHelper.LogicalProcessors}");
+            WritePrivate("StartUp", "Information", $"CPU Speed: {_wmiHelper.CpuSpeed}");
+            WritePrivate("StartUp", "Information", $"Physical Memory: {_wmiHelper.PhysicalMemory}");
 
-            // Log Word
-            WritePrivate("StartUp", "Information", Environment.GetCommandLineArgs()[0]);
-            WritePrivate("StartUp", "Information", _helper.WordProduct);
+            // Log Screen Sizes
+            WritePrivate("StartUp", "Information", $"Screens: {_helper.Screens}");
 
-            // Log Add-In Version
-            WritePrivate("StartUp", "Information", _helper.AddInVersion);
+#if DEBUG
+            string userDomainName = Environment.UserDomainName;
+            string userName = Environment.UserName;
+            string machineName = Environment.MachineName;
+            string userSummary;
+
+            if (userDomainName.Equals(machineName))
+            {
+                // Local account
+                userSummary = $"Local user {userName} on PC {machineName}";
+            }
+            else
+            {
+                // Domain account
+                userSummary = $@"Domain user {userDomainName}\{userName} on PC {machineName}";
+            }
+
+            WritePrivate("StartUp", "Information", $"Debug - Environment.OSVersion: {Environment.OSVersion}");
+            WritePrivate("StartUp", "Information", $"Debug - Environment.Version: {Environment.Version}");
+
+            WritePrivate("StartUp", "Information", $"Debug - {userSummary}");
+
+            WritePrivate("StartUp", "Information", $"Debug - Environment.CommandLine: {Environment.CommandLine}");
+            WritePrivate("StartUp", "Information", $"Debug - AddIn Location: {_helper.AddInLocation}");
+            WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
+            WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitProcess: {Environment.Is64BitProcess}");
+
+            WritePrivate("StartUp", "Information", _helper.GitStatus);
+#endif
 
             _systemInfoSent = true;
         }

@@ -23,10 +23,13 @@ namespace Chem4Word.Model
     /// <summary>
     /// Represents an undordered ring of atoms
     /// </summary>
-    [DebuggerDisplay("Atoms: {Atoms.Count} Priority: {Priority}")]
-    [Serializable]
     public class Ring : IComparer<Ring>, INotifyPropertyChanged
     {
+        public override string ToString()
+        {
+            return $"Atoms: {Atoms.Count} Priority: {Priority}";
+        }
+
         /// <summary>
         /// Indicates which rings of a set of fused rings
         /// should host a double bond in preference
