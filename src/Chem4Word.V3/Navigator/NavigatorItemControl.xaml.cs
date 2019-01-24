@@ -214,9 +214,5 @@ namespace Chem4Word.Navigator
         private void NavItemControl_Loaded(object sender, RoutedEventArgs e)
         {
         }
-
-        private void Display_Loaded()
-        {
-        }
     }
 }

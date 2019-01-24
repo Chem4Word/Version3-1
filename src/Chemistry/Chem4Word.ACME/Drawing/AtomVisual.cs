@@ -446,7 +446,6 @@ namespace Chem4Word.ACME.Drawing
             // Diag: Show Points
             //ShowPoints(symbolPoints, drawingContext);
             //ShowPoints(hydrogenPoints, drawingContext);
-            //ShowPoints(_shapeHull, drawingContext);
             //drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
 
             //stage 6:  draw an isotope label if needed
@@ -462,6 +461,7 @@ namespace Chem4Word.ACME.Drawing
                 LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, ParentAtom.GetDefaultHOrientation());
                 _shapeHull.AddRange(cMetrics.FlattenedPath);
             }
+
             //stage 8:  recalculate the hull
             if (_shapeHull.Any())
             {
@@ -471,7 +471,17 @@ namespace Chem4Word.ACME.Drawing
                                   select p).ToList();
 
                 _shapeHull = Geometry<Point>.GetHull(sortedHull, p => p);
+
+                // Diag: Show Hull
+                //ShowHull(_shapeHull, drawingContext);
             }
+        }
+
+        private void ShowHull(List<Point> points, DrawingContext drawingContext)
+        {
+            var path = BasicGeometry.BuildPath(points);
+            drawingContext.DrawGeometry(BackgroundColor, new Pen(new SolidColorBrush(Colors.GreenYellow), MaskOffsetWidth / 2), path.Data);
+            ShowPoints(_shapeHull, drawingContext);
         }
 
         private void ShowPoints(List<Point> points, DrawingContext drawingContext)

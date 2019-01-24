@@ -359,7 +359,7 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML
                 switch (bl.Type)
                 {
                     case BondLineStyle.Wedge:
-                    case BondLineStyle.Hash:
+                    case BondLineStyle.Hatch:
                         blr.DrawWedgeBond(wordprocessingGroup1, bl);
                         break;
 
