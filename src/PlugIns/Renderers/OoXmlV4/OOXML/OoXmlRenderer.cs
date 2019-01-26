@@ -55,7 +55,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private List<AtomLabelCharacter> _atomLabelCharacters;
         private List<BondLine> _bondLines;
 
-        private Dictionary<string, Ring> _rings = new Dictionary<string, Ring>();
+        private List<Rect> _boundingBoxes = new List<Rect>();
+        private List<Rect> _boundingBoxesWithLabels = new List<Rect>();
+        private List<Point> _ringCentres = new List<Point>();
 
         private PeriodicTable _pt = new PeriodicTable();
 
@@ -121,52 +123,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             //set the median bond length
             _medianBondLength = _chemistryModel.AverageBondLength;
 
-
             int moleculeNo = 0;
             foreach (Molecule mol in _chemistryModel.Molecules.Values)
             {
                 ProcessMolecule(mol, ref moleculeNo);
-            }
-
-            // Local Function
-            void ProcessMolecule(Molecule mol, ref int molNumber)
-            {
-                molNumber++;
-                // Step 1- gather the atom information together
-                Debug.WriteLine($"{module} Starting Step 1");
-                //_telemetry.Write(module, "Verbose", $"Starting Step 1 for molecule {moleculeNo}");
-
-                ProcessAtoms(mol, pb, molNumber, _pt);
-
-                Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
-                //_telemetry.Write(module, "Timing", $"Step 1 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
-                sw.Reset();
-                sw.Start();
-
-                // Step 2- gather the bond information together
-
-                Debug.WriteLine($"{module} Starting Step 2");
-                //_telemetry.Write(module, "Verbose", $"Starting Step 2 for molecule {moleculeNo}");
-                ProcessBonds(mol, pb, molNumber);
-
-                Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
-                //_telemetry.Write(module, "Timing", $"Step 2 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
-                sw.Reset();
-                sw.Start();
-
-                if (_options.ShowRingCentres)
-                {
-                    // Save Rings for later
-                    foreach (Ring ring in mol.Rings)
-                    {
-                        _rings.Add(ring.UniqueID, ring);
-                    }
-                }
-
-                foreach (var child in mol.Molecules.Values)
-                {
-                    ProcessMolecule(child, ref molNumber);
-                }
             }
 
             Debug.WriteLine($"{module} Starting Step 3");
@@ -223,12 +183,44 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             if (_options.ShowMoleculeBoundingBoxes)
             {
-                DrawBox(wordprocessingGroup1, _modelExtents, "00ff00", 1);
-                foreach (Molecule mol in _chemistryModel.Molecules.Values)
+                bool isNew = true;
+                Rect r = new Rect();
+
+                foreach (var box in _boundingBoxes)
                 {
-                    DrawBox(wordprocessingGroup1, mol.BoundingBox, "0000ff", 1);
-                    DrawBox(wordprocessingGroup1, MoleculeExtents(mol), "ff0000", 1);
+                    if (isNew)
+                    {
+                        r = box;
+                        isNew = false;
+                    }
+                    else
+                    {
+                        r.Union(box);
+                    }
+                    DrawBox(wordprocessingGroup1, box, "ff0000", 1);
                 }
+
+                foreach (var box in _boundingBoxesWithLabels)
+                {
+                    if (isNew)
+                    {
+                        r = box;
+                        isNew = false;
+                    }
+                    else
+                    {
+                        r.Union(box);
+                    }
+                    DrawBox(wordprocessingGroup1, box, "00ff00", 1);
+                }
+
+                if (!isNew)
+                {
+                    DrawBox(wordprocessingGroup1, r, "00ff00", 1);
+                }
+
+                DrawBox(wordprocessingGroup1, _modelExtents, "ff0000", 1);
+
                 DrawBox(wordprocessingGroup1, _canvasExtents, "000000", 1);
             }
 
@@ -293,6 +285,55 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             ShutDownProgress(pb);
 
             return run;
+
+            // Local Function
+            void ProcessMolecule(Molecule mol, ref int molNumber)
+            {
+                molNumber++;
+                // Step 1- gather the atom information together
+                Debug.WriteLine($"{module} Starting Step 1");
+                //_telemetry.Write(module, "Verbose", $"Starting Step 1 for molecule {moleculeNo}");
+
+                ProcessAtoms(mol, pb, molNumber, _pt);
+
+                Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
+                //_telemetry.Write(module, "Timing", $"Step 1 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
+                sw.Reset();
+                sw.Start();
+
+                // Step 2- gather the bond information together
+
+                Debug.WriteLine($"{module} Starting Step 2");
+                //_telemetry.Write(module, "Verbose", $"Starting Step 2 for molecule {moleculeNo}");
+                ProcessBonds(mol, pb, molNumber);
+
+                Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
+                //_telemetry.Write(module, "Timing", $"Step 2 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
+                sw.Reset();
+                sw.Start();
+
+                // Populate diagnostic data
+                foreach (Ring ring in mol.Rings)
+                {
+                    if (ring.Centroid.HasValue)
+                    {
+                        _ringCentres.Add(ring.Centroid.Value);
+                    }
+                }
+
+                Rect r1 = mol.BoundingBox;
+                Rect r2 = MoleculeExtents(mol);
+                r2.Union(r1);
+                _boundingBoxes.Add(r1);
+                _boundingBoxesWithLabels.Add(r2);
+
+                // Recurse into any child molecules
+                foreach (var child in mol.Molecules.Values)
+                {
+                    ProcessMolecule(child, ref molNumber);
+                }
+            }
+
         }
 
         private void ShowAtomCentres(Wpg.WordprocessingGroup wordprocessingGroup1)
@@ -407,14 +448,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
 
             //Debug.WriteLine("Ring List :-");
-            foreach (KeyValuePair<string, Ring> kvp in _rings)
+            foreach (var point in _ringCentres)
             {
-                Ring r = (Ring)kvp.Value;
-                //Debug.WriteLine("Ring " + kvp.Key + " " + r.BondIdSet.Count);
-                Debug.Assert(r.Centroid != null);
-                Point c = r.Centroid.Value;
                 //Debug.WriteLine(" Centroid at " + c);
-                Rect bb = new Rect(new Point(c.X - xx, c.Y - xx), new Point(c.X + xx, c.Y + xx));
+                Rect bb = new Rect(new Point(point.X - xx, point.Y - xx), new Point(point.X + xx, point.Y + xx));
                 DrawShape(wordprocessingGroup1, bb, A.ShapeTypeValues.Ellipse, "0000ff");
             }
         }
