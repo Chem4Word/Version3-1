@@ -130,7 +130,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             swr.Start();
 
             //set the median bond length
-            _medianBondLength = GeometryTool.GetMedianBondLength2D(_chemistryModel.AllBonds);
+            _medianBondLength = _chemistryModel.AverageBondLength;
 
             int moleculeNo = 0;
             foreach (Molecule mol in _chemistryModel.Molecules.Values)
@@ -285,7 +285,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             sw.Reset();
             sw.Start();
 
-            double abl = _chemistryModel.MeanBondLength;
+            double abl = _chemistryModel.AverageBondLength;
             Debug.WriteLine("Elapsed time for GenerateRun " + swr.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
             _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0")} ms; Average Bond Length: {abl.ToString("#0.00")}");
 

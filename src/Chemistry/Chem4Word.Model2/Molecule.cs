@@ -84,6 +84,26 @@ namespace Chem4Word.Model2
             }
         }
 
+        public List<double> BondLengths
+        {
+            get
+            {
+                List<double> lengths = new List<double>();
+
+                foreach (var mol in Molecules.Values)
+                {
+                    lengths.AddRange(mol.BondLengths);
+                }
+
+                foreach (var bond in Bonds)
+                {
+                    lengths.Add(bond.BondVector.Length);
+                }
+
+                return lengths;
+            }
+        }
+
         #region Structural Properties
 
         public string Id

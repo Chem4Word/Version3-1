@@ -53,7 +53,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             string fileName = Path.Combine(Path.GetTempPath(), $"Chem4Word-V3-{guid}.docx");
 
-            bool canRender = m.TotalAtomsCount > 0 && (m.MeanBondLength > Constants.BondLengthTolerance / 2 || m.TotalBondsCount == 0);
+            bool canRender = m.TotalAtomsCount > 0 && (m.AverageBondLength > Constants.BondLengthTolerance / 2 || m.TotalBondsCount == 0);
 
             if (canRender)
             {
