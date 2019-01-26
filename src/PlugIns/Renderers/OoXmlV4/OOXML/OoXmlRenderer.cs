@@ -14,8 +14,8 @@ using System.Reflection;
 using System.Windows;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model;
-using Chem4Word.Model.Enums;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.OOXML.Atoms;
 using Chem4Word.Renderer.OoXmlV4.OOXML.Bonds;
 using Chem4Word.Renderer.OoXmlV4.TTF;
@@ -41,7 +41,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private IChem4WordTelemetry _telemetry;
         private Point _topLeft;
 
-        private Model.Model _chemistryModel;
+        private Model2.Model _chemistryModel;
         private Dictionary<char, TtfCharacter> _TtfCharacterSet;
 
         private long _ooxmlId = 1;
@@ -59,7 +59,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private PeriodicTable _pt = new PeriodicTable();
 
-        public OoXmlRenderer(Model.Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        public OoXmlRenderer(Model2.Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -133,7 +133,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             _medianBondLength = GeometryTool.GetMedianBondLength2D(_chemistryModel.AllBonds);
 
             int moleculeNo = 0;
-            foreach (Molecule mol in _chemistryModel.Molecules)
+            foreach (Molecule mol in _chemistryModel.Molecules.Values)
             {
                 moleculeNo++;
                 // Step 1- gather the atom information together
@@ -223,7 +223,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             if (_options.ShowMoleculeBoundingBoxes)
             {
                 DrawBox(wordprocessingGroup1, _modelExtents, "00ff00", 1);
-                foreach (Molecule mol in _chemistryModel.Molecules)
+                foreach (Molecule mol in _chemistryModel.Molecules.Values)
                 {
                     DrawBox(wordprocessingGroup1, mol.BoundingBox, "0000ff", 1);
                     DrawBox(wordprocessingGroup1, MoleculeExtents(mol), "ff0000", 1);
@@ -287,7 +287,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             double abl = _chemistryModel.MeanBondLength;
             Debug.WriteLine("Elapsed time for GenerateRun " + swr.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
-            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.AllAtoms.Count} atoms and {_chemistryModel.AllBonds.Count} bonds took {swr.ElapsedMilliseconds.ToString("##,##0")} ms; Average Bond Length: {abl.ToString("#0.00")}");
+            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0")} ms; Average Bond Length: {abl.ToString("#0.00")}");
 
             ShutDownProgress(pb);
 
@@ -345,7 +345,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             BondLineRenderer blr = new BondLineRenderer(_canvasExtents, ref _ooxmlId, _medianBondLength);
 
-            if (_chemistryModel.AllBonds.Count > 1)
+            if (_chemistryModel.TotalBondsCount > 1)
             {
                 pb.Show();
             }
@@ -391,7 +391,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             // so that they do not overlap label characters
 
-            if (_chemistryModel.AllAtoms.Count > 1)
+            if (_chemistryModel.TotalAtomsCount > 1)
             {
                 pb.Show();
             }
@@ -523,7 +523,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             BondLinePositioner br = new BondLinePositioner(_bondLines, _medianBondLength);
 
-            if (mol.AllBonds.Count > 0)
+            if (mol.Bonds.Count > 0)
             {
                 pb.Show();
             }
@@ -531,7 +531,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             pb.Value = 0;
             pb.Maximum = mol.Bonds.Count;
 
-            foreach (Bond bond in mol.AllBonds)
+            foreach (Bond bond in mol.Bonds)
             {
                 pb.Increment(1);
                 br.CreateLines(bond);
@@ -542,7 +542,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             // Implement beautification of semi open double bonds and double bonds touching rings
 
             // Obtain list of Double Bonds with Placement of BondDirection.None
-            List<Bond> doubleBonds = mol.AllBonds.Where(b => b.OrderValue.Value == 2 && b.Placement == BondDirection.None).ToList();
+            List<Bond> doubleBonds = mol.Bonds.Where(b => b.OrderValue.Value == 2 && b.Placement == Globals.BondDirection.None).ToList();
             if (doubleBonds.Count > 0)
             {
                 pb.Message = $"Processing Double Bonds in Molecule {moleculeNo}";
@@ -561,7 +561,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             if ((Element)atom.Element == Globals.PeriodicTable.C)
             {
-                if (atom.Bonds.Count == 3)
+                if (atom.Bonds.ToList().Count == 3)
                 {
                     bool isInRing = atom.Rings.Count != 0;
                     List<BondLine> lines = _bondLines.Where(bl => bl.ParentBond.Equals(bondId)).ToList();
@@ -648,15 +648,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             AtomLabelPositioner ar = new AtomLabelPositioner(_atomLabelCharacters, _TtfCharacterSet, pt, _telemetry);
 
             // Create Characters
-            if (mol.AllAtoms.Count > 1)
+            if (mol.Atoms.Count > 1)
             {
                 pb.Show();
             }
             pb.Message = $"Processing Atoms in Molecule {moleculeNo}";
             pb.Value = 0;
-            pb.Maximum = mol.AllAtoms.Count;
+            pb.Maximum = mol.Atoms.Count;
 
-            foreach (Atom atom in mol.AllAtoms)
+            foreach (Atom atom in mol.Atoms.Values)
             {
                 //Debug.WriteLine("Atom: " + atom.Id + " " + atom.ElementType);
                 pb.Increment(1);

@@ -8,8 +8,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
-using Chem4Word.Model;
-using Chem4Word.Model.Enums;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 {
@@ -56,32 +56,32 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
             switch (bond.Order)
             {
-                case Bond.OrderZero:
+                case Globals.OrderZero:
                 case "unknown":
                     m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Dotted, bond.Id, bond.Parent.Id));
                     break;
 
-                case Bond.OrderPartial01:
+                case Globals.OrderPartial01:
                     m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Dashed, bond.Id, bond.Parent.Id));
                     break;
 
                 case "1":
-                case Bond.OrderSingle:
+                case Globals.OrderSingle:
                     switch (bond.Stereo)
                     {
-                        case BondStereo.None:
+                        case Globals.BondStereo.None:
                             m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id));
                             break;
 
-                        case BondStereo.Hatch:
+                        case Globals.BondStereo.Hatch:
                             m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Hatch, bond.Id, bond.Parent.Id));
                             break;
 
-                        case BondStereo.Wedge:
+                        case Globals.BondStereo.Wedge:
                             m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Wedge, bond.Id, bond.Parent.Id));
                             break;
 
-                        case BondStereo.Indeterminate:
+                        case Globals.BondStereo.Indeterminate:
                             m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Wavy, bond.Id, bond.Parent.Id));
                             break;
 
@@ -92,8 +92,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                     }
                     break;
 
-                case Bond.OrderPartial12:
-                case Bond.OrderAromatic:
+                case Globals.OrderPartial12:
+                case Globals.OrderAromatic:
                     BondLine a = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                     m_BondLines.Add(a.GetParallel(-(BondOffset() / 2)));
                     BondLine a1 = a.GetParallel(BondOffset() / 2);
@@ -104,8 +104,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                     m_BondLines.Add(a1);
                     break;
 
-                case Bond.OrderDouble:
-                    if (bond.Stereo == BondStereo.Indeterminate) //crossing bonds
+                case Globals.OrderDouble:
+                    if (bond.Stereo == Globals.BondStereo.Indeterminate) //crossing bonds
                     {
                         // Crossed lines
                         BondLine d = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
@@ -151,7 +151,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
                             switch (bond.Placement)
                             {
-                                case BondDirection.Anticlockwise:
+                                case Globals.BondDirection.Anticlockwise:
                                     BondLine da = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                                     m_BondLines.Add(da);
 
@@ -180,7 +180,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                                     }
                                     break;
 
-                                case BondDirection.Clockwise:
+                                case Globals.BondDirection.Clockwise:
                                     BondLine dc = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                                     m_BondLines.Add(dc);
 
@@ -212,7 +212,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                                 default:
                                     switch (bond.Stereo)
                                     {
-                                        case BondStereo.Cis:
+                                        case Globals.BondStereo.Cis:
                                             BondLine dcc = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                                             m_BondLines.Add(dcc);
                                             BondLine blnewc = dcc.GetParallel(+BondOffset());
@@ -222,7 +222,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                                             m_BondLines.Add(new BondLine(startPointn, endPointn, BondLineStyle.Solid, bond.Id, bond.Parent.Id));
                                             break;
 
-                                        case BondStereo.Trans:
+                                        case Globals.BondStereo.Trans:
                                             BondLine dtt = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                                             m_BondLines.Add(dtt);
                                             BondLine blnewt = dtt.GetParallel(+BondOffset());
@@ -245,7 +245,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                     break;
 
                 case "3":
-                case "T":
+                case Globals.OrderTriple:
                     // Draw main bond line
                     BondLine t = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                     m_BondLines.Add(t);

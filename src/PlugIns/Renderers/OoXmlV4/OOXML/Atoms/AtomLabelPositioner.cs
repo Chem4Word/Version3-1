@@ -12,6 +12,8 @@ using System.Reflection;
 using System.Windows;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using IChem4Word.Contracts;
 using Point = System.Windows.Point;
@@ -65,8 +67,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             //Debug.WriteLine("  X: " + atom.X2 + " Y: " + atom.Y2 + " Implicit H Count: " + implicitHCount);
 
-            int ringCount = atom.Rings.Count();
-            int bondCount = atom.Bonds.Count;
+            int ringCount = atom.Rings.Count;
+            int bondCount = atom.Bonds.ToList().Count;
 
             //var bv = atom.BalancingVector;
             //_telemetry.Write(module, "Debugging", $"Atom {atomLabel} [{atom.Id}] at {atom.Position} BalancingVector {bv} [{CoordinateTool.BearingOfVector(bv)}°]");
@@ -85,8 +87,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                     if (bondCount == 2)
                     {
-                        Point p1 = atom.Bonds[0].OtherAtom(atom).Position;
-                        Point p2 = atom.Bonds[1].OtherAtom(atom).Position;
+                        Point p1 = atom.Bonds.ToList()[0].OtherAtom(atom).Position;
+                        Point p2 = atom.Bonds.ToList()[1].OtherAtom(atom).Position;
 
                         double angle1 = Vector.AngleBetween(-(atom.Position - p1), atom.Position - p2);
 
@@ -286,7 +288,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         switch (nesw)
                         {
                             case CompassPoints.North:
-                                if (atom.Bonds.Count > 1)
+                                if (atom.Bonds.ToList().Count > 1)
                                 {
                                     cursorPosition.X = labelBounds.X + (labelBounds.Width / 2) - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
                                     cursorPosition.Y = cursorPosition.Y +
@@ -307,7 +309,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                                 break;
 
                             case CompassPoints.South:
-                                if (atom.Bonds.Count > 1)
+                                if (atom.Bonds.ToList().Count > 1)
                                 {
                                     cursorPosition.X = labelBounds.X + (labelBounds.Width / 2) - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
                                     cursorPosition.Y = cursorPosition.Y +

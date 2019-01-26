@@ -245,7 +245,7 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Bonds
                     break;
 
                 case "3":
-                case "T":
+                case Bond.OrderTriple:
                     // Draw main bond line
                     BondLine t = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id);
                     m_BondLines.Add(t);

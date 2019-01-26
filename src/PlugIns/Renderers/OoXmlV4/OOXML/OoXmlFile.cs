@@ -10,7 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using Chem4Word.Core.Helpers;
-using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model2.Helpers;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -37,7 +37,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             CMLConverter cc = new CMLConverter();
-            Model.Model m = cc.Import(cml);
+            Model2.Model m = cc.Import(cml);
             if (m.AllErrors.Count > 0 || m.AllWarnings.Count > 0)
             {
                 if (m.AllErrors.Count > 0)
@@ -53,7 +53,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             string fileName = Path.Combine(Path.GetTempPath(), $"Chem4Word-V3-{guid}.docx");
 
-            bool canRender = m.AllAtoms.Count > 0 && (m.MeanBondLength > Constants.BondLengthTolerance / 2 || m.AllBonds.Count == 0);
+            bool canRender = m.TotalAtomsCount > 0 && (m.MeanBondLength > Constants.BondLengthTolerance / 2 || m.TotalBondsCount == 0);
 
             if (canRender)
             {
@@ -89,7 +89,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         /// <param name="options"></param>
         /// <param name="telemetry"></param>
         /// <param name="topLeft"></param>
-        private static void AddPictureFromModel(Body docbody, Model.Model model, string bookmarkName, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        private static void AddPictureFromModel(Body docbody, Model2.Model model, string bookmarkName, Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             Paragraph paragraph1 = new Paragraph();
             if (!string.IsNullOrEmpty(bookmarkName))
