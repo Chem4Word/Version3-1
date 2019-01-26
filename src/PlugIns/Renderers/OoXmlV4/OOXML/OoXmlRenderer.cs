@@ -298,7 +298,38 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
 
-            foreach (var atom in _chemistryModel.AllAtoms)
+            foreach (var molecule in _chemistryModel.Molecules.Values)
+            {
+                foreach (var atom in molecule.Atoms.Values)
+                {
+                    DrawAtomCentre(atom);
+                }
+
+                foreach (var childMolecule in molecule.Molecules.Values)
+                {
+                    DrawAtoms(childMolecule);
+                }
+            }
+
+            //Local Function
+            void DrawAtoms(Molecule molecule)
+            {
+                foreach (var atom in molecule.Atoms.Values)
+                {
+                    DrawAtomCentre(atom);
+                }
+
+                foreach (var childMolecule in molecule.Molecules.Values)
+                {
+                    foreach (var atom in childMolecule.Atoms.Values)
+                    {
+                        DrawAtomCentre(atom);
+                    }
+                }
+            }
+
+            //Local Function
+            void DrawAtomCentre(Atom atom)
             {
                 Rect bb = new Rect(new Point(atom.Position.X - xx, atom.Position.Y - xx), new Point(atom.Position.X + xx, atom.Position.Y + xx));
                 DrawShape(wordprocessingGroup1, bb, A.ShapeTypeValues.Ellipse, "ff0000");
@@ -326,7 +357,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             AtomLabelRenderer alr = new AtomLabelRenderer(_canvasExtents, ref _ooxmlId, _options);
 
-            if (_chemistryModel.AllAtoms.Count() > 1)
+            if (_chemistryModel.TotalAtomsCount > 1)
             {
                 pb.Show();
             }
