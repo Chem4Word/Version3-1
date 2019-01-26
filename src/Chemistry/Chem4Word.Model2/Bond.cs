@@ -656,7 +656,7 @@ namespace Chem4Word.Model2
 
         public Atom OtherAtom(Atom a)
         {
-            return OtherAtom(a.Id);
+            return OtherAtom(a.InternalId);
         }
 
         private Atom OtherAtom(string aId)

@@ -160,11 +160,21 @@ namespace Chem4Word.Model2
         {
             get
             {
+                bool isNew = true;
                 Rect boundingBox = new Rect();
 
                 foreach (var mol in Molecules.Values)
                 {
-                    boundingBox.Union(mol.BoundingBox);
+                    if (isNew)
+                    {
+                        boundingBox = mol.BoundingBox;
+                        isNew = false;
+                    }
+                    else
+                    {
+                        boundingBox.Union(mol.BoundingBox);
+                    }
+
                 }
 
                 return boundingBox;

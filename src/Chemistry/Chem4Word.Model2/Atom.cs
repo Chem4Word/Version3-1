@@ -402,6 +402,7 @@ namespace Chem4Word.Model2
         {
             Id = Guid.NewGuid().ToString("D");
             _internalId = Id;
+            Rings = new List<Ring>();
         }
 
         /// <summary>
