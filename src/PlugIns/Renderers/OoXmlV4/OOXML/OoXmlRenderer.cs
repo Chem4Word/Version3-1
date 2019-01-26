@@ -121,15 +121,22 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             //set the median bond length
             _medianBondLength = _chemistryModel.AverageBondLength;
 
+
             int moleculeNo = 0;
             foreach (Molecule mol in _chemistryModel.Molecules.Values)
             {
-                moleculeNo++;
+                ProcessMolecule(mol, ref moleculeNo);
+            }
+
+            // Local Function
+            void ProcessMolecule(Molecule mol, ref int molNumber)
+            {
+                molNumber++;
                 // Step 1- gather the atom information together
                 Debug.WriteLine($"{module} Starting Step 1");
                 //_telemetry.Write(module, "Verbose", $"Starting Step 1 for molecule {moleculeNo}");
 
-                ProcessAtoms(mol, pb, moleculeNo, _pt);
+                ProcessAtoms(mol, pb, molNumber, _pt);
 
                 Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
                 //_telemetry.Write(module, "Timing", $"Step 1 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
@@ -140,7 +147,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 Debug.WriteLine($"{module} Starting Step 2");
                 //_telemetry.Write(module, "Verbose", $"Starting Step 2 for molecule {moleculeNo}");
-                ProcessBonds(mol, pb, moleculeNo);
+                ProcessBonds(mol, pb, molNumber);
 
                 Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
                 //_telemetry.Write(module, "Timing", $"Step 2 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
@@ -154,6 +161,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     {
                         _rings.Add(ring.UniqueID, ring);
                     }
+                }
+
+                foreach (var child in mol.Molecules.Values)
+                {
+                    ProcessMolecule(child, ref molNumber);
                 }
             }
 

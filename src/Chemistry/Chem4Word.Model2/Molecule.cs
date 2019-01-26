@@ -109,17 +109,31 @@ namespace Chem4Word.Model2
         {
             get
             {
-                var xMax = Atoms.Values.Select(a => a.Position.X).Max();
-                var xMin = Atoms.Values.Select(a => a.Position.X).Min();
+                bool isNew = true;
+                Rect boundingBox = new Rect();
+                if (Atoms != null && Atoms.Any())
+                {
+                    var xMax = Atoms.Values.Select(a => a.Position.X).Max();
+                    var xMin = Atoms.Values.Select(a => a.Position.X).Min();
 
-                var yMax = Atoms.Values.Select(a => a.Position.Y).Max();
-                var yMin = Atoms.Values.Select(a => a.Position.Y).Min();
+                    var yMax = Atoms.Values.Select(a => a.Position.Y).Max();
+                    var yMin = Atoms.Values.Select(a => a.Position.Y).Min();
 
-                var boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+                    boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+                    isNew = false;
+                }
 
                 foreach (var mol in Molecules.Values)
                 {
-                    boundingBox.Union(mol.BoundingBox);
+                    if (isNew)
+                    {
+                        boundingBox = mol.BoundingBox;
+                        isNew = false;
+                    }
+                    else
+                    {
+                        boundingBox.Union(mol.BoundingBox);
+                    }
                 }
 
                 return boundingBox;
