@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 
 namespace Chem4Word.Model2
 {
@@ -154,6 +155,22 @@ namespace Chem4Word.Model2
                 return lengths.Average();
             }
         }
+
+        public Rect OverallBoundingBox
+        {
+            get
+            {
+                Rect boundingBox = new Rect();
+
+                foreach (var mol in Molecules.Values)
+                {
+                    boundingBox.Union(mol.BoundingBox);
+                }
+
+                return boundingBox;
+            }
+        }
+
 
         public string Path => "/";
         private Dictionary<string, Molecule> _molecules { get; }

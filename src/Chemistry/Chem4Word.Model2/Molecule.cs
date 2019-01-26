@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Xml.Linq;
 using static Chem4Word.Model2.Helpers.CML;
 
@@ -101,6 +102,27 @@ namespace Chem4Word.Model2
                 }
 
                 return lengths;
+            }
+        }
+
+        public Rect BoundingBox
+        {
+            get
+            {
+                var xMax = Atoms.Values.Select(a => a.Position.X).Max();
+                var xMin = Atoms.Values.Select(a => a.Position.X).Min();
+
+                var yMax = Atoms.Values.Select(a => a.Position.Y).Max();
+                var yMin = Atoms.Values.Select(a => a.Position.Y).Min();
+
+                var boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+
+                foreach (var mol in Molecules.Values)
+                {
+                    boundingBox.Union(mol.BoundingBox);
+                }
+
+                return boundingBox;
             }
         }
 

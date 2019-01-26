@@ -73,18 +73,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             _chemistryModel = model;
 
-            DetermineInitialExtents();
-        }
-
-        private void DetermineInitialExtents()
-        {
-            var xMax = _chemistryModel.AllAtoms.Select(a => a.Position.X).Max();
-            var xMin = _chemistryModel.AllAtoms.Select(a => a.Position.X).Min();
-
-            var yMax = _chemistryModel.AllAtoms.Select(a => a.Position.Y).Max();
-            var yMin = _chemistryModel.AllAtoms.Select(a => a.Position.Y).Min();
-
-            _modelExtents = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            _modelExtents = model.OverallBoundingBox;
         }
 
         private Rect MoleculeExtents(Molecule mol)
