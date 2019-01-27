@@ -5,11 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Interfaces;
 using System.Xml.Linq;
-using static Chem4Word.Model2.Helpers.CML;
+using Chem4Word.Model2.Interfaces;
 
-namespace Chem4Word.Model2.Helpers
+namespace Chem4Word.Model2.Converters
 {
     public class CMLConverter
     {
@@ -31,13 +30,13 @@ namespace Chem4Word.Model2.Helpers
                 var root = modelDoc.Root;
 
                 // Only import if not null
-                var customXmlPartGuid = GetCustomXmlPartGuid(root);
+                var customXmlPartGuid = CML.GetCustomXmlPartGuid(root);
                 if (customXmlPartGuid != null && !string.IsNullOrEmpty(customXmlPartGuid.Value))
                 {
                     newModel.CustomXmlPartGuid = customXmlPartGuid.Value;
                 }
 
-                var moleculeElements = GetMolecules(root);
+                var moleculeElements = CML.GetMolecules(root);
 
                 foreach (XElement meElement in moleculeElements)
                 {
@@ -56,6 +55,8 @@ namespace Chem4Word.Model2.Helpers
                     // molecule.ConciseFormula = molecule.CalculatedFormula();
                 }
                 //newModel.Relabel(true);
+
+                newModel.Refresh();
             }
 
             return newModel;

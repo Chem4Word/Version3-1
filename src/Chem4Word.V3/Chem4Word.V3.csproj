@@ -586,6 +586,10 @@
       <Project>{1e3fc1f1-06cc-44bd-8004-3ef0ce7eeaa7}</Project>
       <Name>Chem4Word.ACME</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Chemistry\Chem4Word.Model2\Chem4Word.Model2.csproj">
+      <Project>{c69bab8f-4881-4d5f-9929-fc8470df1e48}</Project>
+      <Name>Chem4Word.Model2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Chemistry\Chem4Word.View\Chem4Word.View.csproj">
       <Project>{352c0710-fe0d-41ce-ac98-a1af992f9eff}</Project>
       <Name>Chem4Word.View</Name>

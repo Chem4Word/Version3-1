@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows;
 
 namespace Chem4Word.Model2
 {
@@ -139,6 +141,47 @@ namespace Chem4Word.Model2
             }
         }
 
+        public double AverageBondLength
+        {
+            get
+            {
+                List<double> lengths = new List<double>();
+
+                foreach (var mol in Molecules.Values)
+                {
+                    lengths.AddRange(mol.BondLengths);
+                }
+
+                return lengths.Average();
+            }
+        }
+
+        public Rect OverallBoundingBox
+        {
+            get
+            {
+                bool isNew = true;
+                Rect boundingBox = new Rect();
+
+                foreach (var mol in Molecules.Values)
+                {
+                    if (isNew)
+                    {
+                        boundingBox = mol.BoundingBox;
+                        isNew = false;
+                    }
+                    else
+                    {
+                        boundingBox.Union(mol.BoundingBox);
+                    }
+
+                }
+
+                return boundingBox;
+            }
+        }
+
+
         public string Path => "/";
         private Dictionary<string, Molecule> _molecules { get; }
         public ReadOnlyDictionary<string, Molecule> Molecules;
@@ -217,6 +260,14 @@ namespace Chem4Word.Model2
             foreach (Molecule m in Molecules.Values)
             {
                 m.ReLabel(b, ref iMolcount, ref iAtomCount, ref iBondcount);
+            }
+        }
+
+        public void Refresh()
+        {
+            foreach (var molecule in Molecules.Values)
+            {
+                molecule.Refresh();
             }
         }
     }

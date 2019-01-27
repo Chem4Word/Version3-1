@@ -11,6 +11,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Helpers;
 using Microsoft.Win32;
 

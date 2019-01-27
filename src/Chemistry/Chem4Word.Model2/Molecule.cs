@@ -16,8 +16,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Xml.Linq;
-using static Chem4Word.Model2.Helpers.CML;
+using Chem4Word.Model2.Converters;
+using static Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -84,6 +86,61 @@ namespace Chem4Word.Model2
             }
         }
 
+        public List<double> BondLengths
+        {
+            get
+            {
+                List<double> lengths = new List<double>();
+
+                foreach (var mol in Molecules.Values)
+                {
+                    lengths.AddRange(mol.BondLengths);
+                }
+
+                foreach (var bond in Bonds)
+                {
+                    lengths.Add(bond.BondVector.Length);
+                }
+
+                return lengths;
+            }
+        }
+
+        public Rect BoundingBox
+        {
+            get
+            {
+                bool isNew = true;
+                Rect boundingBox = new Rect();
+                if (Atoms != null && Atoms.Any())
+                {
+                    var xMax = Atoms.Values.Select(a => a.Position.X).Max();
+                    var xMin = Atoms.Values.Select(a => a.Position.X).Min();
+
+                    var yMax = Atoms.Values.Select(a => a.Position.Y).Max();
+                    var yMin = Atoms.Values.Select(a => a.Position.Y).Min();
+
+                    boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+                    isNew = false;
+                }
+
+                foreach (var mol in Molecules.Values)
+                {
+                    if (isNew)
+                    {
+                        boundingBox = mol.BoundingBox;
+                        isNew = false;
+                    }
+                    else
+                    {
+                        boundingBox.Union(mol.BoundingBox);
+                    }
+                }
+
+                return boundingBox;
+            }
+        }
+
         #region Structural Properties
 
         public string Id
@@ -107,7 +164,9 @@ namespace Chem4Word.Model2
                 if (Parent != null)
                 {
                     if (Parent.Root != null)
+                    {
                         return Parent.Root;
+                    }
                     return this;
                 }
 
@@ -575,6 +634,11 @@ namespace Chem4Word.Model2
 
         public void Refresh()
         {
+            foreach (var child in Molecules.Values)
+            {
+                child.Refresh();
+            }
+
             RebuildRingsFigueras();
         }
 
