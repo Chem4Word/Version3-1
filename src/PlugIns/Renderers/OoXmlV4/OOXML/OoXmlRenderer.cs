@@ -34,6 +34,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 {
     public class OoXmlRenderer
     {
+        // DrawingML Units
+        // https://startbigthinksmall.wordpress.com/2010/01/04/points-inches-and-emus-measuring-units-in-office-open-xml/
+        // EMU Calculator
+        // http://lcorneliussen.de/raw/dashboards/ooxml/
+
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
@@ -197,7 +202,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     {
                         r.Union(box);
                     }
-                    DrawBox(wordprocessingGroup1, box, "ff0000", 1);
+                    DrawBox(wordprocessingGroup1, box, "ff0000", .25);
                 }
 
                 foreach (var box in _boundingBoxesWithLabels)
@@ -211,17 +216,17 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     {
                         r.Union(box);
                     }
-                    DrawBox(wordprocessingGroup1, box, "00ff00", 1);
+                    DrawBox(wordprocessingGroup1, box, "00ff00", .25);
                 }
 
                 if (!isNew)
                 {
-                    DrawBox(wordprocessingGroup1, r, "00ff00", 1);
+                    DrawBox(wordprocessingGroup1, r, "00ff00", .25);
                 }
 
-                DrawBox(wordprocessingGroup1, _modelExtents, "ff0000", 1);
+                DrawBox(wordprocessingGroup1, _modelExtents, "ff0000", .25);
 
-                DrawBox(wordprocessingGroup1, _canvasExtents, "000000", 1);
+                DrawBox(wordprocessingGroup1, _canvasExtents, "000000", .25);
             }
 
             if (_options.ShowRingCentres)
@@ -797,7 +802,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return inline1;
         }
 
-        private void DrawBox(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, int thick)
+        private void DrawBox(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, double points)
         {
             UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "box" + bondLineId;
@@ -878,7 +883,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            A.Outline outline1 = new A.Outline() { Width = thick, CapType = A.LineCapValues.Round };
+            Int32Value emus = (Int32Value) (points * 12700);
+            A.Outline outline1 = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();
 
