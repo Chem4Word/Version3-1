@@ -16,7 +16,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
-using static Chem4Word.Model2.Helpers.CML;
+using static Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {

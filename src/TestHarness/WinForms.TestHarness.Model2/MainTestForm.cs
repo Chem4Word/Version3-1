@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Telemetry;
 

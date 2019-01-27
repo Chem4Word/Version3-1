@@ -262,5 +262,13 @@ namespace Chem4Word.Model2
                 m.ReLabel(b, ref iMolcount, ref iAtomCount, ref iBondcount);
             }
         }
+
+        public void Refresh()
+        {
+            foreach (var molecule in Molecules.Values)
+            {
+                molecule.Refresh();
+            }
+        }
     }
 }

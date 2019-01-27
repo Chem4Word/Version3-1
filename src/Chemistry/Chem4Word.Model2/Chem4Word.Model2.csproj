@@ -66,8 +66,8 @@
     <Compile Include="Geometry\Packer.cs" />
     <Compile Include="Geometry\Seperator.cs" />
     <Compile Include="Group.cs" />
-    <Compile Include="Helpers\CML.cs" />
-    <Compile Include="Helpers\CMLConverter.cs" />
+    <Compile Include="Converters\CML.cs" />
+    <Compile Include="Converters\CMLConverter.cs" />
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Interfaces\IChemistryContainer.cs" />

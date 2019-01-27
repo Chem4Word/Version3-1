@@ -10,6 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using Chem4Word.Core.Helpers;
+using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Helpers;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;

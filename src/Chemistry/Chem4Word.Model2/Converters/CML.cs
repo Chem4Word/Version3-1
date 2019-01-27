@@ -11,8 +11,9 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Xml.Linq;
+using Chem4Word.Model2.Helpers;
 
-namespace Chem4Word.Model2.Helpers
+namespace Chem4Word.Model2.Converters
 {
     public static class CML
     {

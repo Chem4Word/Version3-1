@@ -18,7 +18,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
-using static Chem4Word.Model2.Helpers.CML;
+using Chem4Word.Model2.Converters;
+using static Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -163,7 +164,9 @@ namespace Chem4Word.Model2
                 if (Parent != null)
                 {
                     if (Parent.Root != null)
+                    {
                         return Parent.Root;
+                    }
                     return this;
                 }
 
@@ -631,6 +634,11 @@ namespace Chem4Word.Model2
 
         public void Refresh()
         {
+            foreach (var child in Molecules.Values)
+            {
+                child.Refresh();
+            }
+
             RebuildRingsFigueras();
         }
 
