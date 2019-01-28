@@ -217,7 +217,7 @@ namespace Chem4Word.Model2
 
             //start with the start atom, and find the other two adjacent atoms that are part of the ring
             var adj = from n in start.Neighbours
-                      where n.Rings.Contains(this)
+                      where Atoms.Contains(n)
                       select n;
             var nextatoms = adj.ToArray();
 

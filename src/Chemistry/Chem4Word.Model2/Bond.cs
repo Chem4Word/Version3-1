@@ -555,7 +555,7 @@ namespace Chem4Word.Model2
 
         public Vector BondVector
         {
-            get { return StartAtom.Position - EndAtom.Position; }
+            get { return EndAtom.Position - StartAtom.Position; }
         }
 
         public double HatchScaling => BondVector.Length / (Globals.SingleAtomPseudoBondLength * 2);

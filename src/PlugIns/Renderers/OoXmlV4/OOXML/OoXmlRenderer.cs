@@ -202,7 +202,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     {
                         r.Union(box);
                     }
-                    DrawBox(wordprocessingGroup1, box, "ff0000", .25);
+                    DrawBox(wordprocessingGroup1, box, "ff0000", .75);
                 }
 
                 foreach (var box in _boundingBoxesWithLabels)
