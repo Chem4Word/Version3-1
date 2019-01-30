@@ -50,18 +50,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private Dictionary<char, TtfCharacter> _TtfCharacterSet;
 
         private long _ooxmlId = 1;
-        private Rect _canvasExtents;
+        private Rect _boundingBoxOfAllCharacters;
 
         private double _medianBondLength;
-        private Rect _modelExtents;
+        private Rect _boundingBoxOfAllAtoms;
 
         private const double EPSILON = 1e-4;
 
         private List<AtomLabelCharacter> _atomLabelCharacters;
         private List<BondLine> _bondLines;
 
-        private List<Rect> _boundingBoxes = new List<Rect>();
-        private List<Rect> _boundingBoxesWithLabels = new List<Rect>();
+        private List<Rect> _boundingBoxesOfMoleculeAtoms = new List<Rect>();
+        private List<Rect> _boundingBoxesOfMoleculesIncludingCharacters = new List<Rect>();
+        private List<Rect> _boundingBoxesOfMoleculesWithAtLeastTwoChildren = new List<Rect>();
         private List<Point> _ringCentres = new List<Point>();
 
         private PeriodicTable _pt = new PeriodicTable();
@@ -80,12 +81,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             _chemistryModel = model;
 
-            _modelExtents = model.OverallBoundingBox;
+            _boundingBoxOfAllAtoms = model.OverallBoundingBox;
         }
 
-        private Rect MoleculeExtents(Molecule mol)
+        private Rect CharacterExtents(Molecule mol)
         {
-            var chars = _atomLabelCharacters.Where(m => m.ParentMolecule.Equals(mol.Id));
+            var chars = _atomLabelCharacters.Where(m => m.ParentMolecule.StartsWith(mol.Path)).ToList();
 
             double xMin = mol.BoundingBox.Left;
             double xMax = mol.BoundingBox.Right;
@@ -175,7 +176,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wp.Inline inline1 = CreateInline(graphicData1, wordprocessingGroup1);
 
             // Right-Click Issues - Step 1 of hopefull fix - Add background to force whole object select
-            //DrawShape(wordprocessingGroup1, _canvasExtents, A.ShapeTypeValues.Rectangle, "eeeeee");
+            //DrawShape(wordprocessingGroup1, _boundingBoxOfAllCharacters, A.ShapeTypeValues.Rectangle, "eeeeee");
 
             #endregion Step 5 - Create main OoXml drawing objects
 
@@ -188,45 +189,24 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             if (_options.ShowMoleculeBoundingBoxes)
             {
-                bool isNew = true;
-                Rect r = new Rect();
-
-                foreach (var box in _boundingBoxes)
+                foreach (var box in _boundingBoxesOfMoleculeAtoms)
                 {
-                    if (isNew)
-                    {
-                        r = box;
-                        isNew = false;
-                    }
-                    else
-                    {
-                        r.Union(box);
-                    }
                     DrawBox(wordprocessingGroup1, box, "ff0000", .75);
                 }
 
-                foreach (var box in _boundingBoxesWithLabels)
+                foreach (var box in _boundingBoxesOfMoleculesWithAtLeastTwoChildren)
                 {
-                    if (isNew)
-                    {
-                        r = box;
-                        isNew = false;
-                    }
-                    else
-                    {
-                        r.Union(box);
-                    }
+                    DrawBox(wordprocessingGroup1, box, "00ffff", .75);
+                }
+
+                foreach (var box in _boundingBoxesOfMoleculesIncludingCharacters)
+                {
                     DrawBox(wordprocessingGroup1, box, "00ff00", .25);
                 }
 
-                if (!isNew)
-                {
-                    DrawBox(wordprocessingGroup1, r, "00ff00", .25);
-                }
+                DrawBox(wordprocessingGroup1, _boundingBoxOfAllAtoms, "ff0000", .25);
 
-                DrawBox(wordprocessingGroup1, _modelExtents, "ff0000", .25);
-
-                DrawBox(wordprocessingGroup1, _canvasExtents, "000000", .25);
+                DrawBox(wordprocessingGroup1, _boundingBoxOfAllCharacters, "000000", .25);
             }
 
             if (_options.ShowRingCentres)
@@ -326,16 +306,20 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     }
                 }
 
-                Rect r1 = mol.BoundingBox;
-                Rect r2 = MoleculeExtents(mol);
-                r2.Union(r1);
-                _boundingBoxes.Add(r1);
-                _boundingBoxesWithLabels.Add(r2);
-
                 // Recurse into any child molecules
                 foreach (var child in mol.Molecules.Values)
                 {
                     ProcessMolecule(child, ref molNumber);
+                }
+
+                Rect r1 = mol.BoundingBox;
+                Rect r2 = CharacterExtents(mol);
+                r2.Union(r1);
+                _boundingBoxesOfMoleculeAtoms.Add(r1);
+                _boundingBoxesOfMoleculesIncludingCharacters.Add(r2);
+                if (mol.Molecules.Count > 1)
+                {
+                    _boundingBoxesOfMoleculesWithAtLeastTwoChildren.Add(r2);
                 }
             }
 
@@ -402,7 +386,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void AppendAtomLabelOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup1)
         {
-            AtomLabelRenderer alr = new AtomLabelRenderer(_canvasExtents, ref _ooxmlId, _options);
+            AtomLabelRenderer alr = new AtomLabelRenderer(_boundingBoxOfAllCharacters, ref _ooxmlId, _options);
 
             if (_chemistryModel.TotalAtomsCount > 1)
             {
@@ -421,7 +405,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void AppendBondOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup1)
         {
-            BondLineRenderer blr = new BondLineRenderer(_canvasExtents, ref _ooxmlId, _medianBondLength);
+            BondLineRenderer blr = new BondLineRenderer(_boundingBoxOfAllCharacters, ref _ooxmlId, _medianBondLength);
 
             if (_chemistryModel.TotalBondsCount > 1)
             {
@@ -571,10 +555,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             //Debug.WriteLine(m_canvasExtents);
 
-            double xMin = _modelExtents.Left;
-            double xMax = _modelExtents.Right;
-            double yMin = _modelExtents.Top;
-            double yMax = _modelExtents.Bottom;
+            double xMin = _boundingBoxOfAllAtoms.Left;
+            double xMax = _boundingBoxOfAllAtoms.Right;
+            double yMin = _boundingBoxOfAllAtoms.Top;
+            double yMax = _boundingBoxOfAllAtoms.Bottom;
 
             foreach (AtomLabelCharacter alc in _atomLabelCharacters)
             {
@@ -585,7 +569,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
 
             // Create new canvas extents
-            _canvasExtents = new Rect(xMin - OoXmlHelper.DRAWING_MARGIN,
+            _boundingBoxOfAllCharacters = new Rect(xMin - OoXmlHelper.DRAWING_MARGIN,
                 yMin - OoXmlHelper.DRAWING_MARGIN,
                 xMax - xMin + (2 * OoXmlHelper.DRAWING_MARGIN),
                 yMax - yMin + (2 * OoXmlHelper.DRAWING_MARGIN));
@@ -760,8 +744,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(_canvasExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(_canvasExtents.Height);
+            Int64Value width = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfAllCharacters.Width);
+            Int64Value height = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfAllCharacters.Height);
 
             Wp.Inline inline1 = new Wp.Inline() { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U };
             Wp.Extent extent1 = new Wp.Extent() { Cx = width, Cy = height };
@@ -813,7 +797,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value left1 = OoXmlHelper.ScaleCmlToEmu(extents.Left);
             Point pp1 = new Point(left1, top1);
             Size ss2 = new Size(width1, height1);
-            pp1.Offset(OoXmlHelper.ScaleCmlToEmu(-_canvasExtents.Left), OoXmlHelper.ScaleCmlToEmu(-_canvasExtents.Top));
+            pp1.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
             Rect boundingBox = new Rect(pp1, ss2);
 
             Int64Value width = (Int64Value)boundingBox.Width;
@@ -933,7 +917,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value left1 = OoXmlHelper.ScaleCmlToEmu(extents.Left);
             Point pp1 = new Point(left1, top1);
             Size ss2 = new Size(width1, height1);
-            pp1.Offset(OoXmlHelper.ScaleCmlToEmu(-_canvasExtents.Left), OoXmlHelper.ScaleCmlToEmu(-_canvasExtents.Top));
+            pp1.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
             Rect boundingBox = new Rect(pp1, ss2);
 
             Int64Value width = (Int64Value)boundingBox.Width;

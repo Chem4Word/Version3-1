@@ -46,9 +46,6 @@ namespace Chem4Word.Model2.Converters
                     newMol.Parent = (IChemistryContainer)newModel;
                 }
 
-                // Can't use newModel.RebuildMolecules() as it trashes the formulae and labels
-                //newModel.RefreshMolecules();
-
                 foreach (Molecule molecule in newModel.Molecules.Values)
                 {
                     // Force ConciseFormula to be calculated

@@ -187,7 +187,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     if (c != null)
                     {
                         thisCharacterPosition = GetCharacterPosition(cursorPosition, c);
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Id, atom.Parent.Id);
+                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Path, atom.Parent.Path);
                         m_AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
@@ -246,7 +246,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             // Raise the superscript Character
                             thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
 
-                            AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, chargeValueCharacter, atomColour, chr, atom.Id, atom.Parent.Id);
+                            AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, chargeValueCharacter, atomColour, chr, atom.Path, atom.Parent.Path);
                             alcc.IsSubScript = true;
                             m_AtomLabelCharacters.Add(alcc);
 
@@ -261,7 +261,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
                     thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.Height / 2 * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
 
-                    AtomLabelCharacter alcs = new AtomLabelCharacter(thisCharacterPosition, chargeSignCharacter, atomColour, sign, atom.Id, atom.Parent.Id);
+                    AtomLabelCharacter alcs = new AtomLabelCharacter(thisCharacterPosition, chargeSignCharacter, atomColour, sign, atom.Path, atom.Parent.Path);
                     alcs.IsSubScript = true;
                     m_AtomLabelCharacters.Add(alcs);
 
@@ -339,7 +339,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                         //_telemetry.Write(module, "Debugging", $"Adding H at {cursorPosition}");
                         thisCharacterPosition = GetCharacterPosition(cursorPosition, hydrogenCharacter);
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, hydrogenCharacter, atomColour, 'H', atom.Id, atom.Parent.Id);
+                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, hydrogenCharacter, atomColour, 'H', atom.Path, atom.Parent.Path);
                         m_AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
@@ -368,7 +368,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             // Drop the subscript Character
                             thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR));
 
-                            AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, numbers[implicitHCount], atom.Id, atom.Parent.Id);
+                            AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, numbers[implicitHCount], atom.Path, atom.Parent.Path);
                             alc.IsSubScript = true;
                             m_AtomLabelCharacters.Add(alc);
 
@@ -426,7 +426,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         // Raise the superscript Character
                         thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
 
-                        AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Id, atom.Parent.Id);
+                        AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Path, atom.Parent.Path);
                         alcc.IsSubScript = true;
                         m_AtomLabelCharacters.Add(alcc);
 

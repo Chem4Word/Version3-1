@@ -19,7 +19,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
 using Chem4Word.Model2.Converters;
-using static Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -110,8 +109,8 @@ namespace Chem4Word.Model2
         {
             get
             {
-                bool isNew = true;
-                Rect boundingBox = new Rect();
+                Rect boundingBox = Rect.Empty;
+
                 if (Atoms != null && Atoms.Any())
                 {
                     var xMax = Atoms.Values.Select(a => a.Position.X).Max();
@@ -121,15 +120,13 @@ namespace Chem4Word.Model2
                     var yMin = Atoms.Values.Select(a => a.Position.Y).Min();
 
                     boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
-                    isNew = false;
                 }
 
                 foreach (var mol in Molecules.Values)
                 {
-                    if (isNew)
+                    if (boundingBox.IsEmpty)
                     {
                         boundingBox = mol.BoundingBox;
-                        isNew = false;
                     }
                     else
                     {
@@ -268,12 +265,12 @@ namespace Chem4Word.Model2
             Errors = new List<string>();
             Warnings = new List<string>();
 
-            List<XElement> childMolecules = GetMolecules(cmlElement);
+            List<XElement> childMolecules = CML.GetMolecules(cmlElement);
 
-            List<XElement> atomElements = GetAtoms(cmlElement);
+            List<XElement> atomElements = CML.GetAtoms(cmlElement);
             List<XElement> bondElements = CML.GetBonds(cmlElement);
-            List<XElement> nameElements = GetNames(cmlElement);
-            List<XElement> formulaElements = GetFormulas(cmlElement);
+            List<XElement> nameElements = CML.GetNames(cmlElement);
+            List<XElement> formulaElements = CML.GetFormulas(cmlElement);
 
             foreach (XElement childElement in childMolecules)
             {
@@ -326,6 +323,7 @@ namespace Chem4Word.Model2
                     Formulas.Add(formula);
                 }
             }
+
             foreach (XElement nameElement in nameElements)
             {
                 if (string.IsNullOrEmpty(ConciseFormula))
@@ -333,6 +331,7 @@ namespace Chem4Word.Model2
                     Names.Add(new ChemicalName(nameElement));
                 }
             }
+
             RebuildRings();
         }
 
@@ -639,7 +638,7 @@ namespace Chem4Word.Model2
                 child.Refresh();
             }
 
-            RebuildRingsFigueras();
+            RebuildRings();
         }
 
         public Molecule Clone()
@@ -785,77 +784,135 @@ namespace Chem4Word.Model2
         public void RebuildRings()
         {
             RebuildRingsFigueras();
-        }
 
-        /// <summary>
-        /// Modified Figueras top-level algorithm:
-        /// 1. choose the lowest degree atom
-        /// 2. Work out which rings it belongs to
-        /// 3. If it belongs to a ring and that ring hasn't been calculated before, then add it to the set
-        /// 4. delete the atom from the projection, reduce the degree of neighbouring atoms and prune away the side chains
-        /// </summary>
-        private void RebuildRingsFiguerasAlt()
-        {
-#if DEBUG
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-#endif
-            HashSet<string> RingIDs = new HashSet<string>(); //list of rings processed so far
-            if (HasRings)
+            // -------------- //
+            // Local Function //
+            // -------------- //
+            void RebuildRingsFigueras()
             {
-                WipeMoleculeRings();
-
-                //working set of atoms
-                //it's a dictionary, because we initially store the degree of each atom against it
-                //this will change as the pruning operation kicks in
-                Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
-                //lop off any terminal branches - removes all atoms of degree <=1
-                PruneSideChains(workingSet);
-
-                while (workingSet.Any()) //do we have any atoms left in the set
-                {
-                    Atom startAtom = workingSet.OrderBy(kvp => kvp.Value).First().Key; // go for the lowest degree atom (will be of degree >=2)
-                    Ring nextRing = GetRing(startAtom); //identify a ring
-
-                    if (nextRing != null && !RingIDs.Contains(nextRing.UniqueID)) //bingo
-                    {
-                        //and add the ring to the atoms
-                        Rings.Add(nextRing); //add the ring to the set
-                        RingIDs.Add(nextRing.UniqueID);
-
-                        foreach (Atom a in nextRing.Atoms.ToList())
-                        {
-                            a.Rings.Add(nextRing);
-                        }
-
-                        //
-                        if (workingSet.ContainsKey(startAtom))
-                        {
-                            foreach (Atom atom in startAtom.Neighbours.Where(a => workingSet.ContainsKey(a)))
-                            {
-                                //reduce the degree of its neighbours by one
-                                workingSet[atom] -= 1;
-                            }
-                            //break the ring
-
-                            workingSet.Remove(startAtom);
-                            //and chop down the dangling chains
-                            PruneSideChains(workingSet);
-                        }
-                        //remove the atoms in the ring from the working set BUT NOT the graph!
-                    }
-                    else
-                    {
-                        Debug.Assert(workingSet.ContainsKey(startAtom));
-                        workingSet.Remove(startAtom);
-                    } //the atom doesn't belong in a ring, remove it from the set.
-                }
-            }
 #if DEBUG
-            //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
-            sw.Stop();
-            Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+                //Stopwatch sw = new Stopwatch();
+                //sw.Start();
 #endif
+                Rings.Clear();
+
+                if (HasRings)
+                {
+                    //working set of atoms
+                    //it's a dictionary, because we initially store the degree of each atom against it
+                    //this will change as the pruning operation kicks in
+                    Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
+                    //lop off any terminal branches
+                    PruneSideChains(workingSet);
+
+                    while (workingSet.Any()) //do we have any atoms left in the set
+                    {
+                        Atom startAtom = workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
+                        Ring nextRing = GetRing(startAtom); //identify a ring
+                        if (nextRing != null) //bingo
+                        {
+                            //and add the ring to the atoms
+                            Rings.Add(nextRing); //add the ring to the set
+                            foreach (Atom a in nextRing.Atoms.ToList())
+                            {
+                                //if (!a.Rings.Contains(nextRing))
+                                //{
+                                //    a.Rings.Add(nextRing);
+                                //}
+
+                                if (workingSet.ContainsKey(a))
+                                {
+                                    workingSet.Remove(a);
+                                }
+                                //remove the atoms in the ring from the working set BUT NOT the graph!
+                            }
+                        }
+                        else
+                        {
+                            workingSet.Remove(startAtom);
+                        } //the atom doesn't belong in a ring, remove it from the set.
+                    }
+                }
+#if DEBUG
+                //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
+                //sw.Stop();
+                //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+#endif
+                //RefreshRingBonds();
+            }
+
+            // -------------- //
+            // Local Function //
+            // -------------- //
+
+            // Modified Figueras top-level algorithm:
+            // 1. choose the lowest degree atom
+            // 2. Work out which rings it belongs to
+            // 3. If it belongs to a ring and that ring hasn't been calculated before, then add it to the set
+            // 4. delete the atom from the projection, reduce the degree of neighbouring atoms and prune away the side chains
+            void RebuildRingsFiguerasAlt()
+            {
+#if DEBUG
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+#endif
+                HashSet<string> RingIDs = new HashSet<string>(); //list of rings processed so far
+                if (HasRings)
+                {
+                    WipeMoleculeRings();
+
+                    //working set of atoms
+                    //it's a dictionary, because we initially store the degree of each atom against it
+                    //this will change as the pruning operation kicks in
+                    Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
+                    //lop off any terminal branches - removes all atoms of degree <=1
+                    PruneSideChains(workingSet);
+
+                    while (workingSet.Any()) //do we have any atoms left in the set
+                    {
+                        Atom startAtom = workingSet.OrderBy(kvp => kvp.Value).First().Key; // go for the lowest degree atom (will be of degree >=2)
+                        Ring nextRing = GetRing(startAtom); //identify a ring
+
+                        if (nextRing != null && !RingIDs.Contains(nextRing.UniqueID)) //bingo
+                        {
+                            //and add the ring to the atoms
+                            Rings.Add(nextRing); //add the ring to the set
+                            RingIDs.Add(nextRing.UniqueID);
+
+                            foreach (Atom a in nextRing.Atoms.ToList())
+                            {
+                                a.Rings.Add(nextRing);
+                            }
+
+                            //
+                            if (workingSet.ContainsKey(startAtom))
+                            {
+                                foreach (Atom atom in startAtom.Neighbours.Where(a => workingSet.ContainsKey(a)))
+                                {
+                                    //reduce the degree of its neighbours by one
+                                    workingSet[atom] -= 1;
+                                }
+                                //break the ring
+
+                                workingSet.Remove(startAtom);
+                                //and chop down the dangling chains
+                                PruneSideChains(workingSet);
+                            }
+                            //remove the atoms in the ring from the working set BUT NOT the graph!
+                        }
+                        else
+                        {
+                            Debug.Assert(workingSet.ContainsKey(startAtom));
+                            workingSet.Remove(startAtom);
+                        } //the atom doesn't belong in a ring, remove it from the set.
+                    }
+                }
+#if DEBUG
+                //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
+                sw.Stop();
+                Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+#endif
+            }
         }
 
         /// <summary>
@@ -1019,58 +1076,6 @@ namespace Chem4Word.Model2
             return null;
         }
 
-        public void RebuildRingsFigueras()
-        {
-#if DEBUG
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
-#endif
-            Rings.Clear();
-
-            if (HasRings)
-            {
-                //working set of atoms
-                //it's a dictionary, because we initially store the degree of each atom against it
-                //this will change as the pruning operation kicks in
-                Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
-                //lop off any terminal branches
-                PruneSideChains(workingSet);
-
-                while (workingSet.Any()) //do we have any atoms left in the set
-                {
-                    Atom startAtom = workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
-                    Ring nextRing = GetRing(startAtom); //identify a ring
-                    if (nextRing != null) //bingo
-                    {
-                        //and add the ring to the atoms
-                        Rings.Add(nextRing); //add the ring to the set
-                        foreach (Atom a in nextRing.Atoms.ToList())
-                        {
-                            //if (!a.Rings.Contains(nextRing))
-                            //{
-                            //    a.Rings.Add(nextRing);
-                            //}
-
-                            if (workingSet.ContainsKey(a))
-                            {
-                                workingSet.Remove(a);
-                            }
-                            //remove the atoms in the ring from the working set BUT NOT the graph!
-                        }
-                    }
-                    else
-                    {
-                        workingSet.Remove(startAtom);
-                    } //the atom doesn't belong in a ring, remove it from the set.
-                }
-            }
-#if DEBUG
-            //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
-            //sw.Stop();
-            //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
-#endif
-            //RefreshRingBonds();
-        }
 
         #endregion Ring stuff
     }

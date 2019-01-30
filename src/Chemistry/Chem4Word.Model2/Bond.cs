@@ -17,8 +17,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
 using Chem4Word.Model2.Converters;
-using static Chem4Word.Model2.Converters.CML;
-using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.Model2
 {
@@ -109,27 +107,27 @@ namespace Chem4Word.Model2
             {
                 if (value.Equals("0.5"))
                 {
-                    value = OrderPartial01;
+                    value = Globals.OrderPartial01;
                 }
                 if (value.Equals("1") || value.Equals("S"))
                 {
-                    value = OrderSingle;
+                    value = Globals.OrderSingle;
                 }
                 if (value.Equals("1.5"))
                 {
-                    value = OrderPartial12;
+                    value = Globals.OrderPartial12;
                 }
                 if (value.Equals("2") || value.Equals("D"))
                 {
-                    value = OrderDouble;
+                    value = Globals.OrderDouble;
                 }
                 if (value.Equals("3") || value.Equals("T"))
                 {
-                    value = OrderTriple;
+                    value = Globals.OrderTriple;
                 }
                 if (value.Equals("0"))
                 {
-                    value = OrderZero;
+                    value = Globals.OrderZero;
                 }
 
                 _order = value;
@@ -146,29 +144,29 @@ namespace Chem4Word.Model2
         {
             switch (order)
             {
-                case OrderZero:
-                case OrderOther:
+                case Globals.OrderZero:
+                case Globals.OrderOther:
                     return 0;
 
-                case OrderPartial01:
+                case Globals.OrderPartial01:
                     return 0.5;
 
-                case OrderSingle:
+                case Globals.OrderSingle:
                     return 1;
 
-                case OrderPartial12:
+                case Globals.OrderPartial12:
                     return 1.5;
 
-                case OrderAromatic:
+                case Globals.OrderAromatic:
                     return 1.5;
 
-                case OrderDouble:
+                case Globals.OrderDouble:
                     return 2;
 
-                case OrderPartial23:
+                case Globals.OrderPartial23:
                     return 2.5;
 
-                case OrderTriple:
+                case Globals.OrderTriple:
                     return 3;
 
                 default:
@@ -622,7 +620,7 @@ namespace Chem4Word.Model2
             }
             Globals.BondDirection? dir = null;
 
-            var dirAttr = cmlElement.Attribute(c4w + "placement");
+            var dirAttr = cmlElement.Attribute(CML.c4w + "placement");
             if (dirAttr != null)
             {
                 Globals.BondDirection temp;
