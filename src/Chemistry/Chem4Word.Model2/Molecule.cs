@@ -573,10 +573,7 @@ namespace Chem4Word.Model2
 
         public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
         {
-            //do the atoms first THEN the bonds
-            //this sets the bond IDs
             Id = $"m{++iMolcount}";
-            Dictionary<string, string> atomIDLookup = new Dictionary<string, string>();
             foreach (Atom a in Atoms.Values)
             {
                 a.Id = $"a{++iAtomCount}";
@@ -587,24 +584,24 @@ namespace Chem4Word.Model2
                 b.Id = $"b{++iBondcount}";
             }
 
-            int count = 1;
-            foreach (var formula in Formulas)
+            if (includeNames)
             {
-                formula.Id = $"{Id}.f{count++}";
-            }
-
-            count = 1;
-            foreach (var name in Names)
-            {
-                name.Id = $"{Id}.n{count++}";
-            }
-
-            if (Molecules.Any())
-            {
-                foreach (Molecule mol in Molecules.Values)
+                int count = 1;
+                foreach (var formula in Formulas)
                 {
-                    mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
+                    formula.Id = $"{Id}.f{count++}";
                 }
+
+                count = 1;
+                foreach (var name in Names)
+                {
+                    name.Id = $"{Id}.n{count++}";
+                }
+            }
+
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
             }
         }
 
