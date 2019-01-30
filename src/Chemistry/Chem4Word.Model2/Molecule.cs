@@ -672,7 +672,7 @@ namespace Chem4Word.Model2
 
         public override string ToString()
         {
-            return $"Molecule {Id} - {InternalId}; Atoms {Atoms.Count} Bonds {Bonds.Count} Molecules {Molecules.Count}";
+            return $"Molecule {Id} - {Path}; Atoms {Atoms.Count} Bonds {Bonds.Count} Molecules {Molecules.Count}";
         }
 
         #endregion Overrides
