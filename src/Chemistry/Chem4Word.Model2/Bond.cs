@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
 using Chem4Word.Model2.Converters;
+using String = System.String;
 
 namespace Chem4Word.Model2
 {
@@ -24,26 +25,26 @@ namespace Chem4Word.Model2
     {
         #region Properties
 
-        public string EndAtomID
+        public string EndAtomInternalId
         {
-            get => _endAtomId;
-            set => _endAtomId = value;
+            get => _endAtomInternalId;
+            set => _endAtomInternalId = value;
         }
 
-        public string StartAtomID
+        public string StartAtomInternalId
         {
-            get => _startAtomId;
-            set => _startAtomId = value;
+            get => _startAtomInternalId;
+            set => _startAtomInternalId = value;
         }
 
         public Atom EndAtom
         {
-            get { return Parent.Atoms[EndAtomID]; }
+            get { return Parent.Atoms[EndAtomInternalId]; }
         }
 
         public Atom StartAtom
         {
-            get { return Parent.Atoms[StartAtomID]; }
+            get { return Parent.Atoms[StartAtomInternalId]; }
         }
 
         public List<Atom> GetAtoms()
@@ -177,8 +178,8 @@ namespace Chem4Word.Model2
         #endregion Bond Orders
 
         private Globals.BondStereo _stereo;
-        private string _endAtomId;
-        private string _startAtomId;
+        private string _endAtomInternalId;
+        private string _startAtomInternalId;
 
         public Globals.BondStereo Stereo
         {
@@ -569,13 +570,13 @@ namespace Chem4Word.Model2
             Messages = new List<string>();
         }
 
-        public Bond(XElement cmlElement) : this()
+        public Bond(XElement cmlElement, Dictionary<string, string> reverseAtomLookup) : this()
         {
             string[] atomRefs = cmlElement.Attribute("atomRefs2")?.Value.Split(' ');
             if (atomRefs?.Length == 2)
             {
-                StartAtomID = atomRefs[0];
-                EndAtomID = atomRefs[1];
+                StartAtomInternalId = reverseAtomLookup[atomRefs[0]];
+                EndAtomInternalId = reverseAtomLookup[atomRefs[1]];
             }
             var bondRef = cmlElement.Attribute("id")?.Value;
             Id = bondRef ?? Id;
@@ -665,13 +666,13 @@ namespace Chem4Word.Model2
 
         private string OtherAtomID(string aId)
         {
-            if (aId.Equals(StartAtomID))
+            if (aId.Equals(StartAtomInternalId))
             {
-                return EndAtomID;
+                return EndAtomInternalId;
             }
-            else if (aId.Equals(EndAtomID))
+            else if (aId.Equals(EndAtomInternalId))
             {
-                return StartAtomID;
+                return StartAtomInternalId;
             }
             else
             {
@@ -718,14 +719,14 @@ namespace Chem4Word.Model2
 
         public override string ToString()
         {
-            return $"Bond {Id} - {InternalId}: From {StartAtomID} to {EndAtomID}";
+            return $"Bond {Id} - {Path}: From {StartAtom.Path} to {EndAtom.Path}";
         }
 
         #endregion Overrides
 
         public Bond Clone()
         {
-            return new Bond().CloneExcept(this, new[] { "Id" });
+            return new Bond().CloneExcept(this, new string [] { });
         }
     }
 }

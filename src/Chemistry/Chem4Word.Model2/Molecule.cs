@@ -233,6 +233,7 @@ namespace Chem4Word.Model2
             }
         }
 
+        
         #endregion Properties
 
         #region Constructors
@@ -295,10 +296,9 @@ namespace Chem4Word.Model2
 
             foreach (XElement bondElement in bondElements)
             {
-                Bond newBond = new Bond(bondElement);
+                Bond newBond = new Bond(bondElement, reverseAtomLookup);
 
-                newBond.StartAtomID = reverseAtomLookup[newBond.StartAtomID];
-                newBond.EndAtomID = reverseAtomLookup[newBond.EndAtomID];
+               
 
                 if (newBond.Messages.Count > 0)
                 {
@@ -376,7 +376,7 @@ namespace Chem4Word.Model2
         public bool RemoveAtom(Atom toRemove)
         {
             bool bondsExist =
-                Bonds.Any(b => b.StartAtomID.Equals(toRemove.InternalId) | b.EndAtomID.Equals(toRemove.InternalId));
+                Bonds.Any(b => b.StartAtomInternalId.Equals(toRemove.InternalId) | b.EndAtomInternalId.Equals(toRemove.InternalId));
             if (bondsExist)
             {
                 throw new InvalidOperationException("Cannot remove an Atom without first removing the attached Bonds.");
@@ -544,19 +544,19 @@ namespace Chem4Word.Model2
         //public void UpdateBondRefs(string oldID, string newID)
         //{
         //    var bstart = from b in this?.Bonds
-        //        where b.StartAtomID == oldID
+        //        where b.StartAtomInternalId == oldID
         //        select b;
         //    foreach (Bond b in bstart)
         //    {
-        //        b.StartAtomID = newID;
+        //        b.StartAtomInternalId = newID;
         //    }
 
         //    var bend = from b in this?.Bonds
-        //        where b.EndAtomID == oldID
+        //        where b.EndAtomInternalId == oldID
         //        select b;
         //    foreach (Bond b in bend)
         //    {
-        //        b.EndAtomID = newID;
+        //        b.EndAtomInternalId = newID;
         //    }
         //}
 
@@ -565,13 +565,13 @@ namespace Chem4Word.Model2
             List<Atom> temps = new List<Atom>();
             foreach (Bond bond in Bonds)
             {
-                if (bond.StartAtomID.Equals(atom.InternalId))
+                if (bond.StartAtomInternalId.Equals(atom.InternalId))
                 {
-                    temps.Add(Atoms[bond.EndAtomID]);
+                    temps.Add(Atoms[bond.EndAtomInternalId]);
                 }
-                if (bond.EndAtomID.Equals(atom.InternalId))
+                if (bond.EndAtomInternalId.Equals(atom.InternalId))
                 {
-                    temps.Add(Atoms[bond.StartAtomID]);
+                    temps.Add(Atoms[bond.StartAtomInternalId]);
                 }
             }
             return temps.ToList();
@@ -586,14 +586,14 @@ namespace Chem4Word.Model2
             foreach (Atom a in Atoms.Values)
             {
                 string newID = $"a{++iAtomCount}";
-                atomIDLookup[a.InternalId] = newID;
+                //atomIDLookup[a.InternalId] = newID;
                 a.Id = newID;
             }
 
             foreach (Bond b in Bonds)
             {
-                b.StartAtomID = atomIDLookup[b.StartAtomID];
-                b.EndAtomID = atomIDLookup[b.EndAtomID];
+                //b.StartAtomInternalId = atomIDLookup[b.StartAtom.InternalId];
+                //b.EndAtomInternalId = atomIDLookup[b.EndAtom.InternalId];
                 b.Id = $"b{++iBondcount}";
             }
             if (Molecules.Any())
@@ -610,7 +610,7 @@ namespace Chem4Word.Model2
         {
             foreach (Bond bond in Bonds)
             {
-                if (!Atoms.Keys.Contains(bond.StartAtomID) || !Atoms.Keys.Contains(bond.EndAtomID))
+                if (!Atoms.Keys.Contains(bond.StartAtomInternalId) || !Atoms.Keys.Contains(bond.EndAtomInternalId))
                 {
                     return false;
                 }
@@ -622,14 +622,12 @@ namespace Chem4Word.Model2
         public IEnumerable<Bond> GetBonds(string atomID)
         {
             return (from startBond in Bonds
-                    where startBond.StartAtomID.Equals(atomID)
+                    where startBond.StartAtomInternalId.Equals(atomID)
                     select startBond)
                 .Union(from endBond in Bonds
-                       where endBond.EndAtomID.Equals(atomID)
+                       where endBond.EndAtomInternalId.Equals(atomID)
                        select endBond);
         }
-
-        #endregion Methods
 
         public void Refresh()
         {
@@ -643,7 +641,7 @@ namespace Chem4Word.Model2
 
         public Molecule Clone()
         {
-            Molecule clone = new Molecule().CloneExcept(this, new[] { "Id" });
+            Molecule clone = new Molecule().CloneExcept(this, new string[] { });
             foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
             {
                 Atom atom = keyValuePair.Value;
@@ -664,6 +662,9 @@ namespace Chem4Word.Model2
             clone.RebuildRings();
             return clone;
         }
+        #endregion Methods
+
+
 
         #region Overrides
 

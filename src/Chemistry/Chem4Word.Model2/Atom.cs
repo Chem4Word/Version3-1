@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters;
 
 namespace Chem4Word.Model2
@@ -394,6 +395,7 @@ namespace Chem4Word.Model2
             }
         }
 
+       
         #endregion Properties
 
         #region Constructors
@@ -459,11 +461,11 @@ namespace Chem4Word.Model2
         {
             foreach (var parentBond in Parent.Bonds)
             {
-                if (parentBond.StartAtomID.Equals(InternalId) && parentBond.EndAtomID.Equals(atom.InternalId))
+                if (parentBond.StartAtomInternalId.Equals(InternalId) && parentBond.EndAtomInternalId.Equals(atom.InternalId))
                 {
                     return parentBond;
                 }
-                if (parentBond.EndAtomID.Equals(InternalId) && parentBond.StartAtomID.Equals(atom.InternalId))
+                if (parentBond.EndAtomInternalId.Equals(InternalId) && parentBond.StartAtomInternalId.Equals(atom.InternalId))
                 {
                     return parentBond;
                 }
@@ -473,7 +475,7 @@ namespace Chem4Word.Model2
 
         public Atom Clone()
         {
-            return new Atom().CloneExcept(this, new[] { "Id" });
+            return new Atom().CloneExcept(this, new string[] { });
         }
 
         public CompassPoints GetDefaultHOrientation()
@@ -531,7 +533,7 @@ namespace Chem4Word.Model2
         public override string ToString()
         {
             var symbol = Element != null ? Element.Symbol : "???";
-            return $"Atom {Id} - {InternalId}: {symbol} @ {Position.X.ToString("0.000")}, {Position.Y.ToString("0.000")}";
+            return $"Atom {Id} - {Path}: {symbol} @ {Position.X.ToString("0.000")}, {Position.Y.ToString("0.000")}";
         }
 
         #endregion Overrides
