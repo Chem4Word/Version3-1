@@ -5,10 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Linq;
-using System.Xml.Linq;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace Chem4Word.Model2.Converters
 {
@@ -47,6 +47,7 @@ namespace Chem4Word.Model2.Converters
         public static string Description => "Chemical Markup Language";
         public bool CanImport => true;
         public bool Compressed { get; set; }
+
         public static string[] Extensions => new[]
         {
             "*.CML",
@@ -95,7 +96,7 @@ namespace Chem4Word.Model2.Converters
         public string Export(Chem4Word.Model2.Model model)
         {
             XDocument xd = new XDocument();
-            
+
             XElement root = new XElement(CML.cml + TagCml,
                 new XAttribute(XNamespace.Xmlns + TagConventions, CML.conventions),
                 new XAttribute(XNamespace.Xmlns + TagCml, CML.cml),
@@ -192,6 +193,7 @@ namespace Chem4Word.Model2.Converters
 
             return result;
         }
+
         public XElement GetXElement(string concise, string molId)
         {
             XElement result = new XElement(Converters.CML.cml + TagFormula);
@@ -294,7 +296,6 @@ namespace Chem4Word.Model2.Converters
                     return null;
             }
         }
-
 
         public XElement GetMoleculeElement(Molecule mol)
         {

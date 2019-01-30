@@ -174,13 +174,11 @@ namespace Chem4Word.Model2
                     {
                         boundingBox.Union(mol.BoundingBox);
                     }
-
                 }
 
                 return boundingBox;
             }
         }
-
 
         public string Path => "/";
         private Dictionary<string, Molecule> _molecules { get; }

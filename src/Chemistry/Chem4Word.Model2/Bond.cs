@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 using System;
@@ -16,8 +17,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
-using Chem4Word.Model2.Converters;
-using String = System.String;
 
 namespace Chem4Word.Model2
 {
@@ -726,7 +725,7 @@ namespace Chem4Word.Model2
 
         public Bond Clone()
         {
-            return new Bond().CloneExcept(this, new string [] { });
+            return new Bond().CloneExcept(this, new string[] { });
         }
     }
 }

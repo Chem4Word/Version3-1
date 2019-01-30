@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
 using System;
@@ -18,7 +19,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
-using Chem4Word.Model2.Converters;
 
 namespace Chem4Word.Model2
 {
@@ -233,7 +233,6 @@ namespace Chem4Word.Model2
             }
         }
 
-        
         #endregion Properties
 
         #region Constructors
@@ -298,8 +297,6 @@ namespace Chem4Word.Model2
             {
                 Bond newBond = new Bond(bondElement, reverseAtomLookup);
 
-               
-
                 if (newBond.Messages.Count > 0)
                 {
                     Errors.AddRange(newBond.Messages);
@@ -314,7 +311,7 @@ namespace Chem4Word.Model2
                 // Only import Concise Once
                 if (string.IsNullOrEmpty(ConciseFormula))
                 {
-                    ConciseFormula = formulaElement.Attribute("concise")?.Value; ;
+                    ConciseFormula = formulaElement.Attribute("concise")?.Value;
                 }
 
                 Formula formula = new Formula(formulaElement);
@@ -326,10 +323,7 @@ namespace Chem4Word.Model2
 
             foreach (XElement nameElement in nameElements)
             {
-                if (string.IsNullOrEmpty(ConciseFormula))
-                {
-                    Names.Add(new ChemicalName(nameElement));
-                }
+                Names.Add(new ChemicalName(nameElement));
             }
 
             RebuildRings();
@@ -585,17 +579,26 @@ namespace Chem4Word.Model2
             Dictionary<string, string> atomIDLookup = new Dictionary<string, string>();
             foreach (Atom a in Atoms.Values)
             {
-                string newID = $"a{++iAtomCount}";
-                //atomIDLookup[a.InternalId] = newID;
-                a.Id = newID;
+                a.Id = $"a{++iAtomCount}";
             }
 
             foreach (Bond b in Bonds)
             {
-                //b.StartAtomInternalId = atomIDLookup[b.StartAtom.InternalId];
-                //b.EndAtomInternalId = atomIDLookup[b.EndAtom.InternalId];
                 b.Id = $"b{++iBondcount}";
             }
+
+            int count = 1;
+            foreach (var formula in Formulas)
+            {
+                formula.Id = $"{Id}.f{count++}";
+            }
+
+            count = 1;
+            foreach (var name in Names)
+            {
+                name.Id = $"{Id}.n{count++}";
+            }
+
             if (Molecules.Any())
             {
                 foreach (Molecule mol in Molecules.Values)
@@ -662,9 +665,8 @@ namespace Chem4Word.Model2
             clone.RebuildRings();
             return clone;
         }
+
         #endregion Methods
-
-
 
         #region Overrides
 
@@ -1076,7 +1078,6 @@ namespace Chem4Word.Model2
             //no collisions therefore no rings detected
             return null;
         }
-
 
         #endregion Ring stuff
     }

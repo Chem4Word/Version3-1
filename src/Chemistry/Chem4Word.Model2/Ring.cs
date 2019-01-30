@@ -22,8 +22,6 @@ namespace Chem4Word.Model2
     /// <summary>
     /// Represents an unordered ring of atoms
     /// </summary>
-    //[DebuggerDisplay("Atoms: {Atoms.Count} Priority: {Priority}")]
-    [Serializable]
     public class Ring : IComparer<Ring>, INotifyPropertyChanged
     {
         /// <summary>
