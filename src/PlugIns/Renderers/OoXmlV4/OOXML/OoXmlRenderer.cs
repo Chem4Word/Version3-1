@@ -609,33 +609,33 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 foreach (Bond bond in doubleBonds)
                 {
-                    BeautifyLines(bond.StartAtom, bond.Id);
-                    BeautifyLines(bond.EndAtom, bond.Id);
+                    BeautifyLines(bond.StartAtom, bond.Path);
+                    BeautifyLines(bond.EndAtom, bond.Path);
                 }
             }
         }
 
-        private void BeautifyLines(Atom atom, string bondId)
+        private void BeautifyLines(Atom atom, string bondPath)
         {
             if ((Element)atom.Element == Globals.PeriodicTable.C)
             {
                 if (atom.Bonds.ToList().Count == 3)
                 {
                     bool isInRing = atom.Rings.Count != 0;
-                    List<BondLine> lines = _bondLines.Where(bl => bl.ParentBond.Equals(bondId)).ToList();
+                    List<BondLine> lines = _bondLines.Where(bl => bl.ParentBond.Equals(bondPath)).ToList();
                     List<Bond> otherBonds;
                     if (isInRing)
                     {
-                        otherBonds = atom.Bonds.Where(b => !b.Id.Equals(bondId)).ToList();
+                        otherBonds = atom.Bonds.Where(b => !b.Id.Equals(bondPath)).ToList();
                     }
                     else
                     {
-                        otherBonds = atom.Bonds.Where(b => !b.Id.Equals(bondId) && b.OrderValue == 1).ToList();
+                        otherBonds = atom.Bonds.Where(b => !b.Id.Equals(bondPath) && b.OrderValue == 1).ToList();
                     }
                     if (otherBonds.Count == 2)
                     {
-                        BondLine line1 = _bondLines.First(bl => bl.ParentBond.Equals(otherBonds[0].Id));
-                        BondLine line2 = _bondLines.First(bl => bl.ParentBond.Equals(otherBonds[1].Id));
+                        BondLine line1 = _bondLines.First(bl => bl.ParentBond.Equals(otherBonds[0].Path));
+                        BondLine line2 = _bondLines.First(bl => bl.ParentBond.Equals(otherBonds[1].Path));
                         TrimLines(lines, line1, line2, isInRing);
                     }
                 }
