@@ -357,7 +357,7 @@ namespace Chem4Word.Model2.Converters
 
             result = new XElement(Converters.CML.cml + TagBond,
                 new XAttribute(TagId, bond.Id),
-                new XAttribute(TagAtomRefs2, $"{bond.StartAtomInternalId} {bond.EndAtomInternalId}"),
+                new XAttribute(TagAtomRefs2, $"{bond.StartAtom.Id} {bond.EndAtom.Id}"),
                 new XAttribute(TagOrder, bond.Order),
                 GetStereoXElement(bond));
 

@@ -23,7 +23,7 @@ namespace WinForms.TestHarness.Model2
     public partial class MainTestForm : Form
     {
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
-
+        private Model lastModel = null;
         public MainTestForm()
         {
             InitializeComponent();
@@ -60,6 +60,7 @@ namespace WinForms.TestHarness.Model2
                 {
                     Stopwatch sw = new Stopwatch();
                     var model = converter.Import(sr.ReadToEnd());
+                    lastModel = model;
                     sw.Stop();
                     //MessageBox.Show($"Converting took {sw.ElapsedMilliseconds}");
 
@@ -220,6 +221,16 @@ namespace WinForms.TestHarness.Model2
                 default:
                     break;
             }
+        }
+
+        private void ExportStructure_Click(object sender, EventArgs e)
+        {
+
+           
+           var converter = new CMLConverter();
+           var cml= converter.Export(lastModel);
+           Clipboard.SetText(cml);
+            MessageBox.Show("Model exported to clipboard");
         }
     }
 }
