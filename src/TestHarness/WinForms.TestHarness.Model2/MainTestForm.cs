@@ -5,6 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters;
+using Chem4Word.Telemetry;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,10 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters;
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Telemetry;
 
 namespace WinForms.TestHarness.Model2
 {
@@ -24,6 +23,7 @@ namespace WinForms.TestHarness.Model2
     {
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
         private Model lastModel = null;
+
         public MainTestForm()
         {
             InitializeComponent();
@@ -140,7 +140,6 @@ namespace WinForms.TestHarness.Model2
                     LoadTreeNode(childMol, parentNode);
                 }
             }
-
         }
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -192,14 +191,6 @@ namespace WinForms.TestHarness.Model2
             }
         }
 
-        private void MainTestForm_Load(object sender, EventArgs e)
-        {
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-        }
-
         private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             switch (e.Node.Tag)
@@ -225,11 +216,9 @@ namespace WinForms.TestHarness.Model2
 
         private void ExportStructure_Click(object sender, EventArgs e)
         {
-
-           
-           var converter = new CMLConverter();
-           var cml= converter.Export(lastModel);
-           Clipboard.SetText(cml);
+            var converter = new CMLConverter();
+            var cml = converter.Export(lastModel);
+            Clipboard.SetText(cml);
             MessageBox.Show("Model exported to clipboard");
         }
     }
