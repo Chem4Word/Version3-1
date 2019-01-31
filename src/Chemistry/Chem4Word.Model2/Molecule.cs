@@ -535,25 +535,7 @@ namespace Chem4Word.Model2
 
         #region Methods
 
-        //public void UpdateBondRefs(string oldID, string newID)
-        //{
-        //    var bstart = from b in this?.Bonds
-        //        where b.StartAtomInternalId == oldID
-        //        select b;
-        //    foreach (Bond b in bstart)
-        //    {
-        //        b.StartAtomInternalId = newID;
-        //    }
-
-        //    var bend = from b in this?.Bonds
-        //        where b.EndAtomInternalId == oldID
-        //        select b;
-        //    foreach (Bond b in bend)
-        //    {
-        //        b.EndAtomInternalId = newID;
-        //    }
-        //}
-
+      
         public List<Atom> GetAtomNeighbours(Atom atom)
         {
             List<Atom> temps = new List<Atom>();
@@ -641,7 +623,7 @@ namespace Chem4Word.Model2
 
         public Molecule Clone()
         {
-            Molecule clone = new Molecule().CloneExcept(this, new string[] { });
+            Molecule clone = new Molecule().CloneExcept(this, new string[] { "Id" });
             foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
             {
                 Atom atom = keyValuePair.Value;
