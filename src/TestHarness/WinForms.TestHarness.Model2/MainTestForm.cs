@@ -112,18 +112,28 @@ namespace WinForms.TestHarness.Model2
                 }
                 parentNode.Tag = modelMolecule;
 
-                foreach (Atom atom in modelMolecule.Atoms.Values)
+                if (modelMolecule.Atoms.Any())
                 {
-                    var res = parentNode.Nodes.Add(atom.Path, atom.ToString());
-                    res.Tag = atom;
-                    textBox1.AppendText($"Atom {atom.Path} added. \n");
+                    var atomsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Atoms", $"Atom count {modelMolecule.Atoms.Count}");
+
+                    foreach (Atom atom in modelMolecule.Atoms.Values)
+                    {
+                        var res = atomsNode.Nodes.Add(atom.Path, atom.ToString());
+                        res.Tag = atom;
+                        textBox1.AppendText($"Atom {atom.Path} added. \n");
+                    }
                 }
 
-                foreach (Bond bond in modelMolecule.Bonds)
+                if (modelMolecule.Bonds.Any())
                 {
-                    var res = parentNode.Nodes.Add(bond.Path, bond.ToString());
-                    res.Tag = bond;
-                    textBox1.AppendText($"Bond {bond.Path} added. \n");
+                    var bondsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Bonds", $"Bond count {modelMolecule.Bonds.Count}");
+
+                    foreach (Bond bond in modelMolecule.Bonds)
+                    {
+                        var res = bondsNode.Nodes.Add(bond.Path, bond.ToString());
+                        res.Tag = bond;
+                        textBox1.AppendText($"Bond {bond.Path} added. \n");
+                    }
                 }
 
                 foreach (Ring r in modelMolecule.Rings)
@@ -135,6 +145,7 @@ namespace WinForms.TestHarness.Model2
                         ringnode.Nodes.Add(r.GetHashCode() + a.Id, a.Id);
                     }
                 }
+
                 foreach (var childMol in modelMolecule.Molecules.Values)
                 {
                     LoadTreeNode(childMol, parentNode);
@@ -214,12 +225,37 @@ namespace WinForms.TestHarness.Model2
             }
         }
 
-        private void ExportStructure_Click(object sender, EventArgs e)
+        private void MainTestForm_Load(object sender, EventArgs e)
         {
-            var converter = new CMLConverter();
-            var cml = converter.Export(lastModel);
-            Clipboard.SetText(cml);
-            MessageBox.Show("Model exported to clipboard");
+            ExportAs.Items.Clear();
+            ExportAs.Items.Add("Export as ...");
+            ExportAs.Items.Add("Export as CML");
+            ExportAs.Items.Add("Export as MOL/SDF");
+            ExportAs.Items.Add("Export as JSON");
+            ExportAs.SelectedIndex = 0;
+            LoadStructure.Focus();
+        }
+
+        private void ExportAs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lastModel != null)
+            {
+                switch (ExportAs.SelectedIndex)
+                {
+                    case 1:
+                        var converter = new CMLConverter();
+                        var cml = converter.Export(lastModel);
+                        Clipboard.SetText(cml);
+                        MessageBox.Show("Model exported to clipboard");
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                }
+            }
+            ExportAs.SelectedIndex = 0;
+            LoadStructure.Focus();
         }
     }
 }

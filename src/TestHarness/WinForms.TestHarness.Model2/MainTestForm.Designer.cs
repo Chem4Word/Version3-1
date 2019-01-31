@@ -33,7 +33,7 @@
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.LoadStructure = new System.Windows.Forms.Button();
-            this.ExportStructure = new System.Windows.Forms.Button();
+            this.ExportAs = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -94,28 +94,28 @@
             this.LoadStructure.UseVisualStyleBackColor = true;
             this.LoadStructure.Click += new System.EventHandler(this.Load_Click);
             // 
-            // ExportStructure
+            // ExportAs
             // 
-            this.ExportStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExportStructure.Location = new System.Drawing.Point(925, 611);
-            this.ExportStructure.Name = "ExportStructure";
-            this.ExportStructure.Size = new System.Drawing.Size(75, 28);
-            this.ExportStructure.TabIndex = 6;
-            this.ExportStructure.Text = "Export";
-            this.ExportStructure.UseVisualStyleBackColor = true;
-            this.ExportStructure.Click += new System.EventHandler(this.ExportStructure_Click);
+            this.ExportAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExportAs.FormattingEnabled = true;
+            this.ExportAs.Location = new System.Drawing.Point(863, 616);
+            this.ExportAs.Name = "ExportAs";
+            this.ExportAs.Size = new System.Drawing.Size(124, 21);
+            this.ExportAs.TabIndex = 7;
+            this.ExportAs.SelectedIndexChanged += new System.EventHandler(this.ExportAs_SelectedIndexChanged);
             // 
             // MainTestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1093, 651);
-            this.Controls.Add(this.ExportStructure);
+            this.Controls.Add(this.ExportAs);
             this.Controls.Add(this.LoadStructure);
             this.Controls.Add(this.splitContainer1);
             this.Name = "MainTestForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.MainTestForm_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
@@ -131,7 +131,7 @@
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button LoadStructure;
-        private System.Windows.Forms.Button ExportStructure;
+        private System.Windows.Forms.ComboBox ExportAs;
     }
 }
 
