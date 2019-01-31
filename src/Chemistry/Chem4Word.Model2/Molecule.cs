@@ -623,7 +623,7 @@ namespace Chem4Word.Model2
 
         public Molecule Clone()
         {
-            Molecule clone = new Molecule().CloneExcept(this, new string[] { "Id" });
+            Molecule clone = new Molecule().CloneExcept(this, new string[] { nameof(Id) });
             foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
             {
                 Atom atom = keyValuePair.Value;
