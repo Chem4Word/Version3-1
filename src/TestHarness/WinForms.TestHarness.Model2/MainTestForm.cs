@@ -233,7 +233,6 @@ namespace WinForms.TestHarness.Model2
             ExportAs.Items.Add("Export as MOL/SDF");
             ExportAs.Items.Add("Export as JSON");
             ExportAs.SelectedIndex = 0;
-            LoadStructure.Focus();
         }
 
         private void ExportAs_SelectedIndexChanged(object sender, EventArgs e)
@@ -246,7 +245,7 @@ namespace WinForms.TestHarness.Model2
                         var converter = new CMLConverter();
                         var cml = converter.Export(lastModel);
                         Clipboard.SetText(cml);
-                        MessageBox.Show("Model exported to clipboard");
+                        MessageBox.Show("Last loaded model exported to clipboard as CML");
                         break;
                     case 2:
                         break;

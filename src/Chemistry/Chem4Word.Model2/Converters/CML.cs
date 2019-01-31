@@ -32,10 +32,6 @@ namespace Chem4Word.Model2.Converters
         // ReSharper disable once InconsistentNaming
         public static XNamespace c4w = "http://www.chem4word.com/cml";
 
-        static CML()
-        {
-        }
-
         // ReSharper disable once InconsistentNaming
         public static XDocument LoadCML(string cml)
         {
@@ -56,7 +52,7 @@ namespace Chem4Word.Model2.Converters
             }
         }
 
-        public static ElementBase GetChemicalElement(XElement cmlElement, out string message)
+        internal static ElementBase GetChemicalElement(XElement cmlElement, out string message)
         {
             message = "";
             XAttribute xa = cmlElement.Attribute("elementType");
@@ -88,7 +84,7 @@ namespace Chem4Word.Model2.Converters
             return null;
         }
 
-        public static XElement GetCustomXmlPartGuid(XElement doc)
+        internal static XElement GetCustomXmlPartGuid(XElement doc)
         {
             var id1 = from XElement xe in doc.Elements("customXmlPartGuid") select xe;
             var id2 = from XElement xe in doc.Elements(c4w + "customXmlPartGuid") select xe;
@@ -96,14 +92,14 @@ namespace Chem4Word.Model2.Converters
         }
 
         // ReSharper disable once InconsistentNaming
-        public static List<XElement> GetMolecules(XElement doc)
+        internal static List<XElement> GetMolecules(XElement doc)
         {
             var mols = from XElement xe in doc.Elements("molecule") select xe;
             var mols2 = from XElement xe2 in doc.Elements(cml + "molecule") select xe2;
             return mols.Union(mols2).ToList();
         }
 
-        public static List<XElement> GetAtoms(XElement mol)
+        internal static List<XElement> GetAtoms(XElement mol)
         {
             // Task 336
             var aa1 = from a in mol.Elements("atomArray") select a;
@@ -124,7 +120,7 @@ namespace Chem4Word.Model2.Converters
             }
         }
 
-        public static List<XElement> GetBonds(XElement mol)
+        internal static List<XElement> GetBonds(XElement mol)
         {
             // Task 336
             var ba1 = from b in mol.Elements("bondArray") select b;
@@ -145,28 +141,28 @@ namespace Chem4Word.Model2.Converters
             }
         }
 
-        public static List<XElement> GetStereo(XElement bond)
+        internal static List<XElement> GetStereo(XElement bond)
         {
             var stereo = from s in bond.Elements("bondStereo") select s;
             var stereo2 = from s in bond.Elements(cml + "bondStereo") select s;
             return stereo.Union(stereo2).ToList();
         }
 
-        public static List<XElement> GetNames(XElement mol)
+        internal static List<XElement> GetNames(XElement mol)
         {
             var names1 = from n1 in mol.Descendants("name") select n1;
             var names2 = from n2 in mol.Descendants(cml + "name") select n2;
             return names1.Union(names2).ToList();
         }
 
-        public static List<XElement> GetFormulas(XElement mol)
+        internal static List<XElement> GetFormulas(XElement mol)
         {
             var formulae1 = from f1 in mol.Descendants("formula") select f1;
             var formulae2 = from f2 in mol.Descendants(cml + "formula") select f2;
             return formulae1.Union(formulae2).ToList();
         }
 
-        public static int? GetFormalCharge(XElement cmlElement)
+        internal static int? GetFormalCharge(XElement cmlElement)
         {
             int formalCharge;
 
@@ -185,7 +181,7 @@ namespace Chem4Word.Model2.Converters
         /// </summary>
         /// <param name="cmlElement">XElement representing the cmlElement CML</param>
         /// <returns>Point containing the cmlElement coordinates</returns>
-        public static Point GetPosn(XElement cmlElement, out string message)
+        internal static Point GetPosn(XElement cmlElement, out string message)
         {
             message = "";
             string symbol = cmlElement.Attribute("elementType")?.Value;
