@@ -45,6 +45,8 @@ namespace Chem4Word.Model2.Converters
         private const string TagIsotopeNumber = "isotopeNumber";
 
         public static string Description => "Chemical Markup Language";
+        public bool CanExport => true;
+
         public bool CanImport => true;
         public bool Compressed { get; set; }
 
@@ -167,7 +169,7 @@ namespace Chem4Word.Model2.Converters
             return cml;
         }
 
-        public XElement GetXElement(Formula f, string concise)
+        private XElement GetXElement(Formula f, string concise)
         {
             XElement result = new XElement(Converters.CML.cml + TagFormula);
 
@@ -194,7 +196,7 @@ namespace Chem4Word.Model2.Converters
             return result;
         }
 
-        public XElement GetXElement(string concise, string molId)
+        private XElement GetXElement(string concise, string molId)
         {
             XElement result = new XElement(Converters.CML.cml + TagFormula);
 
@@ -207,7 +209,7 @@ namespace Chem4Word.Model2.Converters
             return result;
         }
 
-        public XElement GetXElement(ChemicalName name)
+        private XElement GetXElement(ChemicalName name)
         {
             XElement result = new XElement(Converters.CML.cml + TagName, name.Name);
 
@@ -297,7 +299,7 @@ namespace Chem4Word.Model2.Converters
             }
         }
 
-        public XElement GetMoleculeElement(Molecule mol)
+        private XElement GetMoleculeElement(Molecule mol)
         {
             XElement molElement = new XElement(Converters.CML.cml + TagMolecule, new XAttribute(TagId, mol.Id));
 
@@ -352,7 +354,7 @@ namespace Chem4Word.Model2.Converters
             return molElement;
         }
 
-        public XElement GetXElement(Bond bond)
+        private XElement GetXElement(Bond bond)
         {
             XElement result;
 
@@ -369,7 +371,7 @@ namespace Chem4Word.Model2.Converters
             return result;
         }
 
-        public XElement GetXElement(Atom atom)
+        private XElement GetXElement(Atom atom)
         {
             XElement result = new XElement(Converters.CML.cml + TagAtom,
                 new XAttribute(TagId, atom.Id),
@@ -388,8 +390,6 @@ namespace Chem4Word.Model2.Converters
             }
             return result;
         }
-
-        public bool CanExport => true;
 
         private static Molecule AddMolecule(Model newModel, Molecule newMol)
         {

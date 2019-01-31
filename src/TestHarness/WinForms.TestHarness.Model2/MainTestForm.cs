@@ -5,6 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters;
+using Chem4Word.Telemetry;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,10 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters;
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Telemetry;
 
 namespace WinForms.TestHarness.Model2
 {
@@ -24,6 +23,7 @@ namespace WinForms.TestHarness.Model2
     {
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
         private Model lastModel = null;
+
         public MainTestForm()
         {
             InitializeComponent();
@@ -112,18 +112,28 @@ namespace WinForms.TestHarness.Model2
                 }
                 parentNode.Tag = modelMolecule;
 
-                foreach (Atom atom in modelMolecule.Atoms.Values)
+                if (modelMolecule.Atoms.Any())
                 {
-                    var res = parentNode.Nodes.Add(atom.Path, atom.ToString());
-                    res.Tag = atom;
-                    textBox1.AppendText($"Atom {atom.Path} added. \n");
+                    var atomsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Atoms", $"Atom count {modelMolecule.Atoms.Count}");
+
+                    foreach (Atom atom in modelMolecule.Atoms.Values)
+                    {
+                        var res = atomsNode.Nodes.Add(atom.Path, atom.ToString());
+                        res.Tag = atom;
+                        textBox1.AppendText($"Atom {atom.Path} added. \n");
+                    }
                 }
 
-                foreach (Bond bond in modelMolecule.Bonds)
+                if (modelMolecule.Bonds.Any())
                 {
-                    var res = parentNode.Nodes.Add(bond.Path, bond.ToString());
-                    res.Tag = bond;
-                    textBox1.AppendText($"Bond {bond.Path} added. \n");
+                    var bondsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Bonds", $"Bond count {modelMolecule.Bonds.Count}");
+
+                    foreach (Bond bond in modelMolecule.Bonds)
+                    {
+                        var res = bondsNode.Nodes.Add(bond.Path, bond.ToString());
+                        res.Tag = bond;
+                        textBox1.AppendText($"Bond {bond.Path} added. \n");
+                    }
                 }
 
                 foreach (Ring r in modelMolecule.Rings)
@@ -135,12 +145,12 @@ namespace WinForms.TestHarness.Model2
                         ringnode.Nodes.Add(r.GetHashCode() + a.Id, a.Id);
                     }
                 }
+
                 foreach (var childMol in modelMolecule.Molecules.Values)
                 {
                     LoadTreeNode(childMol, parentNode);
                 }
             }
-
         }
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -192,14 +202,6 @@ namespace WinForms.TestHarness.Model2
             }
         }
 
-        private void MainTestForm_Load(object sender, EventArgs e)
-        {
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-        }
-
         private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             switch (e.Node.Tag)
@@ -223,14 +225,36 @@ namespace WinForms.TestHarness.Model2
             }
         }
 
-        private void ExportStructure_Click(object sender, EventArgs e)
+        private void MainTestForm_Load(object sender, EventArgs e)
         {
+            ExportAs.Items.Clear();
+            ExportAs.Items.Add("Export as ...");
+            ExportAs.Items.Add("Export as CML");
+            ExportAs.Items.Add("Export as MOL/SDF");
+            ExportAs.Items.Add("Export as JSON");
+            ExportAs.SelectedIndex = 0;
+        }
 
-           
-           var converter = new CMLConverter();
-           var cml= converter.Export(lastModel);
-           Clipboard.SetText(cml);
-            MessageBox.Show("Model exported to clipboard");
+        private void ExportAs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lastModel != null)
+            {
+                switch (ExportAs.SelectedIndex)
+                {
+                    case 1:
+                        var converter = new CMLConverter();
+                        var cml = converter.Export(lastModel);
+                        Clipboard.SetText(cml);
+                        MessageBox.Show("Last loaded model exported to clipboard as CML");
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                }
+            }
+            ExportAs.SelectedIndex = 0;
+            LoadStructure.Focus();
         }
     }
 }
