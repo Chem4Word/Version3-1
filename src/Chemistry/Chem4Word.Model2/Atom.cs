@@ -95,7 +95,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public string Path
+        public override string Path
         {
             get
             {
@@ -105,7 +105,7 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    return Parent.Path + "/" + Id;
+                    return Parent.Path + Id;
                 }
             }
         }

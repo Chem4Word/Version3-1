@@ -176,21 +176,21 @@ namespace Chem4Word.Model2
         /// if the molecule is part of a model
         /// this starts with "/"
         /// </summary>
-        public string Path
+        public override string Path
         {
             get
             {
                 if (Parent == null)
                 {
-                    return Id;
+                    return Id + "/";
                 }
 
-                if (Parent is Model)
+                if (Parent is Model model)
                 {
-                    return ((Model)Parent).Path + Id;
+                    return model.Path + Id + "/";
                 }
 
-                return ((Molecule)Parent).Path + "/" + Id;
+                return ((Molecule)Parent).Path + "/" + Id + "/";
             }
         }
 

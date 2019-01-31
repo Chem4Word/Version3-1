@@ -81,7 +81,7 @@ namespace Chem4Word.Model2
         public string Id { get; set; }
         internal string InternalId => _internalId;
 
-        public string Path
+        public override string Path
         {
             get
             {
@@ -91,7 +91,7 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    return Parent.Path + "/" + Id;
+                    return Parent.Path  + Id;
                 }
             }
         }
@@ -679,6 +679,11 @@ namespace Chem4Word.Model2
             }
         }
 
+        public Bond Clone()
+        {
+            return new Bond().CloneExcept(this, new string[] { });
+        }
+
         #region Geometry Routines
 
         public bool AtomsAreCis(Atom atomA, Atom atomB)
@@ -723,9 +728,6 @@ namespace Chem4Word.Model2
 
         #endregion Overrides
 
-        public Bond Clone()
-        {
-            return new Bond().CloneExcept(this, new string[] { });
-        }
+       
     }
 }
