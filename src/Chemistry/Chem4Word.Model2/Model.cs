@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.Model2.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +13,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -181,11 +183,45 @@ namespace Chem4Word.Model2
         }
 
         public string Path => "/";
+        public IChemistryContainer Root => null;
+
+        public ChemistryBase GetFromPath(string path)
+        {
+            try
+            {
+
+                //first part of the path has to be a molecule
+                if (path.StartsWith("/"))
+                {
+                    path = path.Substring(1); //strip off the first separator
+                }
+
+                string molID = path.UpTo("/");
+
+                if (!Molecules.ContainsKey(molID))
+                {
+                    throw new ArgumentException("First child is not a molecule");
+                }
+
+                string relativepath = Helpers.Utils.GetRelativePath(molID, path);
+                if (relativepath != "")
+                {
+                    return Molecules[molID].GetFromPath(relativepath);
+                }
+                else
+                {
+                    return Molecules[molID];
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"Object {path} not found");
+            }
+        }
+
         private Dictionary<string, Molecule> _molecules { get; }
+        //wraps up the above Molecules collection
         public ReadOnlyDictionary<string, Molecule> Molecules;
-
-        #endregion Properties
-
         public string CustomXmlPartGuid { get; set; }
 
         public List<string> GeneralErrors { get; set; }
@@ -218,12 +254,19 @@ namespace Chem4Word.Model2
             }
         }
 
-        public Model()
+        #endregion Properties
+
+        #region Constructors
+
+          public Model()
         {
             _molecules = new Dictionary<string, Molecule>();
             Molecules = new ReadOnlyDictionary<string, Molecule>(_molecules);
             GeneralErrors = new List<string>();
         }
+
+        #endregion
+      
 
         public bool RemoveMolecule(Molecule mol)
         {
@@ -249,7 +292,6 @@ namespace Chem4Word.Model2
             return newMol;
         }
 
-        public IChemistryContainer Root => null;
 
         public void Relabel(bool b)
         {

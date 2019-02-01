@@ -194,6 +194,39 @@ namespace Chem4Word.Model2
             }
         }
 
+        public ChemistryBase GetFromPath(string path)
+        {
+            //first part of the path has to be a molecule
+            if (path.StartsWith("/"))
+            {
+                path = path.Substring(1); //strip off the first separator
+            }
+            string id = path.UpTo("/");
+
+            string relativepath = Helpers.Utils.GetRelativePath(id, path);
+            if (Molecules.ContainsKey(id))
+            {
+                return Molecules[id].GetFromPath(relativepath);
+            }
+
+            if (Atoms.ContainsKey(relativepath))
+            {
+                return Atoms[relativepath];
+            }
+
+            var bond = (from b in Bonds
+                where b.Id == relativepath
+                select b).FirstOrDefault();
+            if (bond != null)
+            {
+                return bond;
+            }
+
+            throw new ArgumentException("Object not found");
+
+        }
+
+
         public Model Model => Root as Model;
 
         #endregion Structural Properties

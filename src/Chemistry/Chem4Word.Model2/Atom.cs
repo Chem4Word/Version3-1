@@ -110,6 +110,8 @@ namespace Chem4Word.Model2
             }
         }
 
+      
+
         public Point Position
         {
             get { return _position; }

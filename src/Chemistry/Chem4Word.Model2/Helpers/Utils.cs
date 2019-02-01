@@ -22,7 +22,8 @@ namespace Chem4Word.Model2.Helpers
 
         public static bool ContainNoH(this IEnumerable<Atom> atomList)
         {
-            return atomList.All(a => ((a.Element as Element) != Globals.PeriodicTable.H & a.ImplicitHydrogenCount == 0));
+            return atomList.All(a =>
+                ((a.Element as Element) != Globals.PeriodicTable.H & a.ImplicitHydrogenCount == 0));
         }
 
         public static Atom GetFirstNonH(this IEnumerable<Atom> atomList)
@@ -56,6 +57,7 @@ namespace Chem4Word.Model2.Helpers
             {
                 return target;
             }
+
             Type sourceType = typeof(S);
             Type targetType = typeof(T);
             BindingFlags flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
@@ -72,7 +74,29 @@ namespace Chem4Word.Model2.Helpers
                     }
                 }
             }
+
             return target;
+        }
+
+        public static string GetRelativePath(string ancestor, string descendant)
+        {
+            System.Uri urifrom = new Uri(ancestor);
+
+            System.Uri urito = new Uri(descendant);
+
+            Uri relativeURI = urifrom.MakeRelativeUri(urito);
+            return relativeURI.ToString();
+        }
+
+        public static string UpTo(this string input, string terminator)
+        {
+            var index = input.IndexOf(terminator);
+            if (index >= 0)
+            {
+                return input.Substring(0, index);
+            }
+
+            return input;
         }
     }
 }

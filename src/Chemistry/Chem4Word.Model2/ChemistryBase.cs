@@ -5,10 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.IO;
 namespace Chem4Word.Model2
 {
     public abstract class ChemistryBase
     {
         public abstract string Path { get; }
+
+       
+       
     }
 }
