@@ -17,6 +17,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -420,7 +421,7 @@ namespace Chem4Word.Model2
             string message = "";
             string atomLabel = atomElement.Attribute("id")?.Value;
 
-            Point p = CML.GetPosn(atomElement, out message);
+            Point p = Helper.GetPosn(atomElement, out message);
             if (!string.IsNullOrEmpty(message))
             {
                 Messages.Add(message);
@@ -429,7 +430,7 @@ namespace Chem4Word.Model2
             Id = atomLabel;
             Position = p;
 
-            ElementBase e = CML.GetChemicalElement(atomElement, out message);
+            ElementBase e = Helper.GetChemicalElement(atomElement, out message);
             if (!string.IsNullOrEmpty(message))
             {
                 Messages.Add(message);
@@ -438,8 +439,8 @@ namespace Chem4Word.Model2
             if (e != null)
             {
                 Element = e;
-                FormalCharge = CML.GetFormalCharge(atomElement);
-                IsotopeNumber = CML.GetIsotopeNumber(atomElement);
+                FormalCharge = Helper.GetFormalCharge(atomElement);
+                IsotopeNumber = Helper.GetIsotopeNumber(atomElement);
             }
         }
 

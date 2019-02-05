@@ -19,6 +19,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -305,12 +306,12 @@ namespace Chem4Word.Model2
             Errors = new List<string>();
             Warnings = new List<string>();
 
-            List<XElement> childMolecules = CML.GetMolecules(cmlElement);
+            List<XElement> childMolecules = Helper.GetMolecules(cmlElement);
 
-            List<XElement> atomElements = CML.GetAtoms(cmlElement);
-            List<XElement> bondElements = CML.GetBonds(cmlElement);
-            List<XElement> nameElements = CML.GetNames(cmlElement);
-            List<XElement> formulaElements = CML.GetFormulas(cmlElement);
+            List<XElement> atomElements = Helper.GetAtoms(cmlElement);
+            List<XElement> bondElements = Helper.GetBonds(cmlElement);
+            List<XElement> nameElements = Helper.GetNames(cmlElement);
+            List<XElement> formulaElements = Helper.GetFormulas(cmlElement);
 
             foreach (XElement childElement in childMolecules)
             {

@@ -55,8 +55,8 @@
     <Compile Include="Bond.cs" />
     <Compile Include="ChemicalName.cs" />
     <Compile Include="ChemistryBase.cs" />
-    <Compile Include="Converters\CMLConstants.cs" />
-    <Compile Include="Converters\CMLNamespaces.cs" />
+    <Compile Include="Converters\CML\Constants.cs" />
+    <Compile Include="Converters\CML\Namespaces.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="ElementBase.cs" />
     <Compile Include="ElementConverter.cs" />
@@ -68,8 +68,8 @@
     <Compile Include="Geometry\Packer.cs" />
     <Compile Include="Geometry\Seperator.cs" />
     <Compile Include="Group.cs" />
-    <Compile Include="Converters\CML.cs" />
-    <Compile Include="Converters\CMLConverter.cs" />
+    <Compile Include="Converters\CML\Helper.cs" />
+    <Compile Include="Converters\CML\CMLConverter.cs" />
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Interfaces\IChemistryContainer.cs" />

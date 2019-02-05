@@ -5,10 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2.Converters
+namespace Chem4Word.Model2.Converters.CML
 {
     // ReSharper disable once InconsistentNaming
-    public static class CMLConstants
+    public static class Constants
     {
         public const string TagConventions = "conventions";
         public const string TagCml = "cml";

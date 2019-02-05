@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Windows;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Converters;
+using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -54,11 +55,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             string fileName = Path.Combine(Path.GetTempPath(), $"Chem4Word-V3-{guid}.docx");
 
-            bool canRender = m.TotalAtomsCount > 0 && (m.AverageBondLength > Constants.BondLengthTolerance / 2 || m.TotalBondsCount == 0);
+            bool canRender = m.TotalAtomsCount > 0 && (m.AverageBondLength > Core.Helpers.Constants.BondLengthTolerance / 2 || m.TotalBondsCount == 0);
 
             if (canRender)
             {
-                string bookmarkName = Constants.OoXmlBookmarkPrefix + guid;
+                string bookmarkName = Core.Helpers.Constants.OoXmlBookmarkPrefix + guid;
 
                 // Create a Wordprocessing document.
                 using (WordprocessingDocument package = WordprocessingDocument.Create(fileName, WordprocessingDocumentType.Document))

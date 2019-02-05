@@ -7,10 +7,10 @@
 
 using System.Xml.Linq;
 
-namespace Chem4Word.Model2.Converters
+namespace Chem4Word.Model2.Converters.CML
 {
     // ReSharper disable once InconsistentNaming
-    public class CMLNamespaces
+    public class Namespaces
     {
         // ReSharper disable once InconsistentNaming
         public static XNamespace cml = "http://www.xml-cml.org/schema";

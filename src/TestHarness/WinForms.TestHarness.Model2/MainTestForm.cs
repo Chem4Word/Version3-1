@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.Model2.Converters.CML;
 
 namespace WinForms.TestHarness.Model2
 {

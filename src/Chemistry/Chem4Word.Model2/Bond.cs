@@ -17,6 +17,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Xml.Linq;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -581,7 +582,7 @@ namespace Chem4Word.Model2
             Id = bondRef ?? Id;
             Order = cmlElement.Attribute("order")?.Value;
 
-            var stereoElems = CML.GetStereo(cmlElement);
+            var stereoElems = Helper.GetStereo(cmlElement);
 
             if (stereoElems.Any())
             {
@@ -620,7 +621,7 @@ namespace Chem4Word.Model2
             }
             Globals.BondDirection? dir = null;
 
-            var dirAttr = cmlElement.Attribute(CMLNamespaces.c4w + "placement");
+            var dirAttr = cmlElement.Attribute(Namespaces.c4w + "placement");
             if (dirAttr != null)
             {
                 Globals.BondDirection temp;
