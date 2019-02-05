@@ -85,6 +85,10 @@
       <Project>{c69bab8f-4881-4d5f-9929-fc8470df1e48}</Project>
       <Name>Chem4Word.Model2</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Chemistry\Chem4Word.Model\Chem4Word.Model.csproj">
+      <Project>{2AC2B698-58E4-45EA-A69E-D8380FA73B3E}</Project>
+      <Name>Chem4Word.Model</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Telemetry\Chem4Word.Telemetry.csproj">
       <Project>{c89bc92a-4183-48a6-b039-ad76aa1df48f}</Project>
       <Name>Chem4Word.Telemetry</Name>

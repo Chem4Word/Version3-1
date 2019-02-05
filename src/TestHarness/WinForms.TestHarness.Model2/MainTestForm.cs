@@ -14,13 +14,18 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.Model2.Converters.MDL;
 
 namespace WinForms.TestHarness.Model2
 {
     public partial class MainTestForm : Form
     {
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
         private Model lastModel = null;
 
@@ -31,10 +36,12 @@ namespace WinForms.TestHarness.Model2
 
         private void Load_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             StringBuilder sb = new StringBuilder();
-            sb.Append("CML molecule files (*.cml)|*.cml");
-            //sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
-            //sb.Append("|All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
+            sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
+            sb.Append("|CML molecule files (*.cml)|*.cml");
+            sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
 
             openFileDialog1.Title = "Open Structure";
             openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
@@ -45,7 +52,7 @@ namespace WinForms.TestHarness.Model2
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string filename = Path.GetFileName(openFileDialog1.FileName);
-                _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
+                _telemetry.Write(module, "Information", $"File: {filename}");
 
                 LoadModel(openFileDialog1.FileName);
             }
@@ -53,25 +60,49 @@ namespace WinForms.TestHarness.Model2
 
         private void LoadModel(string fileName)
         {
-            try
-            {
-                var converter = new CMLConverter();
-                using (StreamReader sr = new StreamReader(fileName))
-                {
-                    Stopwatch sw = new Stopwatch();
-                    var model = converter.Import(sr.ReadToEnd());
-                    lastModel = model;
-                    sw.Stop();
-                    //MessageBox.Show($"Converting took {sw.ElapsedMilliseconds}");
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
+            if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
+            {
+                try
+                {
+                    string contents = string.Empty;
+                    using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        using (var textReader = new StreamReader(fileStream))
+                        {
+                            contents = textReader.ReadToEnd();
+                        }
+                    }
+
+                    Model model = null;
+                    string fileType = Path.GetExtension(fileName).ToLower();
+                    switch (fileType)
+                    {
+                        case ".cml":
+                            var cmlConverter = new CMLConverter();
+                            model = cmlConverter.Import(contents);
+                            break;
+                        case ".sdf":
+                        case ".mol":
+                            var sdFileConverter = new SdFileConverter();
+                            model = sdFileConverter.Import(contents);
+                            break;
+                        case ".json":
+                            break;
+                    }
+
+                    if (model != null)
+                    {
+                        lastModel = model;
+                    }
+
+                    // Load model into TreeView
                     foreach (var modelMolecule in model.Molecules.Values)
                     {
-                        sw.Reset();
-
-                        //MessageBox.Show($"Rebuilding rings took {sw.ElapsedMilliseconds}");
-                        //MessageBox.Show($"Ring count= {modelMolecule.Rings.Count}");
                         LoadTreeNode(modelMolecule);
                     }
+
                     model.AtomsChanged += Model_AtomsChanged;
                     model.BondsChanged += Model_BondsChanged;
                     model.MoleculesChanged += Model_MoleculesChanged;
@@ -86,12 +117,12 @@ namespace WinForms.TestHarness.Model2
                     list.AddRange(model.AllWarnings);
                     textBox1.AppendText(string.Join(Environment.NewLine, list) + "\n");
                 }
-            }
-            catch (Exception exception)
-            {
-                _telemetry.Write("FlexForm.LoadStructure()", "Exception", $"Exception: {exception.Message}");
-                _telemetry.Write("FlexForm.LoadStructure()", "Exception(Data)", $"Exception: {exception}");
-                MessageBox.Show(exception.StackTrace, exception.Message);
+                catch (Exception exception)
+                {
+                    _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                    _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                    MessageBox.Show(exception.StackTrace, exception.Message);
+                }
             }
 
             // Local function to allow recursive calling
@@ -244,21 +275,29 @@ namespace WinForms.TestHarness.Model2
         {
             if (lastModel != null)
             {
+                string result = string.Empty;
+
                 switch (ExportAs.SelectedIndex)
                 {
                     case 1:
-                        var converter = new CMLConverter();
-                        var cml = converter.Export(lastModel);
-                        //Clipboard.SetText(cml);
-                        //MessageBox.Show("Last loaded model exported to clipboard as CML");
-                        textBox1.Text = cml + Environment.NewLine;
+                        var cmlConverter = new CMLConverter();
+                        result = cmlConverter.Export(lastModel);
                         break;
 
                     case 2:
+                        var sdFileConverter = new SdFileConverter();
+                        result = sdFileConverter.Export(lastModel);
                         break;
 
                     case 3:
                         break;
+                }
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    //Clipboard.SetText(result);
+                    //MessageBox.Show("Last loaded model exported to clipboard as CML");
+                    textBox1.Text = result + Environment.NewLine;
                 }
             }
             ExportAs.SelectedIndex = 0;

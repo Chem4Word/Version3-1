@@ -57,6 +57,15 @@
     <Compile Include="ChemistryBase.cs" />
     <Compile Include="Converters\CML\Constants.cs" />
     <Compile Include="Converters\CML\Namespaces.cs" />
+    <Compile Include="Converters\MDL\Counts.cs" />
+    <Compile Include="Converters\MDL\CtabProcessor.cs" />
+    <Compile Include="Converters\MDL\DataProcessor.cs" />
+    <Compile Include="Converters\MDL\MDLConstants.cs" />
+    <Compile Include="Converters\MDL\MDLConverter.cs" />
+    <Compile Include="Converters\MDL\PropertyType.cs" />
+    <Compile Include="Converters\MDL\SdFileBase.cs" />
+    <Compile Include="Converters\MDL\SdFileConverter.cs" />
+    <Compile Include="Converters\MDL\SdfState.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="ElementBase.cs" />
     <Compile Include="ElementConverter.cs" />
