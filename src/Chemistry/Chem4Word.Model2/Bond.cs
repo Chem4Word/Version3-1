@@ -620,7 +620,7 @@ namespace Chem4Word.Model2
             }
             Globals.BondDirection? dir = null;
 
-            var dirAttr = cmlElement.Attribute(CML.c4w + "placement");
+            var dirAttr = cmlElement.Attribute(CMLNamespaces.c4w + "placement");
             if (dirAttr != null)
             {
                 Globals.BondDirection temp;

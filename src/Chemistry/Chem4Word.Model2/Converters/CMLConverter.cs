@@ -12,38 +12,9 @@ using System.Xml.Linq;
 
 namespace Chem4Word.Model2.Converters
 {
+    // ReSharper disable once InconsistentNaming
     public class CMLConverter
     {
-        private const string TagConventions = "conventions";
-        private const string TagCml = "cml";
-        private const string TagCmlDict = "cmlDict";
-        private const string TagNameDict = "nameDict";
-        private const string TagC4W = "c4w";
-        private const string TagValConvetionMolecular = "convention:molecular";
-        private const string TagFormula = "formula";
-        private const string TagXMLPartGuid = "customXmlPartGuid";
-        private const string TagId = "id";
-        private const string AttrConvention = "convention";
-        private const string AttrInline = "inline";
-        private const string TagConcise = "concise";
-        private const string TagName = "name";
-        private const string TagDictRef = "dictRef";
-        private const string TagBondStereo = "bondStereo";
-        private const string TagAtomRefs4 = "atomRefs4";
-        private const string TagAtomRefs2 = "atomRefs2";
-        private const string TagMolecule = "molecule";
-        private const string TagAtomArray = "atomArray";
-        private const string TagBondArray = "bondArray";
-        private const string TagBond = "bond";
-        private const string TagOrder = "order";
-        private const string TagPlacement = "placement";
-        private const string TagAtom = "atom";
-        private const string TagElementType = "elementType";
-        private const string TagX2 = "x2";
-        private const string TagY2 = "y2";
-        private const string TagFormalCharge = "formalCharge";
-        private const string TagIsotopeNumber = "isotopeNumber";
-
         public static string Description => "Chemical Markup Language";
         public bool CanExport => true;
 
@@ -99,19 +70,19 @@ namespace Chem4Word.Model2.Converters
         {
             XDocument xd = new XDocument();
 
-            XElement root = new XElement(CML.cml + TagCml,
-                new XAttribute(XNamespace.Xmlns + TagConventions, CML.conventions),
-                new XAttribute(XNamespace.Xmlns + TagCml, CML.cml),
-                new XAttribute(XNamespace.Xmlns + TagCmlDict, CML.cmlDict),
-                new XAttribute(XNamespace.Xmlns + TagNameDict, CML.nameDict),
-                new XAttribute(XNamespace.Xmlns + TagC4W, CML.c4w),
-                new XAttribute(TagConventions, TagValConvetionMolecular)
+            XElement root = new XElement(CMLNamespaces.cml + CMLConstants.TagCml,
+                new XAttribute(XNamespace.Xmlns + CMLConstants.TagConventions, CMLNamespaces.conventions),
+                new XAttribute(XNamespace.Xmlns + CMLConstants.TagCml, CMLNamespaces.cml),
+                new XAttribute(XNamespace.Xmlns + CMLConstants.TagCmlDict, CMLNamespaces.cmlDict),
+                new XAttribute(XNamespace.Xmlns + CMLConstants.TagNameDict, CMLNamespaces.nameDict),
+                new XAttribute(XNamespace.Xmlns + CMLConstants.TagC4W, CMLNamespaces.c4w),
+                new XAttribute(CMLConstants.TagConventions, CMLConstants.TagValConvetionMolecular)
                 );
 
             // Only export if set
             if (!string.IsNullOrEmpty(model.CustomXmlPartGuid))
             {
-                XElement customXmlPartGuid = new XElement(Converters.CML.c4w + TagXMLPartGuid, model.CustomXmlPartGuid);
+                XElement customXmlPartGuid = new XElement(Converters.CMLNamespaces.c4w + CMLConstants.TagXMLPartGuid, model.CustomXmlPartGuid);
                 root.Add(customXmlPartGuid);
             }
 
@@ -171,26 +142,26 @@ namespace Chem4Word.Model2.Converters
 
         private XElement GetXElement(Formula f, string concise)
         {
-            XElement result = new XElement(Converters.CML.cml + TagFormula);
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagFormula);
 
             if (f.Id != null)
             {
-                result.Add(new XAttribute(TagId, f.Id));
+                result.Add(new XAttribute(CMLConstants.TagId, f.Id));
             }
 
             if (f.Convention != null)
             {
-                result.Add(new XAttribute(AttrConvention, f.Convention));
+                result.Add(new XAttribute(CMLConstants.AttrConvention, f.Convention));
             }
 
             if (f.Inline != null)
             {
-                result.Add(new XAttribute(AttrInline, f.Inline));
+                result.Add(new XAttribute(CMLConstants.AttrInline, f.Inline));
             }
 
             if (concise != null)
             {
-                result.Add(new XAttribute(TagConcise, concise));
+                result.Add(new XAttribute(CMLConstants.TagConcise, concise));
             }
 
             return result;
@@ -198,12 +169,12 @@ namespace Chem4Word.Model2.Converters
 
         private XElement GetXElement(string concise, string molId)
         {
-            XElement result = new XElement(Converters.CML.cml + TagFormula);
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagFormula);
 
             if (concise != null)
             {
-                result.Add(new XAttribute(TagId, $"{molId}.f0"));
-                result.Add(new XAttribute(TagConcise, concise));
+                result.Add(new XAttribute(CMLConstants.TagId, $"{molId}.f0"));
+                result.Add(new XAttribute(CMLConstants.TagConcise, concise));
             }
 
             return result;
@@ -211,16 +182,16 @@ namespace Chem4Word.Model2.Converters
 
         private XElement GetXElement(ChemicalName name)
         {
-            XElement result = new XElement(Converters.CML.cml + TagName, name.Name);
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagName, name.Name);
 
             if (name.Id != null)
             {
-                result.Add(new XAttribute(TagId, name.Id));
+                result.Add(new XAttribute(CMLConstants.TagId, name.Id));
             }
 
             if (name.DictRef != null)
             {
-                result.Add(new XAttribute(TagDictRef, name.DictRef));
+                result.Add(new XAttribute(CMLConstants.TagDictRef, name.DictRef));
             }
 
             return result;
@@ -256,15 +227,15 @@ namespace Chem4Word.Model2.Converters
                         }
                     }
 
-                    result = new XElement(Converters.CML.cml + TagBondStereo,
-                        new XAttribute(TagAtomRefs4,
+                    result = new XElement(CMLNamespaces.cml + CMLConstants.TagBondStereo,
+                        new XAttribute(CMLConstants.TagAtomRefs4,
                             $"{firstAtom.Id} {bond.StartAtom.Id} {bond.EndAtom.Id} {lastAtom.Id}"),
                         GetStereoString(bond.Stereo));
                 }
                 else
                 {
-                    result = new XElement(Converters.CML.cml + TagBondStereo,
-                        new XAttribute(TagAtomRefs2, $"{bond.StartAtom.Id} {bond.EndAtom.Id}"),
+                    result = new XElement(CMLNamespaces.cml + CMLConstants.TagBondStereo,
+                        new XAttribute(CMLConstants.TagAtomRefs2, $"{bond.StartAtom.Id} {bond.EndAtom.Id}"),
                         GetStereoString(bond.Stereo));
                 }
             }
@@ -301,7 +272,7 @@ namespace Chem4Word.Model2.Converters
 
         private XElement GetMoleculeElement(Molecule mol)
         {
-            XElement molElement = new XElement(Converters.CML.cml + TagMolecule, new XAttribute(TagId, mol.Id));
+            XElement molElement = new XElement(CMLNamespaces.cml + CMLConstants.TagMolecule, new XAttribute(CMLConstants.TagId, mol.Id));
 
             if (mol.Molecules.Any())
             {
@@ -331,7 +302,7 @@ namespace Chem4Word.Model2.Converters
                 if (mol.Atoms.Count > 0)
                 {
                     // Add atomArray element, then add these to it
-                    XElement aaElement = new XElement(Converters.CML.cml + TagAtomArray);
+                    XElement aaElement = new XElement(CMLNamespaces.cml + CMLConstants.TagAtomArray);
                     foreach (Atom atom in mol.Atoms.Values)
                     {
                         aaElement.Add(GetXElement(atom));
@@ -342,7 +313,7 @@ namespace Chem4Word.Model2.Converters
                 // Task 336
                 if (mol.Bonds.Count > 0)
                 {
-                    XElement baElement = new XElement(Converters.CML.cml + TagBondArray);
+                    XElement baElement = new XElement(CMLNamespaces.cml + CMLConstants.TagBondArray);
                     // Add bondArray element, then add these to it
                     foreach (Bond bond in mol.Bonds)
                     {
@@ -358,35 +329,35 @@ namespace Chem4Word.Model2.Converters
         {
             XElement result;
 
-            result = new XElement(Converters.CML.cml + TagBond,
-                new XAttribute(TagId, bond.Id),
-                new XAttribute(TagAtomRefs2, $"{bond.StartAtom.Id} {bond.EndAtom.Id}"),
-                new XAttribute(TagOrder, bond.Order),
+            result = new XElement(CMLNamespaces.cml + CMLConstants.TagBond,
+                new XAttribute(CMLConstants.TagId, bond.Id),
+                new XAttribute(CMLConstants.TagAtomRefs2, $"{bond.StartAtom.Id} {bond.EndAtom.Id}"),
+                new XAttribute(CMLConstants.TagOrder, bond.Order),
                 GetStereoXElement(bond));
 
             if (bond.ExplicitPlacement != null)
             {
-                result.Add(new XAttribute(Converters.CML.c4w + TagPlacement, bond.ExplicitPlacement));
+                result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.TagPlacement, bond.ExplicitPlacement));
             }
             return result;
         }
 
         private XElement GetXElement(Atom atom)
         {
-            XElement result = new XElement(Converters.CML.cml + TagAtom,
-                new XAttribute(TagId, atom.Id),
-                new XAttribute(TagElementType, atom.Element.Symbol),
-                new XAttribute(TagX2, atom.Position.X),
-                new XAttribute(TagY2, atom.Position.Y)
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,
+                new XAttribute(CMLConstants.TagId, atom.Id),
+                new XAttribute(CMLConstants.TagElementType, atom.Element.Symbol),
+                new XAttribute(CMLConstants.TagX2, atom.Position.X),
+                new XAttribute(CMLConstants.TagY2, atom.Position.Y)
             );
 
             if (atom.FormalCharge != null)
             {
-                result.Add(new XAttribute(TagFormalCharge, atom.FormalCharge.Value));
+                result.Add(new XAttribute(CMLConstants.TagFormalCharge, atom.FormalCharge.Value));
             }
             if (atom.IsotopeNumber != null)
             {
-                result.Add(new XAttribute(TagIsotopeNumber, atom.IsotopeNumber));
+                result.Add(new XAttribute(CMLConstants.TagIsotopeNumber, atom.IsotopeNumber));
             }
             return result;
         }

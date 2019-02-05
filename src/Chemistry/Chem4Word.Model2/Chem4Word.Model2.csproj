@@ -55,6 +55,8 @@
     <Compile Include="Bond.cs" />
     <Compile Include="ChemicalName.cs" />
     <Compile Include="ChemistryBase.cs" />
+    <Compile Include="Converters\CMLConstants.cs" />
+    <Compile Include="Converters\CMLNamespaces.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="ElementBase.cs" />
     <Compile Include="ElementConverter.cs" />
