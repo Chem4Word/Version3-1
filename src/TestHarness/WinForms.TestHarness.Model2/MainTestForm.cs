@@ -6,7 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2;
-using Chem4Word.Model2.Converters;
+using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Telemetry;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Model2.Converters.CML;
 
 namespace WinForms.TestHarness.Model2
 {
@@ -104,12 +103,12 @@ namespace WinForms.TestHarness.Model2
                     //FileInfo fi = new FileInfo(fileName);
                     //parentNode = treeView1.Nodes.Add(modelMolecule.Path, fi.Name + ": " + modelMolecule.ToString());
                     parentNode = treeView1.Nodes.Add(modelMolecule.Path, modelMolecule.ToString());
-                    textBox1.AppendText($"Molecule {modelMolecule.Path} added. \n");
+                    textBox1.AppendText($"Molecule {modelMolecule.Path} added.\n");
                 }
                 else
                 {
                     parentNode = root.Nodes.Add(modelMolecule.Path, modelMolecule.ToString());
-                    textBox1.AppendText($"Molecule {modelMolecule.Path} added. \n");
+                    textBox1.AppendText($"Molecule {modelMolecule.Path} added.\n");
                 }
                 parentNode.Tag = modelMolecule;
 
@@ -121,7 +120,7 @@ namespace WinForms.TestHarness.Model2
                     {
                         var res = atomsNode.Nodes.Add(atom.Path, atom.ToString());
                         res.Tag = atom;
-                        textBox1.AppendText($"Atom {atom.Path} added. \n");
+                        textBox1.AppendText($"Atom {atom.Path} added.\n");
                     }
                 }
 
@@ -133,22 +132,22 @@ namespace WinForms.TestHarness.Model2
                     {
                         var res = bondsNode.Nodes.Add(bond.Path, bond.ToString());
                         res.Tag = bond;
-                        textBox1.AppendText($"Bond {bond.Path} added. \n");
+                        textBox1.AppendText($"Bond {bond.Path} added.\n");
                     }
                 }
 
                 if (modelMolecule.Rings.Any())
                 {
                     var ringsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Rings", $"Rings: count {modelMolecule.Rings.Count}");
-                    int ringCounter = 0;
 
+                    int ringCounter = 1;
                     foreach (Ring r in modelMolecule.Rings)
                     {
-                        var ringnode = ringsNode.Nodes.Add(r.GetHashCode().ToString(), $"Ring {ringCounter++} Length {r.Atoms.Count}");
+                        var ringnode = ringsNode.Nodes.Add(r.GetHashCode().ToString(), $"Ring {ringCounter++} - Priority {r.Priority} with {r.Atoms.Count} Atoms");
                         ringnode.Tag = r;
                         foreach (Atom a in r.Atoms)
                         {
-                            ringnode.Nodes.Add(r.GetHashCode() + a.Id, a.Path);
+                            ringnode.Nodes.Add(r.GetHashCode() + a.Id, $"{a.Id} - {a.Path}");
                         }
                     }
                 }
@@ -163,7 +162,6 @@ namespace WinForms.TestHarness.Model2
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is Bond)
-
             {
                 textBox1.AppendText($"Bond {(sender as Bond).Path} property {e.PropertyName} changed.\n");
             }
@@ -185,7 +183,7 @@ namespace WinForms.TestHarness.Model2
                         var foundNode = treeView1.Nodes.Find(key, true);
 
                         treeView1.Nodes.Remove(foundNode[0]);
-                        textBox1.AppendText($"Bond {foundNode[0].Tag} removed. \n");
+                        textBox1.AppendText($"Bond {foundNode[0].Tag} removed.\n");
                     }
                 }
             }
@@ -203,7 +201,7 @@ namespace WinForms.TestHarness.Model2
                         var foundNode = treeView1.Nodes.Find(key, true);
 
                         treeView1.Nodes.Remove(foundNode[0]);
-                        textBox1.AppendText($"Atom {foundNode[0].Tag} removed. \n");
+                        textBox1.AppendText($"Atom {foundNode[0].Tag} removed.\n");
                     }
                 }
             }
@@ -253,10 +251,12 @@ namespace WinForms.TestHarness.Model2
                         var cml = converter.Export(lastModel);
                         //Clipboard.SetText(cml);
                         //MessageBox.Show("Last loaded model exported to clipboard as CML");
-                        textBox1.Text = cml;
+                        textBox1.Text = cml + Environment.NewLine;
                         break;
+
                     case 2:
                         break;
+
                     case 3:
                         break;
                 }
