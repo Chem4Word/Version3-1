@@ -244,8 +244,9 @@ namespace WinForms.TestHarness.Model2
                     case 1:
                         var converter = new CMLConverter();
                         var cml = converter.Export(lastModel);
-                        Clipboard.SetText(cml);
-                        MessageBox.Show("Last loaded model exported to clipboard as CML");
+                        //Clipboard.SetText(cml);
+                        //MessageBox.Show("Last loaded model exported to clipboard as CML");
+                        textBox1.Text = cml;
                         break;
                     case 2:
                         break;

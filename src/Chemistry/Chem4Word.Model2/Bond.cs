@@ -91,7 +91,7 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    return Parent.Path  + Id;
+                    return Parent.Path + "/" + Id;
                 }
             }
         }

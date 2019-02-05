@@ -180,17 +180,24 @@ namespace Chem4Word.Model2
         {
             get
             {
+                string path = "";
+
                 if (Parent == null)
                 {
-                    return Id + "/";
+                    path = Id;
                 }
 
                 if (Parent is Model model)
                 {
-                    return model.Path + Id + "/";
+                    path = model.Path + Id;
                 }
 
-                return ((Molecule)Parent).Path + "/" + Id + "/";
+                if (Parent is Molecule molecule)
+                {
+                    path = molecule.Path + "/" + Id;
+                }
+
+                return path;
             }
         }
 
