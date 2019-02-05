@@ -115,7 +115,7 @@ namespace WinForms.TestHarness.Model2
 
                 if (modelMolecule.Atoms.Any())
                 {
-                    var atomsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Atoms", $"Atom count {modelMolecule.Atoms.Count}");
+                    var atomsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Atoms", $"Atoms: count {modelMolecule.Atoms.Count}");
 
                     foreach (Atom atom in modelMolecule.Atoms.Values)
                     {
@@ -127,7 +127,7 @@ namespace WinForms.TestHarness.Model2
 
                 if (modelMolecule.Bonds.Any())
                 {
-                    var bondsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Bonds", $"Bond count {modelMolecule.Bonds.Count}");
+                    var bondsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Bonds", $"Bonds: count {modelMolecule.Bonds.Count}");
 
                     foreach (Bond bond in modelMolecule.Bonds)
                     {
@@ -137,13 +137,19 @@ namespace WinForms.TestHarness.Model2
                     }
                 }
 
-                foreach (Ring r in modelMolecule.Rings)
+                if (modelMolecule.Rings.Any())
                 {
-                    var ringnode = parentNode.Nodes.Add(r.GetHashCode().ToString(), $"Ring count {r.Atoms.Count}");
-                    ringnode.Tag = r;
-                    foreach (Atom a in r.Atoms)
+                    var ringsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Rings", $"Rings: count {modelMolecule.Rings.Count}");
+                    int ringCounter = 0;
+
+                    foreach (Ring r in modelMolecule.Rings)
                     {
-                        ringnode.Nodes.Add(r.GetHashCode() + a.Id, a.Id);
+                        var ringnode = ringsNode.Nodes.Add(r.GetHashCode().ToString(), $"Ring {ringCounter++} Length {r.Atoms.Count}");
+                        ringnode.Tag = r;
+                        foreach (Atom a in r.Atoms)
+                        {
+                            ringnode.Nodes.Add(r.GetHashCode() + a.Id, a.Path);
+                        }
                     }
                 }
 
