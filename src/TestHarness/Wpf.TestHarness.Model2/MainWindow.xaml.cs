@@ -85,8 +85,6 @@ namespace Wpf.TestHarness.Model2
                 {
                     LoadTreeNode(childMol, parentNode);
                 }
-
-
             }
 
             MoleculeTreeView.Items.Clear();

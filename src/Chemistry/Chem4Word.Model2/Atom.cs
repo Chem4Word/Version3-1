@@ -26,7 +26,7 @@ namespace Chem4Word.Model2
         #region Fields
 
         private bool _explicitC;
-        public readonly List<string> Messages = new List<string>();
+        public List<string> Messages = new List<string>();
 
         #endregion Fields
 
@@ -414,35 +414,6 @@ namespace Chem4Word.Model2
         private readonly string _internalId;
 
         internal string InternalId => _internalId;
-
-        public Atom(XElement atomElement) : this()
-        {
-            Messages = new List<string>();
-            string message = "";
-            string atomLabel = atomElement.Attribute("id")?.Value;
-
-            Point p = Helper.GetPosn(atomElement, out message);
-            if (!string.IsNullOrEmpty(message))
-            {
-                Messages.Add(message);
-            }
-
-            Id = atomLabel;
-            Position = p;
-
-            ElementBase e = Helper.GetChemicalElement(atomElement, out message);
-            if (!string.IsNullOrEmpty(message))
-            {
-                Messages.Add(message);
-            }
-
-            if (e != null)
-            {
-                Element = e;
-                FormalCharge = Helper.GetFormalCharge(atomElement);
-                IsotopeNumber = Helper.GetIsotopeNumber(atomElement);
-            }
-        }
 
         #endregion Constructors
 

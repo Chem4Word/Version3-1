@@ -5,10 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Linq;
-using System.Xml.Linq;
+using System;
+using System.Collections.Generic;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
+using System.Linq;
+using System.Windows;
+using System.Xml.Linq;
 
 namespace Chem4Word.Model2.Converters.CML
 {
@@ -47,7 +50,7 @@ namespace Chem4Word.Model2.Converters.CML
 
                 foreach (XElement meElement in moleculeElements)
                 {
-                    var newMol = new Molecule(meElement);
+                    var newMol = GetMolecule(meElement);
 
                     AddMolecule(newModel, newMol);
                     newMol.Parent = (IChemistryContainer)newModel;
@@ -364,7 +367,7 @@ namespace Chem4Word.Model2.Converters.CML
             return result;
         }
 
-        #endregion
+        #endregion Export Helpers
 
         #region Import Helpers
 
@@ -373,6 +376,190 @@ namespace Chem4Word.Model2.Converters.CML
             return newModel.AddMolecule(newMol);
         }
 
-        #endregion
+        public static Molecule GetMolecule(XElement cmlElement)
+        {
+            Molecule molecule = new Molecule();
+
+            string idValue = cmlElement.Attribute("id")?.Value;
+            if (idValue != null)
+            {
+                molecule.Id = idValue;
+            }
+
+            molecule.Errors = new List<string>();
+            molecule.Warnings = new List<string>();
+
+            List<XElement> childMolecules = Helper.GetMolecules(cmlElement);
+
+            List<XElement> atomElements = Helper.GetAtoms(cmlElement);
+            List<XElement> bondElements = Helper.GetBonds(cmlElement);
+            List<XElement> nameElements = Helper.GetNames(cmlElement);
+            List<XElement> formulaElements = Helper.GetFormulas(cmlElement);
+
+            foreach (XElement childElement in childMolecules)
+            {
+                Molecule newMol = GetMolecule(childElement);
+                molecule.AddMolecule(newMol);
+                newMol.Parent = molecule;
+            }
+
+            Dictionary<string, string> reverseAtomLookup = new Dictionary<string, string>();
+            foreach (XElement atomElement in atomElements)
+            {
+                Atom newAtom = GetAtom(atomElement);
+                if (newAtom.Messages.Count > 0)
+                {
+                    molecule.Errors.AddRange(newAtom.Messages);
+                }
+
+                molecule.AddAtom(newAtom);
+                reverseAtomLookup[newAtom.Id] = newAtom.InternalId;
+                newAtom.Parent = molecule;
+            }
+
+            foreach (XElement bondElement in bondElements)
+            {
+                Bond newBond = GetBond(bondElement, reverseAtomLookup);
+
+                if (newBond.Messages.Count > 0)
+                {
+                    molecule.Errors.AddRange(newBond.Messages);
+                }
+
+                molecule.AddBond(newBond);
+                newBond.Parent = molecule;
+            }
+
+            foreach (XElement formulaElement in formulaElements)
+            {
+                // Only import Concise Once
+                if (string.IsNullOrEmpty(molecule.ConciseFormula))
+                {
+                    molecule.ConciseFormula = formulaElement.Attribute(Constants.TagConcise)?.Value;
+                }
+
+                Formula formula = new Formula(formulaElement);
+                if (formula.IsValid)
+                {
+                    molecule.Formulas.Add(formula);
+                }
+            }
+
+            foreach (XElement nameElement in nameElements)
+            {
+                molecule.Names.Add(new ChemicalName(nameElement));
+            }
+
+            molecule.RebuildRings();
+
+            return molecule;
+        }
+
+        public static Atom GetAtom(XElement atomElement)
+        {
+            Atom atom = new Atom();
+
+            atom.Messages = new List<string>();
+            string message = "";
+            string atomLabel = atomElement.Attribute(Constants.TagId)?.Value;
+
+            Point p = Helper.GetPosn(atomElement, out message);
+            if (!string.IsNullOrEmpty(message))
+            {
+                atom.Messages.Add(message);
+            }
+
+            atom.Id = atomLabel;
+            atom.Position = p;
+
+            ElementBase e = Helper.GetChemicalElement(atomElement, out message);
+            if (!string.IsNullOrEmpty(message))
+            {
+                atom.Messages.Add(message);
+            }
+
+            if (e != null)
+            {
+                atom.Element = e;
+                atom.FormalCharge = Helper.GetFormalCharge(atomElement);
+                atom.IsotopeNumber = Helper.GetIsotopeNumber(atomElement);
+            }
+
+            return atom;
+        }
+
+        public static Bond GetBond(XElement cmlElement, Dictionary<string, string> reverseAtomLookup)
+        {
+            Bond bond = new Bond();
+
+            string[] atomRefs = cmlElement.Attribute( Constants.TagAtomRefs2)?.Value.Split(' ');
+            if (atomRefs?.Length == 2)
+            {
+                bond.StartAtomInternalId = reverseAtomLookup[atomRefs[0]];
+                bond.EndAtomInternalId = reverseAtomLookup[atomRefs[1]];
+            }
+            var bondRef = cmlElement.Attribute(Constants.TagId)?.Value;
+            bond.Id = bondRef ?? bond.Id;
+            bond.Order = cmlElement.Attribute(Constants.TagOrder)?.Value;
+
+            var stereoElems = Helper.GetStereo(cmlElement);
+
+            if (stereoElems.Any())
+            {
+                var stereo = stereoElems[0].Value;
+
+                switch (stereo)
+                {
+                    case "N":
+                        bond.Stereo = Globals.BondStereo.None;
+                        break;
+
+                    case "W":
+                        bond.Stereo = Globals.BondStereo.Wedge;
+                        break;
+
+                    case "H":
+                        bond.Stereo = Globals.BondStereo.Hatch;
+                        break;
+
+                    case "S":
+                        bond.Stereo = Globals.BondStereo.Indeterminate;
+                        break;
+
+                    case "C":
+                        bond.Stereo = Globals.BondStereo.Cis;
+                        break;
+
+                    case "T":
+                        bond.Stereo = Globals.BondStereo.Trans;
+                        break;
+
+                    default:
+                        bond.Stereo = Globals.BondStereo.None;
+                        break;
+                }
+            }
+            Globals.BondDirection? dir = null;
+
+            var dirAttr = cmlElement.Attribute(Namespaces.c4w + Constants.TagPlacement);
+            if (dirAttr != null)
+            {
+                Globals.BondDirection temp;
+
+                if (Enum.TryParse(dirAttr.Value, out temp))
+                {
+                    dir = temp;
+                }
+            }
+
+            if (dir != null)
+            {
+                bond.Placement = dir.Value;
+            }
+
+            return bond;
+        }
+
+        #endregion Import Helpers
     }
 }
