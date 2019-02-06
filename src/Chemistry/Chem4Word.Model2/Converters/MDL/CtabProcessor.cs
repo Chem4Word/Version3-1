@@ -87,16 +87,16 @@ namespace Chem4Word.Model2.Converters.MDL
             writer.WriteLine(MDLConstants.M_END);
         }
 
-        public override void ExportToStream(Molecule molecule, StreamWriter writer, out string message)
-        {
-            _molecule = molecule;
-            atomByNumber = new Dictionary<int, Atom>();
-            bondByNumber = new Dictionary<int, Bond>();
-            numberByAtom = new Dictionary<Atom, int>();
+        //public void ExportToStream(Molecule molecule, StreamWriter writer, out string message)
+        //{
+        //    _molecule = molecule;
+        //    atomByNumber = new Dictionary<int, Atom>();
+        //    bondByNumber = new Dictionary<int, Bond>();
+        //    numberByAtom = new Dictionary<Atom, int>();
 
-            message = null;
-            WriteCtab(writer);
-        }
+        //    message = null;
+        //    WriteCtab(writer);
+        //}
 
 
         #region Reading Into Model
@@ -343,14 +343,14 @@ namespace Chem4Word.Model2.Converters.MDL
 
         #region Exporting From Model
 
-        private void WriteCtab(StreamWriter writer)
-        {
-            WriteHeader(writer);
-            WriteAtoms(writer);
-            WriteBonds(writer);
-            WriteProperties(writer);
-            writer.WriteLine(MDLConstants.M_END);
-        }
+        //private void WriteCtab(StreamWriter writer)
+        //{
+        //    WriteHeader(writer);
+        //    WriteAtoms(writer);
+        //    WriteBonds(writer);
+        //    WriteProperties(writer);
+        //    writer.WriteLine(MDLConstants.M_END);
+        //}
 
         private void WriteHeader(StreamWriter writer, int atoms, int bonds)
         {
@@ -388,41 +388,41 @@ namespace Chem4Word.Model2.Converters.MDL
             writer.WriteLine($"{OutputMDLInt(atoms)}{OutputMDLInt(bonds)}  0     0  0              0 V2000");
         }
 
-        private void WriteHeader(StreamWriter writer)
-        {
-            // Line 1 - Molecule Name (80)
-            writer.WriteLine("");
+        //private void WriteHeader(StreamWriter writer)
+        //{
+        //    // Line 1 - Molecule Name (80)
+        //    writer.WriteLine("");
 
-            // Line 2
-            // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
-            //           1         2         3         4         5         6         7
-            // IIPPPPPPPPMMDDYYHHmmddSSssssssssssEEEEEEEEEEEERRRRRR
-            // A2<--A8--><---A10-->A2I2<--F10.5-><---F12.5--><-I6->
-            // I == User Initials
-            // P == Program Name
-            // MMDDYYHHmm == Date and Time
-            // d == dimensional codes
-            // Ss == scaling factors
-            // E == Energy
-            // R == registry number
-            writer.WriteLine($"  Chem4Wrd{DateTime.Now.ToString("MMddyyHHmm")}");
+        //    // Line 2
+        //    // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
+        //    //           1         2         3         4         5         6         7
+        //    // IIPPPPPPPPMMDDYYHHmmddSSssssssssssEEEEEEEEEEEERRRRRR
+        //    // A2<--A8--><---A10-->A2I2<--F10.5-><---F12.5--><-I6->
+        //    // I == User Initials
+        //    // P == Program Name
+        //    // MMDDYYHHmm == Date and Time
+        //    // d == dimensional codes
+        //    // Ss == scaling factors
+        //    // E == Energy
+        //    // R == registry number
+        //    writer.WriteLine($"  Chem4Wrd{DateTime.Now.ToString("MMddyyHHmm")}");
 
-            // Line 3 - Comments (80)
-            writer.WriteLine("");
+        //    // Line 3 - Comments (80)
+        //    writer.WriteLine("");
 
-            // Counts line
-            // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
-            //           1         2         3         4         5         6         7
-            // aaabbblll---cccsss------------mmm-vvvvv
-            //   6  5  0     0  0              3 V2000
-            // a == number of atoms
-            // b == number of bonds
-            // l == number of atom lists
-            // c == chiral flag; 0=not chiral, 1=chiral
-            // m == number of additional properties
-            // v == version number
-            writer.WriteLine($"{OutputMDLInt(_molecule.Atoms.Count)}{OutputMDLInt(_molecule.Bonds.Count)}  0     0  0              0 V2000");
-        }
+        //    // Counts line
+        //    // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
+        //    //           1         2         3         4         5         6         7
+        //    // aaabbblll---cccsss------------mmm-vvvvv
+        //    //   6  5  0     0  0              3 V2000
+        //    // a == number of atoms
+        //    // b == number of bonds
+        //    // l == number of atom lists
+        //    // c == chiral flag; 0=not chiral, 1=chiral
+        //    // m == number of additional properties
+        //    // v == version number
+        //    writer.WriteLine($"{OutputMDLInt(_molecule.Atoms.Count)}{OutputMDLInt(_molecule.Bonds.Count)}  0     0  0              0 V2000");
+        //}
 
         private void WriteAtoms(StreamWriter writer, List<Atom> atoms)
         {
@@ -434,15 +434,15 @@ namespace Chem4Word.Model2.Converters.MDL
             }
         }
 
-        private void WriteAtoms(StreamWriter writer)
-        {
-            int i = 0;
-            foreach (var atom in _molecule.Atoms.Values)
-            {
-                writer.WriteLine(CreateAtomLine(atom));
-                numberByAtom.Add(atom, ++i);
-            }
-        }
+        //private void WriteAtoms(StreamWriter writer)
+        //{
+        //    int i = 0;
+        //    foreach (var atom in _molecule.Atoms.Values)
+        //    {
+        //        writer.WriteLine(CreateAtomLine(atom));
+        //        numberByAtom.Add(atom, ++i);
+        //    }
+        //}
 
         private void WriteBonds(StreamWriter writer, List<Bond> bonds)
         {
@@ -452,13 +452,13 @@ namespace Chem4Word.Model2.Converters.MDL
             }
         }
 
-        private void WriteBonds(StreamWriter writer)
-        {
-            foreach (var bond in _molecule.Bonds)
-            {
-                writer.WriteLine(CreateBondLine(bond));
-            }
-        }
+        //private void WriteBonds(StreamWriter writer)
+        //{
+        //    foreach (var bond in _molecule.Bonds)
+        //    {
+        //        writer.WriteLine(CreateBondLine(bond));
+        //    }
+        //}
 
         private string CreateAtomLine(Atom atom)
         {
@@ -672,24 +672,24 @@ namespace Chem4Word.Model2.Converters.MDL
             }
         }
 
-        private void WriteProperties(StreamWriter writer)
-        {
-            string p = CreateAtomPropertyLine(MDLConstants.M_CHG);
-            if (!string.IsNullOrEmpty(p))
-            {
-                writer.WriteLine(p);
-            }
-            p = CreateAtomPropertyLine(MDLConstants.M_ISO);
-            if (!string.IsNullOrEmpty(p))
-            {
-                writer.WriteLine(p);
-            }
-            p = CreateAtomPropertyLine(MDLConstants.M_RAD);
-            if (!string.IsNullOrEmpty(p))
-            {
-                writer.WriteLine(p);
-            }
-        }
+        //private void WriteProperties(StreamWriter writer)
+        //{
+        //    string p = CreateAtomPropertyLine(MDLConstants.M_CHG);
+        //    if (!string.IsNullOrEmpty(p))
+        //    {
+        //        writer.WriteLine(p);
+        //    }
+        //    p = CreateAtomPropertyLine(MDLConstants.M_ISO);
+        //    if (!string.IsNullOrEmpty(p))
+        //    {
+        //        writer.WriteLine(p);
+        //    }
+        //    p = CreateAtomPropertyLine(MDLConstants.M_RAD);
+        //    if (!string.IsNullOrEmpty(p))
+        //    {
+        //        writer.WriteLine(p);
+        //    }
+        //}
 
         #endregion Exporting From Model
 
@@ -754,66 +754,66 @@ namespace Chem4Word.Model2.Converters.MDL
             return output.ToString().TrimEnd();
         }
 
-        private String CreateAtomPropertyLine(string propertyType)
-        {
-            List<int> values = new List<int>();
-            List<int> atomNumbers = new List<int>();
+        //private String CreateAtomPropertyLine(string propertyType)
+        //{
+        //    List<int> values = new List<int>();
+        //    List<int> atomNumbers = new List<int>();
 
-            foreach (Atom atom in _molecule.Atoms.Values)
-            {
-                int atomNumber = numberByAtom[atom];
+        //    foreach (Atom atom in _molecule.Atoms.Values)
+        //    {
+        //        int atomNumber = numberByAtom[atom];
 
-                int fCharge = 0;
-                if (atom.FormalCharge != null)
-                {
-                    fCharge = atom.FormalCharge.Value;
-                }
-                double isotope = 0.0;
-                if (atom.IsotopeNumber != null)
-                {
-                    isotope = atom.IsotopeNumber.Value;
-                }
-                int spin = 0;
-                if (atom.SpinMultiplicity != null)
-                {
-                    spin = atom.SpinMultiplicity.Value;
-                }
+        //        int fCharge = 0;
+        //        if (atom.FormalCharge != null)
+        //        {
+        //            fCharge = atom.FormalCharge.Value;
+        //        }
+        //        double isotope = 0.0;
+        //        if (atom.IsotopeNumber != null)
+        //        {
+        //            isotope = atom.IsotopeNumber.Value;
+        //        }
+        //        int spin = 0;
+        //        if (atom.SpinMultiplicity != null)
+        //        {
+        //            spin = atom.SpinMultiplicity.Value;
+        //        }
 
-                if (propertyType == MDLConstants.M_CHG & fCharge != 0)
-                {
-                    values.Add(atom.FormalCharge.Value);
-                    atomNumbers.Add(atomNumber);
-                }
-                else if (propertyType == MDLConstants.M_ISO & isotope > 0.0001)
-                {
-                    values.Add(atom.IsotopeNumber.Value);
-                    atomNumbers.Add(atomNumber);
-                }
-                else if (propertyType == MDLConstants.M_RAD & spin > 0.0001)
-                {
-                    values.Add(atom.SpinMultiplicity.Value);
-                    atomNumbers.Add(atomNumber);
-                }
-            }
+        //        if (propertyType == MDLConstants.M_CHG & fCharge != 0)
+        //        {
+        //            values.Add(atom.FormalCharge.Value);
+        //            atomNumbers.Add(atomNumber);
+        //        }
+        //        else if (propertyType == MDLConstants.M_ISO & isotope > 0.0001)
+        //        {
+        //            values.Add(atom.IsotopeNumber.Value);
+        //            atomNumbers.Add(atomNumber);
+        //        }
+        //        else if (propertyType == MDLConstants.M_RAD & spin > 0.0001)
+        //        {
+        //            values.Add(atom.SpinMultiplicity.Value);
+        //            atomNumbers.Add(atomNumber);
+        //        }
+        //    }
 
-            int count = atomNumbers.Count;
+        //    int count = atomNumbers.Count;
 
-            StringBuilder output = new StringBuilder();
+        //    StringBuilder output = new StringBuilder();
 
-            for (int i = 0; i < (float)count / 8f; i++)
-            {
-                int thisLineCount = (count - i * 8) > 8 ? 8 : count - i * 8;
-                output.Append(propertyType + "  " + thisLineCount);
-                for (int j = 0; j < thisLineCount; j++)
-                {
-                    String atomNumber = OutputMDLInt(atomNumbers[j + i * 8]);
-                    String value = OutputMDLInt(values[j + i * 8]);
-                    output.Append(" " + atomNumber + " " + value);
-                }
-            }
+        //    for (int i = 0; i < (float)count / 8f; i++)
+        //    {
+        //        int thisLineCount = (count - i * 8) > 8 ? 8 : count - i * 8;
+        //        output.Append(propertyType + "  " + thisLineCount);
+        //        for (int j = 0; j < thisLineCount; j++)
+        //        {
+        //            String atomNumber = OutputMDLInt(atomNumbers[j + i * 8]);
+        //            String value = OutputMDLInt(values[j + i * 8]);
+        //            output.Append(" " + atomNumber + " " + value);
+        //        }
+        //    }
 
-            return output.ToString().TrimEnd();
-        }
+        //    return output.ToString().TrimEnd();
+        //}
 
         private void ReadAtomPropertyLine(String line)
         {
