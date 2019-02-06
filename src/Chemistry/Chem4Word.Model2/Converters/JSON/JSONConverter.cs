@@ -163,13 +163,17 @@ namespace Chem4Word.Model2.Converters.JSON
                 AddMolecule(jsonMol, newModel);
             }
 
+            newModel.Relabel(true);
+            newModel.Refresh();
             return newModel;
         }
 
         private static void AddMolecule(dynamic data, Model newModel)
         {
+            Dictionary<int,string> atoms = new Dictionary<int, string>();
             var newMol = new Molecule();
             Element ce;
+            int atomCount = 0;
             foreach (AtomJSON a in data.a)
             {
                 if (!string.IsNullOrEmpty(a.l))
@@ -193,6 +197,7 @@ namespace Chem4Word.Model2.Converters.JSON
                     atom.FormalCharge = a.c.Value;
                 }
 
+                atoms.Add(atomCount++, atom.InternalId);
                 newMol.AddAtom(atom);
                 atom.Parent = newMol;
             }
@@ -250,14 +255,12 @@ namespace Chem4Word.Model2.Converters.JSON
                         s = Globals.BondStereo.None;
                     }
 
-                    Debugger.Break();
-                    var sa = newMol.Atoms[""];
-                    var ea = newMol.Atoms[""];
+                    var sa = atoms[b.b.Value];
+                    var ea = atoms[b.e.Value];
                     Bond newBond = new Bond()
                     {
-                        // ToDo: *** Fix This ***
-                        //StartAtom = newMol.Atoms[b.b.Value],
-                        //EndAtom = newMol.Atoms[b.e.Value],
+                        StartAtomInternalId = sa,
+                        EndAtomInternalId = ea,
                         Stereo = s,
                         Order = o
                     };

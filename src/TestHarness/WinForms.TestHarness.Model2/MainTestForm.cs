@@ -313,6 +313,8 @@ namespace WinForms.TestHarness.Model2
                         break;
 
                     case 3:
+                        var jsonConverter = new JSONConverter();
+                        result = jsonConverter.Export(lastModel);
                         break;
                 }
 

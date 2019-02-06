@@ -500,7 +500,7 @@ namespace Chem4Word.Model2
         public override string ToString()
         {
             var symbol = Element != null ? Element.Symbol : "???";
-            return $"Atom {Id} - {Path}: {symbol} @ {Position.X.ToString("0.000")}, {Position.Y.ToString("0.000")}";
+            return $"Atom {Id} - {Path}: {symbol} @ {Position.X.ToString("0.0000")}, {Position.Y.ToString("0.0000")}";
         }
 
         #endregion Overrides
