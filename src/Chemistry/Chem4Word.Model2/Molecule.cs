@@ -513,6 +513,34 @@ namespace Chem4Word.Model2
             return temps.ToList();
         }
 
+        public void ScaleBonds(double scale)
+        {
+            foreach (var atom in Atoms.Values)
+            {
+                atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
+            }
+
+            foreach (var child in Molecules.Values)
+            {
+                child.ScaleBonds(scale);
+            }
+        }
+
+        public void MoveAllAtoms(double x, double y)
+        {
+            var offsetVector = new Vector(x, y);
+
+            foreach (Atom a in Atoms.Values)
+            {
+                a.Position += offsetVector;
+            }
+
+            foreach (Molecule child in Molecules.Values)
+            {
+                child.MoveAllAtoms(x, y);
+            }
+        }
+
         public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
         {
             Id = $"m{++iMolcount}";

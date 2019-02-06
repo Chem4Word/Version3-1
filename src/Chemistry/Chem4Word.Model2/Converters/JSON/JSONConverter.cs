@@ -5,12 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows;
 using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 
 namespace Chem4Word.Model2.Converters.JSON
 {
@@ -170,7 +169,7 @@ namespace Chem4Word.Model2.Converters.JSON
 
         private static void AddMolecule(dynamic data, Model newModel)
         {
-            Dictionary<int,string> atoms = new Dictionary<int, string>();
+            Dictionary<int, string> atoms = new Dictionary<int, string>();
             var newMol = new Molecule();
             Element ce;
             int atomCount = 0;

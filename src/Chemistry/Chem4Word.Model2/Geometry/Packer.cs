@@ -28,53 +28,53 @@ namespace Chem4Word.Model2.Geometry
 
         public bool Pack(double padding)
         {
-            // ToDo: Copy from old molecule - This is may be called from the Separate Button on the Ribbon
+            // ToDo: Test this is may be called from the Separate Button on the Ribbon
             Debugger.Break();
-            //if (Model != null)
-            //{
-            //    var watch = Stopwatch.StartNew();
+            if (Model != null)
+            {
+                var watch = Stopwatch.StartNew();
 
-            //    List<Node> nodes = new List<Node>();
+                List<Node> nodes = new List<Node>();
 
-            //    foreach (var moleclue in Model.Molecules.Values)
-            //    {
-            //        nodes.Add(new Node(moleclue.Id, 0, 0, moleclue.BoundingBox.Width, moleclue.BoundingBox.Height));
-            //    }
+                foreach (var moleclue in Model.Molecules.Values)
+                {
+                    nodes.Add(new Node(moleclue.Id, 0, 0, moleclue.BoundingBox.Width, moleclue.BoundingBox.Height));
+                }
 
-            //    //nodes.Sort((a, b) => b.Area.CompareTo(a.Area));
-            //    nodes.Sort((a, b) => b.W.CompareTo(a.W));
-            //    //nodes.Sort((a, b) => b.H.CompareTo(a.H));
-            //    //nodes.Sort((a, b) => b.Perimeter.CompareTo(a.Perimeter));
+                //nodes.Sort((a, b) => b.Area.CompareTo(a.Area));
+                nodes.Sort((a, b) => b.W.CompareTo(a.W));
+                //nodes.Sort((a, b) => b.H.CompareTo(a.H));
+                //nodes.Sort((a, b) => b.Perimeter.CompareTo(a.Perimeter));
 
-            //    for (int i = 0; i < nodes.Count; ++i)
-            //    {
-            //        Node node = nodes[i];
+                for (int i = 0; i < nodes.Count; ++i)
+                {
+                    Node node = nodes[i];
 
-            //        if (!Pack(node.Id, node.W + padding, node.H + padding, out node.X, out node.Y))
-            //        {
-            //            Debug.WriteLine("Packing failed!");
-            //        }
+                    if (!Pack(node.Id, node.W + padding, node.H + padding, out node.X, out node.Y))
+                    {
+                        Debug.WriteLine("Packing failed!");
+                    }
 
-            //        nodes[i] = node;
-            //    }
+                    nodes[i] = node;
+                }
 
-            //    int packTime = (int)watch.ElapsedMilliseconds;
-            //    Debug.WriteLine($"Packing took {packTime}ms");
-            //    Debug.WriteLine($"Width: {Width} Height {Height}");
+                int packTime = (int)watch.ElapsedMilliseconds;
+                Debug.WriteLine($"Packing took {packTime}ms");
+                Debug.WriteLine($"Width: {Width} Height {Height}");
 
-            //    foreach (var moleclue in Model.Molecules)
-            //    {
-            //        foreach (var node in nodes)
-            //        {
-            //            if (node.Id.Equals(moleclue.Id))
-            //            {
-            //                double dx = node.X - moleclue.BoundingBox.X;
-            //                double dy = node.Y - moleclue.BoundingBox.Y;
-            //                moleclue.MoveAllAtoms(dx, dy);
-            //            }
-            //        }
-            //    }
-            //}
+                foreach (var moleclue in Model.Molecules.Values)
+                {
+                    foreach (var node in nodes)
+                    {
+                        if (node.Id.Equals(moleclue.Id))
+                        {
+                            double dx = node.X - moleclue.BoundingBox.X;
+                            double dy = node.Y - moleclue.BoundingBox.Y;
+                            moleclue.MoveAllAtoms(dx, dy);
+                        }
+                    }
+                }
+            }
 
             return true;
         }

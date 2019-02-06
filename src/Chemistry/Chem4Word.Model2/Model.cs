@@ -212,7 +212,7 @@ namespace Chem4Word.Model2
                     return Molecules[molID];
                 }
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 throw new ArgumentException($"Object {path} not found");
             }
@@ -246,7 +246,6 @@ namespace Chem4Word.Model2
             get
             {
                 var list = new List<string>();
-                //list.AddRange(GeneralErrors);
                 foreach (var molecule in Molecules.Values)
                 {
                     list.AddRange(molecule.Errors);
@@ -307,6 +306,19 @@ namespace Chem4Word.Model2
             foreach (var molecule in Molecules.Values)
             {
                 molecule.Refresh();
+            }
+        }
+
+        public void ScaleToAverageBondLength(double newLength)
+        {
+            var current = AverageBondLength;
+            if (current > 0)
+            {
+                double scale = newLength / current;
+                foreach (var molecule in Molecules.Values)
+                {
+                    molecule.ScaleBonds(scale);
+                }
             }
         }
     }

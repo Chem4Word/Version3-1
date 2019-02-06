@@ -809,6 +809,7 @@ namespace Chem4Word.Model
                 sw2.Stop();
                 Debug.WriteLine("Distance Matrix");
 
+                // Local Function
                 void PrintDistanceMatrix(float[,] dm)
                 {
                     Debug.WriteLine("---------------------------------------------------------");
@@ -824,6 +825,7 @@ namespace Chem4Word.Model
                     Debug.WriteLine("---------------------------------------------------------");
                 }
 
+                // Local Function
                 void PrintPIDMatrix(List<BitArray>[,] pm)
                 {
                     Debug.WriteLine("---------------------------------------------------------");
@@ -876,6 +878,7 @@ namespace Chem4Word.Model
 
                 EdgeList allBonds = new EdgeList();
 
+                // Local Function
                 void AddRing(EdgeList tempring)
                 {
                     if (!tempring.IsSubsetOf(allBonds))
@@ -917,7 +920,7 @@ namespace Chem4Word.Model
 
                     if (candidate.cyclenum % 2 != 0) //it's odd
                     {
-                        EdgeList ringbonds;
+                        //EdgeList ringbonds;
                         for (int j = 0; j < candidate.longPath.Length; j++)
                         {
                             var tempring = sp[0] + lp[j];

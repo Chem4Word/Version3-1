@@ -111,9 +111,13 @@ namespace Chem4Word.Model2.Converters.MDL
         {
             string result;
 
-            // MDL Standard bond length is 1.54 Angstoms (Å)
-            // Already done in Ribbon Export Button code
-            //model.ScaleToAverageBondLength(1.54);
+            double average = model.AverageBondLength;
+            if (average < 1.53 || average > 1.55)
+            {
+                // MDL Standard bond length is 1.54 Angstoms (Å)
+                // Should have already been done in Ribbon Export Button code
+                model.ScaleToAverageBondLength(1.54);
+            }
 
             MemoryStream stream = new MemoryStream();
             using (StreamWriter writer = new StreamWriter(stream))

@@ -5,8 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Xml.Linq;
-
 namespace Chem4Word.Model2
 {
     public class ChemicalName
