@@ -5,12 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
-using Chem4Word.Model.Enums;
-using Chem4Word.ViewModel;
+
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
+using Chem4Word.Model.Geometry;
+//using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -44,12 +47,12 @@ namespace Chem4Word.ACME.Drawing
             var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
 
             //check to see if it's a wedge or a hatch yet
-            if (ParentBond.Stereo == BondStereo.Wedge | ParentBond.Stereo == BondStereo.Hatch)
+            if (ParentBond.Stereo == Globals.BondStereo.Wedge | ParentBond.Stereo == Globals.BondStereo.Hatch)
             {
                 return BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength, startAtomGeometry, endAtomGeometry);
             }
 
-            if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
+            if (ParentBond.Stereo == Globals.BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
             {
                 return BondGeometry.WavyBondGeometry(startPoint, endPoint, modelXamlBondLength, startAtomGeometry, endAtomGeometry);
             }
@@ -72,7 +75,7 @@ namespace Chem4Word.ACME.Drawing
             //double bond
             if (ParentBond.OrderValue == 2)
             {
-                if (ParentBond.Stereo == BondStereo.Indeterminate)
+                if (ParentBond.Stereo == Globals.BondStereo.Indeterminate)
                 {
                     return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, modelXamlBondLength,
                         ref _enclosingPoly, startAtomGeometry, endAtomGeometry);
@@ -157,7 +160,7 @@ namespace Chem4Word.ACME.Drawing
                 _subsidiaryBondPen.DashStyle = DashStyles.Dash;
             }
 
-            if (ParentBond.Stereo == BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
+            if (ParentBond.Stereo == Globals.BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
             {
                 //it's a wavy bond
                 
@@ -168,10 +171,10 @@ namespace Chem4Word.ACME.Drawing
                 using (DrawingContext dc = RenderOpen())
                 {
                     Brush bondBrush = Brushes.Black;
-                    if (ParentBond.Stereo == BondStereo.Hatch || ParentBond.Stereo == BondStereo.Wedge)
+                    if (ParentBond.Stereo == Globals.BondStereo.Hatch || ParentBond.Stereo == Globals.BondStereo.Wedge)
                     {
                         _mainBondPen.Thickness = 0; //don't draw around the bonds
-                        if (ParentBond.Stereo == BondStereo.Hatch)
+                        if (ParentBond.Stereo == Globals.BondStereo.Hatch)
                         {
                             bondBrush = GetHatchBrush();
                         }

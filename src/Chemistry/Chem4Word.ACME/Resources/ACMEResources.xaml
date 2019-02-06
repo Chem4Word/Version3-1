@@ -11,7 +11,7 @@
 
     <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
 
-    <model:ElementConverter x:Key="ElementConverter" />
+   <!-- <model:ElementConverter x:Key="ElementConverter" /> -->
 
     <Style x:Key="TripleBondStyle" TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />

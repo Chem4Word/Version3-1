@@ -111,7 +111,7 @@ namespace Chem4Word.Model2.Converters.MDL
         {
             string result;
 
-            double average = model.AverageBondLength;
+            double average = model.MeanBondLength;
             if (average < 1.53 || average > 1.55)
             {
                 // MDL Standard bond length is 1.54 Angstoms (Å)

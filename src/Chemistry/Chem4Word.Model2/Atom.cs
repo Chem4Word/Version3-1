@@ -148,12 +148,64 @@ namespace Chem4Word.Model2
                         break;
 
                     default:
-                        Debugger.Break();
-                        throw new ArgumentOutOfRangeException("ShowSymbol", "Cannot set explicit display on a non-carbon atom.");
+                        //just ignor3e it for now
+                        //Debugger.Break();
+                        //throw new ArgumentOutOfRangeException("ShowSymbol", "Cannot set explicit display on a non-carbon atom.");
+                        break;
                 }
             }
         }
 
+        //tries to get an estimated bounding box for each atom symbol
+        public Rect BoundingBox(double fontSize)
+        {
+            //Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
+            double halfBoxWidth = fontSize * 0.5;
+            Point position = Position;
+            Rect baseAtomBox = new Rect(
+                new Point(position.X - halfBoxWidth, position.Y - halfBoxWidth),
+                new Point(position.X + halfBoxWidth, position.Y + halfBoxWidth));
+            if (SymbolText != "")
+            {
+                double symbolWidth = SymbolText.Length * fontSize;
+                Rect mainElementBox = new Rect(
+                    new Point(position.X - symbolWidth / 2, position.Y - halfBoxWidth),
+                    new Size(symbolWidth, fontSize));
+
+                if (ImplicitHydrogenCount > 0)
+                {
+                    Vector shift = new Vector();
+                    Rect hydrogenBox = baseAtomBox;
+                    switch (GetDefaultHOrientation())
+                    {
+                        case CompassPoints.East:
+                            shift = BasicGeometry.ScreenEast * fontSize;
+                            break;
+
+                        case CompassPoints.North:
+                            shift = BasicGeometry.ScreenNorth * fontSize;
+                            break;
+
+                        case CompassPoints.South:
+                            shift = BasicGeometry.ScreenSouth * fontSize;
+                            break;
+
+                        case CompassPoints.West:
+                            shift = BasicGeometry.ScreenWest * fontSize;
+                            break;
+                    }
+                    hydrogenBox.Offset(shift);
+                    mainElementBox.Union(hydrogenBox);
+                }
+                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
+                return mainElementBox;
+            }
+            else
+            {
+                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
+                return baseAtomBox;
+            }
+        }
         public string SymbolText
         {
             get

@@ -70,13 +70,14 @@
     <Compile Include="AtomPicker.xaml.cs">
       <DependentUpon>AtomPicker.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\AtomVisual.cs" />
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
-    <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
-    <Compile Include="Behaviors\RingBehavior.cs" />
+    <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\LassoBehavior.cs" />
+    <Compile Include="Behaviors\RingBehavior.cs" />
+    <Compile Include="Drawing\AtomVisual.cs" />
+    <Compile Include="Drawing\BondGeometry.cs" />
     <Compile Include="Drawing\BondVisual.cs" />
     <Compile Include="Drawing\ChemicalVisual.cs" />
     <Compile Include="Controls\ChemistryCanvas.cs" />
@@ -90,11 +91,11 @@
     <Compile Include="Converters\ElementConverter.cs" />
     <Compile Include="Converters\EnabledConverter.cs" />
     <Compile Include="Converters\ModeConverter.cs" />
-    <Compile Include="Editor.xaml.cs">
-      <DependentUpon>Editor.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Display.xaml.cs">
       <DependentUpon>Display.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editor.xaml.cs">
+      <DependentUpon>Editor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Graphics\Arc.cs" />
     <Compile Include="Graphics\ArcArrow.cs" />
@@ -115,13 +116,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Editor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Display.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Editor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="Resources\AdornerBrushes.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -141,16 +142,24 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Chem4Word.DisplayViewModel2\Chem4Word.DisplayViewModel2.csproj">
+      <Project>{ff85d479-ab23-4016-b5eb-747f606db677}</Project>
+      <Name>Chem4Word.DisplayViewModel2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Common\Chem4Word.Core\Chem4Word.Core.csproj">
       <Project>{2e7b1308-8149-4b03-9cb9-48e0b7151560}</Project>
       <Name>Chem4Word.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Chem4Word.Model2\Chem4Word.Model2.csproj">
+      <Project>{c69bab8f-4881-4d5f-9929-fc8470df1e48}</Project>
+      <Name>Chem4Word.Model2</Name>
     </ProjectReference>
     <ProjectReference Include="..\Chem4Word.Model\Chem4Word.Model.csproj">
       <Project>{2ac2b698-58e4-45ea-a69e-d8380fa73b3e}</Project>
       <Name>Chem4Word.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\Chem4Word.ViewModel\Chem4Word.ViewModel.csproj">
-      <Project>{1de9f0ca-2291-49b9-a3ef-7be2222d81e2}</Project>
+      <Project>{1DE9F0CA-2291-49B9-A3EF-7BE2222D81E2}</Project>
       <Name>Chem4Word.ViewModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Chem4Word.View\Chem4Word.View.csproj">

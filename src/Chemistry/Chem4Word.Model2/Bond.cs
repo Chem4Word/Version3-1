@@ -16,6 +16,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
+using static Chem4Word.Model2.Helpers.Globals;
+
 namespace Chem4Word.Model2
 {
     public class Bond : ChemistryBase, INotifyPropertyChanged
@@ -46,7 +48,7 @@ namespace Chem4Word.Model2
 
         public List<Atom> GetAtoms()
         {
-            return new List<Atom>() { StartAtom, EndAtom };
+            return new List<Atom> { StartAtom, EndAtom };
         }
 
         public Molecule Parent { get; set; }
@@ -89,7 +91,7 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    return Parent.Path + "/" + Id;
+                    return Parent.Path  + "/" + Id;
                 }
             }
         }
@@ -178,7 +180,7 @@ namespace Chem4Word.Model2
         private string _endAtomInternalId;
         private string _startAtomInternalId;
 
-        public Globals.BondStereo Stereo
+        public BondStereo Stereo
         {
             get { return _stereo; }
             set
@@ -191,10 +193,10 @@ namespace Chem4Word.Model2
         public object Tag { get; set; }
         public List<string> Messages { get; private set; }
 
-        private Globals.BondDirection? _implicitPlacement = null; //caching variable, can be trashed
+        private BondDirection? _implicitPlacement; //caching variable, can be trashed
         private string _internalId;
 
-        public Globals.BondDirection Placement
+        public BondDirection Placement
         {
             get
             {
@@ -205,12 +207,10 @@ namespace Chem4Word.Model2
                     {
                         Parent.RebuildRings();
                     }
-                    return ExplicitPlacement ?? ImplicitPlacement ?? Globals.BondDirection.None;
+                    return ExplicitPlacement ?? ImplicitPlacement ?? BondDirection.None;
                 }
-                else
-                {
-                    return Globals.BondDirection.None;
-                }
+
+                return BondDirection.None;
             }
             set
             {
@@ -219,7 +219,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public Globals.BondDirection? ExplicitPlacement { get; set; }
+        public BondDirection? ExplicitPlacement { get; set; }
 
         private Vector? VectorOnSideOfNonHAtomFromStartLigands(Atom startAtom, Atom endAtom, IEnumerable<Atom> startLigands)
         {
@@ -260,16 +260,14 @@ namespace Chem4Word.Model2
                 {
                     return null;
                 }
-                else
-                {
-                    List<Ring> ringList = Parent.SortedRings;
-                    var firstRing = (
-                        from Ring r in ringList
-                        where r.Atoms.Contains(this.StartAtom) && r.Atoms.Contains(this.EndAtom)
-                        select r
-                    ).FirstOrDefault();
-                    return firstRing;
-                }
+
+                List<Ring> ringList = Parent.SortedRings;
+                var firstRing = (
+                    from Ring r in ringList
+                    where r.Atoms.Contains(StartAtom) && r.Atoms.Contains(EndAtom)
+                    select r
+                ).FirstOrDefault();
+                return firstRing;
             }
         }
 
@@ -371,28 +369,27 @@ namespace Chem4Word.Model2
                     //Now must be a trans bond.
                     return null;
                 }
-                else
+
+                //Count now 1
+                if (endLigands.GetHCount() == 1)
                 {
-                    //Count now 1
-                    if (endLigands.GetHCount() == 1)
-                    {
-                        //Double bond on the side of non H from StartLigands, bevel 1 end.
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                    }
-
-                    //Now !H
-                    if (AtomsAreCis(startLigands.GetFirstNonH(), endLigands.GetFirstNonH())
-                        /*EndAtomAtom's !H is on the same side as StartAtomAtom's !H*/)
-                    {
-                        //double bond on the side of !H from StartLigands, bevel both ends
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                    }
-
-                    //Now must be a trans bond.
-                    return null;
+                    //Double bond on the side of non H from StartLigands, bevel 1 end.
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
                 }
+
+                //Now !H
+                if (AtomsAreCis(startLigands.GetFirstNonH(), endLigands.GetFirstNonH())
+                    /*EndAtomAtom's !H is on the same side as StartAtomAtom's !H*/)
+                {
+                    //double bond on the side of !H from StartLigands, bevel both ends
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
+                }
+
+                //Now must be a trans bond.
+                return null;
             }
-            else if (startLigands.AreAllH())
+
+            if (startLigands.AreAllH())
             {
                 if (endLigands.Count() == 2)
                 {
@@ -410,7 +407,8 @@ namespace Chem4Word.Model2
                 // Double bond on the side of EndLigands' !H, bevel 1 end only.
                 return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
             }
-            else if (startLigands.GetHCount() == 0)
+
+            if (startLigands.GetHCount() == 0)
             {
                 if (endLigands.Count() == 2)
                 {
@@ -517,25 +515,25 @@ namespace Chem4Word.Model2
             return vector;
         }
 
-        private Globals.BondDirection? GetPlacement()
+        private BondDirection? GetPlacement()
         {
-            Globals.BondDirection dir = Globals.BondDirection.None;
+            BondDirection dir = BondDirection.None;
 
             var vec = GetPrettyDoubleBondVector();
 
             if (vec == null)
             {
-                dir = Globals.BondDirection.None;
+                dir = BondDirection.None;
             }
             else
             {
-                dir = (Globals.BondDirection)Math.Sign(Vector.CrossProduct(vec.Value, BondVector));
+                dir = (BondDirection)Math.Sign(Vector.CrossProduct(vec.Value, BondVector));
             }
 
             return dir;
         }
 
-        public Globals.BondDirection? ImplicitPlacement
+        public BondDirection? ImplicitPlacement
         {
             get
             {
@@ -554,7 +552,10 @@ namespace Chem4Word.Model2
             get { return EndAtom.Position - StartAtom.Position; }
         }
 
-        public double HatchScaling => BondVector.Length / (Globals.SingleAtomPseudoBondLength * 2);
+        public double Angle => Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector);
+
+        public double HatchScaling => BondVector.Length / (SingleAtomPseudoBondLength * 2);
+        public double BondLength => BondVector.Length;
 
         #endregion Properties
 
@@ -614,6 +615,10 @@ namespace Chem4Word.Model2
             return new Bond().CloneExcept(this, new string[] { });
         }
 
+        public void NotifyBondingChanged()
+        {
+            OnPropertyChanged(nameof(Order));
+        }
         #region Geometry Routines
 
         public bool AtomsAreCis(Atom atomA, Atom atomB)
@@ -632,17 +637,13 @@ namespace Chem4Word.Model2
                     return BasicGeometry.LineSegmentsIntersect(EndAtom.Position, atomA.Position,
                                StartAtom.Position, atomB.Position) != null;
                 }
-                else
-                {
-                    //draw the lines the other way around
-                    return BasicGeometry.LineSegmentsIntersect(EndAtom.Position, atomB.Position,
-                               StartAtom.Position, atomA.Position) != null;
-                }
+
+                //draw the lines the other way around
+                return BasicGeometry.LineSegmentsIntersect(EndAtom.Position, atomB.Position,
+                           StartAtom.Position, atomA.Position) != null;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         #endregion Geometry Routines

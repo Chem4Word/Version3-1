@@ -7,9 +7,7 @@
 
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Core;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.MDL;
-using Chem4Word.ViewModel;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +15,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using ChemistryModel = Chem4Word.Model.Model;
+using Chem4Word.DisplayViewModel2;
+using Chem4Word.Model2.Helpers;
+using ChemistryModel = Chem4Word.Model2.Model;
 
 namespace Chem4Word.ACME
 {
@@ -129,33 +129,33 @@ namespace Chem4Word.ACME
                 {
                     if (data.StartsWith("<"))
                     {
-                        var conv = new CMLConverter();
+                        var conv = new Model2.Converters.CML.CMLConverter();
                         chemistryModel = conv.Import(data);
                     }
-                    else if (data.Contains("M  END"))
-                    {
-                        var conv = new SdFileConverter();
-                        chemistryModel = conv.Import(data);
-                    }
+                    //else if (data.Contains("M  END"))
+                    //{
+                    //    var conv = new SdFileConverter();
+                    //    chemistryModel = conv.Import(data);
+                    //}
                 }
             }
             else
             {
-                if (Chemistry != null && !(Chemistry is ChemistryModel))
+                if (Chemistry != null && !(Chemistry is Model2.Model))
                 {
                     Debugger.Break();
-                    throw new ArgumentException("Object must be of type 'Chem4Word.Model.Model'.");
+                    throw new ArgumentException($"Object must be of type {nameof(Model2.Model)}.");
                 }
-                chemistryModel = Chemistry as ChemistryModel;
+                chemistryModel = Chemistry as Chem4Word.Model2.Model;
             }
             //assuming we've got this far, we should have something we can draw
             if (chemistryModel != null)
             {
-                if (chemistryModel.AllAtoms.Count > 0)
+                if (chemistryModel.TotalAtomsCount> 0)
                 {
                     chemistryModel.RescaleForXaml(true);
 
-                    CurrentViewModel = new ViewModel.DisplayViewModel(chemistryModel);
+                    CurrentViewModel = new DisplayViewModel2.DisplayViewModel2(chemistryModel);
                     DrawChemistry(CurrentViewModel);
                 }
                 else
@@ -169,12 +169,12 @@ namespace Chem4Word.ACME
             }
         }
 
-        private void DrawChemistry(DisplayViewModel currentViewModel)
+        private void DrawChemistry(DisplayViewModel2.DisplayViewModel2 currentViewModel)
         {
             ChemCanvas.Chemistry = currentViewModel;
         }
 
-        public DisplayViewModel CurrentViewModel { get; set; }
+        public DisplayViewModel2.DisplayViewModel2 CurrentViewModel { get; set; }
 
         #endregion Private Methods
 

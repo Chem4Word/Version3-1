@@ -5,15 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
-using Chem4Word.View;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.View;
 using static Chem4Word.View.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
@@ -515,7 +516,7 @@ namespace Chem4Word.ACME.Drawing
             Point centre = ParentAtom.Position;
             using (DrawingContext dc = RenderOpen())
             {
-                GlyphText.SymbolSize = ParentAtom.Model.XamlBondLength / 2.0d;
+                GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
                 //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
                 GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
                 GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;

@@ -6,15 +6,18 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Drawing;
-using Chem4Word.Model;
-using Chem4Word.ViewModel;
+using Chem4Word.DisplayViewModel2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mail;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -48,33 +51,174 @@ namespace Chem4Word.ACME.Controls
         #region Properties
 
         //properties
-        private DisplayViewModel _mychemistry;
+        private DisplayViewModel2.DisplayViewModel2 _mychemistry;
 
-        public DisplayViewModel Chemistry
+        public DisplayViewModel2.DisplayViewModel2 Chemistry
         {
             get { return _mychemistry; }
             set
             {
+                if (_mychemistry != null && _mychemistry != value)
+                {
+                    DisconnectHandlers();
+                }
                 _mychemistry = value;
                 DrawChemistry(_mychemistry);
+                ConnectHandlers();
             }
+        }
+
+        private void ConnectHandlers()
+        {
+            _mychemistry.Model.AtomsChanged += Model_AtomsChanged;
+            _mychemistry.Model.BondsChanged += Model_BondsChanged;
+            _mychemistry.Model.MoleculesChanged += Model_MoleculesChanged;
+
+            _mychemistry.Model.PropertyChanged += Model_PropertyChanged;
+        }
+        public bool AutoResize = true;
+
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (sender)
+            {
+                case Atom a:
+                    RedrawAtom(a);
+                    
+                    break;
+                case Bond b:
+                    RedrawBond(b);
+                    break;
+            }
+
+            if (AutoResize)
+            {
+                InvalidateMeasure();
+            }
+        }
+
+        private void RedrawBond(Bond bond)
+        {
+            var bv = (BondVisual)chemicalVisuals[bond];
+
+            var refCount = bv.RefCount;
+
+            BondRemoved(bond);
+            BondAdded(bond);
+
+            bv = (BondVisual)chemicalVisuals[bond];
+            bv.RefCount = refCount;
+        }
+
+        private void RedrawAtom(Atom atom)
+        {
+            var av = (AtomVisual)chemicalVisuals[atom];
+
+            var refCount = av.RefCount;
+
+            AtomRemoved(atom);
+            AtomAdded(atom);
+
+            av = (AtomVisual)chemicalVisuals[atom];
+            av.RefCount = refCount;
+        }
+
+        private void Model_MoleculesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            
+        }
+
+        private void Model_BondsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems!=null)
+            {
+                foreach (var eNewItem in e.NewItems)
+                {
+                    Bond b = (Bond) eNewItem;
+
+                    BondAdded(b);
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (var eNewItem in e.OldItems)
+                {
+                    Bond b = (Bond)eNewItem;
+
+                    BondRemoved(b);
+                }
+            }
+        }
+
+        private void Model_AtomsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (var eNewItem in e.NewItems)
+                {
+                    Atom a = (Atom)eNewItem;
+
+                    AtomAdded(a);
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (var eNewItem in e.OldItems)
+                {
+                    Atom a = (Atom)eNewItem;
+
+                    AtomRemoved(a);
+                }
+            }
+        }
+
+        private void DisconnectHandlers()
+        {
+            _mychemistry.Model.AtomsChanged -= Model_AtomsChanged;
+            _mychemistry.Model.BondsChanged -= Model_BondsChanged;
+            _mychemistry.Model.MoleculesChanged -= Model_MoleculesChanged;
+
+            _mychemistry.Model.PropertyChanged -= Model_PropertyChanged;
         }
 
         #endregion Properties
 
+        #region Fields
+
+        private Rect _boundingBox = default(Rect);
+
+        #endregion
+
         #region DPs
+
+        public bool FitToContents
+        {
+            get { return (bool) GetValue(FitToContentsProperty); }
+            set { SetValue(FitToContentsProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for FitToContents.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty FitToContentsProperty =
+            DependencyProperty.Register("FitToContents", typeof(bool), typeof(ChemistryCanvas),
+                new PropertyMetadata(default(bool)));
+
 
         public Thickness Overhang
         {
-            get { return (Thickness)GetValue(OverhangProperty); }
+            get { return (Thickness) GetValue(OverhangProperty); }
             set { SetValue(OverhangProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Overhang.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OverhangProperty =
-            DependencyProperty.Register("Overhang", typeof(Thickness), typeof(Display), new PropertyMetadata(default(Thickness)));
+            DependencyProperty.Register("Overhang", typeof(Thickness), typeof(Display),
+                new PropertyMetadata(default(Thickness)));
 
         #endregion
+
         #region Methods
 
 
@@ -105,6 +249,7 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion
+
         //overrides
         protected override Visual GetVisualChild(int index)
         {
@@ -120,13 +265,13 @@ namespace Chem4Word.ACME.Controls
         /// Draws the chemistry
         /// </summary>
         /// <param name="vm"></param>
-        private void DrawChemistry(DisplayViewModel vm)
+        private void DrawChemistry(DisplayViewModel2.DisplayViewModel2 vm)
         {
             Clear();
 
-            foreach (Molecule molecule in vm.Model.Molecules)
+            foreach (Molecule molecule in vm.Model.Molecules.Values)
             {
-                DrawMolecule(molecule, Rect.Empty);
+                MoleculeAdded(molecule);
             }
 
             var bb = GetBoundingBox();
@@ -144,86 +289,87 @@ namespace Chem4Word.ACME.Controls
         /// <param name="molecule"></param>
         /// <param name="moleculeBounds"></param>
         /// <returns></returns>
-        private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
-        {
-            var bounds = moleculeBounds;
+        //private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
+        //{
+        //    var bounds = moleculeBounds;
 
-            foreach (Atom moleculeAtom in molecule.Atoms)
-            {
-                bounds = DrawAtom(moleculeAtom, bounds);
-            }
+        //    //foreach (Atom moleculeAtom in molecule.Atoms)
+        //    //{
+        //    //    bounds = DrawAtom(moleculeAtom, bounds);
+        //    //}
 
-            foreach (Bond moleculeBond in molecule.Bonds)
-            {
-                bounds = DrawBond(moleculeBond, bounds);
-            }
+        //    //foreach (Bond moleculeBond in molecule.Bonds)
+        //    //{
+        //    //    bounds = DrawBond(moleculeBond, bounds);
+        //    //}
 
-            //check to see if we have child molecules
-            if (molecule.Molecules.Any())
-            {
-                Rect groupRect = Rect.Empty;
-                foreach (Molecule child in molecule.Molecules)
-                {
-                    var childRect = DrawMolecule(child, bounds);
+        //    //check to see if we have child molecules
+        //    //if (molecule.Molecules.Any())
+        //    //{
+        //    //    Rect groupRect = Rect.Empty;
+        //    //    foreach (Molecule child in molecule.Molecules)
+        //    //    {
+        //    //        var childRect = DrawMolecule(child, bounds);
 
-                    groupRect.Union(childRect);
-                }
+        //    //        groupRect.Union(childRect);
+        //    //    }
 
-                DrawGroupBox(molecule, groupRect, ref bounds);
-            }
-            return bounds;
-        }
+        //    //    //DrawGroupBox(molecule, groupRect, ref bounds);
+        //    //}
 
-        private void DrawGroupBox(Molecule molecule, Rect groupRect, ref Rect bounds)
-        {
-            var groupBox = new DrawingVisual();
-            using (DrawingContext dc = groupBox.RenderOpen())
-            {
-                Brush bracketBrush = new SolidColorBrush(Colors.Gray);
-                Pen bracketPen = new Pen(bracketBrush, 1d);
-                //bracketPen.DashStyle = new DashStyle(new double[]{2,2});
-                dc.DrawRectangle(null, bracketPen, groupRect);
-                dc.Close();
-            }
+        //    return bounds;
+        //}
 
-            AddVisualChild(groupBox);
-            AddLogicalChild(groupBox);
-            chemicalVisuals.Add(molecule, groupBox);
+        //private void DrawGroupBox(Molecule molecule, Rect groupRect, ref Rect bounds)
+        //{
+        //    var groupBox = new DrawingVisual();
+        //    using (DrawingContext dc = groupBox.RenderOpen())
+        //    {
+        //        Brush bracketBrush = new SolidColorBrush(Colors.Gray);
+        //        Pen bracketPen = new Pen(bracketBrush, 1d);
+        //        //bracketPen.DashStyle = new DashStyle(new double[]{2,2});
+        //        dc.DrawRectangle(null, bracketPen, groupRect);
+        //        dc.Close();
+        //    }
 
-            bounds.Union(groupBox.ContentBounds);
-        }
+        //    AddVisualChild(groupBox);
+        //    AddLogicalChild(groupBox);
+        //    chemicalVisuals.Add(molecule, groupBox);
 
-        private Rect DrawAtom(Atom moleculeAtom, Rect moleculeBounds)
-        {
-            var bounds = moleculeBounds;
-            var atomVisual = new AtomVisual(moleculeAtom);
-            atomVisual.ChemicalVisuals = chemicalVisuals;
-            atomVisual.BondThickness = Chemistry.BondThickness;
-            atomVisual.BackgroundColor = Background;
+        //    bounds.Union(groupBox.ContentBounds);
+        //}
 
-            atomVisual.Render();
-            chemicalVisuals.Add(moleculeAtom, atomVisual);
-            AddVisual(atomVisual);
+        //private Rect DrawAtom(Atom moleculeAtom, Rect moleculeBounds)
+        //{
+        //    var bounds = moleculeBounds;
+        //    var atomVisual = new AtomVisual(moleculeAtom);
+        //    atomVisual.ChemicalVisuals = chemicalVisuals;
+        //    atomVisual.BondThickness = Chemistry.BondThickness;
+        //    atomVisual.BackgroundColor = Background;
 
-            bounds.Union(atomVisual.ContentBounds);
+        //    atomVisual.Render();
+        //    chemicalVisuals.Add(moleculeAtom, atomVisual);
+        //    AddVisual(atomVisual);
 
-            return bounds;
-        }
+        //    bounds.Union(atomVisual.ContentBounds);
 
-        private Rect DrawBond(Bond moleculeBond, Rect moleculeBounds)
-        {
-            var bounds = moleculeBounds;
-            var bondVisual = new BondVisual(moleculeBond);
-            bondVisual.ChemicalVisuals = chemicalVisuals;
-            bondVisual.BondThickness = Chemistry.BondThickness;
-            bondVisual.Render();
-            chemicalVisuals.Add(moleculeBond, bondVisual);
-            AddVisual(bondVisual);
+        //    return bounds;
+        //}
 
-            bounds.Union(bondVisual.ContentBounds);
+        //private Rect DrawBond(Bond moleculeBond, Rect moleculeBounds)
+        //{
+        //    var bounds = moleculeBounds;
+        //    var bondVisual = new BondVisual(moleculeBond);
+        //    bondVisual.ChemicalVisuals = chemicalVisuals;
+        //    bondVisual.BondThickness = Chemistry.BondThickness;
+        //    bondVisual.Render();
+        //    chemicalVisuals.Add(moleculeBond, bondVisual);
+        //    AddVisual(bondVisual);
 
-            return bounds;
-        }
+        //    bounds.Union(bondVisual.ContentBounds);
+
+        //    return bounds;
+        //}
 
         public void Clear()
         {
@@ -246,7 +392,120 @@ namespace Chem4Word.ACME.Controls
             AddVisualChild(visual);
             AddLogicalChild(visual);
         }
-    }
 
-    #endregion Drawing
+        private void MoleculeAdded(Molecule molecule)
+        {
+            foreach (Atom moleculeAtom in molecule.Atoms.Values)
+            {
+                AtomAdded(moleculeAtom);
+            }
+
+            foreach (Bond moleculeBond in molecule.Bonds)
+            {
+                BondAdded(moleculeBond);
+            }
+
+            foreach (Molecule child in molecule.Molecules.Values)
+            {
+                MoleculeAdded(child);
+            }
+        }
+
+        private void MoleculeRemoved(Molecule molecule)
+        {
+            foreach (Atom moleculeAtom in molecule.Atoms.Values)
+            {
+                AtomRemoved(moleculeAtom);
+            }
+
+            foreach (Bond moleculeBond in molecule.Bonds)
+            {
+                BondRemoved(moleculeBond);
+            }
+
+            foreach (Molecule child in molecule.Molecules.Values)
+            {
+                MoleculeRemoved(child);
+            }
+        }
+
+
+
+        private void AtomAdded(Atom atom)
+        {
+            if (!chemicalVisuals.ContainsKey(atom)) //it's already in the list
+            {
+                chemicalVisuals[atom] = new AtomVisual(atom);
+            }
+
+            var av = (AtomVisual) chemicalVisuals[atom];
+
+            if (av.RefCount == 0) // it hasn't been added before
+            {
+                av.ChemicalVisuals = chemicalVisuals;
+
+                av.BackgroundColor = Background;
+
+                av.Render();
+
+                AddVisual(av);
+            }
+
+            av.RefCount += 1;
+        }
+
+        private void AtomRemoved(Atom atom)
+        {
+            var av = (AtomVisual) chemicalVisuals[atom];
+
+            if (av.RefCount == 1) //removing this atom will remove the last visual
+            {
+                DeleteVisual(av);
+                chemicalVisuals.Remove(atom);
+            }
+            else
+            {
+                av.RefCount -= 1;
+            }
+        }
+
+        private void BondAdded(Bond bond)
+        {
+            if (!chemicalVisuals.ContainsKey(bond)) //it's already in the list
+            {
+                chemicalVisuals[bond] = new BondVisual(bond);
+            }
+
+            BondVisual bv = (BondVisual) chemicalVisuals[bond];
+
+            if (bv.RefCount == 0) // it hasn't been added before
+            {
+                bv.ChemicalVisuals = chemicalVisuals;
+                bv.BondThickness = Globals.BondThickness;
+
+                bv.Render();
+                AddVisual(bv);
+            }
+
+            bv.RefCount += 1;
+        }
+
+        private void BondRemoved(Bond bond)
+        {
+            var bv = (BondVisual) chemicalVisuals[bond];
+
+            if (bv.RefCount == 1) //removing this atom will remove the last visual
+            {
+                DeleteVisual(bv);
+                chemicalVisuals.Remove(bond);
+            }
+            else
+            {
+                bv.RefCount -= 1;
+            }
+        }
+
+
+        #endregion Drawing
+    }
 }
