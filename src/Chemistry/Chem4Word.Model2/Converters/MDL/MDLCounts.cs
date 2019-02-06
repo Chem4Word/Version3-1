@@ -5,20 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2
+namespace Chem4Word.Model2.Converters.MDL
 {
-    public class Formula
+    // ReSharper disable once InconsistentNaming
+    public class MDLCounts
     {
-        public string Id { get; set; }
-
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
-        {
-        }
+        public string Version { get; set; }
+        public int Atoms { get; set; }
+        public int Bonds { get; set; }
+        public string Message { get; set; }
     }
 }

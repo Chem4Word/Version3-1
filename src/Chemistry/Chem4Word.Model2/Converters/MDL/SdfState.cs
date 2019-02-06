@@ -5,20 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2
+namespace Chem4Word.Model2.Converters.MDL
 {
-    public class Formula
+    public enum SdfState
     {
-        public string Id { get; set; }
-
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
-        {
-        }
+        Null,
+        EndOfCtab,
+        EndOfData,
+        Error,
+        Unsupported
     }
 }

@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters;
+using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
 using Microsoft.Win32;
 
@@ -27,8 +28,6 @@ namespace Wpf.TestHarness.Model2
         {
             InitializeComponent();
         }
-
-      
 
         private void LoadModel(string fileName)
         {
@@ -86,8 +85,6 @@ namespace Wpf.TestHarness.Model2
                 {
                     LoadTreeNode(childMol, parentNode);
                 }
-
-
             }
 
             MoleculeTreeView.Items.Clear();

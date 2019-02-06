@@ -5,24 +5,29 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
+using Chem4Word.Telemetry;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters;
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Telemetry;
+using Chem4Word.Model2.Converters.JSON;
 
 namespace WinForms.TestHarness.Model2
 {
     public partial class MainTestForm : Form
     {
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
+        private Model lastModel = null;
 
         public MainTestForm()
         {
@@ -31,10 +36,13 @@ namespace WinForms.TestHarness.Model2
 
         private void Load_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             StringBuilder sb = new StringBuilder();
-            sb.Append("CML molecule files (*.cml)|*.cml");
-            //sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
-            //sb.Append("|All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
+            sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
+            sb.Append("|CML molecule files (*.cml)|*.cml");
+            sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
+            sb.Append("|JSON molecule files (*.json)|*.json");
 
             openFileDialog1.Title = "Open Structure";
             openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
@@ -45,7 +53,7 @@ namespace WinForms.TestHarness.Model2
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string filename = Path.GetFileName(openFileDialog1.FileName);
-                _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
+                _telemetry.Write(module, "Information", $"File: {filename}");
 
                 LoadModel(openFileDialog1.FileName);
             }
@@ -53,44 +61,73 @@ namespace WinForms.TestHarness.Model2
 
         private void LoadModel(string fileName)
         {
-            try
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
             {
-                var converter = new CMLConverter();
-                using (StreamReader sr = new StreamReader(fileName))
+                try
                 {
-                    Stopwatch sw = new Stopwatch();
-                    var model = converter.Import(sr.ReadToEnd());
-                    sw.Stop();
-                    //MessageBox.Show($"Converting took {sw.ElapsedMilliseconds}");
-
-                    foreach (var modelMolecule in model.Molecules.Values)
+                    string contents = string.Empty;
+                    using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                     {
-                        sw.Reset();
-
-                        //MessageBox.Show($"Rebuilding rings took {sw.ElapsedMilliseconds}");
-                        //MessageBox.Show($"Ring count= {modelMolecule.Rings.Count}");
-                        LoadTreeNode(modelMolecule);
+                        using (var textReader = new StreamReader(fileStream))
+                        {
+                            contents = textReader.ReadToEnd();
+                        }
                     }
-                    model.AtomsChanged += Model_AtomsChanged;
-                    model.BondsChanged += Model_BondsChanged;
-                    model.MoleculesChanged += Model_MoleculesChanged;
-                    model.PropertyChanged += Model_PropertyChanged;
 
-                    int atoms = model.TotalAtomsCount;
-                    int bonds = model.TotalBondsCount;
-                    textBox1.AppendText($"Total Atoms Count is {atoms}, Total Bonds Count is {bonds}\n");
-                    var list = new List<string>();
-                    list.AddRange(model.GeneralErrors);
-                    list.AddRange(model.AllErrors);
-                    list.AddRange(model.AllWarnings);
-                    textBox1.AppendText(string.Join(Environment.NewLine, list) + "\n");
+                    Model model = null;
+                    string fileType = Path.GetExtension(fileName).ToLower();
+                    switch (fileType)
+                    {
+                        case ".cml":
+                            var cmlConverter = new CMLConverter();
+                            model = cmlConverter.Import(contents);
+                            break;
+
+                        case ".sdf":
+                        case ".mol":
+                            var sdFileConverter = new SdFileConverter();
+                            model = sdFileConverter.Import(contents);
+                            break;
+
+                        case ".json":
+                            var jsonConverter = new JSONConverter();
+                            model = jsonConverter.Import(contents);
+                            break;
+                    }
+
+                    if (model != null)
+                    {
+                        lastModel = model;
+
+                        // Load model into TreeView
+                        foreach (var modelMolecule in model.Molecules.Values)
+                        {
+                            LoadTreeNode(modelMolecule);
+                        }
+
+                        model.AtomsChanged += Model_AtomsChanged;
+                        model.BondsChanged += Model_BondsChanged;
+                        model.MoleculesChanged += Model_MoleculesChanged;
+                        model.PropertyChanged += Model_PropertyChanged;
+
+                        int atoms = model.TotalAtomsCount;
+                        int bonds = model.TotalBondsCount;
+                        textBox1.AppendText($"Total Atoms Count is {atoms}, Total Bonds Count is {bonds}\n");
+                        var list = new List<string>();
+                        list.AddRange(model.GeneralErrors);
+                        list.AddRange(model.AllErrors);
+                        list.AddRange(model.AllWarnings);
+                        textBox1.AppendText(string.Join(Environment.NewLine, list) + "\n");
+                    }
                 }
-            }
-            catch (Exception exception)
-            {
-                _telemetry.Write("FlexForm.LoadStructure()", "Exception", $"Exception: {exception.Message}");
-                _telemetry.Write("FlexForm.LoadStructure()", "Exception(Data)", $"Exception: {exception}");
-                MessageBox.Show(exception.StackTrace, exception.Message);
+                catch (Exception exception)
+                {
+                    _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                    _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                    MessageBox.Show(exception.StackTrace, exception.Message);
+                }
             }
 
             // Local function to allow recursive calling
@@ -102,50 +139,83 @@ namespace WinForms.TestHarness.Model2
                     //FileInfo fi = new FileInfo(fileName);
                     //parentNode = treeView1.Nodes.Add(modelMolecule.Path, fi.Name + ": " + modelMolecule.ToString());
                     parentNode = treeView1.Nodes.Add(modelMolecule.Path, modelMolecule.ToString());
-                    textBox1.AppendText($"Molecule {modelMolecule.Path} added. \n");
+                    textBox1.AppendText($"Molecule {modelMolecule.Path} added.\n");
                 }
                 else
                 {
                     parentNode = root.Nodes.Add(modelMolecule.Path, modelMolecule.ToString());
-                    textBox1.AppendText($"Molecule {modelMolecule.Path} added. \n");
+                    textBox1.AppendText($"Molecule {modelMolecule.Path} added.\n");
                 }
                 parentNode.Tag = modelMolecule;
 
-                foreach (Atom atom in modelMolecule.Atoms.Values)
+                if (modelMolecule.Atoms.Any())
                 {
-                    var res = parentNode.Nodes.Add(atom.Path, atom.ToString());
-                    res.Tag = atom;
-                    textBox1.AppendText($"Atom {atom.Path} added. \n");
-                }
+                    var atomsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Atoms", $"Atoms: count {modelMolecule.Atoms.Count}");
 
-                foreach (Bond bond in modelMolecule.Bonds)
-                {
-                    var res = parentNode.Nodes.Add(bond.Path, bond.ToString());
-                    res.Tag = bond;
-                    textBox1.AppendText($"Bond {bond.Path} added. \n");
-                }
-
-                foreach (Ring r in modelMolecule.Rings)
-                {
-                    var ringnode = parentNode.Nodes.Add(r.GetHashCode().ToString(), $"Ring count {r.Atoms.Count}");
-                    ringnode.Tag = r;
-                    foreach (Atom a in r.Atoms)
+                    foreach (Atom atom in modelMolecule.Atoms.Values)
                     {
-                        ringnode.Nodes.Add(r.GetHashCode() + a.Id, a.Id);
+                        var res = atomsNode.Nodes.Add(atom.Path, atom.ToString());
+                        res.Tag = atom;
+                        textBox1.AppendText($"Atom {atom.Path} added.\n");
                     }
                 }
+
+                if (modelMolecule.Bonds.Any())
+                {
+                    var bondsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Bonds", $"Bonds: count {modelMolecule.Bonds.Count}");
+
+                    foreach (Bond bond in modelMolecule.Bonds)
+                    {
+                        var res = bondsNode.Nodes.Add(bond.Path, bond.ToString());
+                        res.Tag = bond;
+                        textBox1.AppendText($"Bond {bond.Path} added.\n");
+                    }
+                }
+
+                if (modelMolecule.Formulas.Any())
+                {
+                    var formulasNode = parentNode.Nodes.Add(modelMolecule.Path + "/Formulas", $"Formulas: count {modelMolecule.Formulas.Count}");
+                    foreach (var formula in modelMolecule.Formulas)
+                    {
+                        formulasNode.Nodes.Add(formula.Id, $"Formula {formula.Id} {formula.Convention} {formula.Inline}");
+                    }
+                }
+
+                if (modelMolecule.Names.Any())
+                {
+                    var namesNode = parentNode.Nodes.Add(modelMolecule.Path + "/Names", $"Names: count {modelMolecule.Names.Count}");
+                    foreach (var name in modelMolecule.Names)
+                    {
+                        namesNode.Nodes.Add(name.Id, $"Name {name.Id} {name.DictRef} {name.Name}");
+                    }
+                }
+
+                if (modelMolecule.Rings.Any())
+                {
+                    var ringsNode = parentNode.Nodes.Add(modelMolecule.Path + "/Rings", $"Rings: count {modelMolecule.Rings.Count}");
+
+                    int ringCounter = 1;
+                    foreach (Ring r in modelMolecule.Rings)
+                    {
+                        var ringnode = ringsNode.Nodes.Add(r.GetHashCode().ToString(), $"Ring {ringCounter++} - Priority {r.Priority} with {r.Atoms.Count} Atoms");
+                        ringnode.Tag = r;
+                        foreach (Atom a in r.Atoms)
+                        {
+                            ringnode.Nodes.Add(r.GetHashCode() + a.Id, $"{a.Id} - {a.Path}");
+                        }
+                    }
+                }
+
                 foreach (var childMol in modelMolecule.Molecules.Values)
                 {
                     LoadTreeNode(childMol, parentNode);
                 }
             }
-
         }
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender is Bond)
-
             {
                 textBox1.AppendText($"Bond {(sender as Bond).Path} property {e.PropertyName} changed.\n");
             }
@@ -167,7 +237,7 @@ namespace WinForms.TestHarness.Model2
                         var foundNode = treeView1.Nodes.Find(key, true);
 
                         treeView1.Nodes.Remove(foundNode[0]);
-                        textBox1.AppendText($"Bond {foundNode[0].Tag} removed. \n");
+                        textBox1.AppendText($"Bond {foundNode[0].Tag} removed.\n");
                     }
                 }
             }
@@ -185,18 +255,10 @@ namespace WinForms.TestHarness.Model2
                         var foundNode = treeView1.Nodes.Find(key, true);
 
                         treeView1.Nodes.Remove(foundNode[0]);
-                        textBox1.AppendText($"Atom {foundNode[0].Tag} removed. \n");
+                        textBox1.AppendText($"Atom {foundNode[0].Tag} removed.\n");
                     }
                 }
             }
-        }
-
-        private void MainTestForm_Load(object sender, EventArgs e)
-        {
-        }
-
-        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
-        {
         }
 
         private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -220,6 +282,51 @@ namespace WinForms.TestHarness.Model2
                 default:
                     break;
             }
+        }
+
+        private void MainTestForm_Load(object sender, EventArgs e)
+        {
+            ExportAs.Items.Clear();
+            ExportAs.Items.Add("Export as ...");
+            ExportAs.Items.Add("Export as CML");
+            ExportAs.Items.Add("Export as MOL/SDF");
+            ExportAs.Items.Add("Export as JSON");
+            ExportAs.SelectedIndex = 0;
+        }
+
+        private void ExportAs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lastModel != null)
+            {
+                string result = string.Empty;
+
+                switch (ExportAs.SelectedIndex)
+                {
+                    case 1:
+                        var cmlConverter = new CMLConverter();
+                        result = cmlConverter.Export(lastModel);
+                        break;
+
+                    case 2:
+                        var sdFileConverter = new SdFileConverter();
+                        result = sdFileConverter.Export(lastModel);
+                        break;
+
+                    case 3:
+                        var jsonConverter = new JSONConverter();
+                        result = jsonConverter.Export(lastModel);
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    //Clipboard.SetText(result);
+                    //MessageBox.Show("Last loaded model exported to clipboard as CML");
+                    textBox1.Text = result + Environment.NewLine;
+                }
+            }
+            ExportAs.SelectedIndex = 0;
+            LoadStructure.Focus();
         }
     }
 }

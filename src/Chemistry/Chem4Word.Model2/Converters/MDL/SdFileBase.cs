@@ -5,20 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2
+using System.IO;
+
+namespace Chem4Word.Model2.Converters.MDL
 {
-    public class Formula
+    public class SdFileBase
     {
-        public string Id { get; set; }
-
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
+        public virtual SdfState ImportFromStream(StreamReader reader, Molecule molecule, out string message)
         {
+            message = null;
+            return SdfState.Null;
         }
+
+        //public virtual void ExportToStream(Molecule molecule, StreamWriter writer, out string message)
+        //{
+        //    message = null;
+        //}
     }
 }

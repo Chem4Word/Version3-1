@@ -7,7 +7,7 @@
 
 using System.Diagnostics;
 
-namespace Chem4Word.Model.Geometry
+namespace Chem4Word.Model2.Geometry
 {
     public class Seperator
     {
@@ -20,10 +20,10 @@ namespace Chem4Word.Model.Geometry
 
         public bool Seperate(double padding, int maxLoops, out int loops)
         {
-            // ToDo: Copy from old molecule - This is called from the Separate Button on the Ribbon
-            Debugger.Break();
-
             loops = 0;
+
+            // ToDo: Copied from old molecule - This was called from the Separate Button on the Ribbon, may not be needed!
+            Debugger.Break();
 
             //Rect a;
             //Rect b;

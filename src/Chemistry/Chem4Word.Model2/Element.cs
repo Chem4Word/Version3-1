@@ -11,7 +11,6 @@ using System.Reflection;
 
 namespace Chem4Word.Model2
 {
-    [Serializable]
     public class Element : ElementBase
     {
         public Element()

@@ -15,10 +15,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Xml.Linq;
-using Chem4Word.Model2.Converters;
-using static Chem4Word.Model2.Converters.CML;
-using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.Model2
 {
@@ -26,26 +22,26 @@ namespace Chem4Word.Model2
     {
         #region Properties
 
-        public string EndAtomID
+        public string EndAtomInternalId
         {
-            get => _endAtomId;
-            set => _endAtomId = value;
+            get => _endAtomInternalId;
+            set => _endAtomInternalId = value;
         }
 
-        public string StartAtomID
+        public string StartAtomInternalId
         {
-            get => _startAtomId;
-            set => _startAtomId = value;
+            get => _startAtomInternalId;
+            set => _startAtomInternalId = value;
         }
 
         public Atom EndAtom
         {
-            get { return Parent.Atoms[EndAtomID]; }
+            get { return Parent.Atoms[EndAtomInternalId]; }
         }
 
         public Atom StartAtom
         {
-            get { return Parent.Atoms[StartAtomID]; }
+            get { return Parent.Atoms[StartAtomInternalId]; }
         }
 
         public List<Atom> GetAtoms()
@@ -83,7 +79,7 @@ namespace Chem4Word.Model2
         public string Id { get; set; }
         internal string InternalId => _internalId;
 
-        public string Path
+        public override string Path
         {
             get
             {
@@ -109,27 +105,27 @@ namespace Chem4Word.Model2
             {
                 if (value.Equals("0.5"))
                 {
-                    value = OrderPartial01;
+                    value = Globals.OrderPartial01;
                 }
                 if (value.Equals("1") || value.Equals("S"))
                 {
-                    value = OrderSingle;
+                    value = Globals.OrderSingle;
                 }
                 if (value.Equals("1.5"))
                 {
-                    value = OrderPartial12;
+                    value = Globals.OrderPartial12;
                 }
                 if (value.Equals("2") || value.Equals("D"))
                 {
-                    value = OrderDouble;
+                    value = Globals.OrderDouble;
                 }
                 if (value.Equals("3") || value.Equals("T"))
                 {
-                    value = OrderTriple;
+                    value = Globals.OrderTriple;
                 }
                 if (value.Equals("0"))
                 {
-                    value = OrderZero;
+                    value = Globals.OrderZero;
                 }
 
                 _order = value;
@@ -146,29 +142,29 @@ namespace Chem4Word.Model2
         {
             switch (order)
             {
-                case OrderZero:
-                case OrderOther:
+                case Globals.OrderZero:
+                case Globals.OrderOther:
                     return 0;
 
-                case OrderPartial01:
+                case Globals.OrderPartial01:
                     return 0.5;
 
-                case OrderSingle:
+                case Globals.OrderSingle:
                     return 1;
 
-                case OrderPartial12:
+                case Globals.OrderPartial12:
                     return 1.5;
 
-                case OrderAromatic:
+                case Globals.OrderAromatic:
                     return 1.5;
 
-                case OrderDouble:
+                case Globals.OrderDouble:
                     return 2;
 
-                case OrderPartial23:
+                case Globals.OrderPartial23:
                     return 2.5;
 
-                case OrderTriple:
+                case Globals.OrderTriple:
                     return 3;
 
                 default:
@@ -179,8 +175,8 @@ namespace Chem4Word.Model2
         #endregion Bond Orders
 
         private Globals.BondStereo _stereo;
-        private string _endAtomId;
-        private string _startAtomId;
+        private string _endAtomInternalId;
+        private string _startAtomInternalId;
 
         public Globals.BondStereo Stereo
         {
@@ -571,74 +567,6 @@ namespace Chem4Word.Model2
             Messages = new List<string>();
         }
 
-        public Bond(XElement cmlElement) : this()
-        {
-            string[] atomRefs = cmlElement.Attribute("atomRefs2")?.Value.Split(' ');
-            if (atomRefs?.Length == 2)
-            {
-                StartAtomID = atomRefs[0];
-                EndAtomID = atomRefs[1];
-            }
-            var bondRef = cmlElement.Attribute("id")?.Value;
-            Id = bondRef ?? Id;
-            Order = cmlElement.Attribute("order")?.Value;
-
-            var stereoElems = CML.GetStereo(cmlElement);
-
-            if (stereoElems.Any())
-            {
-                var stereo = stereoElems[0].Value;
-
-                switch (stereo)
-                {
-                    case "N":
-                        Stereo = Globals.BondStereo.None;
-                        break;
-
-                    case "W":
-                        Stereo = Globals.BondStereo.Wedge;
-                        break;
-
-                    case "H":
-                        Stereo = Globals.BondStereo.Hatch;
-                        break;
-
-                    case "S":
-                        Stereo = Globals.BondStereo.Indeterminate;
-                        break;
-
-                    case "C":
-                        Stereo = Globals.BondStereo.Cis;
-                        break;
-
-                    case "T":
-                        Stereo = Globals.BondStereo.Trans;
-                        break;
-
-                    default:
-                        Stereo = Globals.BondStereo.None;
-                        break;
-                }
-            }
-            Globals.BondDirection? dir = null;
-
-            var dirAttr = cmlElement.Attribute(c4w + "placement");
-            if (dirAttr != null)
-            {
-                Globals.BondDirection temp;
-
-                if (Enum.TryParse(dirAttr.Value, out temp))
-                {
-                    dir = temp;
-                }
-            }
-
-            if (dir != null)
-            {
-                Placement = dir.Value;
-            }
-        }
-
         #endregion Constructors
 
         #region INotifyPropertyChanged
@@ -667,18 +595,23 @@ namespace Chem4Word.Model2
 
         private string OtherAtomID(string aId)
         {
-            if (aId.Equals(StartAtomID))
+            if (aId.Equals(StartAtomInternalId))
             {
-                return EndAtomID;
+                return EndAtomInternalId;
             }
-            else if (aId.Equals(EndAtomID))
+            else if (aId.Equals(EndAtomInternalId))
             {
-                return StartAtomID;
+                return StartAtomInternalId;
             }
             else
             {
                 throw new ArgumentException("Atom ID is not part of this Bond.", aId);
             }
+        }
+
+        public Bond Clone()
+        {
+            return new Bond().CloneExcept(this, new string[] { });
         }
 
         #region Geometry Routines
@@ -720,14 +653,9 @@ namespace Chem4Word.Model2
 
         public override string ToString()
         {
-            return $"Bond {Id} - {InternalId}: From {StartAtomID} to {EndAtomID}";
+            return $"Bond {Id} - {Path}: From {StartAtom.Path} to {EndAtom.Path}";
         }
 
         #endregion Overrides
-
-        public Bond Clone()
-        {
-            return new Bond().CloneExcept(this, new[] { "Id" });
-        }
     }
 }

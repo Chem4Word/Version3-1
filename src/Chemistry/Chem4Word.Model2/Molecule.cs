@@ -17,9 +17,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Xml.Linq;
-using Chem4Word.Model2.Converters;
-using static Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -30,7 +27,7 @@ namespace Chem4Word.Model2
         #region Collections
 
         public readonly List<Ring> Rings;
-        public readonly ReadOnlyDictionary<string, Atom> Atoms; //keyed by ID
+        public readonly ReadOnlyDictionary<string, Atom> Atoms; //keyed by InternalId
         private Dictionary<string, Atom> _atoms;
         public readonly ReadOnlyCollection<Bond> Bonds; //this is the edge list
         private List<Bond> _bonds;
@@ -110,8 +107,8 @@ namespace Chem4Word.Model2
         {
             get
             {
-                bool isNew = true;
-                Rect boundingBox = new Rect();
+                Rect boundingBox = Rect.Empty;
+
                 if (Atoms != null && Atoms.Any())
                 {
                     var xMax = Atoms.Values.Select(a => a.Position.X).Max();
@@ -121,15 +118,13 @@ namespace Chem4Word.Model2
                     var yMin = Atoms.Values.Select(a => a.Position.Y).Min();
 
                     boundingBox = new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
-                    isNew = false;
                 }
 
                 foreach (var mol in Molecules.Values)
                 {
-                    if (isNew)
+                    if (boundingBox.IsEmpty)
                     {
                         boundingBox = mol.BoundingBox;
-                        isNew = false;
                     }
                     else
                     {
@@ -179,22 +174,60 @@ namespace Chem4Word.Model2
         /// if the molecule is part of a model
         /// this starts with "/"
         /// </summary>
-        public string Path
+        public override string Path
         {
             get
             {
+                string path = "";
+
                 if (Parent == null)
                 {
-                    return Id;
+                    path = Id;
                 }
 
-                if (Parent is Model)
+                if (Parent is Model model)
                 {
-                    return ((Model)Parent).Path + Id;
+                    path = model.Path + Id;
                 }
 
-                return ((Molecule)Parent).Path + "/" + Id;
+                if (Parent is Molecule molecule)
+                {
+                    path = molecule.Path + "/" + Id;
+                }
+
+                return path;
             }
+        }
+
+        public ChemistryBase GetFromPath(string path)
+        {
+            //first part of the path has to be a molecule
+            if (path.StartsWith("/"))
+            {
+                path = path.Substring(1); //strip off the first separator
+            }
+            string id = path.UpTo("/");
+
+            string relativepath = Helpers.Utils.GetRelativePath(id, path);
+            if (Molecules.ContainsKey(id))
+            {
+                return Molecules[id].GetFromPath(relativepath);
+            }
+
+            if (Atoms.ContainsKey(relativepath))
+            {
+                return Atoms[relativepath];
+            }
+
+            var bond = (from b in Bonds
+                        where b.Id == relativepath
+                        select b).FirstOrDefault();
+            if (bond != null)
+            {
+                return bond;
+            }
+
+            throw new ArgumentException("Object not found");
         }
 
         public Model Model => Root as Model;
@@ -257,85 +290,6 @@ namespace Chem4Word.Model2
             Rings = new List<Ring>();
         }
 
-        public Molecule(XElement cmlElement) : this()
-        {
-            string idValue = cmlElement.Attribute("id")?.Value;
-            if (idValue != null)
-            {
-                Id = idValue;
-            }
-
-            Errors = new List<string>();
-            Warnings = new List<string>();
-
-            List<XElement> childMolecules = GetMolecules(cmlElement);
-
-            List<XElement> atomElements = GetAtoms(cmlElement);
-            List<XElement> bondElements = CML.GetBonds(cmlElement);
-            List<XElement> nameElements = GetNames(cmlElement);
-            List<XElement> formulaElements = GetFormulas(cmlElement);
-
-            foreach (XElement childElement in childMolecules)
-            {
-                Molecule newMol = new Molecule(childElement);
-                AddMolecule(newMol);
-                newMol.Parent = this;
-            }
-
-            Dictionary<string, string> reverseAtomLookup = new Dictionary<string, string>();
-            foreach (XElement atomElement in atomElements)
-            {
-                Atom newAtom = new Atom(atomElement);
-                if (newAtom.Messages.Count > 0)
-                {
-                    Errors.AddRange(newAtom.Messages);
-                }
-
-                AddAtom(newAtom);
-                reverseAtomLookup[newAtom.Id] = newAtom.InternalId;
-                newAtom.Parent = this;
-            }
-
-            foreach (XElement bondElement in bondElements)
-            {
-                Bond newBond = new Bond(bondElement);
-
-                newBond.StartAtomID = reverseAtomLookup[newBond.StartAtomID];
-                newBond.EndAtomID = reverseAtomLookup[newBond.EndAtomID];
-
-                if (newBond.Messages.Count > 0)
-                {
-                    Errors.AddRange(newBond.Messages);
-                }
-
-                AddBond(newBond);
-                newBond.Parent = this;
-            }
-
-            foreach (XElement formulaElement in formulaElements)
-            {
-                // Only import Concise Once
-                if (string.IsNullOrEmpty(ConciseFormula))
-                {
-                    ConciseFormula = formulaElement.Attribute("concise")?.Value; ;
-                }
-
-                Formula formula = new Formula(formulaElement);
-                if (formula.IsValid)
-                {
-                    Formulas.Add(formula);
-                }
-            }
-            foreach (XElement nameElement in nameElements)
-            {
-                if (string.IsNullOrEmpty(ConciseFormula))
-                {
-                    Names.Add(new ChemicalName(nameElement));
-                }
-            }
-            RebuildRings();
-        }
-
         public void AddBond(Bond newBond)
         {
             _bonds.Add(newBond);
@@ -377,7 +331,7 @@ namespace Chem4Word.Model2
         public bool RemoveAtom(Atom toRemove)
         {
             bool bondsExist =
-                Bonds.Any(b => b.StartAtomID.Equals(toRemove.InternalId) | b.EndAtomID.Equals(toRemove.InternalId));
+                Bonds.Any(b => b.StartAtomInternalId.Equals(toRemove.InternalId) | b.EndAtomInternalId.Equals(toRemove.InternalId));
             if (bondsExist)
             {
                 throw new InvalidOperationException("Cannot remove an Atom without first removing the attached Bonds.");
@@ -542,67 +496,82 @@ namespace Chem4Word.Model2
 
         #region Methods
 
-        //public void UpdateBondRefs(string oldID, string newID)
-        //{
-        //    var bstart = from b in this?.Bonds
-        //        where b.StartAtomID == oldID
-        //        select b;
-        //    foreach (Bond b in bstart)
-        //    {
-        //        b.StartAtomID = newID;
-        //    }
-
-        //    var bend = from b in this?.Bonds
-        //        where b.EndAtomID == oldID
-        //        select b;
-        //    foreach (Bond b in bend)
-        //    {
-        //        b.EndAtomID = newID;
-        //    }
-        //}
-
         public List<Atom> GetAtomNeighbours(Atom atom)
         {
             List<Atom> temps = new List<Atom>();
             foreach (Bond bond in Bonds)
             {
-                if (bond.StartAtomID.Equals(atom.InternalId))
+                if (bond.StartAtomInternalId.Equals(atom.InternalId))
                 {
-                    temps.Add(Atoms[bond.EndAtomID]);
+                    temps.Add(Atoms[bond.EndAtomInternalId]);
                 }
-                if (bond.EndAtomID.Equals(atom.InternalId))
+                if (bond.EndAtomInternalId.Equals(atom.InternalId))
                 {
-                    temps.Add(Atoms[bond.StartAtomID]);
+                    temps.Add(Atoms[bond.StartAtomInternalId]);
                 }
             }
             return temps.ToList();
         }
 
-        public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
+        public void ScaleBonds(double scale)
         {
-            //do the atoms first THEN the bonds
-            //this sets the bond IDs
-            Id = $"m{++iMolcount}";
-            Dictionary<string, string> atomIDLookup = new Dictionary<string, string>();
+            foreach (var atom in Atoms.Values)
+            {
+                atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
+            }
+
+            foreach (var child in Molecules.Values)
+            {
+                child.ScaleBonds(scale);
+            }
+        }
+
+        public void MoveAllAtoms(double x, double y)
+        {
+            var offsetVector = new Vector(x, y);
+
             foreach (Atom a in Atoms.Values)
             {
-                string newID = $"a{++iAtomCount}";
-                atomIDLookup[a.InternalId] = newID;
-                a.Id = newID;
+                a.Position += offsetVector;
+            }
+
+            foreach (Molecule child in Molecules.Values)
+            {
+                child.MoveAllAtoms(x, y);
+            }
+        }
+
+        public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
+        {
+            Id = $"m{++iMolcount}";
+            foreach (Atom a in Atoms.Values)
+            {
+                a.Id = $"a{++iAtomCount}";
             }
 
             foreach (Bond b in Bonds)
             {
-                b.StartAtomID = atomIDLookup[b.StartAtomID];
-                b.EndAtomID = atomIDLookup[b.EndAtomID];
                 b.Id = $"b{++iBondcount}";
             }
-            if (Molecules.Any())
+
+            if (includeNames)
             {
-                foreach (Molecule mol in Molecules.Values)
+                int count = 1;
+                foreach (var formula in Formulas)
                 {
-                    mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
+                    formula.Id = $"{Id}.f{count++}";
                 }
+
+                count = 1;
+                foreach (var name in Names)
+                {
+                    name.Id = $"{Id}.n{count++}";
+                }
+            }
+
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
             }
         }
 
@@ -611,7 +580,7 @@ namespace Chem4Word.Model2
         {
             foreach (Bond bond in Bonds)
             {
-                if (!Atoms.Keys.Contains(bond.StartAtomID) || !Atoms.Keys.Contains(bond.EndAtomID))
+                if (!Atoms.Keys.Contains(bond.StartAtomInternalId) || !Atoms.Keys.Contains(bond.EndAtomInternalId))
                 {
                     return false;
                 }
@@ -623,14 +592,12 @@ namespace Chem4Word.Model2
         public IEnumerable<Bond> GetBonds(string atomID)
         {
             return (from startBond in Bonds
-                    where startBond.StartAtomID.Equals(atomID)
+                    where startBond.StartAtomInternalId.Equals(atomID)
                     select startBond)
                 .Union(from endBond in Bonds
-                       where endBond.EndAtomID.Equals(atomID)
+                       where endBond.EndAtomInternalId.Equals(atomID)
                        select endBond);
         }
-
-        #endregion Methods
 
         public void Refresh()
         {
@@ -639,12 +606,12 @@ namespace Chem4Word.Model2
                 child.Refresh();
             }
 
-            RebuildRingsFigueras();
+            RebuildRings();
         }
 
         public Molecule Clone()
         {
-            Molecule clone = new Molecule().CloneExcept(this, new[] { "Id" });
+            Molecule clone = new Molecule().CloneExcept(this, new string[] { nameof(Id) });
             foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
             {
                 Atom atom = keyValuePair.Value;
@@ -666,11 +633,13 @@ namespace Chem4Word.Model2
             return clone;
         }
 
+        #endregion Methods
+
         #region Overrides
 
         public override string ToString()
         {
-            return $"Molecule {Id} - {InternalId}; Atoms {Atoms.Count} Bonds {Bonds.Count} Molecules {Molecules.Count}";
+            return $"Molecule {Id} - {Path}; Atoms {Atoms.Count} Bonds {Bonds.Count} Molecules {Molecules.Count}";
         }
 
         #endregion Overrides
@@ -785,77 +754,135 @@ namespace Chem4Word.Model2
         public void RebuildRings()
         {
             RebuildRingsFigueras();
-        }
 
-        /// <summary>
-        /// Modified Figueras top-level algorithm:
-        /// 1. choose the lowest degree atom
-        /// 2. Work out which rings it belongs to
-        /// 3. If it belongs to a ring and that ring hasn't been calculated before, then add it to the set
-        /// 4. delete the atom from the projection, reduce the degree of neighbouring atoms and prune away the side chains
-        /// </summary>
-        private void RebuildRingsFiguerasAlt()
-        {
-#if DEBUG
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-#endif
-            HashSet<string> RingIDs = new HashSet<string>(); //list of rings processed so far
-            if (HasRings)
+            // -------------- //
+            // Local Function //
+            // -------------- //
+            void RebuildRingsFigueras()
             {
-                WipeMoleculeRings();
-
-                //working set of atoms
-                //it's a dictionary, because we initially store the degree of each atom against it
-                //this will change as the pruning operation kicks in
-                Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
-                //lop off any terminal branches - removes all atoms of degree <=1
-                PruneSideChains(workingSet);
-
-                while (workingSet.Any()) //do we have any atoms left in the set
-                {
-                    Atom startAtom = workingSet.OrderBy(kvp => kvp.Value).First().Key; // go for the lowest degree atom (will be of degree >=2)
-                    Ring nextRing = GetRing(startAtom); //identify a ring
-
-                    if (nextRing != null && !RingIDs.Contains(nextRing.UniqueID)) //bingo
-                    {
-                        //and add the ring to the atoms
-                        Rings.Add(nextRing); //add the ring to the set
-                        RingIDs.Add(nextRing.UniqueID);
-
-                        foreach (Atom a in nextRing.Atoms.ToList())
-                        {
-                            a.Rings.Add(nextRing);
-                        }
-
-                        //
-                        if (workingSet.ContainsKey(startAtom))
-                        {
-                            foreach (Atom atom in startAtom.Neighbours.Where(a => workingSet.ContainsKey(a)))
-                            {
-                                //reduce the degree of its neighbours by one
-                                workingSet[atom] -= 1;
-                            }
-                            //break the ring
-
-                            workingSet.Remove(startAtom);
-                            //and chop down the dangling chains
-                            PruneSideChains(workingSet);
-                        }
-                        //remove the atoms in the ring from the working set BUT NOT the graph!
-                    }
-                    else
-                    {
-                        Debug.Assert(workingSet.ContainsKey(startAtom));
-                        workingSet.Remove(startAtom);
-                    } //the atom doesn't belong in a ring, remove it from the set.
-                }
-            }
 #if DEBUG
-            //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
-            sw.Stop();
-            Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+                //Stopwatch sw = new Stopwatch();
+                //sw.Start();
 #endif
+                Rings.Clear();
+
+                if (HasRings)
+                {
+                    //working set of atoms
+                    //it's a dictionary, because we initially store the degree of each atom against it
+                    //this will change as the pruning operation kicks in
+                    Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
+                    //lop off any terminal branches
+                    PruneSideChains(workingSet);
+
+                    while (workingSet.Any()) //do we have any atoms left in the set
+                    {
+                        Atom startAtom = workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
+                        Ring nextRing = GetRing(startAtom); //identify a ring
+                        if (nextRing != null) //bingo
+                        {
+                            //and add the ring to the atoms
+                            Rings.Add(nextRing); //add the ring to the set
+                            foreach (Atom a in nextRing.Atoms.ToList())
+                            {
+                                //if (!a.Rings.Contains(nextRing))
+                                //{
+                                //    a.Rings.Add(nextRing);
+                                //}
+
+                                if (workingSet.ContainsKey(a))
+                                {
+                                    workingSet.Remove(a);
+                                }
+                                //remove the atoms in the ring from the working set BUT NOT the graph!
+                            }
+                        }
+                        else
+                        {
+                            workingSet.Remove(startAtom);
+                        } //the atom doesn't belong in a ring, remove it from the set.
+                    }
+                }
+#if DEBUG
+                //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
+                //sw.Stop();
+                //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+#endif
+                //RefreshRingBonds();
+            }
+
+            // -------------- //
+            // Local Function //
+            // -------------- //
+
+            // Modified Figueras top-level algorithm:
+            // 1. choose the lowest degree atom
+            // 2. Work out which rings it belongs to
+            // 3. If it belongs to a ring and that ring hasn't been calculated before, then add it to the set
+            // 4. delete the atom from the projection, reduce the degree of neighbouring atoms and prune away the side chains
+            void RebuildRingsFiguerasAlt()
+            {
+#if DEBUG
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+#endif
+                HashSet<string> RingIDs = new HashSet<string>(); //list of rings processed so far
+                if (HasRings)
+                {
+                    WipeMoleculeRings();
+
+                    //working set of atoms
+                    //it's a dictionary, because we initially store the degree of each atom against it
+                    //this will change as the pruning operation kicks in
+                    Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
+                    //lop off any terminal branches - removes all atoms of degree <=1
+                    PruneSideChains(workingSet);
+
+                    while (workingSet.Any()) //do we have any atoms left in the set
+                    {
+                        Atom startAtom = workingSet.OrderBy(kvp => kvp.Value).First().Key; // go for the lowest degree atom (will be of degree >=2)
+                        Ring nextRing = GetRing(startAtom); //identify a ring
+
+                        if (nextRing != null && !RingIDs.Contains(nextRing.UniqueID)) //bingo
+                        {
+                            //and add the ring to the atoms
+                            Rings.Add(nextRing); //add the ring to the set
+                            RingIDs.Add(nextRing.UniqueID);
+
+                            foreach (Atom a in nextRing.Atoms.ToList())
+                            {
+                                a.Rings.Add(nextRing);
+                            }
+
+                            //
+                            if (workingSet.ContainsKey(startAtom))
+                            {
+                                foreach (Atom atom in startAtom.Neighbours.Where(a => workingSet.ContainsKey(a)))
+                                {
+                                    //reduce the degree of its neighbours by one
+                                    workingSet[atom] -= 1;
+                                }
+                                //break the ring
+
+                                workingSet.Remove(startAtom);
+                                //and chop down the dangling chains
+                                PruneSideChains(workingSet);
+                            }
+                            //remove the atoms in the ring from the working set BUT NOT the graph!
+                        }
+                        else
+                        {
+                            Debug.Assert(workingSet.ContainsKey(startAtom));
+                            workingSet.Remove(startAtom);
+                        } //the atom doesn't belong in a ring, remove it from the set.
+                    }
+                }
+#if DEBUG
+                //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
+                sw.Stop();
+                Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
+#endif
+            }
         }
 
         /// <summary>
@@ -1017,59 +1044,6 @@ namespace Chem4Word.Model2
             }
             //no collisions therefore no rings detected
             return null;
-        }
-
-        public void RebuildRingsFigueras()
-        {
-#if DEBUG
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
-#endif
-            Rings.Clear();
-
-            if (HasRings)
-            {
-                //working set of atoms
-                //it's a dictionary, because we initially store the degree of each atom against it
-                //this will change as the pruning operation kicks in
-                Dictionary<Atom, int> workingSet = Projection(a => a.Degree);
-                //lop off any terminal branches
-                PruneSideChains(workingSet);
-
-                while (workingSet.Any()) //do we have any atoms left in the set
-                {
-                    Atom startAtom = workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
-                    Ring nextRing = GetRing(startAtom); //identify a ring
-                    if (nextRing != null) //bingo
-                    {
-                        //and add the ring to the atoms
-                        Rings.Add(nextRing); //add the ring to the set
-                        foreach (Atom a in nextRing.Atoms.ToList())
-                        {
-                            //if (!a.Rings.Contains(nextRing))
-                            //{
-                            //    a.Rings.Add(nextRing);
-                            //}
-
-                            if (workingSet.ContainsKey(a))
-                            {
-                                workingSet.Remove(a);
-                            }
-                            //remove the atoms in the ring from the working set BUT NOT the graph!
-                        }
-                    }
-                    else
-                    {
-                        workingSet.Remove(startAtom);
-                    } //the atom doesn't belong in a ring, remove it from the set.
-                }
-            }
-#if DEBUG
-            //Debug.WriteLine($"Molecule = {(ChemicalNames.Count > 0 ? this.ChemicalNames?[0].Name : this.ConciseFormula)},  Number of rings = {Rings.Count}");
-            //sw.Stop();
-            //Debug.WriteLine($"Elapsed {sw.ElapsedMilliseconds}");
-#endif
-            //RefreshRingBonds();
         }
 
         #endregion Ring stuff

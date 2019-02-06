@@ -5,8 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Xml.Linq;
-
 namespace Chem4Word.Model2
 {
     public class ChemicalName
@@ -21,30 +19,6 @@ namespace Chem4Word.Model2
 
         public ChemicalName()
         {
-        }
-
-        public ChemicalName(XElement cmlElement) : this()
-        {
-            ChemicalName n = new ChemicalName();
-
-            Id = cmlElement.Attribute("id")?.Value;
-
-            if (cmlElement.Attribute("dictRef") == null)
-            {
-                DictRef = "chem4word:Synonym";
-            }
-            else
-            {
-                DictRef = cmlElement.Attribute("dictRef")?.Value;
-            }
-
-            // Correct import from legacy Add-In
-            if (string.IsNullOrEmpty(DictRef) || DictRef.Equals("nameDict:unknown"))
-            {
-                DictRef = "chem4word:Synonym";
-            }
-
-            Name = cmlElement.Value;
         }
     }
 }

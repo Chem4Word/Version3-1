@@ -15,8 +15,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Xml.Linq;
-using static Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -25,7 +23,7 @@ namespace Chem4Word.Model2
         #region Fields
 
         private bool _explicitC;
-        public readonly List<string> Messages = new List<string>();
+        public List<string> Messages = new List<string>();
 
         #endregion Fields
 
@@ -95,7 +93,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public string Path
+        public override string Path
         {
             get
             {
@@ -412,35 +410,6 @@ namespace Chem4Word.Model2
 
         internal string InternalId => _internalId;
 
-        public Atom(XElement atomElement) : this()
-        {
-            Messages = new List<string>();
-            string message = "";
-            string atomLabel = atomElement.Attribute("id")?.Value;
-
-            Point p = GetPosn(atomElement, out message);
-            if (!string.IsNullOrEmpty(message))
-            {
-                Messages.Add(message);
-            }
-
-            Id = atomLabel;
-            Position = p;
-
-            ElementBase e = GetChemicalElement(atomElement, out message);
-            if (!string.IsNullOrEmpty(message))
-            {
-                Messages.Add(message);
-            }
-
-            if (e != null)
-            {
-                Element = e;
-                FormalCharge = GetFormalCharge(atomElement);
-                IsotopeNumber = GetIsotopeNumber(atomElement);
-            }
-        }
-
         #endregion Constructors
 
         #region Methods
@@ -459,11 +428,11 @@ namespace Chem4Word.Model2
         {
             foreach (var parentBond in Parent.Bonds)
             {
-                if (parentBond.StartAtomID.Equals(InternalId) && parentBond.EndAtomID.Equals(atom.InternalId))
+                if (parentBond.StartAtomInternalId.Equals(InternalId) && parentBond.EndAtomInternalId.Equals(atom.InternalId))
                 {
                     return parentBond;
                 }
-                if (parentBond.EndAtomID.Equals(InternalId) && parentBond.StartAtomID.Equals(atom.InternalId))
+                if (parentBond.EndAtomInternalId.Equals(InternalId) && parentBond.StartAtomInternalId.Equals(atom.InternalId))
                 {
                     return parentBond;
                 }
@@ -473,7 +442,7 @@ namespace Chem4Word.Model2
 
         public Atom Clone()
         {
-            return new Atom().CloneExcept(this, new[] { "Id" });
+            return new Atom().CloneExcept(this, new string[] { });
         }
 
         public CompassPoints GetDefaultHOrientation()
@@ -531,7 +500,7 @@ namespace Chem4Word.Model2
         public override string ToString()
         {
             var symbol = Element != null ? Element.Symbol : "???";
-            return $"Atom {Id} - {InternalId}: {symbol} @ {Position.X.ToString("0.000")}, {Position.Y.ToString("0.000")}";
+            return $"Atom {Id} - {Path}: {symbol} @ {Position.X.ToString("0.0000")}, {Position.Y.ToString("0.0000")}";
         }
 
         #endregion Overrides

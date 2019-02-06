@@ -5,20 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2
+namespace Chem4Word.Model2.Converters.MDL
 {
-    public class Formula
+    public class PropertyType
     {
-        public string Id { get; set; }
-
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
-        {
-        }
+        public string ExternalName { get; set; }
+        public string InternalName { get; set; }
+        public bool IsFormula { get; set; }
     }
 }
