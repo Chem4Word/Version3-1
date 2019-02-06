@@ -41,5 +41,8 @@ namespace Chem4Word.Model2.Converters.CML
         public const string TagY3 = "y3";
         public const string TagFormalCharge = "formalCharge";
         public const string TagIsotopeNumber = "isotopeNumber";
+        public const string TagChem4WordFormula = "chem4word:Formula";
+        public const string TagChem4WordSynonym = "chem4word:Synonym";
+        public const string TagNameDictUnknown = "nameDict:unknown";
     }
 }

@@ -428,7 +428,7 @@ namespace Chem4Word.Model2.Converters.CML
                     molecule.ConciseFormula = formulaElement.Attribute(CMLConstants.TagConcise)?.Value;
                 }
 
-                Formula formula = new Formula(formulaElement);
+                Formula formula = GetFormula(formulaElement);
                 if (formula.IsValid)
                 {
                     molecule.Formulas.Add(formula);
@@ -437,7 +437,7 @@ namespace Chem4Word.Model2.Converters.CML
 
             foreach (XElement nameElement in nameElements)
             {
-                molecule.Names.Add(new ChemicalName(nameElement));
+                molecule.Names.Add(GetName(nameElement));
             }
 
             molecule.RebuildRings();
@@ -445,15 +445,15 @@ namespace Chem4Word.Model2.Converters.CML
             return molecule;
         }
 
-        public static Atom GetAtom(XElement atomElement)
+        private static Atom GetAtom(XElement cmlElement)
         {
             Atom atom = new Atom();
 
             atom.Messages = new List<string>();
             string message = "";
-            string atomLabel = atomElement.Attribute(CMLConstants.TagId)?.Value;
+            string atomLabel = cmlElement.Attribute(CMLConstants.TagId)?.Value;
 
-            Point p = CMLHelper.GetPosn(atomElement, out message);
+            Point p = CMLHelper.GetPosn(cmlElement, out message);
             if (!string.IsNullOrEmpty(message))
             {
                 atom.Messages.Add(message);
@@ -462,7 +462,7 @@ namespace Chem4Word.Model2.Converters.CML
             atom.Id = atomLabel;
             atom.Position = p;
 
-            ElementBase e = CMLHelper.GetChemicalElement(atomElement, out message);
+            ElementBase e = CMLHelper.GetChemicalElement(cmlElement, out message);
             if (!string.IsNullOrEmpty(message))
             {
                 atom.Messages.Add(message);
@@ -471,14 +471,14 @@ namespace Chem4Word.Model2.Converters.CML
             if (e != null)
             {
                 atom.Element = e;
-                atom.FormalCharge = CMLHelper.GetFormalCharge(atomElement);
-                atom.IsotopeNumber = CMLHelper.GetIsotopeNumber(atomElement);
+                atom.FormalCharge = CMLHelper.GetFormalCharge(cmlElement);
+                atom.IsotopeNumber = CMLHelper.GetIsotopeNumber(cmlElement);
             }
 
             return atom;
         }
 
-        public static Bond GetBond(XElement cmlElement, Dictionary<string, string> reverseAtomLookup)
+        private static Bond GetBond(XElement cmlElement, Dictionary<string, string> reverseAtomLookup)
         {
             Bond bond = new Bond();
 
@@ -550,6 +550,64 @@ namespace Chem4Word.Model2.Converters.CML
             return bond;
         }
 
-        #endregion Import Helpers
+        private static Formula GetFormula(XElement cmlElement)
+        {
+            Formula formula = new Formula();
+
+            if (cmlElement.Attribute(CMLConstants.TagId) != null)
+            {
+                formula.Id = cmlElement.Attribute(CMLConstants.TagId)?.Value;
+            }
+
+            if (cmlElement.Attribute(CMLConstants.AttrConvention) == null)
+            {
+                formula.Convention = CMLConstants.TagChem4WordFormula;
+            }
+            else
+            {
+                formula.Convention = cmlElement.Attribute(CMLConstants.AttrConvention)?.Value;
+            }
+
+            // Correct import from legacy Add-In
+            if (string.IsNullOrEmpty(formula.Convention))
+            {
+                formula.Convention = CMLConstants.TagChem4WordFormula;
+            }
+            if (cmlElement.Attribute(CMLConstants.AttrInline) != null)
+            {
+                formula.Inline = cmlElement.Attribute(CMLConstants.AttrInline)?.Value;
+                formula.IsValid = true;
+            }
+
+            return formula;
+        }
+
+        private static ChemicalName GetName(XElement cmlElement)
+        {
+            ChemicalName name = new ChemicalName();
+
+            name.Id = cmlElement.Attribute(CMLConstants.TagId)?.Value;
+
+            if (cmlElement.Attribute(CMLConstants.TagCmlDict) == null)
+            {
+                name.DictRef = CMLConstants.TagChem4WordSynonym;
+            }
+            else
+            {
+                name.DictRef = cmlElement.Attribute(CMLConstants.TagCmlDict)?.Value;
+            }
+
+            // Correct import from legacy Add-In
+            if (string.IsNullOrEmpty(name.DictRef) || name.DictRef.Equals(CMLConstants.TagNameDictUnknown))
+            {
+                name.DictRef = CMLConstants.TagChem4WordSynonym;
+            }
+
+            name.Name = cmlElement.Value;
+
+            return name;
+        }
     }
+
+    #endregion Import Helpers
 }

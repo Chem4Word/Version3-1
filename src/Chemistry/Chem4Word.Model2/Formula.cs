@@ -22,33 +22,5 @@ namespace Chem4Word.Model2
         public Formula()
         {
         }
-
-        public Formula(XElement cmlElement)
-        {
-            if (cmlElement.Attribute("id") != null)
-            {
-                Id = cmlElement.Attribute("id")?.Value;
-            }
-
-            if (cmlElement.Attribute("convention") == null)
-            {
-                Convention = "chem4word:Formula";
-            }
-            else
-            {
-                Convention = cmlElement.Attribute("convention")?.Value;
-            }
-
-            // Correct import from legacy Add-In
-            if (string.IsNullOrEmpty(Convention))
-            {
-                Convention = "chem4word:Formula";
-            }
-            if (cmlElement.Attribute("inline") != null)
-            {
-                Inline = cmlElement.Attribute("inline")?.Value;
-                IsValid = true;
-            }
-        }
     }
 }
