@@ -7,7 +7,8 @@
 
 namespace Chem4Word.Model2.Converters.MDL
 {
-    public class Counts
+    // ReSharper disable once InconsistentNaming
+    public class MDLCounts
     {
         public string Version { get; set; }
         public int Atoms { get; set; }

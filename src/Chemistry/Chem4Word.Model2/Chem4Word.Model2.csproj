@@ -55,9 +55,9 @@
     <Compile Include="Bond.cs" />
     <Compile Include="ChemicalName.cs" />
     <Compile Include="ChemistryBase.cs" />
-    <Compile Include="Converters\CML\Constants.cs" />
-    <Compile Include="Converters\CML\Namespaces.cs" />
-    <Compile Include="Converters\MDL\Counts.cs" />
+    <Compile Include="Converters\CML\CMLConstants.cs" />
+    <Compile Include="Converters\CML\CMLNamespaces.cs" />
+    <Compile Include="Converters\MDL\MDLCounts.cs" />
     <Compile Include="Converters\MDL\CtabProcessor.cs" />
     <Compile Include="Converters\MDL\DataProcessor.cs" />
     <Compile Include="Converters\MDL\MDLConstants.cs" />
@@ -77,7 +77,7 @@
     <Compile Include="Geometry\Packer.cs" />
     <Compile Include="Geometry\Seperator.cs" />
     <Compile Include="Group.cs" />
-    <Compile Include="Converters\CML\Helper.cs" />
+    <Compile Include="Converters\CML\CMLHelper.cs" />
     <Compile Include="Converters\CML\CMLConverter.cs" />
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\Utils.cs" />

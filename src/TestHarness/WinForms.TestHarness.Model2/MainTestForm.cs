@@ -7,17 +7,16 @@
 
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Telemetry;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Model2.Converters.MDL;
 
 namespace WinForms.TestHarness.Model2
 {
@@ -83,11 +82,13 @@ namespace WinForms.TestHarness.Model2
                             var cmlConverter = new CMLConverter();
                             model = cmlConverter.Import(contents);
                             break;
+
                         case ".sdf":
                         case ".mol":
                             var sdFileConverter = new SdFileConverter();
                             model = sdFileConverter.Import(contents);
                             break;
+
                         case ".json":
                             break;
                     }
@@ -164,6 +165,24 @@ namespace WinForms.TestHarness.Model2
                         var res = bondsNode.Nodes.Add(bond.Path, bond.ToString());
                         res.Tag = bond;
                         textBox1.AppendText($"Bond {bond.Path} added.\n");
+                    }
+                }
+
+                if (modelMolecule.Formulas.Any())
+                {
+                    var formulasNode = parentNode.Nodes.Add(modelMolecule.Path + "/Formulas", $"Formulas: count {modelMolecule.Formulas.Count}");
+                    foreach (var formula in modelMolecule.Formulas)
+                    {
+                        formulasNode.Nodes.Add(formula.Id, $"Formula {formula.Id} {formula.Convention} {formula.Inline}");
+                    }
+                }
+
+                if (modelMolecule.Names.Any())
+                {
+                    var namesNode = parentNode.Nodes.Add(modelMolecule.Path + "/Names", $"Names: count {modelMolecule.Names.Count}");
+                    foreach (var name in modelMolecule.Names)
+                    {
+                        namesNode.Nodes.Add(name.Id, $"Name {name.Id} {name.DictRef} {name.Name}");
                     }
                 }
 

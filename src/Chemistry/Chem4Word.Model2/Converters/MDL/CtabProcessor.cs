@@ -41,7 +41,7 @@ namespace Chem4Word.Model2.Converters.MDL
             {
                 while (!reader.EndOfStream)
                 {
-                    Counts counts = ReadCtabHeader(reader);
+                    MDLCounts counts = ReadCtabHeader(reader);
                     if (!string.IsNullOrEmpty(counts.Message))
                     {
                         if (counts.Message.Contains("Unsupported"))
@@ -98,12 +98,11 @@ namespace Chem4Word.Model2.Converters.MDL
         //    WriteCtab(writer);
         //}
 
-
         #region Reading Into Model
 
-        private Counts ReadCtabHeader(StreamReader reader)
+        private MDLCounts ReadCtabHeader(StreamReader reader)
         {
-            Counts result = new Counts();
+            MDLCounts result = new MDLCounts();
 
             // Title
             string title = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
