@@ -5,10 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Xml.Linq;
@@ -18,17 +18,7 @@ namespace Chem4Word.Model2.Converters.CML
     // ReSharper disable once InconsistentNaming
     public class CMLConverter
     {
-        public static string Description => "Chemical Markup Language";
-        public bool CanExport => true;
-
-        public bool CanImport => true;
         public bool Compressed { get; set; }
-
-        public static string[] Extensions => new[]
-        {
-            "*.CML",
-            "*.XML"
-        };
 
         public Model Import(object data)
         {
@@ -492,7 +482,7 @@ namespace Chem4Word.Model2.Converters.CML
         {
             Bond bond = new Bond();
 
-            string[] atomRefs = cmlElement.Attribute( Constants.TagAtomRefs2)?.Value.Split(' ');
+            string[] atomRefs = cmlElement.Attribute(Constants.TagAtomRefs2)?.Value.Split(' ');
             if (atomRefs?.Length == 2)
             {
                 bond.StartAtomInternalId = reverseAtomLookup[atomRefs[0]];

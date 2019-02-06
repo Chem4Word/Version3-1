@@ -99,6 +99,64 @@ namespace Chem4Word.Model2.Converters.MDL
             return result;
         }
 
+        public void ExportToStream(List<ChemicalName> names, List<Formula> formulas, StreamWriter writer)
+        {
+            Dictionary<string, List<string>> properties = new Dictionary<string, List<string>>();
+
+            foreach (var name in names)
+            {
+                if (properties.ContainsKey(name.DictRef))
+                {
+                    properties[name.DictRef].Add(name.Name);
+                }
+                else
+                {
+                    List<string> dataNames = new List<string>();
+                    dataNames.Add(name.Name);
+                    properties.Add(name.DictRef, dataNames);
+                }
+            }
+
+            foreach (var formula in formulas)
+            {
+                if (properties.ContainsKey(formula.Convention))
+                {
+                    properties[formula.Convention].Add(formula.Inline);
+                }
+                else
+                {
+                    List<string> dataNames = new List<string>();
+                    dataNames.Add(formula.Inline);
+                    properties.Add(formula.Convention, dataNames);
+                }
+            }
+
+            foreach (var property in properties)
+            {
+                string externalName = null;
+                foreach (var propertyType in _propertyTypes)
+                {
+                    if (propertyType.InternalName.Equals(property.Key))
+                    {
+                        externalName = propertyType.ExternalName;
+                        break;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(externalName))
+                {
+                    writer.WriteLine(externalName);
+                    foreach (var line in property.Value)
+                    {
+                        writer.WriteLine(line);
+                    }
+                    writer.WriteLine("");
+                }
+            }
+
+            writer.WriteLine(MDLConstants.SDF_END);
+        }
+
         public override void ExportToStream(Molecule molecule, StreamWriter writer, out string message)
         {
             message = null;

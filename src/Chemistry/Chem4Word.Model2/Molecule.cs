@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
 using System;
@@ -18,8 +17,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Xml.Linq;
-using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Model2
 {
@@ -223,17 +220,15 @@ namespace Chem4Word.Model2
             }
 
             var bond = (from b in Bonds
-                where b.Id == relativepath
-                select b).FirstOrDefault();
+                        where b.Id == relativepath
+                        select b).FirstOrDefault();
             if (bond != null)
             {
                 return bond;
             }
 
             throw new ArgumentException("Object not found");
-
         }
-
 
         public Model Model => Root as Model;
 
@@ -501,7 +496,6 @@ namespace Chem4Word.Model2
 
         #region Methods
 
-      
         public List<Atom> GetAtomNeighbours(Atom atom)
         {
             List<Atom> temps = new List<Atom>();

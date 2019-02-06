@@ -5,30 +5,19 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
 using Chem4Word.Core.Helpers;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace Chem4Word.Model2.Converters.MDL
 {
     public class SdFileConverter
     {
         private List<PropertyType> _propertyTypes = null;
-
-        public bool CanExport => true;
-
-        public bool CanImport => true;
-
-        public string Description => "Import and Export of MDL MolFile and SdFile formats";
-
-        public string[] Extensions => new string[]
-        {
-            "*.sdf",
-            "*.mol"
-        };
 
         public SdFileConverter()
         {
@@ -131,18 +120,47 @@ namespace Chem4Word.Model2.Converters.MDL
             {
                 foreach (var mol in model.Molecules.Values)
                 {
+                    List<Atom> atoms = mol.Atoms.Values.ToList();
+                    List<Bond> bonds = mol.Bonds.ToList();
+                    List<ChemicalName> names = mol.Names.ToList();
+                    List<Formula> formulas = mol.Formulas.ToList();
+
+                    if (mol.Molecules.Any())
+                    {
+                        foreach (var child in mol.Molecules.Values)
+                        {
+                            GatherChildren(child, atoms, bonds, names, formulas);
+                        }
+                    }
+
                     string message;
                     CtabProcessor pct = new CtabProcessor();
-                    pct.ExportToStream(mol, writer, out message);
+                    pct.ExportToStream(atoms, bonds, writer);
+                    //pct.ExportToStream(mol, writer, out message);
 
                     DataProcessor dp = new DataProcessor(_propertyTypes);
-                    dp.ExportToStream(mol, writer, out message);
+                    dp.ExportToStream(names, formulas, writer);
+                    //dp.ExportToStream(mol, writer, out message);
                 }
                 writer.Flush();
             }
 
             result = Encoding.ASCII.GetString(stream.ToArray());
             return result;
+
+            // Local Function
+            void GatherChildren(Molecule molecule, List<Atom> atoms, List<Bond> bonds, List<ChemicalName> names, List<Formula> formulas)
+            {
+                atoms.AddRange(molecule.Atoms.Values.ToList());
+                bonds.AddRange(molecule.Bonds.ToList());
+                names.AddRange(molecule.Names.ToList());
+                formulas.AddRange(molecule.Formulas.ToList());
+
+                foreach (var child in molecule.Molecules.Values)
+                {
+                    GatherChildren(child, atoms, bonds, names, formulas);
+                }
+            }
         }
     }
 }

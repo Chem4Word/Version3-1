@@ -5,15 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
+using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -189,7 +189,6 @@ namespace Chem4Word.Model2
         {
             try
             {
-
                 //first part of the path has to be a molecule
                 if (path.StartsWith("/"))
                 {
@@ -220,8 +219,10 @@ namespace Chem4Word.Model2
         }
 
         private Dictionary<string, Molecule> _molecules { get; }
+
         //wraps up the above Molecules collection
         public ReadOnlyDictionary<string, Molecule> Molecules;
+
         public string CustomXmlPartGuid { get; set; }
 
         public List<string> GeneralErrors { get; set; }
@@ -258,15 +259,14 @@ namespace Chem4Word.Model2
 
         #region Constructors
 
-          public Model()
+        public Model()
         {
             _molecules = new Dictionary<string, Molecule>();
             Molecules = new ReadOnlyDictionary<string, Molecule>(_molecules);
             GeneralErrors = new List<string>();
         }
 
-        #endregion
-      
+        #endregion Constructors
 
         public bool RemoveMolecule(Molecule mol)
         {
@@ -291,7 +291,6 @@ namespace Chem4Word.Model2
             UpdateMoleculeEventHandlers(e);
             return newMol;
         }
-
 
         public void Relabel(bool b)
         {

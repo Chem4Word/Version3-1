@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.ComponentModel;
 
 namespace Chem4Word.Model2

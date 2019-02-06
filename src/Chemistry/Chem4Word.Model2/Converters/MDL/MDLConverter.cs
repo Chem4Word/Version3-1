@@ -10,6 +10,5 @@ namespace Chem4Word.Model2.Converters.MDL
     // ReSharper disable once InconsistentNaming
     public class MDLConverter
     {
-        
     }
 }
