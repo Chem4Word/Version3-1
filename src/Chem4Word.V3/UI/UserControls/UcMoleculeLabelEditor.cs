@@ -7,14 +7,15 @@
 
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.UI.UserControls
 {
@@ -87,7 +88,7 @@ namespace Chem4Word.UI.UserControls
             panelNames.Controls.Clear();
 
             int i = 0;
-            foreach (var n in Molecule.ChemicalNames)
+            foreach (var n in Molecule.Names)
             {
                 UcEditName elc = new UcEditName(this);
                 elc.Id = n.Id;
@@ -112,8 +113,9 @@ namespace Chem4Word.UI.UserControls
             RefreshNamesPanel();
             if (string.IsNullOrEmpty(_cml))
             {
-                Model.Model model = new Model.Model();
-                model.Molecules.Add(Molecule);
+                Model model = new Model();
+                model.AddMolecule(Molecule);
+                Molecule.Parent = model;
                 CMLConverter cmlConverter = new CMLConverter();
                 _cml = cmlConverter.Export(model);
                 display1.Chemistry = _cml;
@@ -153,7 +155,7 @@ namespace Chem4Word.UI.UserControls
 
         public void ChangeNameValueAt(string id, string name)
         {
-            foreach (ChemicalName n in Molecule.ChemicalNames)
+            foreach (ChemicalName n in Molecule.Names)
             {
                 if (n.Id.Equals(id))
                 {
@@ -166,11 +168,11 @@ namespace Chem4Word.UI.UserControls
 
         public void DeleteChemicalNameAt(string id)
         {
-            foreach (ChemicalName n in Molecule.ChemicalNames.ToList())
+            foreach (ChemicalName n in Molecule.Names.ToList())
             {
                 if (n.Id.Equals(id))
                 {
-                    Molecule.ChemicalNames.Remove(n);
+                    Molecule.Names.Remove(n);
                     RefreshNamesPanel();
                     break;
                 }
@@ -194,7 +196,7 @@ namespace Chem4Word.UI.UserControls
                 n.DictRef = Constants.Chem4WordUserSynonym;
                 n.Name = "";
                 n.Id = $"{Molecule.Id}.n{++_maxNameId}";
-                Molecule.ChemicalNames.Add(n);
+                Molecule.Names.Add(n);
                 RefreshNamesPanel();
             }
             catch (Exception ex)

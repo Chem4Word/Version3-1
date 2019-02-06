@@ -10,7 +10,6 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
 using Chem4Word.Library;
-using Chem4Word.Model.Converters.CML;
 using Chem4Word.Navigator;
 using Chem4Word.Telemetry;
 using IChem4Word.Contracts;
@@ -29,6 +28,8 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 using Extensions = Microsoft.Office.Tools.Word.Extensions;
 using OfficeTools = Microsoft.Office.Tools;
 using Word = Microsoft.Office.Interop.Word;
@@ -1090,9 +1091,9 @@ namespace Chem4Word
                         #region Find Id of name
 
                         string tagPrefix = "";
-                        foreach (var mol in model.Molecules)
+                        foreach (var mol in model.Molecules.Values)
                         {
-                            foreach (var name in mol.ChemicalNames)
+                            foreach (var name in mol.Names)
                             {
                                 if (tw.ChemicalName.ToLower().Equals(name.Name.ToLower()))
                                 {
@@ -2234,7 +2235,7 @@ namespace Chem4Word
                                     NewContentControl.Tag = newGuid;
 
                                     CMLConverter cmlConverter = new CMLConverter();
-                                    Model.Model model = cmlConverter.Import(cxml.XML);
+                                    Model model = cmlConverter.Import(cxml.XML);
                                     model.CustomXmlPartGuid = newGuid;
                                     doc.CustomXMLParts.Add(cmlConverter.Export(model));
                                 }

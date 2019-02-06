@@ -1106,6 +1106,9 @@ namespace Chem4Word.Model2
 
         #endregion Ring stuff
 
+       
+
+
         public void BuildAtomList(List<Atom> allAtoms)
         {
             allAtoms.AddRange(Atoms.Values);

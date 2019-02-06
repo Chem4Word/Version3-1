@@ -7,8 +7,6 @@
 
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
 using Microsoft.Office.Core;
 using System;
 using System.Collections;
@@ -23,6 +21,8 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Helpers
@@ -204,10 +204,11 @@ namespace Chem4Word.Helpers
                                     cc.Delete();
 
                                     doc.Application.Selection.SetRange(start - 1, start - 1);
-                                    var model = new Model.Model();
+                                    var model = new Model();
                                     var molecule = new Molecule();
-                                    molecule.ChemicalNames.Add(new ChemicalName { Id = "m1.n1", Name = cci.Text, DictRef = Constants.Chem4WordUserSynonym });
-                                    model.Molecules.Add(molecule);
+                                    molecule.Names.Add(new ChemicalName { Id = "m1.n1", Name = cci.Text, DictRef = Constants.Chem4WordUserSynonym });
+                                    model.AddMolecule(molecule);
+                                    molecule.Parent = model;
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
 
                                     var cmlConvertor = new CMLConverter();
@@ -406,7 +407,7 @@ namespace Chem4Word.Helpers
 
                                     #region Find new style 1D code
 
-                                    foreach (var molecule in target.Model.Molecules)
+                                    foreach (var molecule in target.Model.Molecules.Values)
                                     {
                                         if (dv.Equals(molecule.ConciseFormula))
                                         {
@@ -420,7 +421,7 @@ namespace Chem4Word.Helpers
                                                 break;
                                             }
                                         }
-                                        foreach (var name in molecule.ChemicalNames)
+                                        foreach (var name in molecule.Names)
                                         {
                                             if (name.Name.Equals(dv))
                                             {
@@ -464,7 +465,7 @@ namespace Chem4Word.Helpers
 
         public string CxmlPartId { get; set; }
         public string Cml { get; set; }
-        public Model.Model Model { get; set; }
+        public Model Model { get; set; }
         public List<ContentControlInfo> ContentControls { get; set; }
     }
 

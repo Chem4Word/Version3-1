@@ -298,6 +298,7 @@ namespace Chem4Word.Model2
             }
         }
 
+
         public string ConciseFormula
         {
             get
