@@ -17,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.Model2.Converters.JSON;
 
 namespace WinForms.TestHarness.Model2
 {
@@ -41,6 +42,7 @@ namespace WinForms.TestHarness.Model2
             sb.Append("All molecule files (*.mol, *.sdf, *.cml)|*.mol;*.sdf;*.cml");
             sb.Append("|CML molecule files (*.cml)|*.cml");
             sb.Append("|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf");
+            sb.Append("|JSON molecule files (*.json)|*.json");
 
             openFileDialog1.Title = "Open Structure";
             openFileDialog1.InitialDirectory = Environment.SpecialFolder.MyDocuments.ToString();
@@ -90,33 +92,35 @@ namespace WinForms.TestHarness.Model2
                             break;
 
                         case ".json":
+                            var jsonConverter = new JSONConverter();
+                            model = jsonConverter.Import(contents);
                             break;
                     }
 
                     if (model != null)
                     {
                         lastModel = model;
+
+                        // Load model into TreeView
+                        foreach (var modelMolecule in model.Molecules.Values)
+                        {
+                            LoadTreeNode(modelMolecule);
+                        }
+
+                        model.AtomsChanged += Model_AtomsChanged;
+                        model.BondsChanged += Model_BondsChanged;
+                        model.MoleculesChanged += Model_MoleculesChanged;
+                        model.PropertyChanged += Model_PropertyChanged;
+
+                        int atoms = model.TotalAtomsCount;
+                        int bonds = model.TotalBondsCount;
+                        textBox1.AppendText($"Total Atoms Count is {atoms}, Total Bonds Count is {bonds}\n");
+                        var list = new List<string>();
+                        list.AddRange(model.GeneralErrors);
+                        list.AddRange(model.AllErrors);
+                        list.AddRange(model.AllWarnings);
+                        textBox1.AppendText(string.Join(Environment.NewLine, list) + "\n");
                     }
-
-                    // Load model into TreeView
-                    foreach (var modelMolecule in model.Molecules.Values)
-                    {
-                        LoadTreeNode(modelMolecule);
-                    }
-
-                    model.AtomsChanged += Model_AtomsChanged;
-                    model.BondsChanged += Model_BondsChanged;
-                    model.MoleculesChanged += Model_MoleculesChanged;
-                    model.PropertyChanged += Model_PropertyChanged;
-
-                    int atoms = model.TotalAtomsCount;
-                    int bonds = model.TotalBondsCount;
-                    textBox1.AppendText($"Total Atoms Count is {atoms}, Total Bonds Count is {bonds}\n");
-                    var list = new List<string>();
-                    list.AddRange(model.GeneralErrors);
-                    list.AddRange(model.AllErrors);
-                    list.AddRange(model.AllWarnings);
-                    textBox1.AppendText(string.Join(Environment.NewLine, list) + "\n");
                 }
                 catch (Exception exception)
                 {

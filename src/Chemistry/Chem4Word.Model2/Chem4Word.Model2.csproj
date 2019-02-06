@@ -57,6 +57,7 @@
     <Compile Include="ChemistryBase.cs" />
     <Compile Include="Converters\CML\CMLConstants.cs" />
     <Compile Include="Converters\CML\CMLNamespaces.cs" />
+    <Compile Include="Converters\JSON\JSONConverter.cs" />
     <Compile Include="Converters\MDL\MDLCounts.cs" />
     <Compile Include="Converters\MDL\CtabProcessor.cs" />
     <Compile Include="Converters\MDL\DataProcessor.cs" />

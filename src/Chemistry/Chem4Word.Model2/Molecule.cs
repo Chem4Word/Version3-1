@@ -27,7 +27,7 @@ namespace Chem4Word.Model2
         #region Collections
 
         public readonly List<Ring> Rings;
-        public readonly ReadOnlyDictionary<string, Atom> Atoms; //keyed by ID
+        public readonly ReadOnlyDictionary<string, Atom> Atoms; //keyed by InternalId
         private Dictionary<string, Atom> _atoms;
         public readonly ReadOnlyCollection<Bond> Bonds; //this is the edge list
         private List<Bond> _bonds;

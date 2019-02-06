@@ -133,15 +133,13 @@ namespace Chem4Word.Model2.Converters.MDL
                         }
                     }
 
-                    string message;
                     CtabProcessor pct = new CtabProcessor();
                     pct.ExportToStream(atoms, bonds, writer);
-                    //pct.ExportToStream(mol, writer, out message);
 
                     DataProcessor dp = new DataProcessor(_propertyTypes);
                     dp.ExportToStream(names, formulas, writer);
-                    //dp.ExportToStream(mol, writer, out message);
                 }
+
                 writer.Flush();
             }
 
