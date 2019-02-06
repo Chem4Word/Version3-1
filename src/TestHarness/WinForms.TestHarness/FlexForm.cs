@@ -10,18 +10,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Converters;
 using Chem4Word.Telemetry;
 using Chem4Word.DisplayViewModel2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Model2.Helpers;
-using Bond = Chem4Word.Model.Bond;
+
+//using Chem4Word.Model2.Helpers;
 
 namespace WinForms.TestHarness
 {

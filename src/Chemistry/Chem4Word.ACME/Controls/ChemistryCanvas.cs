@@ -100,11 +100,17 @@ namespace Chem4Word.ACME.Controls
 
         private void RedrawBond(Bond bond)
         {
-            var bv = (BondVisual)chemicalVisuals[bond];
 
-            var refCount = bv.RefCount;
+            int refCount = 1;
+            BondVisual bv = null;
+            if (chemicalVisuals.ContainsKey(bond))
+            {
+                bv = (BondVisual) chemicalVisuals[bond];
+                refCount = bv.RefCount;
+                BondRemoved(bond);
+            }
 
-            BondRemoved(bond);
+            
             BondAdded(bond);
 
             bv = (BondVisual)chemicalVisuals[bond];
@@ -113,11 +119,16 @@ namespace Chem4Word.ACME.Controls
 
         private void RedrawAtom(Atom atom)
         {
-            var av = (AtomVisual)chemicalVisuals[atom];
+            int refCount = 1;
+            AtomVisual av = null;
+            if (chemicalVisuals.ContainsKey(atom))
+            {
+                av = (AtomVisual) chemicalVisuals[atom];
+                refCount = av.RefCount;
+                AtomRemoved(atom);
+            }
 
-            var refCount = av.RefCount;
-
-            AtomRemoved(atom);
+            
             AtomAdded(atom);
 
             av = (AtomVisual)chemicalVisuals[atom];
@@ -433,7 +444,7 @@ namespace Chem4Word.ACME.Controls
 
         private void AtomAdded(Atom atom)
         {
-            if (!chemicalVisuals.ContainsKey(atom)) //it's already in the list
+            if (!chemicalVisuals.ContainsKey(atom)) //it's not already in the list
             {
                 chemicalVisuals[atom] = new AtomVisual(atom);
             }
@@ -451,7 +462,7 @@ namespace Chem4Word.ACME.Controls
                 AddVisual(av);
             }
 
-            av.RefCount += 1;
+            av.RefCount++;
         }
 
         private void AtomRemoved(Atom atom)
@@ -465,7 +476,7 @@ namespace Chem4Word.ACME.Controls
             }
             else
             {
-                av.RefCount -= 1;
+                av.RefCount--;
             }
         }
 
@@ -487,7 +498,7 @@ namespace Chem4Word.ACME.Controls
                 AddVisual(bv);
             }
 
-            bv.RefCount += 1;
+            bv.RefCount ++;
         }
 
         private void BondRemoved(Bond bond)
@@ -501,7 +512,7 @@ namespace Chem4Word.ACME.Controls
             }
             else
             {
-                bv.RefCount -= 1;
+                bv.RefCount --;
             }
         }
 
