@@ -7,15 +7,17 @@
 
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model.Converters.CML;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Database
 {
@@ -98,21 +100,21 @@ namespace Chem4Word.Database
             try
             {
                 var converter = new CMLConverter();
-                Model.Model model = converter.Import(cmlFile);
-
-                if (model.AllAtoms.Count > 0)
+                Model model = converter.Import(cmlFile);
+                
+                if (model.TotalAtomsCount > 0)
                 {
-                    double before = model.MeanBondLength;
+                    double before = model.AverageBondLength;
                     if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                         || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
                     {
                         model.ScaleToAverageBondLength(Constants.StandardBondLength);
-                        double after = model.MeanBondLength;
+                        double after = model.AverageBondLength;
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
                     }
 
                     // Ensure each molecule has a Consise Formula set
-                    foreach (var molecule in model.Molecules)
+                    foreach (var molecule in model.Molecules.Values)
                     {
                         if (string.IsNullOrEmpty(molecule.ConciseFormula))
                         {
@@ -125,10 +127,10 @@ namespace Chem4Word.Database
                     var cml = cmlConverter.Export(model);
 
                     string chemicalName = model.ConciseFormula;
-                    var mol = model.Molecules[0];
-                    if (mol.ChemicalNames.Count > 0)
+                    var mol = model.Molecules.Values.First();
+                    if (mol.Names.Count > 0)
                     {
-                        foreach (var name in mol.ChemicalNames)
+                        foreach (var name in mol.Names)
                         {
                             long temp;
                             if (!long.TryParse(name.Name, out temp))
@@ -142,7 +144,7 @@ namespace Chem4Word.Database
                     using (SQLiteConnection conn = LibraryConnection())
                     {
                         var id = AddChemistry(conn, cml, chemicalName, model.ConciseFormula);
-                        foreach (var name in mol.ChemicalNames)
+                        foreach (var name in mol.Names)
                         {
                             AddChemicalName(conn, id, name.Name, name.DictRef);
                         }
@@ -455,13 +457,13 @@ namespace Chem4Word.Database
         {
             string cml = Encoding.UTF8.GetString(byteArray);
             CMLConverter cc = new CMLConverter();
-            Model.Model m = cc.Import(cml);
-            double before = m.MeanBondLength;
+            Model m = cc.Import(cml);
+            double before = m.AverageBondLength;
             if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                 || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
             {
                 m.ScaleToAverageBondLength(Constants.StandardBondLength);
-                double after = m.MeanBondLength;
+                double after = m.AverageBondLength;
                 Debug.WriteLine($"Structure Id: {id} rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
             }
 

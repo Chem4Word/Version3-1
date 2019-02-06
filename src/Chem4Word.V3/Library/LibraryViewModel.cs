@@ -8,7 +8,6 @@
 using Chem4Word.ACME.Annotations;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Database;
-using Chem4Word.Model.Converters.CML;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -493,7 +492,7 @@ namespace Chem4Word.Library
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                XName nameNodeName = CML.cml + "name";
+                XName nameNodeName = Model2.Converters.CML.CMLNamespaces.cml  + "name";
 
                 var names = (from namenode in mol.cmlDoc.Descendants(nameNodeName)
                              where namenode.Name == nameNodeName

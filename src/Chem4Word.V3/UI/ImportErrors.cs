@@ -9,6 +9,7 @@ using Chem4Word.Core.UI.Forms;
 using System;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Model2;
 
 namespace Chem4Word.UI
 {
@@ -17,7 +18,7 @@ namespace Chem4Word.UI
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        public Model.Model Model { get; set; }
+        public Model Model { get; set; }
 
         public System.Windows.Point TopLeft { get; set; }
 

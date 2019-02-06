@@ -1047,5 +1047,12 @@ namespace Chem4Word.Model2
         }
 
         #endregion Ring stuff
+
+        public string CalculatedFormula()
+
+        {
+            return "";
+        }
+
     }
 }

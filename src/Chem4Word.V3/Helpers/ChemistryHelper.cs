@@ -6,8 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.Helpers;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
 using IChem4Word.Contracts;
 using Microsoft.Office.Core;
 using System;
@@ -15,6 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Helpers
@@ -55,13 +55,13 @@ namespace Chem4Word.Helpers
                     var model = converter.Import(cml);
                     var modified = false;
 
-                    double before = model.MeanBondLength;
+                    double before = model.AverageBondLength;
                     if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                         || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
                     {
                         model.ScaleToAverageBondLength(Constants.StandardBondLength);
                         modified = true;
-                        double after = model.MeanBondLength;
+                        double after = model.AverageBondLength;
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
                     }
 
@@ -73,7 +73,7 @@ namespace Chem4Word.Helpers
                     }
 
                     // Ensure each molecule has a Concise Formula set
-                    foreach (var molecule in model.Molecules)
+                    foreach (var molecule in model.Molecules.Values)
                     {
                         if (string.IsNullOrEmpty(molecule.ConciseFormula))
                         {
@@ -198,7 +198,7 @@ namespace Chem4Word.Helpers
             }
         }
 
-        public static void UpdateThisStructure(Word.Document doc, Model.Model model, string cxmlId, string tempFilename)
+        public static void UpdateThisStructure(Word.Document doc, Model model, string cxmlId, string tempFilename)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -343,14 +343,14 @@ namespace Chem4Word.Helpers
             cc.LockContents = true;
         }
 
-        public static string GetInlineText(Model.Model model, string prefix, ref bool isFormula, out string source)
+        public static string GetInlineText(Model model, string prefix, ref bool isFormula, out string source)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
             source = null;
             string text = "";
 
-            foreach (Molecule m in model.Molecules)
+            foreach (Molecule m in model.Molecules.Values)
             {
                 if (prefix.Equals($"{m.Id}.f0"))
                 {
@@ -383,7 +383,7 @@ namespace Chem4Word.Helpers
                 // Only check names if necessary
                 if (string.IsNullOrEmpty(text))
                 {
-                    foreach (ChemicalName n in m.ChemicalNames)
+                    foreach (ChemicalName n in m.Names)
                     {
                         if (n.Id.Equals(prefix))
                         {

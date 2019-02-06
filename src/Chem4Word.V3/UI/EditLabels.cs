@@ -9,14 +9,14 @@ using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
 using Chem4Word.UI.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.UI
 {
@@ -36,7 +36,7 @@ namespace Chem4Word.UI
             set { label1.Text = value; }
         }
 
-        private Model.Model _model;
+        private Model _model;
         private CMLConverter _cmlConvertor = new CMLConverter();
 
         public EditLabels()
@@ -102,7 +102,7 @@ namespace Chem4Word.UI
             this.SuspendLayout();
 
             int idx = 0;
-            foreach (var molecule in _model.Molecules)
+            foreach (var molecule in _model.Molecules.Values)
             {
                 if (idx == 0)
                 {
@@ -142,7 +142,7 @@ namespace Chem4Word.UI
         {
             bool isValid = true;
 
-            foreach (var molecule in _model.Molecules)
+            foreach (var molecule in _model.Molecules.Values)
             {
                 foreach (Formula formula in molecule.Formulas)
                 {
@@ -158,7 +158,7 @@ namespace Chem4Word.UI
 
                 if (isValid)
                 {
-                    foreach (ChemicalName chemicalName in molecule.ChemicalNames)
+                    foreach (ChemicalName chemicalName in molecule.Names)
                     {
                         if (chemicalName.DictRef.Equals(Constants.Chem4WordUserSynonym))
                         {

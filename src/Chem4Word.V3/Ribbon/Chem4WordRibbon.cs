@@ -10,10 +10,7 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
 using Chem4Word.Library;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.MDL;
-using Chem4Word.Model.Geometry;
+
 using Chem4Word.Navigator;
 using Chem4Word.Telemetry;
 using Chem4Word.UI;
@@ -30,6 +27,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
+using Chem4Word.Model2.Geometry;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -166,7 +167,7 @@ namespace Chem4Word
                                             else
                                             {
                                                 CMLConverter conv = new CMLConverter();
-                                                Model.Model model = conv.Import(customXmlPart.XML);
+                                                Model model = conv.Import(customXmlPart.XML);
 
                                                 bool isFormula = false;
                                                 string text;
@@ -251,12 +252,12 @@ namespace Chem4Word
                         {
                             string cml = customXmlPart.XML;
                             CMLConverter conv = new CMLConverter();
-                            Model.Model model = conv.Import(cml);
+                            Model model = conv.Import(cml);
 
                             if (model.Molecules.Count > 0)
                             {
                                 int allAtomsCount = 0;
-                                foreach (var mol in model.Molecules)
+                                foreach (var mol in model.Molecules.Values)
                                 {
                                     allAtomsCount = mol.Atoms.Count;
                                 }
@@ -292,7 +293,7 @@ namespace Chem4Word
                                 }
                             }
 
-                            foreach (Molecule mol in model.Molecules)
+                            foreach (Molecule mol in model.Molecules.Values)
                             {
                                 RibbonSeparator separator = this.Factory.CreateRibbonSeparator();
                                 ShowAsMenu.Items.Add(separator);
@@ -329,7 +330,7 @@ namespace Chem4Word
                                 }
 
                                 // Chemical Names
-                                foreach (ChemicalName n in mol.ChemicalNames)
+                                foreach (ChemicalName n in mol.Names)
                                 {
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
                                     ribbonButton.Tag = n.Id;
@@ -431,7 +432,7 @@ namespace Chem4Word
                         if (ofd.FileName != null)
                         {
                             string fileType = Path.GetExtension(ofd.FileName).ToLower();
-                            Model.Model model = null;
+                            Model model = null;
                             string mol = string.Empty;
                             string cml = string.Empty;
 
@@ -486,7 +487,7 @@ namespace Chem4Word
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
                                     CMLConverter cmlConverter = new CMLConverter();
                                     cml = cmlConverter.Export(model);
-                                    if (model.AllAtoms.Any())
+                                    if (model.TotalAtomsCount >0)
                                     {
                                         Word.ContentControl cc = ChemistryHelper.Insert2DChemistry(doc, cml, true);
                                         if (cc != null)
@@ -497,11 +498,11 @@ namespace Chem4Word
                                     }
                                     else
                                     {
-                                        if (model.Molecules.Any() && model.Molecules[0].ChemicalNames.Any())
+                                        if (model.Molecules.Any() && model.Molecules.Values.First().Names.Any())
                                         {
                                             Word.ContentControl cc = ChemistryHelper.Insert1DChemistry(doc,
-                                                model.Molecules[0].ChemicalNames[0].Name, false,
-                                                $"{model.Molecules[0].ChemicalNames[0].Id}:{model.CustomXmlPartGuid}");
+                                                model.Molecules.Values.First().Names[0].Name, false,
+                                                $"{model.Molecules.Values.First().Names[0].Id}:{model.CustomXmlPartGuid}");
                                             doc.CustomXMLParts.Add(cml);
                                             if (cc != null)
                                             {
@@ -622,9 +623,9 @@ namespace Chem4Word
                             {
                                 beforeCml = customXmlPart.XML;
                                 CMLConverter cmlConverter = new CMLConverter();
-                                Model.Model beforeModel = cmlConverter.Import(beforeCml);
-                                if (beforeModel.AllAtoms.Count
-                                    + beforeModel.AllBonds.Count == 0)
+                                Model beforeModel = cmlConverter.Import(beforeCml);
+                                if (beforeModel.TotalAtomsCount
+                                    + beforeModel.TotalBondsCount == 0)
                                 {
                                     UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
                                     return;
@@ -664,19 +665,19 @@ namespace Chem4Word
                             CMLConverter cmlConverter = new CMLConverter();
                             SdFileConverter molConverter = new SdFileConverter();
 
-                            Model.Model beforeModel = cmlConverter.Import(beforeCml);
-                            Model.Model afterModel = cmlConverter.Import(editor.Cml);
+                            Model beforeModel = cmlConverter.Import(beforeCml);
+                            Model afterModel = cmlConverter.Import(editor.Cml);
 
                             int matchedMolecules = 0;
 
                             #region Copy old formulae and labels to new model and count matched molecues
 
-                            foreach (Molecule beforeMolecule in beforeModel.Molecules)
+                            foreach (Molecule beforeMolecule in beforeModel.Molecules.Values)
                             {
                                 string concise = beforeMolecule.ConciseFormula;
                                 string molId = beforeMolecule.Id;
 
-                                foreach (Molecule afterMolecule in afterModel.Molecules)
+                                foreach (Molecule afterMolecule in afterModel.Molecules.Values)
                                 {
                                     if (afterMolecule.ConciseFormula.Equals(concise) && afterMolecule.Id.Equals(molId))
                                     {
@@ -688,13 +689,13 @@ namespace Chem4Word
                                             f.Inline = formula.Inline;
                                             afterMolecule.Formulas.Add(f);
                                         }
-                                        foreach (var name in beforeMolecule.ChemicalNames)
+                                        foreach (var name in beforeMolecule.Names)
                                         {
                                             ChemicalName n = new ChemicalName();
                                             n.Id = name.Id;
                                             n.DictRef = name.DictRef;
                                             n.Name = name.Name;
-                                            afterMolecule.ChemicalNames.Add(n);
+                                            afterMolecule.Names.Add(n);
                                         }
                                         matchedMolecules++;
                                         break;
@@ -715,14 +716,14 @@ namespace Chem4Word
                             pb.Value = 0;
                             pb.Maximum = webServiceCalls;
 
-                            foreach (Molecule mol in afterModel.Molecules)
+                            foreach (Molecule mol in afterModel.Molecules.Values)
                             {
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
                                 // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 0 or > 4 or Elements < 1 or > 118
                                 List<Bond> invalidBonds = mol.Bonds.Where(b => b.OrderValue != null && (CtabProcessor.MdlBondType(b.Order) < 1 || CtabProcessor.MdlBondType(b.Order) > 4)).ToList();
-                                int maxAtomicNumber = mol.Atoms.Max(x => ((Element)x.Element).AtomicNumber);
-                                int minAtomicNumber = mol.Atoms.Min(x => ((Element)x.Element).AtomicNumber);
+                                int maxAtomicNumber = mol.Atoms.Values.Max(x => ((Element)x.Element).AtomicNumber);
+                                int minAtomicNumber = mol.Atoms.Values.Min(x => ((Element)x.Element).AtomicNumber);
                                 if (invalidBonds.Any() || minAtomicNumber < 1 || maxAtomicNumber > 118)
                                 {
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
@@ -736,8 +737,9 @@ namespace Chem4Word
 
                                     try
                                     {
-                                        Model.Model temp = new Model.Model();
-                                        temp.Molecules.Add(mol);
+                                        Model temp = new Model();
+                                        temp.AddMolecule(mol);
+                                        mol.Parent = temp;
 
                                         string afterMolFile = molConverter.Export(temp);
                                         mol.ConciseFormula = mol.CalculatedFormula();
@@ -806,7 +808,7 @@ namespace Chem4Word
                                         case Constants.ChemspiderInchiKeyName:
                                         case Constants.Chem4WordResolverIupacName:
                                             updated = false;
-                                            foreach (var name in mol.ChemicalNames)
+                                            foreach (var name in mol.Names)
                                             {
                                                 if (name.DictRef.Equals(kvp.Key))
                                                 {
@@ -820,7 +822,7 @@ namespace Chem4Word
                                                 ChemicalName n = new ChemicalName();
                                                 n.DictRef = kvp.Key;
                                                 n.Name = kvp.Value;
-                                                mol.ChemicalNames.Add(n);
+                                                mol.Names.Add(n);
                                             }
                                             break;
                                     }
@@ -1111,7 +1113,7 @@ namespace Chem4Word
                         customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
                         if (customXmlPart != null)
                         {
-                            Model.Model m = new Model.Model();
+                            Model m = new Model();
                             CMLConverter cmlConverter = new CMLConverter();
                             m = cmlConverter.Import(customXmlPart.XML);
                             m.CustomXmlPartGuid = "";
@@ -1136,10 +1138,10 @@ namespace Chem4Word
                                     case ".mol":
                                     case ".sdf":
                                         // https://www.chemaxon.com/marvin-archive/6.0.2/marvin/help/formats/mol-csmol-doc.html
-                                        double before = m.MeanBondLength;
+                                        double before = m.AverageBondLength;
                                         // Set bond length to 1.54 angstroms (Å)
                                         m.ScaleToAverageBondLength(1.54);
-                                        double after = m.MeanBondLength;
+                                        double after = m.AverageBondLength;
                                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
                                         SdFileConverter converter = new SdFileConverter();
                                         File.WriteAllText(sfd.FileName, converter.Export(m));
@@ -1201,7 +1203,7 @@ namespace Chem4Word
                                     doc.CustomXMLParts.Add(f.Cml);
 
                                     CMLConverter conv = new CMLConverter();
-                                    Model.Model model = conv.Import(f.Cml);
+                                    Model model = conv.Import(f.Cml);
                                     ChemistryHelper.UpdateThisStructure(doc, model, guid, "");
 
                                     app.Selection.SetRange(cc.Range.Start, cc.Range.End);
@@ -1342,7 +1344,7 @@ namespace Chem4Word
 
                     if (sel.ContentControls.Count > 0)
                     {
-                        Model.Model m = null;
+                        Model m = null;
 
                         cc = sel.ContentControls[1];
                         //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc.Tag + " Title: " + cc.Title);
@@ -1355,7 +1357,7 @@ namespace Chem4Word
                             {
                                 string cml = customXmlPart.XML;
                                 m = new CMLConverter().Import(cml);
-                                if (m.AllAtoms.Any())
+                                if (m.TotalAtomsCount >0)
                                 {
                                     if (Globals.Chem4WordV3.LibraryNames == null)
                                     {
@@ -1676,12 +1678,12 @@ namespace Chem4Word
                                 {
                                     string beforeCml = customXmlPart.XML;
                                     CMLConverter cmlConverter = new CMLConverter();
-                                    Model.Model model = cmlConverter.Import(beforeCml);
+                                    Model model = cmlConverter.Import(beforeCml);
 
                                     Packer packer = new Packer();
                                     packer.Model = model;
 
-                                    packer.Pack(model.MeanBondLength * 2);
+                                    packer.Pack(model.AverageBondLength * 2);
 
                                     string afterCml = cmlConverter.Export(model);
 

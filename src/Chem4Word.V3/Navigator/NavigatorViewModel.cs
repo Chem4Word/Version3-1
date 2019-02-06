@@ -7,7 +7,6 @@
 
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
-using Chem4Word.Model.Converters.CML;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Word;
 using System;
@@ -18,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Model2.Converters.CML;
 using ContentControl = Microsoft.Office.Interop.Word.ContentControl;
 
 namespace Chem4Word.Navigator
@@ -45,7 +45,7 @@ namespace Chem4Word.Navigator
         {
             //get a reference to the document
             _doc = doc;
-            _parts = _doc.CustomXMLParts.SelectByNamespace(CML.cml.NamespaceName);
+            _parts = _doc.CustomXMLParts.SelectByNamespace(CMLNamespaces.cml.NamespaceName);
             _parts.PartAfterAdd += OnPartAfterAdd;
             _parts.PartAfterLoad += OnPartAfterLoad;
             _parts.PartBeforeDelete += OnPartBeforeDelete;
