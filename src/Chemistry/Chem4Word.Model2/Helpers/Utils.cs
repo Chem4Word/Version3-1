@@ -68,7 +68,7 @@ namespace Chem4Word.Model2.Helpers
                 if (!propertyNames.Contains(sPI.Name))
                 {
                     PropertyInfo tPI = targetType.GetProperty(sPI.Name, flags);
-                    if (tPI != null && tPI.PropertyType.IsAssignableFrom(sPI.PropertyType))
+                    if (tPI != null && tPI.PropertyType.IsAssignableFrom(sPI.PropertyType) && tPI.CanWrite)
                     {
                         tPI.SetValue(target, sPI.GetValue(source, null), null);
                     }

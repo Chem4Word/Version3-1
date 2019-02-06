@@ -9,11 +9,11 @@ using Chem4Word.Core;
 using Chem4Word.Model;
 using Chem4Word.Model.Geometry;
 using Chem4Word.View;
-using Chem4Word.ViewModel;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME.Behaviors
 {

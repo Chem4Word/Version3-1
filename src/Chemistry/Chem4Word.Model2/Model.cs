@@ -17,7 +17,7 @@ using System.Windows;
 
 namespace Chem4Word.Model2
 {
-    public class Model : IChemistryContainer
+    public class Model : IChemistryContainer, INotifyPropertyChanged
     {
         #region Fields
 
@@ -158,6 +158,22 @@ namespace Chem4Word.Model2
             }
         }
 
+        public double MeanBondLength
+        {
+            get
+            {
+                var allBonds = GetAllBonds();
+                if (allBonds.Any())
+                {
+                    return allBonds.Select(b => b.BondLength).Average();
+                }
+
+                return XamlBondLength;
+            }
+        }
+
+        public double XamlBondLength { get; set; }
+
         public Rect OverallBoundingBox
         {
             get
@@ -185,38 +201,65 @@ namespace Chem4Word.Model2
         public string Path => "/";
         public IChemistryContainer Root => null;
 
-        public ChemistryBase GetFromPath(string path)
+        public bool ScaledForXaml { get; set; }
+
+        private Rect _boundingBox = Rect.Empty;
+
+        public double MinX => BoundingBox.Left;
+        public double MaxX => BoundingBox.Right;
+        public double MinY => BoundingBox.Top;
+        public double MaxY => BoundingBox.Bottom;
+
+        
+        public Rect BoundingBox
         {
-            try
+            get
             {
-                //first part of the path has to be a molecule
-                if (path.StartsWith("/"))
+                var allAtoms = GetAllAtoms();
+                if (_boundingBox == Rect.Empty)
                 {
-                    path = path.Substring(1); //strip off the first separator
+                    var modelRect = allAtoms[0].BoundingBox(FontSize);
+                    for (int i = 1; i < allAtoms.Count; i++)
+                    {
+                        var atom = allAtoms[i];
+                        modelRect.Union(atom.BoundingBox(FontSize));
+                    }
+
+                    Point topleft =
+                        new Point(modelRect.TopLeft.X - FontSize, modelRect.TopLeft.Y - FontSize); // modelRect.TopLeft;
+                    Point bottomRight = new Point(modelRect.BottomRight.X + FontSize,
+                        modelRect.BottomRight.Y + FontSize); //modelRect.BottomRight;
+                    var bb = new Rect(topleft, bottomRight);
+
+                    _boundingBox = modelRect;
                 }
 
-                string molID = path.UpTo("/");
-
-                if (!Molecules.ContainsKey(molID))
-                {
-                    throw new ArgumentException("First child is not a molecule");
-                }
-
-                string relativepath = Helpers.Utils.GetRelativePath(molID, path);
-                if (relativepath != "")
-                {
-                    return Molecules[molID].GetFromPath(relativepath);
-                }
-                else
-                {
-                    return Molecules[molID];
-                }
-            }
-            catch (ArgumentException)
-            {
-                throw new ArgumentException($"Object {path} not found");
+                return _boundingBox;
             }
         }
+
+        //used to calculate the bounds of the atom
+        public double FontSize
+        {
+            get
+            {
+                var allBonds = GetAllBonds();
+                double fontSize = Globals.DefaultFontSize * Globals.ScaleFactorForXaml;
+
+                if (allBonds.Any())
+                {
+                    fontSize = XamlBondLength * Globals.FontSizePercentageBond;
+                }
+
+                return fontSize;
+            }
+        }
+
+        /// <summary>
+        /// Drags all Atoms back to the origin by the specified offset
+        /// </summary>
+        /// <param name="x">X offset</param>
+        /// <param name="y">Y offset</param>
 
         private Dictionary<string, Molecule> _molecules { get; }
 
@@ -250,7 +293,52 @@ namespace Chem4Word.Model2
                 {
                     list.AddRange(molecule.Errors);
                 }
+
                 return list;
+            }
+        }
+
+        public string ConciseFormula
+        {
+            get
+            {
+                string result = "";
+                Dictionary<string, int> f = new Dictionary<string, int>();
+                foreach (var mol in Molecules.Values)
+                {
+                    if (string.IsNullOrEmpty(mol.ConciseFormula))
+                    {
+                        mol.ConciseFormula = mol.CalculatedFormula();
+                    }
+
+                    if (f.ContainsKey(mol.ConciseFormula))
+                    {
+                        f[mol.ConciseFormula]++;
+                    }
+                    else
+                    {
+                        f.Add(mol.ConciseFormula, 1);
+                    }
+                }
+
+                foreach (KeyValuePair<string, int> kvp in f)
+                {
+                    if (kvp.Value == 1)
+                    {
+                        result += $"{kvp.Key} . ";
+                    }
+                    else
+                    {
+                        result += $"{kvp.Value} {kvp.Key} . ";
+                    }
+                }
+
+                if (result.EndsWith(" . "))
+                {
+                    result = result.Substring(0, result.Length - 3);
+                }
+
+                return result;
             }
         }
 
@@ -267,13 +355,57 @@ namespace Chem4Word.Model2
 
         #endregion Constructors
 
+        #region Methods
+
+        public void RepositionAll(double x, double y)
+        {
+            foreach (Molecule molecule in Molecules.Values)
+            {
+                molecule.RepositionAll(x, y);
+            }
+        }
+
+        public ChemistryBase GetFromPath(string path)
+        {
+            try
+            {
+                //first part of the path has to be a molecule
+                if (path.StartsWith("/"))
+                {
+                    path = path.Substring(1); //strip off the first separator
+                }
+
+                string molID = path.UpTo("/");
+
+                if (!Molecules.ContainsKey(molID))
+                {
+                    throw new ArgumentException("First child is not a molecule");
+                }
+
+                string relativepath = Helpers.Utils.GetRelativePath(molID, path);
+                if (relativepath != "")
+                {
+                    return Molecules[molID].GetFromPath(relativepath);
+                }
+                else
+                {
+                    return Molecules[molID];
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"Object {path} not found");
+            }
+        }
+
         public bool RemoveMolecule(Molecule mol)
         {
             var res = _molecules.Remove(mol.InternalId);
             if (res)
             {
                 NotifyCollectionChangedEventArgs e =
-                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Molecule> { mol });
+                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
+                        new List<Molecule> { mol });
                 OnMoleculesChanged(this, e);
                 UpdateMoleculeEventHandlers(e);
             }
@@ -285,19 +417,20 @@ namespace Chem4Word.Model2
         {
             _molecules[newMol.Id] = newMol;
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Molecule> { newMol });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
+                    new List<Molecule> { newMol });
             OnMoleculesChanged(this, e);
             UpdateMoleculeEventHandlers(e);
             return newMol;
         }
 
-        public void Relabel(bool b)
+        public void Relabel(bool includeNames)
         {
             int iBondcount = 0, iAtomCount = 0, iMolcount = 0;
 
             foreach (Molecule m in Molecules.Values)
             {
-                m.ReLabel(b, ref iMolcount, ref iAtomCount, ref iBondcount);
+                m.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
             }
         }
 
@@ -309,17 +442,110 @@ namespace Chem4Word.Model2
             }
         }
 
+        public Model Clone()
+        {
+            var clone = (Model)this.MemberwiseClone();
+
+            var molList = Molecules.Values.ToList();
+            foreach (Molecule source in molList)
+            {
+                clone.AddMolecule(source.Clone());
+            }
+
+            return clone;
+        }
+
         public void ScaleToAverageBondLength(double newLength)
         {
-            var current = AverageBondLength;
-            if (current > 0)
+            if (MeanBondLength > 0)
             {
-                double scale = newLength / current;
-                foreach (var molecule in Molecules.Values)
+                double scale = newLength / MeanBondLength;
+                var allAtoms = GetAllAtoms();
+                foreach (var atom in allAtoms)
                 {
-                    molecule.ScaleBonds(scale);
+                    atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
                 }
+            }
+
+            XamlBondLength = newLength;
+            OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
+            OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));
+        }
+
+        public List<Atom> GetAllAtoms()
+        {
+            List<Atom> allAtoms = new List<Atom>();
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.BuildAtomList(allAtoms);
+            }
+
+            return allAtoms;
+        }
+
+        public List<Bond> GetAllBonds()
+        {
+            List<Bond> allBonds = new List<Bond>();
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.BuildBondList(allBonds);
+            }
+
+            return allBonds;
+        }
+
+        public List<Molecule> GetAllMolecules()
+        {
+            List<Molecule> allMolecules = new List<Molecule>();
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.BuildMolList(allMolecules);
+            }
+
+            return allMolecules;
+        }
+
+        public void RescaleForCml()
+        {
+            if (ScaledForXaml)
+            {
+                if (MeanBondLength > 0)
+                {
+                    ScaleToAverageBondLength(MeanBondLength / Globals.ScaleFactorForXaml);
+                }
+                else
+                {
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength / Globals.ScaleFactorForXaml);
+                }
+
+                ScaledForXaml = false;
+            }
+        }
+
+        public void RescaleForXaml(bool forDisplay)
+        {
+            if (!ScaledForXaml)
+            {
+                if (MeanBondLength > 0)
+                {
+                    ScaleToAverageBondLength(MeanBondLength * Globals.ScaleFactorForXaml);
+                }
+                else
+                {
+                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength * Globals.ScaleFactorForXaml);
+                }
+
+                ScaledForXaml = true;
+
+                if (forDisplay)
+                {
+                    RepositionAll(MinX, MinY);
+                }
+
+                //OnPropertyChanged(nameof(BoundingBox));
             }
         }
     }
+
+    #endregion Methods
 }

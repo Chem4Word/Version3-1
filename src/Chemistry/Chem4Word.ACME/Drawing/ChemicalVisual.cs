@@ -17,6 +17,7 @@ namespace Chem4Word.ACME.Drawing
 
         public ChemicalVisual()
         {
+            RefCount = 0;
         }
 
         public abstract void Render();

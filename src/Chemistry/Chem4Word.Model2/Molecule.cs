@@ -162,7 +162,7 @@ namespace Chem4Word.Model2
                     {
                         return Parent.Root;
                     }
-                    return this;
+                    return Parent;
                 }
 
                 return this;
@@ -209,6 +209,7 @@ namespace Chem4Word.Model2
             string id = path.UpTo("/");
 
             string relativepath = Helpers.Utils.GetRelativePath(id, path);
+
             if (Molecules.ContainsKey(id))
             {
                 return Molecules[id].GetFromPath(relativepath);
@@ -226,7 +227,6 @@ namespace Chem4Word.Model2
             {
                 return bond;
             }
-
             throw new ArgumentException("Object not found");
         }
 
@@ -267,6 +267,64 @@ namespace Chem4Word.Model2
                 //Attributed call knows who we are, no need to pass "FormalCharge" as an argument
                 OnPropertyChanged();
             }
+        }
+
+        public string CalculatedFormula()
+        {
+            string result = "";
+
+            Dictionary<string, int> f = new Dictionary<string, int>();
+            SortedDictionary<string, int> r = new SortedDictionary<string, int>();
+
+            f.Add("C", 0);
+            f.Add("H", 0);
+
+            foreach (Atom atom in Atoms.Values)
+            {
+                // ToDo: Do we need to check if this is a functional group here?
+
+                switch (atom.Element.Symbol)
+                {
+                    case "C":
+                        f["C"]++;
+                        break;
+
+                    case "H":
+                        f["H"]++;
+                        break;
+
+                    default:
+                        if (!r.ContainsKey(atom.SymbolText))
+                        {
+                            r.Add(atom.SymbolText, 1);
+                        }
+                        else
+                        {
+                            r[atom.SymbolText]++;
+                        }
+                        break;
+                }
+
+                int hCount = atom.ImplicitHydrogenCount;
+                if (hCount > 0)
+                {
+                    f["H"] += hCount;
+                }
+            }
+
+            foreach (KeyValuePair<string, int> kvp in f)
+            {
+                if (kvp.Value > 0)
+                {
+                    result += $"{kvp.Key} {kvp.Value} ";
+                }
+            }
+            foreach (KeyValuePair<string, int> kvp in r)
+            {
+                result += $"{kvp.Key} {kvp.Value} ";
+            }
+
+            return result.Trim();
         }
 
         #endregion Properties
@@ -1047,5 +1105,64 @@ namespace Chem4Word.Model2
         }
 
         #endregion Ring stuff
+
+        public void BuildAtomList(List<Atom> allAtoms)
+        {
+            allAtoms.AddRange(Atoms.Values);
+
+            foreach (Molecule child in Molecules.Values)
+            {
+                child.BuildAtomList(allAtoms);
+            }
+        }
+
+        public void BuildBondList(List<Bond> allBonds)
+        {
+            allBonds.AddRange(Bonds);
+
+            foreach (Molecule child in Molecules.Values)
+            {
+                child.BuildBondList(allBonds);
+            }
+        }
+
+        /// <summary>
+        /// Moves all atoms of molecule by inverse of x and y
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        public void RepositionAll(double x, double y)
+        {
+            var offsetVector = new Vector(-x, -y);
+
+            foreach (Atom a in Atoms.Values)
+            {
+                a.Position += offsetVector;
+            }
+
+            foreach (Molecule child in Molecules.Values)
+            {
+                child.RepositionAll(x, y);
+            }
+        }
+
+        public void BuildMolList(List<Molecule> allMolecules)
+        {
+            allMolecules.Add(this);
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.BuildMolList(allMolecules);
+            }
+        }
+
+        public void AddBondLengths(List<double> lengths)
+        {
+           
+            foreach (Molecule mol in Molecules.Values)
+            {
+                lengths.AddRange(mol.BondLengths);
+                mol.AddBondLengths(lengths);
+            }
+        }
     }
 }

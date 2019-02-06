@@ -14,12 +14,14 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.MDL;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters;
 using Chem4Word.Telemetry;
-using Chem4Word.ViewModel;
-using WinFormsTestHarness;
+using Chem4Word.DisplayViewModel2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
+using Chem4Word.Model2.Helpers;
+using Bond = Chem4Word.Model.Bond;
 
 namespace WinForms.TestHarness
 {
@@ -69,16 +71,16 @@ namespace WinForms.TestHarness
                         case ".mol":
                         case ".sdf":
                             model = sdFileConverter.Import(mol);
-                            model.RefreshMolecules();
-                            model.Relabel();
+                            model.Refresh();
+                            model.Relabel(false);
                             cml = cmlConvertor.Export(model);
                             break;
 
                         case ".cml":
                         case ".xml":
                             model = cmlConvertor.Import(mol);
-                            model.RefreshMolecules();
-                            model.Relabel();
+                            
+                            model.Relabel(true);
                             cml = cmlConvertor.Export(model);
                             break;
                     }
@@ -100,6 +102,7 @@ namespace WinForms.TestHarness
                             model.ScaleToAverageBondLength(20);
                         }
                         _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
+                        //model.RescaleForXaml(true);
                         ShowChemistry(filename, model);
                     }
                 }
@@ -181,7 +184,7 @@ namespace WinForms.TestHarness
                     Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
-                    model.RefreshMolecules();
+                    model.Refresh();
 
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
@@ -202,16 +205,14 @@ namespace WinForms.TestHarness
             EditCml.Enabled = true;
         }
 
-        private List<DisplayViewModel> StackToList(Stack<Model> stack)
+        private List<DisplayViewModel2> StackToList(Stack<Model> stack)
         {
-            List<DisplayViewModel> list = new List<DisplayViewModel>();
+            List<DisplayViewModel2> list = new List<DisplayViewModel2>();
             CMLConverter cc = new CMLConverter();
             foreach (var item in stack)
             {
-                list.Add(new DisplayViewModel
-                {
-                    Model = cc.Import(cc.Export(item))
-                });
+                list.Add(new DisplayViewModel2(cc.Import(cc.Export(item))));
+               
             }
             return list;
         }
@@ -228,7 +229,7 @@ namespace WinForms.TestHarness
 
         private void SetCarbons(Model model, bool state)
         {
-            foreach (var atom in model.AllAtoms)
+            foreach (var atom in model.GetAllAtoms())
             {
                 if (atom.Element.Symbol.Equals("C"))
                 {
@@ -251,7 +252,7 @@ namespace WinForms.TestHarness
             {
                 Model newModel = model.Clone();
                 SetCarbons(newModel, ShowCarbons.Checked);
-                newModel.RefreshMolecules();
+                newModel.Refresh();
                 Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
                 Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");
                 Display.Chemistry = newModel;
@@ -263,61 +264,80 @@ namespace WinForms.TestHarness
             Model model = Display.Chemistry as Model;
             if (model != null)
             {
-                if (model.AllAtoms.Any())
+                //TODO: get this working
+
+ 
+                var allAtoms = model.GetAllAtoms();
+                if (model.GetAllAtoms().Any())
                 {
-                    Molecule modelMolecule = model.Molecules.Where(m => m.Atoms.Any()).FirstOrDefault();
-                    var atom = modelMolecule.Atoms[0];
-                    foreach (var neighbouringBond in atom.Bonds)
+                    Molecule modelMolecule = model.GetAllMolecules().FirstOrDefault(m => allAtoms.Any() && m.Atoms.Count>0);
+                    var atom = modelMolecule.Atoms.Values.First();
+                    var bondList = atom.Bonds.ToList();
+                    foreach (var neighbouringBond in bondList)
                     {
-                        neighbouringBond.OtherAtom(atom).Bonds.Remove(neighbouringBond);
-                        modelMolecule.Bonds.Remove(neighbouringBond);
+                        
+                        modelMolecule.RemoveBond(neighbouringBond);
+                        neighbouringBond.OtherAtom(atom).NotifyBondingChanged();
+                        foreach (Chem4Word.Model2.Bond bond in neighbouringBond.OtherAtom(atom).Bonds)
+                        {
+                            bond.NotifyBondingChanged();
+                        }
                     }
 
-                    modelMolecule.Atoms.Remove(atom);
+                    modelMolecule.RemoveAtom(atom);
                 }
 
                 foreach (var mol in model.Molecules)
                 {
-                    mol.ConciseFormula = "";
+                    //mol.ConciseFormula = "";
                 }
 
-                model.RefreshMolecules();
+                model.Refresh();
                 Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
             }
         }
 
         private void RandomElement_Click(object sender, EventArgs e)
         {
+
+
             Model model = Display.Chemistry as Model;
             if (model != null)
             {
-
-                if (model.AllAtoms.Any())
+                var allAtoms = model.GetAllAtoms();
+                if (allAtoms.Any())
                 {
                     var rnd = new Random(DateTime.Now.Millisecond);
 
-                    var maxAtoms = model.AllAtoms.Count;
+                    var maxAtoms = allAtoms.Count;
                     int targetAtom = rnd.Next(0, maxAtoms);
 
                     var elements = Globals.PeriodicTable.Elements;
                     int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
-                    var x = elements.Values.Where(v => v.AtomicNumber == newElement).FirstOrDefault();
+                    var x = elements.Values.FirstOrDefault(v => v.AtomicNumber == newElement);
 
                     if (x == null)
                     {
                         Debugger.Break();
                     }
-                    model.AllAtoms[targetAtom].Element = x as ElementBase;
+                    allAtoms[targetAtom].Element = x as ElementBase;
                     if (x.Symbol.Equals("C"))
                     {
-                        model.AllAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                       allAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                    }
+
+                    allAtoms[targetAtom].NotifyBondingChanged();
+
+                    foreach (Chem4Word.Model2.Bond b in allAtoms[targetAtom].Bonds)
+                    {
+                        b.NotifyBondingChanged();
                     }
 
                     foreach (var mol in model.Molecules)
                     {
-                        mol.ConciseFormula = "";
+                        //mol.ConciseFormula = "";
                     }
-                    model.RefreshMolecules();
+                    model.Refresh();
                     Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
                 }
             }

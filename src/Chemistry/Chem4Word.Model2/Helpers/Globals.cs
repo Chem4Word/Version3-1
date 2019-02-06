@@ -60,6 +60,7 @@ namespace Chem4Word.Model2.Helpers
         public const string OrderPartial23 = "partial23";
         public const string OrderTriple = "T";
 
+
         public static string OrderValueToOrder(double val, bool isAromatic = false)
         {
             if (val == 0)
@@ -165,6 +166,8 @@ namespace Chem4Word.Model2.Helpers
 
         // Percentage of Average bond length for any added Explicit Hydrogens
         public const double ExplicitHydrogenBondPercentage = 1.0;
+
+        public const double BondThickness = 3.0;
 
         #endregion Layout Constants
 
