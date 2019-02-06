@@ -140,15 +140,15 @@ namespace Chem4Word.Model2.Converters.CML
 
         internal static List<XElement> GetNames(XElement mol)
         {
-            var names1 = from n1 in mol.Descendants(Constants.TagName) select n1;
-            var names2 = from n2 in mol.Descendants(Namespaces.cml + Constants.TagName) select n2;
+            var names1 = from n1 in mol.Elements(Constants.TagName) select n1;
+            var names2 = from n2 in mol.Elements(Namespaces.cml + Constants.TagName) select n2;
             return names1.Union(names2).ToList();
         }
 
         internal static List<XElement> GetFormulas(XElement mol)
         {
-            var formulae1 = from f1 in mol.Descendants(Constants.TagFormula) select f1;
-            var formulae2 = from f2 in mol.Descendants(Namespaces.cml + Constants.TagFormula) select f2;
+            var formulae1 = from f1 in mol.Elements(Constants.TagFormula) select f1;
+            var formulae2 = from f2 in mol.Elements(Namespaces.cml + Constants.TagFormula) select f2;
             return formulae1.Union(formulae2).ToList();
         }
 
