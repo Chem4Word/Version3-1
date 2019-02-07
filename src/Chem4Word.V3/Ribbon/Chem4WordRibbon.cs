@@ -716,9 +716,9 @@ namespace Chem4Word
                             pb.Value = 0;
                             pb.Maximum = webServiceCalls;
 
-                            // Hack: This is a bodge, but fails to inject new values
-                            var clone = cmlConverter.Import(cmlConverter.Export(afterModel));
-                            foreach (Molecule mol in clone.Molecules.Values)
+                            double averageBondLength = afterModel.AverageBondLength;
+
+                            foreach (Molecule mol in afterModel.Molecules.Values)
                             {
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
@@ -740,7 +740,7 @@ namespace Chem4Word
                                     try
                                     {
                                         Model temp = new Model();
-                                        temp.AddMolecule(mol);
+                                        temp.AddMolecule(mol.Clone());
                                         mol.Parent = temp;
 
                                         string afterMolFile = molConverter.Export(temp);
@@ -866,6 +866,8 @@ namespace Chem4Word
 
                             afterModel.CustomXmlPartGuid = guidString;
                             afterModel.Relabel(true);
+                            // Bodge restore bond length
+                            afterModel.ScaleToAverageBondLength(averageBondLength);
 
                             if (showLabelEditor)
                             {
