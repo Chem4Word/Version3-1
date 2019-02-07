@@ -6,16 +6,16 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model.Converters;
 using Chem4Word.Searcher.ChEBIPlugin.ChEBI;
 using IChem4Word.Contracts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
-using System.Windows.Media;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.MDL;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
 
 namespace Chem4Word.Searcher.ChEBIPlugin
 {
@@ -26,7 +26,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private Entity _allResults;
-        private Model.Model _lastModel;
+        private Model2.Model _lastModel;
         private string _lastMolfile = string.Empty;
         private string _lastSelected = string.Empty;
 
@@ -173,34 +173,34 @@ namespace Chem4Word.Searcher.ChEBIPlugin
             {
                 CMLConverter conv = new CMLConverter();
 
-                var expModel = (Model.Model)display1.Chemistry;
+                var expModel = (Model2.Model)display1.Chemistry;
                 double before = expModel.MeanBondLength;
                 expModel.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
                 double after = expModel.MeanBondLength;
                 Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
-                expModel.Relabel();
+                expModel.Relabel(true);
 
                 using (new WaitCursor())
                 {
-                    expModel.Molecules[0].ChemicalNames.Clear();
+                    expModel.Molecules.Values.First().Names.Clear();
                     if (_allResults.IupacNames != null)
                     {
                         foreach (var di in _allResults.IupacNames)
                         {
-                            var cn = new Model.ChemicalName();
+                            var cn = new ChemicalName();
                             cn.Name = di.data;
                             cn.DictRef = "chebi:Iupac";
-                            expModel.Molecules[0].ChemicalNames.Add(cn);
+                            expModel.Molecules.Values.First().Names.Add(cn);
                         }
                     }
                     if (_allResults.Synonyms != null)
                     {
                         foreach (var di in _allResults.Synonyms)
                         {
-                            var cn = new Model.ChemicalName();
+                            var cn = new ChemicalName();
                             cn.Name = di.data;
                             cn.DictRef = "chebi:Synonym";
-                            expModel.Molecules[0].ChemicalNames.Add(cn);
+                            expModel.Molecules.Values.First().Names.Add(cn);
                         }
                     }
                     Cml = conv.Export(expModel);

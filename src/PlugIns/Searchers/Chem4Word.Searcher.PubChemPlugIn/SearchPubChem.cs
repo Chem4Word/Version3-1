@@ -7,7 +7,6 @@
 
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model.Converters;
 using IChem4Word.Contracts;
 using System;
 using System.Collections.Generic;
@@ -22,9 +21,8 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.MDL;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
 
 namespace Chem4Word.Searcher.PubChemPlugIn
 {
@@ -393,7 +391,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                             {
                                 lastMolfile = new StreamReader(resStream).ReadToEnd();
                                 SdFileConverter sdFileConverter = new SdFileConverter();
-                                Model.Model model = sdFileConverter.Import(lastMolfile);
+                                Model2.Model model = sdFileConverter.Import(lastMolfile);
                                 if (model.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
                                     || model.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
                                 {

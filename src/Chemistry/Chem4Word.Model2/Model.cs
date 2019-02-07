@@ -393,7 +393,7 @@ namespace Chem4Word.Model2
                     return Molecules[molID];
                 }
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 throw new ArgumentException($"Object {path} not found");
             }
