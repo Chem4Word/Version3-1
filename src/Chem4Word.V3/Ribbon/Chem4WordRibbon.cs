@@ -716,7 +716,9 @@ namespace Chem4Word
                             pb.Value = 0;
                             pb.Maximum = webServiceCalls;
 
-                            foreach (Molecule mol in afterModel.Molecules.Values)
+                            // Hack: This is a bodge, but fails to inject new values
+                            var clone = cmlConverter.Import(cmlConverter.Export(afterModel));
+                            foreach (Molecule mol in clone.Molecules.Values)
                             {
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
