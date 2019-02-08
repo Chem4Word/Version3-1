@@ -104,12 +104,12 @@ namespace Chem4Word.Database
                 
                 if (model.TotalAtomsCount > 0)
                 {
-                    double before = model.AverageBondLength;
+                    double before = model.MeanBondLength;
                     if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                         || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
                     {
                         model.ScaleToAverageBondLength(Constants.StandardBondLength);
-                        double after = model.AverageBondLength;
+                        double after = model.MeanBondLength;
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
                     }
 
@@ -458,12 +458,12 @@ namespace Chem4Word.Database
             string cml = Encoding.UTF8.GetString(byteArray);
             CMLConverter cc = new CMLConverter();
             Model m = cc.Import(cml);
-            double before = m.AverageBondLength;
+            double before = m.MeanBondLength;
             if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                 || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
             {
                 m.ScaleToAverageBondLength(Constants.StandardBondLength);
-                double after = m.AverageBondLength;
+                double after = m.MeanBondLength;
                 Debug.WriteLine($"Structure Id: {id} rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
             }
 

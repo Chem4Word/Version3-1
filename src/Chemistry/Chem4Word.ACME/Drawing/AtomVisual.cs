@@ -618,8 +618,6 @@ namespace Chem4Word.ACME.Drawing
         {
             Pen _widepen = new Pen(Brushes.Black, BondThickness);
             Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(_widepen);
-            //
-            Point? p;
 
             CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedHullGeometry, lg);
 

@@ -97,6 +97,7 @@
     <Compile Include="ControlTestForm.Designer.cs">
       <DependentUpon>ControlTestForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Model2\General2.cs" />
     <Compile Include="PersistenceTests.cs" />
     <Compile Include="FunctionalGroupsTests.cs" />
     <Compile Include="GeneralTests.cs" />
@@ -107,6 +108,10 @@
     <ProjectReference Include="..\Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj">
       <Project>{1e3fc1f1-06cc-44bd-8004-3ef0ce7eeaa7}</Project>
       <Name>Chem4Word.ACME</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Chemistry\Chem4Word.Model2\Chem4Word.Model2.csproj">
+      <Project>{c69bab8f-4881-4d5f-9929-fc8470df1e48}</Project>
+      <Name>Chem4Word.Model2</Name>
     </ProjectReference>
     <ProjectReference Include="..\Chemistry\Chem4Word.Model\Chem4Word.Model.csproj">
       <Project>{2AC2B698-58E4-45EA-A69E-D8380FA73B3E}</Project>

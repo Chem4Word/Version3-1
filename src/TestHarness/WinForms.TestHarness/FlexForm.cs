@@ -277,7 +277,7 @@ namespace WinForms.TestHarness
                         
                         modelMolecule.RemoveBond(neighbouringBond);
                         neighbouringBond.OtherAtom(atom).NotifyBondingChanged();
-                        foreach (Chem4Word.Model2.Bond bond in neighbouringBond.OtherAtom(atom).Bonds)
+                        foreach (Bond bond in neighbouringBond.OtherAtom(atom).Bonds)
                         {
                             bond.NotifyBondingChanged();
                         }
@@ -350,10 +350,12 @@ namespace WinForms.TestHarness
         private void Undo_Click(object sender, EventArgs e)
         {
             Model m = _undoStack.Pop();
+            m.CheckIntegrity();
             Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Undo Stack");
 
             Model c = Display.Chemistry as Model;
             Model clone = c.Clone();
+            clone.CheckIntegrity();
             clone.RescaleForCml();
 
             Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Redo Stack");

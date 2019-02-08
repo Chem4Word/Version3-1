@@ -1138,10 +1138,10 @@ namespace Chem4Word
                                     case ".mol":
                                     case ".sdf":
                                         // https://www.chemaxon.com/marvin-archive/6.0.2/marvin/help/formats/mol-csmol-doc.html
-                                        double before = m.AverageBondLength;
+                                        double before = m.MeanBondLength;
                                         // Set bond length to 1.54 angstroms (Å)
                                         m.ScaleToAverageBondLength(1.54);
-                                        double after = m.AverageBondLength;
+                                        double after = m.MeanBondLength;
                                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
                                         SdFileConverter converter = new SdFileConverter();
                                         File.WriteAllText(sfd.FileName, converter.Export(m));
@@ -1683,7 +1683,7 @@ namespace Chem4Word
                                     Packer packer = new Packer();
                                     packer.Model = model;
 
-                                    packer.Pack(model.AverageBondLength * 2);
+                                    packer.Pack(model.MeanBondLength * 2);
 
                                     string afterCml = cmlConverter.Export(model);
 

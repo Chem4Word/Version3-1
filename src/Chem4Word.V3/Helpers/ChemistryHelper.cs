@@ -55,13 +55,13 @@ namespace Chem4Word.Helpers
                     var model = converter.Import(cml);
                     var modified = false;
 
-                    double before = model.AverageBondLength;
+                    double before = model.MeanBondLength;
                     if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
                         || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
                     {
                         model.ScaleToAverageBondLength(Constants.StandardBondLength);
                         modified = true;
-                        double after = model.AverageBondLength;
+                        double after = model.MeanBondLength;
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
                     }
 
