@@ -568,12 +568,8 @@ namespace Chem4Word.Model2
             Messages = new List<string>();
         }
 
-        public Bond(Atom startAtom, Atom endAtom)
+        public Bond(Atom startAtom, Atom endAtom) : this()
         {
-            Id = Guid.NewGuid().ToString("D");
-            _internalId = Id;
-            Messages = new List<string>();
-
             StartAtomInternalId = startAtom.InternalId;
             EndAtomInternalId = endAtom.InternalId;
         }
