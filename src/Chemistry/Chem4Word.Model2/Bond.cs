@@ -568,6 +568,16 @@ namespace Chem4Word.Model2
             Messages = new List<string>();
         }
 
+        public Bond(Atom startAtom, Atom endAtom)
+        {
+            Id = Guid.NewGuid().ToString("D");
+            _internalId = Id;
+            Messages = new List<string>();
+
+            StartAtomInternalId = startAtom.InternalId;
+            EndAtomInternalId = endAtom.InternalId;
+        }
+
         #endregion Constructors
 
         #region INotifyPropertyChanged
