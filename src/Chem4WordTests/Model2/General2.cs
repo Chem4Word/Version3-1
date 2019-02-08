@@ -54,6 +54,7 @@ namespace Chem4WordTests.Model2
             Debug.WriteLine($"Atom a1 {a1} Atom {c1}");
 
             clone.ScaleToAverageBondLength(5);
+            c1.Element = Globals.PeriodicTable.N;
 
             var aa1 = model.Molecules.Values.First().Atoms.Values.First();
             var ac1 = clone.Molecules.Values.First().Atoms.Values.First();
