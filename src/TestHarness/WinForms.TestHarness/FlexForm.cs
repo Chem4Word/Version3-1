@@ -190,6 +190,7 @@ namespace WinForms.TestHarness
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
                     model.Refresh();
 
+                    Display.Chemistry = null;
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 

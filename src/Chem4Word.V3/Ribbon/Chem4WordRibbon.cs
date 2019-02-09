@@ -716,7 +716,7 @@ namespace Chem4Word
                             pb.Value = 0;
                             pb.Maximum = webServiceCalls;
 
-                            double averageBondLength = afterModel.AverageBondLength;
+                            double averageBondLength = afterModel.MeanBondLength;
 
                             foreach (Molecule mol in afterModel.Molecules.Values)
                             {
