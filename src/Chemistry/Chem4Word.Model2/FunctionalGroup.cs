@@ -80,5 +80,7 @@ namespace Chem4Word.Model2
         {
             return NameParser.IsMatch(expr) || ShortcutParser.IsMatch(expr);
         }
+
+        public override string Colour => "#000000";
     }
 }

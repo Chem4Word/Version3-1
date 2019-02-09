@@ -91,7 +91,7 @@ namespace WinForms.TestHarness
                         Model existing = Display.Chemistry as Model;
                         if (existing != null)
                         {
-                            Model clone = existing.Clone();
+                            Model clone = existing.Copy();
                             clone.RescaleForCml();
 
                             Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
@@ -134,7 +134,7 @@ namespace WinForms.TestHarness
                 Model model = Display.Chemistry as Model;
                 if (model != null)
                 {
-                    Model clone = model.Clone();
+                    Model clone = model.Copy();
                     clone.RescaleForCml();
 
                     CMLConverter cc = new CMLConverter();
@@ -270,7 +270,7 @@ namespace WinForms.TestHarness
             Model model = Display.Chemistry as Model;
             if (model != null)
             {
-                Model newModel = model.Clone();
+                Model newModel = model.Copy();
                 SetCarbons(newModel, ShowCarbons.Checked);
                 newModel.Refresh();
                 Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
@@ -377,7 +377,7 @@ namespace WinForms.TestHarness
             Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Undo Stack");
 
             Model c = Display.Chemistry as Model;
-            Model clone = c.Clone();
+            Model clone = c.Copy();
             clone.CheckIntegrity();
             clone.RescaleForCml();
 
@@ -396,14 +396,17 @@ namespace WinForms.TestHarness
             Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Redo Stack");
 
             Model c = Display.Chemistry as Model;
-            Model clone = c.Clone();
-            clone.RescaleForCml();
+            if (c != null)
+            {
+                Model clone = c.Copy();
+                clone.RescaleForCml();
 
-            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Undo Stack");
-            _undoStack.Push(clone);
-            //_undoStack2.Push(cmlConverter.Export(clone));
+                Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Undo Stack");
+                _undoStack.Push(clone);
+                //_undoStack2.Push(cmlConverter.Export(clone));
 
-            ShowChemistry($"Redo -> {m.ConciseFormula}", m);
+                ShowChemistry($"Redo -> {m.ConciseFormula}", m);
+            }
         }
 
         //private void ListStacks()
@@ -433,7 +436,7 @@ namespace WinForms.TestHarness
                 Model model = Display.Chemistry as Model;
                 if (model != null)
                 {
-                    Model clone = model.Clone();
+                    Model clone = model.Copy();
                     clone.RescaleForCml();
 
                     CMLConverter cc = new CMLConverter();

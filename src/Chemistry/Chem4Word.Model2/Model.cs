@@ -437,6 +437,19 @@ namespace Chem4Word.Model2
             }
         }
 
+        public Model Copy()
+        {
+            Model copy = new Model();
+            foreach (var child in Molecules.Values)
+            {
+                Molecule m = child.Copy();
+                copy.AddMolecule(m);
+                m.Parent = copy;
+            }
+
+            return copy;
+        }
+
         public Model Clone()
         {
             var clone = this.CloneExcept(new[] { nameof(_molecules), nameof(_boundingBox) });
