@@ -141,13 +141,14 @@ namespace Chem4Word.ACME
             }
             else
             {
-                if (Chemistry != null && !(Chemistry is Model2.Model))
+                if (Chemistry != null && !(Chemistry is ChemistryModel))
                 {
                     Debugger.Break();
                     throw new ArgumentException($"Object must be of type {nameof(Model2.Model)}.");
                 }
                 chemistryModel = Chemistry as Chem4Word.Model2.Model;
             }
+
             //assuming we've got this far, we should have something we can draw
             if (chemistryModel != null)
             {

@@ -113,6 +113,24 @@ namespace Chem4Word.Model2
 
         #region Properties
 
+        public bool HasNestedMolecules
+        {
+            get
+            {
+                bool result = false;
+
+                foreach (var child in Molecules.Values)
+                {
+                    if (child.Molecules.Count > 0)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+
+                return result;
+            }
+        }
         public int TotalAtomsCount
         {
             get

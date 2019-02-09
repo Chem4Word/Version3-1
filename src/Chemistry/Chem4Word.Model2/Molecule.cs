@@ -741,7 +741,7 @@ namespace Chem4Word.Model2
             foreach (var child in Molecules.Values)
             {
                 Molecule c = child.Copy();
-                AddMolecule(c);
+                copy.AddMolecule(c);
                 c.Parent = copy;
             }
             return copy;

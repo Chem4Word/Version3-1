@@ -73,17 +73,11 @@ namespace WinForms.TestHarness
                         case ".mol":
                         case ".sdf":
                             model = sdFileConverter.Import(mol);
-                            model.Refresh();
-                            model.Relabel(false);
-                            cml = cmlConvertor.Export(model);
                             break;
 
                         case ".cml":
                         case ".xml":
                             model = cmlConvertor.Import(mol);
-
-                            model.Relabel(true);
-                            cml = cmlConvertor.Export(model);
                             break;
                     }
 
