@@ -740,7 +740,7 @@ namespace Chem4Word
                                     try
                                     {
                                         Model temp = new Model();
-                                        temp.AddMolecule(mol.Clone());
+                                        temp.AddMolecule(mol.Copy());
                                         mol.Parent = temp;
 
                                         string afterMolFile = molConverter.Export(temp);
