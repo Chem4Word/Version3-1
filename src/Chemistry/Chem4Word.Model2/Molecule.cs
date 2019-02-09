@@ -683,9 +683,11 @@ namespace Chem4Word.Model2
             Molecule copy = new Molecule();
 
             Dictionary<string, Atom> aa = new Dictionary<string, Atom>();
+
             foreach (var atom in Atoms.Values)
             {
                 Atom a = new Atom();
+
                 a.Id = atom.Id;
                 a.Position = atom.Position;
                 a.Element = atom.Element;
@@ -702,6 +704,7 @@ namespace Chem4Word.Model2
                 Atom s = aa[bond.StartAtom.Id];
                 Atom e = aa[bond.EndAtom.Id];
                 Bond b = new Bond(s, e);
+
                 b.Id = bond.Id;
                 b.Order = bond.Order;
                 b.Stereo = bond.Stereo;
@@ -715,12 +718,10 @@ namespace Chem4Word.Model2
             {
                 ChemicalName n = new ChemicalName();
 
-                // Add properties which would have been serialized to CML
                 n.Id = cn.Id;
                 n.DictRef = cn.DictRef;
                 n.Name = cn.Name;
 
-                // Add to clone
                 copy.Names.Add(n);
             }
 
@@ -728,22 +729,21 @@ namespace Chem4Word.Model2
             {
                 Formula ff = new Formula();
 
-                // Add properties which would have been serialized to CML
                 ff.Id = f.Id;
                 ff.Convention = f.Convention;
                 ff.Inline = f.Inline;
 
-                // Add to clone
                 copy.Formulas.Add(f);
             }
 
-
+            // Copy child molecules
             foreach (var child in Molecules.Values)
             {
                 Molecule c = child.Copy();
                 copy.AddMolecule(c);
                 c.Parent = copy;
             }
+
             return copy;
         }
 
