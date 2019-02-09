@@ -447,6 +447,8 @@ namespace Chem4Word.Model2
                 m.Parent = copy;
             }
 
+            copy.ScaledForXaml = ScaledForXaml;
+
             return copy;
         }
 

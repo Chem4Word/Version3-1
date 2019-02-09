@@ -28,8 +28,6 @@ namespace WinForms.TestHarness
     {
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
-        //private Stack<string> _undoStack2 = new Stack<string>();
-        //private Stack<string> _redoStack2 = new Stack<string>();
 
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
 
@@ -94,7 +92,7 @@ namespace WinForms.TestHarness
                             Model clone = existing.Copy();
                             clone.RescaleForCml();
 
-                            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
                             _undoStack.Push(clone);
                             //_undoStack2.Push(cmlConvertor.Export(clone));
                         }
@@ -104,7 +102,6 @@ namespace WinForms.TestHarness
                             model.ScaleToAverageBondLength(20);
                         }
                         _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
-                        //model.RescaleForXaml(true);
                         ShowChemistry(filename, model);
                     }
                 }
@@ -142,10 +139,8 @@ namespace WinForms.TestHarness
                     editorHost.ShowDialog();
                     if (editorHost.Result == DialogResult.OK)
                     {
-                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
                         _undoStack.Push(clone);
-                        //CMLConverter cmlConvertor = new CMLConverter();
-                        //_undoStack2.Push(cmlConvertor.Export(clone));
                         Model m = cc.Import(editorHost.OutputValue);
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
@@ -185,12 +180,11 @@ namespace WinForms.TestHarness
                     {
                         Text = filename;
                     }
-                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
                     model.Refresh();
 
-                    Display.Chemistry = null;
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
@@ -208,39 +202,24 @@ namespace WinForms.TestHarness
             RemoveAtom.Enabled = true;
             RandomElement.Enabled = true;
             EditCml.Enabled = true;
+            ListStacks();
         }
 
-        private List<DisplayViewModel2> StackToList2(Stack<string> stack)
-        {
-            List<DisplayViewModel2> list = new List<DisplayViewModel2>();
-            CMLConverter cc = new CMLConverter();
-            foreach (var item in stack)
-            {
-                list.Add(new DisplayViewModel2(cc.Import(item)));
-
-            }
-            return list;
-        }
 
         private List<DisplayViewModel2> StackToList(Stack<Model> stack)
         {
             List<DisplayViewModel2> list = new List<DisplayViewModel2>();
-            CMLConverter cc = new CMLConverter();
             foreach (var item in stack)
             {
-                item.Refresh();
-                list.Add(new DisplayViewModel2(item));
+                var model = item.Copy();
+                model.Refresh();
+                list.Add(new DisplayViewModel2(model));
             }
             return list;
         }
 
         private void EnableUndoRedoButtons()
         {
-            //Redo.Enabled = _redoStack2.Count > 0;
-            //Undo.Enabled = _undoStack2.Count > 0;
-            //UndoStack.StackList.ItemsSource = StackToList2(_undoStack2);
-            //RedoStack.StackList.ItemsSource = StackToList2(_redoStack2);
-
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
             UndoStack.StackList.ItemsSource = StackToList(_undoStack);
@@ -313,7 +292,7 @@ namespace WinForms.TestHarness
                 }
 
                 model.Refresh();
-                Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
+                Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
             }
         }
 
@@ -358,7 +337,7 @@ namespace WinForms.TestHarness
                         //mol.ConciseFormula = "";
                     }
                     model.Refresh();
-                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
                 }
             }
         }
@@ -372,18 +351,15 @@ namespace WinForms.TestHarness
         {
             Model m = _undoStack.Pop();
             m.CheckIntegrity();
-            //CMLConverter cmlConverter = new CMLConverter();
-            //Model m = cmlConverter.Import(_undoStack2.Pop());
-            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Undo Stack");
+            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.0##")} from Undo Stack");
 
             Model c = Display.Chemistry as Model;
             Model clone = c.Copy();
             clone.CheckIntegrity();
             clone.RescaleForCml();
 
-            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Redo Stack");
+            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Redo Stack");
             _redoStack.Push(clone);
-            //_redoStack2.Push(cmlConverter.Export(clone));
 
             ShowChemistry($"Undo -> {m.ConciseFormula}", m);
         }
@@ -391,9 +367,7 @@ namespace WinForms.TestHarness
         private void Redo_Click(object sender, EventArgs e)
         {
             Model m = _redoStack.Pop();
-            //CMLConverter cmlConverter = new CMLConverter();
-            //Model m = cmlConverter.Import(_redoStack2.Pop());
-            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Redo Stack");
+            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.0##")} from Redo Stack");
 
             Model c = Display.Chemistry as Model;
             if (c != null)
@@ -401,33 +375,32 @@ namespace WinForms.TestHarness
                 Model clone = c.Copy();
                 clone.RescaleForCml();
 
-                Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Undo Stack");
+                Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Undo Stack");
                 _undoStack.Push(clone);
-                //_undoStack2.Push(cmlConverter.Export(clone));
 
                 ShowChemistry($"Redo -> {m.ConciseFormula}", m);
             }
         }
 
-        //private void ListStacks()
-        //{
-        //    if (_undoStack.Any())
-        //    {
-        //        Debug.WriteLine("Undo Stack");
-        //        foreach (var model in _undoStack)
-        //        {
-        //            Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
-        //        }
-        //    }
-        //    if (_redoStack.Any())
-        //    {
-        //        Debug.WriteLine("Redo Stack");
-        //        foreach (var model in _redoStack)
-        //        {
-        //            Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
-        //        }
-        //    }
-        //}
+        private void ListStacks()
+        {
+            if (_undoStack.Any())
+            {
+                Debug.WriteLine("Undo Stack");
+                foreach (var model in _undoStack)
+                {
+                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}] {model.MeanBondLength.ToString("#,##0.0##")}");
+                }
+            }
+            if (_redoStack.Any())
+            {
+                Debug.WriteLine("Redo Stack");
+                foreach (var model in _redoStack)
+                {
+                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}] {model.MeanBondLength.ToString("#,##0.0##")}");
+                }
+            }
+        }
 
         private void EditCml_Click(object sender, EventArgs e)
         {
@@ -444,9 +417,8 @@ namespace WinForms.TestHarness
                     editorHost.ShowDialog();
                     if (editorHost.Result == DialogResult.OK)
                     {
-                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
                         _undoStack.Push(clone);
-                        //_undoStack2.Push(editorHost.OutputValue);
                         Model m = cc.Import(editorHost.OutputValue);
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
