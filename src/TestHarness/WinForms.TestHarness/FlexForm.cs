@@ -28,6 +28,8 @@ namespace WinForms.TestHarness
     {
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
+        //private Stack<string> _undoStack2 = new Stack<string>();
+        //private Stack<string> _redoStack2 = new Stack<string>();
 
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
 
@@ -94,6 +96,7 @@ namespace WinForms.TestHarness
 
                             Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
                             _undoStack.Push(clone);
+                            //_undoStack2.Push(cmlConvertor.Export(clone));
                         }
 
                         if (model.MeanBondLength < 2.5 || model.MeanBondLength > 97.5)
@@ -141,6 +144,8 @@ namespace WinForms.TestHarness
                     {
                         Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
                         _undoStack.Push(clone);
+                        //CMLConverter cmlConvertor = new CMLConverter();
+                        //_undoStack2.Push(cmlConvertor.Export(clone));
                         Model m = cc.Import(editorHost.OutputValue);
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
@@ -204,26 +209,41 @@ namespace WinForms.TestHarness
             EditCml.Enabled = true;
         }
 
+        private List<DisplayViewModel2> StackToList2(Stack<string> stack)
+        {
+            List<DisplayViewModel2> list = new List<DisplayViewModel2>();
+            CMLConverter cc = new CMLConverter();
+            foreach (var item in stack)
+            {
+                list.Add(new DisplayViewModel2(cc.Import(item)));
+
+            }
+            return list;
+        }
+
         private List<DisplayViewModel2> StackToList(Stack<Model> stack)
         {
             List<DisplayViewModel2> list = new List<DisplayViewModel2>();
             CMLConverter cc = new CMLConverter();
             foreach (var item in stack)
             {
-                list.Add(new DisplayViewModel2(cc.Import(cc.Export(item))));
-               
+                item.Refresh();
+                list.Add(new DisplayViewModel2(item));
             }
             return list;
         }
 
         private void EnableUndoRedoButtons()
         {
+            //Redo.Enabled = _redoStack2.Count > 0;
+            //Undo.Enabled = _undoStack2.Count > 0;
+            //UndoStack.StackList.ItemsSource = StackToList2(_undoStack2);
+            //RedoStack.StackList.ItemsSource = StackToList2(_redoStack2);
+
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
-
             UndoStack.StackList.ItemsSource = StackToList(_undoStack);
             RedoStack.StackList.ItemsSource = StackToList(_redoStack);
-
         }
 
         private void SetCarbons(Model model, bool state)
@@ -350,6 +370,8 @@ namespace WinForms.TestHarness
         private void Undo_Click(object sender, EventArgs e)
         {
             Model m = _undoStack.Pop();
+            //CMLConverter cmlConverter = new CMLConverter();
+            //Model m = cmlConverter.Import(_undoStack2.Pop());
             Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Undo Stack");
 
             Model c = Display.Chemistry as Model;
@@ -358,6 +380,7 @@ namespace WinForms.TestHarness
 
             Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Redo Stack");
             _redoStack.Push(clone);
+            //_redoStack2.Push(cmlConverter.Export(clone));
 
             ShowChemistry($"Undo -> {m.ConciseFormula}", m);
         }
@@ -365,6 +388,8 @@ namespace WinForms.TestHarness
         private void Redo_Click(object sender, EventArgs e)
         {
             Model m = _redoStack.Pop();
+            //CMLConverter cmlConverter = new CMLConverter();
+            //Model m = cmlConverter.Import(_redoStack2.Pop());
             Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Redo Stack");
 
             Model c = Display.Chemistry as Model;
@@ -373,29 +398,30 @@ namespace WinForms.TestHarness
 
             Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Undo Stack");
             _undoStack.Push(clone);
+            //_undoStack2.Push(cmlConverter.Export(clone));
 
             ShowChemistry($"Redo -> {m.ConciseFormula}", m);
         }
 
-        private void ListStacks()
-        {
-            if (_undoStack.Any())
-            {
-                Debug.WriteLine("Undo Stack");
-                foreach (var model in _undoStack)
-                {
-                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
-                }
-            }
-            if (_redoStack.Any())
-            {
-                Debug.WriteLine("Redo Stack");
-                foreach (var model in _redoStack)
-                {
-                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
-                }
-            }
-        }
+        //private void ListStacks()
+        //{
+        //    if (_undoStack.Any())
+        //    {
+        //        Debug.WriteLine("Undo Stack");
+        //        foreach (var model in _undoStack)
+        //        {
+        //            Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
+        //        }
+        //    }
+        //    if (_redoStack.Any())
+        //    {
+        //        Debug.WriteLine("Redo Stack");
+        //        foreach (var model in _redoStack)
+        //        {
+        //            Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
+        //        }
+        //    }
+        //}
 
         private void EditCml_Click(object sender, EventArgs e)
         {
@@ -414,6 +440,7 @@ namespace WinForms.TestHarness
                     {
                         Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
                         _undoStack.Push(clone);
+                        //_undoStack2.Push(editorHost.OutputValue);
                         Model m = cc.Import(editorHost.OutputValue);
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
