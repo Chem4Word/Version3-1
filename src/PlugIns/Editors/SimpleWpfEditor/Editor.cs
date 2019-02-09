@@ -6,15 +6,14 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters;
 using IChem4Word.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Editor.SimpleWpfEditor
 {
@@ -70,10 +69,10 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
                 // Strip off Formulae and ChemicalNames as we don't edit them here
                 CMLConverter cmlConverter = new CMLConverter();
-                Model.Model model = cmlConverter.Import(Cml);
-                foreach (Molecule molecule in model.Molecules)
+                Model2.Model model = cmlConverter.Import(Cml);
+                foreach (Molecule molecule in model.Molecules.Values)
                 {
-                    molecule.ChemicalNames.Clear();
+                    molecule.Names.Clear();
                     molecule.Formulas.Clear();
                     molecule.ConciseFormula = "";
                 }

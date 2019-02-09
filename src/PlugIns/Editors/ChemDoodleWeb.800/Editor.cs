@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model.Converters;
 using IChem4Word.Contracts;
 using Newtonsoft.Json;
 using System;
@@ -15,8 +14,6 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.Json;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
 {

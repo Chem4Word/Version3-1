@@ -49,7 +49,7 @@ namespace Chem4Word.Model2.Converters.CML
                 foreach (Molecule molecule in newModel.Molecules.Values)
                 {
                     // Force ConciseFormula to be calculated
-                    // molecule.ConciseFormula = molecule.CalculatedFormula();
+                    molecule.ConciseFormula = molecule.CalculatedFormula();
                 }
                 newModel.Relabel(true);
 

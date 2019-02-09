@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model.Converters;
 using IChem4Word.Contracts;
 using Newtonsoft.Json;
 using System;
@@ -15,8 +14,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.Model.Converters.Json;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.JSON;
 
 namespace Chem4Word.Editor.ChemDoodleWeb702
 {
@@ -125,7 +124,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
                 }
 
                 CMLConverter cmlConverter = new CMLConverter();
-                Model.Model model = cmlConverter.Import(Cml);
+                Model2.Model model = cmlConverter.Import(Cml);
                 JSONConverter jsonConverter = new JSONConverter();
                 string json = jsonConverter.Export(model);
 

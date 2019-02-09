@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
@@ -139,6 +140,14 @@ namespace Chem4Word.ACME.Drawing
             endPoint = ParentBond.EndAtom.Position;
             Geometry bondGeometry = null;
             Vector bondVector = endPoint - startPoint;
+
+            var cv1 = ChemicalVisuals.ContainsKey(ParentBond.StartAtom);
+            var cv2 = ChemicalVisuals.ContainsKey(ParentBond.EndAtom);
+            if (!cv1 || !cv2)
+            {
+                // Hack: Abort if either ChemicalVisual is missing !
+                return;
+            }
             var startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
             var endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
 

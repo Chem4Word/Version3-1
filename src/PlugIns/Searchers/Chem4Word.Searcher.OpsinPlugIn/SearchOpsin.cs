@@ -12,8 +12,7 @@ using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
-using Chem4Word.Model.Converters;
-using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Searcher.OpsinPlugIn
 {
@@ -104,7 +103,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                     string temp = sr.ReadToEnd();
 
                     CMLConverter cmlConverter = new CMLConverter();
-                    Model.Model model = cmlConverter.Import(temp);
+                    Model2.Model model = cmlConverter.Import(temp);
                     if (model.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
                         || model.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
                     {
