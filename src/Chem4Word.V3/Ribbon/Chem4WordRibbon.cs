@@ -10,7 +10,10 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
 using Chem4Word.Library;
-
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
+using Chem4Word.Model2.Geometry;
 using Chem4Word.Navigator;
 using Chem4Word.Telemetry;
 using Chem4Word.UI;
@@ -27,10 +30,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Model2.Converters.MDL;
-using Chem4Word.Model2.Geometry;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -487,7 +486,7 @@ namespace Chem4Word
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
                                     CMLConverter cmlConverter = new CMLConverter();
                                     cml = cmlConverter.Export(model);
-                                    if (model.TotalAtomsCount >0)
+                                    if (model.TotalAtomsCount > 0)
                                     {
                                         Word.ContentControl cc = ChemistryHelper.Insert2DChemistry(doc, cml, true);
                                         if (cc != null)
@@ -630,6 +629,16 @@ namespace Chem4Word
                                     UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
                                     return;
                                 }
+
+                                if (beforeModel.HasNestedMolecules)
+                                {
+                                    if (Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn.Contains("ChemDoodle"))
+                                    {
+                                        UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
+                                        return;
+                                    }
+                                }
+
                                 isNewDrawing = false;
                             }
                         }
@@ -640,10 +649,6 @@ namespace Chem4Word
                         }
                     }
 
-                    if (Globals.Chem4WordV3.SystemOptions == null)
-                    {
-                        Globals.Chem4WordV3.LoadOptions();
-                    }
                     IChem4WordEditor editor =
                         Globals.Chem4WordV3.GetEditorPlugIn(Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn);
 
@@ -1361,7 +1366,7 @@ namespace Chem4Word
                             {
                                 string cml = customXmlPart.XML;
                                 m = new CMLConverter().Import(cml);
-                                if (m.TotalAtomsCount >0)
+                                if (m.TotalAtomsCount > 0)
                                 {
                                     if (Globals.Chem4WordV3.LibraryNames == null)
                                     {
