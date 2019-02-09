@@ -785,8 +785,8 @@ namespace Chem4Word.Model2
         }
 
         /// <summary>
-        /// Checks to make sure the internals of the molecule
-        /// haven't become busted up
+        /// Checks to make sure the internals of the molecule haven't become busted up.
+        /// This will throw an Exception if something is wrong. You should be ready to catch it...
         /// </summary>
         public void CheckIntegrity()
         {
@@ -810,6 +810,7 @@ namespace Chem4Word.Model2
                 child.CheckIntegrity();
             }
         }
+
         #endregion Methods
 
         #region Overrides
