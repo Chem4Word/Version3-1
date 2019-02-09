@@ -51,23 +51,24 @@ namespace Chem4Word.Model2.Helpers
             }
         }
 
-        public static T CloneExcept<T, S>(this T target, S source, string[] propertyNames)
+        public static T CloneExcept<T>(this T source, string[] propertyNames) where T : new()
         {
             if (source == null)
             {
-                return target;
+                return default(T);
             }
 
-            Type sourceType = typeof(S);
-            Type targetType = typeof(T);
-            BindingFlags flags = BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance;
+            T target = new T();
+
+            Type sourceType = typeof(T);
+            BindingFlags flags = BindingFlags.IgnoreCase | BindingFlags.Public |BindingFlags.NonPublic | BindingFlags.Instance;
 
             PropertyInfo[] properties = sourceType.GetProperties();
             foreach (PropertyInfo sPI in properties)
             {
                 if (!propertyNames.Contains(sPI.Name))
                 {
-                    PropertyInfo tPI = targetType.GetProperty(sPI.Name, flags);
+                    PropertyInfo tPI = sourceType.GetProperty(sPI.Name, flags);
                     if (tPI != null && tPI.PropertyType.IsAssignableFrom(sPI.PropertyType) && tPI.CanWrite)
                     {
                         tPI.SetValue(target, sPI.GetValue(source, null), null);

@@ -144,7 +144,11 @@ namespace Chem4Word.Model2
             set { _id = value; }
         }
 
-        public string InternalId => _internalId;
+        public string InternalId
+        {
+            get { return _internalId; }
+            set { _internalId = value; }
+        }
 
         public IChemistryContainer Parent { get; set; }
 
@@ -334,7 +338,7 @@ namespace Chem4Word.Model2
         public Molecule()
         {
             Id = Guid.NewGuid().ToString("D");
-            _internalId = Id;
+            InternalId = Id;
             Errors = new List<string>();
             Warnings = new List<string>();
             Formulas = new ObservableCollection<Formula>();
@@ -636,15 +640,22 @@ namespace Chem4Word.Model2
         //checks to make sure that all atom references within bonds are valid
         public bool CheckAtomRefs()
         {
+            bool result = true;
+
             foreach (Bond bond in Bonds)
             {
                 if (!Atoms.Keys.Contains(bond.StartAtomInternalId) || !Atoms.Keys.Contains(bond.EndAtomInternalId))
                 {
-                    return false;
+                    result = false;
                 }
             }
 
-            return true;
+            foreach (var child in Molecules.Values)
+            {
+                result = result & child.CheckAtomRefs();
+            }
+
+            return result;
         }
 
         public IEnumerable<Bond> GetBonds(string atomID)
@@ -669,15 +680,20 @@ namespace Chem4Word.Model2
 
         public Molecule Clone()
         {
-            Molecule clone = new Molecule().CloneExcept(this, new string[] { nameof(Id) });
+            Molecule clone = new Molecule().CloneExcept(new[] { nameof(Id), nameof(_atoms), nameof(_bonds), nameof(_molecules) });
+            clone.ClearAll();
             foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
             {
                 Atom atom = keyValuePair.Value;
-                clone.AddAtom(atom.Clone());
+                var target = atom.Clone();
+                clone.AddAtom(target);
             }
 
             foreach (Bond bond in Bonds)
             {
+                var startAtomClone = clone.Atoms[bond.StartAtomInternalId];
+                var endAtomClone = clone.Atoms[bond.EndAtomInternalId];
+
                 clone.AddBond(bond.Clone());
             }
 
@@ -685,12 +701,46 @@ namespace Chem4Word.Model2
             {
                 Molecule child = keyValuePair.Value;
                 Molecule tempMol = child.Clone();
+                tempMol.CheckIntegrity();
                 clone.AddMolecule(tempMol);
             }
             clone.RebuildRings();
             return clone;
         }
 
+        protected void ClearAll()
+        {
+            _molecules.Clear();
+            _atoms.Clear();
+            _bonds.Clear();
+        }
+
+        /// <summary>
+        /// Checks to make sure the internals of the molecule
+        /// haven't become busted up
+        /// </summary>
+        public void CheckIntegrity()
+        {
+            //first, check to see whether there aren't more than one region 
+            if (TheoreticalRings < 0) //we have a disconnected graph!
+            {
+                throw new Exception($"Molecule {Path} is disconnected.");
+            }
+
+            //now check to see that ever bond refers to a valid atom
+            foreach (Bond b in Bonds)
+            {
+                if (!Atoms.ContainsKey(b.StartAtomInternalId) | !Atoms.ContainsKey(b.EndAtomInternalId))
+                {
+                    throw new Exception($"Bond {b} refers to a missing atom");
+                }
+            }
+
+            foreach (var child in Molecules.Values)
+            {
+                child.CheckIntegrity();
+            }
+        }
         #endregion Methods
 
         #region Overrides
@@ -1106,9 +1156,6 @@ namespace Chem4Word.Model2
 
         #endregion Ring stuff
 
-       
-
-
         public void BuildAtomList(List<Atom> allAtoms)
         {
             allAtoms.AddRange(Atoms.Values);
@@ -1160,7 +1207,6 @@ namespace Chem4Word.Model2
 
         public void AddBondLengths(List<double> lengths)
         {
-           
             foreach (Molecule mol in Molecules.Values)
             {
                 lengths.AddRange(mol.BondLengths);

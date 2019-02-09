@@ -79,7 +79,14 @@ namespace Chem4Word.Model2
             (StartAtom.Position.Y + EndAtom.Position.Y) / 2);
 
         public string Id { get; set; }
-        internal string InternalId => _internalId;
+
+        public string InternalId
+        {
+
+            get { return _internalId; }
+            set { _internalId = value; }
+        }
+
 
         public override string Path
         {
@@ -91,7 +98,7 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    return Parent.Path  + "/" + Id;
+                    return Parent.Path + "/" + Id;
                 }
             }
         }
@@ -564,7 +571,7 @@ namespace Chem4Word.Model2
         public Bond()
         {
             Id = Guid.NewGuid().ToString("D");
-            _internalId = Id;
+            InternalId = Id;
             Messages = new List<string>();
         }
 
@@ -618,13 +625,14 @@ namespace Chem4Word.Model2
 
         public Bond Clone()
         {
-            return new Bond().CloneExcept(this, new string[] { });
+            return this.CloneExcept(new string[] { });
         }
 
         public void NotifyBondingChanged()
         {
             OnPropertyChanged(nameof(Order));
         }
+
         #region Geometry Routines
 
         public bool AtomsAreCis(Atom atomA, Atom atomB)

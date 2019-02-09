@@ -60,7 +60,6 @@ namespace Chem4Word.Model2.Helpers
         public const string OrderPartial23 = "partial23";
         public const string OrderTriple = "T";
 
-
         public static string OrderValueToOrder(double val, bool isAromatic = false)
         {
             if (val == 0)

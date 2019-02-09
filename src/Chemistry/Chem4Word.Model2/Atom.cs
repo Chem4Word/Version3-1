@@ -11,7 +11,6 @@ using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -61,12 +60,14 @@ namespace Chem4Word.Model2
         {
             get
             {
+                IEnumerable<Bond> bonds = new List<Bond>();
+
                 if (Parent != null)
                 {
-                    return Parent.GetBonds(InternalId);
+                    bonds = Parent.GetBonds(InternalId);
                 }
-                else
-                    return null;
+
+                return bonds;
             }
         }
 
@@ -115,6 +116,13 @@ namespace Chem4Word.Model2
             {
                 _position = value;
                 OnPropertyChanged();
+                if (Bonds.Any())
+                {
+                    foreach (Bond bond in Bonds)
+                    {
+                        bond.NotifyBondingChanged();
+                    }
+                }
             }
         }
 
@@ -206,6 +214,7 @@ namespace Chem4Word.Model2
                 return baseAtomBox;
             }
         }
+
         public string SymbolText
         {
             get
@@ -451,16 +460,19 @@ namespace Chem4Word.Model2
         public Atom()
         {
             Id = Guid.NewGuid().ToString("D");
-            _internalId = Id;
+            InternalId = Id;
             Rings = new List<Ring>();
         }
 
         /// <summary>
         /// The internal ID is what is used to tie atoms and bonds together
         /// </summary>
-        private readonly string _internalId;
-
-        internal string InternalId => _internalId;
+        private string _internalId;
+        public string InternalId
+        {
+            get { return _internalId; }
+            set { _internalId = value; }
+        }
 
         #endregion Constructors
 
@@ -494,7 +506,7 @@ namespace Chem4Word.Model2
 
         public Atom Clone()
         {
-            return new Atom().CloneExcept(this, new string[] { });
+            return this.CloneExcept(new string[]{});
         }
 
         public CompassPoints GetDefaultHOrientation()

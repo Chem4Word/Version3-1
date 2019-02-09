@@ -5,12 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
-using System.Linq;
-using System.Windows;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using System.Windows;
 
 namespace Chem4WordTests.Model2
 {
@@ -30,7 +30,7 @@ namespace Chem4WordTests.Model2
             Atom startAtom = new Atom();
             startAtom.Id = "a1";
             startAtom.Element = Globals.PeriodicTable.C;
-            startAtom.Position = new Point(5,5);
+            startAtom.Position = new Point(5, 5);
             molecule.AddAtom(startAtom);
             startAtom.Parent = molecule;
 
@@ -47,18 +47,30 @@ namespace Chem4WordTests.Model2
             molecule.AddBond(bond);
             bond.Parent = molecule;
 
-            Model clone = model.Clone();
+            Assert.IsTrue(model.Molecules.Count == 1, $"Expected 1 Molecule; Got {model.Molecules.Count}");
 
             var a1 = model.Molecules.Values.First().Atoms.Values.First();
-            var c1 = clone.Molecules.Values.First().Atoms.Values.First();
-            Debug.WriteLine($"Atom a1 {a1} Atom c1 {c1}");
+            Assert.IsTrue(Math.Abs(a1.Position.X - 5.0) < 0.001, $"Expected a1.X = 5; Got {a1.Position.X}");
+            Assert.IsTrue(Math.Abs(a1.Position.Y - 5.0) < 0.001, $"Expected a1.Y = 5; Got {a1.Position.Y}");
+
+            Model clone = model.Clone();
+
+            Assert.IsTrue(model.Molecules.Count == 1, $"Expected 1 Molecule; Got {model.Molecules.Count}");
+            Assert.IsTrue(clone.Molecules.Count == 1, $"Expected 1 Molecule; Got {clone.Molecules.Count}");
+
+            var a2 = clone.Molecules.Values.First().Atoms.Values.First();
+            Assert.IsTrue(Math.Abs(a2.Position.X - 5.0) < 0.001, $"Expected a2.X = 5; Got {a2.Position.X}");
+            Assert.IsTrue(Math.Abs(a2.Position.Y - 5.0) < 0.001, $"Expected a2.Y = 5; Got {a2.Position.Y}");
 
             clone.ScaleToAverageBondLength(5);
-            c1.Element = Globals.PeriodicTable.N;
 
-            var aa1 = model.Molecules.Values.First().Atoms.Values.First();
-            var ac1 = clone.Molecules.Values.First().Atoms.Values.First();
-            Debug.WriteLine($"Atom a1 {aa1} Atom c1 {ac1}");
+            var a3 = model.Molecules.Values.First().Atoms.Values.First();
+            Assert.IsTrue(Math.Abs(a3.Position.X - 5.0) < 0.001, $"Expected a3.X = 5; Got {a3.Position.X}");
+            Assert.IsTrue(Math.Abs(a3.Position.Y - 5.0) < 0.001, $"Expected a3.Y = 5; Got {a3.Position.Y}");
+
+            var a4 = clone.Molecules.Values.First().Atoms.Values.First();
+            Assert.IsTrue(Math.Abs(a4.Position.X - 3.535) < 0.001, $"Expected a4.X = 3.535; Got {a4.Position.X}");
+            Assert.IsTrue(Math.Abs(a4.Position.Y - 3.535) < 0.001, $"Expected a4.Y = 3.535; Got {a4.Position.Y}");
         }
     }
 }

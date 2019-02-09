@@ -143,7 +143,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public double AverageBondLength
+        public double MeanBondLength
         {
             get
             {
@@ -154,21 +154,17 @@ namespace Chem4Word.Model2
                     lengths.AddRange(mol.BondLengths);
                 }
 
-                return lengths.Average();
-            }
-        }
-
-        public double MeanBondLength
-        {
-            get
-            {
-                var allBonds = GetAllBonds();
-                if (allBonds.Any())
+                if (lengths.Any())
                 {
-                    return allBonds.Select(b => b.BondLength).Average();
+                    return lengths.Average();
                 }
 
-                return XamlBondLength;
+                if (ScaledForXaml)
+                {
+                    return XamlBondLength;
+                }
+
+                return 0;
             }
         }
 
@@ -210,7 +206,6 @@ namespace Chem4Word.Model2
         public double MinY => BoundingBox.Top;
         public double MaxY => BoundingBox.Bottom;
 
-        
         public Rect BoundingBox
         {
             get
@@ -394,7 +389,7 @@ namespace Chem4Word.Model2
             }
             catch (ArgumentException)
             {
-                throw new ArgumentException($"Object {path} not found");
+                throw new ArgumentException($"Object {path} not found {ex.Message}");
             }
         }
 
@@ -444,15 +439,22 @@ namespace Chem4Word.Model2
 
         public Model Clone()
         {
-            var clone = (Model)this.MemberwiseClone();
-
+            var clone = this.CloneExcept(new[] { nameof(_molecules), nameof(_boundingBox) });
+            clone.ClearMolecules();
             var molList = Molecules.Values.ToList();
             foreach (Molecule source in molList)
             {
-                clone.AddMolecule(source.Clone());
+                var target = source.Clone();
+                target.CheckIntegrity();
+                clone.AddMolecule(target);
             }
 
             return clone;
+        }
+
+        private void ClearMolecules()
+        {
+            _molecules.Clear();
         }
 
         public void ScaleToAverageBondLength(double newLength)
@@ -466,10 +468,6 @@ namespace Chem4Word.Model2
                     atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
                 }
             }
-
-            XamlBondLength = newLength;
-            OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
-            OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));
         }
 
         public List<Atom> GetAllAtoms()
@@ -509,14 +507,14 @@ namespace Chem4Word.Model2
         {
             if (ScaledForXaml)
             {
+                double newLength = Globals.SingleAtomPseudoBondLength / Globals.ScaleFactorForXaml;
+
                 if (MeanBondLength > 0)
                 {
-                    ScaleToAverageBondLength(MeanBondLength / Globals.ScaleFactorForXaml);
+                    newLength = MeanBondLength / Globals.ScaleFactorForXaml;
                 }
-                else
-                {
-                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength / Globals.ScaleFactorForXaml);
-                }
+
+                ScaleToAverageBondLength(newLength);
 
                 ScaledForXaml = false;
             }
@@ -526,23 +524,34 @@ namespace Chem4Word.Model2
         {
             if (!ScaledForXaml)
             {
+                double newLength = Globals.SingleAtomPseudoBondLength * Globals.ScaleFactorForXaml;
+
                 if (MeanBondLength > 0)
                 {
-                    ScaleToAverageBondLength(MeanBondLength * Globals.ScaleFactorForXaml);
-                }
-                else
-                {
-                    ScaleToAverageBondLength(Globals.SingleAtomPseudoBondLength * Globals.ScaleFactorForXaml);
+                    newLength = MeanBondLength * Globals.ScaleFactorForXaml;
                 }
 
+                ScaleToAverageBondLength(newLength);
+
                 ScaledForXaml = true;
+
+                XamlBondLength = newLength;
+                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
+                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));
 
                 if (forDisplay)
                 {
                     RepositionAll(MinX, MinY);
                 }
+            }
+        }
 
-                //OnPropertyChanged(nameof(BoundingBox));
+        public void CheckIntegrity()
+        {
+            var mols = GetAllMolecules();
+            foreach (Molecule mol in mols)
+            {
+                mol.CheckIntegrity();
             }
         }
     }
