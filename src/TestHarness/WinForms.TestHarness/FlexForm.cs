@@ -5,22 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.DisplayViewModel2;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
+using Chem4Word.Model2.Helpers;
+using Chem4Word.Telemetry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
-using Chem4Word.Model2;
-using Chem4Word.Telemetry;
-using Chem4Word.DisplayViewModel2;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Model2.Converters.MDL;
-using Chem4Word.Model2.Helpers;
-
-//using Chem4Word.Model2.Helpers;
 
 namespace WinForms.TestHarness
 {
@@ -28,10 +27,11 @@ namespace WinForms.TestHarness
     {
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
-        //private Stack<string> _undoStack2 = new Stack<string>();
-        //private Stack<string> _redoStack2 = new Stack<string>();
 
         private TelemetryWriter _telemetry = new TelemetryWriter(true);
+
+        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public FlexForm()
         {
@@ -40,6 +40,7 @@ namespace WinForms.TestHarness
 
         private void LoadStructure_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
                 Model model = null;
@@ -72,17 +73,11 @@ namespace WinForms.TestHarness
                         case ".mol":
                         case ".sdf":
                             model = sdFileConverter.Import(mol);
-                            model.Refresh();
-                            model.Relabel(false);
-                            cml = cmlConvertor.Export(model);
                             break;
 
                         case ".cml":
                         case ".xml":
                             model = cmlConvertor.Import(mol);
-                            
-                            model.Relabel(true);
-                            cml = cmlConvertor.Export(model);
                             break;
                     }
 
@@ -91,28 +86,26 @@ namespace WinForms.TestHarness
                         Model existing = Display.Chemistry as Model;
                         if (existing != null)
                         {
-                            Model clone = existing.Copy();
-                            clone.RescaleForCml();
+                            Model copy = existing.Copy();
+                            copy.RescaleForCml();
 
-                            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
-                            _undoStack.Push(clone);
-                            //_undoStack2.Push(cmlConvertor.Export(clone));
+                            Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Stack");
+                            _undoStack.Push(copy);
                         }
 
                         if (model.MeanBondLength < 2.5 || model.MeanBondLength > 97.5)
                         {
                             model.ScaleToAverageBondLength(20);
                         }
-                        _telemetry.Write("FlexForm.LoadStructure()", "Information", $"File: {filename}");
-                        //model.RescaleForXaml(true);
+                        _telemetry.Write(module, "Information", $"File: {filename}");
                         ShowChemistry(filename, model);
                     }
                 }
             }
             catch (Exception exception)
             {
-                _telemetry.Write("FlexForm.LoadStructure()", "Exception", $"Exception: {exception.Message}");
-                _telemetry.Write("FlexForm.LoadStructure()", "Exception(Data)", $"Exception: {exception}");
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
                 MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
@@ -129,23 +122,22 @@ namespace WinForms.TestHarness
 
         private void EditWithAcme_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
                 Model model = Display.Chemistry as Model;
                 if (model != null)
                 {
-                    Model clone = model.Copy();
-                    clone.RescaleForCml();
+                    Model copy = model.Copy();
+                    copy.RescaleForCml();
 
                     CMLConverter cc = new CMLConverter();
-                    EditorHost editorHost = new EditorHost(cc.Export(clone), "ACME");
+                    EditorHost editorHost = new EditorHost(cc.Export(copy), "ACME");
                     editorHost.ShowDialog();
                     if (editorHost.Result == DialogResult.OK)
                     {
-                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
-                        _undoStack.Push(clone);
-                        //CMLConverter cmlConvertor = new CMLConverter();
-                        //_undoStack2.Push(cmlConvertor.Export(clone));
+                        Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Stack");
+                        _undoStack.Push(copy);
                         Model m = cc.Import(editorHost.OutputValue);
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
@@ -153,8 +145,9 @@ namespace WinForms.TestHarness
             }
             catch (Exception exception)
             {
-                _telemetry.Write("FlexForm.EditWithAcme_Click()", "Exception", $"Exception: {exception.Message}");
-                _telemetry.Write("FlexForm.EditWithAcme_Click()", "Exception(Data)", $"Exception: {exception}");
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
 
@@ -185,12 +178,11 @@ namespace WinForms.TestHarness
                     {
                         Text = filename;
                     }
-                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
 
                     //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
                     model.Refresh();
 
-                    Display.Chemistry = null;
                     Display.Chemistry = model;
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
@@ -208,39 +200,23 @@ namespace WinForms.TestHarness
             RemoveAtom.Enabled = true;
             RandomElement.Enabled = true;
             EditCml.Enabled = true;
-        }
-
-        private List<DisplayViewModel2> StackToList2(Stack<string> stack)
-        {
-            List<DisplayViewModel2> list = new List<DisplayViewModel2>();
-            CMLConverter cc = new CMLConverter();
-            foreach (var item in stack)
-            {
-                list.Add(new DisplayViewModel2(cc.Import(item)));
-
-            }
-            return list;
+            ListStacks();
         }
 
         private List<DisplayViewModel2> StackToList(Stack<Model> stack)
         {
             List<DisplayViewModel2> list = new List<DisplayViewModel2>();
-            CMLConverter cc = new CMLConverter();
             foreach (var item in stack)
             {
-                item.Refresh();
-                list.Add(new DisplayViewModel2(item));
+                var model = item.Copy();
+                model.Refresh();
+                list.Add(new DisplayViewModel2(model));
             }
             return list;
         }
 
         private void EnableUndoRedoButtons()
         {
-            //Redo.Enabled = _redoStack2.Count > 0;
-            //Undo.Enabled = _undoStack2.Count > 0;
-            //UndoStack.StackList.ItemsSource = StackToList2(_undoStack2);
-            //RedoStack.StackList.ItemsSource = StackToList2(_redoStack2);
-
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
             UndoStack.StackList.ItemsSource = StackToList(_undoStack);
@@ -267,99 +243,126 @@ namespace WinForms.TestHarness
 
         private void ShowCarbons_CheckedChanged(object sender, EventArgs e)
         {
-            Model model = Display.Chemistry as Model;
-            if (model != null)
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                Model newModel = model.Copy();
-                SetCarbons(newModel, ShowCarbons.Checked);
-                newModel.Refresh();
-                Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
-                Debug.WriteLine($"New Model: ({newModel.MinX}, {newModel.MinY}):({newModel.MaxX}, {newModel.MaxY})");
-                Display.Chemistry = newModel;
+                Model model = Display.Chemistry as Model;
+                if (model != null)
+                {
+                    Model copy = model.Copy();
+                    SetCarbons(copy, ShowCarbons.Checked);
+                    copy.Refresh();
+                    Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
+                    Debug.WriteLine($"New Model: ({copy.MinX}, {copy.MinY}):({copy.MaxX}, {copy.MaxY})");
+                    Display.Chemistry = copy;
+                }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
 
         private void RemoveAtom_Click(object sender, EventArgs e)
         {
-            Model model = Display.Chemistry as Model;
-            if (model != null)
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                //TODO: get this working
-
- 
-                var allAtoms = model.GetAllAtoms();
-                if (model.GetAllAtoms().Any())
+                Model model = Display.Chemistry as Model;
+                if (model != null)
                 {
-                    Molecule modelMolecule = model.GetAllMolecules().FirstOrDefault(m => allAtoms.Any() && m.Atoms.Count>0);
-                    var atom = modelMolecule.Atoms.Values.First();
-                    var bondList = atom.Bonds.ToList();
-                    foreach (var neighbouringBond in bondList)
+                    var allAtoms = model.GetAllAtoms();
+                    if (model.GetAllAtoms().Any())
                     {
-                        
-                        modelMolecule.RemoveBond(neighbouringBond);
-                        neighbouringBond.OtherAtom(atom).NotifyBondingChanged();
-                        foreach (Bond bond in neighbouringBond.OtherAtom(atom).Bonds)
+                        Molecule modelMolecule = model.GetAllMolecules().FirstOrDefault(m => allAtoms.Any() && m.Atoms.Count > 0);
+                        var atom = modelMolecule.Atoms.Values.First();
+                        var bondList = atom.Bonds.ToList();
+                        foreach (var neighbouringBond in bondList)
                         {
-                            bond.NotifyBondingChanged();
+                            modelMolecule.RemoveBond(neighbouringBond);
+                            neighbouringBond.OtherAtom(atom).NotifyBondingChanged();
+                            foreach (Bond bond in neighbouringBond.OtherAtom(atom).Bonds)
+                            {
+                                bond.NotifyBondingChanged();
+                            }
                         }
+
+                        modelMolecule.RemoveAtom(atom);
                     }
 
-                    modelMolecule.RemoveAtom(atom);
-                }
+                    //foreach (var mol in model.Molecules)
+                    //{
+                    //    mol.ConciseFormula = "";
+                    //}
 
-                foreach (var mol in model.Molecules)
-                {
-                    //mol.ConciseFormula = "";
+                    model.Refresh();
+                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
                 }
-
-                model.Refresh();
-                Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
 
         private void RandomElement_Click(object sender, EventArgs e)
         {
-
-
-            Model model = Display.Chemistry as Model;
-            if (model != null)
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                var allAtoms = model.GetAllAtoms();
-                if (allAtoms.Any())
+                Model model = Display.Chemistry as Model;
+                if (model != null)
                 {
-                    var rnd = new Random(DateTime.Now.Millisecond);
-
-                    var maxAtoms = allAtoms.Count;
-                    int targetAtom = rnd.Next(0, maxAtoms);
-
-                    var elements = Globals.PeriodicTable.Elements;
-                    int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
-                    var x = elements.Values.FirstOrDefault(v => v.AtomicNumber == newElement);
-
-                    if (x == null)
+                    var allAtoms = model.GetAllAtoms();
+                    if (allAtoms.Any())
                     {
-                        Debugger.Break();
-                    }
-                    allAtoms[targetAtom].Element = x as ElementBase;
-                    if (x.Symbol.Equals("C"))
-                    {
-                       allAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
-                    }
+                        var rnd = new Random(DateTime.Now.Millisecond);
 
-                    allAtoms[targetAtom].NotifyBondingChanged();
+                        var maxAtoms = allAtoms.Count;
+                        int targetAtom = rnd.Next(0, maxAtoms);
 
-                    foreach (Chem4Word.Model2.Bond b in allAtoms[targetAtom].Bonds)
-                    {
-                        b.NotifyBondingChanged();
-                    }
+                        var elements = Globals.PeriodicTable.Elements;
+                        int newElement = rnd.Next(0, elements.Values.Max(v => v.AtomicNumber));
+                        var x = elements.Values.FirstOrDefault(v => v.AtomicNumber == newElement);
 
-                    foreach (var mol in model.Molecules)
-                    {
-                        //mol.ConciseFormula = "";
+                        if (x == null)
+                        {
+                            Debugger.Break();
+                        }
+
+                        allAtoms[targetAtom].Element = x as ElementBase;
+                        if (x.Symbol.Equals("C"))
+                        {
+                            allAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                        }
+
+                        allAtoms[targetAtom].NotifyBondingChanged();
+
+                        foreach (Bond b in allAtoms[targetAtom].Bonds)
+                        {
+                            b.NotifyBondingChanged();
+                        }
+
+                        //foreach (var mol in model.Molecules)
+                        //{
+                        //    mol.ConciseFormula = "";
+                        //}
+
+                        model.Refresh();
+                        Information.Text =
+                            $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
                     }
-                    model.Refresh();
-                    Information.Text = $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength}";
                 }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
 
@@ -367,70 +370,88 @@ namespace WinForms.TestHarness
         {
         }
 
-
         private void Undo_Click(object sender, EventArgs e)
         {
-            Model m = _undoStack.Pop();
-            m.CheckIntegrity();
-            //CMLConverter cmlConverter = new CMLConverter();
-            //Model m = cmlConverter.Import(_undoStack2.Pop());
-            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Undo Stack");
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                Model m = _undoStack.Pop();
+                m.CheckIntegrity();
+                Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.0##")} from Undo Stack");
 
-            Model c = Display.Chemistry as Model;
-            Model clone = c.Copy();
-            clone.CheckIntegrity();
-            clone.RescaleForCml();
+                Model c = Display.Chemistry as Model;
+                if (c != null)
+                {
+                    Model copy = c.Copy();
+                    copy.CheckIntegrity();
+                    copy.RescaleForCml();
 
-            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Redo Stack");
-            _redoStack.Push(clone);
-            //_redoStack2.Push(cmlConverter.Export(clone));
+                    Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Redo Stack");
+                    _redoStack.Push(copy);
+                }
 
-            ShowChemistry($"Undo -> {m.ConciseFormula}", m);
+                ShowChemistry($"Undo -> {m.ConciseFormula}", m);
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
+            }
         }
 
         private void Redo_Click(object sender, EventArgs e)
         {
-            Model m = _redoStack.Pop();
-            //CMLConverter cmlConverter = new CMLConverter();
-            //Model m = cmlConverter.Import(_redoStack2.Pop());
-            Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength} from Redo Stack");
-
-            Model c = Display.Chemistry as Model;
-            if (c != null)
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                Model clone = c.Copy();
-                clone.RescaleForCml();
+                Model m = _redoStack.Pop();
+                Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.0##")} from Redo Stack");
 
-                Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Undo Stack");
-                _undoStack.Push(clone);
-                //_undoStack2.Push(cmlConverter.Export(clone));
+                Model c = Display.Chemistry as Model;
+                if (c != null)
+                {
+                    Model clone = c.Copy();
+                    clone.RescaleForCml();
+
+                    Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Undo Stack");
+                    _undoStack.Push(clone);
+                }
 
                 ShowChemistry($"Redo -> {m.ConciseFormula}", m);
             }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
+            }
         }
 
-        //private void ListStacks()
-        //{
-        //    if (_undoStack.Any())
-        //    {
-        //        Debug.WriteLine("Undo Stack");
-        //        foreach (var model in _undoStack)
-        //        {
-        //            Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
-        //        }
-        //    }
-        //    if (_redoStack.Any())
-        //    {
-        //        Debug.WriteLine("Redo Stack");
-        //        foreach (var model in _redoStack)
-        //        {
-        //            Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}]");
-        //        }
-        //    }
-        //}
+        private void ListStacks()
+        {
+            if (_undoStack.Any())
+            {
+                Debug.WriteLine("Undo Stack");
+                foreach (var model in _undoStack)
+                {
+                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}] {model.MeanBondLength.ToString("#,##0.0##")}");
+                }
+            }
+            if (_redoStack.Any())
+            {
+                Debug.WriteLine("Redo Stack");
+                foreach (var model in _redoStack)
+                {
+                    Debug.WriteLine($"{model.ConciseFormula} [{model.GetHashCode()}] {model.MeanBondLength.ToString("#,##0.0##")}");
+                }
+            }
+        }
 
         private void EditCml_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 Model model = Display.Chemistry as Model;
@@ -444,9 +465,8 @@ namespace WinForms.TestHarness
                     editorHost.ShowDialog();
                     if (editorHost.Result == DialogResult.OK)
                     {
-                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength} onto Stack");
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
                         _undoStack.Push(clone);
-                        //_undoStack2.Push(editorHost.OutputValue);
                         Model m = cc.Import(editorHost.OutputValue);
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
@@ -454,8 +474,9 @@ namespace WinForms.TestHarness
             }
             catch (Exception exception)
             {
-                _telemetry.Write("FlexForm.EditCml_Click()", "Exception", $"Exception: {exception.Message}");
-                _telemetry.Write("FlexForm.EditCml_Click()", "Exception(Data)", $"Exception: {exception}");
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
     }

@@ -195,7 +195,7 @@ namespace Chem4Word.Model2.Converters.CML
                 if (cmlElement.Attribute(CMLConstants.TagX3) != null && cmlElement.Attribute(CMLConstants.TagY3) != null)
                 {
                     result = new Point(
-                        Double.Parse(cmlElement.Attribute(CMLConstants.TagY3).Value, CultureInfo.InvariantCulture),
+                        Double.Parse(cmlElement.Attribute(CMLConstants.TagX3).Value, CultureInfo.InvariantCulture),
                         Double.Parse(cmlElement.Attribute(CMLConstants.TagY3).Value, CultureInfo.InvariantCulture));
                     found = true;
                 }

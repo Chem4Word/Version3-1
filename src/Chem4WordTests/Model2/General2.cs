@@ -53,7 +53,7 @@ namespace Chem4WordTests.Model2
             Assert.IsTrue(Math.Abs(a1.Position.X - 5.0) < 0.001, $"Expected a1.X = 5; Got {a1.Position.X}");
             Assert.IsTrue(Math.Abs(a1.Position.Y - 5.0) < 0.001, $"Expected a1.Y = 5; Got {a1.Position.Y}");
 
-            Model clone = model.Clone();
+            Model clone = model.Copy();
 
             Assert.IsTrue(model.Molecules.Count == 1, $"Expected 1 Molecule; Got {model.Molecules.Count}");
             Assert.IsTrue(clone.Molecules.Count == 1, $"Expected 1 Molecule; Got {clone.Molecules.Count}");

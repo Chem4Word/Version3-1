@@ -683,9 +683,11 @@ namespace Chem4Word.Model2
             Molecule copy = new Molecule();
 
             Dictionary<string, Atom> aa = new Dictionary<string, Atom>();
+
             foreach (var atom in Atoms.Values)
             {
                 Atom a = new Atom();
+
                 a.Id = atom.Id;
                 a.Position = atom.Position;
                 a.Element = atom.Element;
@@ -702,6 +704,7 @@ namespace Chem4Word.Model2
                 Atom s = aa[bond.StartAtom.Id];
                 Atom e = aa[bond.EndAtom.Id];
                 Bond b = new Bond(s, e);
+
                 b.Id = bond.Id;
                 b.Order = bond.Order;
                 b.Stereo = bond.Stereo;
@@ -715,12 +718,10 @@ namespace Chem4Word.Model2
             {
                 ChemicalName n = new ChemicalName();
 
-                // Add properties which would have been serialized to CML
                 n.Id = cn.Id;
                 n.DictRef = cn.DictRef;
                 n.Name = cn.Name;
 
-                // Add to clone
                 copy.Names.Add(n);
             }
 
@@ -728,55 +729,25 @@ namespace Chem4Word.Model2
             {
                 Formula ff = new Formula();
 
-                // Add properties which would have been serialized to CML
                 ff.Id = f.Id;
                 ff.Convention = f.Convention;
                 ff.Inline = f.Inline;
 
-                // Add to clone
                 copy.Formulas.Add(f);
             }
 
-
+            // Copy child molecules
             foreach (var child in Molecules.Values)
             {
                 Molecule c = child.Copy();
-                AddMolecule(c);
+                copy.AddMolecule(c);
                 c.Parent = copy;
             }
+
             return copy;
         }
 
-        public Molecule Clone()
-        {
-            Molecule clone = new Molecule().CloneExcept(new[] { nameof(Id), nameof(_atoms), nameof(_bonds), nameof(_molecules) });
-            clone.ClearAll();
-            foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
-            {
-                Atom atom = keyValuePair.Value;
-                var target = atom.Clone();
-                clone.AddAtom(target);
-            }
-
-            foreach (Bond bond in Bonds)
-            {
-                var startAtomClone = clone.Atoms[bond.StartAtomInternalId];
-                var endAtomClone = clone.Atoms[bond.EndAtomInternalId];
-
-                clone.AddBond(bond.Clone());
-            }
-
-            foreach (KeyValuePair<string, Molecule> keyValuePair in Molecules)
-            {
-                Molecule child = keyValuePair.Value;
-                Molecule tempMol = child.Clone();
-                tempMol.CheckIntegrity();
-                clone.AddMolecule(tempMol);
-            }
-            clone.RebuildRings();
-            return clone;
-        }
-
+       
         protected void ClearAll()
         {
             _molecules.Clear();
@@ -785,8 +756,8 @@ namespace Chem4Word.Model2
         }
 
         /// <summary>
-        /// Checks to make sure the internals of the molecule
-        /// haven't become busted up
+        /// Checks to make sure the internals of the molecule haven't become busted up.
+        /// This will throw an Exception if something is wrong. You should be ready to catch it...
         /// </summary>
         public void CheckIntegrity()
         {
@@ -810,6 +781,7 @@ namespace Chem4Word.Model2
                 child.CheckIntegrity();
             }
         }
+
         #endregion Methods
 
         #region Overrides

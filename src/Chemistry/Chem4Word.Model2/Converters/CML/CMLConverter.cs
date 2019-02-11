@@ -51,8 +51,8 @@ namespace Chem4Word.Model2.Converters.CML
                     // Force ConciseFormula to be calculated
                     molecule.ConciseFormula = molecule.CalculatedFormula();
                 }
-                newModel.Relabel(true);
 
+                newModel.Relabel(true);
                 newModel.Refresh();
             }
 

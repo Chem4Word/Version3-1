@@ -113,6 +113,24 @@ namespace Chem4Word.Model2
 
         #region Properties
 
+        public bool HasNestedMolecules
+        {
+            get
+            {
+                bool result = false;
+
+                foreach (var child in Molecules.Values)
+                {
+                    if (child.Molecules.Count > 0)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+
+                return result;
+            }
+        }
         public int TotalAtomsCount
         {
             get
@@ -447,23 +465,12 @@ namespace Chem4Word.Model2
                 m.Parent = copy;
             }
 
+            copy.ScaledForXaml = ScaledForXaml;
+
             return copy;
         }
 
-        public Model Clone()
-        {
-            var clone = this.CloneExcept(new[] { nameof(_molecules), nameof(_boundingBox) });
-            clone.ClearMolecules();
-            var molList = Molecules.Values.ToList();
-            foreach (Molecule source in molList)
-            {
-                var target = source.Clone();
-                target.CheckIntegrity();
-                clone.AddMolecule(target);
-            }
-
-            return clone;
-        }
+      
 
         private void ClearMolecules()
         {
@@ -559,6 +566,10 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Checks to make sure the internals of the molecule haven't become busted up.
+        /// This will throw an Exception if something is wrong. You should be ready to catch it...
+        /// </summary>
         public void CheckIntegrity()
         {
             var mols = GetAllMolecules();

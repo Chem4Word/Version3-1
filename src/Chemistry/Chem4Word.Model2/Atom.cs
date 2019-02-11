@@ -504,10 +504,6 @@ namespace Chem4Word.Model2
             return null;
         }
 
-        public Atom Clone()
-        {
-            return this.CloneExcept(new string[]{});
-        }
 
         public CompassPoints GetDefaultHOrientation()
         {
