@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
 using Chem4Word.Model2;
+using System.Collections.Generic;
 
 namespace Chem4Word.ACME.Drawing
 {
-    public class CustomTextSourceRun
-    {
-        public string Text;
-        public bool IsSuperscript;
-        public bool IsEndParagraph;
-        public int Length { get { return IsEndParagraph ? 1 : Text.Length; } }
-    }
-
-    public class FunctionalGroupVisual: ChemicalVisual
+    public class FunctionalGroupVisual : ChemicalVisual
     {
         private List<CustomTextSourceRun> ComponentRuns { get; }
         public FunctionalGroup ParentGroup { get; }
@@ -27,8 +20,6 @@ namespace Chem4Word.ACME.Drawing
             ParentGroup = fg;
             ComponentRuns = new List<CustomTextSourceRun>();
             BuildTextRuns();
-
-
         }
 
         private void BuildTextRuns()
@@ -41,7 +32,14 @@ namespace Chem4Word.ACME.Drawing
 
         public override void Render()
         {
-            
         }
+    }
+
+    public class CustomTextSourceRun
+    {
+        public string Text;
+        public bool IsSuperscript;
+        public bool IsEndParagraph;
+        public int Length { get { return IsEndParagraph ? 1 : Text.Length; } }
     }
 }

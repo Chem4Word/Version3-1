@@ -20,10 +20,22 @@ namespace Chem4WordTests
         public void FgKeyEqualsSymbol()
         {
             int i = 0;
-            foreach (var fg in FunctionalGroups.ShortcutList)
+            foreach (var kvp in FunctionalGroups.ShortcutList)
             {
-                Assert.IsTrue(fg.Key.Equals(fg.Value.Symbol));
+                Assert.IsTrue(kvp.Key.Equals(kvp.Value.Symbol));
                 i++;
+                FunctionalGroup fg = kvp.Value;
+                if (fg.ShowAsSymbol)
+                {
+                    Debug.WriteLine($"{fg.Symbol}");
+                }
+                else
+                {
+                    foreach (var comp in fg.Components)
+                    {
+                        Debug.WriteLine($"{fg.Symbol} - {comp.Component} {comp.Count}");
+                    }
+                }
             }
             Debug.WriteLine($"Found {i} FunctionalGroups");
         }
