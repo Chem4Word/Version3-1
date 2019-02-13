@@ -641,7 +641,7 @@
             Background="White"
             HorizontalScrollBarVisibility="Auto"
             VerticalScrollBarVisibility="Auto">
-            <control:ChemistryCanvas x:Name="ChemCanvas"
+            <control:EditorCanvas x:Name="ChemCanvas"
                 MinWidth="4000"
                 MinHeight="3000"
                 Background="White" />
