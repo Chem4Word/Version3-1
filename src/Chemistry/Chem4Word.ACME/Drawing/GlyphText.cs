@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -33,11 +34,7 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                if (_symbolSize == null)
-                {
-                    return AtomVisual.SymbolSize;
-
-                }
+               
                 return _symbolSize.Value;
             }
             set { _symbolSize = value; }
@@ -49,11 +46,7 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                if (_scriptSize == null)
-                {
-                    return AtomVisual.ScriptSize;
-
-                }
+                
                 return _scriptSize.Value;
             }
             set { _scriptSize = value; }
@@ -65,11 +58,7 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                if (_isotopeSize == null)
-                {
-                    return AtomVisual.IsotopeSize;
-
-                }
+               
                 return _isotopeSize.Value;
             }
             set { _isotopeSize = value; }

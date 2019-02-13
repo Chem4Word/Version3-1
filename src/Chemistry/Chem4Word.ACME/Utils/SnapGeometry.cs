@@ -3,13 +3,13 @@
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
-//
-using Chem4Word.Model.Geometry;
-using Chem4Word.ViewModel;
+
+
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Utils
 {

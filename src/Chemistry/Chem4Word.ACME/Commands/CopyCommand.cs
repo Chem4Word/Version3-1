@@ -8,7 +8,7 @@
 using System;
 using Chem4Word.ACME;
 
-namespace Chem4Word.ViewModel.Commands
+namespace Chem4Word.ACME.Commands
 {
     public class CopyCommand : ACME.Commands.BaseCommand
     {

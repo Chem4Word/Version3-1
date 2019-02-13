@@ -14,7 +14,7 @@ using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Helpers;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -80,7 +80,7 @@ namespace Chem4Word.ACME.Adorners
                 return BondGeometry.WedgeBondGeometry(startPoint, endPoint, bondLength);
             }
 
-            if (stereo == Globals.BondStereo.Indeterminate && (order == Bond.OrderSingle))
+            if (stereo == Globals.BondStereo.Indeterminate && (order == Globals.OrderSingle))
             {
                 return BondGeometry.WavyBondGeometry(startPoint, endPoint, bondLength);
             }

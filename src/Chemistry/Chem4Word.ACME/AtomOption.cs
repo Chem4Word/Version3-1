@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------------namespace Chem4Word.ACME
 //  Copyright (c) 2019, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Chem4Word.Model2;
 
-namespace Chem4Word.ViewModel
+namespace Chem4Word.ACME
 {
     public class AtomOption : ComboBoxItem
     {

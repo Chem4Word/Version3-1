@@ -13,7 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Chem4Word.ACME;
 
-namespace Chem4Word.ViewModel
+namespace Chem4Word.ACME
 {
     /// <summary>
     /// Manages undo/redo for a view model

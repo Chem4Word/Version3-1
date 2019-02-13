@@ -14,7 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.Model2;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -255,7 +255,7 @@ namespace Chem4Word.ACME.Adorners
             InvalidateVisual();
 
             //move the molecule
-            CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.ToList());
+            CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.Values.ToList());
             RaiseDRCompleted(sender, e);
             Dragging = false;
         }

@@ -24,8 +24,6 @@ using Chem4Word.ACME.Commands;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Helpers;
-using Chem4Word.ViewModel;
-using Chem4Word.ViewModel.Commands;
 
 namespace Chem4Word.ACME
 {
@@ -667,7 +665,7 @@ namespace Chem4Word.ACME
                     //endAtoms[bond] = bond.EndAtom;
                     //bond.StartAtom = null;
                     //bond.EndAtom = null;
-                    //parent.Bonds.Remove(bond);
+                    //parent.RemoveBond(bond);
                 }
                 parent.RemoveAtom(atom);
                 if (SelectedItems.Contains(atom))
@@ -699,7 +697,7 @@ namespace Chem4Word.ACME
                 //}
                 //bond.StartAtom = null;
                 //bond.EndAtom = null;
-                //parent?.Bonds.Remove(bond);
+                //parent?.RemoveBond(bond);
 
                 //parent?.Split(a1, a2);
                 //if (isTopLevel)
@@ -753,7 +751,7 @@ namespace Chem4Word.ACME
                 Action undo = () =>
                 {
                     lastAtom.Tag = oldDir;
-                    //currentMol.Atoms.Remove(newAtom);
+                    //currentMol.RemoveAtom(newAtom);
                 };
                 Action redo = () =>
                 {
@@ -824,7 +822,7 @@ namespace Chem4Word.ACME
             Action undo = () =>
             {
                 var isCyclic = newbond.IsCyclic();
-                //mol.Bonds.Remove(newbond);
+                //mol.RemoveBond(newbond);
                 //newbond.StartAtom = null;
                 //newbond.EndAtom = null;
                 if (isCyclic)
@@ -1121,9 +1119,11 @@ namespace Chem4Word.ACME
             var mols = SelectedItems.OfType<Molecule>().ToList();
             if (mols.Any())
             {
+
                 foreach (var mol in mols)
                 {
-                    foreach (var atom in mol.AllAtoms)
+
+                    foreach (var atom in mol.Atoms.Values)
                     {
                         if (atom.ImplicitHydrogenCount > 0)
                         {
@@ -1134,7 +1134,7 @@ namespace Chem4Word.ACME
             }
             else
             {
-                foreach (var atom in AllAtoms)
+                foreach (var atom in Model.GetAllAtoms())
                 {
                     if (atom.ImplicitHydrogenCount > 0)
                     {
@@ -1151,7 +1151,7 @@ namespace Chem4Word.ACME
                 foreach (var atom in targetAtoms)
                 {
                     double seperation = 90.0;
-                    if (atom.Bonds.Count > 1)
+                    if (atom.Bonds.Count() > 1)
                     {
                         seperation = 30.0;
                     }
@@ -1194,7 +1194,7 @@ namespace Chem4Word.ACME
                         var aa = new Atom
                         {
                             Element = Globals.PeriodicTable.H,
-                            Position = atom.Position + vector * (Model2.Model.XamlBondLength * Globals.ExplicitHydrogenBondPercentage)
+                            Position = atom.Position + vector * (Model.XamlBondLength * Globals.ExplicitHydrogenBondPercentage)
                         };
                         newAtoms.Add(aa);
                         if (!parents.ContainsKey(aa.Id))
@@ -1203,8 +1203,8 @@ namespace Chem4Word.ACME
                         }
                         var bb = new Bond
                         {
-                            StartAtom = atom,
-                            EndAtom = aa,
+                            //StartAtom = atom,
+                            //EndAtom = aa,
                             Stereo = Globals.BondStereo.None,
                             Order = "S"
                         };
@@ -1222,7 +1222,7 @@ namespace Chem4Word.ACME
                 {
                     foreach (var bond in newBonds)
                     {
-                        bond.Parent.Bonds.Remove(bond);
+                        bond.Parent.RemoveBond(bond);
                     }
                     // BUG: Removing a bond does not remove it from an Atom's Bonds Collection so we have to remove them manually
                     foreach (var atom in targetAtoms)
@@ -1231,13 +1231,13 @@ namespace Chem4Word.ACME
                         {
                             if (atom.Bonds.Contains(bond))
                             {
-                                atom.Bonds.Remove(bond);
+                                //atom.RemoveBond(bond);
                             }
                         }
                     }
                     foreach (var atom in newAtoms)
                     {
-                        atom.Parent.Atoms.Remove(atom);
+                        atom.Parent.RemoveAtom(atom);
                     }
                     SelectedItems.Clear();
                 };
@@ -1246,11 +1246,11 @@ namespace Chem4Word.ACME
                 {
                     foreach (var atom in newAtoms)
                     {
-                        parents[atom.Id].Atoms.Add(atom);
+                        //parents[atom.Id].Atoms.Add(atom);
                     }
                     foreach (var bond in newBonds)
                     {
-                        parents[bond.Id].Bonds.Add(bond);
+                        //parents[bond.Id].Bonds.Add(bond);
                     }
                     // HACK: Add bonds into each target atom's bonds collection if not already present
                     // HACK: This is only required in redo (from undo manager)
@@ -1262,7 +1262,7 @@ namespace Chem4Word.ACME
                             {
                                 if (!atom.Bonds.Contains(bond))
                                 {
-                                    atom.Bonds.Add(bond);
+                                    //atom.Bonds.Add(bond);
                                 }
                             }
                         }
@@ -1278,127 +1278,120 @@ namespace Chem4Word.ACME
             }
         }
 
-        public void RemoveHydrogens()
-        {
-            List<Atom> targetAtoms = new List<Atom>();
-            List<Bond> targetBonds = new List<Bond>();
-            Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
+        //public void RemoveHydrogens()
+        //{
+        //    List<Atom> targetAtoms = new List<Atom>();
+        //    List<Bond> targetBonds = new List<Bond>();
+        //    Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
 
-            var mols = SelectedItems.OfType<Molecule>().ToList();
-            if (mols.Any())
-            {
-                foreach (var mol in mols)
-                {
-                    var allHydrogens = mol.AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
-                    if (allHydrogens.Any())
-                    {
-                        foreach (var hydrogen in allHydrogens)
-                        {
-                            // Terminal Atom?
-                            if (hydrogen.Degree == 1)
-                            {
-                                // Not Stereo
-                                if (hydrogen.Bonds[0].Stereo == Globals.BondStereo.None)
-                                {
-                                    if (!parents.ContainsKey(hydrogen.Id))
-                                    {
-                                        parents.Add(hydrogen.Id, hydrogen.Parent);
-                                    }
-                                    targetAtoms.Add(hydrogen);
-                                    if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
-                                    {
-                                        parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
-                                    }
-                                    targetBonds.Add(hydrogen.Bonds[0]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var allHydrogens = AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
-                if (allHydrogens.Any())
-                {
-                    foreach (var hydrogen in allHydrogens)
-                    {
-                        // Terminal Atom?
-                        if (hydrogen.Degree == 1)
-                        {
-                            // Not Stereo
-                            if (hydrogen.Bonds[0].Stereo == Globals.BondStereo.None)
-                            {
-                                if (!parents.ContainsKey(hydrogen.Id))
-                                {
-                                    parents.Add(hydrogen.Id, hydrogen.Parent);
-                                }
-                                targetAtoms.Add(hydrogen);
-                                if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
-                                {
-                                    parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
-                                }
-                                targetBonds.Add(hydrogen.Bonds[0]);
-                            }
-                        }
-                    }
-                }
-            }
+        //    var mols = SelectedItems.OfType<Molecule>().ToList();
+        //    //if (mols.Any())
+        //    //{
+        //    //    foreach (var mol in mols)
+        //    //    {
+        //    //        var allHydrogens = mol.AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
+        //    //        if (allHydrogens.Any())
+        //    //        {
+        //    //            foreach (var hydrogen in allHydrogens)
+        //    //            {
+        //    //                // Terminal Atom?
+        //    //                if (hydrogen.Degree == 1)
+        //    //                {
+        //    //                    // Not Stereo
+        //    //                    if (hydrogen.Bonds[0].Stereo == Globals.BondStereo.None)
+        //    //                    {
+        //    //                        if (!parents.ContainsKey(hydrogen.Id))
+        //    //                        {
+        //    //                            parents.Add(hydrogen.Id, hydrogen.Parent);
+        //    //                        }
+        //    //                        targetAtoms.Add(hydrogen);
+        //    //                        if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
+        //    //                        {
+        //    //                            parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
+        //    //                        }
+        //    //                        targetBonds.Add(hydrogen.Bonds[0]);
+        //    //                    }
+        //    //                }
+        //    //            }
+        //    //        }
+        //    //    }
+        //    //}
+        //    else
+        //    {
+        //        var allHydrogens = AllAtoms.Where(a => a.Element.Symbol.Equals("H")).ToList();
+        //        if (allHydrogens.Any())
+        //        {
+        //            foreach (var hydrogen in allHydrogens)
+        //            {
+        //                // Terminal Atom?
+        //                if (hydrogen.Degree == 1)
+        //                {
+        //                    // Not Stereo
+        //                    if (hydrogen.Bonds[0].Stereo == Globals.BondStereo.None)
+        //                    {
+        //                        if (!parents.ContainsKey(hydrogen.Id))
+        //                        {
+        //                            parents.Add(hydrogen.Id, hydrogen.Parent);
+        //                        }
+        //                        targetAtoms.Add(hydrogen);
+        //                        if (!parents.ContainsKey(hydrogen.Bonds[0].Id))
+        //                        {
+        //                            parents.Add(hydrogen.Bonds[0].Id, hydrogen.Parent);
+        //                        }
+        //                        targetBonds.Add(hydrogen.Bonds[0]);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
 
-            if (targetAtoms.Any())
-            {
-                UndoManager.BeginUndoBlock();
-                Action undoAction = () =>
-                {
-                    foreach (var atom in targetAtoms)
-                    {
-                        parents[atom.Id].Atoms.Add(atom);
-                    }
-                    foreach (var bond in targetBonds)
-                    {
-                        parents[bond.Id].Bonds.Add(bond);
-                    }
-                    // HACK: Add bonds into each target bond's start atom's bonds collection if not already present
-                    // HACK: This is only required in undo (from undo manager)
-                    foreach (var bond in targetBonds)
-                    {
-                        var atom = bond.StartAtom;
-                        if (!atom.Bonds.Contains(bond))
-                        {
-                            atom.Bonds.Add(bond);
-                        }
-                    }
-                    SelectedItems.Clear();
-                };
+        //    if (targetAtoms.Any())
+        //    {
+        //        UndoManager.BeginUndoBlock();
+        //        Action undoAction = () =>
+        //        {
+        //            foreach (var atom in targetAtoms)
+        //            {
+        //                parents[atom.Id].Atoms.Add(atom);
+        //            }
+        //            foreach (var bond in targetBonds)
+        //            {
+        //                parents[bond.Id].Bonds.Add(bond);
+        //            }
+        //            // HACK: Add bonds into each target bond's start atom's bonds collection if not already present
+        //            // HACK: This is only required in undo (from undo manager)
+        //            foreach (var bond in targetBonds)
+        //            {
+        //                var atom = bond.StartAtom;
+        //                if (!atom.Bonds.Contains(bond))
+        //                {
+        //                    atom.Bonds.Add(bond);
+        //                }
+        //            }
+        //            SelectedItems.Clear();
+        //        };
 
-                Action redoAction = () =>
-                {
-                    foreach (var bond in targetBonds)
-                    {
-                        bond.Parent.Bonds.Remove(bond);
-                        bond.StartAtom.Bonds.Remove(bond);
-                    }
-                    foreach (var atom in targetAtoms)
-                    {
-                        atom.Parent.Atoms.Remove(atom);
-                    }
-                    SelectedItems.Clear();
-                };
+        //        Action redoAction = () =>
+        //        {
+        //            foreach (var bond in targetBonds)
+        //            {
+        //                bond.Parent.RemoveBond(bond);
+                      
+        //            }
+        //            foreach (var atom in targetAtoms)
+        //            {
+        //                atom.Parent.RemoveAtom(atom);
+        //            }
+        //            SelectedItems.Clear();
+        //        };
 
-                UndoManager.RecordAction(undoAction, redoAction);
-                redoAction();
+        //        UndoManager.RecordAction(undoAction, redoAction);
+        //        redoAction();
 
-                UndoManager.EndUndoBlock();
-            }
-        }
+        //        UndoManager.EndUndoBlock();
+        //    }
+        //}
 
-        public override Rect BoundingBox
-        {
-            get
-            {
-                return CalcBoundingBox();
-            }
-        }
 
         public bool SingleMolSelected
         {
@@ -1422,7 +1415,7 @@ namespace Chem4Word.ACME
 
             UndoManager.BeginUndoBlock();
 
-            foreach (Atom atomToFlip in selMolecule.Atoms)
+            foreach (Atom atomToFlip in selMolecule.Atoms.Values)
             {
                 Point currentPos = atomToFlip.Position;
                 Point newPos = flipTransform.Transform(currentPos);
@@ -1468,7 +1461,7 @@ namespace Chem4Word.ACME
                 {
                     Molecule parent = atom.Parent;
 
-                    if (atom.Singleton)
+                    if (!atom.Neighbours.Any())
                     {
                         SelectedItems.Add(parent);
                     }
@@ -1479,7 +1472,7 @@ namespace Chem4Word.ACME
                             return;//the molecule itself is selected
                         }
 
-                        var allObjects = new HashSet<object>(parent.Atoms);
+                        var allObjects = new HashSet<object>(parent.Atoms.Values);
                         allObjects.Add(parent.Bonds);
 
                         var selobjects =
@@ -1487,7 +1480,7 @@ namespace Chem4Word.ACME
                         selobjects.Add(parent.Bonds);
                         if (allObjects.SetEquals(selobjects))
                         {
-                            foreach (Atom a in parent.Atoms)
+                            foreach (Atom a in parent.Atoms.Values)
                             {
                                 SelectedItems.Remove(a);
                             }
@@ -1520,7 +1513,7 @@ namespace Chem4Word.ACME
                             return;//the molecule itself is selected
                         }
 
-                        var allObjects = new HashSet<object>(parent.Atoms);
+                        var allObjects = new HashSet<object>(parent.Atoms.Values);
                         allObjects.Add(parent.Bonds);
 
                         var selobjects =
@@ -1535,7 +1528,7 @@ namespace Chem4Word.ACME
                                 SelectedItems.Remove(b);
                             }
 
-                            foreach (Atom a in parent.Atoms)
+                            foreach (Atom a in parent.Atoms.Values)
                             {
                                 SelectedItems.Remove(a);
                             }
@@ -1568,7 +1561,7 @@ namespace Chem4Word.ACME
             {
                 if (o is Atom atom)
                 {
-                    if (atom.Singleton)
+                    if (!atom.Neighbours.Any())
                     {
                         SelectedItems.Remove(atom.Parent);
                     }

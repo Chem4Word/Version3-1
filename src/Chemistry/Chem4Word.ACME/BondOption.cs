@@ -8,10 +8,9 @@
 
 using System;
 using System.Windows;
-using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 
-namespace Chem4Word.ViewModel
+namespace Chem4Word.ACME
 {
     /// <summary>
     /// Rolls up Bond Stereo and Order into a single class to facilitate binding.

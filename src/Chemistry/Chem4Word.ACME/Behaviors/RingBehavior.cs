@@ -14,7 +14,7 @@ using System.Windows.Media;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Behaviors
 {

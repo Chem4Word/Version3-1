@@ -7,7 +7,7 @@
 
 using System.Linq;
 using Chem4Word.Model2;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Commands
 {
@@ -29,7 +29,7 @@ namespace Chem4Word.ACME.Commands
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.RemoveHydrogens();
+            //MyEditViewModel.RemoveHydrogens();
         }
     }
 }

@@ -14,7 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using Chem4Word.Model2;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -164,7 +164,7 @@ namespace Chem4Word.ACME.Adorners
 
             if (LastOperation != null && LastOperation is ScaleTransform)
             {
-                var atomList = AdornedMolecule.Atoms.ToList();
+                var atomList = AdornedMolecule.Atoms.Values.ToList();
                 CurrentModel.DoOperation(LastOperation, atomList);
                 SetBoundingBox();
                 ResizeCompleted?.Invoke(this, dragCompletedEventArgs);
@@ -176,7 +176,7 @@ namespace Chem4Word.ACME.Adorners
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            AdornedMolecule.ResetBoundingBox();
+            //AdornedMolecule.ResetBoundingBox();
             BoundingBox = AdornedMolecule.BoundingBox;
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }

@@ -45,7 +45,7 @@ namespace Chem4Word.ACME.Adorners
         {
             base.OnRender(drawingContext);
 
-            Model.Model model = _adornedAtom.Model;
+            Model model = _adornedAtom.Parent.Model;
             double renderRadius = (model.XamlBondLength * Globals.FontSizePercentageBond) / 4;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
@@ -60,7 +60,7 @@ namespace Chem4Word.ACME.Adorners
             }
             else
             {
-                drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox(_adornedAtom.Model.FontSize));
+                drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox(_adornedAtom.Parent.Model.FontSize));
             }
         }
 

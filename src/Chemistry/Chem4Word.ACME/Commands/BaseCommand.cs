@@ -7,7 +7,7 @@
 
 using System;
 using System.Windows.Input;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Commands
 {

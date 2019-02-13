@@ -5,7 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Commands
 {

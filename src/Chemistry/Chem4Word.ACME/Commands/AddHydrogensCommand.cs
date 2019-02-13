@@ -8,8 +8,7 @@
 using System.Linq;
 
 using Chem4Word.Model2;
-using Chem4Word.ViewModel;
-using Chem4Word.ViewModel.Commands;
+
 
 namespace Chem4Word.ACME.Commands
 {

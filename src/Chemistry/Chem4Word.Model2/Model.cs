@@ -578,6 +578,11 @@ namespace Chem4Word.Model2
                 mol.CheckIntegrity();
             }
         }
+
+        public void CentreInCanvas(Size size)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     #endregion Methods

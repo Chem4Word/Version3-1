@@ -8,7 +8,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Behaviors
 {

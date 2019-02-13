@@ -6,7 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using Chem4Word.ViewModel;
+
 
 namespace Chem4Word.ACME.Commands
 {

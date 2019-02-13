@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Linq;
 using Chem4Word.ACME.Utils;
 
 using System.Windows;
@@ -195,7 +196,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             else if (lastAtom.Degree == 1)
             {
-                Vector bondVector = lastAtom.Position - lastAtom.Neighbours[0].Position;
+                Vector bondVector = lastAtom.Position - lastAtom.Neighbours.First().Position;
 
                 var hour = GetGeneralDir(bondVector);
 

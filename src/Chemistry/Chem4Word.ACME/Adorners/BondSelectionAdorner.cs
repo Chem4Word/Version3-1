@@ -47,7 +47,7 @@ namespace Chem4Word.ACME.Adorners
         {
             base.OnRender(drawingContext);
 
-            Model.Model model = _adornedBond.Model;
+            Model model = _adornedBond.Model;
             double renderRadius = (model.XamlBondLength * Globals.FontSizePercentageBond) / 4;
 
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
