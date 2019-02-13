@@ -82,5 +82,12 @@ namespace Chem4Word.Model2
         }
 
         public override string Colour => "#000000";
+
+        [JsonProperty]
+        public bool Flippable { get; set; }
+        [JsonProperty]
+        public string Symbol { get; set; }
+        [JsonProperty]
+        public bool ShowAsSymbol { get; set; }
     }
 }

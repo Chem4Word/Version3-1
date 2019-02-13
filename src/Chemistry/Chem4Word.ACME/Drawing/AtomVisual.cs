@@ -223,25 +223,7 @@ namespace Chem4Word.ACME.Drawing
 
         #region Rendering
 
-        /// <summary>
-        /// Draws a background mask for the atom symbol
-        /// </summary>
-        /// <param name="shapeHull"></param>
-        /// <param name="drawingContext"></param>
-        private void DrawMask(List<Point> shapeHull, DrawingContext drawingContext)
-        {
-            if (BackgroundColor == null)
-            {
-                BackgroundColor = SystemColors.WindowBrush;
-            }
-
-            var path = BasicGeometry.BuildPath(shapeHull);
-            drawingContext.DrawGeometry(BackgroundColor, new Pen(BackgroundColor, MaskOffsetWidth), path.Data);
-            // ToDo: Try to get this better, was from GlyphUtils.GetOutline()
-            //var geo = path.Data.GetWidenedPathGeometry(new Pen(Brushes.Wheat, SymbolSize / 8)).GetOutlinedPathGeometry();
-            //var geo = path.Data.GetWidenedPathGeometry(new Pen(Brushes.Wheat, SymbolSize / 8), 0.01, ToleranceType.Relative);
-            //drawingContext.DrawGeometry(BackgroundColor, new Pen(BackgroundColor, MaskOffsetWidth), geo);
-        }
+        
 
         /// <summary>
         ///
