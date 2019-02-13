@@ -7,7 +7,7 @@
 
 using System;
 using System.Linq;
-using Chem4Word.Model;
+using Chem4Word.Model2;
 using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME.Commands

@@ -6,7 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using System.Linq;
-using Chem4Word.Model;
+
+using Chem4Word.Model2;
 using Chem4Word.ViewModel;
 using Chem4Word.ViewModel.Commands;
 

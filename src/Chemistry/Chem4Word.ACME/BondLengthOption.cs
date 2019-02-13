@@ -6,8 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.Helpers;
-using Chem4Word.Model;
 using System.Windows;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ViewModel
 {

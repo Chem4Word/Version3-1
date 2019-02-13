@@ -818,15 +818,15 @@ namespace Chem4Word.ACME
             newbond.Stereo = stereo;
             newbond.Order = order;
 
-            newbond.StartAtom = a;
-            newbond.EndAtom = b;
+            //newbond.StartAtom = a;
+            //newbond.EndAtom = b;
 
             Action undo = () =>
             {
                 var isCyclic = newbond.IsCyclic();
-                mol.Bonds.Remove(newbond);
-                newbond.StartAtom = null;
-                newbond.EndAtom = null;
+                //mol.Bonds.Remove(newbond);
+                //newbond.StartAtom = null;
+                //newbond.EndAtom = null;
                 if (isCyclic)
                 {
                     mol.RebuildRings();
@@ -834,12 +834,12 @@ namespace Chem4Word.ACME
             };
             Action redo = () =>
             {
-                newbond.StartAtom = a;
-                newbond.EndAtom = b;
-                mol.Bonds.Add(newbond);
+                //newbond.StartAtom = a;
+                //newbond.EndAtom = b;
+                //mol.Bonds.Add(newbond);
                 if (newbond.StartAtom.Parent != newbond.EndAtom.Parent)
                 {
-                    newbond.StartAtom.Parent.Merge(newbond.EndAtom.Parent);
+                    //newbond.StartAtom.Parent.Merge(newbond.EndAtom.Parent);
                 }
                 else
                 {
@@ -873,35 +873,35 @@ namespace Chem4Word.ACME
 
             Action redo = () =>
             {
-                existingBond.Stereo = Globals.BondStereo.None;
-                if (existingBond.Order == Bond.OrderZero)
-                {
-                    existingBond.Order = Bond.OrderSingle;
-                    existingBond.NotifyPlacementChanged();
-                }
-                if (existingBond.Order == Bond.OrderSingle)
-                {
-                    existingBond.Order = Bond.OrderDouble;
-                    existingBond.NotifyPlacementChanged();
-                }
-                else if (existingBond.Order == Bond.OrderDouble)
-                {
-                    existingBond.Order = Bond.OrderTriple;
-                    existingBond.NotifyPlacementChanged();
-                }
-                else if (existingBond.Order == Bond.OrderTriple)
-                {
-                    existingBond.Order = Bond.OrderSingle;
-                    existingBond.NotifyPlacementChanged();
-                }
-                existingBond.StartAtom.NotifyBondingChanged();
-                existingBond.EndAtom.NotifyBondingChanged();
+                //existingBond.Stereo = Globals.BondStereo.None;
+                //if (existingBond.Order == Bond.OrderZero)
+                //{
+                //    existingBond.Order = Bond.OrderSingle;
+                //    existingBond.NotifyPlacementChanged();
+                //}
+                //if (existingBond.Order == Bond.OrderSingle)
+                //{
+                //    existingBond.Order = Bond.OrderDouble;
+                //    existingBond.NotifyPlacementChanged();
+                //}
+                //else if (existingBond.Order == Bond.OrderDouble)
+                //{
+                //    existingBond.Order = Bond.OrderTriple;
+                //    existingBond.NotifyPlacementChanged();
+                //}
+                //else if (existingBond.Order == Bond.OrderTriple)
+                //{
+                //    existingBond.Order = Bond.OrderSingle;
+                //    existingBond.NotifyPlacementChanged();
+                //}
+                //existingBond.StartAtom.NotifyBondingChanged();
+                //existingBond.EndAtom.NotifyBondingChanged();
             };
             Action undo = () =>
             {
                 existingBond.Stereo = stereo;
                 existingBond.Order = order;
-                existingBond.NotifyPlacementChanged();
+                //existingBond.NotifyPlacementChanged();
                 existingBond.StartAtom.NotifyBondingChanged();
                 existingBond.EndAtom.NotifyBondingChanged();
             };
@@ -948,14 +948,14 @@ namespace Chem4Word.ACME
 
             Action undo = () =>
             {
-                parentBond.StartAtom = startAtom;
-                parentBond.EndAtom = endAtom;
+                //parentBond.StartAtom = startAtom;
+                //parentBond.EndAtom = endAtom;
             };
 
             Action redo = () =>
             {
-                parentBond.StartAtom = endAtom;
-                parentBond.EndAtom = startAtom;
+                //parentBond.StartAtom = endAtom;
+                //parentBond.EndAtom = startAtom;
             };
             UndoManager.RecordAction(undo, redo);
 
@@ -1017,8 +1017,8 @@ namespace Chem4Word.ACME
 
                     if (!list[startpos].ExistingAtom.IsUnsaturated & !list[nextPos].ExistingAtom.IsUnsaturated)
                     {
-                        SetBondAttributes(list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom),
-                            Bond.OrderDouble, Globals.BondStereo.None);
+                        //SetBondAttributes(list[startpos].ExistingAtom.BondBetween(list[nextPos].ExistingAtom),
+                        //    Bond.OrderDouble, Globals.BondStereo.None);
 
                         startpos += 2;
                     }
@@ -1089,7 +1089,7 @@ namespace Chem4Word.ACME
         {
             UndoManager.BeginUndoBlock();
 
-            Model.Model theModel = mol.Model;
+            //Model.Model theModel = mol.Model;
             var atomList = mol.Atoms.ToList();
             var bondList = mol.Bonds.ToList();
 
@@ -1098,14 +1098,14 @@ namespace Chem4Word.ACME
             Action redoAction = () =>
             {
                 mol.Parent = null;
-                theModel.Molecules.Remove(mol);
+                //theModel.Molecules.Remove(mol);
                 RemoveFromSelection(mol);
             };
 
             Action undoAction = () =>
             {
-                mol.Parent = theModel;
-                theModel.Molecules.Add(mol);
+                //mol.Parent = theModel;
+                //theModel.Molecules.Add(mol);
                 //AddToSelection(mol);
             };
 
