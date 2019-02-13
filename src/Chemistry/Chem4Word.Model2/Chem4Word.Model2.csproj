@@ -80,6 +80,7 @@
     <Compile Include="Group.cs" />
     <Compile Include="Converters\CML\CMLHelper.cs" />
     <Compile Include="Converters\CML\CMLConverter.cs" />
+    <Compile Include="Helpers\AtomHelpers.cs" />
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Interfaces\IChemistryContainer.cs" />

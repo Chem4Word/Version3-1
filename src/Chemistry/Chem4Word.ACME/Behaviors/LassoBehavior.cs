@@ -5,14 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.View;
-using Chem4Word.ViewModel.Adorners;
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Drawing;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -124,14 +125,14 @@ namespace Chem4Word.ACME.Behaviors
             if (e.ClickCount == 1)
             {
                 var hitTestResult = GetTarget(e);
-                if (hitTestResult.VisualHit is AtomShape)
+                if (hitTestResult.VisualHit is AtomVisual)
                 {
-                    var atom = (AtomShape)hitTestResult.VisualHit;
+                    var atom = (AtomVisual)hitTestResult.VisualHit;
                     Debug.WriteLine($"Right Click Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
                 }
-                else if (hitTestResult.VisualHit is BondShape)
+                else if (hitTestResult.VisualHit is BondVisual)
                 {
-                    var bond = (BondShape)hitTestResult.VisualHit;
+                    var bond = (BondVisual)hitTestResult.VisualHit;
                     var pos = e.GetPosition(AssociatedObject);
                     Debug.WriteLine($"Right Click Bond {bond.ParentBond.Id} at ({pos.X},{pos.Y})");
                 }
@@ -186,16 +187,16 @@ namespace Chem4Word.ACME.Behaviors
             var hitTestResult = GetTarget(e);
             Debug.Print(hitTestResult.ToString());
 
-            if (hitTestResult.VisualHit is AtomShape)
+            if (hitTestResult.VisualHit is AtomVisual)
             {
-                var atom = (AtomShape)hitTestResult.VisualHit;
+                var atom = (AtomVisual)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
                 ViewModel.AddToSelection(atom.ParentAtom.Parent);
             }
-            else if (hitTestResult.VisualHit is BondShape)
+            else if (hitTestResult.VisualHit is BondVisual)
             {
-                var bond = (BondShape)hitTestResult.VisualHit;
+                var bond = (BondVisual)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
                 ViewModel.AddToSelection(bond.ParentBond.Parent);
@@ -211,16 +212,16 @@ namespace Chem4Word.ACME.Behaviors
             var hitTestResult = GetTarget(e);
             Debug.Print(hitTestResult.ToString());
 
-            if (hitTestResult.VisualHit is AtomShape)
+            if (hitTestResult.VisualHit is AtomVisual)
             {
-                var atom = (AtomShape)hitTestResult.VisualHit;
+                var atom = (AtomVisual)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
                 ViewModel.AddToSelection(atom.ParentAtom);
             }
-            else if (hitTestResult.VisualHit is BondShape)
+            else if (hitTestResult.VisualHit is BondVisual)
             {
-                var bond = (BondShape)hitTestResult.VisualHit;
+                var bond = (BondVisual)hitTestResult.VisualHit;
                 //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
                 ViewModel.AddToSelection(bond.ParentBond);
@@ -241,15 +242,15 @@ namespace Chem4Word.ACME.Behaviors
             var id = ((GeometryHitTestResult)result).IntersectionDetail;
 
             var myShape = (result.VisualHit);
-            if (myShape != null && (myShape is AtomShape | myShape is BondShape))
+            if (myShape != null && (myShape is AtomVisual | myShape is BondVisual))
             {
                 switch (id)
                 {
                     case IntersectionDetail.FullyContains:
                     case IntersectionDetail.Intersects:
                     case IntersectionDetail.FullyInside:
-                        var selAtom = ((myShape as AtomShape)?.ParentAtom);
-                        var selBond = ((myShape as BondShape)?.ParentBond);
+                        var selAtom = ((myShape as AtomVisual)?.ParentAtom);
+                        var selBond = ((myShape as BondVisual)?.ParentBond);
 
                         if (!(ViewModel.SelectedItems.Contains(selAtom) || ViewModel.SelectedItems.Contains(selBond)))
                         {
@@ -265,8 +266,8 @@ namespace Chem4Word.ACME.Behaviors
                         return HitTestResultBehavior.Continue;
 
                     case IntersectionDetail.Empty:
-                        selAtom = ((myShape as AtomShape)?.ParentAtom);
-                        selBond = ((myShape as BondShape)?.ParentBond);
+                        selAtom = ((myShape as AtomVisual)?.ParentAtom);
+                        selBond = ((myShape as BondVisual)?.ParentBond);
 
                         if ((ViewModel.SelectedItems.Contains(selAtom) || ViewModel.SelectedItems.Contains(selBond)))
                         {

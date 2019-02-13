@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Chem4Word.Model2
 {
@@ -1050,6 +1051,8 @@ namespace Chem4Word.Model2
             }
         }
 
+        public Point Centroid { get; set; }
+
         private void WipeMoleculeRings()
         {
             Rings.Clear();
@@ -1253,6 +1256,26 @@ namespace Chem4Word.Model2
                 lengths.AddRange(mol.BondLengths);
                 mol.AddBondLengths(lengths);
             }
+        }
+
+        public void Move(Transform lastOperation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Windows.Media.Geometry Ghost()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ResetBoundingBox()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Overlaps(List<Point> preferredPlacements, List<Atom> atoms =null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

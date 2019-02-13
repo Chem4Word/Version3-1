@@ -6,17 +6,14 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Drawing;
-using Chem4Word.DisplayViewModel2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Mail;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
@@ -51,9 +48,9 @@ namespace Chem4Word.ACME.Controls
         #region Properties
 
         //properties
-        private DisplayViewModel2.DisplayViewModel2 _mychemistry;
+        private ViewModel _mychemistry;
 
-        public DisplayViewModel2.DisplayViewModel2 Chemistry
+        public ViewModel Chemistry
         {
             get { return _mychemistry; }
             set
@@ -276,7 +273,7 @@ namespace Chem4Word.ACME.Controls
         /// Draws the chemistry
         /// </summary>
         /// <param name="vm"></param>
-        private void DrawChemistry(DisplayViewModel2.DisplayViewModel2 vm)
+        private void DrawChemistry(ViewModel vm)
         {
             Clear();
 
@@ -293,94 +290,6 @@ namespace Chem4Word.ACME.Controls
             Overhang = new Thickness(leftOverhang, topOverhang, leftOverhang, topOverhang);
             InvalidateMeasure();
         }
-
-        /// <summary>
-        /// Draws a single molecule - and its children
-        /// </summary>
-        /// <param name="molecule"></param>
-        /// <param name="moleculeBounds"></param>
-        /// <returns></returns>
-        //private Rect DrawMolecule(Molecule molecule, Rect moleculeBounds)
-        //{
-        //    var bounds = moleculeBounds;
-
-        //    //foreach (Atom moleculeAtom in molecule.Atoms)
-        //    //{
-        //    //    bounds = DrawAtom(moleculeAtom, bounds);
-        //    //}
-
-        //    //foreach (Bond moleculeBond in molecule.Bonds)
-        //    //{
-        //    //    bounds = DrawBond(moleculeBond, bounds);
-        //    //}
-
-        //    //check to see if we have child molecules
-        //    //if (molecule.Molecules.Any())
-        //    //{
-        //    //    Rect groupRect = Rect.Empty;
-        //    //    foreach (Molecule child in molecule.Molecules)
-        //    //    {
-        //    //        var childRect = DrawMolecule(child, bounds);
-
-        //    //        groupRect.Union(childRect);
-        //    //    }
-
-        //    //    //DrawGroupBox(molecule, groupRect, ref bounds);
-        //    //}
-
-        //    return bounds;
-        //}
-
-        //private void DrawGroupBox(Molecule molecule, Rect groupRect, ref Rect bounds)
-        //{
-        //    var groupBox = new DrawingVisual();
-        //    using (DrawingContext dc = groupBox.RenderOpen())
-        //    {
-        //        Brush bracketBrush = new SolidColorBrush(Colors.Gray);
-        //        Pen bracketPen = new Pen(bracketBrush, 1d);
-        //        //bracketPen.DashStyle = new DashStyle(new double[]{2,2});
-        //        dc.DrawRectangle(null, bracketPen, groupRect);
-        //        dc.Close();
-        //    }
-
-        //    AddVisualChild(groupBox);
-        //    AddLogicalChild(groupBox);
-        //    chemicalVisuals.Add(molecule, groupBox);
-
-        //    bounds.Union(groupBox.ContentBounds);
-        //}
-
-        //private Rect DrawAtom(Atom moleculeAtom, Rect moleculeBounds)
-        //{
-        //    var bounds = moleculeBounds;
-        //    var atomVisual = new AtomVisual(moleculeAtom);
-        //    atomVisual.ChemicalVisuals = chemicalVisuals;
-        //    atomVisual.BondThickness = Chemistry.BondThickness;
-        //    atomVisual.BackgroundColor = Background;
-
-        //    atomVisual.Render();
-        //    chemicalVisuals.Add(moleculeAtom, atomVisual);
-        //    AddVisual(atomVisual);
-
-        //    bounds.Union(atomVisual.ContentBounds);
-
-        //    return bounds;
-        //}
-
-        //private Rect DrawBond(Bond moleculeBond, Rect moleculeBounds)
-        //{
-        //    var bounds = moleculeBounds;
-        //    var bondVisual = new BondVisual(moleculeBond);
-        //    bondVisual.ChemicalVisuals = chemicalVisuals;
-        //    bondVisual.BondThickness = Chemistry.BondThickness;
-        //    bondVisual.Render();
-        //    chemicalVisuals.Add(moleculeBond, bondVisual);
-        //    AddVisual(bondVisual);
-
-        //    bounds.Union(bondVisual.ContentBounds);
-
-        //    return bounds;
-        //}
 
         public void Clear()
         {

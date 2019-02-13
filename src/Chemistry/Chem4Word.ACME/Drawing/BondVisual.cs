@@ -12,8 +12,8 @@ using System.Windows;
 using System.Windows.Media;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
-using Chem4Word.Model.Geometry;
-//using Chem4Word.ViewModel;
+
+//
 
 
 namespace Chem4Word.ACME.Drawing

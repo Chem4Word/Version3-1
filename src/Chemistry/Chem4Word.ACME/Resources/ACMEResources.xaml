@@ -2,8 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
-    xmlns:model="clr-namespace:Chem4Word.Model;assembly=Chem4Word.Model"
-    xmlns:viewModel="clr-namespace:Chem4Word.ViewModel;assembly=Chem4Word.ViewModel">
+    xmlns:acme ="clr-namespace:Chem4Word.ACME">
+
     <!--  Simple shapes for use in menus, buttons etc  -->
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Brushes.xaml" />
@@ -143,70 +143,70 @@
     </Style>
 
     <!--  used to populate the bond dropdown combo  -->
-    <x:Array x:Key="BondItems" Type="{x:Type viewModel:BondOption}">
-        <!--  modify these options and you *must* modify LoadBondOptions() in chem4word.viewmodel\editviewmodel.csodel\editviewmodel.cs  -->
-        <viewModel:BondOption
+    <x:Array x:Key="BondItems" Type="{x:Type acme:BondOption}">
+        <!--  modify these options and you *must* modify LoadBondOptions() in chem4word.acme\editacme.csodel\editacme.cs  -->
+        <acme:BondOption
             DisplayStyle="{StaticResource SingleBondStyle}"
             Id="1"
             Order="S"
             Stereo="None" />
-        <viewModel:BondOption
+        <acme:BondOption
             DisplayStyle="{StaticResource DoubleBondStyle}"
             Id="2"
             Order="D"
             Stereo="None" />
-        <viewModel:BondOption
+        <acme:BondOption
             DisplayStyle="{StaticResource TripleBondStyle}"
             Id="3"
             Order="T"
             Stereo="None" />
-        <viewModel:BondOption
+        <acme:BondOption
             DisplayStyle="{StaticResource WedgeBondStyle}"
             Id="4"
             Order="S"
             Stereo="Wedge" />
-        <viewModel:BondOption
+        <acme:BondOption
             DisplayStyle="{StaticResource HatchBondStyle}"
             Id="5"
             Order="S"
             Stereo="Hatch" />
     </x:Array>
 
-    <x:Array x:Key="AtomItems" Type="{x:Type viewModel:AtomOption}">
-        <viewModel:AtomOption Element="C" Foreground="{StaticResource CBrush}">
+    <x:Array x:Key="AtomItems" Type="{x:Type acme:AtomOption}">
+        <acme:AtomOption Element="C" Foreground="{StaticResource CBrush}">
             C
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="H" Foreground="{StaticResource HBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="H" Foreground="{StaticResource HBrush}">
             H
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="N" Foreground="{StaticResource NBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="N" Foreground="{StaticResource NBrush}">
             N
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="O" Foreground="{StaticResource OBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="O" Foreground="{StaticResource OBrush}">
             O
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="P" Foreground="{StaticResource PBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="P" Foreground="{StaticResource PBrush}">
             P
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="S" Foreground="{StaticResource SBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="S" Foreground="{StaticResource SBrush}">
             S
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">
             Cl
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="Br" Foreground="{StaticResource BrBrush}">
             Br
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="I" Foreground="{StaticResource IBrush}">
+        </acme:AtomOption>
+        <acme:AtomOption Element="I" Foreground="{StaticResource IBrush}">
             I
-        </viewModel:AtomOption>
-        <viewModel:AtomOption Element="R" Foreground="Black">
+        </acme:AtomOption>
+        <acme:AtomOption Element="R" Foreground="Black">
             <TextBlock>
                 R<Run BaselineAlignment="Subscript" FontSize="8">
                     1
                 </Run>
             </TextBlock>
-        </viewModel:AtomOption>
+        </acme:AtomOption>
     </x:Array>
     <!--  button paths  -->
 

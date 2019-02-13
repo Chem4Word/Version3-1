@@ -5,30 +5,33 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Linq;
 using Chem4Word.ACME.Utils;
-using Chem4Word.Model;
-using Chem4Word.Model.Enums;
-using Chem4Word.Model.Geometry;
-using Chem4Word.View;
-using Chem4Word.ViewModel.Adorners;
+
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
+using DrawBondAdorner = Chem4Word.ACME.Adorners.DrawBondAdorner;
+using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME.Behaviors
 {
     public class DrawBehavior : BaseEditBehavior
     {
         private readonly TranslateTransform _transform = new TranslateTransform();
-        private AtomShape _currentAtomShape;
+        private AtomVisual _currentAtomVisual;
         private bool _flag;
         private SnapGeometry _angleSnapper;
         private Window _parent;
 
         private DrawBondAdorner _adorner;
         private Point _lastPos;
-        private AtomShape _lastAtomShape;
+        private AtomVisual _lastAtomVisual;
         //private Atom _lastAtom;
 
         public DrawBehavior()
@@ -54,7 +57,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (_currentAtomShape != null)
+            if (_currentAtomVisual != null)
             {
                 Point lastPos;
 
@@ -69,83 +72,83 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         lastPos = e.GetPosition(AssociatedObject);
 
-                        var angleBetween = Vector.AngleBetween((_lastAtomShape?.ParentAtom?.BalancingVector) ?? BasicGeometry.ScreenNorth, BasicGeometry.ScreenNorth);
+                        var angleBetween = Vector.AngleBetween((_lastAtomVisual?.ParentAtom?.BalancingVector) ?? BasicGeometry.ScreenNorth, BasicGeometry.ScreenNorth);
 
                         lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
                     }
 
                     if (_adorner == null)
                     {
-                        _adorner = new DrawBondAdorner(AssociatedObject, ViewModel.BondThickness)
+                        _adorner = new DrawBondAdorner(AssociatedObject, Globals.BondThickness)
                         {
                             Stereo = ViewModel.CurrentStereo,
                             BondOrder = ViewModel.CurrentBondOrder
                         };
                     }
-                    _adorner.StartPoint = _currentAtomShape.Position;
+                    _adorner.StartPoint = _currentAtomVisual.Position;
                     _adorner.EndPoint = lastPos;
                     _lastPos = lastPos;
                 }
             }
         }
 
-        private AtomShape GetAtomUnderCursor(MouseEventArgs e)
+        private AtomVisual GetAtomUnderCursor(MouseEventArgs e)
         {
             var result = GetTarget(e.GetPosition(AssociatedObject));
-            return (result?.VisualHit as AtomShape);
+            return (result?.VisualHit as AtomVisual);
         }
 
         private void AssociatedObject_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             AssociatedObject.ReleaseMouseCapture();
 
-            var landedAtomShape = GetAtomUnderCursor(e);
-            var landedBondShape = GetBondUnderCursor(e);
+            var landedAtomVisual = GetAtomUnderCursor(e);
+            var landedBondVisual = GetBondUnderCursor(e);
 
-            if (landedBondShape != null)
+            if (landedBondVisual != null)
             {
-                if (landedBondShape.Stereo == BondStereo.Hatch & ViewModel.CurrentStereo == BondStereo.Hatch |
-                    landedBondShape.Stereo == BondStereo.Wedge & ViewModel.CurrentStereo == BondStereo.Wedge)
+                if (landedBondVisual.ParentBond.Stereo == Globals.BondStereo.Hatch & ViewModel.CurrentStereo == Globals.BondStereo.Hatch |
+                    landedBondVisual.ParentBond.Stereo == Globals.BondStereo.Wedge & ViewModel.CurrentStereo == Globals.BondStereo.Wedge)
                 {
-                    ViewModel.SwapBondDirection(landedBondShape.ParentBond);
+                    ViewModel.SwapBondDirection(landedBondVisual.ParentBond);
                 }
                 else
                 {
-                    ViewModel.SetBondAttributes(landedBondShape.ParentBond);
+                    ViewModel.SetBondAttributes(landedBondVisual.ParentBond);
                 }
             }
             else
             {
                 // ReSharper disable once PossibleUnintendedReferenceComparison
-                if (landedAtomShape == null)  //no atom hit
+                if (landedAtomVisual == null)  //no atom hit
                 {
-                    if (_currentAtomShape != null)
+                    if (_currentAtomVisual != null)
                     {
-                        ViewModel.AddAtomChain(_currentAtomShape.ParentAtom, _angleSnapper.SnapBond(e.GetPosition(AssociatedObject), e), ClockDirections.Two);
+                        ViewModel.AddAtomChain(_currentAtomVisual.ParentAtom, _angleSnapper.SnapBond(e.GetPosition(AssociatedObject), e), Globals.ClockDirections.Two);
                     }
                     else
                     {
-                        ViewModel.AddAtomChain(null, e.GetPosition(AssociatedObject), ClockDirections.Two);
+                        ViewModel.AddAtomChain(null, e.GetPosition(AssociatedObject), Globals.ClockDirections.Two);
                     }
                 }
-                else if (landedAtomShape == _currentAtomShape) //both are the same atom
+                else if (landedAtomVisual == _currentAtomVisual) //both are the same atom
                 {
-                    var atomMetrics = GetNewChainEndPos(landedAtomShape);
+                    var atomMetrics = GetNewChainEndPos(landedAtomVisual);
 
-                    ViewModel.AddAtomChain(landedAtomShape.ParentAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
+                    ViewModel.AddAtomChain(landedAtomVisual.ParentAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
                 }
                 else //we must have hit a different atom altogether
                 {
                     //already has a bond to the target atom
-                    var existingBond = _currentAtomShape.ParentAtom.BondBetween(landedAtomShape.ParentAtom);
+                    var existingBond = _currentAtomVisual.ParentAtom.BondBetween(landedAtomVisual.ParentAtom);
                     if (existingBond != null)
                     {
                         ViewModel.IncreaseBondOrder(existingBond);
                     }
                     else //doesn't have a bond to the target atom
                     {
-                        ViewModel.AddNewBond(_currentAtomShape.ParentAtom, landedAtomShape.ParentAtom,
-                            _currentAtomShape.ParentAtom.Parent);
+                        ViewModel.AddNewBond(_currentAtomVisual.ParentAtom, landedAtomVisual.ParentAtom,
+                            _currentAtomVisual.ParentAtom.Parent);
                     }
                 }
             }
@@ -169,9 +172,9 @@ namespace Chem4Word.ACME.Behaviors
         /// <summary>
         ///
         /// </summary>
-        /// <param name="lastAtomShape"></param>
+        /// <param name="lastAtomVisual"></param>
         /// <returns></returns>
-        private (Point NewPos, ClockDirections sproutDir) GetNewChainEndPos(AtomShape lastAtomShape)
+        private (Point NewPos, ClockDirections sproutDir) GetNewChainEndPos(AtomVisual lastAtomVisual)
         {
             ClockDirections GetGeneralDir(Vector bondVector)
             {
@@ -181,7 +184,7 @@ namespace Chem4Word.ACME.Behaviors
                 return hour;
             }
 
-            var lastAtom = lastAtomShape.ParentAtom;
+            var lastAtom = lastAtomVisual.ParentAtom;
             Vector newDirection;
 
             ClockDirections newTag;
@@ -193,7 +196,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             else if (lastAtom.Degree == 1)
             {
-                Vector bondVector = lastAtom.Position - lastAtom.Neighbours[0].Position;
+                Vector bondVector = lastAtom.Position - lastAtom.Neighbours.First().Position;
 
                 var hour = GetGeneralDir(bondVector);
 
@@ -287,16 +290,16 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _currentAtomShape = GetAtomUnderCursor(e);
-            if (_currentAtomShape == null)
+            _currentAtomVisual = GetAtomUnderCursor(e);
+            if (_currentAtomVisual == null)
             {
                 _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo: AssociatedObject), ViewModel);
             }
             else
             {
                 Mouse.Capture(AssociatedObject);
-                _angleSnapper = new SnapGeometry(_currentAtomShape.ParentAtom.Position, ViewModel);
-                _lastAtomShape = _currentAtomShape;
+                _angleSnapper = new SnapGeometry(_currentAtomVisual.ParentAtom.Position, ViewModel);
+                _lastAtomVisual = _currentAtomVisual;
             }
             _flag = true;
         }
@@ -306,16 +309,16 @@ namespace Chem4Word.ACME.Behaviors
             return e.LeftButton == MouseButtonState.Pressed & _flag;
         }
 
-        private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
+        private AtomVisual GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-            return (result?.VisualHit as AtomShape);
+            return (result?.VisualHit as AtomVisual);
         }
 
-        private BondShape GetBondUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
+        private BondVisual GetBondUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-            return (result?.VisualHit as BondShape);
+            return (result?.VisualHit as BondVisual);
         }
 
         private HitTestResult GetTarget(Point p)
