@@ -14,8 +14,7 @@ using System.Windows;
 using System.Windows.Media;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
-using Chem4Word.View;
-using static Chem4Word.View.GlyphUtils;
+using static Chem4Word.ACME.Drawing.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -517,7 +516,7 @@ namespace Chem4Word.ACME.Drawing
             using (DrawingContext dc = RenderOpen())
             {
                 GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
-                //Debug.WriteLine($"AtomShape.OnRender() SymbolSize: {SymbolSize}");
+                //Debug.WriteLine($"AtomVisual.OnRender() SymbolSize: {SymbolSize}");
                 GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
                 GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
                 MaskOffsetWidth = GlyphText.SymbolSize * 0.1;

@@ -6,13 +6,14 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core;
-using Chem4Word.Model;
-using Chem4Word.Model.Geometry;
-using Chem4Word.View;
+
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
 using Chem4Word.ViewModel;
 
 namespace Chem4Word.ACME.Behaviors
@@ -140,7 +141,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 var nap = new NewAtomPlacement
                 {
-                    ExistingAtom = (GetTarget(placement)?.VisualHit as AtomShape)?.ParentAtom,
+                    ExistingAtom = (GetTarget(placement)?.VisualHit as AtomVisual)?.ParentAtom,
                     Position = placement
                 };
                 newAtomPlacements.Add(nap);
@@ -250,16 +251,16 @@ namespace Chem4Word.ACME.Behaviors
             return placements;
         }
 
-        private AtomShape GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
+        private AtomVisual GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-            return (result?.VisualHit as AtomShape);
+            return (result?.VisualHit as AtomVisual);
         }
 
-        private BondShape GetBondUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
+        private BondVisual GetBondUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
         {
             var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-            return (result?.VisualHit as BondShape);
+            return (result?.VisualHit as BondVisual);
         }
 
         private HitTestResult GetTarget(Point p)

@@ -143,10 +143,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Chemistry\Chem4Word.DisplayViewModel2\Chem4Word.DisplayViewModel2.csproj">
-      <Project>{ff85d479-ab23-4016-b5eb-747f606db677}</Project>
-      <Name>Chem4Word.DisplayViewModel2</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Chem4Word.V3\Chem4Word.V3.csproj">
       <Project>{578789AB-84C4-4EA5-831D-BDCF20BA465F}</Project>
       <Name>Chem4Word.V3</Name>

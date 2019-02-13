@@ -11,36 +11,22 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2.Geometry
 {
-    public enum ClockDirections
-    {
-        Nothing = 0,
-        One,
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Ten,
-        Eleven,
-        Twelve
-    }
+  
 
     public static class AngleMethods
     {
-        public static Vector ToVector(this ClockDirections dir)
+        public static Vector ToVector(this Globals.ClockDirections dir)
         {
             Matrix rotator = new Matrix();
             rotator.Rotate((int)dir.ToDegrees());
             return BasicGeometry.ScreenNorth * rotator;
         }
 
-        public static double ToDegrees(this ClockDirections cd)
+        public static double ToDegrees(this Globals.ClockDirections cd)
         {
             return 30 * ((int)cd % 12);
         }
@@ -51,9 +37,9 @@ namespace Chem4Word.Model2.Geometry
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns>A clock direction pointing to the new direction </returns>
-        public static ClockDirections Split(this ClockDirections first, ClockDirections second)
+        public static Globals.ClockDirections Split(this Globals.ClockDirections first, Globals.ClockDirections second)
         {
-            return (ClockDirections)((((int)first + (int)second) % 12) / 2);
+            return (Globals.ClockDirections)((((int)first + (int)second) % 12) / 2);
         }
 
         public static double ToDegrees(this CompassPoints cp)

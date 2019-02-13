@@ -6,17 +6,14 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Drawing;
-using Chem4Word.DisplayViewModel2;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Mail;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
@@ -51,9 +48,9 @@ namespace Chem4Word.ACME.Controls
         #region Properties
 
         //properties
-        private DisplayViewModel2.DisplayViewModel2 _mychemistry;
+        private ViewModel _mychemistry;
 
-        public DisplayViewModel2.DisplayViewModel2 Chemistry
+        public ViewModel Chemistry
         {
             get { return _mychemistry; }
             set
@@ -276,7 +273,7 @@ namespace Chem4Word.ACME.Controls
         /// Draws the chemistry
         /// </summary>
         /// <param name="vm"></param>
-        private void DrawChemistry(DisplayViewModel2.DisplayViewModel2 vm)
+        private void DrawChemistry(ViewModel vm)
         {
             Clear();
 

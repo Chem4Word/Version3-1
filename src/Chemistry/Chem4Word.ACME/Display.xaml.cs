@@ -15,7 +15,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.DisplayViewModel2;
 using Chem4Word.Model2.Helpers;
 using ChemistryModel = Chem4Word.Model2.Model;
 
@@ -156,7 +155,7 @@ namespace Chem4Word.ACME
                 {
                     chemistryModel.RescaleForXaml(true);
 
-                    CurrentViewModel = new DisplayViewModel2.DisplayViewModel2(chemistryModel);
+                    CurrentViewModel = new ViewModel(chemistryModel);
                     DrawChemistry(CurrentViewModel);
                 }
                 else
@@ -170,12 +169,12 @@ namespace Chem4Word.ACME
             }
         }
 
-        private void DrawChemistry(DisplayViewModel2.DisplayViewModel2 currentViewModel)
+        private void DrawChemistry(ViewModel currentViewModel)
         {
             ChemCanvas.Chemistry = currentViewModel;
         }
 
-        public DisplayViewModel2.DisplayViewModel2 CurrentViewModel { get; set; }
+        public ViewModel CurrentViewModel { get; set; }
 
         #endregion Private Methods
 

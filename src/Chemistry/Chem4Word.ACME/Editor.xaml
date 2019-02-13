@@ -693,7 +693,7 @@
                                 </LinearGradientBrush.Transform>
                             </LinearGradientBrush>
                         </DataTemplate.Resources>
-                        <view:BondShape Name="BondShape"
+                        <view:BondVisual Name="BondVisual"
                             DrawingCanvas="{Binding ElementName=ChemCanvas, Mode=OneTime}"
                             Order="{Binding Path=Order, Mode=OneWay}"
                             ParentBond="{Binding Path=SelfRef, Mode=OneTime}"
@@ -701,8 +701,8 @@
                             Stereo="{Binding Path=Stereo, Mode=OneWay}"
                             StartPoint="{Binding Path=StartAtom.Position, Mode=OneWay}"
                             EndPoint="{Binding Path=EndAtom.Position, Mode=OneWay}">
-                            <view:BondShape.Style>
-                                <Style TargetType="{x:Type view:BondShape}">
+                            <view:BondVisual.Style>
+                                <Style TargetType="{x:Type view:BondVisual}">
                                     <Setter Property="StrokeThickness" Value="{Binding ElementName=ChemCanvas, Path=DataContext.EditBondThickness}" />
                                     <Setter Property="StrokeEndLineCap" Value="Round" />
                                     <Setter Property="StrokeStartLineCap" Value="Round" />
@@ -796,11 +796,11 @@
                                         </MultiTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </view:BondShape.Style>
-                        </view:BondShape>
+                            </view:BondVisual.Style>
+                        </view:BondVisual>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type model:Atom}">
-                        <view:AtomShape Name="AtomShape"
+                        <view:AtomVisual Name="AtomVisual"
                             AtomSymbol="{Binding Path=SymbolText}"
                             BackgroundColor="{Binding ElementName=ACMEDisplay, Path=BackgroundColor}"
                             Charge="{Binding Path=FormalCharge}"
@@ -808,8 +808,8 @@
                             Isotope="{Binding Path=IsotopeNumber}"
                             ParentAtom="{Binding Path=SelfRef}"
                             Position="{Binding Path=Position}">
-                            <view:AtomShape.Style>
-                                <Style TargetType="{x:Type view:AtomShape}">
+                            <view:AtomVisual.Style>
+                                <Style TargetType="{x:Type view:AtomVisual}">
                                     <Setter Property="Fill">
                                         <Setter.Value>
                                             <SolidColorBrush Color="{Binding Element.Colour}" />
@@ -836,8 +836,8 @@
                                         </Trigger>
                                     </Style.Triggers>
                                 </Style>
-                            </view:AtomShape.Style>
-                        </view:AtomShape>
+                            </view:AtomVisual.Style>
+                        </view:AtomVisual>
                     </DataTemplate>
                 </ItemsControl.Resources>
             </ItemsControl>
