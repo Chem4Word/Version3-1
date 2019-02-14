@@ -50,13 +50,18 @@ namespace Chem4Word.ACME.Drawing
 
                         if (!Flipped)
                         {
-                            if(count>1 && component is FunctionalGroup fg3)
+                            if(count > 1 && component is FunctionalGroup fg3)
                             {
                                 //need to draw brackets around it
                                 componentRuns.Add(new CustomTextSourceRun { Text = "(" });
                                 BuildTextRuns(fg3, componentRuns);
                                 ComponentRuns.Add(new CustomTextSourceRun { Text = ")" });
-                                ComponentRuns.Add(new CustomTextSourceRun { Text = count.ToString(), IsSuperscript = true });
+                                ComponentRuns.Add(new CustomTextSourceRun { Text = count.ToString(), IsSubscript=true });
+
+                            }
+                            else if (count > 1 && component is Element e2)
+                            {
+
                             }
                         }
                     }
@@ -66,8 +71,6 @@ namespace Chem4Word.ACME.Drawing
 
         public override void Render()
         {
-
-            
             GetTextRuns();
         }
     }
@@ -75,7 +78,7 @@ namespace Chem4Word.ACME.Drawing
     public class CustomTextSourceRun
     {
         public string Text;
-        public bool IsSuperscript;
+        public bool IsSubscript;
         public bool IsEndParagraph;
         public int Length { get { return IsEndParagraph ? 1 : Text.Length; } }
     }
