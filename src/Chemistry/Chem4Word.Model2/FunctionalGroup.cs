@@ -18,8 +18,23 @@ namespace Chem4Word.Model2
 {
     public class SubGroup
     {
-        public ElementBase Component { get; set; }
+        public string Component { get; set; }
         public int Count { get; set; }
+
+        public ElementBase Resolve()
+        {
+            
+            if(FunctionalGroup.TryParse(Component, out FunctionalGroup fg))
+            {
+                return fg;
+            }
+            else if (Globals.PeriodicTable.HasElement(Component))
+            {
+                return Globals.PeriodicTable.Elements[Component];
+            }
+
+            return null;
+        }
     }
     public class FunctionalGroup : ElementBase
     {
@@ -94,7 +109,7 @@ namespace Chem4Word.Model2
         public string Symbol { get; set; }
         [JsonProperty]
         public bool ShowAsSymbol { get; set; }
-        [JsonProperty("Components")]
+        [JsonProperty]
         public List<SubGroup> Components { get; set; }
     }
 }
