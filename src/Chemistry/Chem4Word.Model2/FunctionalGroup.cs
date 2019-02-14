@@ -16,6 +16,11 @@ using System.Text.RegularExpressions;
 
 namespace Chem4Word.Model2
 {
+    public class SubGroup
+    {
+        public ElementBase Component { get; set; }
+        public int Count { get; set; }
+    }
     public class FunctionalGroup : ElementBase
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
@@ -89,5 +94,7 @@ namespace Chem4Word.Model2
         public string Symbol { get; set; }
         [JsonProperty]
         public bool ShowAsSymbol { get; set; }
+        [JsonProperty("Components")]
+        public List<SubGroup> Components { get; set; }
     }
 }
