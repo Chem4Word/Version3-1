@@ -21,14 +21,13 @@ namespace Chem4Word.ACME.Drawing
     {
         private List<CustomTextSourceRun> ComponentRuns { get; }
         public FunctionalGroup ParentGroup { get; }
-
-        public Point Position { get; set; }
+        public AtomVisual ParentVisual { get; }
         public bool Flipped { get; set; }
-        public FunctionalGroupVisual(object fg)
+        public FunctionalGroupVisual(object fg, AtomVisual parent)
         {
             ParentGroup = (FunctionalGroup)fg;
             ComponentRuns = new List<CustomTextSourceRun>();
-            
+            ParentVisual = parent;
         }
 
         private void GetTextRuns()
@@ -134,41 +133,48 @@ namespace Chem4Word.ACME.Drawing
         }
 
    
-        public override void Render()
+        public  void Render(DrawingContext dc)
         {
+
             GetTextRuns();
             GlyphText firstGlyph = new GlyphText(ComponentRuns[0].Text[0].ToString(),GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
-            firstGlyph.MeasureAtCenter(Position);
+            var parentAtomPosition = ParentVisual.ParentAtom.Position;
+            firstGlyph.MeasureAtCenter(parentAtomPosition);
 
-            Point startingPoint = firstGlyph.TextMetrics.OffsetVector + Position;
-
+            Point startingPoint =
+                parentAtomPosition + firstGlyph.TextMetrics.TextFormatterOffset;
+            ;// - new Vector(0d, GlyphText.SymbolSize);
+            //Point startingPoint = parentAtomPosition;
             int textStorePosition = 0;
-
+            dc.DrawLine(new Pen(Brushes.Gray, 1 ),parentAtomPosition,startingPoint );
             var textStore = new CustomTextSource();
             textStore.Runs.AddRange(ComponentRuns);
-         
+            //textStore.Runs.Add(new CustomTextSourceRun());
 
             TextFormatter tc = TextFormatter.Create();
-            using (DrawingContext dc = this.RenderOpen())
+       
+            //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 20, 20);
+            //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
+            var flowDirection = Flipped ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+            var paraprops = new CustomTextSource.GenericTextParagraphProperties(
+                flowDirection,
+                TextAlignment.Left,
+                true,
+                false,
+                new CustomTextSource.CustomTextRunProperties(false),
+                TextWrapping.NoWrap,
+                GlyphText.SymbolSize,
+                0d);
+            using (TextLine myTextLine = tc.FormatLine(textStore, textStorePosition, 60,
+                paraprops,
+                null))
             {
-                using (TextLine myTextLine = tc.FormatLine(textStore, textStorePosition, 96 * 6,
-                    new CustomTextSource.GenericTextParagraphProperties(
-                        Flipped ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
-                        TextAlignment.Left,
-                        true,
-                        false,
-                        new CustomTextSource.CustomTextRunProperties(false),
-                        TextWrapping.NoWrap,
-                        GlyphText.SymbolSize,
-                        0d),
-                    null))
-                {
-                    myTextLine.Draw(dc, startingPoint, InvertAxes.None);
-                    
-                };
+                //myTextLine.Draw( dc, startingPoint, InvertAxes.None);
+                myTextLine.Draw(dc, startingPoint, InvertAxes.None);
+            };
 
-                dc.Close();
-            }
+           dc.Close();
+            
 
             
 

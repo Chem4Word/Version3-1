@@ -25,12 +25,12 @@ namespace Chem4Word.ACME.Drawing
 
             public override double FontHintingEmSize
             {
-                get { return 22; }
+                get { return GlyphText.SymbolSize; }
             }
 
             public override double FontRenderingEmSize
             {
-                get { return 22; }
+                get { return GlyphText.SymbolSize; }
             }
 
             public override Brush ForegroundBrush
@@ -50,7 +50,7 @@ namespace Chem4Word.ACME.Drawing
 
             public override System.Windows.Media.Typeface Typeface
             {
-                get { return new Typeface("Calibri"); }
+                get { return GlyphUtils.SymbolTypeface; }
             }
 
             public override TextRunTypographyProperties TypographyProperties

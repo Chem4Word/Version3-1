@@ -467,7 +467,7 @@ namespace Chem4Word.ACME.Drawing
             ShowPoints(Hull, drawingContext);
         }
 
-        private void ShowPoints(List<Point> points, DrawingContext drawingContext)
+        public void ShowPoints(List<Point> points, DrawingContext drawingContext)
         {
             // Show points for debugging
             SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
@@ -479,15 +479,15 @@ namespace Chem4Word.ACME.Drawing
             {
                 if (i > 0 && i < max)
                 {
-                    drawingContext.DrawEllipse(otherPoints, null, point, 2, 2);
+                    drawingContext.DrawEllipse(otherPoints, null, point, 20, 20);
                 }
                 if (i == 0)
                 {
-                    drawingContext.DrawEllipse(firstPoint, null, point, 2, 2);
+                    drawingContext.DrawEllipse(firstPoint, null, point, 20, 20);
                 }
                 if (i == max)
                 {
-                    drawingContext.DrawEllipse(lastPoint, null, point, 2, 2);
+                    drawingContext.DrawEllipse(lastPoint, null, point, 20, 20);
                 }
                 i++;
             }
@@ -547,9 +547,10 @@ namespace Chem4Word.ACME.Drawing
 
         private void RenderFunctionalGroup(DrawingContext dc, FunctionalGroup fg)
         {
-             _functionalGroupVisual = new FunctionalGroupVisual(fg);
-             _functionalGroupVisual.Flipped = Vector.AngleBetween(BasicGeometry.ScreenNorth, ParentAtom.BalancingVector) > 0;
-             _functionalGroupVisual.Render();
+             _functionalGroupVisual = new FunctionalGroupVisual(fg, this);
+             _functionalGroupVisual.Flipped = ParentAtom.BalancingVector.X < 0;
+             _functionalGroupVisual.Render(dc);
+             
              AddVisualChild(_functionalGroupVisual);
              
         }

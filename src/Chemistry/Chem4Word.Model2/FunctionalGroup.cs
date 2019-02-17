@@ -62,16 +62,7 @@ namespace Chem4Word.Model2
 
         public static bool TryParse(string desc, out FunctionalGroup fg)
         {
-            try
-            {
-                fg = ShortcutList[desc];
-                return true;
-            }
-            catch (Exception)
-            {
-                fg = null;
-                return false;
-            }
+            return ShortcutList.TryGetValue(desc, out fg);
         }
 
         private static void LoadFromResource()
