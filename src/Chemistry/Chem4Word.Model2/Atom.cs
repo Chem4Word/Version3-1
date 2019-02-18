@@ -328,10 +328,15 @@ namespace Chem4Word.Model2
         public int ImplicitHydrogenCount
         {
             get
+
             {
                 // Return -1 if we don't need to do anything
                 int iHydrogenCount = -1;
 
+                if (Element is FunctionalGroup)
+                {
+                    return iHydrogenCount;
+                }
                 // Applies to "B,C,N,O,F,Si,P,S,Cl,As,Se,Br,Te,I,At";
                 string appliesTo = Globals.PeriodicTable.ImplicitHydrogenTargets;
 

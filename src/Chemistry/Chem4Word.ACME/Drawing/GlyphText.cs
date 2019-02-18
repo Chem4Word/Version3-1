@@ -32,12 +32,8 @@ namespace Chem4Word.ACME.Drawing
 
         public static double SymbolSize
         {
-            get
-            {
-               
-                return _symbolSize.Value;
-            }
-            set { _symbolSize = value; }
+            get => _symbolSize.Value;
+            set => _symbolSize = value;
         }
 
         private static double? _scriptSize;
@@ -154,16 +150,20 @@ namespace Chem4Word.ACME.Drawing
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
+            
             Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, SymbolSize) +
                                 new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
-
+            var bb = groupGlyphRun.GetBoundingBox(center + mainOffset);
+            Vector textFormatterOffset = new Vector(mainOffset.X, -FirstBearing(groupGlyphRun) -bb.Height/2  );
+                                
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
-                BoundingBox = groupGlyphRun.GetBoundingBox(center + mainOffset),
+                BoundingBox = bb,
                 Geocenter = center,
                 TotalBoundingBox = groupGlyphRun.GetBoundingBox(center + mainOffset),
-                OffsetVector = mainOffset
+                OffsetVector = mainOffset,
+                TextFormatterOffset = textFormatterOffset
             };
         }
 
@@ -274,6 +274,7 @@ namespace Chem4Word.ACME.Drawing
 
 
         public Vector OffsetVector { get; set; }
+        public Vector TextFormatterOffset { get; set; }
     }
 
     public class LabelMetrics

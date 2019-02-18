@@ -26,16 +26,12 @@ namespace Chem4Word.ACME.Drawing
         #region private fields
 
         private static double MaskOffsetWidth = 0;
-        private Geometry _hullGeometry;
+        private FunctionalGroupVisual _functionalGroupVisual;
 
         public double BondThickness { get; set; }
 
         #endregion private fields
-
         #region Collections
-
-        //list of points that make up the hull of the shape
-        private List<Point> _shapeHull;
 
         #endregion Collections
 
@@ -193,11 +189,15 @@ namespace Chem4Word.ACME.Drawing
 
         #endregion Nested Classes
 
-        public AtomVisual(Atom atom)
+        public AtomVisual(object atom):this()
         {
-            ParentAtom = atom;
+            ParentAtom = (Atom)atom;
         }
 
+        public AtomVisual()
+        {
+
+        }
         #region Properties
 
         public Atom ParentAtom { get; }
@@ -212,9 +212,9 @@ namespace Chem4Word.ACME.Drawing
         public int? Isotope { get; set; }
         public int ImplicitHydrogenCount { get; set; }
 
-        public List<Point> Hull => _shapeHull;
+        public virtual List<Point> Hull { get; protected set; }
 
-        private double Standoff => GlyphText.SymbolSize / 4;
+        protected double Standoff => GlyphText.SymbolSize / 4;
         #endregion Visual Properties
 
         #endregion Properties
@@ -386,7 +386,7 @@ namespace Chem4Word.ACME.Drawing
             AtomTextMetrics hydrogenMetrics = null;
             LabelMetrics isoMetrics = null;
             SubscriptedGroup subscriptedGroup = null;
-            _shapeHull = new List<Point>();
+            Hull = new List<Point>();
 
             //stage 1:  measure up the main atom symbol in position
             //we need the metrics first
@@ -399,7 +399,7 @@ namespace Chem4Word.ACME.Drawing
                 if (symbolText.FlattenedPath != null)
                 {
                     symbolPoints = symbolText.FlattenedPath;
-                    _shapeHull.AddRange(symbolText.FlattenedPath);
+                    Hull.AddRange(symbolText.FlattenedPath);
                 }
             }
 
@@ -418,7 +418,7 @@ namespace Chem4Word.ACME.Drawing
 
                 subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
                 hydrogenPoints = hydrogenMetrics.FlattenedPath;
-                _shapeHull.AddRange(hydrogenPoints);
+                Hull.AddRange(hydrogenPoints);
             }
 
             //then do the drawing of the main symbol (again)
@@ -435,25 +435,25 @@ namespace Chem4Word.ACME.Drawing
             if (Isotope != null)
             {
                 isoMetrics = DrawIsotopeLabel(drawingContext, mainAtomMetrics, hydrogenMetrics);
-                _shapeHull.AddRange(isoMetrics.Corners);
+                Hull.AddRange(isoMetrics.Corners);
             }
 
             //stage7:  draw any charges
             if ((Charge ?? 0) != 0)
             {
                 LabelMetrics cMetrics = DrawCharges(drawingContext, mainAtomMetrics, hydrogenMetrics, isoMetrics, ParentAtom.GetDefaultHOrientation());
-                _shapeHull.AddRange(cMetrics.FlattenedPath);
+                Hull.AddRange(cMetrics.FlattenedPath);
             }
 
             //stage 8:  recalculate the hull
-            if (_shapeHull.Any())
+            if (Hull.Any())
             {
                 //sort the points properly before doing a hull calculation
-                var sortedHull = (from Point p in _shapeHull
+                var sortedHull = (from Point p in Hull
                                   orderby p.X, p.Y descending
                                   select p).ToList();
 
-                _shapeHull = Geometry<Point>.GetHull(sortedHull, p => p);
+                Hull = Geometry<Point>.GetHull(sortedHull, p => p);
 
                 // Diag: Show Hull
                 //ShowHull(_shapeHull, drawingContext);
@@ -464,10 +464,10 @@ namespace Chem4Word.ACME.Drawing
         {
             var path = BasicGeometry.BuildPath(points);
             drawingContext.DrawGeometry(BackgroundColor, new Pen(new SolidColorBrush(Colors.GreenYellow), MaskOffsetWidth / 2), path.Data);
-            ShowPoints(_shapeHull, drawingContext);
+            ShowPoints(Hull, drawingContext);
         }
 
-        private void ShowPoints(List<Point> points, DrawingContext drawingContext)
+        public void ShowPoints(List<Point> points, DrawingContext drawingContext)
         {
             // Show points for debugging
             SolidColorBrush firstPoint = new SolidColorBrush(Colors.Red);
@@ -479,15 +479,15 @@ namespace Chem4Word.ACME.Drawing
             {
                 if (i > 0 && i < max)
                 {
-                    drawingContext.DrawEllipse(otherPoints, null, point, 2, 2);
+                    drawingContext.DrawEllipse(otherPoints, null, point, 20, 20);
                 }
                 if (i == 0)
                 {
-                    drawingContext.DrawEllipse(firstPoint, null, point, 2, 2);
+                    drawingContext.DrawEllipse(firstPoint, null, point, 20, 20);
                 }
                 if (i == max)
                 {
-                    drawingContext.DrawEllipse(lastPoint, null, point, 2, 2);
+                    drawingContext.DrawEllipse(lastPoint, null, point, 20, 20);
                 }
                 i++;
             }
@@ -496,36 +496,63 @@ namespace Chem4Word.ACME.Drawing
         public override void Render()
         {
             Point centre = ParentAtom.Position;
-            using (DrawingContext dc = RenderOpen())
+            GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
+
+            GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
+            GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
+            MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
+
+            if ( ParentAtom.Element is Element e )
             {
-                GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
-                //Debug.WriteLine($"AtomVisual.OnRender() SymbolSize: {SymbolSize}");
-                GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
-                GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
-                MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
-
-                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(ParentAtom.Element.Colour));
-                AtomSymbol = ParentAtom.SymbolText;
-                Charge = ParentAtom.FormalCharge;
-                ImplicitHydrogenCount = ParentAtom.ImplicitHydrogenCount;
-                Isotope = ParentAtom.IsotopeNumber;
-                Position = ParentAtom.Position;
-
-                if (GlyphText.SymbolSize > 0)
+                using (DrawingContext dc = RenderOpen())
                 {
-                    RenderAtom(dc);
-                    //debugging code - uncomment to show the convex hull
-                    //#if DEBUG
-                    //                    if (AtomSymbol != "")
+                    
+                    //Debug.WriteLine($"AtomVisual.OnRender() SymbolSize: {SymbolSize}");
+                    
 
-                    //                    {
-                    //                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
-                    //                        areaBrush.Opacity = 0.33;
-                    //                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
-                    //                    }
-                    //#endif
+                    Fill = new SolidColorBrush((Color) ColorConverter.ConvertFromString(e.Colour));
+                    AtomSymbol = ParentAtom.SymbolText;
+                    Charge = ParentAtom.FormalCharge;
+                    ImplicitHydrogenCount = ParentAtom.ImplicitHydrogenCount;
+                    Isotope = ParentAtom.IsotopeNumber;
+                    Position = ParentAtom.Position;
+
+                    if (GlyphText.SymbolSize > 0)
+                    {
+                        RenderAtom(dc);
+                        //debugging code - uncomment to show the convex hull
+                        //#if DEBUG
+                        //                    if (AtomSymbol != "")
+
+                        //                    {
+                        //                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
+                        //                        areaBrush.Opacity = 0.33;
+                        //                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
+                        //                    }
+                        //#endif
+                        //dc.Close();
+                    }
                 }
             }
+            else if (ParentAtom.Element is FunctionalGroup fg)
+            {
+                using (DrawingContext dc = RenderOpen())
+                {
+                    RenderFunctionalGroup(dc, fg);
+                    //dc.Close();
+                }
+            }
+
+        }
+
+        private void RenderFunctionalGroup(DrawingContext dc, FunctionalGroup fg)
+        {
+             _functionalGroupVisual = new FunctionalGroupVisual(fg, this);
+             _functionalGroupVisual.Flipped = ParentAtom.BalancingVector.X < 0;
+             _functionalGroupVisual.Render(dc);
+             
+             AddVisualChild(_functionalGroupVisual);
+             
         }
 
         #endregion Rendering
@@ -541,31 +568,44 @@ namespace Chem4Word.ACME.Drawing
 
         #endregion Methods
 
-        public Geometry HullGeometry
+        public virtual Geometry HullGeometry
         {
             get
             {
-                if (_hullGeometry == null)
+                List<Point> hullList = null;
+   
+                if (ParentAtom.Element is Element)
                 {
                     if (Hull == null || Hull.Count == 0)
                     {
-                        _hullGeometry = null;
+                        hullList = null;
                     }
                     else
                     {
-                        //need to combine the actually filled atom area
-                        //with a stroked outline of it, to give a sufficient margin
-                        Geometry geo1 = BasicGeometry.BuildPolyPath(Hull);
-                        CombinedGeometry cg = new CombinedGeometry(geo1, geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, Standoff)));
-                        _hullGeometry = cg;
+                        hullList = Hull;
                     }
                 }
+                else if (ParentAtom.Element is FunctionalGroup)
+                {
+                    hullList = _functionalGroupVisual.Hull;
+                    
+                }
 
-                return _hullGeometry;
+                //need to combine the actually filled atom area
+                //with a stroked outline of it, to give a sufficient margin
+                if (hullList != null)
+                {
+                    Geometry geo1 = BasicGeometry.BuildPolyPath(hullList);
+                    CombinedGeometry cg = new CombinedGeometry(geo1,
+                        geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, Standoff)));
+                    return cg;
+                }
+
+                return Geometry.Empty;
             }
         }
 
-        public Geometry WidenedHullGeometry
+        public virtual Geometry WidenedHullGeometry
         {
             get
             {
@@ -611,5 +651,7 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
+
+        
     }
 }

@@ -115,23 +115,28 @@ namespace Chem4Word.ACME.Drawing
                 var geo = glyphRun.BuildGeometry();
                 // System.Windows.Media.GetFlattenedPathGeometry(double tolerance, ToleranceType type)
                 // tolerance: Smaller values produce more accurate results but cause slower execution
-                var pg = geo.GetFlattenedPathGeometry(0.01, ToleranceType.Relative);
+                GetGeoPoints(geo, retval);
+            }
+            return retval;
+        }
 
-                foreach (var f in pg.Figures)
+        public static void GetGeoPoints(Geometry geo, List<Point> retval)
+        {
+            var pg = geo.GetFlattenedPathGeometry(0.01, ToleranceType.Relative);
+
+            foreach (var f in pg.Figures)
+            {
+                foreach (var s in f.Segments)
                 {
-                    foreach (var s in f.Segments)
+                    if (s is PolyLineSegment)
                     {
-                        if (s is PolyLineSegment)
+                        foreach (var pt in ((PolyLineSegment) s).Points)
                         {
-                            foreach (var pt in ((PolyLineSegment)s).Points)
-                            {
-                                retval.Add(pt);
-                            }
+                            retval.Add(pt);
                         }
                     }
                 }
             }
-            return retval;
         }
 
         /// <summary>

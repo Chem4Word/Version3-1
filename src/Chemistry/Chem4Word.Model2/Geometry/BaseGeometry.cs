@@ -244,5 +244,29 @@ namespace Chem4Word.Model2.Geometry
 
             return geo;
         }
+
+        public static System.Windows.Media.Geometry CreateGeometry(DrawingGroup drawingGroup)
+        {
+            var geometry = new GeometryGroup();
+
+            foreach (var drawing in drawingGroup.Children)
+            {
+                if (drawing is GeometryDrawing)
+                {
+                    geometry.Children.Add(((GeometryDrawing)drawing).Geometry);
+                }
+                else if (drawing is GlyphRunDrawing)
+                {
+                    geometry.Children.Add(((GlyphRunDrawing)drawing).GlyphRun.BuildGeometry());
+                }
+                else if (drawing is DrawingGroup)
+                {
+                    geometry.Children.Add(CreateGeometry((DrawingGroup)drawing));
+                }
+            }
+
+            geometry.Transform = drawingGroup.Transform;
+            return geometry;
+        }
     }
 }
