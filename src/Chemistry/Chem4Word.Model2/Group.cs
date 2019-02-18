@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Newtonsoft.Json;
 
 namespace Chem4Word.Model2
@@ -49,6 +50,11 @@ namespace Chem4Word.Model2
                     }
                 }
             }
+        }
+
+        public ElementBase Resolve()
+        {
+            throw new NotImplementedException();
         }
     }
 }

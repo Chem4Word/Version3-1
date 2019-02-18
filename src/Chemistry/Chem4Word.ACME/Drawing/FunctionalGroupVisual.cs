@@ -80,7 +80,7 @@ namespace Chem4Word.ACME.Drawing
                     for (int i = 0; i< fg2.Components.Count; i++)
                     {
                         var component = fg2.Components[i];
-                        var group = component.Resolve();
+                        ElementBase group = component.Resolve();
                         int count = component.Count;
 
                         if (!Flipped)

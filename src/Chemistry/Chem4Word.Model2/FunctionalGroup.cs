@@ -81,7 +81,7 @@ namespace Chem4Word.Model2
                 fg = null;
                 return false;
             }
-            return ShortcutList.TryGetValue(desc, out fg);
+            //return ShortcutList.TryGetValue(desc, out fg);
         }
 
         private static void LoadFromResource()
@@ -166,7 +166,5 @@ namespace Chem4Word.Model2
                 }
             }
         }
-        [JsonProperty]
-        public List<SubGroup> Components { get; set; }
     }
 }
