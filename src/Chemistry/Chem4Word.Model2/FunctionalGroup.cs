@@ -17,26 +17,7 @@ using System.Text.RegularExpressions;
 namespace Chem4Word.Model2
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class SubGroup
-    {
-        public string Component { get; set; }
-        public int Count { get; set; }
 
-        public ElementBase Resolve()
-        {
-            
-            if(FunctionalGroup.TryParse(Component, out FunctionalGroup fg))
-            {
-                return fg;
-            }
-            else if (Globals.PeriodicTable.HasElement(Component))
-            {
-                return Globals.PeriodicTable.Elements[Component];
-            }
-
-            return null;
-        }
-    }
     public class FunctionalGroup : ElementBase
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];

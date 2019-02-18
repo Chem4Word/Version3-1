@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 
 namespace Chem4Word.Model2
@@ -23,6 +24,20 @@ namespace Chem4Word.Model2
         {
             Component = e;
             Count = c;
+        }
+
+        public ElementBase Resolve()
+        {
+            if (FunctionalGroup.TryParse(Component, out FunctionalGroup fg))
+            {
+                return fg;
+            }
+            else if (Globals.PeriodicTable.HasElement(Component))
+            {
+                return Globals.PeriodicTable.Elements[Component];
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -50,11 +65,6 @@ namespace Chem4Word.Model2
                     }
                 }
             }
-        }
-
-        public ElementBase Resolve()
-        {
-            throw new NotImplementedException();
         }
     }
 }
