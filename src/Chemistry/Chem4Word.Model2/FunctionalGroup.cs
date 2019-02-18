@@ -109,10 +109,11 @@ namespace Chem4Word.Model2
         /// Symbol can also be of the form CH3, CF3, C2H5 etc
         /// </summary>
         [JsonProperty]
-        public string Symbol { get; set; }
+        public override string Symbol { get; set; }
         [JsonProperty]
 
         public bool ShowAsSymbol { get; set; }
+
         /// <summary>
         /// Defines the constituents of the superatom
         /// The 'pivot' atom that bonds to the fragment appears FIRST in the list

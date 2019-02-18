@@ -13,7 +13,7 @@ using System.Diagnostics;
 namespace Chem4WordTests
 {
     [TestClass]
-    public class FunctionalGroupTests
+    public class FunctionalGroupsTests
     {
 
         [TestMethod]
