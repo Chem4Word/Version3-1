@@ -66,11 +66,7 @@ namespace Chem4Word.Model2
         }
 
         //list of valid shortcuts for testing input
-        public static string ValidShortCuts => "^(" +
-                                               ShortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")$";
-
-        //and the regex to use it
-        public static Regex ShortcutParser => new Regex(ValidShortCuts);
+        public static string ValidShortCuts => "(" + ShortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")";
 
         //list of valid elements (followed by subscripts) for testing input
         public static Regex NameParser => new Regex($"^(?<element>{Globals.PeriodicTable.ValidElements}+[0-9]*)+\\s*$");
@@ -78,7 +74,12 @@ namespace Chem4Word.Model2
         //checks to see whether a typed in expression matches a given shortcut
         public static bool IsValid(string expr)
         {
-            return NameParser.IsMatch(expr) || ShortcutParser.IsMatch(expr);
+            return NameParser.IsMatch(expr) || IsFunctionalGroup(expr);
+        }
+
+        public static bool IsFunctionalGroup(string expr)
+        {
+            return ValidShortCuts.Contains($"|{expr}|");
         }
     }
 }

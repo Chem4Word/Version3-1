@@ -5,7 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
+using Chem4Word.Model2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -27,14 +27,17 @@ namespace Chem4WordTests
                 FunctionalGroup fg = kvp.Value;
                 if (fg.ShowAsSymbol)
                 {
-                    Debug.WriteLine($"{fg.Symbol}");
+                    Debug.WriteLine($"FG: {i} {fg.Symbol}");
                 }
                 else
                 {
                     foreach (var comp in fg.Components)
                     {
-                        Debug.WriteLine($"{fg.Symbol} - {comp.Component} {comp.Count}");
+                        var componentType = FunctionalGroups.IsFunctionalGroup(comp.Component) ? "FG" : "Element";
+                        Debug.WriteLine($"FG: {i} {fg.Symbol} - {comp.Count} * {comp.Component} [{componentType}] {fg.ShowAsSymbol}");
                     }
+                    Debug.WriteLine($"Forward {fg.Expand()}");
+                    Debug.WriteLine($"Reverse {fg.Expand(true)}");
                 }
             }
             Debug.WriteLine($"Found {i} FunctionalGroups");

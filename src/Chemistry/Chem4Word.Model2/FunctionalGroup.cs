@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 
 namespace Chem4Word.Model2
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class FunctionalGroup : ElementBase
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
@@ -44,8 +45,16 @@ namespace Chem4Word.Model2
         {
             try
             {
-                fg = ShortcutList[desc];
-                return true;
+                if (ShortcutList.ContainsKey(desc))
+                {
+                    fg = ShortcutList[desc];
+                    return true;
+                }
+                else
+                {
+                    fg = null;
+                    return false;
+                }
             }
             catch (Exception)
             {
@@ -65,29 +74,76 @@ namespace Chem4Word.Model2
             }
         }
 
-        //list of valid shortcuts for testing input
-        public static string ValidShortCuts => "^(" +
-                                               ShortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")$";
-
-        //and the regex to use it
-        public static Regex ShortcutParser => new Regex(ValidShortCuts);
-
-        //list of valid elements (followed by subscripts) for testing input
-        public static Regex NameParser => new Regex($"^(?<element>{Globals.PeriodicTable.ValidElements}+[0-9]*)+\\s*$");
-
-        //checks to see whether a typed in expression matches a given shortcut
-        public static bool IsValid(string expr)
-        {
-            return NameParser.IsMatch(expr) || ShortcutParser.IsMatch(expr);
-        }
-
         public override string Colour => "#000000";
 
+        /// <summary>
+        /// Determines whether the functional group can be flipped about the pivot
+        /// </summary>
         [JsonProperty]
         public bool Flippable { get; set; }
+
+        /// <summary>
+        /// Symbol refers to the 'Ph', 'Bz' etc
+        /// It is a unique key for the functional group
+        /// Symbol can also be of the form CH3, CF3, C2H5 etc
+        /// </summary>
         [JsonProperty]
         public string Symbol { get; set; }
         [JsonProperty]
+
         public bool ShowAsSymbol { get; set; }
+        /// <summary>
+        /// Defines the constituents of the superatom
+        /// The 'pivot' atom that bonds to the fragment appears FIRST in the list
+        /// so CH3 can appear as H3C
+        ///
+        /// Ths property can be null, which means that the symbol gets rendered
+        /// </summary>
+        [JsonProperty]
+        public List<Group> Components { get; set; }
+
+        public string Expand(bool reverse = false)
+        {
+            string result = "";
+
+            if (reverse)
+            {
+                for (int i = Components.Count - 1; i >= 0; i--)
+                {
+                    Append(Components[i]);
+                }
+            }
+            else
+            {
+                foreach (var component in Components)
+                {
+                    Append(component);
+                }
+            }
+
+            return result;
+
+            // Local Function
+            void Append(Group component)
+            {
+                // Expand FG
+                FunctionalGroup fg;
+                FunctionalGroup.TryParse(component.Component, out fg);
+                if (fg != null && !fg.ShowAsSymbol)
+                {
+                    // This is a nested FG
+                    result += fg.Expand(reverse);
+                }
+                else
+                {
+                    // This is an Element or Simple FG
+                    result += $"{component.Component}";
+                    if (component.Count > 1)
+                    {
+                        result += $"{component.Count}";
+                    }
+                }
+            }
+        }
     }
 }
