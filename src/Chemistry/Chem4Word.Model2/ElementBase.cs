@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.ComponentModel;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -24,5 +25,6 @@ namespace Chem4Word.Model2
         {
             throw new System.NotImplementedException();
         }
+
     }
 }

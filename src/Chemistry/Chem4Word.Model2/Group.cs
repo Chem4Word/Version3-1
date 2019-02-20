@@ -26,18 +26,23 @@ namespace Chem4Word.Model2
             Count = c;
         }
 
-        public ElementBase Resolve()
+        public static bool TryParse(string text, out ElementBase result)
         {
-            if (FunctionalGroup.TryParse(Component, out FunctionalGroup fg))
+            bool success = false;
+            result = null;
+
+            if (FunctionalGroup.TryParse(text, out FunctionalGroup fg))
             {
-                return fg;
+                result = fg;
+                success = true;
             }
-            else if (Globals.PeriodicTable.HasElement(Component))
+            else if (Globals.PeriodicTable.HasElement(text))
             {
-                return Globals.PeriodicTable.Elements[Component];
+                result = Globals.PeriodicTable.Elements[text];
+                success = true;
             }
 
-            return null;
+            return success;
         }
 
         /// <summary>

@@ -362,18 +362,18 @@
       }
     ]
   },
-  "tBu": {
-    "Symbol": "tBu",
-    "ShowAsSymbol": true,
-    "Flippable": false,
+  "TBU": {
+    "Symbol": "TBU",
+    "ShowAsSymbol": false,
+    "Flippable": true,
     "Components": [
       {
         "Component": "C",
-        "Count": 4
+        "Count": 1
       },
       {
-        "Component": "H",
-        "Count": 9
+        "Component": "CH3",
+        "Count": 3
       }
     ]
   },
@@ -384,11 +384,11 @@
     "Components": [
       {
         "Component": "C",
-        "Count": 4
+        "Count": 1
       },
       {
-        "Component": "H",
-        "Count": 9
+        "Component": "CH3",
+        "Count": 3
       }
     ]
   },
@@ -454,20 +454,16 @@
   },
   "TMS": {
     "Symbol": "TMS",
-    "ShowAsSymbol": true,
-    "Flippable": false,
+    "ShowAsSymbol": false,
+    "Flippable": true,
     "Components": [
-      {
-        "Component": "C",
-        "Count": 3
-      },
       {
         "Component": "Si",
         "Count": 1
       },
       {
-        "Component": "H",
-        "Count": 9
+        "Component": "CH3",
+        "Count": 3
       }
     ]
   },

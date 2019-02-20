@@ -113,14 +113,34 @@ namespace Chem4Word.Model2
             {
                 for (int i = Components.Count - 1; i >= 0; i--)
                 {
-                    Append(Components[i]);
+                    if (i == 0)
+                    {
+                        result += "[";
+                        Append(Components[i]);
+                        result += "]";
+                    }
+                    else
+                    {
+                        Append(Components[i]);
+                    }
                 }
             }
             else
             {
+                int ii = 0;
                 foreach (var component in Components)
                 {
-                    Append(component);
+                    if (ii == 0)
+                    {
+                        result += "[";
+                        Append(component);
+                        result += "]";
+                    }
+                    else
+                    {
+                        Append(component);
+                    }
+                    ii++;
                 }
             }
 
@@ -129,22 +149,40 @@ namespace Chem4Word.Model2
             // Local Function
             void Append(Group component)
             {
-                // Expand FG
-                FunctionalGroup fg;
-                FunctionalGroup.TryParse(component.Component, out fg);
-                if (fg != null && !fg.ShowAsSymbol)
+                ElementBase elementBase;
+                var ok = Group.TryParse(component.Component, out elementBase);
+                if (ok)
                 {
-                    // This is a nested FG
-                    result += fg.Expand(reverse);
+                    if (elementBase is Element)
+                    {
+                        result += $"{component.Component}";
+                        if (component.Count > 1)
+                        {
+                            result += $"{component.Count}";
+                        }
+                    }
+                    if (elementBase is FunctionalGroup fg)
+                    {
+                        if (fg.ShowAsSymbol)
+                        {
+                            if (component.Count == 1)
+                            {
+                                result += $"{component.Component}";
+                            }
+                            else
+                            {
+                                result += $"({component.Component}){component.Count}";
+                            }
+                        }
+                        else
+                        {
+                            result += fg.Expand(reverse);
+                        }
+                    }
                 }
                 else
                 {
-                    // This is an Element or Simple FG
-                    result += $"{component.Component}";
-                    if (component.Count > 1)
-                    {
-                        result += $"{component.Count}";
-                    }
+                    result += "?";
                 }
             }
         }
