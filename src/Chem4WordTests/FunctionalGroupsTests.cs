@@ -15,7 +15,6 @@ namespace Chem4WordTests
     [TestClass]
     public class FunctionalGroupsTests
     {
-
         [TestMethod]
         public void FgKeyEqualsSymbol()
         {
@@ -24,21 +23,21 @@ namespace Chem4WordTests
             {
                 Assert.IsTrue(kvp.Key.Equals(kvp.Value.Symbol));
                 i++;
-                FunctionalGroup fg = kvp.Value;
-                if (fg.ShowAsSymbol)
-                {
-                    Debug.WriteLine($"FG: {i} {fg.Symbol}");
-                }
-                else
-                {
-                    foreach (var comp in fg.Components)
-                    {
-                        var componentType = FunctionalGroups.IsFunctionalGroup(comp.Component) ? "FG" : "Element";
-                        Debug.WriteLine($"FG: {i} {fg.Symbol} - {comp.Count} * {comp.Component} [{componentType}] {fg.ShowAsSymbol}");
-                    }
-                    Debug.WriteLine($"Forward {fg.Expand()}");
-                    Debug.WriteLine($"Reverse {fg.Expand(true)}");
-                }
+                //FunctionalGroup fg = kvp.Value;
+                //if (fg.ShowAsSymbol)
+                //{
+                //    Debug.WriteLine($"FG: {i} {fg.Symbol}");
+                //}
+                //else
+                //{
+                //    foreach (var comp in fg.Components)
+                //    {
+                //        var componentType = FunctionalGroups.IsFunctionalGroup(comp.Component) ? "FG" : "Element";
+                //        Debug.WriteLine($"FG: {i} {fg.Symbol} - {comp.Count} * {comp.Component} [{componentType}] {fg.ShowAsSymbol}");
+                //    }
+                //    Debug.WriteLine($"Forward {fg.Expand()}");
+                //    Debug.WriteLine($"Reverse {fg.Expand(true)}");
+                //}
             }
             Debug.WriteLine($"Found {i} FunctionalGroups");
         }
