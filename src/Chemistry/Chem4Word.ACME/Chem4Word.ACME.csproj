@@ -94,11 +94,14 @@
     <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="Commands\UnGroupCommand.cs" />
     <Compile Include="Controls\EditorCanvas.cs" />
-    <Compile Include="Drawing\CustomTextRunProperties.cs" />
-    <Compile Include="Drawing\CustomTextSource.cs" />
-    <Compile Include="Drawing\CustomTextSourceRun.cs" />
+    <Compile Include="Drawing\SubscriptTextRunProperties.cs" />
+    <Compile Include="Drawing\LabelTextRunProperties.cs" />
+    <Compile Include="Drawing\FunctionalGroupTextSource.cs" />
+    <Compile Include="Drawing\LabelTextSourceRun.cs" />
     <Compile Include="Drawing\FunctionalGroupVisual.cs" />
     <Compile Include="Drawing\GenericTextParagraphProperties.cs" />
+    <Compile Include="Drawing\SubscriptTextRunTypographyProperties.cs" />
+    <Compile Include="Drawing\LabelTextRunTypographyProperties.cs" />
     <Compile Include="UndoHandler.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Drawing\AtomVisual.cs" />

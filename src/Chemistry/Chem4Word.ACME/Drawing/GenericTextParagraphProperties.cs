@@ -3,7 +3,7 @@ using System.Windows.Media.TextFormatting;
 
 namespace Chem4Word.ACME.Drawing
 {
-    partial class CustomTextSource
+    partial class FunctionalGroupTextSource
     {
         public class GenericTextParagraphProperties : TextParagraphProperties
         {

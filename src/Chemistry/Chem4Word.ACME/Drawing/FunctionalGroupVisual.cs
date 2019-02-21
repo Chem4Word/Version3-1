@@ -19,14 +19,14 @@ namespace Chem4Word.ACME.Drawing
 {
     public class FunctionalGroupVisual : AtomVisual
     {
-        private List<CustomTextSourceRun> ComponentRuns { get; }
+        private List<LabelTextSourceRun> ComponentRuns { get; }
         public FunctionalGroup ParentGroup { get; }
         public AtomVisual ParentVisual { get; }
-        public bool Flipped { get; set; }
+        public bool Flipped => ParentVisual.ParentAtom.BalancingVector.X < 0d;
         public FunctionalGroupVisual(object fg, AtomVisual parent)
         {
             ParentGroup = (FunctionalGroup)fg;
-            ComponentRuns = new List<CustomTextSourceRun>();
+            ComponentRuns = new List<LabelTextSourceRun>();
             ParentVisual = parent;
         }
 
@@ -49,63 +49,95 @@ namespace Chem4Word.ACME.Drawing
         public  void Render(DrawingContext dc)
         {
 
-            GetTextRuns();
-            GlyphText firstGlyph = new GlyphText(ComponentRuns[0].Text[0].ToString(),GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
-            var parentAtomPosition = ParentVisual.ParentAtom.Position;
-            firstGlyph.MeasureAtCenter(parentAtomPosition);
 
-            Point startingPoint =
-                parentAtomPosition + firstGlyph.TextMetrics.TextFormatterOffset;
+            var parentAtomPosition = ParentVisual.ParentAtom.Position;
+
+            //Point startingPoint =
+            //    parentAtomPosition + firstGlyph.TextMetrics.TextFormatterOffset;
             ;// - new Vector(0d, GlyphText.SymbolSize);
-            //Point startingPoint = parentAtomPosition;
+
             int textStorePosition = 0;
-            dc.DrawLine(new Pen(Brushes.Gray, 1 ),parentAtomPosition,startingPoint );
-            var textStore = new CustomTextSource();
-            textStore.Runs.AddRange(ComponentRuns);
-            //textStore.Runs.Add(new CustomTextSourceRun());
+            //dc.DrawLine(new Pen(Brushes.Gray, 1 ),parentAtomPosition,startingPoint );
+
+            string expansion = this.ParentGroup.Expand(Flipped);
+            var textStore = new FunctionalGroupTextSource(expansion);
+
+            //GlyphText firstGlyph = new GlyphText(ComponentRuns[0].Text[0].ToString(), GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
+
+            //firstGlyph.MeasureAtCenter(parentAtomPosition);
+
+            //textStore.Runs.AddRange(ComponentRuns);
+            //textStore.Runs.Add(new LabelTextSourceRun());
 
             TextFormatter tc = TextFormatter.Create();
        
             //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 20, 20);
             //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
-            var flowDirection = Flipped ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-            var paraprops = new CustomTextSource.GenericTextParagraphProperties(
-                flowDirection,
+
+            var paraprops = new FunctionalGroupTextSource.GenericTextParagraphProperties(
+                FlowDirection.LeftToRight,
                 TextAlignment.Left,
                 true,
                 false,
-                new CustomTextSource.CustomTextRunProperties(false),
+                new LabelTextRunProperties(), 
                 TextWrapping.NoWrap,
                 GlyphText.SymbolSize,
                 0d);
+
+            Vector dragBackVector;
+            IEnumerable<IndexedGlyphRun> glyphRuns;
             using (TextLine myTextLine = tc.FormatLine(textStore, textStorePosition, 60,
                 paraprops,
                 null))
             {
                 //myTextLine.Draw( dc, startingPoint, InvertAxes.None);
-                myTextLine.Draw(dc, startingPoint, InvertAxes.None);
+                TextRun anchorRun;
+                int startingPos;
+
+                var textRunSpans = myTextLine.GetTextRunSpans();
+                if (!Flipped)
+                {
+                    anchorRun = textRunSpans.First().Value;
+                    startingPos = 0;
+                }
+                else
+                {
+                    anchorRun = textRunSpans[textRunSpans.Count-2].Value; //avoids the end of par
+                    startingPos = myTextLine.Length - anchorRun.Length;
+                }
+
+                var textBounds = myTextLine.GetTextBounds(0, myTextLine.Length);
+                
+                var firstRect = textBounds[0].Rectangle;
+                Point center = new Point((firstRect.Left+firstRect.Right)/2, (firstRect.Top+firstRect.Bottom)/2);
+                dragBackVector = parentAtomPosition - center;
+                var locus = new Point(0, 0) + dragBackVector;
+                glyphRuns = myTextLine.GetIndexedGlyphRuns();
+                myTextLine.Draw(dc, locus, InvertAxes.None);
+
+                List<Point> outline = new List<Point>();
+
+                foreach (IndexedGlyphRun igr in glyphRuns)
+                {
+                    var runOutline = GlyphUtils.GetOutline(igr.GlyphRun, GlyphText.SymbolSize);
+                    outline.AddRange(runOutline);
+                }
+                var sortedOutline = (from Point p in outline
+                    orderby p.X ascending, p.Y descending
+                    select p + dragBackVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+
+                Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
+                StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
+                dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
+                dc.Close();
+                var d = this.Drawing;
             };
 
-           dc.Close();
-            
+          
 
-            
-
-            BuildHull();
+         
         }
 
-        private void BuildHull()
-        {
-            var outline = BasicGeometry.CreateGeometry(this.Drawing).GetFlattenedPathGeometry();
-            Hull = new List<Point>();
-            GlyphUtils.GetGeoPoints(outline, Hull);
-
-            var sortedHull = (from Point p in Hull
-                orderby p.X, p.Y descending
-                select p).ToList();
-
-            Hull = Geometry<Point>.GetHull(sortedHull, p => p);
-        }
 
 
         public override Geometry HullGeometry

@@ -4,15 +4,10 @@ using System.Windows.Media.TextFormatting;
 
 namespace Chem4Word.ACME.Drawing
 {
-    partial class CustomTextSource
-    {
-        public class CustomTextRunProperties : TextRunProperties
+   
+        public class LabelTextRunProperties : TextRunProperties
         {
-            private bool _subscript;
-            public CustomTextRunProperties(bool subscript)
-            {
-                _subscript = subscript;
-            }
+           
             public override System.Windows.Media.Brush BackgroundBrush
             {
                 get { return null; }
@@ -57,10 +52,10 @@ namespace Chem4Word.ACME.Drawing
             {
                 get
                 {
-                    return new CustomTextRunTypographyProperties(_subscript);
+                    return new LabelTextRunTypographyProperties();
                 }
             }
 
         }
-    }
+    
 }

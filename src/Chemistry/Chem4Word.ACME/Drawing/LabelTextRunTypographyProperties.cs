@@ -1,51 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media.TextFormatting;
 
 namespace Chem4Word.ACME.Drawing
 {
-    partial class CustomTextSource : TextSource
-    {
-        public List<CustomTextSourceRun> Runs = new List<CustomTextSourceRun>();
 
-        public override TextRun GetTextRun(int textSourceCharacterIndex)
+        public class LabelTextRunTypographyProperties : TextRunTypographyProperties
         {
-            int pos = 0;
-            foreach (var currentRun in Runs)
+           
+
+            public LabelTextRunTypographyProperties()
             {
-                if (textSourceCharacterIndex < pos + currentRun.Length)
-                {
-                    if (currentRun.IsEndParagraph)
-                    {
-                        return new TextEndOfParagraph(1);
-                    }
-
-                    var props =
-                        new CustomTextRunProperties(currentRun.IsSubscript);
-
-                    return new TextCharacters(
-                        currentRun.Text,
-                        textSourceCharacterIndex - pos,
-                        currentRun.Length - (textSourceCharacterIndex - pos),
-                        props);
-
-
-                }
-                pos += currentRun.Length;
-            }
-
-            // Return an end-of-paragraph if no more text source.
-            return new TextEndOfParagraph(1);
-        }
-
-        class CustomTextRunTypographyProperties : TextRunTypographyProperties
-        {
-            private bool _subscript;
-
-            public CustomTextRunTypographyProperties(bool subscript)
-            {
-                _subscript = subscript;
+               
             }
 
             public override int AnnotationAlternates
@@ -260,31 +225,8 @@ namespace Chem4Word.ACME.Drawing
 
             public override FontVariants Variants
             {
-                get { return _subscript ? FontVariants.Subscript : FontVariants.Normal; }
+                get { return FontVariants.Normal; }
             }
         }
-
-        public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int textSourceCharacterIndexLimit)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public override int GetTextEffectCharacterIndexFromTextSourceCharacterIndex(int textSourceCharacterIndex)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        public int Length
-        {
-            get
-            {
-                int r = 0;
-                foreach (var currentRun in Runs)
-                {
-                    r += currentRun.Length;
-                }
-                return r;
-            }
-        }
-    }
+ 
 }

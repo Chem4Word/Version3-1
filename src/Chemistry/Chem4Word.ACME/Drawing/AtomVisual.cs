@@ -421,15 +421,7 @@ namespace Chem4Word.ACME.Drawing
                 Hull.AddRange(hydrogenPoints);
             }
 
-            //then do the drawing of the main symbol (again)
-            //mainAtomMetrics = DrawSelf(drawingContext);
-
-            //stage 5:  draw the hydrogens
-
-            // Diag: Show Points
-            //ShowPoints(symbolPoints, drawingContext);
-            //ShowPoints(hydrogenPoints, drawingContext);
-            //drawingContext.DrawEllipse(new SolidColorBrush(Colors.Cyan), null, Position, 2, 2);
+            
 
             //stage 6:  draw an isotope label if needed
             if (Isotope != null)
@@ -548,7 +540,7 @@ namespace Chem4Word.ACME.Drawing
         private void RenderFunctionalGroup(DrawingContext dc, FunctionalGroup fg)
         {
              _functionalGroupVisual = new FunctionalGroupVisual(fg, this);
-             _functionalGroupVisual.Flipped = ParentAtom.BalancingVector.X < 0;
+             //_functionalGroupVisual.Flipped = ParentAtom.BalancingVector.X < 0;
              _functionalGroupVisual.Render(dc);
              
              AddVisualChild(_functionalGroupVisual);
