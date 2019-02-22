@@ -573,6 +573,51 @@
       }
     ]
   },
+  "CH2CH2CH2OH": {
+    "Symbol": "CH2CH2CH2OH",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "CH2",
+        "Count": 3
+      },
+      {
+        "Component": "OH",
+        "Count": 1
+      }
+    ]
+  },
+  "OMe": {
+    "Symbol": "OMe",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "Me",
+        "Count": 1
+      }
+    ]
+  },
+  "OEt": {
+    "Symbol": "OEt",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "Et",
+        "Count": 1
+      }
+    ]
+  },
   "Bz": {
     "Symbol": "Bz",
     "ShowAsSymbol": false,
