@@ -154,7 +154,7 @@ namespace Chem4Word.ACME.Drawing
                     for (int i = 0; i <runOutline.Count; i++)
                     {
                         var point = runOutline[i];
-                        point.X += advanceWidths;// + originX;
+                        point.X += advanceWidths;
                         runOutline[i] = point;
                     }
 

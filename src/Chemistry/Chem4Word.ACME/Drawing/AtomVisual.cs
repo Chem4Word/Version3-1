@@ -612,6 +612,8 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
+      
+
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
             Pen _widepen = new Pen(Brushes.Black, BondThickness);
