@@ -5,59 +5,80 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Linq;
+using System.Security.Cryptography;
+using Chem4Word.Model2;
+using Xunit;
 
 namespace Chem4WordTests
 {
-    [TestClass]
-    public class FunctionalGroupsTests
+    public class FunctionalGroupTests
     {
-        [TestMethod]
-        public void FgKeyEqualsSymbol()
+        [Fact]
+        public void FunctionalGroupsShortcutListIsPopulated()
         {
-            int i = 0;
-            foreach (var kvp in FunctionalGroups.ShortcutList)
-            {
-                Assert.IsTrue(kvp.Key.Equals(kvp.Value.Symbol));
-                i++;
-                //FunctionalGroup fg = kvp.Value;
-                //if (fg.ShowAsSymbol)
-                //{
-                //    Debug.WriteLine($"FG: {i} {fg.Symbol}");
-                //}
-                //else
-                //{
-                //    foreach (var comp in fg.Components)
-                //    {
-                //        var componentType = FunctionalGroups.IsFunctionalGroup(comp.Component) ? "FG" : "Element";
-                //        Debug.WriteLine($"FG: {i} {fg.Symbol} - {comp.Count} * {comp.Component} [{componentType}] {fg.ShowAsSymbol}");
-                //    }
-                //    Debug.WriteLine($"Forward {fg.Expand()}");
-                //    Debug.WriteLine($"Reverse {fg.Expand(true)}");
-                //}
-            }
-            Debug.WriteLine($"Found {i} FunctionalGroups");
+            var message = "Expected at least one entry in FunctionalGroups shortcut list";
+            Assert.True(FunctionalGroups.ShortcutList.Any(), message);
         }
 
-        [TestMethod]
-        public void FgAutoLoad()
+        [Fact]
+        public void FunctionalGroupsShortcutListDoesNotContainNullKeys()
         {
-            string temp = JsonConvert.SerializeObject(FunctionalGroups.ShortcutList, Formatting.Indented);
+            var message = "Did not expect any null values";
+            Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Key != null), message);
+        }
 
-            FunctionalGroup fg1 = FunctionalGroups.ShortcutList["R1"];
-            Assert.IsNotNull(fg1, "FunctionalGroup 'R1' not found");
-            Assert.IsTrue(fg1.AtomicWeight == 0, $"Expected AtomicWeigt of 0; got AtomicWeight of {fg1.AtomicWeight}");
+        [Fact]
+        public void FunctionalGroupsShortcutListDoesNotContainNullValues()
+        {
+            var message = "Did not expect any null values";
+            Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Value != null), message);
+        }
 
-            FunctionalGroup fg2 = FunctionalGroups.ShortcutList["Et"];
-            Assert.IsNotNull(fg2, "FunctionalGroup 'Et' not found");
-            Assert.IsTrue(fg2.AtomicWeight > 29 && fg2.AtomicWeight < 30, $"Expected AtomicWeigt of 29; got AtomicWeight of {fg2.AtomicWeight}");
+        [Fact]
+        public void FunctionalGroupsShortcutListKeyEqualsSymbol()
+        {
+            foreach (var entry in FunctionalGroups.ShortcutList)
+            {
+                var actual = entry.Key;
+                var expected = entry.Value.Symbol;
+                Assert.Equal(expected, actual);
+            }
+        }
 
-            FunctionalGroup fg3 = FunctionalGroups.ShortcutList["CH2CH2OH"];
-            Assert.IsNotNull(fg3, "FunctionalGroup 'CH2CH2OH' not found");
-            Assert.IsTrue(fg3.AtomicWeight > 45 && fg3.AtomicWeight < 46, $"Expected AtomicWeigt of 45; got AtomicWeight of {fg3.AtomicWeight}");
+        [Theory]
+        [InlineData("R1", 0)]
+        [InlineData("Et", 29)]
+        [InlineData("CH2CH2OH", 45)]
+        [InlineData("TMS", 73)]
+        public void FunctionalGroupsAtomicWeightIsCalculated(string shortcut, double expectedAtomicWeight)
+        {
+            var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
+
+            var actualAtomicWeight = functionalGroup.AtomicWeight;
+
+            Assert.Equal(expectedAtomicWeight, actualAtomicWeight, 0);
+        }
+
+        [Theory]
+        [InlineData("R1", false, "[R1]")]
+        [InlineData("Et", false, "[Et]")]
+        [InlineData("CH2CH2OH", false, "[CH2]CH2OH")]
+        [InlineData("CH2CH2OH", true, "OHCH2[CH2]")]
+        [InlineData("TMS", false, "[Si](CH3)3")]
+        [InlineData("TMS", true, "(CH3)3[Si]")]
+        [InlineData("CO2H", false, "[C]O2H")]
+        [InlineData("CO2H", true, "[C]O2H")]
+        public void FunctionalGroupsExpansion(string shortcut, bool reverse, string expected)
+        {
+            var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
+
+            var item = functionalGroup.Expand(reverse);
+
+            Debug.WriteLine(item);
+
+            Assert.Equal(expected, item);
         }
     }
 }

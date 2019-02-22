@@ -24,6 +24,7 @@ namespace Chem4Word.Model2
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private static Dictionary<string, FunctionalGroup> _shortcutList;
+        private double _atomicWeight = 0d;
 
         /// <summary>
         /// ShortcutList represent text as a user might type in a superatom,
@@ -78,6 +79,29 @@ namespace Chem4Word.Model2
 
         public override string Colour => "#000000";
 
+        public sealed override double AtomicWeight
+        {
+            get
+            {
+                if (_atomicWeight == 0d)
+                {
+                    double atwt = 0.0d;
+                    if (Components != null)
+                    {
+                        //add up the atoms' atomic weights times their multiplicity
+                        foreach (Group component in Components)
+                        {
+                            atwt += component.AtomicWeight;
+                        }
+                    }
+                    return atwt;
+                }
+
+                return _atomicWeight;
+            }
+            set { _atomicWeight = value; }
+        }
+
         /// <summary>
         /// Determines whether the functional group can be flipped about the pivot
         /// </summary>
@@ -109,38 +133,45 @@ namespace Chem4Word.Model2
         {
             string result = "";
 
-            if (reverse)
+            if (ShowAsSymbol)
             {
-                for (int i = Components.Count - 1; i >= 0; i--)
-                {
-                    if (i == 0)
-                    {
-                        result += "[";
-                        Append(Components[i]);
-                        result += "]";
-                    }
-                    else
-                    {
-                        Append(Components[i]);
-                    }
-                }
+                result =  $"[{Symbol}]";
             }
             else
             {
-                int ii = 0;
-                foreach (var component in Components)
+                if (reverse && Flippable)
                 {
-                    if (ii == 0)
+                    for (int i = Components.Count - 1; i >= 0; i--)
                     {
-                        result += "[";
-                        Append(component);
-                        result += "]";
+                        if (i == 0)
+                        {
+                            result += "[";
+                            Append(Components[i]);
+                            result += "]";
+                        }
+                        else
+                        {
+                            Append(Components[i]);
+                        }
                     }
-                    else
+                }
+                else
+                {
+                    int ii = 0;
+                    foreach (var component in Components)
                     {
-                        Append(component);
+                        if (ii == 0)
+                        {
+                            result += "[";
+                            Append(component);
+                            result += "]";
+                        }
+                        else
+                        {
+                            Append(component);
+                        }
+                        ii++;
                     }
-                    ii++;
                 }
             }
 
