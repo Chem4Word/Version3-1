@@ -119,6 +119,22 @@ namespace Chem4Word.ACME.Drawing
 
                 foreach (IndexedGlyphRun igr in glyphRuns)
                 {
+                //https://docs.microsoft.com/en-us/dotnet/api/system.windows.media.glyphrun.glyphoffsets?f1url=https%3A%2F%2Fmsdn.microsoft.com%2Fquery%2Fdev15.query%3FappId%3DDev15IDEF1%26l%3DEN-US%26k%3Dk(System.Windows.Media.GlyphRun.GlyphOffsets);k(SolutionItemsProject);k(TargetFrameworkMoniker-.NETFramework,Version%3Dv4.6.2);k(DevLang-csharp)%26rd%3Dtrue&view=netframework-4.7.2
+                // The glyph offset values are added to the nominal glyph origin to
+                // generate the final origin for the glyph. The
+                // AdvanceWidths property represents the values of the nominal
+                // glyph origins for the GlyphRun.
+                https://docs.microsoft.com/en-us/dotnet/api/system.windows.media.glyphrun.advancewidths?view=netframework-4.7.2
+                    // Each item in the list of advance widths corresponds to the glyph values returned by the GlyphIndices property.
+                    // The nominal origin of the nth glyph in the run (n>0) is the nominal origin of the n-1th
+                    // glyph plus the n-1th advance width added along the runs advance vector.
+                    // Base glyphs generally have a non-zero advance width, whereas combining glyphs generally have a zero advance width.
+
+                    //Base glyphs generally have a glyph
+                    // offset of(0, 0), combining glyphs generally have an offset that places them
+                    // correctly on top of the nearest preceding base glyph.
+                    var offsets = igr.GlyphRun.GlyphOffsets;
+                    var advanceWidth = igr.GlyphRun.AdvanceWidths;
                     var runOutline = GlyphUtils.GetOutline(igr.GlyphRun, GlyphText.SymbolSize);
                     outline.AddRange(runOutline);
                 }
