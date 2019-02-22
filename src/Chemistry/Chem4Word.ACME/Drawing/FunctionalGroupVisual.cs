@@ -84,7 +84,7 @@ namespace Chem4Word.ACME.Drawing
                 GlyphText.SymbolSize,
                 0d);
 
-            Vector dragBackVector;
+            Vector dispVector;
             IEnumerable<IndexedGlyphRun> glyphRuns;
             using (TextLine myTextLine = tc.FormatLine(textStore, textStorePosition, 60,
                 paraprops,
@@ -95,36 +95,76 @@ namespace Chem4Word.ACME.Drawing
                 int startingPos;
 
                 var textRunSpans = myTextLine.GetTextRunSpans();
+                //if (!Flipped)
+                //{
+                //    anchorRun = textRunSpans.First().Value;
+                //    startingPos = 0;
+                //}
+                //else
+                //{
+                //    anchorRun = textRunSpans[textRunSpans.Count-2].Value; //avoids the end of par
+                //    startingPos = myTextLine.Length - anchorRun.Length;
+                //}
+
+                IList<TextBounds> textBounds;
+               
+               
+
+                Rect firstRect;
+
                 if (!Flipped)
                 {
-                    anchorRun = textRunSpans.First().Value;
-                    startingPos = 0;
+                    textBounds = myTextLine.GetTextBounds(0, 1);
                 }
                 else
                 {
-                    anchorRun = textRunSpans[textRunSpans.Count-2].Value; //avoids the end of par
-                    startingPos = myTextLine.Length - anchorRun.Length;
+                    //length-2 because otherwise you grab the CR/LF character midpoint!
+                    textBounds = myTextLine.GetTextBounds(myTextLine.Length-2, 1);  
+                  
                 }
 
-                var textBounds = myTextLine.GetTextBounds(0, myTextLine.Length);
-                
-                var firstRect = textBounds[0].Rectangle;
+                firstRect = textBounds.First().Rectangle;
+
+                //center will be position close to the origin 0,0
                 Point center = new Point((firstRect.Left+firstRect.Right)/2, (firstRect.Top+firstRect.Bottom)/2);
-                dragBackVector = parentAtomPosition - center;
-                var locus = new Point(0, 0) + dragBackVector;
-                glyphRuns = myTextLine.GetIndexedGlyphRuns();
+                //the dispvector will be added to each relative coordinate for the glyphrun
+                dispVector = parentAtomPosition - center;
+
+                //locus is where the textline is drawn
+                var locus = new Point(0, 0) + dispVector;
+
+
+               //draw the line
                 myTextLine.Draw(dc, locus, InvertAxes.None);
 
-                List<Point> outline = new List<Point>();
 
+                glyphRuns = myTextLine.GetIndexedGlyphRuns();
+                List<Point> outline = new List<Point>();
+                double advanceWidths = 0d;
+
+                //build up the convex hull from each glyph
+                //you need to add in the advance widths for each
+                //glyph run as they are traversed,
+                //to the outline
                 foreach (IndexedGlyphRun igr in glyphRuns)
                 {
-                    var runOutline = GlyphUtils.GetOutline(igr.GlyphRun, GlyphText.SymbolSize);
+                    var currentRun = igr.GlyphRun;
+                    var runOutline = GlyphUtils.GetOutline(currentRun, GlyphText.SymbolSize);
+
+                    for (int i = 0; i <runOutline.Count; i++)
+                    {
+                        var point = runOutline[i];
+                        point.X += advanceWidths;// + originX;
+                        runOutline[i] = point;
+                    }
+
                     outline.AddRange(runOutline);
+                    advanceWidths += currentRun.AdvanceWidths.Sum();
+
                 }
                 var sortedOutline = (from Point p in outline
                     orderby p.X ascending, p.Y descending
-                    select p + dragBackVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+                    select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
@@ -133,9 +173,6 @@ namespace Chem4Word.ACME.Drawing
                 var d = this.Drawing;
             };
 
-          
-
-         
         }
 
 
