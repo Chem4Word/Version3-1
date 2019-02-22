@@ -139,7 +139,7 @@ namespace Chem4Word.Model2
             }
             else
             {
-                if (reverse)
+                if (reverse && Flippable)
                 {
                     for (int i = Components.Count - 1; i >= 0; i--)
                     {
