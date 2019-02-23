@@ -10,14 +10,11 @@ using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Chem4Word.Model2
 {
     [JsonObject(MemberSerialization.OptIn)]
-
     public class FunctionalGroup : ElementBase
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
@@ -63,7 +60,6 @@ namespace Chem4Word.Model2
                 fg = null;
                 return false;
             }
-            //return ShortcutList.TryGetValue(desc, out fg);
         }
 
         private static void LoadFromResource()
@@ -115,8 +111,8 @@ namespace Chem4Word.Model2
         /// </summary>
         [JsonProperty]
         public override string Symbol { get; set; }
-        [JsonProperty]
 
+        [JsonProperty]
         public bool ShowAsSymbol { get; set; }
 
         /// <summary>
@@ -129,110 +125,102 @@ namespace Chem4Word.Model2
         [JsonProperty]
         public List<Group> Components { get; set; }
 
-        private string ExpandPrivate(bool reverse, bool addBrackets)
-        {
-            string result = "";
-
-            if (ShowAsSymbol)
-            {
-                if (addBrackets)
-                {
-                    result = $"[{Symbol}]";
-                }
-                else
-                {
-                    result = $"{Symbol}";
-                }
-            }
-            else
-            {
-                if (reverse && Flippable)
-                {
-                    for (int i = Components.Count - 1; i >= 0; i--)
-                    {
-                        if (i == 0 && addBrackets)
-                        {
-                            result += "[";
-                            Append(Components[i]);
-                            result += "]";
-                        }
-                        else
-                        {
-                            Append(Components[i]);
-                        }
-                    }
-                }
-                else
-                {
-                    int ii = 0;
-                    foreach (var component in Components)
-                    {
-                        if (ii == 0 && addBrackets)
-                        {
-                            result += "[";
-                            Append(component);
-                            result += "]";
-                        }
-                        else
-                        {
-                            Append(component);
-                        }
-                        ii++;
-                    }
-                }
-            }
-
-            return result;
-
-            // Local Function
-            void Append(Group component)
-            {
-                ElementBase elementBase;
-                var ok = Group.TryParse(component.Component, out elementBase);
-                if (ok)
-                {
-                    if (elementBase is Element)
-                    {
-                        result += $"{component.Component}";
-                        if (component.Count > 1)
-                        {
-                            result += $"{component.Count}";
-                        }
-                    }
-                    if (elementBase is FunctionalGroup fg)
-                    {
-                        if (fg.ShowAsSymbol)
-                        {
-                            if (component.Count == 1)
-                            {
-                                result += $"{component.Component}";
-                            }
-                            else
-                            {
-                                result += $"({component.Component}){component.Count}";
-                            }
-                        }
-                        else
-                        {
-                            result += fg.ExpandPrivate(reverse, false);
-                        }
-                    }
-                }
-                else
-                {
-                    result += "?";
-                }
-            }
-
-        }
-
         public string Expand(bool reverse = false)
         {
             string result = "";
 
-            result = ExpandPrivate(reverse, true);
+            // Step 1; Collect a forward list of terms
+            List<string> expanded = new List<string>();
+
+            if (ShowAsSymbol)
+            {
+                expanded.Add(Symbol);
+            }
+            else
+            {
+                foreach (var component in Components)
+                {
+                    expanded.Add(ExpandPrivate(component, reverse));
+                }
+            }
+
+            // Step 2; If reverse, reverse the array and set anchor term as last term
+            int anchorTerm = 0;
+            if (Flippable && reverse)
+            {
+                expanded.Reverse();
+                anchorTerm = expanded.Count - 1;
+            }
+
+            // Step 3; Combine strings together to form final output, surrounding anchor "term" with []
+            for (int i = 0; i < expanded.Count; i++)
+            {
+                if (i == anchorTerm)
+                {
+                    result += $"[{expanded[i]}]";
+                }
+                else
+                {
+                    result += expanded[i];
+                }
+            }
 
             return result;
+
+            // Local Function for recursion
+            string ExpandPrivate(Group localComponent, bool localReverse)
+            {
+                string localResult = "";
+
+                ElementBase elementBase;
+                var ok = AtomHelpers.TryParse(localComponent.Component, out elementBase);
+                if (ok)
+                {
+                    if (elementBase is Element element)
+                    {
+                        localResult = element.Symbol;
+
+                        if (localComponent.Count != 1)
+                        {
+                            localResult = $"{localResult}{localComponent.Count}";
+                        }
+                    }
+
+                    if (elementBase is FunctionalGroup fg)
+                    {
+                        if (fg.ShowAsSymbol)
+                        {
+                            localResult = fg.Symbol;
+                        }
+                        else
+                        {
+                            if (localReverse)
+                            {
+                                for (int i = fg.Components.Count - 1; i >= 0; i--)
+                                {
+                                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                                    localResult += ExpandPrivate(fg.Components[i], localReverse);
+                                }
+                            }
+                            else
+                            {
+                                foreach (var fgc in fg.Components)
+                                {
+                                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                                    localResult += ExpandPrivate(fgc, localReverse);
+                                }
+                            }
+                        }
+
+                        if (localComponent.Count != 1)
+                        {
+                            localResult = $"({localResult}){localComponent.Count}";
+                        }
+                    }
+                }
+
+                return localResult;
+            }
         }
     }
 }
