@@ -84,7 +84,7 @@ namespace Chem4Word.ACME.Drawing
                 GlyphText.SymbolSize,
                 0d);
 
-            Vector dragBackVector;
+            Vector dispVector;
             IEnumerable<IndexedGlyphRun> glyphRuns;
             using (TextLine myTextLine = tc.FormatLine(textStore, textStorePosition, 60,
                 paraprops,
@@ -95,52 +95,76 @@ namespace Chem4Word.ACME.Drawing
                 int startingPos;
 
                 var textRunSpans = myTextLine.GetTextRunSpans();
+                //if (!Flipped)
+                //{
+                //    anchorRun = textRunSpans.First().Value;
+                //    startingPos = 0;
+                //}
+                //else
+                //{
+                //    anchorRun = textRunSpans[textRunSpans.Count-2].Value; //avoids the end of par
+                //    startingPos = myTextLine.Length - anchorRun.Length;
+                //}
+
+                IList<TextBounds> textBounds;
+               
+               
+
+                Rect firstRect;
+
                 if (!Flipped)
                 {
-                    anchorRun = textRunSpans.First().Value;
-                    startingPos = 0;
+                    textBounds = myTextLine.GetTextBounds(0, 1);
                 }
                 else
                 {
-                    anchorRun = textRunSpans[textRunSpans.Count-2].Value; //avoids the end of par
-                    startingPos = myTextLine.Length - anchorRun.Length;
+                    //length-2 because otherwise you grab the CR/LF character midpoint!
+                    textBounds = myTextLine.GetTextBounds(myTextLine.Length-2, 1);  
+                  
                 }
 
-                var textBounds = myTextLine.GetTextBounds(0, myTextLine.Length);
-                
-                var firstRect = textBounds[0].Rectangle;
+                firstRect = textBounds.First().Rectangle;
+
+                //center will be position close to the origin 0,0
                 Point center = new Point((firstRect.Left+firstRect.Right)/2, (firstRect.Top+firstRect.Bottom)/2);
-                dragBackVector = parentAtomPosition - center;
-                var locus = new Point(0, 0) + dragBackVector;
-                glyphRuns = myTextLine.GetIndexedGlyphRuns();
+                //the dispvector will be added to each relative coordinate for the glyphrun
+                dispVector = parentAtomPosition - center;
+
+                //locus is where the textline is drawn
+                var locus = new Point(0, 0) + dispVector;
+
+
+               //draw the line
                 myTextLine.Draw(dc, locus, InvertAxes.None);
 
-                List<Point> outline = new List<Point>();
 
+                glyphRuns = myTextLine.GetIndexedGlyphRuns();
+                List<Point> outline = new List<Point>();
+                double advanceWidths = 0d;
+
+                //build up the convex hull from each glyph
+                //you need to add in the advance widths for each
+                //glyph run as they are traversed,
+                //to the outline
                 foreach (IndexedGlyphRun igr in glyphRuns)
                 {
-                //https://docs.microsoft.com/en-us/dotnet/api/system.windows.media.glyphrun.glyphoffsets?f1url=https%3A%2F%2Fmsdn.microsoft.com%2Fquery%2Fdev15.query%3FappId%3DDev15IDEF1%26l%3DEN-US%26k%3Dk(System.Windows.Media.GlyphRun.GlyphOffsets);k(SolutionItemsProject);k(TargetFrameworkMoniker-.NETFramework,Version%3Dv4.6.2);k(DevLang-csharp)%26rd%3Dtrue&view=netframework-4.7.2
-                // The glyph offset values are added to the nominal glyph origin to
-                // generate the final origin for the glyph. The
-                // AdvanceWidths property represents the values of the nominal
-                // glyph origins for the GlyphRun.
-                https://docs.microsoft.com/en-us/dotnet/api/system.windows.media.glyphrun.advancewidths?view=netframework-4.7.2
-                    // Each item in the list of advance widths corresponds to the glyph values returned by the GlyphIndices property.
-                    // The nominal origin of the nth glyph in the run (n>0) is the nominal origin of the n-1th
-                    // glyph plus the n-1th advance width added along the runs advance vector.
-                    // Base glyphs generally have a non-zero advance width, whereas combining glyphs generally have a zero advance width.
+                    var currentRun = igr.GlyphRun;
+                    var runOutline = GlyphUtils.GetOutline(currentRun, GlyphText.SymbolSize);
 
-                    //Base glyphs generally have a glyph
-                    // offset of(0, 0), combining glyphs generally have an offset that places them
-                    // correctly on top of the nearest preceding base glyph.
-                    var offsets = igr.GlyphRun.GlyphOffsets;
-                    var advanceWidth = igr.GlyphRun.AdvanceWidths;
-                    var runOutline = GlyphUtils.GetOutline(igr.GlyphRun, GlyphText.SymbolSize);
+                    for (int i = 0; i <runOutline.Count; i++)
+                    {
+                        var point = runOutline[i];
+                        point.X += advanceWidths;
+                        runOutline[i] = point;
+                    }
+
                     outline.AddRange(runOutline);
+                    advanceWidths += currentRun.AdvanceWidths.Sum();
+
                 }
                 var sortedOutline = (from Point p in outline
                     orderby p.X ascending, p.Y descending
-                    select p + dragBackVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+                    select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
@@ -149,9 +173,6 @@ namespace Chem4Word.ACME.Drawing
                 var d = this.Drawing;
             };
 
-          
-
-         
         }
 
 

@@ -530,6 +530,7 @@ namespace Chem4Word.ACME.Drawing
             {
                 using (DrawingContext dc = RenderOpen())
                 {
+                    AtomSymbol = fg.Symbol;
                     RenderFunctionalGroup(dc, fg);
                     //dc.Close();
                 }
@@ -610,6 +611,8 @@ namespace Chem4Word.ACME.Drawing
                 return null;
             }
         }
+
+      
 
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {

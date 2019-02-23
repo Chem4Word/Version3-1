@@ -32,15 +32,46 @@ namespace Chem4Word.ACME.Controls
         /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
-            Size size = new Size();
 
-            size = GetOverhang();
+            
+            _size = GetBoundingBox();
 
-            // add margin
-            //size.Width += 10;
-            //size.Height += 10;
-            return size;
+            
+
+            LeftPadding = 0d;
+            TopPadding = 0d;
+            if(_size.X < 0d)
+            {
+                LeftPadding = -_size.X;
+            }
+
+            if (_size.Y < 0d)
+            {
+                TopPadding = -_size.Y;
+            }
+            InteriorPadding = new Thickness(LeftPadding, TopPadding, 0,0);
+            return _size.Size;
+
+            
         }
+
+
+
+        public Thickness InteriorPadding
+        {
+            get { return (Thickness)GetValue(InteriorPaddingProperty); }
+            set { SetValue(InteriorPaddingProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for InteriorPadding.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty InteriorPaddingProperty =
+            DependencyProperty.Register("InteriorPadding", typeof(Thickness), typeof(ChemistryCanvas), new PropertyMetadata(default(Thickness)));
+
+
+
+        public double TopPadding { get; set; }
+
+        public double LeftPadding { get; set; }
 
 
         #region Drawing
@@ -225,16 +256,15 @@ namespace Chem4Word.ACME.Controls
             DependencyProperty.Register("Overhang", typeof(Thickness), typeof(Display),
                 new PropertyMetadata(default(Thickness)));
 
+        private Rect _size;
+        private Thickness _interiorPadding;
+
         #endregion
 
         #region Methods
 
 
-        private Size GetOverhang()
-        {
-            var currentbounds = GetBoundingBox();
-            return currentbounds.Size;
-        }
+      
 
         private Rect GetBoundingBox()
         {
@@ -246,6 +276,8 @@ namespace Chem4Word.ACME.Controls
                 {
                     var bounds = element.ContentBounds;
                     currentbounds.Union(bounds);
+                    var descBounds = element.DescendantBounds;
+                    currentbounds.Union(descBounds);
                 }
             }
             catch (Exception e)
