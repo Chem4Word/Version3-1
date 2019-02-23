@@ -10,6 +10,7 @@ using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Chem4Word.Model2
@@ -75,7 +76,7 @@ namespace Chem4Word.Model2
 
         public override string Colour => "#000000";
 
-        public sealed override double AtomicWeight
+        public override double AtomicWeight
         {
             get
             {
@@ -140,7 +141,7 @@ namespace Chem4Word.Model2
             {
                 foreach (var component in Components)
                 {
-                    expanded.Add(ExpandPrivate(component, reverse));
+                    expanded.Add(ExpandLocal(component));
                 }
             }
 
@@ -168,7 +169,7 @@ namespace Chem4Word.Model2
             return result;
 
             // Local Function for recursion
-            string ExpandPrivate(Group localComponent, bool localReverse)
+            string ExpandLocal(Group localComponent)
             {
                 string localResult = "";
 
@@ -194,20 +195,18 @@ namespace Chem4Word.Model2
                         }
                         else
                         {
-                            if (localReverse)
+                            if (reverse)
                             {
                                 for (int i = fg.Components.Count - 1; i >= 0; i--)
                                 {
-                                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                                    localResult += ExpandPrivate(fg.Components[i], localReverse);
+                                    localResult += ExpandLocal(fg.Components[i]);
                                 }
                             }
                             else
                             {
                                 foreach (var fgc in fg.Components)
                                 {
-                                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                                    localResult += ExpandPrivate(fgc, localReverse);
+                                    localResult += ExpandLocal(fgc);
                                 }
                             }
                         }
