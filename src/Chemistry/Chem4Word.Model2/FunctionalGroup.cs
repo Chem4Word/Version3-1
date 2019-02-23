@@ -129,13 +129,20 @@ namespace Chem4Word.Model2
         [JsonProperty]
         public List<Group> Components { get; set; }
 
-        public string Expand(bool reverse = false)
+        private string ExpandPrivate(bool reverse, bool addBrackets)
         {
             string result = "";
 
             if (ShowAsSymbol)
             {
-                result =  $"[{Symbol}]";
+                if (addBrackets)
+                {
+                    result = $"[{Symbol}]";
+                }
+                else
+                {
+                    result = $"{Symbol}";
+                }
             }
             else
             {
@@ -143,7 +150,7 @@ namespace Chem4Word.Model2
                 {
                     for (int i = Components.Count - 1; i >= 0; i--)
                     {
-                        if (i == 0)
+                        if (i == 0 && addBrackets)
                         {
                             result += "[";
                             Append(Components[i]);
@@ -160,7 +167,7 @@ namespace Chem4Word.Model2
                     int ii = 0;
                     foreach (var component in Components)
                     {
-                        if (ii == 0)
+                        if (ii == 0 && addBrackets)
                         {
                             result += "[";
                             Append(component);
@@ -207,7 +214,7 @@ namespace Chem4Word.Model2
                         }
                         else
                         {
-                            result += fg.Expand(reverse);
+                            result += fg.ExpandPrivate(reverse, false);
                         }
                     }
                 }
@@ -216,6 +223,16 @@ namespace Chem4Word.Model2
                     result += "?";
                 }
             }
+
+        }
+
+        public string Expand(bool reverse = false)
+        {
+            string result = "";
+
+            result = ExpandPrivate(reverse, true);
+
+            return result;
         }
     }
 }

@@ -214,7 +214,7 @@
   },
   "CH2": {
     "Symbol": "CH2",
-    "ShowAsSymbol": false,
+    "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
       {
