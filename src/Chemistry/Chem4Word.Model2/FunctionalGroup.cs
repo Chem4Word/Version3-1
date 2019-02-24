@@ -10,14 +10,12 @@ using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Chem4Word.Model2
 {
     [JsonObject(MemberSerialization.OptIn)]
-
     public class FunctionalGroup : ElementBase
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
@@ -63,7 +61,6 @@ namespace Chem4Word.Model2
                 fg = null;
                 return false;
             }
-            //return ShortcutList.TryGetValue(desc, out fg);
         }
 
         private static void LoadFromResource()
@@ -79,7 +76,7 @@ namespace Chem4Word.Model2
 
         public override string Colour => "#000000";
 
-        public sealed override double AtomicWeight
+        public override double AtomicWeight
         {
             get
             {
@@ -115,8 +112,8 @@ namespace Chem4Word.Model2
         /// </summary>
         [JsonProperty]
         public override string Symbol { get; set; }
-        [JsonProperty]
 
+        [JsonProperty]
         public bool ShowAsSymbol { get; set; }
 
         /// <summary>
@@ -133,88 +130,95 @@ namespace Chem4Word.Model2
         {
             string result = "";
 
+            // Step 1; Collect a forward list of terms
+            List<string> expanded = new List<string>();
+
             if (ShowAsSymbol)
             {
-                result =  $"[{Symbol}]";
+                expanded.Add(Symbol);
             }
             else
             {
-                if (reverse && Flippable)
+                foreach (var component in Components)
                 {
-                    for (int i = Components.Count - 1; i >= 0; i--)
-                    {
-                        if (i == 0)
-                        {
-                            result += "[";
-                            Append(Components[i]);
-                            result += "]";
-                        }
-                        else
-                        {
-                            Append(Components[i]);
-                        }
-                    }
+                    expanded.Add(ExpandLocal(component));
+                }
+            }
+
+            // Step 2; If reverse, reverse the array and set anchor term as last term
+            int anchorTerm = 0;
+            if (Flippable && reverse)
+            {
+                expanded.Reverse();
+                anchorTerm = expanded.Count - 1;
+            }
+
+            // Step 3; Combine strings together to form final output, surrounding anchor "term" with []
+            for (int i = 0; i < expanded.Count; i++)
+            {
+                if (i == anchorTerm)
+                {
+                    result += $"[{expanded[i]}]";
                 }
                 else
                 {
-                    int ii = 0;
-                    foreach (var component in Components)
-                    {
-                        if (ii == 0)
-                        {
-                            result += "[";
-                            Append(component);
-                            result += "]";
-                        }
-                        else
-                        {
-                            Append(component);
-                        }
-                        ii++;
-                    }
+                    result += expanded[i];
                 }
             }
 
             return result;
 
-            // Local Function
-            void Append(Group component)
+            // Local Function for recursion
+            string ExpandLocal(Group localComponent)
             {
+                string localResult = "";
+
                 ElementBase elementBase;
-                var ok = Group.TryParse(component.Component, out elementBase);
+                var ok = AtomHelpers.TryParse(localComponent.Component, out elementBase);
                 if (ok)
                 {
-                    if (elementBase is Element)
+                    if (elementBase is Element element)
                     {
-                        result += $"{component.Component}";
-                        if (component.Count > 1)
+                        localResult = element.Symbol;
+
+                        if (localComponent.Count != 1)
                         {
-                            result += $"{component.Count}";
+                            localResult = $"{localResult}{localComponent.Count}";
                         }
                     }
+
                     if (elementBase is FunctionalGroup fg)
                     {
                         if (fg.ShowAsSymbol)
                         {
-                            if (component.Count == 1)
-                            {
-                                result += $"{component.Component}";
-                            }
-                            else
-                            {
-                                result += $"({component.Component}){component.Count}";
-                            }
+                            localResult = fg.Symbol;
                         }
                         else
                         {
-                            result += fg.Expand(reverse);
+                            if (reverse)
+                            {
+                                for (int i = fg.Components.Count - 1; i >= 0; i--)
+                                {
+                                    localResult += ExpandLocal(fg.Components[i]);
+                                }
+                            }
+                            else
+                            {
+                                foreach (var fgc in fg.Components)
+                                {
+                                    localResult += ExpandLocal(fgc);
+                                }
+                            }
+                        }
+
+                        if (localComponent.Count != 1)
+                        {
+                            localResult = $"({localResult}){localComponent.Count}";
                         }
                     }
                 }
-                else
-                {
-                    result += "?";
-                }
+
+                return localResult;
             }
         }
     }

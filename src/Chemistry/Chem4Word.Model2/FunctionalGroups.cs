@@ -40,20 +40,6 @@ namespace Chem4Word.Model2
             private set { _shortcutList = value; }
         }
 
-        public static bool TryParse(string desc, out FunctionalGroup fg)
-        {
-            try
-            {
-                fg = ShortcutList[desc];
-                return true;
-            }
-            catch (Exception)
-            {
-                fg = null;
-                return false;
-            }
-        }
-
         private static void LoadFromResource()
         {
             ShortcutList = new Dictionary<string, FunctionalGroup>();
