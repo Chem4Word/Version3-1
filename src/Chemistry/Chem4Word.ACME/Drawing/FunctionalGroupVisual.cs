@@ -168,7 +168,7 @@ namespace Chem4Word.ACME.Drawing
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
-                dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
+                //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
                 dc.Close();
                 var d = this.Drawing;
             };

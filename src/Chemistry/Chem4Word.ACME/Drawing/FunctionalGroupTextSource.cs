@@ -14,7 +14,7 @@ namespace Chem4Word.ACME.Drawing
             get { return Runs[0].IsAnchor; }
         }
 
-        private Regex descParser = new Regex(@"(?<anchor>\[(?<normal>[()A-Za-z]+)(?<subscript>[0-9]*)\])|((?<normal>[()A-Za-z]+)(?<subscript>[0-9]*))", RegexOptions.ExplicitCapture);
+        private Regex descParser = new Regex(@"(?<anchor>\[(?<normal>[^\[\]0-9]+)(?<subscript>[0-9]*)\])|((?<normal>[^\[\]0-9]+)(?<subscript>[0-9]*))", RegexOptions.ExplicitCapture);
 
         public FunctionalGroupTextSource(string descriptor)
         {
