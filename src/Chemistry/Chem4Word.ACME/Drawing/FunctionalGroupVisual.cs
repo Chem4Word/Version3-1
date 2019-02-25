@@ -60,7 +60,7 @@ namespace Chem4Word.ACME.Drawing
             //dc.DrawLine(new Pen(Brushes.Gray, 1 ),parentAtomPosition,startingPoint );
 
             string expansion = this.ParentGroup.Expand(Flipped);
-            var textStore = new FunctionalGroupTextSource(expansion);
+            var textStore = new FunctionalGroupTextSource(ParentGroup, Flipped);
 
             //GlyphText firstGlyph = new GlyphText(ComponentRuns[0].Text[0].ToString(), GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
 

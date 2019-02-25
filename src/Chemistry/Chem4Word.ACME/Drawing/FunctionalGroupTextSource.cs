@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -14,13 +15,89 @@ namespace Chem4Word.ACME.Drawing
             get { return Runs[0].IsAnchor; }
         }
 
-        private Regex descParser = new Regex(@"(?<anchor>\[(?<normal>[()A-Za-z]+)(?<subscript>[0-9]*)\])|((?<normal>[()A-Za-z]+)(?<subscript>[0-9]*))", RegexOptions.ExplicitCapture);
+        
 
         public FunctionalGroupTextSource(string descriptor)
         {
             ParseTheGroup(descriptor);
         }
 
+        public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
+        {
+        
+            
+            string result = "";
+
+            if (parentGroup.ShowAsSymbol)
+            {
+                Runs.Add(new LabelTextSourceRun() {IsAnchor = true, IsEndParagraph = false, Text = parentGroup.Symbol});
+            }
+            else
+            {
+                if (isFlipped && parentGroup.Flippable)
+                {
+                    for (int i = parentGroup.Components.Count - 1; i >= 0; i--)
+                    {
+                      
+
+                        Append(parentGroup.Components[i], isAnchor: i ==0);
+
+                        
+                    }
+                }
+                else
+                {
+                    int ii = 0;
+                    foreach (var component in parentGroup.Components)
+                    {  
+                        Append(component, isAnchor: ii == 0);              
+                        ii++;
+                    }
+                }
+            }
+
+            // Local Function
+            void Append(Group component, bool isAnchor)
+            {
+                ElementBase elementBase;
+                var ok = Group.TryParse(component.Component, out elementBase);
+                if (ok)
+                {
+                    if (elementBase is Element)
+                    {
+                        Runs.Add(new LabelTextSourceRun
+                            {IsAnchor = isAnchor, IsEndParagraph = false, Text = component.Component});
+                        if (component.Count > 1)
+                        {
+                            Runs.Add(new Su
+                                { IsAnchor = isAnchor, IsEndParagraph = false, Text = component.Component });
+                        }
+                    }
+                    if (elementBase is FunctionalGroup fg)
+                    {
+                        if (fg.ShowAsSymbol)
+                        {
+                            if (component.Count == 1)
+                            {
+                                result += $"{component.Component}";
+                            }
+                            else
+                            {
+                                result += $"({component.Component}){component.Count}";
+                            }
+                        }
+                        else
+                        {
+                            result += fg.Expand(reverse);
+                        }
+                    }
+                }
+                else
+                {
+                    result += "?";
+                }
+            }
+        }
         private void ParseTheGroup(string descriptor)
         {
             var matches = descParser.Matches(descriptor);
