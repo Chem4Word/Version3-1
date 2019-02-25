@@ -59,7 +59,7 @@ namespace Chem4Word.ACME.Drawing
             int textStorePosition = 0;
             //dc.DrawLine(new Pen(Brushes.Gray, 1 ),parentAtomPosition,startingPoint );
 
-            string expansion = this.ParentGroup.Expand(Flipped);
+            //string expansion = this.ParentGroup.Expand(Flipped);
             var textStore = new FunctionalGroupTextSource(ParentGroup, Flipped);
 
             //GlyphText firstGlyph = new GlyphText(ComponentRuns[0].Text[0].ToString(), GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
@@ -91,21 +91,12 @@ namespace Chem4Word.ACME.Drawing
                 paraprops,
                 null))
             {
-                //myTextLine.Draw( dc, startingPoint, InvertAxes.None);
+
                 TextRun anchorRun;
                 int startingPos;
 
                 var textRunSpans = myTextLine.GetTextRunSpans();
-                //if (!Flipped)
-                //{
-                //    anchorRun = textRunSpans.First().Value;
-                //    startingPos = 0;
-                //}
-                //else
-                //{
-                //    anchorRun = textRunSpans[textRunSpans.Count-2].Value; //avoids the end of par
-                //    startingPos = myTextLine.Length - anchorRun.Length;
-                //}
+               
 
                 IList<TextBounds> textBounds;
                
@@ -134,10 +125,8 @@ namespace Chem4Word.ACME.Drawing
                 //locus is where the textline is drawn
                 var locus = new Point(0, 0) + dispVector;
 
-
                //draw the line
                 myTextLine.Draw(dc, locus, InvertAxes.None);
-
 
                 glyphRuns = myTextLine.GetIndexedGlyphRuns();
                 List<Point> outline = new List<Point>();
