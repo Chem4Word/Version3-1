@@ -61,26 +61,24 @@ namespace Chem4WordTests
             Assert.Equal(expectedAtomicWeight, actualAtomicWeight, 0);
         }
 
-        [Theory]
-        [InlineData("R1", false, "[R1]")]
-        [InlineData("R9", false, "[R9]")]
-        [InlineData("Et", false, "[Et]")]
-        [InlineData("CH2CH2OH", false, "[CH2]CH2OH")]
-        [InlineData("CH2CH2OH", true, "HOCH2[CH2]")]
-        [InlineData("TMS", false, "[Si](CH3)3")]
-        [InlineData("TMS", true, "(CH3)3[Si]")]
-        [InlineData("CO2H", false, "[C]O2H")]
-        [InlineData("CO2H", true, "[C]O2H")]
-        [InlineData("CH2CH2CH2OH", false, "[(CH2)3]OH")]
-        public void FunctionalGroupsExpansion(string shortcut, bool reverse, string expected)
-        {
-            var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
+        //[Theory]
+        //[InlineData("R1", false, "[R1]")]
+        //[InlineData("R9", false, "[R9]")]
+        //[InlineData("Et", false, "[Et]")]
+        //[InlineData("CH2CH2OH", false, "[CH2]CH2OH")]
+        //[InlineData("CH2CH2OH", true, "HOCH2[CH2]")]
+        //[InlineData("TMS", false, "[Si](CH3)3")]
+        //[InlineData("TMS", true, "(CH3)3[Si]")]
+        //[InlineData("CO2H", false, "[C]O2H")]
+        //[InlineData("CO2H", true, "[C]O2H")]
+        //[InlineData("CH2CH2CH2OH", false, "[(CH2)3]OH")]
+        //public void FunctionalGroupsExpansion(string shortcut, bool reverse, string expected)
+        //{
+        //    var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
 
-            var item = functionalGroup.Expand(reverse);
+        //    var item = functionalGroup.Expand(reverse);
 
-            //Debug.WriteLine(item);
-
-            Assert.Equal(expected, item);
-        }
+        //    Assert.Equal(expected, item);
+        //}
     }
 }
