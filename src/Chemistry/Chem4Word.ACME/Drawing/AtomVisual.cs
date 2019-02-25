@@ -243,7 +243,7 @@ namespace Chem4Word.ACME.Drawing
             Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
             var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill, defaultHOrientation);
-            chargeText.TextMetrics.FlattenedPath = chargeText.TextRun.GetOutline(chargeText.TypeSize);
+            chargeText.TextMetrics.FlattenedPath = chargeText.TextRun.GetOutline();
             return chargeText.TextMetrics;
         }
 

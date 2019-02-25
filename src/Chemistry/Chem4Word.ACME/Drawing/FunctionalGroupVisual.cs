@@ -6,14 +6,12 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2;
-using System;
+using Chem4Word.Model2.Geometry;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
-using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -23,6 +21,7 @@ namespace Chem4Word.ACME.Drawing
         public FunctionalGroup ParentGroup { get; }
         public AtomVisual ParentVisual { get; }
         public bool Flipped => ParentVisual.ParentAtom.BalancingVector.X < 0d;
+
         public FunctionalGroupVisual(object fg, AtomVisual parent)
         {
             ParentGroup = (FunctionalGroup)fg;
@@ -30,47 +29,16 @@ namespace Chem4Word.ACME.Drawing
             ParentVisual = parent;
         }
 
-        private void GetTextRuns()
+        public void Render(DrawingContext dc)
         {
-            ComponentRuns.Clear();
-            BuildTextRuns(ParentGroup);
-        }
-        /// <summary>
-        /// Recursively builds up a set of text runs from a functional group
-        /// Allows you to reverse the order of the subgroups inside the group
-        /// </summary>
-        /// <param name="parentGroup">Functional group definition</param>
-        private void BuildTextRuns(ElementBase parentGroup)
-        {
-
-        }
-
-   
-        public  void Render(DrawingContext dc)
-        {
-
-
             var parentAtomPosition = ParentVisual.ParentAtom.Position;
 
-            //Point startingPoint =
-            //    parentAtomPosition + firstGlyph.TextMetrics.TextFormatterOffset;
-            ;// - new Vector(0d, GlyphText.SymbolSize);
-
             int textStorePosition = 0;
-            //dc.DrawLine(new Pen(Brushes.Gray, 1 ),parentAtomPosition,startingPoint );
 
-            //string expansion = this.ParentGroup.Expand(Flipped);
             var textStore = new FunctionalGroupTextSource(ParentGroup, Flipped);
 
-            //GlyphText firstGlyph = new GlyphText(ComponentRuns[0].Text[0].ToString(), GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
-
-            //firstGlyph.MeasureAtCenter(parentAtomPosition);
-
-            //textStore.Runs.AddRange(ComponentRuns);
-            //textStore.Runs.Add(new LabelTextSourceRun());
-
             TextFormatter tc = TextFormatter.Create();
-       
+
             // Diag: Show Atom spot
             dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 20, 20);
             //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
@@ -80,7 +48,7 @@ namespace Chem4Word.ACME.Drawing
                 TextAlignment.Left,
                 true,
                 false,
-                new LabelTextRunProperties(), 
+                new LabelTextRunProperties(),
                 TextWrapping.NoWrap,
                 GlyphText.SymbolSize,
                 0d);
@@ -91,16 +59,12 @@ namespace Chem4Word.ACME.Drawing
                 paraprops,
                 null))
             {
-
                 TextRun anchorRun;
                 int startingPos;
 
                 var textRunSpans = myTextLine.GetTextRunSpans();
-               
 
                 IList<TextBounds> textBounds;
-               
-               
 
                 Rect firstRect;
 
@@ -111,21 +75,20 @@ namespace Chem4Word.ACME.Drawing
                 else
                 {
                     //length-2 because otherwise you grab the CR/LF character midpoint!
-                    textBounds = myTextLine.GetTextBounds(myTextLine.Length-2, 1);  
-                  
+                    textBounds = myTextLine.GetTextBounds(myTextLine.Length - 2, 1);
                 }
 
                 firstRect = textBounds.First().Rectangle;
 
                 //center will be position close to the origin 0,0
-                Point center = new Point((firstRect.Left+firstRect.Right)/2, (firstRect.Top+firstRect.Bottom)/2);
+                Point center = new Point((firstRect.Left + firstRect.Right) / 2, (firstRect.Top + firstRect.Bottom) / 2);
                 //the dispvector will be added to each relative coordinate for the glyphrun
                 dispVector = parentAtomPosition - center;
 
                 //locus is where the textline is drawn
                 var locus = new Point(0, 0) + dispVector;
 
-               //draw the line
+                //draw the line
                 myTextLine.Draw(dc, locus, InvertAxes.None);
 
                 glyphRuns = myTextLine.GetIndexedGlyphRuns();
@@ -139,9 +102,9 @@ namespace Chem4Word.ACME.Drawing
                 foreach (IndexedGlyphRun igr in glyphRuns)
                 {
                     var currentRun = igr.GlyphRun;
-                    var runOutline = GlyphUtils.GetOutline(currentRun, GlyphText.SymbolSize);
+                    var runOutline = GlyphUtils.GetOutline(currentRun);
 
-                    for (int i = 0; i <runOutline.Count; i++)
+                    for (int i = 0; i < runOutline.Count; i++)
                     {
                         var point = runOutline[i];
                         point.X += advanceWidths;
@@ -150,11 +113,10 @@ namespace Chem4Word.ACME.Drawing
 
                     outline.AddRange(runOutline);
                     advanceWidths += currentRun.AdvanceWidths.Sum();
-
                 }
                 var sortedOutline = (from Point p in outline
-                    orderby p.X ascending, p.Y descending
-                    select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+                                     orderby p.X ascending, p.Y descending
+                                     select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
@@ -162,10 +124,7 @@ namespace Chem4Word.ACME.Drawing
                 dc.Close();
                 var d = this.Drawing;
             };
-
         }
-
-
 
         public override Geometry HullGeometry
         {

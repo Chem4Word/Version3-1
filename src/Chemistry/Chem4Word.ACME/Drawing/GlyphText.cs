@@ -82,7 +82,7 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                var outline = GlyphUtils.GetOutline(TextRun, TypeSize);
+                var outline = GlyphUtils.GetOutline(TextRun);
 
                 var sortedHull = (from Point p in outline
                                   orderby p.X ascending, p.Y descending
@@ -142,7 +142,7 @@ namespace Chem4Word.ACME.Drawing
             get
             {
                 Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector + new Vector(LeadingBearing, 0.0);
-                return TextRun.GetOutline(TypeSize).Select(p => p + offset).ToList();
+                return TextRun.GetOutline().Select(p => p + offset).ToList();
             }
         }
 
@@ -181,7 +181,7 @@ namespace Chem4Word.ACME.Drawing
                 BoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
                 Geocenter = bottomLeft,
                 TotalBoundingBox = groupGlyphRun.GetBoundingBox(bottomLeft),
-                FlattenedPath = GlyphUtils.GetOutline(TextRun, TypeSize),
+                FlattenedPath = GlyphUtils.GetOutline(TextRun),
                 OffsetVector = new Vector(0.0d, 0.0d)
             };
         }

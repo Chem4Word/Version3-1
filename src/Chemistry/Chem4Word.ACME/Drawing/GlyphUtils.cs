@@ -106,7 +106,7 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         /// <param name="glyphRun">Glyph run to outline</param>
         /// <returns>List<Point> of geometry tracing the GlyphRun</Point></returns>
-        public static List<Point> GetOutline(this GlyphRun glyphRun, double size)
+        public static List<Point> GetOutline(this GlyphRun glyphRun)
         {
             List<Point> retval = new List<Point>();
 

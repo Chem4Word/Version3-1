@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Chem4Word.Model2;
+using System;
 using System.Collections.Generic;
-
 using System.Windows.Media.TextFormatting;
-using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -15,10 +14,6 @@ namespace Chem4Word.ACME.Drawing
             get { return Runs[0].IsAnchor; }
         }
 
-        
-
-      
-
         public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
         {
             Expand(parentGroup, isFlipped);
@@ -26,10 +21,9 @@ namespace Chem4Word.ACME.Drawing
 
         private void Expand(FunctionalGroup parentGroup, bool isFlipped)
         {
-
             if (parentGroup.ShowAsSymbol)
             {
-                Runs.Add(new LabelTextSourceRun() {IsAnchor = true, IsEndParagraph = false, Text = parentGroup.Symbol});
+                Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsEndParagraph = false, Text = parentGroup.Symbol });
             }
             else
             {
@@ -54,18 +48,25 @@ namespace Chem4Word.ACME.Drawing
             // Local Function
             void Append(Group component, bool isAnchor)
             {
-
                 if (FunctionalGroup.TryParse(component.Component, out ElementBase element))
                 {
                     if (element is Element)
                     {
                         Runs.Add(new LabelTextSourceRun
-                        { IsAnchor = isAnchor, IsEndParagraph = false, Text = component.Component
+                        {
+                            IsAnchor = isAnchor,
+                            IsEndParagraph = false,
+                            Text = component.Component
                         });
                         if (component.Count > 1)
                         {
                             Runs.Add(new LabelTextSourceRun
-                            { IsAnchor = isAnchor, IsSubscript = true, IsEndParagraph = false, Text = component.Count.ToString()});
+                            {
+                                IsAnchor = isAnchor,
+                                IsSubscript = true,
+                                IsEndParagraph = false,
+                                Text = component.Count.ToString()
+                            });
                         }
                     }
                     else if (element is FunctionalGroup fg)
@@ -74,7 +75,10 @@ namespace Chem4Word.ACME.Drawing
                         {
                             Runs.Add(new LabelTextSourceRun()
                             {
-                                IsAnchor = false, IsEndParagraph = false,IsSubscript = false, Text = "("
+                                IsAnchor = false,
+                                IsEndParagraph = false,
+                                IsSubscript = false,
+                                Text = "("
                             });
                         }
 
@@ -86,7 +90,6 @@ namespace Chem4Word.ACME.Drawing
                                 IsEndParagraph = false,
                                 Text = component.Component
                             });
-                           
                         }
                         else
                         {
@@ -103,13 +106,12 @@ namespace Chem4Word.ACME.Drawing
                                 Text = ")"
                             });
                             Runs.Add(new LabelTextSourceRun
-                                { IsAnchor = isAnchor, IsSubscript = true, IsEndParagraph = false, Text = component.Count.ToString() });
+                            { IsAnchor = isAnchor, IsSubscript = true, IsEndParagraph = false, Text = component.Count.ToString() });
                         }
                     }
 
                     //
                 }
-               
                 else
                 {
                     Runs.Add(new LabelTextSourceRun
@@ -121,7 +123,6 @@ namespace Chem4Word.ACME.Drawing
                 }
             }
         }
-
 
         public override TextRun GetTextRun(int textSourceCharacterIndex)
         {
@@ -144,15 +145,12 @@ namespace Chem4Word.ACME.Drawing
                     {
                         props = new LabelTextRunProperties();
                     }
-                        
 
                     return new TextCharacters(
                         currentRun.Text,
                         textSourceCharacterIndex - pos,
                         currentRun.Length - (textSourceCharacterIndex - pos),
                         props);
-
-
                 }
                 pos += currentRun.Length;
             }
