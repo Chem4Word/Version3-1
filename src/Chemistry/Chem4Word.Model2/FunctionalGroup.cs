@@ -41,26 +41,6 @@ namespace Chem4Word.Model2
             private set { _shortcutList = value; }
         }
 
-        public static bool TryParse(string desc, out ElementBase element)
-        {
-            if (TryParse(desc, out FunctionalGroup fg))
-            {
-                element = fg;
-                return true;
-            }
-            else
-            {
-                var pt =new PeriodicTable();
-                if (pt.HasElement(desc))
-                {
-                    element = (ElementBase)pt[desc];
-                    return true;
-                }
-            }
-
-            element = null;
-            return false;
-        }
         public static bool TryParse(string desc, out FunctionalGroup fg)
         {
             try

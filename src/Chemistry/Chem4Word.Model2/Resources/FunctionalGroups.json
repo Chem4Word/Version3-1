@@ -214,7 +214,7 @@
   },
   "CH2": {
     "Symbol": "CH2",
-    "ShowAsSymbol": false,
+    "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
       {
@@ -229,7 +229,7 @@
   },
   "CH3": {
     "Symbol": "CH3",
-    "ShowAsSymbol": false,
+    "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
       {
@@ -244,7 +244,7 @@
   },
   "C2H5": {
     "Symbol": "C2H5",
-    "ShowAsSymbol": false,
+    "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
       {

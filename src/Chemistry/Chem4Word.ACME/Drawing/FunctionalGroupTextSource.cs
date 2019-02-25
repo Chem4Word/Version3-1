@@ -17,15 +17,16 @@ namespace Chem4Word.ACME.Drawing
 
         
 
-      
+        public FunctionalGroupTextSource(string descriptor)
+        {
+            ParseTheGroup(descriptor);
+        }
 
         public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
         {
-            Expand(parentGroup, isFlipped);
-        }
-
-        private void Expand(FunctionalGroup parentGroup, bool isFlipped)
-        {
+        
+            
+            string result = "";
 
             if (parentGroup.ShowAsSymbol)
             {
@@ -37,15 +38,19 @@ namespace Chem4Word.ACME.Drawing
                 {
                     for (int i = parentGroup.Components.Count - 1; i >= 0; i--)
                     {
-                        Append(parentGroup.Components[i], i == 0);
+                      
+
+                        Append(parentGroup.Components[i], isAnchor: i ==0);
+
+                        
                     }
                 }
                 else
                 {
                     int ii = 0;
                     foreach (var component in parentGroup.Components)
-                    {
-                        Append(component, ii == 0);
+                    {  
+                        Append(component, isAnchor: ii == 0);              
                         ii++;
                     }
                 }
@@ -54,74 +59,98 @@ namespace Chem4Word.ACME.Drawing
             // Local Function
             void Append(Group component, bool isAnchor)
             {
-
-                if (FunctionalGroup.TryParse(component.Component, out ElementBase element))
+                ElementBase elementBase;
+                var ok = Group.TryParse(component.Component, out elementBase);
+                if (ok)
                 {
-                    if (element is Element)
+                    if (elementBase is Element)
                     {
                         Runs.Add(new LabelTextSourceRun
-                        { IsAnchor = isAnchor, IsEndParagraph = false, Text = component.Component
-                        });
+                            {IsAnchor = isAnchor, IsEndParagraph = false, Text = component.Component});
                         if (component.Count > 1)
                         {
-                            Runs.Add(new LabelTextSourceRun
-                            { IsAnchor = isAnchor, IsSubscript = true, IsEndParagraph = false, Text = component.Count.ToString()});
+                            Runs.Add(new Su
+                                { IsAnchor = isAnchor, IsEndParagraph = false, Text = component.Component });
                         }
                     }
-                    else if (element is FunctionalGroup fg)
+                    if (elementBase is FunctionalGroup fg)
                     {
-                        if (component.Count > 1)
-                        {
-                            Runs.Add(new LabelTextSourceRun()
-                            {
-                                IsAnchor = false, IsEndParagraph = false,IsSubscript = false, Text = "("
-                            });
-                        }
-
                         if (fg.ShowAsSymbol)
                         {
-                            Runs.Add(new LabelTextSourceRun
+                            if (component.Count == 1)
                             {
-                                IsAnchor = isAnchor,
-                                IsEndParagraph = false,
-                                Text = component.Component
-                            });
-                           
+                                result += $"{component.Component}";
+                            }
+                            else
+                            {
+                                result += $"({component.Component}){component.Count}";
+                            }
                         }
                         else
                         {
-                            Expand(fg, isFlipped);
-                        }
-
-                        if (component.Count > 1)
-                        {
-                            Runs.Add(new LabelTextSourceRun()
-                            {
-                                IsAnchor = false,
-                                IsEndParagraph = false,
-                                IsSubscript = false,
-                                Text = ")"
-                            });
-                            Runs.Add(new LabelTextSourceRun
-                                { IsAnchor = isAnchor, IsSubscript = true, IsEndParagraph = false, Text = component.Count.ToString() });
+                            result += fg.Expand(reverse);
                         }
                     }
-
-                    //
                 }
-               
                 else
                 {
-                    Runs.Add(new LabelTextSourceRun
-                    {
-                        IsAnchor = isAnchor,
-                        IsEndParagraph = false,
-                        Text = "??" //WTF!
-                    });
+                    result += "?";
                 }
             }
         }
+        private void ParseTheGroup(string descriptor)
+        {
+            var matches = descParser.Matches(descriptor);
 
+            var groupnames = descParser.GetGroupNames();
+            var groupNumbers = descParser.GetGroupNumbers();
+            bool isAnchor = false;
+            foreach (Match match in matches)
+            {
+                string val = match.Value;
+                GroupCollection gc = match.Groups;
+                if (val.StartsWith("["))
+                {
+                    isAnchor = true;
+                }
+
+                var normaltext = match.Groups["normal"];
+                
+               
+                Runs.Add(new LabelTextSourceRun()
+                {
+                    IsSubscript = false,
+                    IsAnchor = isAnchor,
+                    IsEndParagraph = false,
+                    Text = normaltext.Value
+                });
+
+                string substring="";
+                try
+                {
+                    var subtext = match.Groups["subscript"];
+                    substring = subtext.Value;
+                    if(substring!="")
+
+                    { Runs.Add(new LabelTextSourceRun()
+                        {
+                            IsSubscript = true,
+                            IsAnchor = isAnchor,
+                            IsEndParagraph = false,
+                            Text = substring
+                        });
+
+                    }
+                }
+                catch (Exception e)
+                {
+                  
+                }
+                
+            }
+
+            Runs.Add(new LabelTextSourceRun() {IsEndParagraph = true});
+        }
 
         public override TextRun GetTextRun(int textSourceCharacterIndex)
         {
