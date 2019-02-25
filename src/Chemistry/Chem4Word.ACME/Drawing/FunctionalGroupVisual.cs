@@ -71,7 +71,8 @@ namespace Chem4Word.ACME.Drawing
 
             TextFormatter tc = TextFormatter.Create();
        
-            //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 20, 20);
+            // Diag: Show Atom spot
+            dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 20, 20);
             //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
 
             var paraprops = new FunctionalGroupTextSource.GenericTextParagraphProperties(
@@ -168,7 +169,7 @@ namespace Chem4Word.ACME.Drawing
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
-                dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
+                //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
                 dc.Close();
                 var d = this.Drawing;
             };

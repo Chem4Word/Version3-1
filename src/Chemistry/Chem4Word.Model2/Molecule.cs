@@ -287,27 +287,29 @@ namespace Chem4Word.Model2
             foreach (Atom atom in Atoms.Values)
             {
                 // ToDo: Do we need to check if this is a functional group here?
-
-                switch (atom.Element.Symbol)
+                if (atom.Element != null)
                 {
-                    case "C":
-                        f["C"]++;
-                        break;
+                    switch (atom.Element.Symbol)
+                    {
+                        case "C":
+                            f["C"]++;
+                            break;
 
-                    case "H":
-                        f["H"]++;
-                        break;
+                        case "H":
+                            f["H"]++;
+                            break;
 
-                    default:
-                        if (!r.ContainsKey(atom.SymbolText))
-                        {
-                            r.Add(atom.SymbolText, 1);
-                        }
-                        else
-                        {
-                            r[atom.SymbolText]++;
-                        }
-                        break;
+                        default:
+                            if (!r.ContainsKey(atom.SymbolText))
+                            {
+                                r.Add(atom.SymbolText, 1);
+                            }
+                            else
+                            {
+                                r[atom.SymbolText]++;
+                            }
+                            break;
+                    }
                 }
 
                 int hCount = atom.ImplicitHydrogenCount;

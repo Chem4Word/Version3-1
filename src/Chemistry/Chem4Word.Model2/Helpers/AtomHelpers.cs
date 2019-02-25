@@ -47,5 +47,24 @@ namespace Chem4Word.Model2.Helpers
             }
             return chargestring;
         }
+
+        public static bool TryParse(string text, out ElementBase result)
+        {
+            bool success = false;
+            result = null;
+
+            if (FunctionalGroup.TryParse(text, out FunctionalGroup fg))
+            {
+                result = fg;
+                success = true;
+            }
+            else if (Globals.PeriodicTable.HasElement(text))
+            {
+                result = Globals.PeriodicTable.Elements[text];
+                success = true;
+            }
+
+            return success;
+        }
     }
 }
