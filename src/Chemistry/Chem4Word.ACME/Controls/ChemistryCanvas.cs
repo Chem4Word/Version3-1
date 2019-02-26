@@ -227,7 +227,7 @@ namespace Chem4Word.ACME.Controls
 
         #region Fields
 
-        private Rect _boundingBox = default(Rect);
+        //private Rect _boundingBox = default(Rect);
 
         #endregion
 
@@ -257,7 +257,7 @@ namespace Chem4Word.ACME.Controls
                 new PropertyMetadata(default(Thickness)));
 
         private Rect _size;
-        private Thickness _interiorPadding;
+        //private Thickness _interiorPadding;
 
         #endregion
 

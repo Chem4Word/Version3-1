@@ -40,7 +40,7 @@ namespace Chem4Word.ACME.Drawing
             TextFormatter tc = TextFormatter.Create();
 
             // Diag: Show Atom spot
-            dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 20, 20);
+            //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 10, 10);
             //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
 
             var paraprops = new FunctionalGroupTextSource.GenericTextParagraphProperties(
@@ -59,10 +59,10 @@ namespace Chem4Word.ACME.Drawing
                 paraprops,
                 null))
             {
-                TextRun anchorRun;
-                int startingPos;
+                //TextRun anchorRun;
+                //int startingPos;
 
-                var textRunSpans = myTextLine.GetTextRunSpans();
+                //var textRunSpans = myTextLine.GetTextRunSpans();
 
                 IList<TextBounds> textBounds;
 

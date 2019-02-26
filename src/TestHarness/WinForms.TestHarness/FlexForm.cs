@@ -63,7 +63,6 @@ namespace WinForms.TestHarness
                     string fileType = Path.GetExtension(openFileDialog1.FileName).ToLower();
                     string filename = Path.GetFileName(openFileDialog1.FileName);
                     string mol = File.ReadAllText(openFileDialog1.FileName);
-                    string cml = "";
 
                     CMLConverter cmlConvertor = new CMLConverter();
                     SdFileConverter sdFileConverter = new SdFileConverter();
