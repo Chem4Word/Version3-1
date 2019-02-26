@@ -581,7 +581,13 @@ namespace Chem4Word.Model2
 
         public void CentreInCanvas(Size size)
         {
-            throw new NotImplementedException();
+            // Re-Centre scaled drawing on Canvas, does not need to be undone
+            double desiredLeft = (size.Width - BoundingBox.Width) / 2.0;
+            double desiredTop = (size.Height - BoundingBox.Height) / 2.0;
+            double offsetLeft = BoundingBox.Left - desiredLeft;
+            double offsetTop = BoundingBox.Top - desiredTop;
+
+            RepositionAll(offsetLeft, offsetTop);
         }
     }
 

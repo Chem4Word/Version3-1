@@ -16,6 +16,7 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
@@ -39,12 +40,11 @@ namespace Chem4Word.ACME
         /// <summary>
         /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         /// </summary>
-        public Editor(string cml)
+        public Editor(string cml):this()
         {
             _cml = cml;
 
-            EnsureApplicationResources();
-            InitializeComponent();
+          
         }
 
         public Editor()
@@ -178,10 +178,10 @@ namespace Chem4Word.ACME
                 var vm = new EditViewModel(tempModel);
                 _activeViewModel = vm;
 
-                this.DataContext = vm;
+                EditorCanvas ec = LocateCanvas();
+                _activeViewModel.Model.CentreInCanvas(new Size(ec.ActualWidth, ec.ActualHeight));
 
-                Canvas c = LocateCanvas();
-                _activeViewModel.Model.CentreInCanvas(new Size(c.ActualWidth, c.ActualHeight));
+                ec.Chemistry = vm;
 
                 ScrollIntoView();
                 BindControls(vm);
@@ -230,9 +230,9 @@ namespace Chem4Word.ACME
             return foundChild;
         }
 
-        private Canvas LocateCanvas()
+        private EditorCanvas LocateCanvas()
         {
-            Canvas res = FindChild<Canvas>(DrawingArea);
+            EditorCanvas res = FindChild<EditorCanvas>(DrawingArea);
             return res;
         }
 

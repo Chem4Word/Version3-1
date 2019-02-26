@@ -16,6 +16,11 @@ namespace Chem4Word.ACME.Controls
 {
     public class EditorCanvas : ChemistryCanvas
     {
+        /// <summary>
+        /// Doesn't autosize the chemistry to fit, unlike the display
+        /// </summary>
+        /// <param name="constraint"></param>
+        /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
             return DesiredSize;
