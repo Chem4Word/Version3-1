@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.ComponentModel;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -19,5 +20,11 @@ namespace Chem4Word.Model2
         public virtual string Name { get; set; }
 
         public virtual string Colour { get; set; }
+
+        public bool IsElement()
+        {
+            throw new System.NotImplementedException();
+        }
+
     }
 }

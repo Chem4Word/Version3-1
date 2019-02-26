@@ -5,20 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.ACME
+using System.Windows;
+
+namespace Chem4Word.ACME.Drawing
 {
-    public class ViewModel
+    public class SubscriptTextRunTypographyProperties : LabelTextRunTypographyProperties
     {
-
-
-        public ViewModel(Model2.Model chemistryModel)
+        public override FontVariants Variants
         {
-            Model = chemistryModel;
+            get { return FontVariants.Subscript; }
         }
-        #region Properties
-
-        public  Model2.Model Model { get; }
-
-        #endregion
     }
 }

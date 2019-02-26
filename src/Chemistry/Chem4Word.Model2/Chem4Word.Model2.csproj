@@ -62,7 +62,6 @@
     <Compile Include="Converters\MDL\CtabProcessor.cs" />
     <Compile Include="Converters\MDL\DataProcessor.cs" />
     <Compile Include="Converters\MDL\MDLConstants.cs" />
-    <Compile Include="Converters\MDL\MDLConverter.cs" />
     <Compile Include="Converters\MDL\PropertyType.cs" />
     <Compile Include="Converters\MDL\SdFileBase.cs" />
     <Compile Include="Converters\MDL\SdFileConverter.cs" />

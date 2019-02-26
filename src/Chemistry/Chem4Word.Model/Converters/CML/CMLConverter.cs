@@ -167,8 +167,8 @@ namespace Chem4Word.Model.Converters.CML
             XElement result = new XElement(Converters.CML.CML.cml + "atom",
                 new XAttribute("id", atom.Id),
                 new XAttribute("elementType", atom.Element.Symbol),
-                new XAttribute("x2", atom.Position.X),
-                new XAttribute("y2", atom.Position.Y)
+                new XAttribute("x2", atom.Position.X.ToString("0.0", CultureInfo.InvariantCulture)),
+                new XAttribute("y2", atom.Position.Y.ToString("0.0", CultureInfo.InvariantCulture))
             );
 
             if (atom.FormalCharge != null)
@@ -680,7 +680,8 @@ namespace Chem4Word.Model.Converters.CML
             // Try first with 2D Co-ordinate scheme
             if (cmlElement.Attribute("x2") != null && cmlElement.Attribute("y2") != null)
             {
-                result = new Point(Double.Parse(cmlElement.Attribute("x2").Value, CultureInfo.InvariantCulture),
+                result = new Point(
+                    Double.Parse(cmlElement.Attribute("x2").Value, CultureInfo.InvariantCulture),
                     Double.Parse(cmlElement.Attribute("y2").Value, CultureInfo.InvariantCulture));
                 found = true;
             }
@@ -690,7 +691,8 @@ namespace Chem4Word.Model.Converters.CML
                 // Try again with 3D Co-ordinate scheme
                 if (cmlElement.Attribute("x3") != null && cmlElement.Attribute("y3") != null)
                 {
-                    result = new Point(Double.Parse(cmlElement.Attribute("x3").Value, CultureInfo.InvariantCulture),
+                    result = new Point(
+                        Double.Parse(cmlElement.Attribute("x3").Value, CultureInfo.InvariantCulture),
                         Double.Parse(cmlElement.Attribute("y3").Value, CultureInfo.InvariantCulture));
                     found = true;
                 }

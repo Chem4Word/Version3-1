@@ -192,12 +192,5 @@ namespace Chem4Word.ACME
         }
 
         #endregion Private EventHandlers
-
-        #region Drawing Code
-
-        // collection to keep track of the visuals
-        private Dictionary<object, ChemicalVisual> chemicalVisuals;
-
-        #endregion Drawing Code
     }
 }

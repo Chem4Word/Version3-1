@@ -199,8 +199,8 @@
   },
   "OH": {
     "Symbol": "OH",
-    "ShowAsSymbol": true,
-    "Flippable": false,
+    "ShowAsSymbol": false,
+    "Flippable": true,
     "Components": [
       {
         "Component": "O",
@@ -214,7 +214,7 @@
   },
   "CH2": {
     "Symbol": "CH2",
-    "ShowAsSymbol": true,
+    "ShowAsSymbol": false,
     "Flippable": false,
     "Components": [
       {
@@ -229,7 +229,7 @@
   },
   "CH3": {
     "Symbol": "CH3",
-    "ShowAsSymbol": true,
+    "ShowAsSymbol": false,
     "Flippable": false,
     "Components": [
       {
@@ -244,7 +244,7 @@
   },
   "C2H5": {
     "Symbol": "C2H5",
-    "ShowAsSymbol": true,
+    "ShowAsSymbol": false,
     "Flippable": false,
     "Components": [
       {
@@ -362,18 +362,18 @@
       }
     ]
   },
-  "tBu": {
-    "Symbol": "tBu",
-    "ShowAsSymbol": true,
-    "Flippable": false,
+  "TBU": {
+    "Symbol": "TBU",
+    "ShowAsSymbol": false,
+    "Flippable": true,
     "Components": [
       {
         "Component": "C",
-        "Count": 4
+        "Count": 1
       },
       {
-        "Component": "H",
-        "Count": 9
+        "Component": "CH3",
+        "Count": 3
       }
     ]
   },
@@ -384,11 +384,11 @@
     "Components": [
       {
         "Component": "C",
-        "Count": 4
+        "Count": 1
       },
       {
-        "Component": "H",
-        "Count": 9
+        "Component": "CH3",
+        "Count": 3
       }
     ]
   },
@@ -454,20 +454,16 @@
   },
   "TMS": {
     "Symbol": "TMS",
-    "ShowAsSymbol": true,
-    "Flippable": false,
+    "ShowAsSymbol": false,
+    "Flippable": true,
     "Components": [
-      {
-        "Component": "C",
-        "Count": 3
-      },
       {
         "Component": "Si",
         "Count": 1
       },
       {
-        "Component": "H",
-        "Count": 9
+        "Component": "CH3",
+        "Count": 3
       }
     ]
   },
@@ -573,6 +569,51 @@
       },
       {
         "Component": "OH",
+        "Count": 1
+      }
+    ]
+  },
+  "CH2CH2CH2OH": {
+    "Symbol": "CH2CH2CH2OH",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "CH2",
+        "Count": 3
+      },
+      {
+        "Component": "OH",
+        "Count": 1
+      }
+    ]
+  },
+  "OMe": {
+    "Symbol": "OMe",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "Me",
+        "Count": 1
+      }
+    ]
+  },
+  "OEt": {
+    "Symbol": "OEt",
+    "ShowAsSymbol": false,
+    "Flippable": true,
+    "Components": [
+      {
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "Et",
         "Count": 1
       }
     ]

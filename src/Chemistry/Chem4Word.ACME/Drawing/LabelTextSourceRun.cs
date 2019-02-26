@@ -5,10 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2.Converters.MDL
+namespace Chem4Word.ACME.Drawing
 {
-    // ReSharper disable once InconsistentNaming
-    public class MDLConverter
+    public class LabelTextSourceRun
     {
+        public string Text;
+        public bool IsAnchor { get; set; }
+        public bool IsSubscript { get; set; }
+        public bool IsEndParagraph;
+        public int Length { get { return IsEndParagraph ? 1 : Text.Length; } }
     }
 }
