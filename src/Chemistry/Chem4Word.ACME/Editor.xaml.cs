@@ -9,7 +9,9 @@ using Chem4Word.Core.UI.Wpf;
 
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
 
@@ -26,9 +29,22 @@ namespace Chem4Word.ACME
     /// <summary>
     /// Interaction logic for Editor.xaml
     /// </summary>
-    public partial class Editor : UserControl
+    public partial class Editor : UserControl, INotifyPropertyChanged
     {
         private EditViewModel _activeViewModel;
+        public EditViewModel ActiveViewModel
+        {
+            get
+            {
+                return _activeViewModel; 
+
+            }
+            set
+            {
+                _activeViewModel = value; 
+                OnPropertyChanged();
+            }
+        }
 
         public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
 
@@ -57,13 +73,13 @@ namespace Chem4Word.ACME
         {
             get
             {
-                if (_activeViewModel == null)
+                if (ActiveViewModel == null)
                 {
                     return false;
                 }
                 else
                 {
-                    return _activeViewModel.Dirty;
+                    return ActiveViewModel.Dirty;
                 }
             }
         }
@@ -72,13 +88,13 @@ namespace Chem4Word.ACME
         {
             get
             {
-                if (_activeViewModel == null)
+                if (ActiveViewModel == null)
                 {
                     return null;
                 }
                 else
                 {
-                    Model model = _activeViewModel.Model.Copy();
+                    Model model = ActiveViewModel.Model.Copy();
                     model.RescaleForCml();
                     return model;
                 }
@@ -137,6 +153,7 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty SelectedAtomOptionProperty =
             DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
 
+
         public Visibility SliderVisibility
         {
             get { return (Visibility)GetValue(SliderVisibilityProperty); }
@@ -176,10 +193,10 @@ namespace Chem4Word.ACME
 
                 tempModel.RescaleForXaml(false);
                 var vm = new EditViewModel(tempModel);
-                _activeViewModel = vm;
+                ActiveViewModel = vm;
 
                 EditorCanvas ec = LocateCanvas();
-                _activeViewModel.Model.CentreInCanvas(new Size(ec.ActualWidth, ec.ActualHeight));
+                ActiveViewModel.Model.CentreInCanvas(new Size(ec.ActualWidth, ec.ActualHeight));
 
                 ec.Chemistry = vm;
 
@@ -188,7 +205,7 @@ namespace Chem4Word.ACME
                 ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
 
                 // Hack: Couldn't find a better way to do this
-                _activeViewModel.BondLengthCombo = BondLengthSelector;
+                ActiveViewModel.BondLengthCombo = BondLengthSelector;
             }
         }
 
@@ -267,10 +284,10 @@ namespace Chem4Word.ACME
         {
             if (BondLengthSelector.SelectedItem is BondLengthOption blo)
             {
-                if (Math.Abs(_activeViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
+                if (Math.Abs(ActiveViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
                     Canvas c = LocateCanvas();
-                    _activeViewModel.SetAverageBondLength(blo.ChosenValue, new Size(c.ActualWidth, c.ActualHeight));
+                    ActiveViewModel.SetAverageBondLength(blo.ChosenValue, new Size(c.ActualWidth, c.ActualHeight));
                     ScrollIntoView();
                 }
             }
@@ -294,8 +311,8 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
-            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {_activeViewModel.BoundingBox.Width}");
-            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {_activeViewModel.BoundingBox.Height}");
+            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {ActiveViewModel.BoundingBox.Width}");
+            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {ActiveViewModel.BoundingBox.Height}");
             Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
             Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
             Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
@@ -309,7 +326,7 @@ namespace Chem4Word.ACME
         {
             WpfEventArgs args = new WpfEventArgs();
 
-            Model result = _activeViewModel.Model.Copy();
+            Model result = ActiveViewModel.Model.Copy();
             result.RescaleForCml();
 
             CMLConverter conv = new CMLConverter();
@@ -327,17 +344,17 @@ namespace Chem4Word.ACME
         /// <param name="e"></param>
         private void ModeButton_OnChecked(object sender, RoutedEventArgs e)
         {
-            if (_activeViewModel != null)
+            if (ActiveViewModel != null)
             {
-                if (_activeViewModel.ActiveMode != null)
+                if (ActiveViewModel.ActiveMode != null)
                 {
-                    _activeViewModel.ActiveMode = null;
+                    ActiveViewModel.ActiveMode = null;
                 }
 
                 var behavior = (Behavior)((sender as RadioButton).Tag);
                 if (behavior != null)
                 {
-                    _activeViewModel.ActiveMode = behavior;
+                    ActiveViewModel.ActiveMode = behavior;
                 }
             }
         }
@@ -346,6 +363,14 @@ namespace Chem4Word.ACME
         {
             Debugger.Break();
             throw new NotImplementedException();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
