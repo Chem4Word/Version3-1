@@ -112,7 +112,7 @@
     </Compile>
     <Compile Include="Model2\General2.cs" />
     <Compile Include="PersistenceTests.cs" />
-    <Compile Include="FunctionalGroupsTests.cs" />
+    <Compile Include="FunctionalGroups.cs" />
     <Compile Include="GeneralTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceHelper.cs" />

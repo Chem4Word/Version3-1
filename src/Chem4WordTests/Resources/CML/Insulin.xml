@@ -4,7 +4,7 @@
          xmlns:conventions='http://www.xml-cml.org/convention/'
          xmlns:cmlDict='http://www.xml-cml.org/dictionary/cml/'
          xmlns:nameDict='http://www.xml-cml.org/dictionary/cml/name/'>
-	<molecule xmlns = 'http://www.xml-cml.org/schema' >
+	<molecule xmlns = 'http://www.xml-cml.org/schema'>
 		<atomArray>
 			<atom id='a1' x2='140.818079927863' y2='442.135731132731' elementType='C' />
 			<atom id = 'a2' x2='140.832321238536' y2='423.19478793855' elementType='O' />
@@ -933,5 +933,5 @@
 			<bond id = 'b415' atomRefs2='a404 a118' order='S' />
 		</bondArray>
 		<formula concise = '' />
-	</molecule >
+	</molecule>
 </cml:cml>

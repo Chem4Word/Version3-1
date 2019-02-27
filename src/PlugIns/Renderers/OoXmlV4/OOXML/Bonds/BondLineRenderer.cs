@@ -234,10 +234,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = "000000" };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
-
             solidFill1.Append(rgbColorModelHex1);
 
             outline1.Append(solidFill1);
@@ -366,10 +362,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             A.SolidFill solidFill10 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex10 = new A.RgbColorModelHex() { Val = "000000" };
-            A.Alpha alpha10 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex10.Append(alpha10);
-
             solidFill10.Append(rgbColorModelHex10);
 
             shapeProperties10.Append(transform2D10);
@@ -501,10 +493,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = "000000" };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
-
             solidFill1.Append(rgbColorModelHex1);
 
             outline1.Append(solidFill1);
@@ -590,10 +578,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             A.PresetDash presetDash1 = new A.PresetDash() { Val = A.PresetLineDashValues.Dash };
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = "000000" };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
-
             solidFill1.Append(rgbColorModelHex1);
 
             outline1.Append(solidFill1);
@@ -680,10 +664,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             A.PresetDash presetDash1 = new A.PresetDash() { Val = A.PresetLineDashValues.LargeDash };
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = "000000" };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
-
             solidFill1.Append(rgbColorModelHex1);
 
             outline1.Append(solidFill1);

@@ -197,9 +197,6 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Atoms
 
             // Set Colour
             A.RgbColorModelHex rgbColorModelHex10 = new A.RgbColorModelHex() { Val = alc.Colour };
-            A.Alpha alpha10 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex10.Append(alpha10);
 
             solidFill10.Append(rgbColorModelHex10);
 
@@ -305,9 +302,6 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Atoms
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
 
             solidFill1.Append(rgbColorModelHex1);
 

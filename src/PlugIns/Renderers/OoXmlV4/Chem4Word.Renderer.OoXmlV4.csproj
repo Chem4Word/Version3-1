@@ -55,6 +55,7 @@
     <Compile Include="OOXML\Atoms\AtomLabelCharacter.cs" />
     <Compile Include="OOXML\Atoms\AtomLabelPositioner.cs" />
     <Compile Include="OOXML\Atoms\AtomLabelRenderer.cs" />
+    <Compile Include="OOXML\Atoms\FunctionalGroupTerm.cs" />
     <Compile Include="OOXML\Bonds\BondLine.cs" />
     <Compile Include="OOXML\Bonds\BondLinePositioner.cs" />
     <Compile Include="OOXML\Bonds\BondLineRenderer.cs" />

@@ -26,6 +26,10 @@ namespace Chem4Word.Model2
             Count = c;
         }
 
+        public override string ToString()
+        {
+            return $"{Component} * {Count}";
+        }
 
         /// <summary>
         /// Calculated combined AtomicWeight

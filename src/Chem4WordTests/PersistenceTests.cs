@@ -5,13 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4WordTests;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Linq;
 using Chem4Word.Model;
-using Chem4Word.Model.Converters;
 using Chem4Word.Model.Converters.CML;
 using Chem4Word.Model.Converters.MDL;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace Chem4WordTests
 {
@@ -271,7 +269,7 @@ namespace Chem4WordTests
             Assert.IsTrue(m.AllBonds.Count == 42, $"Expected 42 Bonds; Got {m.AllBonds.Count}");
 
             // Check that we got three rings
-            Assert.IsTrue(m.Molecules.SelectMany(m1 => m1.Rings).Count() == 3, 
+            Assert.IsTrue(m.Molecules.SelectMany(m1 => m1.Rings).Count() == 3,
                 $"Expected 3 Rings; Got {m.Molecules.SelectMany(m1 => m1.Rings).Count()}");
 
             string molstring = mc.Export(m);

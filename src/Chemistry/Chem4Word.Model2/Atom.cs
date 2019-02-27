@@ -446,6 +446,7 @@ namespace Chem4Word.Model2
                         {
                             // Get vector at right angles
                             vsumVector = vector.Perpendicular();
+                            vsumVector = -vsumVector;
                         }
                         else
                         {
