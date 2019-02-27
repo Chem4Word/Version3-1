@@ -5,6 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Commands;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,11 +24,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interactivity;
 using System.Windows.Media;
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Commands;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME
 {
@@ -56,6 +56,16 @@ namespace Chem4Word.ACME
         #endregion Fields
 
         #region Properties
+
+        public string CurrentBondOrder
+        {
+            get { return _bondOptions[_selectedBondOptionId.Value].Order; }
+        }
+
+        public Globals.BondStereo CurrentStereo
+        {
+            get { return _bondOptions[_selectedBondOptionId.Value].Stereo.Value; }
+        }
 
         public List<BondLengthOption> BondLengthOptions { get; } = new List<BondLengthOption>();
         public BondLengthOption SelectedBondLengthOption { get; set; }
@@ -339,7 +349,7 @@ namespace Chem4Word.ACME
                     DisplayAs = i.ToString("0")
                 };
                 BondLengthOptions.Add(option);
-                if (Math.Abs(i * Globals.ScaleFactorForXaml - Model.XamlBondLength ) < 2.5 * Globals.ScaleFactorForXaml)
+                if (Math.Abs(i * Globals.ScaleFactorForXaml - Model.XamlBondLength) < 2.5 * Globals.ScaleFactorForXaml)
                 {
                     SelectedBondLengthOption = option;
                 }
@@ -361,215 +371,7 @@ namespace Chem4Word.ACME
 
         #endregion Constructors
 
-        private void SelectedItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            var newObjects = e.NewItems;
-            var oldObject = e.OldItems;
-
-            if (newObjects != null)
-            {
-                AddSelectionAdorners(newObjects);
-            }
-
-            if (oldObject != null)
-            {
-                RemoveSelectionAdorners(oldObject);
-            }
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Reset:
-                    RemoveAllAdorners();
-                    break;
-            }
-
-            OnPropertyChanged(nameof(SelectedElement));
-            OnPropertyChanged(nameof(SelectedBondOptionId));
-            OnPropertyChanged(nameof(SelectionType));
-
-            UpdateCommandStatuses();
-        }
-
-        private void UpdateCommandStatuses()
-        {
-            CopyCommand.RaiseCanExecChanged();
-            CutCommand.RaiseCanExecChanged();
-            DeleteCommand.RaiseCanExecChanged();
-            FlipHorizontalCommand.RaiseCanExecChanged();
-            FlipVerticalCommand.RaiseCanExecChanged();
-            AddHydrogensCommand.RaiseCanExecChanged();
-            RemoveHydrogensCommand.RaiseCanExecChanged();
-        }
-
-        public void RemoveAllAdorners()
-        {
-            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
-            var adornerList = SelectionAdorners.Keys.ToList();
-            foreach (object oldObject in adornerList)
-            {
-                layer.Remove(SelectionAdorners[oldObject]);
-                SelectionAdorners.Remove(oldObject);
-            }
-        }
-
-        private void RemoveSelectionAdorners(IList oldObjects)
-        {
-            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
-            foreach (object oldObject in oldObjects)
-            {
-                if (SelectionAdorners.ContainsKey(oldObject))
-                {
-                    var selectionAdorner = SelectionAdorners[oldObject];
-                    if (selectionAdorner is MoleculeSelectionAdorner)
-                    {
-                        var msAdorner = (MoleculeSelectionAdorner)selectionAdorner;
-
-                        msAdorner.DragCompleted -= MolAdorner_ResizeCompleted;
-                        msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
-                        (msAdorner as SingleAtomSelectionAdorner).DragCompleted -= MolAdorner_DragCompleted;
-                    }
-                    layer.Remove(selectionAdorner);
-                    SelectionAdorners.Remove(oldObject);
-                }
-            }
-        }
-
-        private void AddSelectionAdorners(IList newObjects)
-        {
-            foreach (object newObject in newObjects)
-            {
-                if (newObject is Atom)
-                {
-                    var atom = (Atom)newObject;
-
-                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
-                    SelectionAdorners[newObject] = atomAdorner;
-                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-
-                    //if all atoms are selected then select the mol
-                    if (AllAtomsSelected(atom.Parent))
-                    {
-                        RemoveAtomBondAdorners(atom.Parent);
-                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
-                        SelectionAdorners[newObject] = molAdorner;
-                    }
-                }
-                else if (newObject is Bond)
-                {
-                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
-                    SelectionAdorners[newObject] = bondAdorner;
-                    bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-                }
-                else if (newObject is Molecule)
-                {
-                    Molecule mol = (Molecule)newObject;
-                    if (mol.Atoms.Count == 1)
-                    {
-                        SingleAtomSelectionAdorner atomAdorner =
-                            new SingleAtomSelectionAdorner(DrawingSurface, mol, this);
-                        SelectionAdorners[newObject] = atomAdorner;
-                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-                        atomAdorner.DragCompleted += AtomAdorner_DragCompleted;
-                    }
-                    else
-                    {
-                        MoleculeSelectionAdorner molAdorner =
-                            new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
-                        SelectionAdorners[newObject] = molAdorner;
-                        molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
-                        molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-                        (molAdorner as SingleAtomSelectionAdorner).DragCompleted += MolAdorner_DragCompleted;
-                    }
-                }
-            }
-        }
-
-        private void MolAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner)sender);
-            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
-            RemoveFromSelection(movedMolecule);
-
-            //and add in a new one
-            AddToSelection(movedMolecule);
-        }
-
-        private void AtomAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            //we've completed the drag operation
-            //remove the existing molecule adorner
-
-            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner)sender);
-            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
-            RemoveFromSelection(movedMolecule);
-
-            //and add in a new one
-            AddToSelection(movedMolecule.Atoms.Values.First());
-        }
-
-        private void MolAdorner_ResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
-        {
-            //we've completed the drag operation
-            //remove the existing molecule adorner
-            var movedMolecule = (sender as MoleculeSelectionAdorner).AdornedMolecule;
-            RemoveFromSelection(movedMolecule);
-
-            //and add in a new one
-            AddToSelection(movedMolecule);
-        }
-
-        private void SelAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                SelectedItems.Clear();
-                if (sender is AtomSelectionAdorner)
-                {
-                    Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent as Molecule;
-                    RemoveAtomBondAdorners(mol);
-                    AddToSelection(mol);
-                }
-                else if (sender is BondSelectionAdorner)
-                {
-                    Molecule mol = (sender as BondSelectionAdorner).AdornedBond.Parent as Molecule;
-                    RemoveAtomBondAdorners(mol);
-                    AddToSelection(mol);
-                }
-                else if (sender is MoleculeSelectionAdorner)
-                {
-                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule;
-                }
-                else if (sender is SingleAtomSelectionAdorner)
-                {
-                    Molecule mol = (sender as SingleAtomSelectionAdorner).AdornedMolecule.Parent as Molecule;
-                }
-            }
-        }
-
-        private void RemoveAtomBondAdorners(Molecule atomParent)
-        {
-            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
-            foreach (Bond bond in atomParent.Bonds)
-            {
-                if (SelectionAdorners.ContainsKey(bond))
-                {
-                    var selectionAdorner = SelectionAdorners[bond];
-                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
-                    layer.Remove(selectionAdorner);
-                    SelectionAdorners.Remove(bond);
-                }
-            }
-
-            foreach (Atom atom in atomParent.Atoms.Values)
-            {
-                if (SelectionAdorners.ContainsKey(atom))
-                {
-                    var selectionAdorner = SelectionAdorners[atom];
-                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
-                    layer.Remove(selectionAdorner);
-                    SelectionAdorners.Remove(atom);
-                }
-            }
-        }
+        #region Methods
 
         private bool AllAtomsSelected(Molecule atomParent)
         {
@@ -581,285 +383,6 @@ namespace Chem4Word.ACME
         {
             return SelectionAdorners.Values.OfType<AtomSelectionAdorner>()
                 .Where(asl => asl.AdornedAtom.Parent == atomParent);
-        }
-
-        public void CutSelection()
-        {
-            MessageBox.Show("Cut code goes here");
-        }
-
-        public void CopySelection()
-        {
-            MessageBox.Show("Copy code goes here");
-        }
-
-        public void SetAverageBondLength(double newLength, Size canvas)
-        {
-            UndoManager.BeginUndoBlock();
-            double currentLength = Model.MeanBondLength;
-            SelectedBondLengthOption = null;
-            BondLengthOption blo = null;
-            foreach (var option in BondLengthOptions)
-            {
-                if (Math.Abs(option.ChosenValue - currentLength) < 2.5 * Globals.ScaleFactorForXaml)
-                {
-                    blo = option;
-                    break;
-                }
-            }
-
-            Action undoAction = () =>
-            {
-                //Model2.Model.ScaleToAverageBondLength(currentLength);
-                //Model2.Model.CentreInCanvas(canvas);
-
-                //FontSize = currentLength * Globals.FontSizePercentageBond;
-                SelectedBondLengthOption = blo;
-                // Hack: Couldn't find a better way to do this
-                BondLengthCombo.SelectedItem = blo;
-            };
-            Action redoAction = () =>
-            {
-                //Model2.Model.ScaleToAverageBondLength(newLength);
-                //Model2.Model.CentreInCanvas(canvas);
-
-                //FontSize = newLength * Globals.FontSizePercentageBond;
-            };
-
-            UndoManager.RecordAction(undoAction, redoAction);
-
-            redoAction.Invoke();
-
-            UndoManager.EndUndoBlock();
-        }
-
-        public void DeleteAtom(Atom atom)
-        {
-            UndoManager.BeginUndoBlock();
-            var bondlist = atom.Bonds.ToList();
-            var parent = atom.Parent;
-
-            Dictionary<Bond, Atom> startAtoms = new Dictionary<Bond, Atom>();
-            Dictionary<Bond, Atom> endAtoms = new Dictionary<Bond, Atom>();
-
-            Action undoAction = () =>
-            {
-                parent.AddAtom(atom);
-                //SelectedItems.Clear();
-                foreach (Bond bond in bondlist)
-                {
-                    //bond.StartAtom = startAtoms[bond];
-                    //bond.EndAtom = endAtoms[bond];
-                    //parent.Bonds.Add(bond);
-                }
-                //if (!SelectedItems.Contains(atom))
-                //{
-                //    AddToSelection(atom);
-                //}
-            };
-            Action redoAction = () =>
-            {
-                foreach (Bond bond in bondlist)
-                {
-                    //startAtoms[bond] = bond.StartAtom;
-                    //endAtoms[bond] = bond.EndAtom;
-                    //bond.StartAtom = null;
-                    //bond.EndAtom = null;
-                    //parent.RemoveBond(bond);
-                }
-                parent.RemoveAtom(atom);
-                if (SelectedItems.Contains(atom))
-                {
-                    RemoveFromSelection(atom);
-                }
-            };
-
-            UndoManager.RecordAction(undoAction, redoAction);
-            UndoManager.EndUndoBlock();
-            redoAction();
-        }
-
-        public void DeleteBond(Bond bond)
-        {
-            UndoManager.BeginUndoBlock();
-            var a1 = bond.StartAtom;
-            var a2 = bond.EndAtom;
-            Molecule parent = bond.Parent;
-
-            Model mod = bond.Model;
-
-            bool isTopLevel = UndoManager.TransactionLevel == 1;
-            Action redoAction = () =>
-            {
-                //if (SelectedItems.Contains(bond))
-                //{
-                //    RemoveFromSelection(bond);
-                //}
-                //bond.StartAtom = null;
-                //bond.EndAtom = null;
-                //parent?.RemoveBond(bond);
-
-                //parent?.Split(a1, a2);
-                //if (isTopLevel)
-                //{
-                //    parent?.RebuildRings();
-                //}
-            };
-
-            Action undoAction = () =>
-            {
-                //bond.StartAtom = a1;
-                //bond.EndAtom = a2;
-                //a1.Parent.Bonds.Add(bond);
-                ////AddToSelection(bond);
-
-                //if (a2.Parent != a1.Parent)
-                //{
-                //    a1.Parent.Merge(a2.Parent);
-                //}
-                //if (isTopLevel)
-                //{
-                //    a1.Parent.RebuildRings();
-                //}
-            };
-
-            redoAction();
-
-            UndoManager.RecordAction(undoAction, redoAction);
-            UndoManager.EndUndoBlock();
-        }
-
-        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, Globals.ClockDirections dir, Element elem = null)
-        {
-            Atom newAtom = new Atom();
-            newAtom.Element = elem ?? _selectedElement;
-            newAtom.Position = newAtomPos;
-            object tag = null;
-            if (dir != Globals.ClockDirections.Nothing)
-            {
-                tag = dir;
-            }
-
-            object oldDir = lastAtom?.Tag;
-
-            if (lastAtom != null)
-            {
-                UndoManager.BeginUndoBlock();
-
-                Molecule currentMol = lastAtom.Parent;
-
-                Action undo = () =>
-                {
-                    lastAtom.Tag = oldDir;
-                    //currentMol.RemoveAtom(newAtom);
-                };
-                Action redo = () =>
-                {
-                    lastAtom.Tag = tag;//save the last sprouted direction in the tag object
-                    //currentMol.Atoms.Add(newAtom);
-                };
-                UndoManager.RecordAction(undo, redo);
-
-                redo();
-
-                AddNewBond(lastAtom, newAtom, currentMol);
-
-                UndoManager.EndUndoBlock();
-            }
-            else
-            {
-                UndoManager.BeginUndoBlock();
-
-                var _currentMol = new Molecule();
-
-                Action undo = () =>
-                {
-                   Model.RemoveMolecule(_currentMol);
-                };
-                Action redo = () =>
-                {
-                    Model.AddMolecule(_currentMol);
-                };
-                redo();
-
-                UndoManager.RecordAction(undo, redo);
-
-                Action undo2 = () =>
-                {
-                    newAtom.Tag = null;
-                    _currentMol.RemoveAtom(newAtom);
-                };
-                Action redo2 = () =>
-                {
-                    _currentMol.AddAtom(newAtom);
-                    newAtom.Tag = tag;
-                };
-                UndoManager.RecordAction(undo2, redo2);
-
-                redo2();
-
-                UndoManager.EndUndoBlock();
-            }
-
-            return newAtom;
-        }
-
-        public void AddNewBond(Atom a, Atom b, Molecule mol)
-        {
-            UndoManager.BeginUndoBlock();
-
-            var stereo = CurrentStereo;
-            var order = CurrentBondOrder;
-
-            Bond newbond = new Bond();
-
-            newbond.Stereo = stereo;
-            newbond.Order = order;
-
-            //newbond.StartAtom = a;
-            //newbond.EndAtom = b;
-
-            Action undo = () =>
-            {
-                var isCyclic = newbond.IsCyclic();
-                //mol.RemoveBond(newbond);
-                //newbond.StartAtom = null;
-                //newbond.EndAtom = null;
-                if (isCyclic)
-                {
-                    mol.RebuildRings();
-                }
-            };
-            Action redo = () =>
-            {
-                //newbond.StartAtom = a;
-                //newbond.EndAtom = b;
-                //mol.Bonds.Add(newbond);
-                if (newbond.StartAtom.Parent != newbond.EndAtom.Parent)
-                {
-                    //newbond.StartAtom.Parent.Merge(newbond.EndAtom.Parent);
-                }
-                else
-                {
-                    mol.RebuildRings();
-                }
-            };
-
-            UndoManager.RecordAction(undo, redo);
-
-            UndoManager.EndUndoBlock();
-
-            redo();
-        }
-
-        public string CurrentBondOrder
-        {
-            get { return _bondOptions[_selectedBondOptionId.Value].Order; }
-        }
-
-        public Globals.BondStereo CurrentStereo
-        {
-            get { return _bondOptions[_selectedBondOptionId.Value].Stereo.Value; }
         }
 
         public void IncreaseBondOrder(Bond existingBond)
@@ -984,6 +507,491 @@ namespace Chem4Word.ACME
             redo();
             UndoManager.EndUndoBlock();
         }
+
+        public void AddNewBond(Atom a, Atom b, Molecule mol)
+        {
+            UndoManager.BeginUndoBlock();
+
+            var stereo = CurrentStereo;
+            var order = CurrentBondOrder;
+
+            Bond newbond = new Bond();
+
+            newbond.Stereo = stereo;
+            newbond.Order = order;
+
+            //newbond.StartAtom = a;
+            //newbond.EndAtom = b;
+
+            Action undo = () =>
+            {
+                var isCyclic = newbond.IsCyclic();
+                //mol.RemoveBond(newbond);
+                //newbond.StartAtom = null;
+                //newbond.EndAtom = null;
+                if (isCyclic)
+                {
+                    mol.RebuildRings();
+                }
+            };
+            Action redo = () =>
+            {
+                //newbond.StartAtom = a;
+                //newbond.EndAtom = b;
+                //mol.Bonds.Add(newbond);
+                if (newbond.StartAtom.Parent != newbond.EndAtom.Parent)
+                {
+                    //newbond.StartAtom.Parent.Merge(newbond.EndAtom.Parent);
+                }
+                else
+                {
+                    mol.RebuildRings();
+                }
+            };
+
+            UndoManager.RecordAction(undo, redo);
+
+            UndoManager.EndUndoBlock();
+
+            redo();
+        }
+
+        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, Globals.ClockDirections dir, Element elem = null)
+        {
+            Atom newAtom = new Atom();
+            newAtom.Element = elem ?? _selectedElement;
+            newAtom.Position = newAtomPos;
+            object tag = null;
+            if (dir != Globals.ClockDirections.Nothing)
+            {
+                tag = dir;
+            }
+
+            object oldDir = lastAtom?.Tag;
+
+            if (lastAtom != null)
+            {
+                UndoManager.BeginUndoBlock();
+
+                Molecule currentMol = lastAtom.Parent;
+
+                Action undo = () =>
+                {
+                    lastAtom.Tag = oldDir;
+                    //currentMol.RemoveAtom(newAtom);
+                };
+                Action redo = () =>
+                {
+                    lastAtom.Tag = tag;//save the last sprouted direction in the tag object
+                    //currentMol.Atoms.Add(newAtom);
+                };
+                UndoManager.RecordAction(undo, redo);
+
+                redo();
+
+                AddNewBond(lastAtom, newAtom, currentMol);
+
+                UndoManager.EndUndoBlock();
+            }
+            else
+            {
+                UndoManager.BeginUndoBlock();
+
+                var _currentMol = new Molecule();
+
+                Action undo = () =>
+                {
+                    Model.RemoveMolecule(_currentMol);
+                };
+                Action redo = () =>
+                {
+                    Model.AddMolecule(_currentMol);
+                };
+                redo();
+
+                UndoManager.RecordAction(undo, redo);
+
+                Action undo2 = () =>
+                {
+                    newAtom.Tag = null;
+                    _currentMol.RemoveAtom(newAtom);
+                };
+                Action redo2 = () =>
+                {
+                    _currentMol.AddAtom(newAtom);
+                    newAtom.Tag = tag;
+                };
+                UndoManager.RecordAction(undo2, redo2);
+
+                redo2();
+
+                UndoManager.EndUndoBlock();
+            }
+
+            return newAtom;
+        }
+
+        public void DeleteBond(Bond bond)
+        {
+            UndoManager.BeginUndoBlock();
+            var a1 = bond.StartAtom;
+            var a2 = bond.EndAtom;
+            Molecule parent = bond.Parent;
+
+            Model mod = bond.Model;
+
+            bool isTopLevel = UndoManager.TransactionLevel == 1;
+            Action redoAction = () =>
+            {
+                //if (SelectedItems.Contains(bond))
+                //{
+                //    RemoveFromSelection(bond);
+                //}
+                //bond.StartAtom = null;
+                //bond.EndAtom = null;
+                //parent?.RemoveBond(bond);
+
+                //parent?.Split(a1, a2);
+                //if (isTopLevel)
+                //{
+                //    parent?.RebuildRings();
+                //}
+            };
+
+            Action undoAction = () =>
+            {
+                //bond.StartAtom = a1;
+                //bond.EndAtom = a2;
+                //a1.Parent.Bonds.Add(bond);
+                ////AddToSelection(bond);
+
+                //if (a2.Parent != a1.Parent)
+                //{
+                //    a1.Parent.Merge(a2.Parent);
+                //}
+                //if (isTopLevel)
+                //{
+                //    a1.Parent.RebuildRings();
+                //}
+            };
+
+            redoAction();
+
+            UndoManager.RecordAction(undoAction, redoAction);
+            UndoManager.EndUndoBlock();
+        }
+
+        public void DeleteAtom(Atom atom)
+        {
+            UndoManager.BeginUndoBlock();
+            var bondlist = atom.Bonds.ToList();
+            var parent = atom.Parent;
+
+            Dictionary<Bond, Atom> startAtoms = new Dictionary<Bond, Atom>();
+            Dictionary<Bond, Atom> endAtoms = new Dictionary<Bond, Atom>();
+
+            Action undoAction = () =>
+            {
+                parent.AddAtom(atom);
+                //SelectedItems.Clear();
+                foreach (Bond bond in bondlist)
+                {
+                    //bond.StartAtom = startAtoms[bond];
+                    //bond.EndAtom = endAtoms[bond];
+                    //parent.Bonds.Add(bond);
+                }
+                //if (!SelectedItems.Contains(atom))
+                //{
+                //    AddToSelection(atom);
+                //}
+            };
+            Action redoAction = () =>
+            {
+                foreach (Bond bond in bondlist)
+                {
+                    //startAtoms[bond] = bond.StartAtom;
+                    //endAtoms[bond] = bond.EndAtom;
+                    //bond.StartAtom = null;
+                    //bond.EndAtom = null;
+                    //parent.RemoveBond(bond);
+                }
+                parent.RemoveAtom(atom);
+                if (SelectedItems.Contains(atom))
+                {
+                    RemoveFromSelection(atom);
+                }
+            };
+
+            UndoManager.RecordAction(undoAction, redoAction);
+            UndoManager.EndUndoBlock();
+            redoAction();
+        }
+
+        public void SetAverageBondLength(double newLength, Size canvas)
+        {
+            UndoManager.BeginUndoBlock();
+            double currentLength = Model.MeanBondLength;
+            SelectedBondLengthOption = null;
+            BondLengthOption blo = null;
+            foreach (var option in BondLengthOptions)
+            {
+                if (Math.Abs(option.ChosenValue - currentLength) < 2.5 * Globals.ScaleFactorForXaml)
+                {
+                    blo = option;
+                    break;
+                }
+            }
+
+            Action undoAction = () =>
+            {
+                //Model2.Model.ScaleToAverageBondLength(currentLength);
+                //Model2.Model.CentreInCanvas(canvas);
+
+                //FontSize = currentLength * Globals.FontSizePercentageBond;
+                SelectedBondLengthOption = blo;
+                // Hack: Couldn't find a better way to do this
+                BondLengthCombo.SelectedItem = blo;
+            };
+            Action redoAction = () =>
+            {
+                //Model2.Model.ScaleToAverageBondLength(newLength);
+                //Model2.Model.CentreInCanvas(canvas);
+
+                //FontSize = newLength * Globals.FontSizePercentageBond;
+            };
+
+            UndoManager.RecordAction(undoAction, redoAction);
+
+            redoAction.Invoke();
+
+            UndoManager.EndUndoBlock();
+        }
+
+        public void CopySelection()
+        {
+            MessageBox.Show("Copy code goes here");
+        }
+
+        public void CutSelection()
+        {
+            MessageBox.Show("Cut code goes here");
+        }
+
+        private void RemoveAtomBondAdorners(Molecule atomParent)
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            foreach (Bond bond in atomParent.Bonds)
+            {
+                if (SelectionAdorners.ContainsKey(bond))
+                {
+                    var selectionAdorner = SelectionAdorners[bond];
+                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    layer.Remove(selectionAdorner);
+                    SelectionAdorners.Remove(bond);
+                }
+            }
+
+            foreach (Atom atom in atomParent.Atoms.Values)
+            {
+                if (SelectionAdorners.ContainsKey(atom))
+                {
+                    var selectionAdorner = SelectionAdorners[atom];
+                    selectionAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                    layer.Remove(selectionAdorner);
+                    SelectionAdorners.Remove(atom);
+                }
+            }
+        }
+
+        private void SelectedItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var newObjects = e.NewItems;
+            var oldObject = e.OldItems;
+
+            if (newObjects != null)
+            {
+                AddSelectionAdorners(newObjects);
+            }
+
+            if (oldObject != null)
+            {
+                RemoveSelectionAdorners(oldObject);
+            }
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Reset:
+                    RemoveAllAdorners();
+                    break;
+            }
+
+            OnPropertyChanged(nameof(SelectedElement));
+            OnPropertyChanged(nameof(SelectedBondOptionId));
+            OnPropertyChanged(nameof(SelectionType));
+
+            UpdateCommandStatuses();
+        }
+
+        private void UpdateCommandStatuses()
+        {
+            CopyCommand.RaiseCanExecChanged();
+            CutCommand.RaiseCanExecChanged();
+            DeleteCommand.RaiseCanExecChanged();
+            FlipHorizontalCommand.RaiseCanExecChanged();
+            FlipVerticalCommand.RaiseCanExecChanged();
+            AddHydrogensCommand.RaiseCanExecChanged();
+            RemoveHydrogensCommand.RaiseCanExecChanged();
+        }
+
+        public void RemoveAllAdorners()
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            var adornerList = SelectionAdorners.Keys.ToList();
+            foreach (object oldObject in adornerList)
+            {
+                layer.Remove(SelectionAdorners[oldObject]);
+                SelectionAdorners.Remove(oldObject);
+            }
+        }
+
+        private void RemoveSelectionAdorners(IList oldObjects)
+        {
+            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            foreach (object oldObject in oldObjects)
+            {
+                if (SelectionAdorners.ContainsKey(oldObject))
+                {
+                    var selectionAdorner = SelectionAdorners[oldObject];
+                    if (selectionAdorner is MoleculeSelectionAdorner)
+                    {
+                        var msAdorner = (MoleculeSelectionAdorner)selectionAdorner;
+
+                        msAdorner.DragCompleted -= MolAdorner_ResizeCompleted;
+                        msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                        (msAdorner as SingleAtomSelectionAdorner).DragCompleted -= MolAdorner_DragCompleted;
+                    }
+                    layer.Remove(selectionAdorner);
+                    SelectionAdorners.Remove(oldObject);
+                }
+            }
+        }
+
+        private void AddSelectionAdorners(IList newObjects)
+        {
+            foreach (object newObject in newObjects)
+            {
+                if (newObject is Atom)
+                {
+                    var atom = (Atom)newObject;
+
+                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
+                    SelectionAdorners[newObject] = atomAdorner;
+                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+
+                    //if all atoms are selected then select the mol
+                    if (AllAtomsSelected(atom.Parent))
+                    {
+                        RemoveAtomBondAdorners(atom.Parent);
+                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
+                        SelectionAdorners[newObject] = molAdorner;
+                    }
+                }
+                else if (newObject is Bond)
+                {
+                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
+                    SelectionAdorners[newObject] = bondAdorner;
+                    bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                }
+                else if (newObject is Molecule)
+                {
+                    Molecule mol = (Molecule)newObject;
+                    if (mol.Atoms.Count == 1)
+                    {
+                        SingleAtomSelectionAdorner atomAdorner =
+                            new SingleAtomSelectionAdorner(DrawingSurface, mol, this);
+                        SelectionAdorners[newObject] = atomAdorner;
+                        atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                        atomAdorner.DragCompleted += AtomAdorner_DragCompleted;
+                    }
+                    else
+                    {
+                        MoleculeSelectionAdorner molAdorner =
+                            new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
+                        SelectionAdorners[newObject] = molAdorner;
+                        molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
+                        molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+                        (molAdorner as SingleAtomSelectionAdorner).DragCompleted += MolAdorner_DragCompleted;
+                    }
+                }
+            }
+        }
+
+        #endregion Methods
+
+        #region Event Handlers
+
+        private void MolAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner)sender);
+            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
+            RemoveFromSelection(movedMolecule);
+
+            //and add in a new one
+            AddToSelection(movedMolecule);
+        }
+
+        private void AtomAdorner_DragCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            //we've completed the drag operation
+            //remove the existing molecule adorner
+
+            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner)sender);
+            var movedMolecule = moleculeSelectionAdorner.AdornedMolecule;
+            RemoveFromSelection(movedMolecule);
+
+            //and add in a new one
+            AddToSelection(movedMolecule.Atoms.Values.First());
+        }
+
+        private void MolAdorner_ResizeCompleted(object sender, System.Windows.Controls.Primitives.DragCompletedEventArgs e)
+        {
+            //we've completed the drag operation
+            //remove the existing molecule adorner
+            var movedMolecule = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+            RemoveFromSelection(movedMolecule);
+
+            //and add in a new one
+            AddToSelection(movedMolecule);
+        }
+
+        private void SelAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                SelectedItems.Clear();
+                if (sender is AtomSelectionAdorner)
+                {
+                    Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent as Molecule;
+                    RemoveAtomBondAdorners(mol);
+                    AddToSelection(mol);
+                }
+                else if (sender is BondSelectionAdorner)
+                {
+                    Molecule mol = (sender as BondSelectionAdorner).AdornedBond.Parent as Molecule;
+                    RemoveAtomBondAdorners(mol);
+                    AddToSelection(mol);
+                }
+                else if (sender is MoleculeSelectionAdorner)
+                {
+                    Molecule mol = (sender as MoleculeSelectionAdorner).AdornedMolecule;
+                }
+                else if (sender is SingleAtomSelectionAdorner)
+                {
+                    Molecule mol = (sender as SingleAtomSelectionAdorner).AdornedMolecule.Parent as Molecule;
+                }
+            }
+        }
+
+        #endregion Event Handlers
 
         public bool Dirty =>
             UndoManager.CanUndo;
@@ -1119,10 +1127,8 @@ namespace Chem4Word.ACME
             var mols = SelectedItems.OfType<Molecule>().ToList();
             if (mols.Any())
             {
-
                 foreach (var mol in mols)
                 {
-
                     foreach (var atom in mol.Atoms.Values)
                     {
                         if (atom.ImplicitHydrogenCount > 0)
@@ -1376,7 +1382,7 @@ namespace Chem4Word.ACME
         //            foreach (var bond in targetBonds)
         //            {
         //                bond.Parent.RemoveBond(bond);
-                      
+
         //            }
         //            foreach (var atom in targetAtoms)
         //            {
@@ -1391,7 +1397,6 @@ namespace Chem4Word.ACME
         //        UndoManager.EndUndoBlock();
         //    }
         //}
-
 
         public bool SingleMolSelected
         {

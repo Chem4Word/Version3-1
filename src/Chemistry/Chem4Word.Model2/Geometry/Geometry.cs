@@ -134,7 +134,7 @@ namespace Chem4Word.Model2.Geometry
 
             accumulatedArea *= 3f;
             var centroid = new Point(centerX / accumulatedArea, centerY / accumulatedArea);
-            Debug.Assert(centroid.X >= minX & centroid.X <= maxX & centroid.Y >= minY & centroid.Y <= maxY);
+            //Debug.Assert(centroid.X >= minX & centroid.X <= maxX & centroid.Y >= minY & centroid.Y <= maxY);
             return centroid;
         }
     }

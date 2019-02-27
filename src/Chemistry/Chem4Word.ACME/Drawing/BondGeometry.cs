@@ -415,6 +415,7 @@ namespace Chem4Word.ACME.Drawing
             Point tempStartPoint = startPoint;
             Vector offset = bondVector * (1d / 100d);
 
+
             while (startAtomGeometry.FillContains(tempStartPoint))
             {
                 tempStartPoint += offset;

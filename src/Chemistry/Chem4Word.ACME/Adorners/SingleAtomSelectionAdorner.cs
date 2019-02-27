@@ -45,6 +45,7 @@ namespace Chem4Word.ACME.Adorners
 
         //where the dragging starts
         protected Point StartPos;
+        private EditorCanvas _editorCanvas;
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
@@ -63,8 +64,8 @@ namespace Chem4Word.ACME.Adorners
             RenderBrush = (Brush)FindResource("BigThumbFillBrush");
             Focusable = false;
             IsHitTestVisible = true;
-          
 
+            _editorCanvas = (EditorCanvas) adornedElement;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
@@ -157,11 +158,11 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var AdornedMoleculeImage = AdornedMolecule.Ghost();
-                Debug.WriteLine(LastOperation.ToString());
-                AdornedMoleculeImage.Transform = LastOperation;
+                var ghost = _editorCanvas.GhostMolecule(AdornedMolecule);
+                //Debug.WriteLine(LastOperation.ToString());
+                ghost.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
 
                 base.OnRender(drawingContext);
             }

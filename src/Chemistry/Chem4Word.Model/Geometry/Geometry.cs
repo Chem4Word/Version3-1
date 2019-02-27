@@ -375,5 +375,7 @@ namespace Chem4Word.Model.Geometry
 
             return geo;
         }
+
+     
     }
 }

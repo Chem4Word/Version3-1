@@ -94,7 +94,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public override string Colour => "#000000";
+        public override string Colour => "#909090";
 
         public override double AtomicWeight
         {
