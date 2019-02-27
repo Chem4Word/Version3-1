@@ -42,17 +42,17 @@ namespace Chem4Word.Model2
 
         private static void LoadFromResource()
         {
-            ShortcutList = new Dictionary<string, FunctionalGroup>();
+            _shortcutList = new Dictionary<string, FunctionalGroup>();
 
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
             if (!string.IsNullOrEmpty(json))
             {
-                ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
+                _shortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
             }
         }
 
         //list of valid shortcuts for testing input
-        public static string ValidShortCuts => "(" + ShortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")";
+        public static string ValidShortCuts => "(" + _shortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")";
 
         //list of valid elements (followed by subscripts) for testing input
         public static Regex NameParser => new Regex($"^(?<element>{Globals.PeriodicTable.ValidElements}+[0-9]*)+\\s*$");

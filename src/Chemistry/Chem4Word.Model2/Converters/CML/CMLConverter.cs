@@ -339,9 +339,27 @@ namespace Chem4Word.Model2.Converters.CML
 
         private XElement GetXElement(Atom atom)
         {
+            var symbol = "";
+            if (atom.Element is Element element)
+            {
+                symbol = atom.Element.Symbol;
+            }
+
+            if (atom.Element is FunctionalGroup functionalGroup)
+            {
+                foreach (var kvp in Globals.FunctionalGroupsDictionary)
+                {
+                    if (kvp.Value.Equals(functionalGroup))
+                    {
+                        symbol = kvp.Key;
+                        break;
+                    }
+                }
+            }
+
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,
                 new XAttribute(CMLConstants.TagId, atom.Id),
-                new XAttribute(CMLConstants.TagElementType, atom.Element.Symbol),
+                new XAttribute(CMLConstants.TagElementType, symbol),
                 new XAttribute(CMLConstants.TagX2, atom.Position.X),
                 new XAttribute(CMLConstants.TagY2, atom.Position.Y)
             );

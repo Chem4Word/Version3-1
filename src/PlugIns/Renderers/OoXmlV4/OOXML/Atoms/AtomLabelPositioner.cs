@@ -592,7 +592,16 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             {
                 foreach (var ch in symbol)
                 {
-                    var alc = new AtomLabelCharacter(atom.Position, _TtfCharacterSet[ch], atomColour, ch, atom.Path, atom.Parent.Path);
+                    char c = ch;
+                    //if (c.Equals('{'))
+                    //{
+                    //    c = '[';
+                    //}
+                    //if (c.Equals('}'))
+                    //{
+                    //    c = ']';
+                    //}
+                    var alc = new AtomLabelCharacter(atom.Position, _TtfCharacterSet[c], atomColour, c, atom.Path, atom.Parent.Path);
                     alc.IsSubScript = isSubscript;
                     term.Characters.Add(alc);
                 }
