@@ -200,11 +200,10 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var ghostMolecule = (AdornedElement as EditorCanvas).GhostMolecule(AdornedMolecule);
-                Debug.WriteLine(LastOperation.ToString());
-                ghostMolecule.Transform = LastOperation;
+             
+                AdornedMolecule.Transform(LastOperation);
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghostMolecule);
+                //drawingContext.DrawGeometry(RenderBrush, BorderPen, ghostMolecule);
             }
         }
 

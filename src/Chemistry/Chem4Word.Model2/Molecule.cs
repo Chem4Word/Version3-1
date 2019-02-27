@@ -1055,6 +1055,7 @@ namespace Chem4Word.Model2
 
         public Point Centroid { get; set; }
 
+
         private void WipeMoleculeRings()
         {
             Rings.Clear();
@@ -1278,6 +1279,14 @@ namespace Chem4Word.Model2
         public bool Overlaps(List<Point> preferredPlacements, List<Atom> atoms =null)
         {
             throw new NotImplementedException();
+        }
+
+        public void Transform(Transform lastOperation)
+        {
+            foreach (Atom atom in Atoms.Values)
+            {
+                atom.Position = lastOperation.Transform(atom.Position);
+            }
         }
     }
 }
