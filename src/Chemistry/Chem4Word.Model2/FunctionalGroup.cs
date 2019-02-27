@@ -21,7 +21,6 @@ namespace Chem4Word.Model2
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        //private static Dictionary<string, FunctionalGroup> _shortcutList;
         private double _atomicWeight = 0d;
 
         public override string Colour => Globals.PeriodicTable.C.Colour;

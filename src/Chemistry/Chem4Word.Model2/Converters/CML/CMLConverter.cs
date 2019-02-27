@@ -339,27 +339,20 @@ namespace Chem4Word.Model2.Converters.CML
 
         private XElement GetXElement(Atom atom)
         {
-            var symbol = "";
+            var elementType = "";
             if (atom.Element is Element element)
             {
-                symbol = atom.Element.Symbol;
+                elementType = element.Symbol;
             }
 
             if (atom.Element is FunctionalGroup functionalGroup)
             {
-                foreach (var kvp in Globals.FunctionalGroupsDictionary)
-                {
-                    if (kvp.Value.Equals(functionalGroup))
-                    {
-                        symbol = kvp.Key;
-                        break;
-                    }
-                }
+                elementType = FunctionalGroups.GetKey(functionalGroup);
             }
 
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,
                 new XAttribute(CMLConstants.TagId, atom.Id),
-                new XAttribute(CMLConstants.TagElementType, symbol),
+                new XAttribute(CMLConstants.TagElementType, elementType),
                 new XAttribute(CMLConstants.TagX2, atom.Position.X),
                 new XAttribute(CMLConstants.TagY2, atom.Position.Y)
             );
