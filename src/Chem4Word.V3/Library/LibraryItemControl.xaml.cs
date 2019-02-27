@@ -7,7 +7,7 @@
 
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
-using Chem4Word.View;
+using Chem4Word.ACME;
 using Microsoft.Office.Interop.Word;
 using System;
 using System.Reflection;

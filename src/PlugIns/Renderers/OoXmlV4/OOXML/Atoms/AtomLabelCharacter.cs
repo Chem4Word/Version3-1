@@ -30,5 +30,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             ParentAtom = parentAtom;
             ParentMolecule = parentMolecule;
         }
+
+        public override string ToString()
+        {
+            return $"{Character.Character} of {ParentAtom} @ {Position.X:#,##0.000},{Position.Y:#,##0.000}";
+        }
     }
 }

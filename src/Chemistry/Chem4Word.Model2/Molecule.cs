@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Media;
 
 namespace Chem4Word.Model2
 {
@@ -286,27 +287,29 @@ namespace Chem4Word.Model2
             foreach (Atom atom in Atoms.Values)
             {
                 // ToDo: Do we need to check if this is a functional group here?
-
-                switch (atom.Element.Symbol)
+                if (atom.Element != null)
                 {
-                    case "C":
-                        f["C"]++;
-                        break;
+                    switch (atom.Element.Symbol)
+                    {
+                        case "C":
+                            f["C"]++;
+                            break;
 
-                    case "H":
-                        f["H"]++;
-                        break;
+                        case "H":
+                            f["H"]++;
+                            break;
 
-                    default:
-                        if (!r.ContainsKey(atom.SymbolText))
-                        {
-                            r.Add(atom.SymbolText, 1);
-                        }
-                        else
-                        {
-                            r[atom.SymbolText]++;
-                        }
-                        break;
+                        default:
+                            if (!r.ContainsKey(atom.SymbolText))
+                            {
+                                r.Add(atom.SymbolText, 1);
+                            }
+                            else
+                            {
+                                r[atom.SymbolText]++;
+                            }
+                            break;
+                    }
                 }
 
                 int hCount = atom.ImplicitHydrogenCount;
@@ -747,36 +750,7 @@ namespace Chem4Word.Model2
             return copy;
         }
 
-        public Molecule Clone()
-        {
-            Molecule clone = new Molecule().CloneExcept(new[] { nameof(Id), nameof(_atoms), nameof(_bonds), nameof(_molecules) });
-            clone.ClearAll();
-            foreach (KeyValuePair<string, Atom> keyValuePair in Atoms)
-            {
-                Atom atom = keyValuePair.Value;
-                var target = atom.Clone();
-                clone.AddAtom(target);
-            }
-
-            foreach (Bond bond in Bonds)
-            {
-                var startAtomClone = clone.Atoms[bond.StartAtomInternalId];
-                var endAtomClone = clone.Atoms[bond.EndAtomInternalId];
-
-                clone.AddBond(bond.Clone());
-            }
-
-            foreach (KeyValuePair<string, Molecule> keyValuePair in Molecules)
-            {
-                Molecule child = keyValuePair.Value;
-                Molecule tempMol = child.Clone();
-                tempMol.CheckIntegrity();
-                clone.AddMolecule(tempMol);
-            }
-            clone.RebuildRings();
-            return clone;
-        }
-
+       
         protected void ClearAll()
         {
             _molecules.Clear();
@@ -1079,6 +1053,8 @@ namespace Chem4Word.Model2
             }
         }
 
+        public Point Centroid { get; set; }
+
         private void WipeMoleculeRings()
         {
             Rings.Clear();
@@ -1282,6 +1258,26 @@ namespace Chem4Word.Model2
                 lengths.AddRange(mol.BondLengths);
                 mol.AddBondLengths(lengths);
             }
+        }
+
+        public void Move(Transform lastOperation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Windows.Media.Geometry Ghost()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ResetBoundingBox()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Overlaps(List<Point> preferredPlacements, List<Atom> atoms =null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

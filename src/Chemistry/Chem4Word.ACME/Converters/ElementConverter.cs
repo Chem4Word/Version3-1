@@ -5,11 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Converters
 {

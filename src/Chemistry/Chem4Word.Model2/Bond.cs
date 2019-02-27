@@ -623,10 +623,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public Bond Clone()
-        {
-            return this.CloneExcept(new string[] { });
-        }
+       
 
         public void NotifyBondingChanged()
         {

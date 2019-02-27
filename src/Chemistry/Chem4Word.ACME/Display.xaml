@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:Chem4Word.ACME.Controls"
     x:Name="ACMEDisplay">
-    <Viewbox Name="Placeholder">
-        <controls:ChemistryCanvas x:Name="ChemCanvas" Margin="20,22,20,20" />
+    <Viewbox Name="Placeholder"  >
+        <controls:ChemistryCanvas x:Name="ChemCanvas" Margin="{Binding RelativeSource={RelativeSource Self}, Path=InteriorPadding}"  />
     </Viewbox>
 </UserControl>

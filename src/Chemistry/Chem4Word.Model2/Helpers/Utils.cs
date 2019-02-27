@@ -51,33 +51,6 @@ namespace Chem4Word.Model2.Helpers
             }
         }
 
-        public static T CloneExcept<T>(this T source, string[] propertyNames) where T : new()
-        {
-            if (source == null)
-            {
-                return default(T);
-            }
-
-            T target = new T();
-
-            Type sourceType = typeof(T);
-            BindingFlags flags = BindingFlags.IgnoreCase | BindingFlags.Public |BindingFlags.NonPublic | BindingFlags.Instance;
-
-            PropertyInfo[] properties = sourceType.GetProperties();
-            foreach (PropertyInfo sPI in properties)
-            {
-                if (!propertyNames.Contains(sPI.Name))
-                {
-                    PropertyInfo tPI = sourceType.GetProperty(sPI.Name, flags);
-                    if (tPI != null && tPI.PropertyType.IsAssignableFrom(sPI.PropertyType) && tPI.CanWrite)
-                    {
-                        tPI.SetValue(target, sPI.GetValue(source, null), null);
-                    }
-                }
-            }
-
-            return target;
-        }
 
         public static string GetRelativePath(string ancestor, string descendant)
         {

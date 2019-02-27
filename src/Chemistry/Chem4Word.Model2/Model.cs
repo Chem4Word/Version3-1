@@ -470,20 +470,7 @@ namespace Chem4Word.Model2
             return copy;
         }
 
-        public Model Clone()
-        {
-            var clone = this.CloneExcept(new[] { nameof(_molecules), nameof(_boundingBox) });
-            clone.ClearMolecules();
-            var molList = Molecules.Values.ToList();
-            foreach (Molecule source in molList)
-            {
-                var target = source.Clone();
-                target.CheckIntegrity();
-                clone.AddMolecule(target);
-            }
-
-            return clone;
-        }
+      
 
         private void ClearMolecules()
         {
@@ -590,6 +577,11 @@ namespace Chem4Word.Model2
             {
                 mol.CheckIntegrity();
             }
+        }
+
+        public void CentreInCanvas(Size size)
+        {
+            throw new NotImplementedException();
         }
     }
 

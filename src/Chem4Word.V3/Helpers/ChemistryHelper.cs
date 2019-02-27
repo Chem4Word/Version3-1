@@ -109,7 +109,10 @@ namespace Chem4Word.Helpers
                         try
                         {
                             // Delete the temporary file now we are finished with it
+#if DEBUG
+#else
                             File.Delete(tempfileName);
+#endif
                         }
                         catch
                         {

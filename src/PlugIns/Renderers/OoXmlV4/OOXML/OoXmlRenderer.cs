@@ -327,7 +327,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void ShowAtomCentres(Wpg.WordprocessingGroup wordprocessingGroup1)
         {
-            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
+            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 5;
 
             foreach (var molecule in _chemistryModel.Molecules.Values)
             {
@@ -478,8 +478,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     width + (OoXmlHelper.CHARACTER_CLIPPING_MARGIN * 2),
                     height + (OoXmlHelper.CHARACTER_CLIPPING_MARGIN * 2));
 
-                //Debug.WriteLine("Character: " + alc.Ascii + " Rectangle: " + a);
-
                 // Just in case we end up splitting a line into two
                 List<BondLine> extraBondLines = new List<BondLine>();
 
@@ -497,21 +495,23 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                      | (cbb.Top <= l.BoundingBox.Bottom & l.BoundingBox.Bottom <= cbb.Bottom)
                                select l;
 
-                foreach (BondLine bl in targeted)
+                foreach (BondLine bl in targeted.ToList())
                 {
-                    //pb.Increment(1);
-
                     Point start = new Point(bl.Start.X, bl.Start.Y);
                     Point end = new Point(bl.End.X, bl.End.Y);
 
-                    //Debug.WriteLine("  Line From: " + start + " To: " + end);
+                    if (Math.Min(bl.Start.X, bl.End.X) > cbb.Left
+                        && Math.Max(bl.End.X, bl.Start.X) < cbb.Right
+                        && Math.Min(bl.Start.Y, bl.End.Y) > cbb.Top
+                        && Math.Max(bl.End.Y, bl.Start.Y) < cbb.Bottom)
+                    {
+                        // This line is totally 'covered' line so remove it
+                        _bondLines.Remove(bl);
+                    }
 
                     int attempts = 0;
                     if (CohenSutherland.ClipLine(cbb, ref start, ref end, out attempts))
                     {
-                        //Debug.WriteLine("    Clipped Line Start Point: " + start);
-                        //Debug.WriteLine("    Clipped Line   End Point: " + end);
-
                         bool bClipped = false;
 
                         if (Math.Abs(bl.Start.X - start.X) < EPSILON && Math.Abs(bl.Start.Y - start.Y) < EPSILON)
@@ -716,9 +716,17 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             foreach (Atom atom in mol.Atoms.Values)
             {
-                //Debug.WriteLine("Atom: " + atom.Id + " " + atom.ElementType);
+                //Debug.WriteLine("Atom: " + atom.Id + " " + atom.Element.Symbol);
                 pb.Increment(1);
-                ar.CreateCharacters(atom, _options);
+                if (atom.Element is Element)
+                {
+                    ar.CreateElementCharacters(atom, _options);
+                }
+
+                if (atom.Element is FunctionalGroup)
+                {
+                    ar.CreateFunctionalGroupCharacters(atom, _options);
+                }
             }
         }
 
@@ -873,10 +881,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
-
             solidFill1.Append(rgbColorModelHex1);
 
             outline1.Append(solidFill1);
@@ -938,12 +942,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             };
 
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties1 = new Wps.NonVisualDrawingShapeProperties();
-            //A.ShapeLocks shapeLocks = new A.ShapeLocks()
-            //{
-            //    NoMove = true,
-            //    NoSelection = true
-            //};
-            //nonVisualDrawingShapeProperties1.Append(shapeLocks);
 
             Wps.ShapeProperties shapeProperties1 = new Wps.ShapeProperties();
 
@@ -959,7 +957,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
             solidFill1.Append(rgbColorModelHex1);
 
             shapeProperties1.Append(transform2D1);

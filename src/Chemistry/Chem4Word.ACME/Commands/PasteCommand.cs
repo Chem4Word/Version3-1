@@ -5,10 +5,25 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model2.Converters.MDL
+using System.Diagnostics;
+
+
+namespace Chem4Word.ACME.Commands
 {
-    // ReSharper disable once InconsistentNaming
-    public class MDLConverter
+    public class PasteCommand : ACME.Commands.BaseCommand
     {
+        public PasteCommand(EditViewModel vm) : base(vm)
+        {
+        }
+
+        public override bool CanExecute(object parameter)
+        {
+            return false;
+        }
+
+        public override void Execute(object parameter)
+        {
+            Debugger.Break();
+        }
     }
 }

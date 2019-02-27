@@ -5,17 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
-using System.Windows;
 using Chem4Word.Model;
 using Chem4Word.Model.Converters.CML;
 using Chem4Word.Model.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
+using System.Windows;
 
 namespace Chem4WordTests
 {
-    using System.Runtime.InteropServices.ComTypes;
-
     [TestClass]
     public class GeneralTests
     {
@@ -34,7 +32,7 @@ namespace Chem4WordTests
             var aa = new Atom
             {
                 Element = Globals.PeriodicTable.H,
-                Position = new Point(100,100)
+                Position = new Point(100, 100)
             };
 
             var bb = new Bond
@@ -76,7 +74,6 @@ namespace Chem4WordTests
 
             Debug.WriteLine("++++++++++++++++++++++++++");
 
-
             m = mc.Import(ResourceHelper.GetStringResource("C60.xml"));
 
             Debug.WriteLine("C60");
@@ -89,7 +86,6 @@ namespace Chem4WordTests
             Debug.WriteLine($"Molecule c60 has {m.Molecules[0].Rings.Count} rings.");
             Debug.WriteLine("++++++++++++++++++++++++++");
 
-
             Debug.WriteLine("testosterone");
             Debug.WriteLine("-------------------------");
             m = mc.Import(ResourceHelper.GetStringResource("Testosterone.xml"));
@@ -99,7 +95,6 @@ namespace Chem4WordTests
 
             Debug.WriteLine($"Molecule testosterone has {m.Molecules[0].Rings.Count} rings.");
             Debug.WriteLine("++++++++++++++++++++++++++");
-
 
             //m = mc.Import(ResourceHelper.GetStringResource("ParafuchsinCarbol.xml"));
             //m.Molecules[0].ChemicalNames.Add(new ChemicalName { Name = "ParafuchsinCarbol" });

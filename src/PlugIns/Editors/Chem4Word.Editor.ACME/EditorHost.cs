@@ -12,8 +12,7 @@ using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model.Converters;
-using Chem4Word.Model.Converters.CML;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Editor.ACME
 {

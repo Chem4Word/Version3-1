@@ -208,15 +208,22 @@ namespace Chem4Word.Model2.Converters.MDL
 
                     // element type
                     String elType = GetSubString(line, 31, 3);
-                    // Hack: Fix Up for R#
-                    elType = elType.Replace("#", "");
-                    if (ElementExists(elType))
+                    ElementBase eb;
+                    var ok = AtomHelpers.TryParse(elType, out eb);
+                    if (ok)
                     {
-                        thisAtom.Element = _pt.Elements[elType];
+                        if (eb is Element element)
+                        {
+                            thisAtom.Element = element;
+                        }
+
+                        if (eb is FunctionalGroup functionalGroup)
+                        {
+                            thisAtom.Element = functionalGroup;
+                        }
                     }
                     else
                     {
-                        //throw new Exception(elType + " is not a valid element atomicSymbol");
                         _molecule.Errors.Add($"{elType} at Line {SdFileConverter.LineNumber} is not a valid Element");
                         _molecule.Errors.Add($"{line}");
                     }

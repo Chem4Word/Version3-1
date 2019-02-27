@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.DisplayViewModel2;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
@@ -20,6 +19,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.ACME;
 
 namespace WinForms.TestHarness
 {
@@ -63,7 +63,6 @@ namespace WinForms.TestHarness
                     string fileType = Path.GetExtension(openFileDialog1.FileName).ToLower();
                     string filename = Path.GetFileName(openFileDialog1.FileName);
                     string mol = File.ReadAllText(openFileDialog1.FileName);
-                    string cml = "";
 
                     CMLConverter cmlConvertor = new CMLConverter();
                     SdFileConverter sdFileConverter = new SdFileConverter();
@@ -203,14 +202,14 @@ namespace WinForms.TestHarness
             ListStacks();
         }
 
-        private List<DisplayViewModel2> StackToList(Stack<Model> stack)
+        private List<ViewModel> StackToList(Stack<Model> stack)
         {
-            List<DisplayViewModel2> list = new List<DisplayViewModel2>();
+            List<ViewModel> list = new List<ViewModel>();
             foreach (var item in stack)
             {
                 var model = item.Copy();
                 model.Refresh();
-                list.Add(new DisplayViewModel2(model));
+                list.Add(new ViewModel(model));
             }
             return list;
         }

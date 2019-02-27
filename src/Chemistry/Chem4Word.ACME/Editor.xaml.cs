@@ -6,9 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model;
-using Chem4Word.Model.Converters.CML;
-using Chem4Word.ViewModel;
+
+
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -17,6 +16,9 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME
 {
@@ -66,7 +68,7 @@ namespace Chem4Word.ACME
             }
         }
 
-        public Model.Model Data
+        public Model Data
         {
             get
             {
@@ -76,7 +78,7 @@ namespace Chem4Word.ACME
                 }
                 else
                 {
-                    Model.Model model = _activeViewModel.Model.Clone();
+                    Model model = _activeViewModel.Model.Copy();
                     model.RescaleForCml();
                     return model;
                 }
@@ -170,12 +172,12 @@ namespace Chem4Word.ACME
             if (!string.IsNullOrEmpty(_cml))
             {
                 CMLConverter cc = new CMLConverter();
-                Model.Model tempModel = cc.Import(_cml);
+                Model tempModel = cc.Import(_cml);
 
                 tempModel.RescaleForXaml(false);
                 var vm = new EditViewModel(tempModel);
                 _activeViewModel = vm;
-                _activeViewModel.Model = tempModel;
+
                 this.DataContext = vm;
 
                 Canvas c = LocateCanvas();
@@ -292,8 +294,8 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
-            Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {_activeViewModel.BoundingBox.Width}");
-            Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {_activeViewModel.BoundingBox.Height}");
+            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {_activeViewModel.BoundingBox.Width}");
+            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {_activeViewModel.BoundingBox.Height}");
             Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
             Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
             Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
@@ -307,7 +309,7 @@ namespace Chem4Word.ACME
         {
             WpfEventArgs args = new WpfEventArgs();
 
-            Model.Model result = _activeViewModel.Model.Clone();
+            Model result = _activeViewModel.Model.Copy();
             result.RescaleForCml();
 
             CMLConverter conv = new CMLConverter();

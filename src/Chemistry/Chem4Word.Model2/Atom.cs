@@ -332,40 +332,48 @@ namespace Chem4Word.Model2
                 // Return -1 if we don't need to do anything
                 int iHydrogenCount = -1;
 
-                // Applies to "B,C,N,O,F,Si,P,S,Cl,As,Se,Br,Te,I,At";
-                string appliesTo = Globals.PeriodicTable.ImplicitHydrogenTargets;
-
-                if (appliesTo.Contains(Element.Symbol))
+                if (Element is FunctionalGroup)
                 {
-                    int iBondCount = (int)Math.Floor(this.BondOrders);
-                    int iCharge = 0;
-                    iCharge = FormalCharge ?? 0;
-                    int iValence = PeriodicTable.GetValence((Element as Element), iBondCount);
-                    int iDiff = iValence - iBondCount;
-                    if (iCharge > 0)
+                    return iHydrogenCount;
+                }
+
+                if (Element != null)
+                {
+                    // Applies to "B,C,N,O,F,Si,P,S,Cl,As,Se,Br,Te,I,At";
+                    string appliesTo = Globals.PeriodicTable.ImplicitHydrogenTargets;
+
+                    if (appliesTo.Contains(Element.Symbol))
                     {
-                        int iVdiff = 4 - iValence;
-                        if (iCharge <= iVdiff)
+                        int iBondCount = (int)Math.Floor(this.BondOrders);
+                        int iCharge = 0;
+                        iCharge = FormalCharge ?? 0;
+                        int iValence = PeriodicTable.GetValence((Element as Element), iBondCount);
+                        int iDiff = iValence - iBondCount;
+                        if (iCharge > 0)
                         {
-                            iDiff += iCharge;
+                            int iVdiff = 4 - iValence;
+                            if (iCharge <= iVdiff)
+                            {
+                                iDiff += iCharge;
+                            }
+                            else
+                            {
+                                iDiff = 4 - iBondCount - iCharge + iVdiff;
+                            }
                         }
                         else
                         {
-                            iDiff = 4 - iBondCount - iCharge + iVdiff;
+                            iDiff += iCharge;
                         }
-                    }
-                    else
-                    {
-                        iDiff += iCharge;
-                    }
-                    // Ensure iHydrogenCount returned is never -ve
-                    if (iDiff >= 0)
-                    {
-                        iHydrogenCount = iDiff;
-                    }
-                    else
-                    {
-                        iHydrogenCount = 0;
+                        // Ensure iHydrogenCount returned is never -ve
+                        if (iDiff >= 0)
+                        {
+                            iHydrogenCount = iDiff;
+                        }
+                        else
+                        {
+                            iHydrogenCount = 0;
+                        }
                     }
                 }
                 return iHydrogenCount;
@@ -438,6 +446,7 @@ namespace Chem4Word.Model2
                         {
                             // Get vector at right angles
                             vsumVector = vector.Perpendicular();
+                            vsumVector = -vsumVector;
                         }
                         else
                         {
@@ -504,10 +513,6 @@ namespace Chem4Word.Model2
             return null;
         }
 
-        public Atom Clone()
-        {
-            return this.CloneExcept(new string[]{});
-        }
 
         public CompassPoints GetDefaultHOrientation()
         {

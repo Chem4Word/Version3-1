@@ -45,16 +45,15 @@ namespace Chem4Word.Model2.Converters.CML
             if (xa != null)
             {
                 string symbol = xa.Value;
+                ElementBase eb;
+                AtomHelpers.TryParse(symbol, out eb);
 
-                //try to return a chemical element from the Periodic Table
-                if (Globals.PeriodicTable.HasElement(symbol))
+                if (eb is Element element)
                 {
-                    return Globals.PeriodicTable.Elements[symbol];
+                    return element;
                 }
 
-                //if that fails, see if it's a functional group
-                FunctionalGroup functionalGroup;
-                if (FunctionalGroups.TryParse(symbol, out functionalGroup))
+                if (eb is FunctionalGroup functionalGroup)
                 {
                     return functionalGroup;
                 }

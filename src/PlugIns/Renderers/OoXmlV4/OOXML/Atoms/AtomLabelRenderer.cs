@@ -34,7 +34,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             characterPosition.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
 
             UInt32Value atomLabelId = UInt32Value.FromUInt32((uint)m_ooxmlId++);
-            string atomLabelName = "AtomLabel" + atomLabelId;
+            string atomLabelName = "Atom " + alc.ParentAtom;
 
             Int64Value width = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Width);
             Int64Value height = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height);
@@ -197,10 +197,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             // Set Colour
             A.RgbColorModelHex rgbColorModelHex10 = new A.RgbColorModelHex() { Val = alc.Colour };
-            A.Alpha alpha10 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex10.Append(alpha10);
-
             solidFill10.Append(rgbColorModelHex10);
 
             shapeProperties10.Append(transform2D10);
@@ -305,10 +301,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
-
             solidFill1.Append(rgbColorModelHex1);
 
             outline1.Append(solidFill1);

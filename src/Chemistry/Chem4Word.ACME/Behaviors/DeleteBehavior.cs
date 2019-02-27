@@ -5,12 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.View;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-
+using Chem4Word.ACME.Drawing;
 namespace Chem4Word.ACME.Behaviors
 {
     public class DeleteBehavior : BaseEditBehavior
@@ -44,16 +43,16 @@ namespace Chem4Word.ACME.Behaviors
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var hitTestResult = GetTarget(e);
-            if (hitTestResult.VisualHit is AtomShape)
+            if (hitTestResult.VisualHit is AtomVisual)
             {
-                var atomShape = (AtomShape)hitTestResult.VisualHit;
-                var atom = atomShape.ParentAtom;
+                var AtomVisual = (AtomVisual)hitTestResult.VisualHit;
+                var atom = AtomVisual.ParentAtom;
                 this.ViewModel.DeleteAtom(atom);
             }
-            else if (hitTestResult.VisualHit is BondShape)
+            else if (hitTestResult.VisualHit is BondVisual)
             {
-                var bondShape = (BondShape)hitTestResult.VisualHit;
-                var bond = bondShape.ParentBond;
+                var BondVisual = (BondVisual)hitTestResult.VisualHit;
+                var bond = BondVisual.ParentBond;
                 this.ViewModel.DeleteBond(bond);
             }
         }
@@ -65,14 +64,14 @@ namespace Chem4Word.ACME.Behaviors
             if (e.ClickCount == 1)
             {
                 var hitTestResult = GetTarget(e);
-                if (hitTestResult.VisualHit is AtomShape)
+                if (hitTestResult.VisualHit is AtomVisual)
                 {
-                    var atom = (AtomShape)hitTestResult.VisualHit;
+                    var atom = (AtomVisual)hitTestResult.VisualHit;
                     Debug.WriteLine($"Right Click Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
                 }
-                else if (hitTestResult.VisualHit is BondShape)
+                else if (hitTestResult.VisualHit is BondVisual)
                 {
-                    var bond = (BondShape)hitTestResult.VisualHit;
+                    var bond = (BondVisual)hitTestResult.VisualHit;
                     var pos = e.GetPosition(AssociatedObject);
                     Debug.WriteLine($"Right Click Bond {bond.ParentBond.Id} at ({pos.X},{pos.Y})");
                 }
@@ -89,15 +88,15 @@ namespace Chem4Word.ACME.Behaviors
             var id = ((GeometryHitTestResult)result).IntersectionDetail;
 
             var myShape = (result.VisualHit);
-            if (myShape != null && (myShape is AtomShape | myShape is BondShape))
+            if (myShape != null && (myShape is AtomVisual | myShape is BondVisual))
             {
                 switch (id)
                 {
                     case IntersectionDetail.FullyContains:
                     case IntersectionDetail.Intersects:
                     case IntersectionDetail.FullyInside:
-                        var selAtom = ((myShape as AtomShape)?.ParentAtom);
-                        var selBond = ((myShape as BondShape)?.ParentBond);
+                        var selAtom = ((myShape as AtomVisual)?.ParentAtom);
+                        var selBond = ((myShape as BondVisual)?.ParentBond);
 
                         if (!(ViewModel.SelectedItems.Contains(selAtom) || ViewModel.SelectedItems.Contains(selBond)))
                         {
@@ -113,8 +112,8 @@ namespace Chem4Word.ACME.Behaviors
                         return HitTestResultBehavior.Continue;
 
                     case IntersectionDetail.Empty:
-                        selAtom = ((myShape as AtomShape)?.ParentAtom);
-                        selBond = ((myShape as BondShape)?.ParentBond);
+                        selAtom = ((myShape as AtomVisual)?.ParentAtom);
+                        selBond = ((myShape as BondVisual)?.ParentBond);
 
                         if ((ViewModel.SelectedItems.Contains(selAtom) || ViewModel.SelectedItems.Contains(selBond)))
                         {

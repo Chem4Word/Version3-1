@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 
 namespace Chem4Word.Model2
@@ -22,6 +24,11 @@ namespace Chem4Word.Model2
         {
             Component = e;
             Count = c;
+        }
+
+        public override string ToString()
+        {
+            return $"{Component} * {Count}";
         }
 
         /// <summary>
