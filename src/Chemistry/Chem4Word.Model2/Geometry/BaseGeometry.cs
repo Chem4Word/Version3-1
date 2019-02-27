@@ -268,5 +268,26 @@ namespace Chem4Word.Model2.Geometry
             geometry.Transform = drawingGroup.Transform;
             return geometry;
         }
+
+        public static void CombineGeometries(DrawingGroup p_DrawingGroup, GeometryCombineMode p_CombineMode, ref CombinedGeometry p_CombinedGeometry)
+        {
+            if (p_CombinedGeometry == null)
+                p_CombinedGeometry = new CombinedGeometry();
+
+            DrawingCollection drawingCollection = p_DrawingGroup.Children;
+
+            foreach (System.Windows.Media.Drawing drawing in drawingCollection)
+            {
+                if (drawing is DrawingGroup)
+                {
+                    CombineGeometries((DrawingGroup)drawing, p_CombineMode, ref p_CombinedGeometry);
+                }
+                else if (drawing is GeometryDrawing)
+                {
+                    GeometryDrawing geoDrawing = drawing as GeometryDrawing;
+                    p_CombinedGeometry = new CombinedGeometry(p_CombineMode, p_CombinedGeometry, geoDrawing.Geometry);
+                }
+            }
+        }
     }
 }
