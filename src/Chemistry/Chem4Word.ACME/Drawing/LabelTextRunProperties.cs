@@ -8,6 +8,7 @@
 using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -35,7 +36,13 @@ namespace Chem4Word.ACME.Drawing
 
         public override Brush ForegroundBrush
         {
-            get { return Brushes.Black; }
+
+
+            get
+            {
+                var pt = new PeriodicTable();
+                return new SolidColorBrush((Color)ColorConverter.ConvertFromString(pt.C.Colour));
+            }
         }
 
         public override System.Windows.TextDecorationCollection TextDecorations
