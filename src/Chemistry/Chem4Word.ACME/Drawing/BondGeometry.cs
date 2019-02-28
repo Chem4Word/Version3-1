@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +13,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using static Chem4Word.Model2.Helpers.Globals;
-using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -23,7 +23,6 @@ namespace Chem4Word.ACME.Drawing
     /// </summary>
     public static class BondGeometry
     {
-
         /// <summary>
         /// Returns the geometry of a wedge bond.  Hatch bonds use the same geometry
         /// but a different brush.
@@ -35,7 +34,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="endAtomGeometry"></param>
         /// <returns></returns>
         public static Geometry WedgeBondGeometry(Point startPoint, Point endPoint, double bondLength,
-            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
+            Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             void ComputeWedge(StreamGeometry streamGeometry, Point start, Point end, Vector vector)
             {
@@ -52,20 +51,16 @@ namespace Chem4Word.ACME.Drawing
                 }
             }
 
-
-
             Vector bondVector = endPoint - startPoint;
             Vector perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
-            perpVector *= bondLength * BondOffsetPecentage;
-           
+            perpVector *= bondLength * BondOffsetPercentage;
 
             StreamGeometry sg = new StreamGeometry();
 
-            ComputeWedge(sg,startPoint,endPoint, perpVector);
+            ComputeWedge(sg, startPoint, endPoint, perpVector);
 
             sg.Freeze();
-
 
             if (startAtomGeometry == null & endAtomGeometry == null)
             {
@@ -80,7 +75,7 @@ namespace Chem4Word.ACME.Drawing
                 if (startAtomGeometry != null)
                 {
                     var overlap = startAtomGeometry.FillContainsWithDetail(sg);
-                    
+
                     while (overlap == IntersectionDetail.Intersects)
                     {
                         start += offset;
@@ -106,15 +101,11 @@ namespace Chem4Word.ACME.Drawing
                     }
                 }
 
-               
-
                 sg.Freeze();
 
                 return sg;
             }
         }
-
-        
 
         /// <summary>
         /// Defines the three parallel lines of a Triple bond.
@@ -127,21 +118,19 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="endAtomGeometry"></param>
         /// <returns></returns>
         public static Geometry TripleBondGeometry(Point startPoint, Point endPoint,
-            double bondLength, ref List<Point> enclosingPoly, 
-            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
+            double bondLength, ref List<Point> enclosingPoly,
+            Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
             normal.Normalize();
 
-            double distance = bondLength * BondOffsetPecentage;
+            double distance = bondLength * BondOffsetPercentage;
             Point point1 = startPoint + normal * distance;
             Point point2 = point1 + v;
 
             Point point3 = startPoint - normal * distance;
             Point point4 = point3 + v;
-
-            
 
             if (startAtomGeometry != null)
             {
@@ -186,8 +175,8 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
         public static System.Windows.Media.Geometry DoubleBondGeometry(Point startPoint, Point endPoint, double bondLength,
-            BondDirection doubleBondPlacement, ref List<Point> enclosingPoly, Point? ringCentroid = null, 
-            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
+            BondDirection doubleBondPlacement, ref List<Point> enclosingPoly, Point? ringCentroid = null,
+            Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
 
         {
             Point point1;
@@ -199,14 +188,14 @@ namespace Chem4Word.ACME.Drawing
             {
                 AdjustTerminus(ref point1, point2, startAtomGeometry);
                 AdjustTerminus(ref point3, point4, startAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                enclosingPoly = new List<Point> { point1, point2, point4, point3 };
             }
 
             if (endAtomGeometry != null)
             {
                 AdjustTerminus(ref point4, point3, endAtomGeometry);
                 AdjustTerminus(ref point2, point1, endAtomGeometry);
-                enclosingPoly = new List<Point> { point1, point2, point4, point3};
+                enclosingPoly = new List<Point> { point1, point2, point4, point3 };
             }
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
@@ -244,7 +233,7 @@ namespace Chem4Word.ACME.Drawing
 
             Point? point3a, point4a;
 
-            double distance = bondLength * BondOffsetPecentage;
+            double distance = bondLength * BondOffsetPercentage;
 
             if (ringCentroid == null)
             {
@@ -336,7 +325,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="endPoint"></param>
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, double bondLength, 
+        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, double bondLength,
             ref List<Point> enclosingPoly, Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             Vector v = endPoint - startPoint;
@@ -345,7 +334,7 @@ namespace Chem4Word.ACME.Drawing
 
             Point point1, point2, point3, point4;
 
-            double distance = bondLength * BondOffsetPecentage;
+            double distance = bondLength * BondOffsetPercentage;
 
             point1 = startPoint + normal * distance;
             point2 = point1 + v;
@@ -353,12 +342,10 @@ namespace Chem4Word.ACME.Drawing
             point3 = startPoint - normal * distance;
             point4 = point3 + v;
 
-           
             enclosingPoly = new List<Point> { point1, point2, point4, point3 };
 
             if (startAtomGeometry != null)
             {
-                
                 AdjustTerminus(ref point1, point2, startAtomGeometry);
                 AdjustTerminus(ref point3, point4, startAtomGeometry);
                 enclosingPoly = new List<Point> { point1, point2, point4, point3 };
@@ -383,7 +370,7 @@ namespace Chem4Word.ACME.Drawing
             return sg;
         }
 
-        public static Geometry SingleBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
+        public static Geometry SingleBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             var start = startPoint;
             var end = endPoint;
@@ -415,14 +402,12 @@ namespace Chem4Word.ACME.Drawing
             Point tempStartPoint = startPoint;
             Vector offset = bondVector * (1d / 100d);
 
-
             while (startAtomGeometry.FillContains(tempStartPoint))
             {
                 tempStartPoint += offset;
             }
 
             startPoint = tempStartPoint;
-
         }
 
         private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
@@ -436,7 +421,7 @@ namespace Chem4Word.ACME.Drawing
         }
 
         public static Geometry WavyBondGeometry(Point startPoint, Point endPoint, double standardBondLength,
-            Geometry startAtomGeometry=null, Geometry endAtomGeometry=null)
+            Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
             Point newStart = startPoint;
             Point newEnd = endPoint;
@@ -454,7 +439,7 @@ namespace Chem4Word.ACME.Drawing
             using (StreamGeometryContext sgc = sg.Open())
             {
                 Vector bondVector = newEnd - newStart;
-                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / standardBondLength * BondOffsetPecentage);
+                int noOfWiggles = (int)Math.Ceiling(bondVector.Length / standardBondLength * BondOffsetPercentage);
                 if (noOfWiggles < 3)
                 {
                     noOfWiggles = 3;
@@ -476,9 +461,6 @@ namespace Chem4Word.ACME.Drawing
 
                 List<Point> allpoints = new List<Point>();
 
-
-
-               
                 allpoints.Add(newStart);
 
                 Point lastPoint = newStart;

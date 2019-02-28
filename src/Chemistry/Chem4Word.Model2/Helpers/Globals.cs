@@ -158,7 +158,7 @@ namespace Chem4Word.Model2.Helpers
         public const double FontSizePercentageBond = 0.5d;
 
         // Double Bond Offset as %age of bond length
-        public const double BondOffsetPecentage = 0.1d;
+        public const double BondOffsetPercentage = 0.1d;
 
         // How much to magnify CML by for rendering in Display or Editor
         public const double ScaleFactorForXaml = 2.0d;
