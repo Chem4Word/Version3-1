@@ -9,6 +9,7 @@ using Chem4Word.Model2;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -55,9 +56,10 @@ namespace Chem4Word.ACME.Drawing
             // Local Function
             void Append(Group component, bool isAnchor)
             {
-                if (FunctionalGroup.TryParse(component.Component, out ElementBase element))
+                ElementBase eb;
+                if (AtomHelpers.TryParse(component.Component, out eb))
                 {
-                    if (element is Element)
+                    if (eb is Element)
                     {
                         Runs.Add(new LabelTextSourceRun
                         {
@@ -76,7 +78,7 @@ namespace Chem4Word.ACME.Drawing
                             });
                         }
                     }
-                    else if (element is FunctionalGroup fg)
+                    else if (eb is FunctionalGroup fg)
                     {
                         if (component.Count > 1)
                         {

@@ -21,80 +21,9 @@ namespace Chem4Word.Model2
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private static Dictionary<string, FunctionalGroup> _shortcutList;
         private double _atomicWeight = 0d;
 
-        /// <summary>
-        /// ShortcutList represent text as a user might type in a superatom,
-        /// actual values control how they are rendered
-        /// </summary>
-        public static Dictionary<string, FunctionalGroup> ShortcutList
-        {
-            get
-            {
-                if (_shortcutList == null)
-                {
-                    LoadFromResource();
-                }
-                return _shortcutList;
-            }
-            private set { _shortcutList = value; }
-        }
-
-        public static bool TryParse(string desc, out ElementBase element)
-        {
-            if (TryParse(desc, out FunctionalGroup fg))
-            {
-                element = fg;
-                return true;
-            }
-            else
-            {
-                var pt =new PeriodicTable();
-                if (pt.HasElement(desc))
-                {
-                    element = (ElementBase)pt[desc];
-                    return true;
-                }
-            }
-
-            element = null;
-            return false;
-        }
-        public static bool TryParse(string desc, out FunctionalGroup fg)
-        {
-            try
-            {
-                if (ShortcutList.ContainsKey(desc))
-                {
-                    fg = ShortcutList[desc];
-                    return true;
-                }
-                else
-                {
-                    fg = null;
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
-                fg = null;
-                return false;
-            }
-        }
-
-        private static void LoadFromResource()
-        {
-            ShortcutList = new Dictionary<string, FunctionalGroup>();
-
-            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
-            if (!string.IsNullOrEmpty(json))
-            {
-                ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
-            }
-        }
-
-        public override string Colour => "#000000";
+        public override string Colour => Globals.PeriodicTable.C.Colour;
 
         public override double AtomicWeight
         {

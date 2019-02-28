@@ -22,7 +22,7 @@ namespace Chem4WordTests
         [Fact]
         public void ShortcutListDoesNotContainNullKeys()
         {
-            var message = "Did not expect any null values";
+            var message = "Did not expect any null keys";
             Assert.True(Chem4Word.Model2.FunctionalGroups.ShortcutList.All(entry => entry.Key != null), message);
         }
 
@@ -31,17 +31,6 @@ namespace Chem4WordTests
         {
             var message = "Did not expect any null values";
             Assert.True(Chem4Word.Model2.FunctionalGroups.ShortcutList.All(entry => entry.Value != null), message);
-        }
-
-        [Fact]
-        public void ShortcutListKeyEqualsSymbol()
-        {
-            foreach (var entry in Chem4Word.Model2.FunctionalGroups.ShortcutList)
-            {
-                var actual = entry.Key;
-                var expected = entry.Value.Symbol;
-                Assert.Equal(expected, actual);
-            }
         }
 
         [Theory]
