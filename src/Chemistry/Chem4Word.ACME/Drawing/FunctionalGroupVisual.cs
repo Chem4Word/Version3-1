@@ -37,12 +37,10 @@ namespace Chem4Word.ACME.Drawing
 
             var textStore = new FunctionalGroupTextSource(ParentGroup, Flipped);
 
-            TextFormatter tc = TextFormatter.Create();
+            //main textformatter - this does the writing of the visual
+            TextFormatter textFormatter = TextFormatter.Create();
 
-            // Diag: Show Atom spot
-            //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 10, 10);
-            //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
-
+            //set up the default paragraph properties
             var paraprops = new FunctionalGroupTextSource.GenericTextParagraphProperties(
                 FlowDirection.LeftToRight,
                 TextAlignment.Left,
@@ -53,9 +51,34 @@ namespace Chem4Word.ACME.Drawing
                 GlyphText.SymbolSize,
                 0d);
 
+            //created purely to align the anchor -never writes to the screen
+            TextFormatter anchorAligner = TextFormatter.Create();
+            //set up a secondary text store simply to measure the anchor
+            FunctionalGroup anchorGroup = new FunctionalGroup();
+            anchorGroup.Components = new List<Group>();
+            anchorGroup.Components.Add(ParentGroup.Components[0]); //add in the anchor
+            //var anchorStore = new FunctionalGroupTextSource(anchorGroup, Flipped);
+            string dummy = anchorGroup.Expand().TrimStart('[').TrimEnd(']');
+            //int anchorStorePosition = 0;
+            //Rect anchorRect = Rect.Empty;
+            //Vector anchoroffset;
+            //using (TextLine anchorLine = anchorAligner.FormatLine(anchorStore, anchorStorePosition, 60, paraprops, null))
+            //{
+            //    var anchorBounds = anchorLine.GetTextBounds(0, anchorLine.Length - 1);
+
+            //    foreach (TextBounds anchorBound in anchorBounds)
+            //    {
+            //        anchorRect.Union(anchorBound.Rectangle);
+            //    }
+            //}
+
+            // Diag: Show Atom spot
+            //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 10, 10);
+            //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
+
             Vector dispVector;
             IEnumerable<IndexedGlyphRun> glyphRuns;
-            using (TextLine myTextLine = tc.FormatLine(textStore, textStorePosition, 60,
+            using (TextLine myTextLine = textFormatter.FormatLine(textStore, textStorePosition, 60,
                 paraprops,
                 null))
             {
@@ -66,19 +89,22 @@ namespace Chem4Word.ACME.Drawing
 
                 IList<TextBounds> textBounds;
 
-                Rect firstRect;
+                Rect firstRect = Rect.Empty;
 
                 if (!Flipped)
                 {
-                    textBounds = myTextLine.GetTextBounds(0, 1);
+                    textBounds = myTextLine.GetTextBounds(0, dummy.Length);
                 }
                 else
                 {
                     //length-2 because otherwise you grab the CR/LF character midpoint!
-                    textBounds = myTextLine.GetTextBounds(myTextLine.Length - 2, 1);
+                    textBounds = myTextLine.GetTextBounds(myTextLine.Length - 1 - dummy.Length, dummy.Length);
                 }
-
-                firstRect = textBounds.First().Rectangle;
+                foreach (TextBounds anchorBound in textBounds)
+                {
+                    firstRect.Union(anchorBound.Rectangle);
+                }
+                //firstRect = textBounds.First().Rectangle;
 
                 //center will be position close to the origin 0,0
                 Point center = new Point((firstRect.Left + firstRect.Right) / 2, (firstRect.Top + firstRect.Bottom) / 2);
