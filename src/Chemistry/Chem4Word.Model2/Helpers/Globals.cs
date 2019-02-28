@@ -161,12 +161,12 @@ namespace Chem4Word.Model2.Helpers
         public const double BondOffsetPecentage = 0.1d;
 
         // How much to magnify CML by for rendering in Display or Editor
-        public const double ScaleFactorForXaml = 5.0d;
+        public const double ScaleFactorForXaml = 2.0d;
 
         // Percentage of Average bond length for any added Explicit Hydrogens
         public const double ExplicitHydrogenBondPercentage = 1.0;
 
-        public const double BondThickness = 3.0;
+        public const double BondThickness = ScaleFactorForXaml * 0.8;
 
         #endregion Layout Constants
 
