@@ -59,18 +59,6 @@ namespace Chem4Word.ACME.Drawing
             anchorGroup.Components.Add(ParentGroup.Components[0]); //add in the anchor
             //var anchorStore = new FunctionalGroupTextSource(anchorGroup, Flipped);
             string dummy = anchorGroup.Expand().TrimStart('[').TrimEnd(']');
-            //int anchorStorePosition = 0;
-            //Rect anchorRect = Rect.Empty;
-            //Vector anchoroffset;
-            //using (TextLine anchorLine = anchorAligner.FormatLine(anchorStore, anchorStorePosition, 60, paraprops, null))
-            //{
-            //    var anchorBounds = anchorLine.GetTextBounds(0, anchorLine.Length - 1);
-
-            //    foreach (TextBounds anchorBound in anchorBounds)
-            //    {
-            //        anchorRect.Union(anchorBound.Rectangle);
-            //    }
-            //}
 
             // Diag: Show Atom spot
             //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 10, 10);
@@ -82,29 +70,25 @@ namespace Chem4Word.ACME.Drawing
                 paraprops,
                 null))
             {
-                //TextRun anchorRun;
-                //int startingPos;
-
-                //var textRunSpans = myTextLine.GetTextRunSpans();
-
                 IList<TextBounds> textBounds;
 
                 Rect firstRect = Rect.Empty;
 
-                if (!Flipped)
+                //dummy.Length is used to isolate the anchor group's characters' text bounding rectangle
+                if (!Flipped)//isolate them at the beginning
                 {
                     textBounds = myTextLine.GetTextBounds(0, dummy.Length);
                 }
                 else
                 {
-                    //length-2 because otherwise you grab the CR/LF character midpoint!
+                    //isolate them at the end
                     textBounds = myTextLine.GetTextBounds(myTextLine.Length - 1 - dummy.Length, dummy.Length);
                 }
+                //add all the bounds together
                 foreach (TextBounds anchorBound in textBounds)
                 {
                     firstRect.Union(anchorBound.Rectangle);
                 }
-                //firstRect = textBounds.First().Rectangle;
 
                 //center will be position close to the origin 0,0
                 Point center = new Point((firstRect.Left + firstRect.Right) / 2, (firstRect.Top + firstRect.Bottom) / 2);
@@ -148,7 +132,7 @@ namespace Chem4Word.ACME.Drawing
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
                 //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
                 dc.Close();
-                var d = this.Drawing;
+                
             };
         }
 
