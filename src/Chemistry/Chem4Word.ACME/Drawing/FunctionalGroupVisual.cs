@@ -130,11 +130,11 @@ namespace Chem4Word.ACME.Drawing
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
                 StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
+
                 // Diag: Comment out to show hull and atom position
                 //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
-                //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 5, 5);
+                dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 5, 5);
                 dc.Close();
-                
             };
         }
 

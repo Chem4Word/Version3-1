@@ -75,7 +75,6 @@ namespace Chem4Word.Model2
         [JsonProperty]
         public List<Group> Components { get; set; }
 
-        //[Obsolete("This is a diagnostic routine, do not use in live code.")]
         public string Expand(bool reverse = false)
         {
             string result = "";
