@@ -60,8 +60,6 @@ namespace Chem4Word.ACME.Drawing
             //var anchorStore = new FunctionalGroupTextSource(anchorGroup, Flipped);
             string dummy = anchorGroup.Expand().TrimStart('[').TrimEnd(']');
 
-            // Diag: Show Atom spot
-            //dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 10, 10);
             //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
 
             Vector dispVector;
