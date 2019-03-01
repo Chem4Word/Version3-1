@@ -5,9 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -35,7 +37,19 @@ namespace Chem4Word.ACME.Drawing
 
         public override Brush ForegroundBrush
         {
-            get { return Brushes.Black; }
+            get
+            {
+                var brush = Brushes.Black;
+                try
+                {
+                    brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Globals.PeriodicTable.C.Colour));
+                }
+                catch (Exception)
+                {
+                    // Do nothing
+                }
+                return brush;
+            }
         }
 
         public override System.Windows.TextDecorationCollection TextDecorations
