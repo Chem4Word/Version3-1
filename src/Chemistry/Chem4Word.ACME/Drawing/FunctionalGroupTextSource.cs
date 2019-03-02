@@ -97,7 +97,7 @@ namespace Chem4Word.ACME.Drawing
                         }
                         else
                         {
-                            Expand(fg, isFlipped);
+                            Expand(fg, false);
                         }
 
                         if (component.Count > 1)

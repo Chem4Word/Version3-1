@@ -215,7 +215,7 @@
   "CH2": {
     "Symbol": "CH2",
     "ShowAsSymbol": false,
-    "Flippable": false,
+    "Flippable": true,
     "Components": [
       {
         "Component": "C",
@@ -549,7 +549,11 @@
         "Count": 1
       },
       {
-        "Component": "OH",
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "H",
         "Count": 1
       }
     ]
@@ -568,7 +572,11 @@
         "Count": 1
       },
       {
-        "Component": "OH",
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "H",
         "Count": 1
       }
     ]
@@ -583,7 +591,11 @@
         "Count": 3
       },
       {
-        "Component": "OH",
+        "Component": "O",
+        "Count": 1
+      },
+      {
+        "Component": "H",
         "Count": 1
       }
     ]
