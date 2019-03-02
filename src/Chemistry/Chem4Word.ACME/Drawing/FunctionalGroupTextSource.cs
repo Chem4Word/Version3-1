@@ -17,11 +17,6 @@ namespace Chem4Word.ACME.Drawing
     {
         public List<LabelTextSourceRun> Runs = new List<LabelTextSourceRun>();
 
-        public bool AnchoredAtBeginning
-        {
-            get { return Runs[0].IsAnchor; }
-        }
-
         public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
         {
             Expand(parentGroup, isFlipped);
@@ -102,7 +97,7 @@ namespace Chem4Word.ACME.Drawing
                         }
                         else
                         {
-                            Expand(fg, isFlipped);
+                            Expand(fg, false);
                         }
 
                         if (component.Count > 1)
