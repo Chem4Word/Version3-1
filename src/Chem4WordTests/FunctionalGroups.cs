@@ -52,7 +52,7 @@ namespace Chem4WordTests
         [InlineData("R9", false, "[R9]")]
         [InlineData("Et", false, "[Et]")]
         [InlineData("CH2", false, "[C]H2")]
-        [InlineData("CH2", true, "[C]H2")]
+        [InlineData("CH2", true, "H2[C]")]
         [InlineData("CH3", false, "[C]H3")]
         [InlineData("CH3", true, "[C]H3")]
         [InlineData("CH2CH2OH", false, "[CH2]CH2OH")]
