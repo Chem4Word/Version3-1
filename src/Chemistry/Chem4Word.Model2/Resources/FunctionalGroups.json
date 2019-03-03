@@ -11,7 +11,7 @@
     ]
   },
   "R#": {
-    "Symbol": "R#",
+    "Symbol": "R{#}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -22,7 +22,7 @@
     ]
   },
   "R1": {
-    "Symbol": "R1",
+    "Symbol": "R{1}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -33,7 +33,7 @@
     ]
   },
   "R2": {
-    "Symbol": "R2",
+    "Symbol": "R{2}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -44,7 +44,7 @@
     ]
   },
   "R3": {
-    "Symbol": "R3",
+    "Symbol": "R{3}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -55,7 +55,7 @@
     ]
   },
   "R4": {
-    "Symbol": "R4",
+    "Symbol": "R{4}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -66,7 +66,7 @@
     ]
   },
   "R5": {
-    "Symbol": "R5",
+    "Symbol": "R{5}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -77,7 +77,7 @@
     ]
   },
   "R6": {
-    "Symbol": "R6",
+    "Symbol": "R{6}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -88,7 +88,7 @@
     ]
   },
   "R7": {
-    "Symbol": "R7",
+    "Symbol": "R{7}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -99,7 +99,7 @@
     ]
   },
   "R8": {
-    "Symbol": "R8",
+    "Symbol": "R{8}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -110,7 +110,7 @@
     ]
   },
   "R9": {
-    "Symbol": "R9",
+    "Symbol": "R{9}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -121,7 +121,7 @@
     ]
   },
   "R10": {
-    "Symbol": "R10",
+    "Symbol": "R{10}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -143,7 +143,7 @@
     ]
   },
   "R12": {
-    "Symbol": "R12",
+    "Symbol": "R{12}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -154,7 +154,7 @@
     ]
   },
   "R13": {
-    "Symbol": "R13",
+    "Symbol": "R{13}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -165,7 +165,7 @@
     ]
   },
   "R14": {
-    "Symbol": "R14",
+    "Symbol": "R{14}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -176,7 +176,7 @@
     ]
   },
   "R15": {
-    "Symbol": "R15",
+    "Symbol": "R{15}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -187,7 +187,7 @@
     ]
   },
   "R16": {
-    "Symbol": "R16",
+    "Symbol": "R{16}",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -318,7 +318,7 @@
     ]
   },
   "iPr": {
-    "Symbol": "iPr",
+    "Symbol": "{i}Pr",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -333,7 +333,7 @@
     ]
   },
   "nBu": {
-    "Symbol": "nBu",
+    "Symbol": "{n}Bu",
     "ShowAsSymbol": true,
     "Flippable": false,
     "Components": [
@@ -362,10 +362,10 @@
       }
     ]
   },
-  "TBU": {
-    "Symbol": "TBU",
-    "ShowAsSymbol": false,
-    "Flippable": true,
+  "tBu": {
+    "Symbol": "{t}Bu",
+    "ShowAsSymbol": true,
+    "Flippable": false,
     "Components": [
       {
         "Component": "C",
@@ -379,8 +379,8 @@
   },
   "t-Bu": {
     "Symbol": "t-Bu",
-    "ShowAsSymbol": true,
-    "Flippable": false,
+    "ShowAsSymbol": false,
+    "Flippable": true,
     "Components": [
       {
         "Component": "C",

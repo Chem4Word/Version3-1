@@ -48,8 +48,8 @@ namespace Chem4WordTests
         }
 
         [Theory]
-        [InlineData("R1", false, "[R1]")]
-        [InlineData("R9", false, "[R9]")]
+        [InlineData("R1", false, "[R{1}]")]
+        [InlineData("R9", false, "[R{9}]")]
         [InlineData("Et", false, "[Et]")]
         [InlineData("CH2", false, "[C]H2")]
         [InlineData("CH2", true, "H2[C]")]

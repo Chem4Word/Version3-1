@@ -50,15 +50,21 @@ namespace Chem4Word.ACME.Drawing
                 TextWrapping.NoWrap,
                 GlyphText.SymbolSize,
                 0d);
-
-            //created purely to align the anchor -never writes to the screen
-            TextFormatter anchorAligner = TextFormatter.Create();
-            //set up a secondary text store simply to measure the anchor
-            FunctionalGroup anchorGroup = new FunctionalGroup();
-            anchorGroup.Components = new List<Group>();
-            anchorGroup.Components.Add(ParentGroup.Components[0]); //add in the anchor
-            //var anchorStore = new FunctionalGroupTextSource(anchorGroup, Flipped);
-            string dummy = anchorGroup.Expand().TrimStart('[').TrimEnd(']');
+            string anchorString;
+            //if it's not a symbol then grab the actual anchor string
+            if (!ParentGroup.ShowAsSymbol)
+            {
+                //set up a secondary text store simply to measure the anchor
+                FunctionalGroup anchorGroup = new FunctionalGroup();
+                anchorGroup.Components = new List<Group>();
+                anchorGroup.Components.Add(ParentGroup.Components[0]); //add in the anchor
+                //var anchorStore = new FunctionalGroupTextSource(anchorGroup, Flipped);
+                anchorString = anchorGroup.Expand().TrimStart('[').TrimEnd(']');
+            }
+            else
+            {
+                anchorString = ParentGroup.Symbol.Replace("{", "").Replace("}", "");
+            }
 
             //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
 
@@ -75,12 +81,12 @@ namespace Chem4Word.ACME.Drawing
                 //dummy.Length is used to isolate the anchor group's characters' text bounding rectangle
                 if (!Flipped)//isolate them at the beginning
                 {
-                    textBounds = myTextLine.GetTextBounds(0, dummy.Length);
+                    textBounds = myTextLine.GetTextBounds(0, anchorString.Length);
                 }
                 else
                 {
                     //isolate them at the end
-                    textBounds = myTextLine.GetTextBounds(myTextLine.Length - 1 - dummy.Length, dummy.Length);
+                    textBounds = myTextLine.GetTextBounds(myTextLine.Length - 1 - anchorString.Length, anchorString.Length);
                 }
                 //add all the bounds together
                 foreach (TextBounds anchorBound in textBounds)
@@ -127,7 +133,6 @@ namespace Chem4Word.ACME.Drawing
                                      select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
 
                 Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
-                StreamGeometry sg = BasicGeometry.BuildPolyPath(Hull);
 
                 // Diag: Comment out to show hull and atom position
                 //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
