@@ -401,6 +401,12 @@ namespace Chem4Word.ACME.Drawing
             //stage 2.  grab the main atom metrics br drawing it
 
             var mainAtomMetrics = DrawSelf(drawingContext);
+            //if it's a vertex atom we need the hull
+            if (AtomSymbol == "")
+            {
+                Hull.AddRange(mainAtomMetrics.FlattenedPath);
+            }
+
 
             //stage 3:  measure up the hydrogens
             //if we have implicit hydrogens and we have an explicit label, draw them
@@ -517,7 +523,13 @@ namespace Chem4Word.ACME.Drawing
                     }
                     else //draw an empty circle for hit testing purposes
                     {
-                        dc.DrawEllipse(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), ParentAtom.Position, 5.0, 5.0);
+                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, 5.0, 5.0);
+
+                        dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), eg);
+                        //very simple hull definition
+                        Hull=new List<Point>();
+                        
+                        Hull.AddRange(new []{eg.Bounds.BottomLeft, eg.Bounds.TopLeft, eg.Bounds.TopRight, eg.Bounds.BottomRight});
                         dc.Close();
                     }
                 }
@@ -611,14 +623,14 @@ namespace Chem4Word.ACME.Drawing
 
             if (ParentAtom.Element is Element e)
             {
-                if (HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
+                if (HullGeometry.FillContains(hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }
             }
             else if (ParentAtom.Element is FunctionalGroup fg)
             {
-                if (this._functionalGroupVisual.HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
+                if (this._functionalGroupVisual.HullGeometry.FillContains(hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(_functionalGroupVisual, hitTestParameters.HitPoint);
                 }

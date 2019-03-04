@@ -634,6 +634,7 @@
         </ToolBarTray>
         <ToolBarTray />
 
+        <!--actual drawing area-->
         <ScrollViewer Name="DrawingArea"
             Width="Auto"
             Height="Auto"
