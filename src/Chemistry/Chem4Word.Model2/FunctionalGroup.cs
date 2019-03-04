@@ -23,23 +23,6 @@ namespace Chem4Word.Model2
 
         private double _atomicWeight = 0d;
 
-        /// <summary>
-        /// ShortcutList represent text as a user might type in a superatom,
-        /// actual values control how they are rendered
-        /// </summary>
-        public static Dictionary<string, FunctionalGroup> ShortcutList
-        {
-            get
-            {
-                if (_shortcutList == null)
-                {
-                    LoadFromResource();
-                }
-                return _shortcutList;
-            }
-            private set { _shortcutList = value; }
-        }
-
         public static bool TryParse(string desc, out ElementBase element)
         {
             if (TryParse(desc, out FunctionalGroup fg))
@@ -64,9 +47,9 @@ namespace Chem4Word.Model2
         {
             try
             {
-                if (ShortcutList.ContainsKey(desc))
+                if (Globals.FunctionalGroupsDictionary.ContainsKey(desc))
                 {
-                    fg = ShortcutList[desc];
+                    fg = Globals.FunctionalGroupsDictionary[desc];
                     return true;
                 }
                 else
@@ -79,17 +62,6 @@ namespace Chem4Word.Model2
             {
                 fg = null;
                 return false;
-            }
-        }
-
-        private static void LoadFromResource()
-        {
-            ShortcutList = new Dictionary<string, FunctionalGroup>();
-
-            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
-            if (!string.IsNullOrEmpty(json))
-            {
-                ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
             }
         }
 
