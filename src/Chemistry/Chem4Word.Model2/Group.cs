@@ -26,6 +26,10 @@ namespace Chem4Word.Model2
             Count = c;
         }
 
+        public override string ToString()
+        {
+            return $"{Component} * {Count}";
+        }
 
         /// <summary>
         /// Calculated combined AtomicWeight
@@ -41,10 +45,10 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    FunctionalGroup fg = FunctionalGroups.ShortcutList[Component];
+                    FunctionalGroup fg = Globals.FunctionalGroupsDictionary[Component];
                     if (fg != null)
                     {
-                        return FunctionalGroups.ShortcutList[Component].AtomicWeight * Count;
+                        return Globals.FunctionalGroupsDictionary[Component].AtomicWeight * Count;
                     }
                     else
                     {

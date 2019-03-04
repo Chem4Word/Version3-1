@@ -5,15 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Windows;
+
 namespace Chem4Word.ACME.Drawing
 {
-    public class LabelTextSourceRun
+    public class SuperscriptTextRunTypographyProperties : LabelTextRunTypographyProperties
     {
-        public string Text;
-        public bool IsAnchor { get; set; }
-        public bool IsSubscript { get; set; }
-        public bool IsEndParagraph;
-        public int Length { get { return IsEndParagraph ? 1 : Text.Length; } }
-        public bool IsSuperscript { get; set; }
+        public override FontVariants Variants
+        {
+            get { return FontVariants.Superscript; }
+        }
     }
 }

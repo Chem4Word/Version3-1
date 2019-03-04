@@ -21,7 +21,6 @@ namespace Chem4Word.Model2
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private static Dictionary<string, FunctionalGroup> _shortcutList;
         private double _atomicWeight = 0d;
 
         /// <summary>
@@ -146,7 +145,6 @@ namespace Chem4Word.Model2
         [JsonProperty]
         public List<Group> Components { get; set; }
 
-        [Obsolete("This is a diagnostic routine, do not use in live code.")]
         public string Expand(bool reverse = false)
         {
             string result = "";

@@ -6,20 +6,19 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Windows.Media.TextFormatting;
+using Group = Chem4Word.Model2.Group;
 
 namespace Chem4Word.ACME.Drawing
 {
     partial class FunctionalGroupTextSource : TextSource
     {
+        private static Regex _superscriptRegEx = new Regex("(?<normal>[^{}]+)|(?<super>\\{[^{}]+\\})");
         public List<LabelTextSourceRun> Runs = new List<LabelTextSourceRun>();
-
-        public bool AnchoredAtBeginning
-        {
-            get { return Runs[0].IsAnchor; }
-        }
 
         public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
         {
@@ -30,7 +29,20 @@ namespace Chem4Word.ACME.Drawing
         {
             if (parentGroup.ShowAsSymbol)
             {
-                Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsEndParagraph = false, Text = parentGroup.Symbol });
+                var super = _superscriptRegEx.Matches(parentGroup.Symbol);
+
+                foreach (Match match in super)
+                {
+                    
+                    if (match.Value.Contains("{"))//it's a superscript
+                    {
+                        Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsSuperscript = true, IsEndParagraph = false, Text = match.Value.TrimStart('{').TrimEnd('}') });
+                    }
+                    else
+                    {
+                        Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsEndParagraph = false, Text = match.Value });
+                    }
+                }
             }
             else
             {
@@ -55,9 +67,10 @@ namespace Chem4Word.ACME.Drawing
             // Local Function
             void Append(Group component, bool isAnchor)
             {
-                if (FunctionalGroup.TryParse(component.Component, out ElementBase element))
+                ElementBase eb;
+                if (AtomHelpers.TryParse(component.Component, out eb))
                 {
-                    if (element is Element)
+                    if (eb is Element)
                     {
                         Runs.Add(new LabelTextSourceRun
                         {
@@ -76,7 +89,7 @@ namespace Chem4Word.ACME.Drawing
                             });
                         }
                     }
-                    else if (element is FunctionalGroup fg)
+                    else if (eb is FunctionalGroup fg)
                     {
                         if (component.Count > 1)
                         {
@@ -100,7 +113,7 @@ namespace Chem4Word.ACME.Drawing
                         }
                         else
                         {
-                            Expand(fg, isFlipped);
+                            Expand(fg, false);
                         }
 
                         if (component.Count > 1)
@@ -147,6 +160,10 @@ namespace Chem4Word.ACME.Drawing
                     if (currentRun.IsSubscript)
                     {
                         props = new SubscriptTextRunProperties();
+                    }
+                    else if (currentRun.IsSuperscript)
+                    {
+                        props = new SuperscriptTextRunProperties();
                     }
                     else
                     {

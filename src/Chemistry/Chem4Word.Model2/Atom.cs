@@ -445,8 +445,8 @@ namespace Chem4Word.Model2
                         if (Bonds.Count() == 2)
                         {
                             // Get vector at right angles
-                            vsumVector = -vector.Perpendicular();
-                            
+                            vsumVector = vector.Perpendicular();
+                            vsumVector = -vsumVector;
                         }
                         else
                         {

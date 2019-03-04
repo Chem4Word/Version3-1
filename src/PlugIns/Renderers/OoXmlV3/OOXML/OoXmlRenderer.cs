@@ -814,9 +814,6 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex1.Append(alpha1);
 
             solidFill1.Append(rgbColorModelHex1);
 
@@ -879,12 +876,6 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML
             };
 
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties1 = new Wps.NonVisualDrawingShapeProperties();
-            //A.ShapeLocks shapeLocks = new A.ShapeLocks()
-            //{
-            //    NoMove = true,
-            //    NoSelection = true
-            //};
-            //nonVisualDrawingShapeProperties1.Append(shapeLocks);
 
             Wps.ShapeProperties shapeProperties1 = new Wps.ShapeProperties();
 
@@ -900,7 +891,7 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML
             A.SolidFill solidFill1 = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
+
             solidFill1.Append(rgbColorModelHex1);
 
             shapeProperties1.Append(transform2D1);

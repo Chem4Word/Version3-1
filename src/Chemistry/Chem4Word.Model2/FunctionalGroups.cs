@@ -24,6 +24,27 @@ namespace Chem4Word.Model2
         private static Dictionary<string, FunctionalGroup> _shortcutList;
 
         /// <summary>
+        /// Gets the Dictionary key for a given FunctionalGroup
+        /// </summary>
+        /// <param name="functionalGroup"></param>
+        /// <returns></returns>
+        public static string GetKey(FunctionalGroup functionalGroup)
+        {
+            string key = "";
+
+            foreach (var kvp in Globals.FunctionalGroupsDictionary)
+            {
+                if (kvp.Value.Equals(functionalGroup))
+                {
+                    key = kvp.Key;
+                    break;
+                }
+            }
+
+            return key;
+        }
+
+        /// <summary>
         /// ShortcutList represent text as a user might type in a superatom,
         /// actual values control how they are rendered
         /// </summary>
@@ -37,22 +58,22 @@ namespace Chem4Word.Model2
                 }
                 return _shortcutList;
             }
-            private set { _shortcutList = value; }
+            //private set { _shortcutList = value; }
         }
 
         private static void LoadFromResource()
         {
-            ShortcutList = new Dictionary<string, FunctionalGroup>();
+            _shortcutList = new Dictionary<string, FunctionalGroup>();
 
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
             if (!string.IsNullOrEmpty(json))
             {
-                ShortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
+                _shortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
             }
         }
 
         //list of valid shortcuts for testing input
-        public static string ValidShortCuts => "(" + ShortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")";
+        public static string ValidShortCuts => "(" + _shortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")";
 
         //list of valid elements (followed by subscripts) for testing input
         public static Regex NameParser => new Regex($"^(?<element>{Globals.PeriodicTable.ValidElements}+[0-9]*)+\\s*$");

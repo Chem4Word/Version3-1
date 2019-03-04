@@ -5,15 +5,19 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.ACME.Drawing
+using System.Collections.Generic;
+
+namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 {
-    public class LabelTextSourceRun
+
+    public class FunctionalGroupTerm
     {
-        public string Text;
+        public List<AtomLabelCharacter> Characters { get; set; }
         public bool IsAnchor { get; set; }
-        public bool IsSubscript { get; set; }
-        public bool IsEndParagraph;
-        public int Length { get { return IsEndParagraph ? 1 : Text.Length; } }
-        public bool IsSuperscript { get; set; }
+
+        public FunctionalGroupTerm()
+        {
+            Characters = new List<AtomLabelCharacter>();
+        }
     }
 }
