@@ -299,7 +299,7 @@ namespace Chem4Word.ACME.Controls
         protected override int VisualChildrenCount => chemicalVisuals.Count;
 
         //bookkeeping collection
-        private Dictionary<object, DrawingVisual> chemicalVisuals { get; }
+        protected Dictionary<object, DrawingVisual> chemicalVisuals { get; }
 
         /// <summary>
         /// Draws the chemistry

@@ -47,60 +47,93 @@ namespace Chem4Word.ACME.Drawing
             //Vector endOffset = new Vector();
             var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
 
-            //check to see if it's a wedge or a hatch yet
-            if (ParentBond.Stereo == Globals.BondStereo.Wedge | ParentBond.Stereo == Globals.BondStereo.Hatch)
+            if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength, out var singleBondGeometry, ParentBond, ref _enclosingPoly)) return singleBondGeometry;
+
+            return null;
+        }
+
+        public static bool GetBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry, Geometry endAtomGeometry,
+            double modelXamlBondLength, out Geometry singleBondGeometry, Bond parentBond, ref List<Point> enclosingPoly)
+        {
+//check to see if it's a wedge or a hatch yet
+            if (parentBond.Stereo == Globals.BondStereo.Wedge | parentBond.Stereo == Globals.BondStereo.Hatch)
             {
-                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength, startAtomGeometry, endAtomGeometry);
+                {
+                    singleBondGeometry = BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                        startAtomGeometry, endAtomGeometry);
+                    return true;
+                }
             }
 
-            if (ParentBond.Stereo == Globals.BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
+            if (parentBond.Stereo == Globals.BondStereo.Indeterminate && parentBond.OrderValue == 1.0)
             {
-                return BondGeometry.WavyBondGeometry(startPoint, endPoint, modelXamlBondLength, startAtomGeometry, endAtomGeometry);
+                {
+                    singleBondGeometry = BondGeometry.WavyBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                        startAtomGeometry, endAtomGeometry);
+                    return true;
+                }
             }
 
             //single or dotted bond
-            if (ParentBond.OrderValue <= 1)
+            if (parentBond.OrderValue <= 1)
             {
-                return BondGeometry.SingleBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
+                {
+                    singleBondGeometry =
+                        BondGeometry.SingleBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
+                    return true;
+                }
             }
 
-            if (ParentBond.OrderValue == 1.5)
+            if (parentBond.OrderValue == 1.5)
             {
                 //it's a resonance bond, so we deal with this in Render
                 //as we can't return a single geometry that can be
                 //stroked with two different brushes
                 //return BondGeometry.SingleBondGeometry(startPoint.Value, endPoint.Value);
-                return new StreamGeometry();
+                {
+                    singleBondGeometry = new StreamGeometry();
+                    return true;
+                }
             }
 
             //double bond
-            if (ParentBond.OrderValue == 2)
+            if (parentBond.OrderValue == 2)
             {
-                if (ParentBond.Stereo == Globals.BondStereo.Indeterminate)
+                if (parentBond.Stereo == Globals.BondStereo.Indeterminate)
                 {
-                    return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, modelXamlBondLength,
-                        ref _enclosingPoly, startAtomGeometry, endAtomGeometry);
+                    {
+                        singleBondGeometry = BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, modelXamlBondLength,
+                            ref enclosingPoly, startAtomGeometry, endAtomGeometry);
+                        return true;
+                    }
                 }
 
                 Point? centroid = null;
-                if (ParentBond.IsCyclic())
+                if (parentBond.IsCyclic())
                 {
-                    centroid = ParentBond.PrimaryRing?.Centroid;
+                    centroid = parentBond.PrimaryRing?.Centroid;
                 }
 
-                return BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                    ParentBond.Placement,
-                    ref _enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
+                {
+                    singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                        parentBond.Placement,
+                        ref enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
+                    return true;
+                }
             }
 
             //tripe bond
-            if (ParentBond.OrderValue == 3)
+            if (parentBond.OrderValue == 3)
             {
-                return BondGeometry.TripleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                    ref _enclosingPoly, startAtomGeometry, endAtomGeometry);
+                {
+                    singleBondGeometry = BondGeometry.TripleBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                        ref enclosingPoly, startAtomGeometry, endAtomGeometry);
+                    return true;
+                }
             }
 
-            return null;
+            singleBondGeometry = null;
+            return false;
         }
 
         private Brush GetHatchBrush()

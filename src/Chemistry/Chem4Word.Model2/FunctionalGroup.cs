@@ -23,7 +23,49 @@ namespace Chem4Word.Model2
 
         private double _atomicWeight = 0d;
 
-        public override string Colour => Globals.PeriodicTable.C.Colour;
+        public static bool TryParse(string desc, out ElementBase element)
+        {
+            if (TryParse(desc, out FunctionalGroup fg))
+            {
+                element = fg;
+                return true;
+            }
+            else
+            {
+                var pt =new PeriodicTable();
+                if (pt.HasElement(desc))
+                {
+                    element = (ElementBase)pt[desc];
+                    return true;
+                }
+            }
+
+            element = null;
+            return false;
+        }
+        public static bool TryParse(string desc, out FunctionalGroup fg)
+        {
+            try
+            {
+                if (Globals.FunctionalGroupsDictionary.ContainsKey(desc))
+                {
+                    fg = Globals.FunctionalGroupsDictionary[desc];
+                    return true;
+                }
+                else
+                {
+                    fg = null;
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                fg = null;
+                return false;
+            }
+        }
+
+        public override string Colour => "#909090";
 
         public override double AtomicWeight
         {

@@ -13,6 +13,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
 
 
@@ -44,6 +45,7 @@ namespace Chem4Word.ACME.Adorners
 
         //where the dragging starts
         protected Point StartPos;
+        private EditorCanvas _editorCanvas;
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement)
@@ -62,8 +64,8 @@ namespace Chem4Word.ACME.Adorners
             RenderBrush = (Brush)FindResource("BigThumbFillBrush");
             Focusable = false;
             IsHitTestVisible = true;
-            SetBoundingBox();
 
+            _editorCanvas = (EditorCanvas) adornedElement;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
@@ -123,7 +125,7 @@ namespace Chem4Word.ACME.Adorners
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            AdornedMolecule.ResetBoundingBox();
+            //AdornedMolecule.ResetBoundingBox();
         }
 
         /// <summary>
@@ -156,11 +158,11 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var AdornedMoleculeImage = AdornedMolecule.Ghost();
-                Debug.WriteLine(LastOperation.ToString());
-                AdornedMoleculeImage.Transform = LastOperation;
+                var ghost = _editorCanvas.GhostMolecule(AdornedMolecule);
+                //Debug.WriteLine(LastOperation.ToString());
+                ghost.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
 
                 base.OnRender(drawingContext);
             }
@@ -181,7 +183,7 @@ namespace Chem4Word.ACME.Adorners
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = AdornedMolecule.BoundingBox;
+            var bbb = (AdornedElement as EditorCanvas).GetMoleculeBoundingBox(AdornedMolecule);
 
             if (LastOperation != null)
             {

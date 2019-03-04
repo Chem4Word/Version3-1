@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -12,9 +14,6 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-
-using Chem4Word.Model2;
-
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -43,6 +42,7 @@ namespace Chem4Word.ACME.Adorners
 
         private double _rotateAngle;
         private Point _centroid;
+        private EditorCanvas _editorCanvas;
 
         //private SnapGeometry _rotateSnapper;
         //private readonly Brush _renderBrush;
@@ -50,6 +50,8 @@ namespace Chem4Word.ACME.Adorners
         public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
             : base(adornedElement, molecule, currentModel)
         {
+            _editorCanvas = (AdornedElement as EditorCanvas);
+
             if (_thumbWidth == null)
             {
                 _thumbWidth = (int)CurrentModel.Model.XamlBondLength / 10;
@@ -177,7 +179,7 @@ namespace Chem4Word.ACME.Adorners
         {
             //and work out the aspect ratio for later resizing
             //AdornedMolecule.ResetBoundingBox();
-            BoundingBox = AdornedMolecule.BoundingBox;
+            BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecule);
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
@@ -200,11 +202,11 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var AdornedMoleculeImage = AdornedMolecule.Ghost();
-                Debug.WriteLine(LastOperation.ToString());
-                AdornedMoleculeImage.Transform = LastOperation;
+                var ghost = _editorCanvas.GhostMolecule(AdornedMolecule);
+                //Debug.WriteLine(LastOperation.ToString());
+                ghost.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, AdornedMoleculeImage);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
             }
         }
 
@@ -237,7 +239,7 @@ namespace Chem4Word.ACME.Adorners
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = AdornedMolecule.BoundingBox;
+            var bbb = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecule);
 
             if (LastOperation != null)
             {
