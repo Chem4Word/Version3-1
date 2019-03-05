@@ -150,9 +150,11 @@ namespace Chem4Word.ACME.Drawing
         {
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
-            
+
             Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, SymbolSize) +
-                                new Vector(0.0, -MaxBaselineOffset) + new Vector(-FirstBearing(groupGlyphRun), 0.0);
+                                new Vector(0.0, -MaxBaselineOffset);
+            //removed because labels were being canted too much to the left
+                                //+ new Vector(-FirstBearing(groupGlyphRun), 0.0);
             var bb = groupGlyphRun.GetBoundingBox(center + mainOffset);
             Vector textFormatterOffset = new Vector(mainOffset.X, -FirstBearing(groupGlyphRun) -bb.Height/2  );
                                 
