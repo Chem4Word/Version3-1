@@ -41,7 +41,7 @@ namespace Chem4Word.ACME.Adorners
             base.OnRender(drawingContext);
             StreamGeometry sg = new StreamGeometry();
 
-            Rect atomBounds = _targetedVisual.ContentBounds;
+            Rect atomBounds = _targetedVisual.Bounds;
             atomBounds.Inflate(2.0, 2.0);
             Vector twiddle = new Vector(3,0.0);
             using (StreamGeometryContext sgc = sg.Open())

@@ -126,17 +126,20 @@ namespace Chem4Word.ACME.Controls
                 layer.Remove(_highlightAdorner);
                 _highlightAdorner = null;
             }
-            if (cv is AtomVisual av)
+            switch (cv)
             {
-                _highlightAdorner = new AtomHoverAdorner(this, av);
-            }
-            else if (cv is BondVisual bv)
-            {
-                _highlightAdorner = new BondHoverAdorner(this, bv);
-            }
-            else
-            {
-                _highlightAdorner = null;
+                case FunctionalGroupVisual fv:
+                    _highlightAdorner = new AtomHoverAdorner(this, fv);
+                    break;
+                case AtomVisual av:
+                    _highlightAdorner = new AtomHoverAdorner(this, av);
+                    break;
+                case BondVisual bv:
+                    _highlightAdorner = new BondHoverAdorner(this, bv);
+                    break;
+                default:
+                    _highlightAdorner = null;
+                    break;
             }
         }
 

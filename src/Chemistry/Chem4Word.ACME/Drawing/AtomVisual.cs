@@ -603,6 +603,19 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
+        public Rect Bounds
+        {
+            get
+            {
+                var myBounds = ContentBounds;
+                if (Children.Count > 0)
+                {
+                    myBounds.Union(((FunctionalGroupVisual)Children[0]).ContentBounds);
+                }
+
+                return myBounds;
+            }
+        }
         public virtual Geometry WidenedHullGeometry
         {
             get
@@ -660,5 +673,7 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
+
+
     }
 }
