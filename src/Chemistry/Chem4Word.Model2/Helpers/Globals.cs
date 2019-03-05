@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Windows.Media;
 using Chem4Word.Model2;
 
 namespace Chem4Word.Model2.Helpers
@@ -62,6 +63,8 @@ namespace Chem4Word.Model2.Helpers
         public const string OrderDouble = "D";
         public const string OrderPartial23 = "partial23";
         public const string OrderTriple = "T";
+        
+
 
         public static string OrderValueToOrder(double val, bool isAromatic = false)
         {
@@ -170,7 +173,8 @@ namespace Chem4Word.Model2.Helpers
         public const double ExplicitHydrogenBondPercentage = 1.0;
 
         public const double BondThickness = ScaleFactorForXaml * 0.8;
-
+        public const double HoverAdornerThickness = 3.0;
+        public static Color HoverAdornerColor => Colors.DarkOrange;
         #endregion Layout Constants
 
         public static PeriodicTable PeriodicTable = new PeriodicTable();

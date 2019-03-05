@@ -5,14 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Drawing;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -21,47 +21,26 @@ namespace Chem4Word.ACME.Controls
 {
     public class EditorCanvas : ChemistryCanvas
     {
-        private AtomHoverAdorner _highlightAdorner;
+        #region Fields
+
+        private Adorner _highlightAdorner;
+
+        #endregion Fields
+
+        #region Constructors
 
         public EditorCanvas() : base()
         {
             this.MouseMove += EditorCanvas_MouseMove;
         }
 
-        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
-        {
-            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
+        #endregion Constructors
 
-            if (_highlightAdorner != null)
-            {
-                var layer =AdornerLayer.GetAdornerLayer(this);
-                layer.Remove(_highlightAdorner);
-                _highlightAdorner = null;
-            }
-            if (cv is AtomVisual av)
-            {
-                _highlightAdorner = new AtomHoverAdorner(this, av);
-            }
-            else
-            {
-                _highlightAdorner = null;
-            }
-        }
+        #region Methods
 
         private ChemicalVisual GetTargetedVisual(Point p)
         {
             return (VisualTreeHelper.HitTest(this, p).VisualHit as ChemicalVisual);
-
-        }
-
-        /// <summary>
-        /// Doesn't autosize the chemistry to fit, unlike the display
-        /// </summary>
-        /// <param name="constraint"></param>
-        /// <returns></returns>
-        protected override Size MeasureOverride(Size constraint)
-        {
-            return DesiredSize;
         }
 
         public Rect GetMoleculeBoundingBox(Molecule mol)
@@ -119,8 +98,48 @@ namespace Chem4Word.ACME.Controls
             return ghostGeometry;
         }
 
-        
+        #endregion Methods
+
+        #region Overrides
+
+        /// <summary>
+        /// Doesn't autosize the chemistry to fit, unlike the display
+        /// </summary>
+        /// <param name="constraint"></param>
+        /// <returns></returns>
+        protected override Size MeasureOverride(Size constraint)
+        {
+            return DesiredSize;
+        }
+
+        #endregion Overrides
+
+        #region Event Handlers
+
+        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
+
+            if (_highlightAdorner != null)
+            {
+                var layer = AdornerLayer.GetAdornerLayer(this);
+                layer.Remove(_highlightAdorner);
+                _highlightAdorner = null;
+            }
+            if (cv is AtomVisual av)
+            {
+                _highlightAdorner = new AtomHoverAdorner(this, av);
+            }
+            else if (cv is BondVisual bv)
+            {
+                _highlightAdorner = new BondHoverAdorner(this, bv);
+            }
+            else
+            {
+                _highlightAdorner = null;
+            }
+        }
+
+        #endregion Event Handlers
     }
-
-
 }
