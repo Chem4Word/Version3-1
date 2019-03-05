@@ -6,22 +6,54 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model2.Geometry;
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Drawing;
+using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
-using static  Chem4Word.ACME.Drawing.BondVisual;
+
 namespace Chem4Word.ACME.Controls
 
 {
     public class EditorCanvas : ChemistryCanvas
     {
+        private AtomHoverAdorner _highlightAdorner;
+
+        public EditorCanvas() : base()
+        {
+            this.MouseMove += EditorCanvas_MouseMove;
+        }
+
+        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
+
+            if (_highlightAdorner != null)
+            {
+                var layer =AdornerLayer.GetAdornerLayer(this);
+                layer.Remove(_highlightAdorner);
+                _highlightAdorner = null;
+            }
+            if (cv is AtomVisual av)
+            {
+                _highlightAdorner = new AtomHoverAdorner(this, av);
+            }
+            else
+            {
+                _highlightAdorner = null;
+            }
+        }
+
+        private ChemicalVisual GetTargetedVisual(Point p)
+        {
+            return (VisualTreeHelper.HitTest(this, p).VisualHit as ChemicalVisual);
+
+        }
+
         /// <summary>
         /// Doesn't autosize the chemistry to fit, unlike the display
         /// </summary>
@@ -31,21 +63,20 @@ namespace Chem4Word.ACME.Controls
         {
             return DesiredSize;
         }
+
         public Rect GetMoleculeBoundingBox(Molecule mol)
         {
             Rect union = Rect.Empty;
             var atomList = new List<Atom>();
 
             mol.BuildAtomList(atomList);
-            foreach (Atom atom in atomList )
+            foreach (Atom atom in atomList)
             {
                 union.Union(chemicalVisuals[atom].ContentBounds);
             }
 
             return union;
         }
-
-        
 
         public Geometry GhostMolecule(Molecule adornedMolecule)
         {
@@ -58,13 +89,12 @@ namespace Chem4Word.ACME.Controls
             StreamGeometry ghostGeometry = new StreamGeometry();
 
             double atomRadius = this.Chemistry.Model.XamlBondLength / 7.50;
-            using(StreamGeometryContext ghostContext = ghostGeometry.Open())
+            using (StreamGeometryContext ghostContext = ghostGeometry.Open())
             {
                 Dictionary<Atom, Geometry> lookups = new Dictionary<Atom, Geometry>();
                 foreach (Atom atom in atomList)
                 {
                     if (atom.SymbolText != "")
-
                     {
                         EllipseGeometry atomCircle = new EllipseGeometry(atom.Position, atomRadius, atomRadius);
                         DrawGeometry(ghostContext, atomCircle);
@@ -77,19 +107,20 @@ namespace Chem4Word.ACME.Controls
                 }
                 foreach (Bond bond in bondList)
                 {
-                    List<Point> throwaway= new List<Point>();
+                    List<Point> throwaway = new List<Point>();
                     bool ok = GetBondGeometry(bond.StartAtom.Position, bond.EndAtom.Position,
                         lookups[bond.StartAtom], lookups[bond.EndAtom], this.Chemistry.Model.XamlBondLength,
                         out Geometry bondGeom, bond, ref throwaway);
-                    DrawGeometry(ghostContext,bondGeom);
-
+                    DrawGeometry(ghostContext, bondGeom);
                 }
                 ghostContext.Close();
-
             }
 
             return ghostGeometry;
         }
+
+        
     }
-   
+
+
 }

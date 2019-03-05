@@ -14,10 +14,10 @@ namespace Chem4Word.ACME.Adorners
 
         public AtomHoverAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
-            _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
-            _solidColorBrush.Opacity = 0.25;
+            _solidColorBrush = new SolidColorBrush(Colors.DarkOrange);
+            //_solidColorBrush.Opacity = 0.25;
 
-            _bracketPen = new Pen(SystemColors.HighlightBrush, 1);
+            _bracketPen = new Pen(_solidColorBrush, 2);
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
@@ -34,14 +34,15 @@ namespace Chem4Word.ACME.Adorners
             StreamGeometry sg = new StreamGeometry();
 
             Rect atomBounds = _targetedVisual.ContentBounds;
-            Vector twiddle = new Vector(10,0.0);
+            atomBounds.Inflate(2.0, 2.0);
+            Vector twiddle = new Vector(3,0.0);
             using (StreamGeometryContext sgc = sg.Open())
             {
                 sgc.BeginFigure(atomBounds.TopLeft + twiddle, false, false);
                 sgc.LineTo(atomBounds.TopLeft, true, true);
                 sgc.LineTo(atomBounds.BottomLeft, true,true);
                 sgc.LineTo(atomBounds.BottomLeft+twiddle, true,true);
-
+                
                 sgc.BeginFigure(atomBounds.TopRight - twiddle, false, false);
                 sgc.LineTo(atomBounds.TopRight, true, true);
                 sgc.LineTo(atomBounds.BottomRight, true, true);
