@@ -23,7 +23,7 @@ namespace Chem4Word.ACME.Controls
     {
         #region Fields
 
-        private Adorner _highlightAdorner;
+       
 
         #endregion Fields
 
@@ -31,7 +31,7 @@ namespace Chem4Word.ACME.Controls
 
         public EditorCanvas() : base()
         {
-            this.MouseMove += EditorCanvas_MouseMove;
+           
         }
 
         #endregion Constructors
@@ -40,10 +40,6 @@ namespace Chem4Word.ACME.Controls
 
         #region Methods
 
-        private ChemicalVisual GetTargetedVisual(Point p)
-        {
-            return (VisualTreeHelper.HitTest(this, p).VisualHit as ChemicalVisual);
-        }
 
         public Rect GetMoleculeBoundingBox(Molecule mol)
         {
@@ -116,35 +112,6 @@ namespace Chem4Word.ACME.Controls
 
         #endregion Overrides
 
-        #region Event Handlers
-
-        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
-        {
-            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
-
-            if (_highlightAdorner != null)
-            {
-                var layer = AdornerLayer.GetAdornerLayer(this);
-                layer.Remove(_highlightAdorner);
-                _highlightAdorner = null;
-            }
-            switch (cv)
-            {
-                case FunctionalGroupVisual fv:
-                    _highlightAdorner = new AtomHoverAdorner(this, fv);
-                    break;
-                case AtomVisual av:
-                    _highlightAdorner = new AtomHoverAdorner(this, av);
-                    break;
-                case BondVisual bv:
-                    _highlightAdorner = new BondHoverAdorner(this, bv);
-                    break;
-                default:
-                    _highlightAdorner = null;
-                    break;
-            }
-        }
-
-        #endregion Event Handlers
+     
     }
 }

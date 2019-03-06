@@ -69,7 +69,11 @@ namespace Chem4Word.ACME.Drawing
             //Vector endOffset = new Vector();
             var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
 
-            if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength, out var singleBondGeometry, ParentBond, ref _enclosingPoly)) return singleBondGeometry;
+            if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength,
+                out var singleBondGeometry, ParentBond, ref _enclosingPoly))
+            {
+                return singleBondGeometry;
+            }
 
             return null;
         }

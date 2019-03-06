@@ -371,7 +371,7 @@
                             Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DeleteBehavior ViewModel="{Binding}" />
+                        <behaviors:DeleteBehavior ViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
             </ToolBar>

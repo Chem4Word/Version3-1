@@ -14,15 +14,20 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners;
 
 namespace Chem4Word.ACME.Controls
 {
     public class ChemistryCanvas : Canvas
     {
+        private Adorner _highlightAdorner;
         public ChemistryCanvas()
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
+            MouseMove += EditorCanvas_MouseMove;
         }
 
         /// <summary>
@@ -465,5 +470,49 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion Drawing
+
+        #region Event handlers
+        
+
+        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
+
+            if (_highlightAdorner != null)
+            {
+                var layer = AdornerLayer.GetAdornerLayer(this);
+                layer.Remove(_highlightAdorner);
+                _highlightAdorner = null;
+            }
+            switch (cv)
+            {
+                case FunctionalGroupVisual fv:
+                    _highlightAdorner = new AtomHoverAdorner(this, fv);
+                    break;
+                case AtomVisual av:
+                    _highlightAdorner = new AtomHoverAdorner(this, av);
+                    break;
+                case BondVisual bv:
+                    _highlightAdorner = new BondHoverAdorner(this, bv);
+                    break;
+                default:
+                    _highlightAdorner = null;
+                    break;
+            }
+        }
+
+
+        #endregion Event Handlers
+
+        #region Methods
+
+        private ChemicalVisual GetTargetedVisual(Point p)
+        {
+            return (VisualTreeHelper.HitTest(this, p).VisualHit as ChemicalVisual);
+        }
+
+        #endregion
+
+
     }
 }
