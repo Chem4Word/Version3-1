@@ -132,7 +132,7 @@ namespace WinForms.TestHarness
 
                     CMLConverter cc = new CMLConverter();
                     EditorHost editorHost = new EditorHost(cc.Export(copy), "ACME");
-                    editorHost.ShowDialog();
+                    editorHost.ShowDialog(this);
                     if (editorHost.Result == DialogResult.OK)
                     {
                         Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Stack");
@@ -461,7 +461,7 @@ namespace WinForms.TestHarness
 
                     CMLConverter cc = new CMLConverter();
                     EditorHost editorHost = new EditorHost(cc.Export(clone), "CML");
-                    editorHost.ShowDialog();
+                    editorHost.ShowDialog(this);
                     if (editorHost.Result == DialogResult.OK)
                     {
                         Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");

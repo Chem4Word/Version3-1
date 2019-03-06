@@ -58,6 +58,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adorners\BondHoverAdorner.cs" />
+    <Compile Include="Adorners\AtomHoverAdorner.cs" />
     <Compile Include="Adorners\AtomSelectionAdorner.cs" />
     <Compile Include="Adorners\BondSelectionAdorner.cs" />
     <Compile Include="Adorners\DrawBondAdorner.cs" />

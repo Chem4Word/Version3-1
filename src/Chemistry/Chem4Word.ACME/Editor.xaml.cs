@@ -5,9 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Controls;
 using Chem4Word.Core.UI.Wpf;
-
-
+using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -18,11 +21,6 @@ using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME
 {
@@ -32,16 +30,16 @@ namespace Chem4Word.ACME
     public partial class Editor : UserControl, INotifyPropertyChanged
     {
         private EditViewModel _activeViewModel;
+
         public EditViewModel ActiveViewModel
         {
             get
             {
-                return _activeViewModel; 
-
+                return _activeViewModel;
             }
             set
             {
-                _activeViewModel = value; 
+                _activeViewModel = value;
                 OnPropertyChanged();
             }
         }
@@ -56,11 +54,9 @@ namespace Chem4Word.ACME
         /// <summary>
         /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         /// </summary>
-        public Editor(string cml):this()
+        public Editor(string cml) : this()
         {
             _cml = cml;
-
-          
         }
 
         public Editor()
@@ -153,7 +149,6 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty SelectedAtomOptionProperty =
             DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
 
-
         public Visibility SliderVisibility
         {
             get { return (Visibility)GetValue(SliderVisibilityProperty); }
@@ -195,10 +190,10 @@ namespace Chem4Word.ACME
                 var vm = new EditViewModel(tempModel);
                 ActiveViewModel = vm;
 
-                EditorCanvas ec = LocateCanvas();
-                ActiveViewModel.Model.CentreInCanvas(new Size(ec.ActualWidth, ec.ActualHeight));
+                
+                ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
 
-                ec.Chemistry = vm;
+                ChemCanvas.Chemistry = vm;
 
                 ScrollIntoView();
                 BindControls(vm);
@@ -247,11 +242,6 @@ namespace Chem4Word.ACME
             return foundChild;
         }
 
-        private EditorCanvas LocateCanvas()
-        {
-            EditorCanvas res = FindChild<EditorCanvas>(DrawingArea);
-            return res;
-        }
 
         /// <summary>
         /// Sets up data bindings between the dropdowns
@@ -260,16 +250,15 @@ namespace Chem4Word.ACME
         /// <param name="vm">EditViewModel for ACME</param>
         private void BindControls(EditViewModel vm)
         {
-            Binding atomBinding = new Binding("SelectedAtomOption");
-            atomBinding.Source = vm;
-            AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
+            //Binding atomBinding = new Binding("SelectedAtomOption");
+            //atomBinding.Source = vm;
+            //AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
 
-            Binding bondBinding = new Binding("SelectedBondOption");
-            bondBinding.Source = vm;
+            //Binding bondBinding = new Binding("SelectedBondOption");
+            //bondBinding.Source = vm;
+            //BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
 
-            BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
-
-            vm.DrawingSurface = LocateCanvas();
+            vm.Canvas = ChemCanvas;
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -286,8 +275,8 @@ namespace Chem4Word.ACME
             {
                 if (Math.Abs(ActiveViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
-                    Canvas c = LocateCanvas();
-                    ActiveViewModel.SetAverageBondLength(blo.ChosenValue, new Size(c.ActualWidth, c.ActualHeight));
+                   
+                    ActiveViewModel.SetAverageBondLength(blo.ChosenValue, new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
                     ScrollIntoView();
                 }
             }

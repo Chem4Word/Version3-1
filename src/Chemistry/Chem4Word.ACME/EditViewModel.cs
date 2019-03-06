@@ -128,7 +128,7 @@ namespace Chem4Word.ACME
                     return selElements[0];
                 }
 
-                if (selElements.Count == 0) //nothing selected so return null
+                if (selElements.Count == 0) //nothing selected so return last value selected
                 {
                     return _selectedElement;
                 }
@@ -264,7 +264,7 @@ namespace Chem4Word.ACME
             }
         }
 
-        public Canvas DrawingSurface { get; set; }
+        public Canvas Canvas { get; set; }
 
         #endregion Properties
 
@@ -280,7 +280,7 @@ namespace Chem4Word.ACME
                     _activeMode.Detach();
                 }
                 _activeMode = value;
-                _activeMode?.Attach(DrawingSurface);
+                _activeMode?.Attach(Canvas);
             }
         }
 
@@ -330,8 +330,7 @@ namespace Chem4Word.ACME
             UnGroupCommand = new UnGroupCommand(this);
             SettingsCommand = new SettingsCommand(this);
 
-            PeriodicTable pt = new PeriodicTable();
-            _selectedElement = pt.C;
+            _selectedElement = Globals.PeriodicTable.C;
 
             _selectedBondOptionId = 1;
 
@@ -779,7 +778,7 @@ namespace Chem4Word.ACME
 
         private void RemoveAtomBondAdorners(Molecule atomParent)
         {
-            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            var layer = AdornerLayer.GetAdornerLayer(Canvas);
             foreach (Bond bond in atomParent.Bonds)
             {
                 if (SelectionAdorners.ContainsKey(bond))
@@ -844,7 +843,7 @@ namespace Chem4Word.ACME
 
         public void RemoveAllAdorners()
         {
-            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            var layer = AdornerLayer.GetAdornerLayer(Canvas);
             var adornerList = SelectionAdorners.Keys.ToList();
             foreach (object oldObject in adornerList)
             {
@@ -855,7 +854,7 @@ namespace Chem4Word.ACME
 
         private void RemoveSelectionAdorners(IList oldObjects)
         {
-            var layer = AdornerLayer.GetAdornerLayer(DrawingSurface);
+            var layer = AdornerLayer.GetAdornerLayer(Canvas);
             foreach (object oldObject in oldObjects)
             {
                 if (SelectionAdorners.ContainsKey(oldObject))
@@ -883,7 +882,7 @@ namespace Chem4Word.ACME
                 {
                     var atom = (Atom)newObject;
 
-                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(DrawingSurface, atom);
+                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(Canvas, atom);
                     SelectionAdorners[newObject] = atomAdorner;
                     atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
 
@@ -891,13 +890,13 @@ namespace Chem4Word.ACME
                     if (AllAtomsSelected(atom.Parent))
                     {
                         RemoveAtomBondAdorners(atom.Parent);
-                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(DrawingSurface, atom.Parent, this);
+                        MoleculeSelectionAdorner molAdorner = new MoleculeSelectionAdorner(Canvas, atom.Parent, this);
                         SelectionAdorners[newObject] = molAdorner;
                     }
                 }
                 else if (newObject is Bond)
                 {
-                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(DrawingSurface, (newObject as Bond));
+                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(Canvas, (newObject as Bond));
                     SelectionAdorners[newObject] = bondAdorner;
                     bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
@@ -907,7 +906,7 @@ namespace Chem4Word.ACME
                     if (mol.Atoms.Count == 1)
                     {
                         SingleAtomSelectionAdorner atomAdorner =
-                            new SingleAtomSelectionAdorner(DrawingSurface, mol, this);
+                            new SingleAtomSelectionAdorner(Canvas, mol, this);
                         SelectionAdorners[newObject] = atomAdorner;
                         atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                         atomAdorner.DragCompleted += AtomAdorner_DragCompleted;
@@ -915,7 +914,7 @@ namespace Chem4Word.ACME
                     else
                     {
                         MoleculeSelectionAdorner molAdorner =
-                            new MoleculeSelectionAdorner(DrawingSurface, (newObject as Molecule), this);
+                            new MoleculeSelectionAdorner(Canvas, (newObject as Molecule), this);
                         SelectionAdorners[newObject] = molAdorner;
                         molAdorner.ResizeCompleted += MolAdorner_ResizeCompleted;
                         molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;

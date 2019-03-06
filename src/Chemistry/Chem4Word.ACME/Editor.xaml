@@ -8,11 +8,12 @@
     xmlns:control ="clr-namespace:Chem4Word.ACME.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
-    xmlns:acme="clr-namespace:Chem4Word.ACME"
+    xmlns:acme="clr-namespace:Chem4Word.ACME" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
     Width="1013"
     Height="774"
 
-    Loaded="ACMEControl_Loaded">
+    Loaded="ACMEControl_Loaded" d:DataContext="{d:DesignInstance acme:EditViewModel  }">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -109,14 +110,14 @@
                     FontWeight="DemiBold"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
                     ItemsSource="{StaticResource AtomItems}"
-                    SelectedValue="{Binding SelectedElement, Mode=TwoWay}"
+                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, Mode=TwoWay}"
                     SelectedValuePath="Element"
                     ToolTip="Current Atom Type" />
                 <ComboBox x:Name="BondCombo"
                     Width="48"
                     Height="25"
                     ItemsSource="{StaticResource BondItems}"
-                    SelectedValue="{Binding SelectedBondOptionId, Mode=TwoWay}"
+                    SelectedValue="{Binding ElementName=AcmeControl, Path= ActiveViewModel.SelectedBondOptionId, Mode=TwoWay}"
                     SelectedValuePath="Id"
                     ToolTip="Current Bond Type">
                     <ComboBox.ItemTemplate>
@@ -370,7 +371,7 @@
                             Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DeleteBehavior ViewModel="{Binding}" />
+                        <behaviors:DeleteBehavior ViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
             </ToolBar>
@@ -634,6 +635,7 @@
         </ToolBarTray>
         <ToolBarTray />
 
+        <!--actual drawing area-->
         <ScrollViewer Name="DrawingArea"
             Width="Auto"
             Height="Auto"

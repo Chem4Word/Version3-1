@@ -39,6 +39,14 @@ namespace Chem4Word.Model2
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SymbolText));
                 OnPropertyChanged(nameof(ImplicitHydrogenCount));
+                NotifyBondingChanged();
+                if (Bonds.Any())
+                {
+                    foreach (Bond bond in Bonds)
+                    {
+                        bond.NotifyBondingChanged();
+                    }
+                }
             }
         }
 
@@ -589,5 +597,10 @@ namespace Chem4Word.Model2
         #endregion INotifyPropertyChanged
 
         #endregion Events
+
+        public void SendDummyNotif()
+        {
+            OnPropertyChanged(nameof(SymbolText));
+        }
     }
 }

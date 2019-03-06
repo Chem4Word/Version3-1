@@ -19,19 +19,19 @@ namespace Chem4Word.ACME.Drawing
     {
         private List<LabelTextSourceRun> ComponentRuns { get; }
         public FunctionalGroup ParentGroup { get; }
-        public AtomVisual ParentVisual { get; }
-        public bool Flipped => ParentVisual.ParentAtom.BalancingVector.X < 0d;
+        public bool Flipped => ParentAtom.BalancingVector.X < 0d;
 
-        public FunctionalGroupVisual(object fg, AtomVisual parent)
+        public FunctionalGroupVisual( Atom parent)
         {
-            ParentGroup = (FunctionalGroup)fg;
+            ParentGroup = (FunctionalGroup)parent.Element;
+            ParentAtom = parent;
             ComponentRuns = new List<LabelTextSourceRun>();
-            ParentVisual = parent;
         }
 
-        public void Render(DrawingContext dc)
+        public void Render()
         {
-            var parentAtomPosition = ParentVisual.ParentAtom.Position;
+            SetTextParams();
+            var parentAtomPosition = ParentAtom.Position;
 
             int textStorePosition = 0;
 
@@ -102,42 +102,46 @@ namespace Chem4Word.ACME.Drawing
                 //locus is where the textline is drawn
                 var locus = new Point(0, 0) + dispVector;
 
-                //draw the line
-                myTextLine.Draw(dc, locus, InvertAxes.None);
-
-                glyphRuns = myTextLine.GetIndexedGlyphRuns();
-                List<Point> outline = new List<Point>();
-                double advanceWidths = 0d;
-
-                //build up the convex hull from each glyph
-                //you need to add in the advance widths for each
-                //glyph run as they are traversed,
-                //to the outline
-                foreach (IndexedGlyphRun igr in glyphRuns)
+                using (DrawingContext dc = RenderOpen())
+                    //draw the line
                 {
-                    var currentRun = igr.GlyphRun;
-                    var runOutline = GlyphUtils.GetOutline(currentRun);
+                    myTextLine.Draw(dc, locus, InvertAxes.None);
 
-                    for (int i = 0; i < runOutline.Count; i++)
+                    glyphRuns = myTextLine.GetIndexedGlyphRuns();
+                    List<Point> outline = new List<Point>();
+                    double advanceWidths = 0d;
+
+                    //build up the convex hull from each glyph
+                    //you need to add in the advance widths for each
+                    //glyph run as they are traversed,
+                    //to the outline
+                    foreach (IndexedGlyphRun igr in glyphRuns)
                     {
-                        var point = runOutline[i];
-                        point.X += advanceWidths;
-                        runOutline[i] = point;
+                        var currentRun = igr.GlyphRun;
+                        var runOutline = GlyphUtils.GetOutline(currentRun);
+
+                        for (int i = 0; i < runOutline.Count; i++)
+                        {
+                            var point = runOutline[i];
+                            point.X += advanceWidths;
+                            runOutline[i] = point;
+                        }
+
+                        outline.AddRange(runOutline);
+                        advanceWidths += currentRun.AdvanceWidths.Sum();
                     }
 
-                    outline.AddRange(runOutline);
-                    advanceWidths += currentRun.AdvanceWidths.Sum();
+                    var sortedOutline = (from Point p in outline
+                        orderby p.X ascending, p.Y descending
+                        select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+
+                    Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
+
+                    // Diag: Comment out to show hull and atom position
+                    //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
+                    //dc.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
+                    dc.Close();
                 }
-                var sortedOutline = (from Point p in outline
-                                     orderby p.X ascending, p.Y descending
-                                     select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
-
-                Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
-
-                // Diag: Comment out to show hull and atom position
-                //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
-                dc.DrawEllipse(Brushes.Red, null, ParentVisual.ParentAtom.Position, 5, 5);
-                dc.Close();
             };
         }
 
@@ -157,14 +161,18 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                if (!string.IsNullOrEmpty(AtomSymbol))
-                {
-                    //Pen _widepen = new Pen(Brushes.Black, BondThickness);
-                    return HullGeometry;
-                }
-
-                return null;
+                return HullGeometry;
             }
+        }
+
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+        {
+            if (this.HullGeometry.FillContains(hitTestParameters.HitPoint))
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
+            }
+            return null;
+
         }
     }
 }

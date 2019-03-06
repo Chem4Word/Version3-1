@@ -6,23 +6,28 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
+using Chem4Word.ACME.Adorners;
 
 namespace Chem4Word.ACME.Controls
 {
     public class ChemistryCanvas : Canvas
     {
+        private Adorner _highlightAdorner;
         public ChemistryCanvas()
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
+            MouseMove += EditorCanvas_MouseMove;
         }
 
         /// <summary>
@@ -32,15 +37,11 @@ namespace Chem4Word.ACME.Controls
         /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
-
-            
             _size = GetBoundingBox();
-
-            
 
             LeftPadding = 0d;
             TopPadding = 0d;
-            if(_size.X < 0d)
+            if (_size.X < 0d)
             {
                 LeftPadding = -_size.X;
             }
@@ -49,13 +50,9 @@ namespace Chem4Word.ACME.Controls
             {
                 TopPadding = -_size.Y;
             }
-            InteriorPadding = new Thickness(LeftPadding, TopPadding, 0,0);
+            InteriorPadding = new Thickness(LeftPadding, TopPadding, 0, 0);
             return _size.Size;
-
-            
         }
-
-
 
         public Thickness InteriorPadding
         {
@@ -67,12 +64,9 @@ namespace Chem4Word.ACME.Controls
         public static readonly DependencyProperty InteriorPaddingProperty =
             DependencyProperty.Register("InteriorPadding", typeof(Thickness), typeof(ChemistryCanvas), new PropertyMetadata(default(Thickness)));
 
-
-
         public double TopPadding { get; set; }
 
         public double LeftPadding { get; set; }
-
 
         #region Drawing
 
@@ -80,6 +74,8 @@ namespace Chem4Word.ACME.Controls
 
         //properties
         private ViewModel _mychemistry;
+
+        public bool SuppressRedraw { get; set; }
 
         public ViewModel Chemistry
         {
@@ -104,41 +100,43 @@ namespace Chem4Word.ACME.Controls
 
             _mychemistry.Model.PropertyChanged += Model_PropertyChanged;
         }
-        public bool AutoResize = true;
 
+        public bool AutoResize = true;
 
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (sender)
+            if (!SuppressRedraw)
             {
-                case Atom a:
-                    RedrawAtom(a);
-                    
-                    break;
-                case Bond b:
-                    RedrawBond(b);
-                    break;
-            }
+                switch (sender)
+                {
+                    case Atom a:
+                        RedrawAtom(a);
 
-            if (AutoResize)
-            {
-                InvalidateMeasure();
+                        break;
+
+                    case Bond b:
+                        RedrawBond(b);
+                        break;
+                }
+
+                if (AutoResize)
+                {
+                    InvalidateMeasure();
+                }
             }
         }
 
         private void RedrawBond(Bond bond)
         {
-
             int refCount = 1;
             BondVisual bv = null;
             if (chemicalVisuals.ContainsKey(bond))
             {
-                bv = (BondVisual) chemicalVisuals[bond];
+                bv = (BondVisual)chemicalVisuals[bond];
                 refCount = bv.RefCount;
                 BondRemoved(bond);
             }
 
-            
             BondAdded(bond);
 
             bv = (BondVisual)chemicalVisuals[bond];
@@ -151,12 +149,11 @@ namespace Chem4Word.ACME.Controls
             AtomVisual av = null;
             if (chemicalVisuals.ContainsKey(atom))
             {
-                av = (AtomVisual) chemicalVisuals[atom];
+                av = (AtomVisual)chemicalVisuals[atom];
                 refCount = av.RefCount;
                 AtomRemoved(atom);
             }
 
-            
             AtomAdded(atom);
 
             av = (AtomVisual)chemicalVisuals[atom];
@@ -165,16 +162,15 @@ namespace Chem4Word.ACME.Controls
 
         private void Model_MoleculesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            
         }
 
         private void Model_BondsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (e.NewItems!=null)
+            if (e.NewItems != null)
             {
                 foreach (var eNewItem in e.NewItems)
                 {
-                    Bond b = (Bond) eNewItem;
+                    Bond b = (Bond)eNewItem;
 
                     BondAdded(b);
                 }
@@ -229,13 +225,13 @@ namespace Chem4Word.ACME.Controls
 
         //private Rect _boundingBox = default(Rect);
 
-        #endregion
+        #endregion Fields
 
         #region DPs
 
         public bool FitToContents
         {
-            get { return (bool) GetValue(FitToContentsProperty); }
+            get { return (bool)GetValue(FitToContentsProperty); }
             set { SetValue(FitToContentsProperty, value); }
         }
 
@@ -244,10 +240,9 @@ namespace Chem4Word.ACME.Controls
             DependencyProperty.Register("FitToContents", typeof(bool), typeof(ChemistryCanvas),
                 new PropertyMetadata(default(bool)));
 
-
         public Thickness Overhang
         {
-            get { return (Thickness) GetValue(OverhangProperty); }
+            get { return (Thickness)GetValue(OverhangProperty); }
             set { SetValue(OverhangProperty, value); }
         }
 
@@ -259,12 +254,9 @@ namespace Chem4Word.ACME.Controls
         private Rect _size;
         //private Thickness _interiorPadding;
 
-        #endregion
+        #endregion DPs
 
         #region Methods
-
-
-      
 
         private Rect GetBoundingBox()
         {
@@ -288,7 +280,7 @@ namespace Chem4Word.ACME.Controls
             return currentbounds;
         }
 
-        #endregion
+        #endregion Methods
 
         //overrides
         protected override Visual GetVisualChild(int index)
@@ -317,7 +309,6 @@ namespace Chem4Word.ACME.Controls
             var bb = GetBoundingBox();
             var leftOverhang = -Math.Min(0d, bb.Left);
             var topOverhang = Math.Min(0d, bb.Top);
-
 
             Overhang = new Thickness(leftOverhang, topOverhang, leftOverhang, topOverhang);
             InvalidateMeasure();
@@ -381,34 +372,55 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-
-
         private void AtomAdded(Atom atom)
         {
             if (!chemicalVisuals.ContainsKey(atom)) //it's not already in the list
             {
-                chemicalVisuals[atom] = new AtomVisual(atom);
+                if (atom.Element is FunctionalGroup fg)
+                {
+                    chemicalVisuals[atom] = new FunctionalGroupVisual(atom);
+                }
+                else
+                {
+                    chemicalVisuals[atom] = new AtomVisual(atom);
+                }
             }
 
-            var av = (AtomVisual) chemicalVisuals[atom];
+            var cv = chemicalVisuals[atom];
 
-            if (av.RefCount == 0) // it hasn't been added before
+            if (cv is FunctionalGroupVisual fgv)
             {
-                av.ChemicalVisuals = chemicalVisuals;
+                if (fgv.RefCount == 0) // it hasn't been added before
+                {
+                    fgv.ChemicalVisuals = chemicalVisuals;
 
-                av.BackgroundColor = Background;
+                    fgv.BackgroundColor = Background;
 
-                av.Render();
+                    fgv.Render();
 
-                AddVisual(av);
+                    AddVisual(fgv);
+                }
+                fgv.RefCount++;
             }
+            else if (cv is AtomVisual av)
+            {
+                if (av.RefCount == 0) // it hasn't been added before
+                {
+                    av.ChemicalVisuals = chemicalVisuals;
 
-            av.RefCount++;
+                    av.BackgroundColor = Background;
+
+                    av.Render();
+
+                    AddVisual(av);
+                }
+                av.RefCount++;
+            }
         }
 
         private void AtomRemoved(Atom atom)
         {
-            var av = (AtomVisual) chemicalVisuals[atom];
+            var av = (AtomVisual)chemicalVisuals[atom];
 
             if (av.RefCount == 1) //removing this atom will remove the last visual
             {
@@ -428,7 +440,7 @@ namespace Chem4Word.ACME.Controls
                 chemicalVisuals[bond] = new BondVisual(bond);
             }
 
-            BondVisual bv = (BondVisual) chemicalVisuals[bond];
+            BondVisual bv = (BondVisual)chemicalVisuals[bond];
 
             if (bv.RefCount == 0) // it hasn't been added before
             {
@@ -439,12 +451,12 @@ namespace Chem4Word.ACME.Controls
                 AddVisual(bv);
             }
 
-            bv.RefCount ++;
+            bv.RefCount++;
         }
 
         private void BondRemoved(Bond bond)
         {
-            var bv = (BondVisual) chemicalVisuals[bond];
+            var bv = (BondVisual)chemicalVisuals[bond];
 
             if (bv.RefCount == 1) //removing this atom will remove the last visual
             {
@@ -453,11 +465,54 @@ namespace Chem4Word.ACME.Controls
             }
             else
             {
-                bv.RefCount --;
+                bv.RefCount--;
+            }
+        }
+
+        #endregion Drawing
+
+        #region Event handlers
+        
+
+        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
+
+            if (_highlightAdorner != null)
+            {
+                var layer = AdornerLayer.GetAdornerLayer(this);
+                layer.Remove(_highlightAdorner);
+                _highlightAdorner = null;
+            }
+            switch (cv)
+            {
+                case FunctionalGroupVisual fv:
+                    _highlightAdorner = new AtomHoverAdorner(this, fv);
+                    break;
+                case AtomVisual av:
+                    _highlightAdorner = new AtomHoverAdorner(this, av);
+                    break;
+                case BondVisual bv:
+                    _highlightAdorner = new BondHoverAdorner(this, bv);
+                    break;
+                default:
+                    _highlightAdorner = null;
+                    break;
             }
         }
 
 
-        #endregion Drawing
+        #endregion Event Handlers
+
+        #region Methods
+
+        private ChemicalVisual GetTargetedVisual(Point p)
+        {
+            return (VisualTreeHelper.HitTest(this, p).VisualHit as ChemicalVisual);
+        }
+
+        #endregion
+
+
     }
 }

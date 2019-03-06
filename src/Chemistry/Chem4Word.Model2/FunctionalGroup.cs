@@ -32,10 +32,9 @@ namespace Chem4Word.Model2
             }
             else
             {
-                var pt =new PeriodicTable();
-                if (pt.HasElement(desc))
+                if (Globals.PeriodicTable.HasElement(desc))
                 {
-                    element = (ElementBase)pt[desc];
+                    element = (ElementBase)Globals.PeriodicTable[desc];
                     return true;
                 }
             }
@@ -65,7 +64,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public override string Colour => "#909090";
+        public override string Colour => Globals.PeriodicTable.C.Colour;
 
         public override double AtomicWeight
         {

@@ -25,7 +25,6 @@ namespace Chem4Word.Model2.Converters.MDL
         private Dictionary<int, Atom> atomByNumber;
         private Dictionary<int, Bond> bondByNumber;
         private Dictionary<Atom, int> numberByAtom;
-        private static PeriodicTable _pt = new PeriodicTable();
 
         public override SdfState ImportFromStream(StreamReader reader, Molecule molecule, out string message)
         {
@@ -921,7 +920,7 @@ namespace Chem4Word.Model2.Converters.MDL
 
         private static bool ElementExists(String element)
         {
-            bool result = _pt.Elements.ContainsKey(element);
+            bool result = Globals.PeriodicTable.Elements.ContainsKey(element);
             return result;
         }
 

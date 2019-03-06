@@ -25,7 +25,7 @@ namespace Chem4Word.ACME.Drawing
         #region private fields
 
         private static double MaskOffsetWidth = 0;
-        private FunctionalGroupVisual _functionalGroupVisual;
+        
 
         public double BondThickness { get; set; }
 
@@ -185,9 +185,9 @@ namespace Chem4Word.ACME.Drawing
 
         #endregion Nested Classes
 
-        public AtomVisual(object atom) : this()
+        public AtomVisual(Atom atom) : this()
         {
-            ParentAtom = (Atom)atom;
+            ParentAtom = atom;
         }
 
         public AtomVisual()
@@ -196,7 +196,7 @@ namespace Chem4Word.ACME.Drawing
 
         #region Properties
 
-        public Atom ParentAtom { get; }
+        public virtual Atom ParentAtom { get; protected set; }
 
         #region Visual Properties
 
@@ -401,6 +401,12 @@ namespace Chem4Word.ACME.Drawing
             //stage 2.  grab the main atom metrics br drawing it
 
             var mainAtomMetrics = DrawSelf(drawingContext);
+            //if it's a vertex atom we need the hull
+            if (AtomSymbol == "")
+            {
+                Hull.AddRange(mainAtomMetrics.FlattenedPath);
+            }
+
 
             //stage 3:  measure up the hydrogens
             //if we have implicit hydrogens and we have an explicit label, draw them
@@ -481,11 +487,7 @@ namespace Chem4Word.ACME.Drawing
         public override void Render()
         {
             Point centre = ParentAtom.Position;
-            GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
-
-            GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
-            GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
-            MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
+            SetTextParams();
 
             if (ParentAtom.Element is Element e)
             {
@@ -517,29 +519,27 @@ namespace Chem4Word.ACME.Drawing
                     }
                     else //draw an empty circle for hit testing purposes
                     {
-                        dc.DrawEllipse(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), ParentAtom.Position, 5.0, 5.0);
+                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, 5.0, 5.0);
+
+                        dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), eg);
+                        //very simple hull definition
+                        Hull=new List<Point>();
+                        
+                        Hull.AddRange(new []{eg.Bounds.BottomLeft, eg.Bounds.TopLeft, eg.Bounds.TopRight, eg.Bounds.BottomRight});
                         dc.Close();
                     }
                 }
             }
-            else if (ParentAtom.Element is FunctionalGroup fg)
-            {
-                using (DrawingContext dc = RenderOpen())
-                {
-                    AtomSymbol = fg.Symbol;
-                    RenderFunctionalGroup(dc, fg);
-                    //dc.Close();
-                }
-            }
+          
         }
 
-        private void RenderFunctionalGroup(DrawingContext dc, FunctionalGroup fg)
+        protected void SetTextParams()
         {
-            _functionalGroupVisual = new FunctionalGroupVisual(fg, this);
-            //_functionalGroupVisual.Flipped = ParentAtom.BalancingVector.X < 0;
-            _functionalGroupVisual.Render(dc);
+            GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
 
-            AddVisualChild(_functionalGroupVisual);
+            GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
+            GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
+            MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
         }
 
         #endregion Rendering
@@ -561,21 +561,15 @@ namespace Chem4Word.ACME.Drawing
             {
                 List<Point> hullList = null;
 
-                if (ParentAtom.Element is Element)
+                if (Hull == null || Hull.Count == 0)
                 {
-                    if (Hull == null || Hull.Count == 0)
-                    {
-                        hullList = null;
-                    }
-                    else
-                    {
-                        hullList = Hull;
-                    }
+                    hullList = null;
                 }
-                else if (ParentAtom.Element is FunctionalGroup)
+                else
                 {
-                    hullList = _functionalGroupVisual.Hull;
+                    hullList = Hull;
                 }
+              
 
                 //need to combine the actually filled atom area
                 //with a stroked outline of it, to give a sufficient margin
@@ -591,6 +585,19 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
+        public Rect Bounds
+        {
+            get
+            {
+                var myBounds = ContentBounds;
+                if (Children.Count > 0)
+                {
+                    myBounds.Union(((FunctionalGroupVisual)Children[0]).ContentBounds);
+                }
+
+                return myBounds;
+            }
+        }
         public virtual Geometry WidenedHullGeometry
         {
             get
@@ -611,18 +618,12 @@ namespace Chem4Word.ACME.Drawing
 
             if (ParentAtom.Element is Element e)
             {
-                if (HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
+                if (HullGeometry.FillContains(hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }
             }
-            else if (ParentAtom.Element is FunctionalGroup fg)
-            {
-                if (this._functionalGroupVisual.HullGeometry.StrokeContains(_widepen, hitTestParameters.HitPoint))
-                {
-                    return new PointHitTestResult(_functionalGroupVisual, hitTestParameters.HitPoint);
-                }
-            }
+           
 
             return null;
         }
@@ -648,5 +649,7 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
+
+
     }
 }
