@@ -32,10 +32,9 @@ namespace Chem4Word.Model2
             }
             else
             {
-                var pt =new PeriodicTable();
-                if (pt.HasElement(desc))
+                if (Globals.PeriodicTable.HasElement(desc))
                 {
-                    element = (ElementBase)pt[desc];
+                    element = (ElementBase)Globals.PeriodicTable[desc];
                     return true;
                 }
             }

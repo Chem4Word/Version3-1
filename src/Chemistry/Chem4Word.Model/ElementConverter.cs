@@ -29,7 +29,6 @@ namespace Chem4Word.Model
         {
             try
             {
-                var pt = new PeriodicTable();
                 var s = value as string;
                 if (string.IsNullOrEmpty(s))
                 {
@@ -38,7 +37,7 @@ namespace Chem4Word.Model
                 }
                 else
                 {
-                    return pt.Elements[s];
+                    return Globals.PeriodicTable.Elements[s];
                 }
             }
             catch

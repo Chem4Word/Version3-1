@@ -65,8 +65,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private List<Rect> _boundingBoxesOfMoleculesWithAtLeastTwoChildren = new List<Rect>();
         private List<Point> _ringCentres = new List<Point>();
 
-        private PeriodicTable _pt = new PeriodicTable();
-
         public OoXmlRenderer(Model2.Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -279,7 +277,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 Debug.WriteLine($"{module} Starting Step 1");
                 //_telemetry.Write(module, "Verbose", $"Starting Step 1 for molecule {moleculeNo}");
 
-                ProcessAtoms(mol, pb, molNumber, _pt);
+                ProcessAtoms(mol, pb, molNumber);
 
                 Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
                 //_telemetry.Write(module, "Timing", $"Step 1 for molecule {moleculeNo} took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
@@ -701,9 +699,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return intersect;
         }
 
-        private void ProcessAtoms(Molecule mol, Progress pb, int moleculeNo, PeriodicTable pt)
+        private void ProcessAtoms(Molecule mol, Progress pb, int moleculeNo)
         {
-            AtomLabelPositioner ar = new AtomLabelPositioner(_atomLabelCharacters, _TtfCharacterSet, pt, _telemetry);
+            AtomLabelPositioner ar = new AtomLabelPositioner(_atomLabelCharacters, _TtfCharacterSet, _telemetry);
 
             // Create Characters
             if (mol.Atoms.Count > 1)

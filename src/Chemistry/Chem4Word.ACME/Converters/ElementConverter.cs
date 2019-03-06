@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Converters
 {
@@ -30,7 +31,6 @@ namespace Chem4Word.ACME.Converters
         {
             try
             {
-                var pt = new PeriodicTable();
                 var s = value as string;
                 if (string.IsNullOrEmpty(s))
                 {
@@ -39,7 +39,7 @@ namespace Chem4Word.ACME.Converters
                 }
                 else
                 {
-                    return pt.Elements[s];
+                    return Globals.PeriodicTable.Elements[s];
                 }
             }
             catch

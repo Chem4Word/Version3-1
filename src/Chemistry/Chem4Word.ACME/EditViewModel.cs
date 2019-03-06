@@ -330,8 +330,7 @@ namespace Chem4Word.ACME
             UnGroupCommand = new UnGroupCommand(this);
             SettingsCommand = new SettingsCommand(this);
 
-            PeriodicTable pt = new PeriodicTable();
-            _selectedElement = pt.C;
+            _selectedElement = Globals.PeriodicTable.C;
 
             _selectedBondOptionId = 1;
 

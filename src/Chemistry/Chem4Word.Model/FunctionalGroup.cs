@@ -32,10 +32,9 @@ namespace Chem4Word.Model
         {
             get
             {
-                var pt = new PeriodicTable();
-                if (pt.HasElement(Component))
+                if (Globals.PeriodicTable.HasElement(Component))
                 {
-                    return ((Element)pt[Component]).AtomicWeight * Count;
+                    return ((Element)Globals.PeriodicTable[Component]).AtomicWeight * Count;
                 }
                 else
                 {

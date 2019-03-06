@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -29,7 +30,6 @@ namespace Chem4Word.Model2
         {
             try
             {
-                var pt = new PeriodicTable();
                 var s = value as string;
                 if (string.IsNullOrEmpty(s))
                 {
@@ -38,7 +38,7 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    return pt.Elements[s];
+                    return Globals.PeriodicTable.Elements[s];
                 }
             }
             catch
