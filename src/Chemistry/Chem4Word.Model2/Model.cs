@@ -113,6 +113,27 @@ namespace Chem4Word.Model2
 
         #region Properties
 
+        public bool HasFunctionalGroups
+        {
+            get
+            {
+                bool result = false;
+
+                var allAtoms = GetAllAtoms();
+
+                foreach (var atom in allAtoms)
+                {
+                    if (atom.Element is FunctionalGroup)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+
+                return result;
+            }
+        }
+
         public bool HasNestedMolecules
         {
             get
@@ -131,6 +152,7 @@ namespace Chem4Word.Model2
                 return result;
             }
         }
+
         public int TotalAtomsCount
         {
             get
@@ -143,6 +165,45 @@ namespace Chem4Word.Model2
                 }
 
                 return count;
+            }
+        }
+
+        public int MinAtomicNumber
+        {
+            get
+            {
+                int min = Int32.MaxValue;
+
+                var allAtoms = GetAllAtoms();
+
+                foreach (var atom in allAtoms)
+                {
+                    if (atom.Element is Element e)
+                    {
+                        min = Math.Min(min, e.AtomicNumber);
+                    }
+                }
+
+                return min;
+            }
+        }
+        public int MaxAtomicNumber
+        {
+            get
+            {
+                int max = Int32.MinValue;
+
+                var allAtoms = GetAllAtoms();
+
+                foreach (var atom in allAtoms)
+                {
+                    if (atom.Element is Element e)
+                    {
+                        max = Math.Max(max, e.AtomicNumber);
+                    }
+                }
+
+                return max;
             }
         }
 
@@ -165,6 +226,7 @@ namespace Chem4Word.Model2
         {
             get
             {
+                double result = 0.0;
                 List<double> lengths = new List<double>();
 
                 foreach (var mol in Molecules.Values)
@@ -174,15 +236,17 @@ namespace Chem4Word.Model2
 
                 if (lengths.Any())
                 {
-                    return lengths.Average();
+                    result = lengths.Average();
                 }
-
-                if (ScaledForXaml)
+                else
                 {
-                    return XamlBondLength;
+                    if (ScaledForXaml)
+                    {
+                        result = XamlBondLength;
+                    }
                 }
 
-                return 0;
+                return result;
             }
         }
 

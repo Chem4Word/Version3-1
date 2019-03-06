@@ -34,17 +34,17 @@ namespace Chem4WordTests
         }
 
         [Theory]
-        [InlineData("R1", 0)]
-        [InlineData("Et", 29)]
-        [InlineData("CH2CH2OH", 45)]
-        [InlineData("TMS", 73)]
+        [InlineData("R1", 0.00)]
+        [InlineData("Et", 29.06)]
+        [InlineData("CH2CH2OH", 45.06)]
+        [InlineData("TMS", 73.19)]
         public void AtomicWeightIsCalculated(string shortcut, double expectedAtomicWeight)
         {
             var functionalGroup = Chem4Word.Model2.FunctionalGroups.ShortcutList[shortcut];
 
             var actualAtomicWeight = functionalGroup.AtomicWeight;
 
-            Assert.Equal(expectedAtomicWeight, actualAtomicWeight, 0);
+            Assert.Equal(expectedAtomicWeight, actualAtomicWeight, 2);
         }
 
         [Theory]

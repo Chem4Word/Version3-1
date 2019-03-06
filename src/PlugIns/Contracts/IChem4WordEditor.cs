@@ -12,5 +12,8 @@ namespace IChem4Word.Contracts
     public interface IChem4WordEditor : IChem4WordCommon
     {
         DialogResult Edit();
+
+        bool CanEditNestedMolecules { get; }
+        bool CanEditFunctionalGroups { get; }
     }
 }

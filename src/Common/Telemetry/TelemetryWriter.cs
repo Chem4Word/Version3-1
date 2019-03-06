@@ -7,9 +7,11 @@
 
 using IChem4Word.Contracts;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Chem4Word.Telemetry
 {
@@ -93,51 +95,65 @@ namespace Chem4Word.Telemetry
 
         private void WriteStartUpInfo()
         {
+            List<string> lines = new List<string>();
+
             // Log Add-In Version
-            WritePrivate("StartUp", "Information", _helper.AddInVersion);
+            WritePrivate("StartUp", "Information", _helper.AddInVersion); // ** Used by Andy's Knime protocol ?
 
             // Log Word
-            WritePrivate("StartUp", "Information", _helper.WordProduct);
+            WritePrivate("StartUp", "Information", _helper.WordProduct); // ** Used by Andy's Knime protocol
             WritePrivate("StartUp", "Information", Environment.GetCommandLineArgs()[0]);
 
             // Log System
-            WritePrivate("StartUp", "Information", _helper.SystemOs);
+            WritePrivate("StartUp", "Information", _helper.SystemOs); // ** Used by Andy's Knime protocol
             WritePrivate("StartUp", "Information", _helper.DotNetVersion);
             WritePrivate("StartUp", "Information", $"Browser Version: {_helper.BrowserVersion}");
 
             // Log IP Address
-            WritePrivate("StartUp", "Information", _helper.IpAddress);
+            WritePrivate("StartUp", "Information", _helper.IpAddress); // ** Used by Andy's Knime protocol
             WritePrivate("StartUp", "Information", _helper.IpObtainedFrom);
 
-            // Log UtcOffset
-            WritePrivate("StartUp", "Information", $"Server UTC DateTime is {_helper.ServerUtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
-            WritePrivate("StartUp", "Information", $"System UTC DateTime is {_helper.SystemUtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            // Log UtcOffsets
+            lines = new List<string>();
 
-            WritePrivate("StartUp", "Information", $"Server Header [Date] is {_helper.ServerDateHeader}");
-            WritePrivate("StartUp", "Information", $"Server UTC DateTime raw is {_helper.ServerUtcDateRaw}");
+            lines.Add($"Server UTC DateTime is {_helper.ServerUtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
+            lines.Add($"System UTC DateTime is { _helper.SystemUtcDateTime.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)}");
 
-            WritePrivate("StartUp", "Information", $"Calculated UTC Offset is {_helper.UtcOffset}");
+            lines.Add($"Server Header [Date] is {_helper.ServerDateHeader}");
+            lines.Add($"Server UTC DateTime raw is {_helper.ServerUtcDateRaw}");
+
+            lines.Add($"Calculated UTC Offset is {_helper.UtcOffset}");
             if (_helper.UtcOffset > 0)
             {
                 TimeSpan delta = TimeSpan.FromTicks(_helper.UtcOffset);
-                WritePrivate("StartUp", "Information", $"System UTC DateTime is {delta} ahead of Server time");
+                lines.Add($"System UTC DateTime is {delta} ahead of Server time");
             }
             if (_helper.UtcOffset < 0)
             {
                 TimeSpan delta = TimeSpan.FromTicks(0 - _helper.UtcOffset);
-                WritePrivate("StartUp", "Information", $"System UTC DateTime is {delta} behind Server time");
+                lines.Add($"System UTC DateTime is {delta} behind Server time");
             }
 
+            WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
+
             // Log Wmi Gathered Data
-            WritePrivate("StartUp", "Information", $"CPU: {_wmiHelper.CpuName}");
-            WritePrivate("StartUp", "Information", $"CPU Cores: {_wmiHelper.LogicalProcessors}");
-            WritePrivate("StartUp", "Information", $"CPU Speed: {_wmiHelper.CpuSpeed}");
-            WritePrivate("StartUp", "Information", $"Physical Memory: {_wmiHelper.PhysicalMemory}");
+            lines = new List<string>();
+
+            lines.Add($"CPU: {_wmiHelper.CpuName}");
+            lines.Add($"CPU Cores: {_wmiHelper.LogicalProcessors}");
+            lines.Add($"CPU Speed: {_wmiHelper.CpuSpeed}");
+            lines.Add($"Physical Memory: {_wmiHelper.PhysicalMemory}");
 
             // Log Screen Sizes
-            WritePrivate("StartUp", "Information", $"Screens: {_helper.Screens}");
+            lines.Add($"Screens: {_helper.Screens}");
+            WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
 
 #if DEBUG
+            lines = new List<string>();
+
+            lines.Add($"Debug - Environment.OSVersion: {Environment.OSVersion}");
+            lines.Add($"Debug - Environment.Version: {Environment.Version}");
+
             string userDomainName = Environment.UserDomainName;
             string userName = Environment.UserName;
             string machineName = Environment.MachineName;
@@ -154,15 +170,14 @@ namespace Chem4Word.Telemetry
                 userSummary = $@"Domain user {userDomainName}\{userName} on PC {machineName}";
             }
 
-            WritePrivate("StartUp", "Information", $"Debug - Environment.OSVersion: {Environment.OSVersion}");
-            WritePrivate("StartUp", "Information", $"Debug - Environment.Version: {Environment.Version}");
+            lines.Add($"Debug - {userSummary}");
 
-            WritePrivate("StartUp", "Information", $"Debug - {userSummary}");
+            lines.Add($"Debug - Environment.CommandLine: {Environment.CommandLine}");
+            lines.Add($"Debug - AddIn Location: {_helper.AddInLocation}");
+            lines.Add($"Debug - Environment.Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
+            lines.Add($"Debug - Environment.Is64BitProcess: {Environment.Is64BitProcess}");
 
-            WritePrivate("StartUp", "Information", $"Debug - Environment.CommandLine: {Environment.CommandLine}");
-            WritePrivate("StartUp", "Information", $"Debug - AddIn Location: {_helper.AddInLocation}");
-            WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitOperatingSystem: {Environment.Is64BitOperatingSystem}");
-            WritePrivate("StartUp", "Information", $"Debug - Environment.Is64BitProcess: {Environment.Is64BitProcess}");
+            WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
 
             WritePrivate("StartUp", "Information", _helper.GitStatus);
 #endif

@@ -49,8 +49,6 @@ namespace Chem4Word.ACME.Controls
 
         public Geometry GhostMolecule(Molecule adornedMolecule)
         {
-            CombinedGeometry cg = null;
-
             var atomList = new List<Atom>();
             List<Bond> bondList = new List<Bond>();
             adornedMolecule.BuildAtomList(atomList);

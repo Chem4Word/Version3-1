@@ -38,7 +38,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             Int64Value width = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Width);
             Int64Value height = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height);
-            if (alc.IsSubScript)
+            if (alc.IsSmaller)
             {
                 width = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Width);
                 height = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height);
@@ -50,7 +50,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             if (m_options.ShowCharacterBoundingBoxes)
             {
                 Rect boundingBox = new Rect(new Point(left, top), new Size(width, height));
-                DrawCharacterBox(wordprocessingGroup1, boundingBox, "00ff00", 10);
+                DrawCharacterBox(wordprocessingGroup1, boundingBox, "00ff00", 0.25);
             }
 
             Wps.WordprocessingShape wordprocessingShape10 = new Wps.WordprocessingShape();
@@ -90,7 +90,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     {
                         case TtfPoint.PointType.Start:
                             A.MoveTo moveTo1 = new A.MoveTo();
-                            if (alc.IsSubScript)
+                            if (alc.IsSmaller)
                             {
                                 A.Point point1 = new A.Point()
                                 {
@@ -115,7 +115,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                         case TtfPoint.PointType.Line:
                             A.LineTo lineTo1 = new A.LineTo();
-                            if (alc.IsSubScript)
+                            if (alc.IsSmaller)
                             {
                                 A.Point point2 = new A.Point()
                                 {
@@ -140,7 +140,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                         case TtfPoint.PointType.CurveOff:
                             A.QuadraticBezierCurveTo quadraticBezierCurveTo13 = new A.QuadraticBezierCurveTo();
-                            if (alc.IsSubScript)
+                            if (alc.IsSmaller)
                             {
                                 A.Point point3 = new A.Point()
                                 {
@@ -224,7 +224,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             wordprocessingGroup1.Append(wordprocessingShape10);
         }
 
-        private void DrawCharacterBox(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, int thick)
+        private void DrawCharacterBox(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, double points)
         {
             UInt32Value bondLineId = UInt32Value.FromUInt32((uint)m_ooxmlId++);
             string bondLineName = "box" + bondLineId;
@@ -296,7 +296,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            A.Outline outline1 = new A.Outline() { Width = thick, CapType = A.LineCapValues.Round };
+            Int32Value emus = (Int32Value)(points * 12700);
+            A.Outline outline1 = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();
 

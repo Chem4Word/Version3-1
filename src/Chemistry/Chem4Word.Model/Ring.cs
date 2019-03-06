@@ -149,7 +149,7 @@ namespace Chem4Word.Model
         public Molecule Parent { get; set; }
 
         private Point? _centroid;
-        private EdgeList edgeList;
+        //private EdgeList edgeList;
 
         internal void RingCentroidChanged()
         {
@@ -285,7 +285,9 @@ namespace Chem4Word.Model
                     foreach (Atom atom in e.NewItems)
                     {
                         if (!atom.Rings.Contains(this))
+                        {
                             atom.Rings.Add(this);
+                        }
                     }
                     break;
 
@@ -293,7 +295,9 @@ namespace Chem4Word.Model
                     foreach (Atom atom in e.NewItems)
                     {
                         if (atom.Rings.Contains(this))
+                        {
                             atom.Rings.Remove(this);
+                        }
                     }
                     break;
             }

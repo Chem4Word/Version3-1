@@ -29,6 +29,8 @@ namespace Chem4Word.Editor.SimpleWpfEditor
         public Point TopLeft { get; set; }
 
         public bool HasSettings => false;
+        public bool CanEditNestedMolecules => true;
+        public bool CanEditFunctionalGroups => true;
 
         public string Cml { get; set; }
 

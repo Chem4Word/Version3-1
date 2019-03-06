@@ -18,7 +18,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         public Point Position { get; set; }
         public TtfCharacter Character { get; set; }
         public String Colour { get; set; }
+        public bool IsSmaller { get; set; }
         public bool IsSubScript { get; set; }
+        public bool IsSuperScript { get; set; }
         public char Ascii { get; set; }
 
         public AtomLabelCharacter(Point position, TtfCharacter character, String colour, char ascii, string parentAtom, string parentMolecule)

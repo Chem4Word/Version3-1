@@ -210,7 +210,7 @@ namespace Chem4Word.ACME.Adorners
             }
         }
 
-        private bool IsWorking => Dragging | Resizing | Rotating;
+        private new bool IsWorking => Dragging | Resizing | Rotating;
 
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {

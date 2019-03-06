@@ -656,7 +656,24 @@ namespace Chem4Word.Model2.Converters.MDL
 
         private string FormatAtomSymbol(Atom atom)
         {
-            return $"{atom.Element.Symbol}   ".Substring(0, 3);
+            var elementType = "";
+            if (atom.Element is Element element)
+            {
+                elementType = element.Symbol;
+            }
+
+            // Bit of a bodge, but it ensures that it can be re-loaded without exploding
+            if (atom.Element is FunctionalGroup functionalGroup)
+            {
+                elementType = FunctionalGroups.GetKey(functionalGroup);
+                if (elementType.Length > 3)
+                {
+                    elementType = "*";
+                }
+            }
+
+            // Add three spaces the trim back to three characters
+            return $"{elementType}   ".Substring(0, 3);
         }
 
         private void WriteProperties(StreamWriter writer, List<Atom> atoms)

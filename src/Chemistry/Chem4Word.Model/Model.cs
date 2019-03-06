@@ -431,7 +431,7 @@ namespace Chem4Word.Model
 
         #region Interface implementations
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public new event PropertyChangedEventHandler PropertyChanged;
 
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

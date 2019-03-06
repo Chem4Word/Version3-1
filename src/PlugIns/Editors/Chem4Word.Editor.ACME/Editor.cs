@@ -25,9 +25,12 @@ namespace Chem4Word.Editor.ACME
 
         public string Name => "ACME Structure Editor";
 
-        public string Description => "This is the brand new editor";
+        public string Description => "This is the brand new editor. ACME stands for A Chemical Molecule Editor.";
 
         public bool HasSettings => false;
+
+        public bool CanEditNestedMolecules => true;
+        public bool CanEditFunctionalGroups => true;
 
         public Point TopLeft { get; set; }
 
@@ -88,5 +91,6 @@ namespace Chem4Word.Editor.ACME
 
             return result;
         }
+
     }
 }

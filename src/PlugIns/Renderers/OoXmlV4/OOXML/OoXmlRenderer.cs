@@ -209,6 +209,41 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 DrawBox(wordprocessingGroup1, _boundingBoxOfAllCharacters, "000000", .25);
             }
 
+            if (_options.ShowCharacterBoundingBoxes)
+            {
+                TtfCharacter hydrogenCharacter = _TtfCharacterSet['H'];
+                foreach (var atom in _chemistryModel.GetAllAtoms())
+                {
+                    List<AtomLabelCharacter> chars = _atomLabelCharacters.FindAll(a => a.ParentAtom.Equals(atom.Path));
+                    Rect atomCharsRect = Rect.Empty;
+                    foreach (var alc in chars)
+                    {
+                        Rect thisBoundingBox = thisBoundingBox = new Rect(alc.Position,
+                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width),
+                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height)));
+                        if (alc.IsSmaller)
+                        {
+                            thisBoundingBox = new Rect(alc.Position,
+                                new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                        }
+
+                        if (atomCharsRect.IsEmpty)
+                        {
+                            atomCharsRect = thisBoundingBox;
+                        }
+                        else
+                        {
+                            atomCharsRect.Union(thisBoundingBox);
+                        }
+                    }
+
+                    if (!atomCharsRect.IsEmpty)
+                    {
+                        DrawBox(wordprocessingGroup1, atomCharsRect, "FFA500", 0.5);
+                    }
+                }
+            }
             if (_options.ShowRingCentres)
             {
                 ShowRingCentres(wordprocessingGroup1);
@@ -327,7 +362,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void ShowAtomCentres(Wpg.WordprocessingGroup wordprocessingGroup1)
         {
-            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 5;
+            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 6;
 
             foreach (var molecule in _chemistryModel.Molecules.Values)
             {
@@ -436,10 +471,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
 
-            //Debug.WriteLine("Ring List :-");
             foreach (var point in _ringCentres)
             {
-                //Debug.WriteLine(" Centroid at " + c);
                 Rect bb = new Rect(new Point(point.X - xx, point.Y - xx), new Point(point.X + xx, point.Y + xx));
                 DrawShape(wordprocessingGroup1, bb, A.ShapeTypeValues.Ellipse, "0000ff");
             }
@@ -455,7 +488,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
             pb.Message = "Clipping Bond Lines";
             pb.Value = 0;
-            //pb.Maximum = (m_AtomLabelCharacters.Count * m_BondLines.Count);
             pb.Maximum = _atomLabelCharacters.Count;
 
             foreach (AtomLabelCharacter alc in _atomLabelCharacters)
@@ -465,7 +497,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 double width = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width);
                 double height = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height);
 
-                if (alc.IsSubScript)
+                if (alc.IsSmaller)
                 {
                     // Shrink bounding box
                     width = width * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR;

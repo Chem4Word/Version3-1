@@ -14,7 +14,6 @@
       </bondArray>
     </molecule>
     <molecule formalCharge='0' id='m2' spinMultiplicity='1'>
-      <name dictRef='pc:CID'>44134605</name>
       <atomArray>
         <atom id='a2' x2='167.446230082787' y2='86.5812530923711' elementType='O' />
         <atom id='a3' x2='84.5937110669634' y2='292.749872334426' elementType='N' />
@@ -133,12 +132,5 @@
         <bond id='a31_a55' order='S' atomRefs2='a31 a55' cyclic='Acyclic' p7='http://www.xml-cml.org/dictionary/cmlx/' />
       </bondArray>
     </molecule>
-    <name dictRef='pc:iupac'>4-[(4-aminophenyl)-(4-imino-3-methyl-cyclohexa-2,5-dien-1-ylidene)methyl]aniline;phenol;hydrochloride</name>
-    <name dictRef='pc:iupac'>4-[(4-aminophenyl)-(4-imino-3-methyl-1-cyclohexa-2,5-dienylidene)methyl]aniline;phenol;hydrochloride</name>
-    <name dictRef='pc:iupac'>4-[(4-aminophenyl)-(4-imino-3-methylcyclohexa-2,5-dien-1-ylidene)methyl]aniline;phenol;hydrochloride</name>
-    <name dictRef='pc:iupac'>4-[(4-aminophenyl)-(4-azanylidene-3-methyl-cyclohexa-2,5-dien-1-ylidene)methyl]aniline;phenol;hydrochloride</name>
-    <name dictRef='pc:iupac'>[4-[(4-aminophenyl)-(4-imino-3-methyl-cyclohexa-2,5-dien-1-ylidene)methyl]phenyl]amine;phenol;hydrochloride</name>
-    <cidCommand instruction='NormalizeOnImport' xmlns='http://www.xml-cml.org/dictionary/cmlx/' />
-    <formula concise='C 26 H 26 Cl 1 N 3 O 1' />
   </molecule>
 </cml>

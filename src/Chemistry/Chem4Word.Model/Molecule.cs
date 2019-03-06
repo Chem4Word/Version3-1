@@ -807,57 +807,6 @@ namespace Chem4Word.Model
                     }
                 }
                 sw2.Stop();
-                Debug.WriteLine("Distance Matrix");
-
-                // Local Function
-                void PrintDistanceMatrix(float[,] dm)
-                {
-                    Debug.WriteLine("---------------------------------------------------------");
-                    for (int i = 0; i <= dm.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j <= dm.GetUpperBound(1); j++)
-                        {
-                            Debug.Write($"({dm[i, j]})");
-                            Debug.Write("\t");
-                        }
-                        Debug.WriteLine("");
-                    }
-                    Debug.WriteLine("---------------------------------------------------------");
-                }
-
-                // Local Function
-                void PrintPIDMatrix(List<BitArray>[,] pm)
-                {
-                    Debug.WriteLine("---------------------------------------------------------");
-                    for (int i = 0; i <= pm.GetUpperBound(0); i++)
-                    {
-                        for (int j = 0; j <= pm.GetUpperBound(1); j++)
-                        {
-                            List<BitArray> elist = pm[i, j];
-                            EdgeList[] el = ToEdgeList(elist);
-                            Debug.Write("(");
-                            for (int k = 0; k < elist.Count; k++)
-                            {
-                                if (k != 0)
-                                {
-                                    Debug.Write(",");
-                                }
-                                Debug.Write(el[k].ToString());
-                            }
-                            Debug.Write(")");
-                            Debug.Write("\t");
-                        }
-                        Debug.WriteLine("");
-                    }
-                    Debug.WriteLine("---------------------------------------------------------");
-                }
-
-                //PrintDistanceMatrix(distances);
-
-                //Debug.WriteLine("PID matrix");
-                //PrintPIDMatrix(pidMatrix);
-                //Debug.WriteLine("PID+ matrix");
-                //PrintPIDMatrix(pidMatrixPlus);
 
                 //Phase 3
                 //construct the ring and find the SSSR

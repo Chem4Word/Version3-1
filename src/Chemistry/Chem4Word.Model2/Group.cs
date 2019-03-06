@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 
@@ -32,29 +33,66 @@ namespace Chem4Word.Model2
         }
 
         /// <summary>
-        /// Calculated combined AtomicWeight
+        /// Calculated AtomicWeight
         /// </summary>
         public double AtomicWeight
         {
             get
             {
-                var pt = new PeriodicTable();
-                if (pt.HasElement(Component))
+                double atomicWeight = 0;
+                ElementBase eb;
+                if (AtomHelpers.TryParse(Component, out eb))
                 {
-                    return ((Element)pt[Component]).AtomicWeight * Count;
-                }
-                else
-                {
-                    FunctionalGroup fg = Globals.FunctionalGroupsDictionary[Component];
-                    if (fg != null)
+                    if (eb is Element e)
                     {
-                        return Globals.FunctionalGroupsDictionary[Component].AtomicWeight * Count;
+                        atomicWeight = e.AtomicWeight;
                     }
-                    else
+
+                    if (eb is FunctionalGroup fg)
                     {
-                        return 0;
+                        atomicWeight = fg.AtomicWeight;
                     }
                 }
+
+                return atomicWeight;
+            }
+        }
+
+        public Dictionary<string, int> FormulaParts
+        {
+            get
+            {
+                Dictionary<string, int> parts = new Dictionary<string, int>();
+
+                ElementBase eb;
+                if (AtomHelpers.TryParse(Component, out eb))
+                {
+                    if (eb is Element e)
+                    {
+                        parts.Add(e.Symbol, 1);
+                    }
+
+                    if (eb is FunctionalGroup fg)
+                    {
+                        foreach (var component in fg.Components)
+                        {
+                            var pp = component.FormulaParts;
+                            foreach (var p in pp)
+                            {
+                                if (parts.ContainsKey(p.Key))
+                                {
+                                    parts[p.Key] += p.Value;
+                                }
+                                else
+                                {
+                                    parts.Add(p.Key, p.Value);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return parts;
             }
         }
     }

@@ -92,7 +92,15 @@ namespace Chem4Word.Model2.Converters.JSON
                 string elem = null;
                 if (a.Element.Symbol != "C")
                 {
-                    elem = a.Element.Symbol;
+                    if (a.Element is Element element)
+                    {
+                        elem = element.Symbol;
+                    }
+
+                    if (a.Element is FunctionalGroup functionalGroup)
+                    {
+                        elem = FunctionalGroups.GetKey(functionalGroup);
+                    }
                 }
                 mj.a[iAtom] = new AtomJSON()
                 {
@@ -171,14 +179,26 @@ namespace Chem4Word.Model2.Converters.JSON
         {
             Dictionary<int, string> atoms = new Dictionary<int, string>();
             var newMol = new Molecule();
-            Element ce;
+            ElementBase ce = Globals.PeriodicTable.C;
             int atomCount = 0;
             foreach (AtomJSON a in data.a)
             {
                 if (!string.IsNullOrEmpty(a.l))
                 {
-                    bool OK = Globals.PeriodicTable.HasElement(a.l);
-                    ce = Globals.PeriodicTable.Elements[a.l];
+                    ElementBase eb;
+                    var ok = AtomHelpers.TryParse(a.l, out eb);
+                    if (ok)
+                    {
+                        if (eb is Element element)
+                        {
+                            ce = element;
+                        }
+
+                        if (eb is FunctionalGroup functionalGroup)
+                        {
+                            ce = functionalGroup;
+                        }
+                    }
                 }
                 else
                 {

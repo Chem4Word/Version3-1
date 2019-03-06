@@ -278,55 +278,86 @@ namespace Chem4Word.Model2
         {
             string result = "";
 
-            Dictionary<string, int> f = new Dictionary<string, int>();
-            SortedDictionary<string, int> r = new SortedDictionary<string, int>();
+            Dictionary<string, int> chParts = new Dictionary<string, int>();
+            SortedDictionary<string, int> otherParts = new SortedDictionary<string, int>();
 
-            f.Add("C", 0);
-            f.Add("H", 0);
+            chParts.Add("C", 0);
+            chParts.Add("H", 0);
 
             foreach (Atom atom in Atoms.Values)
             {
-                // ToDo: Do we need to check if this is a functional group here?
                 if (atom.Element != null)
                 {
-                    switch (atom.Element.Symbol)
+                    if (atom.Element is Element e)
                     {
-                        case "C":
-                            f["C"]++;
-                            break;
+                        string symbol = e.Symbol;
 
-                        case "H":
-                            f["H"]++;
-                            break;
+                        switch (symbol)
+                        {
+                            case "C":
+                                chParts["C"]++;
+                                break;
 
-                        default:
-                            if (!r.ContainsKey(atom.SymbolText))
-                            {
-                                r.Add(atom.SymbolText, 1);
-                            }
-                            else
-                            {
-                                r[atom.SymbolText]++;
-                            }
-                            break;
+                            case "H":
+                                chParts["H"]++;
+                                break;
+
+                            default:
+                                if (!otherParts.ContainsKey(symbol))
+                                {
+                                    otherParts.Add(symbol, 1);
+                                }
+                                else
+                                {
+                                    otherParts[symbol]++;
+                                }
+                                break;
+                        }
+
+                        int hCount = atom.ImplicitHydrogenCount;
+                        if (hCount > 0)
+                        {
+                            chParts["H"] += hCount;
+                        }
                     }
-                }
 
-                int hCount = atom.ImplicitHydrogenCount;
-                if (hCount > 0)
-                {
-                    f["H"] += hCount;
+                    if (atom.Element is FunctionalGroup fg)
+                    {
+                        var pp = fg.FormulaParts;
+                        foreach (var p in pp)
+                        {
+                            switch (p.Key)
+                            {
+                                case "C":
+                                    chParts["C"] += p.Value;
+                                    break;
+                                case "H":
+                                    chParts["H"] += p.Value;
+                                    break;
+                                default:
+                                    if (otherParts.ContainsKey(p.Key))
+                                    {
+                                        otherParts[p.Key] += p.Value;
+                                    }
+                                    else
+                                    {
+                                        otherParts.Add(p.Key, p.Value);
+                                    }
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
 
-            foreach (KeyValuePair<string, int> kvp in f)
+            foreach (KeyValuePair<string, int> kvp in chParts)
             {
                 if (kvp.Value > 0)
                 {
                     result += $"{kvp.Key} {kvp.Value} ";
                 }
             }
-            foreach (KeyValuePair<string, int> kvp in r)
+            foreach (KeyValuePair<string, int> kvp in otherParts)
             {
                 result += $"{kvp.Key} {kvp.Value} ";
             }

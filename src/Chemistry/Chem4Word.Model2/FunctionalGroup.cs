@@ -79,7 +79,7 @@ namespace Chem4Word.Model2
                         //add up the atoms' atomic weights times their multiplicity
                         foreach (Group component in Components)
                         {
-                            atwt += component.AtomicWeight;
+                            atwt += component.AtomicWeight * component.Count;
                         }
                     }
                     return atwt;
@@ -90,6 +90,31 @@ namespace Chem4Word.Model2
             set { _atomicWeight = value; }
         }
 
+        public Dictionary<string, int> FormulaParts
+        {
+            get
+            {
+                Dictionary<string, int> parts = new Dictionary<string, int>();
+
+                foreach (var component in Components)
+                {
+                    var pp = component.FormulaParts;
+                    foreach (var p in pp)
+                    {
+                        if (parts.ContainsKey(p.Key))
+                        {
+                            parts[p.Key] += p.Value * component.Count;
+                        }
+                        else
+                        {
+                            parts.Add(p.Key, p.Value * component.Count);
+                        }
+                    }
+                }
+
+                return parts;
+            }
+        }
         /// <summary>
         /// Determines whether the functional group can be flipped about the pivot
         /// </summary>

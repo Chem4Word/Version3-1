@@ -29,6 +29,8 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
         public string Description => "The standard free editor using the ChemDoodle Web 7.0.2 (JavaScript) structure editor";
 
         public bool HasSettings => true;
+        public bool CanEditNestedMolecules => false;
+        public bool CanEditFunctionalGroups => false;
 
         public Point TopLeft { get; set; }
 

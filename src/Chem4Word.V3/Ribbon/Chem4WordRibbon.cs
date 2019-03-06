@@ -600,64 +600,71 @@ namespace Chem4Word
                     Globals.Chem4WordV3.LoadOptions();
                 }
 
-                Globals.Chem4WordV3.EvaluateChemistryAllowed();
-                if (Globals.Chem4WordV3.ChemistryAllowed)
+                IChem4WordEditor editor =
+                    Globals.Chem4WordV3.GetEditorPlugIn(Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn);
+
+                if (editor == null)
                 {
-                    CustomXMLPart customXmlPart = null;
-                    string beforeCml = Properties.Resources.EmptyStructure_cml;
-
-                    bool isNewDrawing = true;
-
-                    Word.Selection sel = app.Selection;
-
-                    if (sel.ContentControls.Count > 0)
+                    UserInteractions.WarnUser("Unable to find an Editor Plug-In");
+                }
+                else
+                {
+                    Globals.Chem4WordV3.EvaluateChemistryAllowed();
+                    if (Globals.Chem4WordV3.ChemistryAllowed)
                     {
-                        cc = sel.ContentControls[1];
-                        //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc?.Tag + " Title: " + cc.Title);
-                        if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
-                        {
-                            Word.Application app1 = Globals.Chem4WordV3.Application;
-                            customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
-                            if (customXmlPart != null)
-                            {
-                                beforeCml = customXmlPart.XML;
-                                CMLConverter cmlConverter = new CMLConverter();
-                                Model beforeModel = cmlConverter.Import(beforeCml);
-                                if (beforeModel.TotalAtomsCount
-                                    + beforeModel.TotalBondsCount == 0)
-                                {
-                                    UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
-                                    return;
-                                }
+                        CustomXMLPart customXmlPart = null;
+                        string beforeCml = Properties.Resources.EmptyStructure_cml;
 
-                                if (beforeModel.HasNestedMolecules)
+                        bool isNewDrawing = true;
+
+                        Word.Selection sel = app.Selection;
+
+                        if (sel.ContentControls.Count > 0)
+                        {
+                            cc = sel.ContentControls[1];
+                            //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc?.Tag + " Title: " + cc.Title);
+                            if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                            {
+                                Word.Application app1 = Globals.Chem4WordV3.Application;
+                                customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
+                                if (customXmlPart != null)
                                 {
-                                    if (Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn.Contains("ChemDoodle"))
+                                    beforeCml = customXmlPart.XML;
+                                    CMLConverter cmlConverter = new CMLConverter();
+                                    Model beforeModel = cmlConverter.Import(beforeCml);
+                                    if (beforeModel.TotalAtomsCount == 0)
                                     {
-                                        UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
+                                        UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
                                         return;
                                     }
-                                }
 
-                                isNewDrawing = false;
+                                    if (beforeModel.HasFunctionalGroups && !editor.CanEditFunctionalGroups)
+                                    {
+                                        if (Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn.Contains("ChemDoodle"))
+                                        {
+                                            UserInteractions.InformUser("This chemistry item has Functional Groups!\nPlease use ACME to edit this structure.");
+                                            return;
+                                        }
+                                    }
+                                    if (beforeModel.HasNestedMolecules && !editor.CanEditNestedMolecules)
+                                    {
+                                        if (Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn.Contains("ChemDoodle"))
+                                        {
+                                            UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
+                                            return;
+                                        }
+                                    }
+
+                                    isNewDrawing = false;
+                                }
+                            }
+                            else
+                            {
+                                // Get out of here
+                                return;
                             }
                         }
-                        else
-                        {
-                            // Get out of here
-                            return;
-                        }
-                    }
 
-                    IChem4WordEditor editor =
-                        Globals.Chem4WordV3.GetEditorPlugIn(Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn);
-
-                    if (editor == null)
-                    {
-                        UserInteractions.WarnUser("Unable to find an Editor Plug-In");
-                    }
-                    else
-                    {
                         editor.Cml = beforeCml;
                         DialogResult chemEditorResult = editor.Edit();
 
@@ -723,14 +730,14 @@ namespace Chem4Word
 
                             double averageBondLength = afterModel.MeanBondLength;
 
+                            int maxAtomicNumber = afterModel.MaxAtomicNumber;
+                            int minAtomicNumber = afterModel.MinAtomicNumber;
                             foreach (Molecule mol in afterModel.Molecules.Values)
                             {
                                 Dictionary<string, string> synonyms = new Dictionary<string, string>();
 
                                 // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 0 or > 4 or Elements < 1 or > 118
                                 List<Bond> invalidBonds = mol.Bonds.Where(b => b.OrderValue != null && (CtabProcessor.MdlBondType(b.Order) < 1 || CtabProcessor.MdlBondType(b.Order) > 4)).ToList();
-                                int maxAtomicNumber = mol.Atoms.Values.Max(x => ((Element)x.Element).AtomicNumber);
-                                int minAtomicNumber = mol.Atoms.Values.Min(x => ((Element)x.Element).AtomicNumber);
                                 if (invalidBonds.Any() || minAtomicNumber < 1 || maxAtomicNumber > 118)
                                 {
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
@@ -757,21 +764,24 @@ namespace Chem4Word
                                         if (csr?.Properties != null && csr.Properties.Any())
                                         {
                                             var first = csr.Properties[0];
-                                            if (!string.IsNullOrEmpty(first.InchiKey))
+                                            if (first != null)
                                             {
-                                                synonyms.Add(Constants.Chem4WordInchiKeyName, first.InchiKey);
-                                            }
-                                            if (!string.IsNullOrEmpty(first.Formula))
-                                            {
-                                                synonyms.Add(Constants.Chem4WordResolverFormulaName, first.Formula);
-                                            }
-                                            if (!string.IsNullOrEmpty(first.Name))
-                                            {
-                                                synonyms.Add(Constants.Chem4WordResolverIupacName, first.Name);
-                                            }
-                                            if (!string.IsNullOrEmpty(first.Smiles))
-                                            {
-                                                synonyms.Add(Constants.Chem4WordResolverSmilesName, first.Smiles);
+                                                if (!string.IsNullOrEmpty(first.InchiKey))
+                                                {
+                                                    synonyms.Add(Constants.Chem4WordInchiKeyName, first.InchiKey);
+                                                }
+                                                if (!string.IsNullOrEmpty(first.Formula))
+                                                {
+                                                    synonyms.Add(Constants.Chem4WordResolverFormulaName, first.Formula);
+                                                }
+                                                if (!string.IsNullOrEmpty(first.Name))
+                                                {
+                                                    synonyms.Add(Constants.Chem4WordResolverIupacName, first.Name);
+                                                }
+                                                if (!string.IsNullOrEmpty(first.Smiles))
+                                                {
+                                                    synonyms.Add(Constants.Chem4WordResolverSmilesName, first.Smiles);
+                                                }
                                             }
                                         }
                                     }
@@ -899,10 +909,6 @@ namespace Chem4Word
 
                             string afterCml = cmlConverter.Export(afterModel);
 
-                            if (Globals.Chem4WordV3.SystemOptions == null)
-                            {
-                                Globals.Chem4WordV3.LoadOptions();
-                            }
                             Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
                             IChem4WordRenderer renderer =
                                 Globals.Chem4WordV3.GetRendererPlugIn(
@@ -990,10 +996,10 @@ namespace Chem4Word
                             }
                         }
                     }
-                }
-                else
-                {
-                    UserInteractions.InformUser("Can't edit chemistry here because " + Globals.Chem4WordV3.ChemistryProhibitedReason);
+                    else
+                    {
+                        UserInteractions.InformUser("Can't edit chemistry here because " + Globals.Chem4WordV3.ChemistryProhibitedReason);
+                    }
                 }
             }
             catch (Exception ex)

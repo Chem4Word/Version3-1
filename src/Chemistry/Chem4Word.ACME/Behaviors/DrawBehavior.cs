@@ -27,7 +27,7 @@ namespace Chem4Word.ACME.Behaviors
         private AtomVisual _currentAtomVisual;
         private bool _flag;
         private SnapGeometry _angleSnapper;
-        private Window _parent;
+        //private Window _parent;
 
         private DrawBondAdorner _adorner;
         private Point _lastPos;
@@ -49,10 +49,10 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.MouseMove += AssociatedObject_MouseMove;
 
             AssociatedObject.IsHitTestVisible = true;
-            if (_parent != null)
-            {
-                _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
-            }
+            //if (_parent != null)
+            //{
+            //    _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            //}
         }
 
         private void AssociatedObject_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
@@ -333,10 +333,10 @@ namespace Chem4Word.ACME.Behaviors
             AssociatedObject.MouseLeftButtonUp -= AssociatedObject_MouseLeftButtonUp;
             AssociatedObject.MouseMove -= AssociatedObject_MouseMove;
             //AssociatedObject.IsHitTestVisible = false;
-            if (_parent != null)
-            {
-                _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
-            }
+            //if (_parent != null)
+            //{
+            //    _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
+            //}
         }
     }
 }
