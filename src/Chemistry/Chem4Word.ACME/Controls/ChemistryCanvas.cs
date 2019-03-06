@@ -70,6 +70,8 @@ namespace Chem4Word.ACME.Controls
         //properties
         private ViewModel _mychemistry;
 
+        public bool SuppressRedraw { get; set; }
+
         public ViewModel Chemistry
         {
             get { return _mychemistry; }
@@ -98,21 +100,24 @@ namespace Chem4Word.ACME.Controls
 
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            switch (sender)
+            if (!SuppressRedraw)
             {
-                case Atom a:
-                    RedrawAtom(a);
+                switch (sender)
+                {
+                    case Atom a:
+                        RedrawAtom(a);
 
-                    break;
+                        break;
 
-                case Bond b:
-                    RedrawBond(b);
-                    break;
-            }
+                    case Bond b:
+                        RedrawBond(b);
+                        break;
+                }
 
-            if (AutoResize)
-            {
-                InvalidateMeasure();
+                if (AutoResize)
+                {
+                    InvalidateMeasure();
+                }
             }
         }
 

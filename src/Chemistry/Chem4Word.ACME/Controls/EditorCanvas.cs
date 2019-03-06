@@ -36,6 +36,8 @@ namespace Chem4Word.ACME.Controls
 
         #endregion Constructors
 
+      
+
         #region Methods
 
         private ChemicalVisual GetTargetedVisual(Point p)

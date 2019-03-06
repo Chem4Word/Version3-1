@@ -250,16 +250,15 @@ namespace Chem4Word.ACME
         /// <param name="vm">EditViewModel for ACME</param>
         private void BindControls(EditViewModel vm)
         {
-            Binding atomBinding = new Binding("SelectedAtomOption");
-            atomBinding.Source = vm;
-            AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
+            //Binding atomBinding = new Binding("SelectedAtomOption");
+            //atomBinding.Source = vm;
+            //AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
 
-            Binding bondBinding = new Binding("SelectedBondOption");
-            bondBinding.Source = vm;
+            //Binding bondBinding = new Binding("SelectedBondOption");
+            //bondBinding.Source = vm;
+            //BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
 
-            BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
-
-            vm.DrawingSurface = ChemCanvas;
+            vm.Canvas = ChemCanvas;
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
