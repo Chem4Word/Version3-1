@@ -25,7 +25,7 @@ namespace Chem4Word.ACME.Drawing
         #region private fields
 
         private static double MaskOffsetWidth = 0;
-        private FunctionalGroupVisual _functionalGroupVisual;
+        
 
         public double BondThickness { get; set; }
 
@@ -185,9 +185,9 @@ namespace Chem4Word.ACME.Drawing
 
         #endregion Nested Classes
 
-        public AtomVisual(object atom) : this()
+        public AtomVisual(Atom atom) : this()
         {
-            ParentAtom = (Atom)atom;
+            ParentAtom = atom;
         }
 
         public AtomVisual()
@@ -196,7 +196,7 @@ namespace Chem4Word.ACME.Drawing
 
         #region Properties
 
-        public Atom ParentAtom { get; }
+        public virtual Atom ParentAtom { get; protected set; }
 
         #region Visual Properties
 
@@ -534,25 +534,10 @@ namespace Chem4Word.ACME.Drawing
                     }
                 }
             }
-            else if (ParentAtom.Element is FunctionalGroup fg)
-            {
-                using (DrawingContext dc = RenderOpen())
-                {
-                    AtomSymbol = fg.Symbol;
-                    RenderFunctionalGroup(dc, fg);
-                    //dc.Close();
-                }
-            }
+          
         }
 
-        private void RenderFunctionalGroup(DrawingContext dc, FunctionalGroup fg)
-        {
-            _functionalGroupVisual = new FunctionalGroupVisual(fg, this);
-            //_functionalGroupVisual.Flipped = ParentAtom.BalancingVector.X < 0;
-            _functionalGroupVisual.Render(dc);
-
-            AddVisualChild(_functionalGroupVisual);
-        }
+        
 
         #endregion Rendering
 
@@ -573,21 +558,15 @@ namespace Chem4Word.ACME.Drawing
             {
                 List<Point> hullList = null;
 
-                if (ParentAtom.Element is Element)
+                if (Hull == null || Hull.Count == 0)
                 {
-                    if (Hull == null || Hull.Count == 0)
-                    {
-                        hullList = null;
-                    }
-                    else
-                    {
-                        hullList = Hull;
-                    }
+                    hullList = null;
                 }
-                else if (ParentAtom.Element is FunctionalGroup)
+                else
                 {
-                    hullList = _functionalGroupVisual.Hull;
+                    hullList = Hull;
                 }
+              
 
                 //need to combine the actually filled atom area
                 //with a stroked outline of it, to give a sufficient margin
@@ -641,13 +620,7 @@ namespace Chem4Word.ACME.Drawing
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }
             }
-            else if (ParentAtom.Element is FunctionalGroup fg)
-            {
-                if (this._functionalGroupVisual.HullGeometry.FillContains(hitTestParameters.HitPoint))
-                {
-                    return new PointHitTestResult(_functionalGroupVisual, hitTestParameters.HitPoint);
-                }
-            }
+           
 
             return null;
         }

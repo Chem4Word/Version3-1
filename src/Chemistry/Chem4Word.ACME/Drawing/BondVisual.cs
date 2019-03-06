@@ -203,8 +203,13 @@ namespace Chem4Word.ACME.Drawing
                 // Hack: Abort if either ChemicalVisual is missing !
                 return;
             }
-            var startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
-            var endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
+            Geometry startAtomGeometry;
+            Geometry endAtomGeometry;
+
+
+            startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
+           
+            endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
 
             _bondGeometry = bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
 
