@@ -64,7 +64,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public override string Colour => "#909090";
+        public override string Colour => Globals.PeriodicTable.C.Colour;
 
         public override double AtomicWeight
         {
