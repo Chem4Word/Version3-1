@@ -139,7 +139,7 @@ namespace Chem4Word.ACME.Drawing
 
                     // Diag: Comment out to show hull and atom position
                     //dc.DrawGeometry(null, new Pen(Brushes.Red, thickness: 1), sg);
-                    dc.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
+                    //dc.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
                     dc.Close();
                 }
             };
