@@ -189,7 +189,7 @@ namespace Chem4Word.Model
             {
                 switch (Element)
                 {
-                    case Element e when (e ==Globals.PeriodicTable.C & IsotopeNumber != null | (FormalCharge ?? 0) != 0):
+                    case Element e when (e == Globals.PeriodicTable.C & IsotopeNumber != null | (FormalCharge ?? 0) != 0):
                         return true;
                     case Element e when (e == Globals.PeriodicTable.C):
                         return _explicitC;

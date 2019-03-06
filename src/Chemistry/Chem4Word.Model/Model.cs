@@ -440,8 +440,6 @@ namespace Chem4Word.Model
 
         #endregion Interface implementations
 
-        //public static PeriodicTable PeriodicTable = new PeriodicTable();
-
         #region Diagnostics
 
         public void DumpModel(string comment)

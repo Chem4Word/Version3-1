@@ -54,6 +54,7 @@
             this.ClientSize = new System.Drawing.Size(952, 536);
             this.Controls.Add(this.elementHost1);
             this.Name = "EditorHost";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ACME Editor Host";
             this.Load += new System.EventHandler(this.EditorHost_Load);
             this.ResumeLayout(false);

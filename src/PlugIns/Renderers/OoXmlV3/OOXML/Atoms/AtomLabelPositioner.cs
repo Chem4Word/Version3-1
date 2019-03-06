@@ -28,7 +28,7 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Atoms
         private List<AtomLabelCharacter> m_AtomLabelCharacters;
         private IChem4WordTelemetry _telemetry;
 
-        public AtomLabelPositioner(List<AtomLabelCharacter> atomLabelCharacters, Dictionary<char, TtfCharacter> characterset, PeriodicTable atomDefinitions, IChem4WordTelemetry telemetry)
+        public AtomLabelPositioner(List<AtomLabelCharacter> atomLabelCharacters, Dictionary<char, TtfCharacter> characterset, IChem4WordTelemetry telemetry)
         {
             m_AtomLabelCharacters = atomLabelCharacters;
             m_TtfCharacterSet = characterset;

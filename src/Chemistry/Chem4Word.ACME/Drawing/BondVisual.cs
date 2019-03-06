@@ -5,16 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-
-using System;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 
 //
-
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -35,6 +33,30 @@ namespace Chem4Word.ACME.Drawing
 
         #endregion Fields
 
+        private Geometry _hullGeometry;
+        private Geometry _bondGeometry;
+
+        public Geometry HullGeometry
+        {
+            get
+
+            {
+                if (_hullGeometry == null)
+                {
+                    if (_enclosingPoly != null && _enclosingPoly.Count > 0) //it's not a single-line bond
+                    {
+                        var result = BasicGeometry.BuildPolyPath(_enclosingPoly);
+
+                        _hullGeometry = new CombinedGeometry(result,
+                            result.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness)));
+                    }
+
+                }
+
+                return _hullGeometry;
+            }
+        }
+
         public BondVisual(Bond bond)
         {
             ParentBond = bond;
@@ -47,7 +69,11 @@ namespace Chem4Word.ACME.Drawing
             //Vector endOffset = new Vector();
             var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
 
-            if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength, out var singleBondGeometry, ParentBond, ref _enclosingPoly)) return singleBondGeometry;
+            if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength,
+                out var singleBondGeometry, ParentBond, ref _enclosingPoly))
+            {
+                return singleBondGeometry;
+            }
 
             return null;
         }
@@ -55,7 +81,7 @@ namespace Chem4Word.ACME.Drawing
         public static bool GetBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry, Geometry endAtomGeometry,
             double modelXamlBondLength, out Geometry singleBondGeometry, Bond parentBond, ref List<Point> enclosingPoly)
         {
-//check to see if it's a wedge or a hatch yet
+            //check to see if it's a wedge or a hatch yet
             if (parentBond.Stereo == Globals.BondStereo.Wedge | parentBond.Stereo == Globals.BondStereo.Hatch)
             {
                 {
@@ -181,10 +207,15 @@ namespace Chem4Word.ACME.Drawing
                 // Hack: Abort if either ChemicalVisual is missing !
                 return;
             }
-            var startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
-            var endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
+            Geometry startAtomGeometry;
+            Geometry endAtomGeometry;
 
-            bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
+
+            startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
+           
+            endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
+
+            _bondGeometry = bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
 
             _mainBondPen = new Pen(Brushes.Black, BondThickness);
             _mainBondPen.Thickness = BondThickness;
@@ -205,7 +236,6 @@ namespace Chem4Word.ACME.Drawing
             if (ParentBond.Stereo == Globals.BondStereo.Indeterminate && ParentBond.OrderValue == 1.0)
             {
                 //it's a wavy bond
-                
             }
 
             if (ParentBond.OrderValue != 1.5)
@@ -264,6 +294,26 @@ namespace Chem4Word.ACME.Drawing
                     dc.Close();
                 }
             }
+        }
+
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+        {
+            if(HullGeometry!=null) //not single bond
+            {
+                if (HullGeometry.FillContains(hitTestParameters.HitPoint))
+                {
+                    return new PointHitTestResult(this, hitTestParameters.HitPoint);
+                }
+            }
+            else
+            {
+                if (_bondGeometry.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness * 4.0))
+                    .FillContains(hitTestParameters.HitPoint))
+                {
+                    return new PointHitTestResult(this, hitTestParameters.HitPoint);
+                }
+            }
+            return null;
         }
     }
 }

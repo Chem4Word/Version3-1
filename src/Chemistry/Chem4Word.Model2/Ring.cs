@@ -154,8 +154,8 @@ namespace Chem4Word.Model2
         {
             get
             {
-                _centroid = Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
-                return _centroid;
+                return Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
+                
             }
         }
 

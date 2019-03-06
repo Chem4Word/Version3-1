@@ -712,6 +712,18 @@ namespace Chem4Word.Model2
             RebuildRings();
         }
 
+        public void ForceBondingUpdates()
+        {
+            foreach (var atom in Atoms.Values)
+            {
+                atom.SendDummyNotif();
+            }
+
+            foreach (Bond bond in Bonds)
+            {
+                bond.SendDummyNotif();
+            }
+        }
         public Molecule Copy()
         {
             Molecule copy = new Molecule();

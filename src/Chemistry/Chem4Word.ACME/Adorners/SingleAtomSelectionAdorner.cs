@@ -255,11 +255,14 @@ namespace Chem4Word.ACME.Adorners
 
             SetBoundingBox();
             InvalidateVisual();
-
+            _editorCanvas.SuppressRedraw = true;
             //move the molecule
             CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.Values.ToList());
+            
             RaiseDRCompleted(sender, e);
             Dragging = false;
+            _editorCanvas.SuppressRedraw = false;
+            AdornedMolecule.ForceBondingUpdates();
         }
 
         #endregion Dragging

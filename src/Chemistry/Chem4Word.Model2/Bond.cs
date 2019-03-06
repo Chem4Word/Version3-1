@@ -669,5 +669,15 @@ namespace Chem4Word.Model2
         }
 
         #endregion Overrides
+
+
+        /// <summary>
+        /// Forces a notification event to be sent up the tree
+        /// used to force a redraw
+        /// </summary>
+        public void SendDummyNotif()
+        {
+            OnPropertyChanged(nameof(Order));
+        }
     }
 }
