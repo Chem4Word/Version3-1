@@ -30,6 +30,7 @@ namespace Chem4Word.ACME.Drawing
 
         public void Render()
         {
+            SetTextParams();
             var parentAtomPosition = ParentAtom.Position;
 
             int textStorePosition = 0;

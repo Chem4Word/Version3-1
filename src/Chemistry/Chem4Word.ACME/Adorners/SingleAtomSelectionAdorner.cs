@@ -258,8 +258,10 @@ namespace Chem4Word.ACME.Adorners
 
             //move the molecule
             CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.Values.ToList());
+            
             RaiseDRCompleted(sender, e);
             Dragging = false;
+            AdornedMolecule.ForceBondingUpdates();
         }
 
         #endregion Dragging

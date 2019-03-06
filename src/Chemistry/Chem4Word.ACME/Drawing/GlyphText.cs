@@ -28,13 +28,7 @@ namespace Chem4Word.ACME.Drawing
 
         public double TypeSize { get; }
 
-        private static double? _symbolSize;
-
-        public static double SymbolSize
-        {
-            get => _symbolSize.Value;
-            set => _symbolSize = value;
-        }
+        public static double SymbolSize { get; set; }
 
         private static double? _scriptSize;
 

@@ -589,5 +589,10 @@ namespace Chem4Word.Model2
         #endregion INotifyPropertyChanged
 
         #endregion Events
+
+        public void SendDummyNotif()
+        {
+            OnPropertyChanged(nameof(SymbolText));
+        }
     }
 }
