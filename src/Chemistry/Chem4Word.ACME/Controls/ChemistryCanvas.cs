@@ -10,6 +10,7 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -27,7 +28,7 @@ namespace Chem4Word.ACME.Controls
         public ChemistryCanvas()
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
-            MouseMove += EditorCanvas_MouseMove;
+            MouseMove += Canvas_MouseMove;
         }
 
         /// <summary>
@@ -37,36 +38,35 @@ namespace Chem4Word.ACME.Controls
         /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
-            _size = GetBoundingBox();
+            var size = GetBoundingBox();
 
-            LeftPadding = 0d;
-            TopPadding = 0d;
-            if (_size.X < 0d)
+            if (_mychemistry != null && _mychemistry.Model != null)
             {
-                LeftPadding = -_size.X;
+                // Only need to do this on "small" structures
+                if (_mychemistry.Model.TotalAtomsCount < 100)
+                {
+                    var abb = _mychemistry.Model.OverallAtomBoundingBox;
+
+                    double leftPadding = 0;
+                    double topPadding = 0;
+
+                    if (size.Left < abb.Left)
+                    {
+                        leftPadding = abb.Left - size.Left;
+                    }
+
+                    if (size.Top < abb.Top)
+                    {
+                        topPadding = abb.Top - size.Top;
+                    }
+
+                    _mychemistry.Model.RepositionAll(-leftPadding, -topPadding);
+                    DrawChemistry(_mychemistry);
+                }
             }
 
-            if (_size.Y < 0d)
-            {
-                TopPadding = -_size.Y;
-            }
-            InteriorPadding = new Thickness(LeftPadding, TopPadding, 0, 0);
-            return _size.Size;
+            return size.Size;
         }
-
-        public Thickness InteriorPadding
-        {
-            get { return (Thickness)GetValue(InteriorPaddingProperty); }
-            set { SetValue(InteriorPaddingProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for InteriorPadding.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty InteriorPaddingProperty =
-            DependencyProperty.Register("InteriorPadding", typeof(Thickness), typeof(ChemistryCanvas), new PropertyMetadata(default(Thickness)));
-
-        public double TopPadding { get; set; }
-
-        public double LeftPadding { get; set; }
 
         #region Drawing
 
@@ -240,27 +240,13 @@ namespace Chem4Word.ACME.Controls
             DependencyProperty.Register("FitToContents", typeof(bool), typeof(ChemistryCanvas),
                 new PropertyMetadata(default(bool)));
 
-        public Thickness Overhang
-        {
-            get { return (Thickness)GetValue(OverhangProperty); }
-            set { SetValue(OverhangProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Overhang.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty OverhangProperty =
-            DependencyProperty.Register("Overhang", typeof(Thickness), typeof(Display),
-                new PropertyMetadata(default(Thickness)));
-
-        private Rect _size;
-        //private Thickness _interiorPadding;
-
         #endregion DPs
 
         #region Methods
 
         private Rect GetBoundingBox()
         {
-            Rect currentbounds = new Rect(new Size(0, 0));
+            Rect currentbounds = Rect.Empty;
 
             try
             {
@@ -270,6 +256,7 @@ namespace Chem4Word.ACME.Controls
                     currentbounds.Union(bounds);
                     var descBounds = element.DescendantBounds;
                     currentbounds.Union(descBounds);
+                    //Debug.WriteLine($"CB: {currentbounds}, B:{bounds}, D:{descBounds}");
                 }
             }
             catch (Exception e)
@@ -306,11 +293,6 @@ namespace Chem4Word.ACME.Controls
                 MoleculeAdded(molecule);
             }
 
-            var bb = GetBoundingBox();
-            var leftOverhang = -Math.Min(0d, bb.Left);
-            var topOverhang = Math.Min(0d, bb.Top);
-
-            Overhang = new Thickness(leftOverhang, topOverhang, leftOverhang, topOverhang);
             InvalidateMeasure();
         }
 
@@ -474,8 +456,17 @@ namespace Chem4Word.ACME.Controls
         #region Event handlers
         
 
-        private void EditorCanvas_MouseMove(object sender, MouseEventArgs e)
+        private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
+            if (this is EditorCanvas ec)
+            {
+                Debug.WriteLine($"EC: @ {e.GetPosition(this)}");
+            }
+            else
+            {
+                Debug.WriteLine($"CC: @ {e.GetPosition(this)}");
+            }
+
             ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
 
             if (_highlightAdorner != null)

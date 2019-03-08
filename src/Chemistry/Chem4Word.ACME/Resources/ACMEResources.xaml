@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
-    xmlns:acme ="clr-namespace:Chem4Word.ACME">
+    xmlns:acme="clr-namespace:Chem4Word.ACME"
+    xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics">
 
     <!--  Simple shapes for use in menus, buttons etc  -->
     <ResourceDictionary.MergedDictionaries>
@@ -11,7 +11,7 @@
 
     <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
 
-   <!-- <model:ElementConverter x:Key="ElementConverter" /> -->
+    <!-- <model:ElementConverter x:Key="ElementConverter" /> -->
 
     <Style x:Key="TripleBondStyle" TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />

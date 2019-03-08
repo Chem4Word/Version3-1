@@ -447,14 +447,16 @@ namespace Chem4Word.ACME.Drawing
                 Hull = Geometry<Point>.GetHull(sortedHull, p => p);
 
                 // Diag: Show Hull
-                //ShowHull(_shapeHull, drawingContext);
+                //ShowHull(Hull, drawingContext);
             }
+            // Diag: Show Atom Point
+            //drawingContext.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
         }
 
         private void ShowHull(List<Point> points, DrawingContext drawingContext)
         {
             var path = BasicGeometry.BuildPath(points);
-            drawingContext.DrawGeometry(BackgroundColor, new Pen(new SolidColorBrush(Colors.GreenYellow), MaskOffsetWidth / 2), path.Data);
+            //drawingContext.DrawGeometry(BackgroundColor, new Pen(new SolidColorBrush(Colors.GreenYellow), 0.01), path.Data);
             ShowPoints(Hull, drawingContext);
         }
 
@@ -470,15 +472,15 @@ namespace Chem4Word.ACME.Drawing
             {
                 if (i > 0 && i < max)
                 {
-                    drawingContext.DrawEllipse(otherPoints, null, point, 20, 20);
+                    drawingContext.DrawEllipse(otherPoints, null, point, 1, 1);
                 }
                 if (i == 0)
                 {
-                    drawingContext.DrawEllipse(firstPoint, null, point, 20, 20);
+                    drawingContext.DrawEllipse(firstPoint, null, point, 1, 1);
                 }
                 if (i == max)
                 {
-                    drawingContext.DrawEllipse(lastPoint, null, point, 20, 20);
+                    drawingContext.DrawEllipse(lastPoint, null, point, 1, 1);
                 }
                 i++;
             }

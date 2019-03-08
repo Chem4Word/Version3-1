@@ -79,7 +79,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             _chemistryModel = model;
 
-            _boundingBoxOfAllAtoms = model.OverallBoundingBox;
+            _boundingBoxOfAllAtoms = model.OverallAtomBoundingBox;
         }
 
         private Rect CharacterExtents(Molecule mol)

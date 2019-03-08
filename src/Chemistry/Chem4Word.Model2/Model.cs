@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
@@ -252,24 +253,15 @@ namespace Chem4Word.Model2
 
         public double XamlBondLength { get; set; }
 
-        public Rect OverallBoundingBox
+        public Rect OverallAtomBoundingBox
         {
             get
             {
-                bool isNew = true;
-                Rect boundingBox = new Rect();
+                Rect boundingBox = Rect.Empty;
 
                 foreach (var mol in Molecules.Values)
                 {
-                    if (isNew)
-                    {
-                        boundingBox = mol.BoundingBox;
-                        isNew = false;
-                    }
-                    else
-                    {
-                        boundingBox.Union(mol.BoundingBox);
-                    }
+                    boundingBox.Union(mol.BoundingBox);
                 }
 
                 return boundingBox;
@@ -292,21 +284,16 @@ namespace Chem4Word.Model2
         {
             get
             {
-                var allAtoms = GetAllAtoms();
                 if (_boundingBox == Rect.Empty)
                 {
+                    var allAtoms = GetAllAtoms();
+
                     var modelRect = allAtoms[0].BoundingBox(FontSize);
                     for (int i = 1; i < allAtoms.Count; i++)
                     {
                         var atom = allAtoms[i];
                         modelRect.Union(atom.BoundingBox(FontSize));
                     }
-
-                    Point topleft =
-                        new Point(modelRect.TopLeft.X - FontSize, modelRect.TopLeft.Y - FontSize); // modelRect.TopLeft;
-                    Point bottomRight = new Point(modelRect.BottomRight.X + FontSize,
-                        modelRect.BottomRight.Y + FontSize); //modelRect.BottomRight;
-                    var bb = new Rect(topleft, bottomRight);
 
                     _boundingBox = modelRect;
                 }
@@ -332,11 +319,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        /// <summary>
-        /// Drags all Atoms back to the origin by the specified offset
-        /// </summary>
-        /// <param name="x">X offset</param>
-        /// <param name="y">Y offset</param>
+
 
         private Dictionary<string, Molecule> _molecules { get; }
 
@@ -434,12 +417,18 @@ namespace Chem4Word.Model2
 
         #region Methods
 
+        /// <summary>
+        /// Drags all Atoms back to the origin by the specified offset
+        /// </summary>
+        /// <param name="x">X offset</param>
+        /// <param name="y">Y offset</param>
         public void RepositionAll(double x, double y)
         {
             foreach (Molecule molecule in Molecules.Values)
             {
                 molecule.RepositionAll(x, y);
             }
+            _boundingBox = Rect.Empty;
         }
 
         public ChemistryBase GetFromPath(string path)
@@ -551,6 +540,7 @@ namespace Chem4Word.Model2
                 {
                     atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
                 }
+                _boundingBox = Rect.Empty;
             }
         }
 
@@ -615,18 +605,26 @@ namespace Chem4Word.Model2
                     newLength = MeanBondLength * Globals.ScaleFactorForXaml;
                 }
 
-                ScaleToAverageBondLength(newLength);
+                //var before = OverallAtomBoundingBox;
+                //Debug.WriteLine($"ABB1 = {before}");
 
+                ScaleToAverageBondLength(newLength);
+                XamlBondLength = newLength;
                 ScaledForXaml = true;
 
-                XamlBondLength = newLength;
-                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
-                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));
-
+                var middle = OverallAtomBoundingBox;
+                //Debug.WriteLine($"ABB2 = {middle}");
                 if (forDisplay)
                 {
-                    RepositionAll(MinX, MinY);
+                    // Move to (0,0)
+                    RepositionAll(middle.Left, middle.Top);
                 }
+
+                //var after = OverallAtomBoundingBox;
+                //Debug.WriteLine($"ABB3 = {after}");
+
+                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
+                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));
             }
         }
 

@@ -123,14 +123,7 @@ namespace Chem4Word.Model2
 
                 foreach (var mol in Molecules.Values)
                 {
-                    if (boundingBox.IsEmpty)
-                    {
-                        boundingBox = mol.BoundingBox;
-                    }
-                    else
-                    {
-                        boundingBox.Union(mol.BoundingBox);
-                    }
+                    boundingBox.Union(mol.BoundingBox);
                 }
 
                 return boundingBox;
