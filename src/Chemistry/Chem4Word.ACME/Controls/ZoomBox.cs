@@ -17,10 +17,10 @@ namespace Chem4Word.ACME.Controls
 {
     public class ZoomBox : Control
     {
-        private Thumb zoomThumb;
-        private Canvas zoomCanvas;
-        private Slider zoomSlider;
-        private ScaleTransform scaleTransform;
+        private Thumb _zoomThumb;
+        private Canvas _zoomCanvas;
+        private Slider _zoomSlider;
+        private ScaleTransform _scaleTransform;
 
         #region DPs
 
@@ -28,8 +28,8 @@ namespace Chem4Word.ACME.Controls
 
         public ScrollViewer ScrollViewer
         {
-            get { return (ScrollViewer)GetValue(ScrollViewerProperty); }
-            set { SetValue(ScrollViewerProperty, value); }
+            get => (ScrollViewer)GetValue(ScrollViewerProperty);
+            set => SetValue(ScrollViewerProperty, value);
         }
 
         public static readonly DependencyProperty ScrollViewerProperty =
@@ -46,8 +46,8 @@ namespace Chem4Word.ACME.Controls
 
         public ChemistryCanvas ChemistryCanvas
         {
-            get { return (ChemistryCanvas)GetValue(ChemistryCanvasProperty); }
-            set { SetValue(ChemistryCanvasProperty, value); }
+            get => (ChemistryCanvas)GetValue(ChemistryCanvasProperty);
+            set => SetValue(ChemistryCanvasProperty, value);
         }
 
         private static void OnChemistryCanvasChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -70,7 +70,7 @@ namespace Chem4Word.ACME.Controls
             {
                 newDesignerCanvas.LayoutUpdated += DesignerCanvas_LayoutUpdated;
                 newDesignerCanvas.MouseWheel += DesignerCanvas_MouseWheel;
-                newDesignerCanvas.LayoutTransform = scaleTransform;
+                newDesignerCanvas.LayoutTransform = _scaleTransform;
             }
         }
 
@@ -87,30 +87,30 @@ namespace Chem4Word.ACME.Controls
                 return;
             }
 
-            zoomThumb = Template.FindName("PART_ZoomThumb", this) as Thumb;
-            if (zoomThumb == null)
+            _zoomThumb = Template.FindName("PART_ZoomThumb", this) as Thumb;
+            if (_zoomThumb == null)
             {
                 Debugger.Break();
                 throw new Exception("PART_ZoomThumb template is missing!");
             }
 
-            zoomCanvas = Template.FindName("PART_ZoomCanvas", this) as Canvas;
-            if (zoomCanvas == null)
+            _zoomCanvas = Template.FindName("PART_ZoomCanvas", this) as Canvas;
+            if (_zoomCanvas == null)
             {
                 Debugger.Break();
                 throw new Exception("PART_ZoomCanvas template is missing!");
             }
 
-            zoomSlider = Template.FindName("PART_ZoomSlider", this) as Slider;
-            if (zoomSlider == null)
+            _zoomSlider = Template.FindName("PART_ZoomSlider", this) as Slider;
+            if (_zoomSlider == null)
             {
                 Debugger.Break();
                 throw new Exception("PART_ZoomSlider template is missing!");
             }
 
-            zoomThumb.DragDelta += Thumb_DragDelta;
-            zoomSlider.ValueChanged += ZoomSlider_ValueChanged;
-            scaleTransform = new ScaleTransform();
+            _zoomThumb.DragDelta += Thumb_DragDelta;
+            _zoomSlider.ValueChanged += ZoomSlider_ValueChanged;
+            _scaleTransform = new ScaleTransform();
         }
 
         private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -120,28 +120,26 @@ namespace Chem4Word.ACME.Controls
             double newVerticalOffset = ((ScrollViewer.VerticalOffset + halfViewportHeight) * scale - halfViewportHeight);
             double halfViewportWidth = ScrollViewer.ViewportWidth / 2;
             double newHorizontalOffset = ((ScrollViewer.HorizontalOffset + halfViewportWidth) * scale - halfViewportWidth);
-            scaleTransform.ScaleX *= scale;
-            scaleTransform.ScaleY *= scale;
+            _scaleTransform.ScaleX *= scale;
+            _scaleTransform.ScaleY *= scale;
             ScrollViewer.ScrollToHorizontalOffset(newHorizontalOffset);
             ScrollViewer.ScrollToVerticalOffset(newVerticalOffset);
         }
 
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            double scale, xOffset, yOffset;
-            InvalidateScale(out scale, out xOffset, out yOffset);
+            InvalidateScale(out var scale, out _, out _);
             ScrollViewer.ScrollToHorizontalOffset(ScrollViewer.HorizontalOffset + e.HorizontalChange / scale);
             ScrollViewer.ScrollToVerticalOffset(ScrollViewer.VerticalOffset + e.VerticalChange / scale);
         }
 
         private void DesignerCanvas_LayoutUpdated(object sender, EventArgs e)
         {
-            double scale, xOffset, yOffset;
-            InvalidateScale(out scale, out xOffset, out yOffset);
-            zoomThumb.Width = ScrollViewer.ViewportWidth * scale;
-            zoomThumb.Height = ScrollViewer.ViewportHeight * scale;
-            Canvas.SetLeft(zoomThumb, xOffset + ScrollViewer.HorizontalOffset * scale);
-            Canvas.SetTop(zoomThumb, yOffset + ScrollViewer.VerticalOffset * scale);
+            InvalidateScale(out var scale, out var xOffset, out var yOffset);
+            _zoomThumb.Width = ScrollViewer.ViewportWidth * scale;
+            _zoomThumb.Height = ScrollViewer.ViewportHeight * scale;
+            Canvas.SetLeft(_zoomThumb, xOffset + ScrollViewer.HorizontalOffset * scale);
+            Canvas.SetTop(_zoomThumb, yOffset + ScrollViewer.VerticalOffset * scale);
         }
 
         private void DesignerCanvas_MouseWheel(object sender, EventArgs e)
@@ -149,19 +147,18 @@ namespace Chem4Word.ACME.Controls
             MouseWheelEventArgs wheel = (MouseWheelEventArgs)e;
 
             //divide the value by 10 so that it is more smooth
-            double value = Math.Max(0, wheel.Delta / 10);
-            value = Math.Min(wheel.Delta, 10);
-            zoomSlider.Value += value;
+            double value = Math.Min(wheel.Delta, 10);
+            _zoomSlider.Value += value;
         }
 
         private void InvalidateScale(out double scale, out double xOffset, out double yOffset)
         {
-            double w = ChemistryCanvas.ActualWidth * scaleTransform.ScaleX;
-            double h = ChemistryCanvas.ActualHeight * scaleTransform.ScaleY;
+            double w = ChemistryCanvas.ActualWidth * _scaleTransform.ScaleX;
+            double h = ChemistryCanvas.ActualHeight * _scaleTransform.ScaleY;
 
             // zoom canvas size
-            double x = zoomCanvas.ActualWidth;
-            double y = zoomCanvas.ActualHeight;
+            double x = _zoomCanvas.ActualWidth;
+            double y = _zoomCanvas.ActualHeight;
             double scaleX = x / w;
             double scaleY = y / h;
             scale = (scaleX < scaleY) ? scaleX : scaleY;
