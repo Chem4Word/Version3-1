@@ -104,6 +104,7 @@ namespace Chem4Word.Renderer.OoXmlV3.OOXML.Bonds
                     m_BondLines.Add(a1);
                     break;
 
+                case "2":
                 case Bond.OrderDouble:
                     if (bond.Stereo == BondStereo.Indeterminate) //crossing bonds
                     {

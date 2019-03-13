@@ -226,14 +226,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
                         }
 
-                        if (atomCharsRect.IsEmpty)
-                        {
-                            atomCharsRect = thisBoundingBox;
-                        }
-                        else
-                        {
-                            atomCharsRect.Union(thisBoundingBox);
-                        }
+                        atomCharsRect.Union(thisBoundingBox);
                     }
 
                     if (!atomCharsRect.IsEmpty)

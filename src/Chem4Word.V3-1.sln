@@ -73,14 +73,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4WordUpdater", "Install
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiX.CustomAction", "Installer\WiX.CustomAction\WiX.CustomAction.csproj", "{D8A20813-2BAC-4094-9586-927121C10D06}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3699F2D4-9F6F-4983-8006-33687EC7E2DB}"
-	ProjectSection(SolutionItems) = preProject
-		DeepClean.ps1 = DeepClean.ps1
-		Tools\Install-Dev-Certificate.ps1 = Tools\Install-Dev-Certificate.ps1
-		SetAssemblyVersion.ps1 = SetAssemblyVersion.ps1
-		SignFiles.cmd = SignFiles.cmd
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{1B81DF60-6A34-4B5B-86F3-24ED42587450}"
 	ProjectSection(SolutionItems) = preProject
 		Notes\Build Event Macro Locations.xlsx = Notes\Build Event Macro Locations.xlsx
@@ -117,6 +109,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf.TestHarness.Model2", "TestHarness\Wpf.TestHarness.Model2\Wpf.TestHarness.Model2.csproj", "{70ACE106-9763-4055-A051-3CE6FBFB9437}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Renderer.OoXmlV4", "PlugIns\Renderers\OoXmlV4\Chem4Word.Renderer.OoXmlV4.csproj", "{A73732B0-FF0A-488E-B353-C238A9085C63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0DDBF19B-5D71-4593-A839-D0CF35C6BF3F}"
+	ProjectSection(SolutionItems) = preProject
+		Snippets\You may need these files.txt = Snippets\You may need these files.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -642,7 +639,6 @@ Global
 		{C69BAB8F-4881-4D5F-9929-FC8470DF1E48}.Vso-Ci|x86.ActiveCfg = Release|Any CPU
 		{C69BAB8F-4881-4D5F-9929-FC8470DF1E48}.Vso-Ci|x86.Build.0 = Release|Any CPU
 		{09953DCD-9ECC-454F-9516-A6F737DF3FE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09953DCD-9ECC-454F-9516-A6F737DF3FE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09953DCD-9ECC-454F-9516-A6F737DF3FE1}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{09953DCD-9ECC-454F-9516-A6F737DF3FE1}.Debug|x64.Build.0 = Debug|Any CPU
 		{09953DCD-9ECC-454F-9516-A6F737DF3FE1}.Debug|x86.ActiveCfg = Debug|Any CPU

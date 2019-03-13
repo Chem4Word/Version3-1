@@ -151,9 +151,7 @@ namespace Chem4Word.Telemetry
 #if DEBUG
             lines = new List<string>();
 
-            lines.Add($"Debug - Environment.OSVersion: {Environment.OSVersion}");
-            lines.Add($"Debug - Environment.Version: {Environment.Version}");
-
+            string clientName = Environment.GetEnvironmentVariable("CLIENTNAME");
             string userDomainName = Environment.UserDomainName;
             string userName = Environment.UserName;
             string machineName = Environment.MachineName;
@@ -162,15 +160,24 @@ namespace Chem4Word.Telemetry
             if (userDomainName.Equals(machineName))
             {
                 // Local account
-                userSummary = $"Local user {userName} on PC {machineName}";
+                userSummary = $"Local user {userName} on {machineName}";
             }
             else
             {
                 // Domain account
-                userSummary = $@"Domain user {userDomainName}\{userName} on PC {machineName}";
+                userSummary = $@"Domain user {userDomainName}\{userName} on {machineName}";
+            }
+
+            // Include RDP Info if available
+            if (!string.IsNullOrEmpty(clientName))
+            {
+                userSummary += $" via RDP from {clientName}";
             }
 
             lines.Add($"Debug - {userSummary}");
+
+            lines.Add($"Debug - Environment.OSVersion: {Environment.OSVersion}");
+            lines.Add($"Debug - Environment.Version: {Environment.Version}");
 
             lines.Add($"Debug - Environment.CommandLine: {Environment.CommandLine}");
             lines.Add($"Debug - AddIn Location: {_helper.AddInLocation}");
