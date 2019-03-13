@@ -5,12 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -18,13 +18,13 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Adorners;
 
 namespace Chem4Word.ACME.Controls
 {
     public class ChemistryCanvas : Canvas
     {
         private Adorner _highlightAdorner;
+
         public ChemistryCanvas()
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
@@ -224,6 +224,9 @@ namespace Chem4Word.ACME.Controls
         #region Fields
 
         //private Rect _boundingBox = default(Rect);
+        private ChemicalVisual _visualHit;
+
+        private List<ChemicalVisual> _visuals = new List<ChemicalVisual>();
 
         #endregion Fields
 
@@ -454,7 +457,6 @@ namespace Chem4Word.ACME.Controls
         #endregion Drawing
 
         #region Event handlers
-        
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
@@ -480,30 +482,49 @@ namespace Chem4Word.ACME.Controls
                 case FunctionalGroupVisual fv:
                     _highlightAdorner = new AtomHoverAdorner(this, fv);
                     break;
+
                 case AtomVisual av:
                     _highlightAdorner = new AtomHoverAdorner(this, av);
                     break;
+
                 case BondVisual bv:
                     _highlightAdorner = new BondHoverAdorner(this, bv);
                     break;
+
                 default:
                     _highlightAdorner = null;
                     break;
             }
         }
 
-
-        #endregion Event Handlers
+        #endregion Event handlers
 
         #region Methods
 
         private ChemicalVisual GetTargetedVisual(Point p)
         {
-            return (VisualTreeHelper.HitTest(this, p).VisualHit as ChemicalVisual);
+            _visuals.Clear();
+            VisualTreeHelper.HitTest(this, null, ResultCallback, new PointHitTestParameters(p));
+            var selAtomVisual = _visuals.FirstOrDefault(v => v is AtomVisual);
+            if(selAtomVisual!=null)
+            {
+                return selAtomVisual;
+            }
+            else
+            {
+                return _visuals.FirstOrDefault();
+            }
+
         }
 
-        #endregion
+        private HitTestResultBehavior ResultCallback(HitTestResult result)
+        {
+            _visualHit = result.VisualHit as ChemicalVisual;
+          _visuals.Add(_visualHit);
 
+            return HitTestResultBehavior.Continue;
+        }
 
+        #endregion Methods
     }
 }

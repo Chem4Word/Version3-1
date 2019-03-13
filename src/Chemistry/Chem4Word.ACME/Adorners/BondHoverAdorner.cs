@@ -29,6 +29,8 @@ namespace Chem4Word.ACME.Adorners
 
             
             _bracketPen = new Pen(_solidColorBrush, Globals.HoverAdornerThickness);
+            _bracketPen.StartLineCap = PenLineCap.Round;
+            _bracketPen.EndLineCap = PenLineCap.Round;
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);

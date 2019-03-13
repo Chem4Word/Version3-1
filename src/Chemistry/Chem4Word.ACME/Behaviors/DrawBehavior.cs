@@ -5,19 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Linq;
+using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Utils;
-
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
+using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
-using DrawBondAdorner = Chem4Word.ACME.Adorners.DrawBondAdorner;
 using static Chem4Word.Model2.Helpers.Globals;
+using DrawBondAdorner = Chem4Word.ACME.Adorners.DrawBondAdorner;
 
 namespace Chem4Word.ACME.Behaviors
 {
