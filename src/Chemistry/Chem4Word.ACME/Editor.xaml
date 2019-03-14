@@ -1,19 +1,20 @@
 ﻿<UserControl x:Name="AcmeControl"
-    x:Class="Chem4Word.ACME.Editor"
+             x:Class="Chem4Word.ACME.Editor"
 
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:behaviors="clr-namespace:Chem4Word.ACME.Behaviors"
-    xmlns:converters="clr-namespace:Chem4Word.ACME.Converters"
-    xmlns:control ="clr-namespace:Chem4Word.ACME.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
-    xmlns:acme="clr-namespace:Chem4Word.ACME" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Width="1013"
-    Height="774"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:behaviors="clr-namespace:Chem4Word.ACME.Behaviors"
+             xmlns:converters="clr-namespace:Chem4Word.ACME.Converters"
+             xmlns:control="clr-namespace:Chem4Word.ACME.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
+             xmlns:acme="clr-namespace:Chem4Word.ACME"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Width="1013"
+             Height="774"
 
-    Loaded="ACMEControl_Loaded" d:DataContext="{d:DesignInstance acme:EditViewModel  }">
+             Loaded="ACMEControl_Loaded" d:DataContext="{d:DesignInstance acme:EditViewModel  }">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -22,7 +23,7 @@
                 <ResourceDictionary Source="Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="CommandButtonStyle"
-                TargetType="{x:Type Button}">
+                   TargetType="{x:Type Button}">
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="Background" Value="Transparent" />
@@ -34,8 +35,8 @@
                 <Setter Property="Padding" Value="0" />
             </Style>
             <converters:BoolToVisibilityConverter x:Key="VisConverter"
-                FalseValue="Collapsed"
-                TrueValue="Visible" />
+                                                  FalseValue="Collapsed"
+                                                  TrueValue="Visible" />
             <converters:EnabledConverter x:Key="EnabledConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -43,22 +44,23 @@
     <UserControl.InputBindings>
         <KeyBinding
             Key="Z"
-            Command="{Binding UndoCommand}"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UndoCommand }"
             Modifiers="Control" />
         <KeyBinding
             Key="Y"
-            Command="{Binding RedoCommand}"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand }"
             Modifiers="Control" />
         <KeyBinding
             Key="Delete"
-            Command="{Binding DeleteCommand}" />
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand }"
+            Modifiers="Control" />
     </UserControl.InputBindings>
     <DockPanel LastChildFill="True">
         <DockPanel.Resources>
             <converters:DoNothingConverter x:Key="DoNothingConverter" />
             <converters:BoolToVisibilityConverter x:Key="VisConverter"
-                FalseValue="Collapsed"
-                TrueValue="Visible" />
+                                                  FalseValue="Collapsed"
+                                                  TrueValue="Visible" />
         </DockPanel.Resources>
         <ToolBarTray
             DockPanel.Dock="Top"
@@ -76,7 +78,7 @@
                     <Setter Property="Padding" Value="2" />
                 </Style>
                 <Style x:Key="ToolbarButtonStyle"
-                    TargetType="{x:Type RadioButton}">
+                       TargetType="{x:Type RadioButton}">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="Transparent" />
                     <Setter Property="Background" Value="Transparent" />
@@ -88,7 +90,7 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
                 <Style x:Key="CommandButtonStyle"
-                    TargetType="{x:Type Button}">
+                       TargetType="{x:Type Button}">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="Transparent" />
                     <Setter Property="Background" Value="Transparent" />
@@ -101,25 +103,25 @@
                 </Style>
             </ToolBarTray.Resources>
             <ToolBar x:Name="DrawingToolbar"
-                BandIndex="0">
+                     BandIndex="0">
                 <ComboBox x:Name="AtomCombo"
-                    Width="48"
-                    Height="25"
-                    FontFamily="Arial"
-                    FontSize="16"
-                    FontWeight="DemiBold"
-                    Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
-                    ItemsSource="{StaticResource AtomItems}"
-                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, Mode=TwoWay}"
-                    SelectedValuePath="Element"
-                    ToolTip="Current Atom Type" />
+                          Width="48"
+                          Height="25"
+                          FontFamily="Arial"
+                          FontSize="16"
+                          FontWeight="DemiBold"
+                          Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
+                          ItemsSource="{StaticResource AtomItems}"
+                          SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, Mode=TwoWay}"
+                          SelectedValuePath="Element"
+                          ToolTip="Current Atom Type" />
                 <ComboBox x:Name="BondCombo"
-                    Width="48"
-                    Height="25"
-                    ItemsSource="{StaticResource BondItems}"
-                    SelectedValue="{Binding ElementName=AcmeControl, Path= ActiveViewModel.SelectedBondOptionId, Mode=TwoWay}"
-                    SelectedValuePath="Id"
-                    ToolTip="Current Bond Type">
+                          Width="48"
+                          Height="25"
+                          ItemsSource="{StaticResource BondItems}"
+                          SelectedValue="{Binding ElementName=AcmeControl, Path= ActiveViewModel.SelectedBondOptionId, Mode=TwoWay}"
+                          SelectedValuePath="Id"
+                          ToolTip="Current Bond Type">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Path Style="{Binding Path=DisplayStyle}" />
@@ -128,19 +130,19 @@
                 </ComboBox>
             </ToolBar>
             <ToolBar x:Name="ActionToolBar"
-                Height="40"
-                BandIndex="1">
+                     Height="40"
+                     BandIndex="1">
                 <!--
                     see https://dvoituron.com/2011/01/06/toolbar-dropdownbutton-in-wpf/
                     also https://materialdesignicons.com/ for icon paths
                 -->
 
                 <RadioButton x:Name="SelectionButton"
-                    Checked="ModeButton_OnChecked"
-                    GroupName="Actions"
-                    IsChecked="True"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    ToolTip="Select">
+                             Checked="ModeButton_OnChecked"
+                             GroupName="Actions"
+                             IsChecked="True"
+                             Style="{StaticResource ToolbarButtonStyle}"
+                             ToolTip="Select">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -158,10 +160,10 @@
                 </RadioButton>
 
                 <RadioButton x:Name="DrawButton"
-                    Click="ModeButton_OnChecked"
-                    GroupName="Actions"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    ToolTip="Draw">
+                             Click="ModeButton_OnChecked"
+                             GroupName="Actions"
+                             Style="{StaticResource ToolbarButtonStyle}"
+                             ToolTip="Draw">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -179,13 +181,13 @@
                 </RadioButton>
 
                 <RadioButton Name="RingButton"
-                    Checked="ModeButton_OnChecked"
-                    GroupName="Actions"
-                    ToolTip="Insert a ring">
+                             Checked="ModeButton_OnChecked"
+                             GroupName="Actions"
+                             ToolTip="Insert a ring">
 
                     <StackPanel Orientation="Horizontal">
                         <Path Name="RingButtonPath"
-                            Style="{StaticResource BenzeneStyle}" />
+                              Style="{StaticResource BenzeneStyle}" />
                     </StackPanel>
 
                     <RadioButton.Tag>
@@ -196,9 +198,9 @@
                     </RadioButton.Tag>
                 </RadioButton>
                 <Button Name="RingDropdownButton"
-                    Width="10"
-                    Click="RingDropdown_OnClick"
-                    ToolTip="Select Ring">
+                        Width="10"
+                        Click="RingDropdown_OnClick"
+                        ToolTip="Select Ring">
                     <Viewbox Stretch="Uniform">
                         <Path
                             Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z"
@@ -207,8 +209,8 @@
                 </Button>
                 <!--  Print Toggle Button Popup  -->
                 <Popup x:Name="RingPopup"
-                    PlacementTarget="{Binding ElementName=RingButton}"
-                    StaysOpen="False">
+                       PlacementTarget="{Binding ElementName=RingButton}"
+                       StaysOpen="False">
                     <Border>
                         <Grid Width="70">
                             <Grid.ColumnDefinitions>
@@ -302,7 +304,7 @@
                     </Border>
                 </Popup>
                 <RadioButton x:Name="ChainButton"
-                    GroupName="Actions">
+                             GroupName="Actions">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
                             <RotateTransform Angle="180" />
@@ -311,9 +313,9 @@
                 </RadioButton>
                 <!--  ReactionButton Hidden (Collapsed)  -->
                 <RadioButton x:Name="ReactionButton"
-                    GroupName="Actions"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Visibility="Collapsed">
+                             GroupName="Actions"
+                             Style="{StaticResource ToolbarButtonStyle}"
+                             Visibility="Collapsed">
                     <Viewbox Stretch="Uniform">
                         <StackPanel>
                             <TextBlock
@@ -323,11 +325,13 @@
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>
-                                NH<Run
+                                NH
+                                <Run
                                     BaselineAlignment="Subscript"
                                     FontSize="12">
                                     3
-                                </Run></TextBlock>
+                                </Run>
+                            </TextBlock>
                             <graphics:ArrowBase
                                 ArrowHeadLength="10"
                                 Fill="{StaticResource ResourceKey=Chem4WordBrush}"
@@ -347,21 +351,23 @@
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>
-                                H<Run
+                                H
+                                <Run
                                     BaselineAlignment="Subscript"
                                     FontSize="12">
                                     2
                                 </Run>
-                                O</TextBlock>
+                                O
+                            </TextBlock>
                         </StackPanel>
                     </Viewbox>
                 </RadioButton>
                 <RadioButton x:Name="DeleteButton"
-                    Click="ModeButton_OnChecked"
-                    FontSize="18"
-                    GroupName="Actions"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    ToolTip="Delete">
+                             Click="ModeButton_OnChecked"
+                             FontSize="18"
+                             GroupName="Actions"
+                             Style="{StaticResource ToolbarButtonStyle}"
+                             ToolTip="Delete">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -376,11 +382,11 @@
                 </RadioButton>
             </ToolBar>
             <ToolBar x:Name="EditToolbar"
-                Height="40"
-                BandIndex="2">
+                     Height="40"
+                     BandIndex="2">
                 <Button x:Name="CutButton"
-                    Command="{Binding CutCommand}"
-                    Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -392,8 +398,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="CopyButton"
-                    Command="{Binding CopyCommand}"
-                    Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -405,8 +411,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="PasteButton"
-                    Command="{Binding PasteCommand}"
-                    Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -418,8 +424,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="UndoButton"
-                    Command="{Binding UndoCommand}"
-                    Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UndoCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -433,8 +439,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="RedoButton"
-                    Command="{Binding RedoCommand}"
-                    Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -449,13 +455,13 @@
                 </Button>
             </ToolBar>
             <ToolBar x:Name="ManipulationsToolbar"
-                Height="40"
-                BandIndex="3">
+                     Height="40"
+                     BandIndex="3">
 
                 <Button x:Name="FlipHorizontalButton"
-                    Command="{Binding FlipHorizontalCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Flip Vertical">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipHorizontalCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Flip Vertical">
                     <Viewbox
                         Width="24"
                         Height="24">
@@ -470,9 +476,9 @@
                 </Button>
 
                 <Button x:Name="FlipVerticalButton"
-                    Command="{Binding FlipVerticalCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Flip Horizontal">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipVerticalCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Flip Horizontal">
                     <Viewbox
                         Width="24"
                         Height="24">
@@ -487,9 +493,9 @@
                 </Button>
 
                 <Button x:Name="AddHydrogensButton"
-                    Command="{Binding AddHydrogensCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Add Explicit Hydrogens">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AddHydrogensCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Add Explicit Hydrogens">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -505,9 +511,9 @@
                 </Button>
 
                 <Button x:Name="RemoveHydrogensButton"
-                    Command="{Binding RemoveHydrogensCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Remove Explicit Hydrogens">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RemoveHydrogensCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Remove Explicit Hydrogens">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -523,9 +529,9 @@
                 </Button>
 
                 <Button x:Name="FuseButton"
-                    Command="{Binding FuseCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Fuse">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FuseCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Fuse">
                     <Viewbox
                         Width="24"
                         Height="24">
@@ -540,9 +546,9 @@
                 </Button>
 
                 <Button x:Name="GroupButton"
-                    Command="{Binding GroupCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Group fragments">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.GroupCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Group fragments">
                     <Viewbox
                         Width="24"
                         Height="24">
@@ -557,9 +563,9 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="UngroupButton"
-                    Command="{Binding UnGroupCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Ungroup fragments">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UnGroupCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Ungroup fragments">
                     <Viewbox>
                         <Path
                             Width="24"
@@ -572,24 +578,24 @@
                 </Button>
             </ToolBar>
             <ToolBar x:Name="BondLengthToolbar"
-                BandIndex="4">
+                     BandIndex="4">
                 <ComboBox x:Name="BondLengthSelector"
-                    Width="50"
-                    DisplayMemberPath="DisplayAs"
-                    FontFamily="Arial"
-                    FontSize="16"
-                    ItemsSource="{Binding Path=BondLengthOptions}"
-                    SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
-                    SelectionChanged="BondLengthCombo_OnChange"
-                    ToolTip="Change Bond Length" />
+                          Width="50"
+                          DisplayMemberPath="DisplayAs"
+                          FontFamily="Arial"
+                          FontSize="16"
+                          ItemsSource="{Binding Path=BondLengthOptions}"
+                          SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
+                          SelectionChanged="BondLengthCombo_OnChange"
+                          ToolTip="Change Bond Length" />
                 <ComboBox x:Name="ZoomFactor"
-                    Width="65"
-                    FontFamily="Arial"
-                    FontSize="16"
-                    SelectedIndex="3"
-                    SelectionChanged="ZoomFactorCombo_OnChange"
-                    ToolTip="Change Zoom"
-                    Visibility="Collapsed">
+                          Width="65"
+                          FontFamily="Arial"
+                          FontSize="16"
+                          SelectedIndex="3"
+                          SelectionChanged="ZoomFactorCombo_OnChange"
+                          ToolTip="Change Zoom"
+                          Visibility="Collapsed">
                     <ComboBoxItem>25%</ComboBoxItem>
                     <ComboBoxItem>50%</ComboBoxItem>
                     <ComboBoxItem>75%</ComboBoxItem>
@@ -599,12 +605,12 @@
                 </ComboBox>
             </ToolBar>
             <ToolBar x:Name="ImportantToolbar"
-                Height="40"
-                BandIndex="99">
+                     Height="40"
+                     BandIndex="99">
                 <Button x:Name="SaveButton"
-                    Click="SaveButton_OnClick"
-                    Style="{StaticResource CommandButtonStyle}"
-                    Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
+                        Click="SaveButton_OnClick"
+                        Style="{StaticResource CommandButtonStyle}"
+                        Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -618,9 +624,9 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="SettingsButton"
-                    Command="{Binding SettingsCommand}"
-                    Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Settings">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SettingsCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Settings">
                     <Viewbox>
                         <Path
                             Width="24"
@@ -637,15 +643,15 @@
 
         <!--actual drawing area-->
         <ScrollViewer Name="DrawingArea"
-            Width="Auto"
-            Height="Auto"
-            Background="White"
-            HorizontalScrollBarVisibility="Auto"
-            VerticalScrollBarVisibility="Auto">
+                      Width="Auto"
+                      Height="Auto"
+                      Background="White"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
             <control:EditorCanvas x:Name="ChemCanvas"
-                MinWidth="4000"
-                MinHeight="3000"
-                Background="White" />
+                                  MinWidth="4000"
+                                  MinHeight="3000"
+                                  Background="White" />
         </ScrollViewer>
 
         <Canvas Name="ZoomBox" Left="0" Top="0" Height="200" Width="400" Margin="5">
