@@ -51,9 +51,37 @@ namespace Chem4Word.ACME.Controls
                     _activeVisual = value;
                 }
             }
-       
         }
 
+        public Model2.ChemistryBase ActiveChemistry
+        {
+            get
+            {
+                switch (ActiveVisual)
+                {
+                    case BondVisual bv:
+                        return bv.ParentBond;
+                        break;
+                    case AtomVisual av:
+                        return av.ParentAtom;
+                        break;
+                    default:
+                        return null;
+                }
+
+            }
+            set
+            {
+                if (value==null)
+                {
+                    ActiveVisual = null;   
+                }
+                else
+                {
+                    ActiveVisual = (chemicalVisuals[(value)] as ChemicalVisual);
+                }
+            }
+        }
       
 
         #endregion
