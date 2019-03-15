@@ -146,8 +146,14 @@ namespace Chem4Word.ACME.Controls
         {
             MouseWheelEventArgs wheel = (MouseWheelEventArgs)e;
 
-            //divide the value by 10 so that it is more smooth
-            double value = Math.Min(wheel.Delta, 10);
+            //divide the value by 15 so that it is smoother
+
+            double value = wheel.Delta / 15;
+            if (Math.Abs(value) > 10d)
+            {
+                value = 10 * Math.Sign(value);
+            }
+
             _zoomSlider.Value += value;
         }
 
