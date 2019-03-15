@@ -20,7 +20,7 @@ namespace Chem4Word.ACME.Controls
         private Thumb _zoomThumb;
         private Canvas _zoomCanvas;
         private Slider _zoomSlider;
-        private ScaleTransform _scaleTransform;
+        //private ScaleTransform ChemistryCanvas.LayoutTransform;
 
         #region DPs
 
@@ -70,7 +70,7 @@ namespace Chem4Word.ACME.Controls
             {
                 newDesignerCanvas.LayoutUpdated += DesignerCanvas_LayoutUpdated;
                 newDesignerCanvas.MouseWheel += DesignerCanvas_MouseWheel;
-                newDesignerCanvas.LayoutTransform = _scaleTransform;
+                newDesignerCanvas.LayoutTransform = ChemistryCanvas.LayoutTransform;
             }
         }
 
@@ -110,7 +110,7 @@ namespace Chem4Word.ACME.Controls
 
             _zoomThumb.DragDelta += Thumb_DragDelta;
             _zoomSlider.ValueChanged += ZoomSlider_ValueChanged;
-            _scaleTransform = new ScaleTransform();
+            ChemistryCanvas.LayoutTransform = new ScaleTransform();
         }
 
         private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -120,8 +120,8 @@ namespace Chem4Word.ACME.Controls
             double newVerticalOffset = ((ScrollViewer.VerticalOffset + halfViewportHeight) * scale - halfViewportHeight);
             double halfViewportWidth = ScrollViewer.ViewportWidth / 2;
             double newHorizontalOffset = ((ScrollViewer.HorizontalOffset + halfViewportWidth) * scale - halfViewportWidth);
-            _scaleTransform.ScaleX *= scale;
-            _scaleTransform.ScaleY *= scale;
+            (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleX *= scale;
+            (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleY *= scale;
             ScrollViewer.ScrollToHorizontalOffset(newHorizontalOffset);
             ScrollViewer.ScrollToVerticalOffset(newVerticalOffset);
         }
@@ -153,8 +153,8 @@ namespace Chem4Word.ACME.Controls
 
         private void InvalidateScale(out double scale, out double xOffset, out double yOffset)
         {
-            double w = ChemistryCanvas.ActualWidth * _scaleTransform.ScaleX;
-            double h = ChemistryCanvas.ActualHeight * _scaleTransform.ScaleY;
+            double w = ChemistryCanvas.ActualWidth * (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleX;
+            double h = ChemistryCanvas.ActualHeight * (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleY;
 
             // zoom canvas size
             double x = _zoomCanvas.ActualWidth;
