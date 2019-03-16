@@ -61,10 +61,8 @@ namespace Chem4Word.ACME.Controls
                 {
                     case BondVisual bv:
                         return bv.ParentBond;
-                        break;
                     case AtomVisual av:
                         return av.ParentAtom;
-                        break;
                     default:
                         return null;
                 }

@@ -28,7 +28,7 @@ namespace Chem4Word.ACME.Drawing
             ComponentRuns = new List<LabelTextSourceRun>();
         }
 
-        public void Render()
+        public override void Render()
         {
             SetTextParams();
             var parentAtomPosition = ParentAtom.Position;

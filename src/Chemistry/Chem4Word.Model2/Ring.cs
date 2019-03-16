@@ -140,7 +140,7 @@ namespace Chem4Word.Model2
         /// <remarks>Do NOT set explicitly.  Add or remove the ring from a Molecule</remarks>
         public Molecule Parent { get; set; }
 
-        private Point? _centroid;
+       
 
         internal void RingCentroidChanged()
         {
