@@ -998,16 +998,6 @@ namespace Chem4Word.Model2
 #endif
                 //RefreshRingBonds();
             }
-
-            // -------------- //
-            // Local Function //
-            // -------------- //
-
-            // Modified Figueras top-level algorithm:
-            // 1. choose the lowest degree atom
-            // 2. Work out which rings it belongs to
-            // 3. If it belongs to a ring and that ring hasn't been calculated before, then add it to the set
-            // 4. delete the atom from the projection, reduce the degree of neighbouring atoms and prune away the side chains
         }
 
         /// <summary>
