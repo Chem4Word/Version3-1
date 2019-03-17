@@ -162,8 +162,8 @@ namespace Chem4Word.ACME.Controls
 
         private void InvalidateScale(out double scale, out double xOffset, out double yOffset)
         {
-            double w = ChemistryCanvas.ActualWidth * (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleX;
-            double h = ChemistryCanvas.ActualHeight * (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleY;
+            double w = ChemistryCanvas.ActualWidth * ((ScaleTransform) ChemistryCanvas.LayoutTransform).ScaleX;
+            double h = ChemistryCanvas.ActualHeight * ((ScaleTransform) ChemistryCanvas.LayoutTransform).ScaleY;
 
             // zoom canvas size
             double x = _zoomCanvas.ActualWidth;
