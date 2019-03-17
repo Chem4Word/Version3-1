@@ -241,7 +241,7 @@
                                             VerticalAlignment="Center"
                                             HorizontalAlignment="Center"
                                             Margin="0"
-                                            Ticks="25,50,75,100,125,150,200,300,400,500"
+                                            Ticks="12,25,37,50,75,100,125,150,200,300,400,500"
                                             Minimum="25"
                                             Maximum="500"
                                             SmallChange="25"
