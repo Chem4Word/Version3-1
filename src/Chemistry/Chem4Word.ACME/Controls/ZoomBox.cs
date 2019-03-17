@@ -115,6 +115,7 @@ namespace Chem4Word.ACME.Controls
 
         private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            
             double scale = e.NewValue / e.OldValue;
             double halfViewportHeight = ScrollViewer.ViewportHeight / 2;
             double newVerticalOffset = ((ScrollViewer.VerticalOffset + halfViewportHeight) * scale - halfViewportHeight);
@@ -122,6 +123,7 @@ namespace Chem4Word.ACME.Controls
             double newHorizontalOffset = ((ScrollViewer.HorizontalOffset + halfViewportWidth) * scale - halfViewportWidth);
             (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleX *= scale;
             (ChemistryCanvas.LayoutTransform as ScaleTransform).ScaleY *= scale;
+            InvalidateScale(out _, out _, out _);
             ScrollViewer.ScrollToHorizontalOffset(newHorizontalOffset);
             ScrollViewer.ScrollToVerticalOffset(newVerticalOffset);
         }
@@ -155,6 +157,7 @@ namespace Chem4Word.ACME.Controls
             }
 
             _zoomSlider.Value += value;
+            wheel.Handled = true;
         }
 
         private void InvalidateScale(out double scale, out double xOffset, out double yOffset)
