@@ -23,13 +23,66 @@ namespace Chem4Word.ACME.Controls
 {
     public class ChemistryCanvas : Canvas
     {
+        #region Fields
         private Adorner _highlightAdorner;
+         
+        #endregion
 
+        #region Constructors
         public ChemistryCanvas()
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
             MouseMove += Canvas_MouseMove;
         }
+        #endregion
+
+        #region Properties
+
+        private ChemicalVisual _activeVisual = null;
+        public ChemicalVisual ActiveVisual
+        {
+            get { return _activeVisual; }
+            set
+            {
+                if (_activeVisual != value)
+                {
+                    RemoveActiveAdorner();
+                    SetActiveAdorner(value);
+                    _activeVisual = value;
+                }
+            }
+        }
+
+        public Model2.ChemistryBase ActiveChemistry
+        {
+            get
+            {
+                switch (ActiveVisual)
+                {
+                    case BondVisual bv:
+                        return bv.ParentBond;
+                    case AtomVisual av:
+                        return av.ParentAtom;
+                    default:
+                        return null;
+                }
+
+            }
+            set
+            {
+                if (value==null)
+                {
+                    ActiveVisual = null;   
+                }
+                else
+                {
+                    ActiveVisual = (chemicalVisuals[(value)] as ChemicalVisual);
+                }
+            }
+        }
+      
+
+        #endregion
 
         /// <summary>
         /// called during WPF layout phase
@@ -272,6 +325,39 @@ namespace Chem4Word.ACME.Controls
 
         #endregion Methods
 
+        private void RemoveActiveAdorner()
+        {
+            if (_highlightAdorner != null)
+            {
+                var layer = AdornerLayer.GetAdornerLayer(this);
+                layer.Remove(_highlightAdorner);
+                _highlightAdorner = null;
+            }
+        }
+
+        private void SetActiveAdorner(ChemicalVisual value)
+        {
+            switch (value)
+            {
+                case FunctionalGroupVisual fv:
+                    _highlightAdorner = new AtomHoverAdorner(this, fv);
+                    break;
+
+                case AtomVisual av:
+                    _highlightAdorner = new AtomHoverAdorner(this, av);
+                    break;
+
+                case BondVisual bv:
+                    _highlightAdorner = new BondHoverAdorner(this, bv);
+                    break;
+
+                default:
+                    _highlightAdorner = null;
+                    break;
+            }
+
+            ;
+        }
         //overrides
         protected override Visual GetVisualChild(int index)
         {
@@ -469,32 +555,9 @@ namespace Chem4Word.ACME.Controls
                 Debug.WriteLine($"CC: @ {e.GetPosition(this)}");
             }
 
-            ChemicalVisual cv = GetTargetedVisual(e.GetPosition(this));
+            ActiveVisual = GetTargetedVisual(e.GetPosition(this));
 
-            if (_highlightAdorner != null)
-            {
-                var layer = AdornerLayer.GetAdornerLayer(this);
-                layer.Remove(_highlightAdorner);
-                _highlightAdorner = null;
-            }
-            switch (cv)
-            {
-                case FunctionalGroupVisual fv:
-                    _highlightAdorner = new AtomHoverAdorner(this, fv);
-                    break;
-
-                case AtomVisual av:
-                    _highlightAdorner = new AtomHoverAdorner(this, av);
-                    break;
-
-                case BondVisual bv:
-                    _highlightAdorner = new BondHoverAdorner(this, bv);
-                    break;
-
-                default:
-                    _highlightAdorner = null;
-                    break;
-            }
+           
         }
 
         #endregion Event handlers
