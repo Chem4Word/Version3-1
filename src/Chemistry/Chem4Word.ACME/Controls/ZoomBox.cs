@@ -62,8 +62,8 @@ namespace Chem4Word.ACME.Controls
         {
             if (oldDesignerCanvas != null)
             {
-                newDesignerCanvas.LayoutUpdated -= DesignerCanvas_LayoutUpdated;
-                newDesignerCanvas.MouseWheel -= DesignerCanvas_MouseWheel;
+                oldDesignerCanvas.LayoutUpdated -= DesignerCanvas_LayoutUpdated;
+                oldDesignerCanvas.MouseWheel -= DesignerCanvas_MouseWheel;
             }
 
             if (newDesignerCanvas != null)
@@ -138,10 +138,13 @@ namespace Chem4Word.ACME.Controls
         private void DesignerCanvas_LayoutUpdated(object sender, EventArgs e)
         {
             InvalidateScale(out var scale, out var xOffset, out var yOffset);
-            _zoomThumb.Width = ScrollViewer.ViewportWidth * scale;
-            _zoomThumb.Height = ScrollViewer.ViewportHeight * scale;
-            Canvas.SetLeft(_zoomThumb, xOffset + ScrollViewer.HorizontalOffset * scale);
-            Canvas.SetTop(_zoomThumb, yOffset + ScrollViewer.VerticalOffset * scale);
+            if (_zoomThumb != null)
+            {
+                _zoomThumb.Width = ScrollViewer.ViewportWidth * scale;
+                _zoomThumb.Height = ScrollViewer.ViewportHeight * scale;
+                Canvas.SetLeft(_zoomThumb, xOffset + ScrollViewer.HorizontalOffset * scale);
+                Canvas.SetTop(_zoomThumb, yOffset + ScrollViewer.VerticalOffset * scale);
+            }
         }
 
         private void DesignerCanvas_MouseWheel(object sender, EventArgs e)
@@ -162,17 +165,26 @@ namespace Chem4Word.ACME.Controls
 
         private void InvalidateScale(out double scale, out double xOffset, out double yOffset)
         {
-            double w = ChemistryCanvas.ActualWidth * ((ScaleTransform) ChemistryCanvas.LayoutTransform).ScaleX;
-            double h = ChemistryCanvas.ActualHeight * ((ScaleTransform) ChemistryCanvas.LayoutTransform).ScaleY;
+            if (ChemistryCanvas == null || !(ChemistryCanvas.LayoutTransform is ScaleTransform st))
+            {
+                scale = 1.0;
+                xOffset = 0d;
+                yOffset = 0d;
+            }
+            else
+            {
+                double w = ChemistryCanvas.ActualWidth * st.ScaleX;
+                double h = ChemistryCanvas.ActualHeight * st.ScaleY;
 
-            // zoom canvas size
-            double x = _zoomCanvas.ActualWidth;
-            double y = _zoomCanvas.ActualHeight;
-            double scaleX = x / w;
-            double scaleY = y / h;
-            scale = (scaleX < scaleY) ? scaleX : scaleY;
-            xOffset = (x - scale * w) / 2;
-            yOffset = (y - scale * h) / 2;
+                // zoom canvas size
+                double x = _zoomCanvas.ActualWidth;
+                double y = _zoomCanvas.ActualHeight;
+                double scaleX = x / w;
+                double scaleY = y / h;
+                scale = (scaleX < scaleY) ? scaleX : scaleY;
+                xOffset = (x - scale * w) / 2;
+                yOffset = (y - scale * h) / 2;
+            }
         }
     }
 }
