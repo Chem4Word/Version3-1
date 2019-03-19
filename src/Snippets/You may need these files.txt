@@ -3,6 +3,7 @@ These files should reside in
 C:\Users\{UserName}\AppData\Local\Temp
 C:\Users\{UserName}\AppData\Local\1\Temp
 C:\Users\{UserName}\AppData\Local\2\Temp
+C:\Users\{UserName}\AppData\Local\3\Temp
 
 .NETFramework,Version=v4.5.2.AssemblyAttributes.cs
 .NETFramework,Version=v4.6.2.AssemblyAttributes.cs
@@ -11,4 +12,7 @@ They sometimes get cleaned out of the %temp% folder !
 
 The symptoms you will see are that the assembly Chem4Word.Contracts builds every time.
 When this happens it's Post Build Event clears the PlugIns folder.
-Thus all hell breaks loose in the Word Add-In
+
+Thus all hell breaks loose in the Word Add-In as there are no plug Ins
+
+The \1\ \2\ \3\ folders are created by RDP Sessions and the nunmber varies

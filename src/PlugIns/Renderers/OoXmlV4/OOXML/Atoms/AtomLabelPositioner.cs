@@ -550,25 +550,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                     fgCharacters.Add(alc);
 
-                    if (fgBoundingBox.IsEmpty)
-                    {
-                        fgBoundingBox = thisBoundingBox;
-                    }
-                    else
-                    {
-                        fgBoundingBox.Union(thisBoundingBox);
-                    }
+                    fgBoundingBox.Union(thisBoundingBox);
 
                     if (term.IsAnchor)
                     {
-                        if (anchorBoundingBox.IsEmpty)
-                        {
-                            anchorBoundingBox = thisBoundingBox;
-                        }
-                        else
-                        {
-                            anchorBoundingBox.Union(thisBoundingBox);
-                        }
+                        anchorBoundingBox.Union(thisBoundingBox);
                     }
                 }
             }

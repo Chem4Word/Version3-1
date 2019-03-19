@@ -307,7 +307,8 @@ namespace Chem4Word.ACME.Drawing
             }
             else
             {
-                if (_bondGeometry.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness * 4.0))
+                var widepen = new Pen(Brushes.Black, BondThickness *8.0);
+                if (_bondGeometry.GetWidenedPathGeometry(widepen,0.01, ToleranceType.Relative)
                     .FillContains(hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);

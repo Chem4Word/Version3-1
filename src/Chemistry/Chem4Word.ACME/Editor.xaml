@@ -280,15 +280,16 @@
     <UserControl.InputBindings>
         <KeyBinding
             Key="Z"
-            Command="{Binding UndoCommand}"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UndoCommand }"
             Modifiers="Control" />
         <KeyBinding
             Key="Y"
-            Command="{Binding RedoCommand}"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand }"
             Modifiers="Control" />
         <KeyBinding
             Key="Delete"
-            Command="{Binding DeleteCommand}" />
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand }"
+            Modifiers="Control" />
     </UserControl.InputBindings>
 
     <DockPanel LastChildFill="True">
@@ -623,8 +624,8 @@
                          Height="40"
                          BandIndex="2">
                 <Button x:Name="CutButton"
-                            Command="{Binding CutCommand}"
-                            Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -636,8 +637,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="CopyButton"
-                            Command="{Binding CopyCommand}"
-                            Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -649,8 +650,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="PasteButton"
-                            Command="{Binding PasteCommand}"
-                            Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -662,8 +663,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="UndoButton"
-                            Command="{Binding UndoCommand}"
-                            Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UndoCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -677,8 +678,8 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="RedoButton"
-                            Command="{Binding RedoCommand}"
-                            Style="{StaticResource CommandButtonStyle}">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand }"
+                        Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -697,9 +698,9 @@
                          BandIndex="3">
 
                 <Button x:Name="FlipHorizontalButton"
-                            Command="{Binding FlipHorizontalCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Flip Vertical">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipHorizontalCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Flip Vertical">
                     <Viewbox
                             Width="24"
                             Height="24">
@@ -714,9 +715,9 @@
                 </Button>
 
                 <Button x:Name="FlipVerticalButton"
-                            Command="{Binding FlipVerticalCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Flip Horizontal">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipVerticalCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Flip Horizontal">
                     <Viewbox
                             Width="24"
                             Height="24">
@@ -731,9 +732,9 @@
                 </Button>
 
                 <Button x:Name="AddHydrogensButton"
-                            Command="{Binding AddHydrogensCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Add Explicit Hydrogens">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AddHydrogensCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Add Explicit Hydrogens">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -749,9 +750,9 @@
                 </Button>
 
                 <Button x:Name="RemoveHydrogensButton"
-                            Command="{Binding RemoveHydrogensCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Remove Explicit Hydrogens">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RemoveHydrogensCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Remove Explicit Hydrogens">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -767,9 +768,9 @@
                 </Button>
 
                 <Button x:Name="FuseButton"
-                            Command="{Binding FuseCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Fuse">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FuseCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Fuse">
                     <Viewbox
                             Width="24"
                             Height="24">
@@ -784,9 +785,9 @@
                 </Button>
 
                 <Button x:Name="GroupButton"
-                            Command="{Binding GroupCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Group fragments">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.GroupCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Group fragments">
                     <Viewbox
                             Width="24"
                             Height="24">
@@ -801,9 +802,9 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="UngroupButton"
-                            Command="{Binding UnGroupCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Ungroup fragments">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UnGroupCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Ungroup fragments">
                     <Viewbox>
                         <Path
                                 Width="24"
@@ -816,24 +817,24 @@
                 </Button>
             </ToolBar>
             <ToolBar x:Name="BondLengthToolbar"
-                         BandIndex="4">
+                     BandIndex="4">
                 <ComboBox x:Name="BondLengthSelector"
-                              Width="50"
-                              DisplayMemberPath="DisplayAs"
-                              FontFamily="Arial"
-                              FontSize="16"
-                              ItemsSource="{Binding Path=BondLengthOptions}"
-                              SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
-                              SelectionChanged="BondLengthCombo_OnChange"
-                              ToolTip="Change Bond Length" />
+                          Width="50"
+                          DisplayMemberPath="DisplayAs"
+                          FontFamily="Arial"
+                          FontSize="16"
+                          ItemsSource="{Binding Path=BondLengthOptions}"
+                          SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
+                          SelectionChanged="BondLengthCombo_OnChange"
+                          ToolTip="Change Bond Length" />
                 <ComboBox x:Name="ZoomFactor"
-                              Width="65"
-                              FontFamily="Arial"
-                              FontSize="16"
-                              SelectedIndex="3"
-                              SelectionChanged="ZoomFactorCombo_OnChange"
-                              ToolTip="Change Zoom"
-                              Visibility="Collapsed">
+                          Width="65"
+                          FontFamily="Arial"
+                          FontSize="16"
+                          SelectedIndex="3"
+                          SelectionChanged="ZoomFactorCombo_OnChange"
+                          ToolTip="Change Zoom"
+                          Visibility="Collapsed">
                     <ComboBoxItem>25%</ComboBoxItem>
                     <ComboBoxItem>50%</ComboBoxItem>
                     <ComboBoxItem>75%</ComboBoxItem>
@@ -843,12 +844,12 @@
                 </ComboBox>
             </ToolBar>
             <ToolBar x:Name="ImportantToolbar"
-                         Height="40"
-                         BandIndex="99">
+                     Height="40"
+                     BandIndex="99">
                 <Button x:Name="SaveButton"
-                            Click="SaveButton_OnClick"
-                            Style="{StaticResource CommandButtonStyle}"
-                            Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
+                        Click="SaveButton_OnClick"
+                        Style="{StaticResource CommandButtonStyle}"
+                        Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
                     <Viewbox
                             Width="24"
                             Height="24"
@@ -862,9 +863,9 @@
                     </Viewbox>
                 </Button>
                 <Button x:Name="SettingsButton"
-                            Command="{Binding SettingsCommand}"
-                            Style="{StaticResource CommandButtonStyle}"
-                            ToolTip="Settings">
+                        Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SettingsCommand }"
+                        Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Settings">
                     <Viewbox>
                         <Path
                                 Width="24"
