@@ -397,18 +397,23 @@ namespace Chem4Word.ACME.Drawing
 
         public static void AdjustTerminus(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
         {
-            Vector bondVector = endPoint - startPoint;
-
-            Point tempStartPoint = startPoint;
-            Vector offset = bondVector * (1d / 100d);
-
-            while (startAtomGeometry.FillContains(tempStartPoint))
+            if (startPoint != endPoint)
             {
-                tempStartPoint += offset;
-            }
 
-            startPoint = tempStartPoint;
+                Vector bondVector = endPoint - startPoint;
+
+                Point tempStartPoint = startPoint;
+                Vector offset = bondVector * (1d / 100d);
+
+                while (startAtomGeometry.FillContains(tempStartPoint))
+                {
+                    tempStartPoint += offset;
+                }
+
+                startPoint = tempStartPoint;
+            }
         }
+    
 
         private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
         {

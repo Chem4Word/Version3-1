@@ -1442,7 +1442,7 @@ namespace Chem4Word.ACME
 
                 //UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
             }
-
+            selMolecule.ForceBondingUpdates();
             //UndoManager.EndUndoBlock();
         }
 
