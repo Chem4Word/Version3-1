@@ -1,0 +1,1099 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Chem4Word.ACME.Adorners.AtomHoverAdorner" Collapsed="true">
+    <Position X="50" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAgEAAAAIAAAAAA=</HashCode>
+      <FileName>Adorners\AtomHoverAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.AtomSelectionAdorner" Collapsed="true">
+    <Position X="36" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAgAAAAAAABABAAAAAAIAAAAAA=</HashCode>
+      <FileName>Adorners\AtomSelectionAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.BondHoverAdorner" Collapsed="true">
+    <Position X="41.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAgEAAAAIAAAAAA=</HashCode>
+      <FileName>Adorners\BondHoverAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.BondSelectionAdorner" Collapsed="true">
+    <Position X="46.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAAAAIAAAAAgIAAAAAA=</HashCode>
+      <FileName>Adorners\BondSelectionAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.DrawBondAdorner" Collapsed="true">
+    <Position X="43" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAABAQAAAAAACAAAAAAAAAAgAAIAAIQAABAg=</HashCode>
+      <FileName>Adorners\DrawBondAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.LassoAdorner" Collapsed="true">
+    <Position X="50" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQACAAAAAAAAAAgAAIAAIAAAAAA=</HashCode>
+      <FileName>Adorners\LassoAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.MoleculeSelectionAdorner" Collapsed="true">
+    <Position X="6.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FASIAAIAoAIKAABmQgACCIIUASAAEAAoABiUIAIAAZA=</HashCode>
+      <FileName>Adorners\MoleculeSelectionAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Adorners.SingleAtomSelectionAdorner" Collapsed="true">
+    <Position X="6.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAIgIAAAAwAgkBQAAQGKJQYAABAAACAAgAIiAAABA=</HashCode>
+      <FileName>Adorners\SingleAtomSelectionAdorner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.AtomOption" Collapsed="true">
+    <Position X="51.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAgAAAAAAAAQAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>AtomOption.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.AtomPicker" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="53.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AtomPicker.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.BondLengthOption" Collapsed="true">
+    <Position X="43" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAMAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>BondLengthOption.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.BondOption" Collapsed="true">
+    <Position X="44.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAECBAAAAAAAAAAEAAAAAAACAAAAAAAAAAAAAQAQBAA=</HashCode>
+      <FileName>BondOption.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.CmlEditor" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="53.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>CmlEditor.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Display" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="39.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABCAAAAAAAEAAEAAAIAAgCAAAAAAAAAAAAACCCAA=</HashCode>
+      <FileName>Display.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Editor" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="44.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QCACMAgAAgIAACBEIAIAIAEQgACECBBAAEAAAAEAqAI=</HashCode>
+      <FileName>Editor.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.NewAtomPlacement" Collapsed="true">
+    <Position X="44.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAEAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>EditViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.EditViewModel" Collapsed="true">
+    <Position X="3.5" Y="13.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YEWDAJqAoEiAFIlLKAMEsAQAgIIAIhQxAQKTEABBACc=</HashCode>
+      <FileName>EditViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Chem4Word.ACME.UndoHandler" Collapsed="true">
+    <Position X="50" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAIAAAAABAAEBQAAAAAAQAARIAAAACAAAAAAEAECgAA=</HashCode>
+      <FileName>UndoHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.ViewModel" Collapsed="true">
+    <Position X="3.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>ViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.VisualTreeHelpers" Collapsed="true">
+    <Position X="36" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAIAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>VisualTreeHelpers.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Behaviors.AdjustScaleToFitContentBehavior" Collapsed="true">
+    <Position X="36" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQgAAAAIVAAAAAAIAAAAAAAAAIAABAAAAAAASAAAQAA=</HashCode>
+      <FileName>Behaviors\AdjustScaleToFitContentBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Behaviors.BaseEditBehavior" Collapsed="true">
+    <Position X="4" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAABAAAEAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Behaviors\BaseEditBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Behaviors.DeleteBehavior" Collapsed="true">
+    <Position X="0.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ICAAAAAAFAAAAAAAAAAAAIAQAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Behaviors\DeleteBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Behaviors.DrawBehavior" Collapsed="true">
+    <Position X="3" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ICAAAAGAHAQAAAAAAQAACAAAgQgQABAAAJAgAgAAAAA=</HashCode>
+      <FileName>Behaviors\DrawBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Behaviors.LassoBehavior" Collapsed="true">
+    <Position X="5.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ICAAAACAFIEAAAAACAAACIEQAAgAAABIAAIIAIQgAEA=</HashCode>
+      <FileName>Behaviors\LassoBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Behaviors.RingBehavior" Collapsed="true">
+    <Position X="7.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ICAAACAAFgAAAAAAAAAAAAAQgQEAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Behaviors\RingBehavior.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.AddAtomCommand" Collapsed="true">
+    <Position X="2" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\AddAtomCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.AddHydrogensCommand" Collapsed="true">
+    <Position X="6.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\AddHydrogensCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.BaseCommand" Collapsed="true">
+    <Position X="17.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAACAAQAAEAAAAAAAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Commands\BaseCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.CopyCommand" Collapsed="true">
+    <Position X="13.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\CopyCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.CutCommand" Collapsed="true">
+    <Position X="17.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\CutCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.DeleteCommand" Collapsed="true">
+    <Position X="20" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\DeleteCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.FlipCommand" Collapsed="true">
+    <Position X="23.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\FlipCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.FlipHorizontalCommand" Collapsed="true">
+    <Position X="22.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\FlipHorizontalCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.FlipVerticalCommand" Collapsed="true">
+    <Position X="24.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\FlipVerticalCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.FuseCommand" Collapsed="true">
+    <Position X="26.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\FuseCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.GroupCommand" Collapsed="true">
+    <Position X="29" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\GroupCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.PasteCommand" Collapsed="true">
+    <Position X="31.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\PasteCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.RedoCommand" Collapsed="true">
+    <Position X="33.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\RedoCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.RemoveHydrogensCommand" Collapsed="true">
+    <Position X="4.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\RemoveHydrogensCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.SettingsCommand" Collapsed="true">
+    <Position X="8.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\SettingsCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.UndoCommand" Collapsed="true">
+    <Position X="11" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAACAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\UndoCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Commands.UnGroupCommand" Collapsed="true">
+    <Position X="15.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Commands\UnGroupCommand.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Controls.ChemistryCanvas" Collapsed="true">
+    <Position X="0.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BRAMBAASIAIAAEAIAAIAAIggKABAZIQAQAAAAABGEAI=</HashCode>
+      <FileName>Controls\ChemistryCanvas.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Controls.EditorCanvas" Collapsed="true">
+    <Position X="0.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAACAAAAAA=</HashCode>
+      <FileName>Controls\EditorCanvas.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Controls.ModeButton" Collapsed="true">
+    <Position X="39.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAACAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Controls\ModeButton.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Controls.ZoomBox" Collapsed="true">
+    <Position X="41.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAEAAAAAAABAAAAAAADAAgAAAAAAFAAAAAQAAEEUEAA=</HashCode>
+      <FileName>Controls\ZoomBox.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Converters.BoolToVisibilityConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="48.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgQAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Converters\BoolToVisibilityConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Converters.DoNothingConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="41.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\DoNothingConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Converters.ElementConverter" Collapsed="true">
+    <Position X="46.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAAAAAAACAAAAIAAAAAAAA=</HashCode>
+      <FileName>Converters\ElementConverter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Converters.EnabledConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="48.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\EnabledConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Converters.ModeConverter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="41.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Converters\ModeConverter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.AtomVisual" Collapsed="true">
+    <Position X="10.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIBCCBABAAwgAgAgAEAAIADICAQAGAAEABAAQBEAAhA=</HashCode>
+      <FileName>Drawing\AtomVisual.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.BondGeometry" Collapsed="true">
+    <Position X="39.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAABAAAAAAAAAAAABggAAMAAAAAAAAAAAIAAEI=</HashCode>
+      <FileName>Drawing\BondGeometry.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.BondVisual" Collapsed="true">
+    <Position X="12.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CCBACAAAAAACAAAAAAACAACAAAIAAAAAAJAAQAAABAA=</HashCode>
+      <FileName>Drawing\BondVisual.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.ChemicalVisual" Collapsed="true">
+    <Position X="11.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAAAAACAAABAAAAAAAAA=</HashCode>
+      <FileName>Drawing\ChemicalVisual.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.FunctionalGroupTextSource" Collapsed="true">
+    <Position X="50" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAEAAAAAAAABBAAAAAAAABCAAAAAAAAIA=</HashCode>
+      <FileName>Drawing\FunctionalGroupTextSource.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.FunctionalGroupVisual" Collapsed="true">
+    <Position X="10.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAhAAAAAAAAAAAAAAAAABABAAQAAAAAA=</HashCode>
+      <FileName>Drawing\FunctionalGroupVisual.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.GlyphText" Collapsed="true">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>NYAQAAAAAAIAAAAAAQAIBQKAAAIAigQAIKAAGQFAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.MainLabelText" Collapsed="true">
+    <Position X="0.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.SubLabelText" Collapsed="true">
+    <Position X="3" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.IsotopeLabelText" Collapsed="true">
+    <Position X="5.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.ChargeLabelText" Collapsed="true">
+    <Position X="7.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.AtomTextMetrics" Collapsed="true">
+    <Position X="10.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQIAAAAAAAEAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.LabelMetrics" Collapsed="true">
+    <Position X="10.5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAEAAACAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\GlyphText.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.GlyphUtils" Collapsed="true">
+    <Position X="51.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAIAAAAAAAADAQBgAAQAAIAAAAIAAAAAAAA=</HashCode>
+      <FileName>Drawing\GlyphUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.LabelTextRunProperties" Collapsed="true">
+    <Position X="6.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAACAAAAAIAAAABAAAIAAIAAAAAQDAAAAAAAA=</HashCode>
+      <FileName>Drawing\LabelTextRunProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.LabelTextRunTypographyProperties" Collapsed="true">
+    <Position X="1.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AGCfgRAAhgBgEAQBAIAJQBkAAAACkVFIAACAACACAAA=</HashCode>
+      <FileName>Drawing\LabelTextRunTypographyProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.LabelTextSourceRun" Collapsed="true">
+    <Position X="48.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAABAAAAABAEAAAAAGAAAAAA=</HashCode>
+      <FileName>Drawing\LabelTextSourceRun.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.SubscriptTextRunProperties" Collapsed="true">
+    <Position X="5.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAACBAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>Drawing\SubscriptTextRunProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.SubscriptTextRunTypographyProperties" Collapsed="true">
+    <Position X="0.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\SubscriptTextRunTypographyProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.SuperscriptTextRunProperties" Collapsed="true">
+    <Position X="7.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAACBAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>Drawing\SuperscriptTextRunProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Drawing.SuperscriptTextRunTypographyProperties" Collapsed="true">
+    <Position X="2.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Drawing\SuperscriptTextRunTypographyProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Graphics.Arc" Collapsed="true">
+    <Position X="37.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAIAAAAAAAAABAiAQAAAAAAAAACAAAAAAAICIAIAAA=</HashCode>
+      <FileName>Graphics\Arc.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Graphics.ArcArrow" Collapsed="true">
+    <Position X="10.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAIAAAAAAAAABAgAQAAAAAAAAACAAAEAAAICIAIAAA=</HashCode>
+      <FileName>Graphics\ArcArrow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Graphics.ArrowBase" Collapsed="true">
+    <Position X="10.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAgADAQAACgAAAAAAAAAACQAIMQIgAgAABAAg=</HashCode>
+      <FileName>Graphics\ArrowBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Graphics.RegularPolygon" Collapsed="true">
+    <Position X="39.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAICAAEAAAAAAAIAAgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Graphics\RegularPolygon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Graphics.Shapes" Collapsed="true">
+    <Position X="41.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Graphics\Shapes.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.CanBeNullAttribute" Collapsed="true">
+    <Position X="50" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.NotNullAttribute" Collapsed="true">
+    <Position X="51.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.ItemNotNullAttribute" Collapsed="true">
+    <Position X="44.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.ItemCanBeNullAttribute" Collapsed="true">
+    <Position X="43" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.ImplicitNotNullAttribute" Collapsed="true">
+    <Position X="37.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.StringFormatMethodAttribute" Collapsed="true">
+    <Position X="46.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.ValueProviderAttribute" Collapsed="true">
+    <Position X="53.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.InvokerParameterNameAttribute" Collapsed="true">
+    <Position X="41.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.NotifyPropertyChangedInvocatorAttribute" Collapsed="true">
+    <Position X="50" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.ContractAnnotationAttribute" Collapsed="true">
+    <Position X="37.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAIAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.LocalizationRequiredAttribute" Collapsed="true">
+    <Position X="53.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.CannotApplyEqualityOperatorAttribute" Collapsed="true">
+    <Position X="51.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.BaseTypeRequiredAttribute" Collapsed="true">
+    <Position X="37.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.UsedImplicitlyAttribute" Collapsed="true">
+    <Position X="51.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.MeansImplicitUseAttribute" Collapsed="true">
+    <Position X="37.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.PublicAPIAttribute" Collapsed="true">
+    <Position X="37.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.InstantHandleAttribute" Collapsed="true">
+    <Position X="39.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.PureAttribute" Collapsed="true">
+    <Position X="39.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.MustUseReturnValueAttribute" Collapsed="true">
+    <Position X="43" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.ProvidesContextAttribute" Collapsed="true">
+    <Position X="36" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.PathReferenceAttribute" Collapsed="true">
+    <Position X="53.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.SourceTemplateAttribute" Collapsed="true">
+    <Position X="44.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.MacroAttribute" Collapsed="true">
+    <Position X="36" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAQAAACAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcAreaMasterLocationFormatAttribute" Collapsed="true">
+    <Position X="51.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcAreaPartialViewLocationFormatAttribute" Collapsed="true">
+    <Position X="53.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcAreaViewLocationFormatAttribute" Collapsed="true">
+    <Position X="36" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcMasterLocationFormatAttribute" Collapsed="true">
+    <Position X="44.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcPartialViewLocationFormatAttribute" Collapsed="true">
+    <Position X="50" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcViewLocationFormatAttribute" Collapsed="true">
+    <Position X="41.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcActionAttribute" Collapsed="true">
+    <Position X="46.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcAreaAttribute" Collapsed="true">
+    <Position X="50" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcControllerAttribute" Collapsed="true">
+    <Position X="37.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcMasterAttribute" Collapsed="true">
+    <Position X="43" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcModelTypeAttribute" Collapsed="true">
+    <Position X="46.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcPartialViewAttribute" Collapsed="true">
+    <Position X="48.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcSuppressViewErrorAttribute" Collapsed="true">
+    <Position X="51.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcDisplayTemplateAttribute" Collapsed="true">
+    <Position X="39.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcEditorTemplateAttribute" Collapsed="true">
+    <Position X="41.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcTemplateAttribute" Collapsed="true">
+    <Position X="53.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcViewAttribute" Collapsed="true">
+    <Position X="36" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcViewComponentAttribute" Collapsed="true">
+    <Position X="37.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcViewComponentViewAttribute" Collapsed="true">
+    <Position X="39.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMvcActionSelectorAttribute" Collapsed="true">
+    <Position X="48.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.HtmlElementAttributesAttribute" Collapsed="true">
+    <Position X="36" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.HtmlAttributeValueAttribute" Collapsed="true">
+    <Position X="53.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorSectionAttribute" Collapsed="true">
+    <Position X="50" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.CollectionAccessAttribute" Collapsed="true">
+    <Position X="36" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AssertionMethodAttribute" Collapsed="true">
+    <Position X="48.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AssertionConditionAttribute" Collapsed="true">
+    <Position X="46.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.TerminatesProgramAttribute" Collapsed="true">
+    <Position X="48.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.LinqTunnelAttribute" Collapsed="true">
+    <Position X="51.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.NoEnumerationAttribute" Collapsed="true">
+    <Position X="46.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RegexPatternAttribute" Collapsed="true">
+    <Position X="37.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.XamlItemsControlAttribute" Collapsed="true">
+    <Position X="39.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.XamlItemBindingOfItemsControlAttribute" Collapsed="true">
+    <Position X="37.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspChildControlTypeAttribute" Collapsed="true">
+    <Position X="39.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspDataFieldAttribute" Collapsed="true">
+    <Position X="41.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspDataFieldsAttribute" Collapsed="true">
+    <Position X="43" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspMethodPropertyAttribute" Collapsed="true">
+    <Position X="44.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspRequiredAttributeAttribute" Collapsed="true">
+    <Position X="43" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.AspTypePropertyAttribute" Collapsed="true">
+    <Position X="44.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorImportNamespaceAttribute" Collapsed="true">
+    <Position X="44.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorInjectionAttribute" Collapsed="true">
+    <Position X="46.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorDirectiveAttribute" Collapsed="true">
+    <Position X="41.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorHelperCommonAttribute" Collapsed="true">
+    <Position X="43" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorLayoutAttribute" Collapsed="true">
+    <Position X="48.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorWriteLiteralMethodAttribute" Collapsed="true">
+    <Position X="51.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorWriteMethodAttribute" Collapsed="true">
+    <Position X="53.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.RazorWriteMethodParameterAttribute" Collapsed="true">
+    <Position X="36" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Annotations.NoReorder" Collapsed="true">
+    <Position X="48.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Utils.KeyboardUtils" Collapsed="true">
+    <Position X="46.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Utils\KeyboardUtils.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Chem4Word.ACME.Utils.SnapGeometry" Collapsed="true">
+    <Position X="43" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AiAAAAAAAAAAACAAAAIAAAAAEAABAAAAAAEAAAEACAA=</HashCode>
+      <FileName>Utils\SnapGeometry.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="Chem4Word.ACME.Graphics.ArrowEnds" Collapsed="true">
+    <Position X="36" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAACAAAAAAAgAAAAAAAAAAAAAAAAAAAAEAAAA=</HashCode>
+      <FileName>Graphics\ArrowBase.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chem4Word.ACME.Annotations.ImplicitUseKindFlags" Collapsed="true">
+    <Position X="41.25" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAABAEAAAAAAIAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chem4Word.ACME.Annotations.ImplicitUseTargetFlags" Collapsed="true">
+    <Position X="43" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAIAAAAAAAAAAAAAAEAAAAAAQ=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chem4Word.ACME.Annotations.CollectionAccessType" Collapsed="true">
+    <Position X="39.5" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAgAAAAEAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="Chem4Word.ACME.Annotations.AssertionConditionType" Collapsed="true">
+    <Position X="37.75" Y="10.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAACAAAAAAAAgAAAIAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
