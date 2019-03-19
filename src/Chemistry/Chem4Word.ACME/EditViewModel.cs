@@ -1438,6 +1438,7 @@ namespace Chem4Word.ACME
                 //    atomToFlip.Position = newPos;
                 //};
                 atomToFlip.Position = newPos;
+                Debug.WriteLine($"Setting {atomToFlip} to {newPos}");
 
                 //UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
             }
