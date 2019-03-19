@@ -1404,8 +1404,13 @@ namespace Chem4Word.ACME
 
         public void FlipMolecule(Molecule selMolecule, bool flipVertically, bool flipStereo)
         {
-            Point centroid = selMolecule.Centroid;
-            int scaleX = 1, scaleY = 1;
+            int scaleX = 1;
+            int scaleY = 1;
+
+            var bb = selMolecule.BoundingBox;
+
+            double cx = bb.Left + (bb.Right - bb.Left) / 2;
+            double cy = bb.Top + (bb.Bottom - bb.Top) / 2;
 
             if (flipVertically)
             {
@@ -1415,28 +1420,29 @@ namespace Chem4Word.ACME
             {
                 scaleX = -1;
             }
-            ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, centroid.X, centroid.Y);
 
-            UndoManager.BeginUndoBlock();
+            ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, cx, cy);
+
+            //UndoManager.BeginUndoBlock();
 
             foreach (Atom atomToFlip in selMolecule.Atoms.Values)
             {
                 Point currentPos = atomToFlip.Position;
                 Point newPos = flipTransform.Transform(currentPos);
-                Action undo = () =>
-                {
-                    atomToFlip.Position = currentPos;
-                };
-                Action redo = () =>
-                {
-                    atomToFlip.Position = newPos;
-                };
+                //Action undo = () =>
+                //{
+                //    atomToFlip.Position = currentPos;
+                //};
+                //Action redo = () =>
+                //{
+                //    atomToFlip.Position = newPos;
+                //};
                 atomToFlip.Position = newPos;
 
-                UndoManager.RecordAction(undo, redo, "Flip Atom");
+                //UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
             }
 
-            UndoManager.EndUndoBlock();
+            //UndoManager.EndUndoBlock();
         }
 
         public void AddToSelection(object thingToAdd)
