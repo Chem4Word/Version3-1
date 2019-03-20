@@ -1430,11 +1430,6 @@ namespace Chem4Word.ACME
             int scaleX = 1;
             int scaleY = 1;
 
-            var bb = selMolecule.BoundingBox;
-
-            double cx = bb.Left + (bb.Right - bb.Left) / 2;
-            double cy = bb.Top + (bb.Bottom - bb.Top) / 2;
-
             if (flipVertically)
             {
                 scaleY = -1;
@@ -1443,6 +1438,11 @@ namespace Chem4Word.ACME
             {
                 scaleX = -1;
             }
+
+            var bb = selMolecule.BoundingBox;
+
+            double cx = bb.Left + (bb.Right - bb.Left) / 2;
+            double cy = bb.Top + (bb.Bottom - bb.Top) / 2;
 
             ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, cx, cy);
 
