@@ -1445,7 +1445,6 @@ namespace Chem4Word.ACME
             }
 
             ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, cx, cy);
-            ScaleTransform unFlipTransform = new ScaleTransform(-scaleX, -scaleY, cx, cy);
 
             UndoManager.BeginUndoBlock();
 
@@ -1453,7 +1452,7 @@ namespace Chem4Word.ACME
             {
                 foreach (Atom atomToFlip in selMolecule.Atoms.Values)
                 {
-                    atomToFlip.Position = unFlipTransform.Transform(atomToFlip.Position);
+                    atomToFlip.Position = flipTransform.Transform(atomToFlip.Position);
                 }
                 selMolecule.ForceBondingUpdates();
             };
