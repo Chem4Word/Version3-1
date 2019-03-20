@@ -29,7 +29,7 @@ namespace Chem4Word.ACME.Commands
 
         public override void Execute(object parameter)
         {
-            //MyEditViewModel.RemoveHydrogens();
+            MyEditViewModel.RemoveHydrogens();
         }
     }
 }
