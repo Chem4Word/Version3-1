@@ -1404,8 +1404,13 @@ namespace Chem4Word.ACME
 
         public void FlipMolecule(Molecule selMolecule, bool flipVertically, bool flipStereo)
         {
-            Point centroid = selMolecule.Centroid;
-            int scaleX = 1, scaleY = 1;
+            int scaleX = 1;
+            int scaleY = 1;
+
+            var bb = selMolecule.BoundingBox;
+
+            double cx = bb.Left + (bb.Right - bb.Left) / 2;
+            double cy = bb.Top + (bb.Bottom - bb.Top) / 2;
 
             if (flipVertically)
             {
@@ -1415,26 +1420,32 @@ namespace Chem4Word.ACME
             {
                 scaleX = -1;
             }
-            ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, centroid.X, centroid.Y);
+
+            ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, cx, cy);
+            ScaleTransform unFlipTransform = new ScaleTransform(-scaleX, -scaleY, cx, cy);
 
             UndoManager.BeginUndoBlock();
 
-            foreach (Atom atomToFlip in selMolecule.Atoms.Values)
+            Action undo = () =>
             {
-                Point currentPos = atomToFlip.Position;
-                Point newPos = flipTransform.Transform(currentPos);
-                Action undo = () =>
+                foreach (Atom atomToFlip in selMolecule.Atoms.Values)
                 {
-                    atomToFlip.Position = currentPos;
-                };
-                Action redo = () =>
-                {
-                    atomToFlip.Position = newPos;
-                };
-                atomToFlip.Position = newPos;
+                    atomToFlip.Position = unFlipTransform.Transform(atomToFlip.Position);
+                }
+                selMolecule.ForceBondingUpdates();
+            };
 
-                UndoManager.RecordAction(undo, redo, "Flip Atom");
-            }
+            Action redo = () =>
+            {
+                foreach (Atom atomToFlip in selMolecule.Atoms.Values)
+                {
+                    atomToFlip.Position = flipTransform.Transform(atomToFlip.Position);
+                }
+                selMolecule.ForceBondingUpdates();
+            };
+
+            UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
+            redo();
 
             UndoManager.EndUndoBlock();
         }
