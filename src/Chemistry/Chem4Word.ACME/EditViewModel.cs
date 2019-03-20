@@ -1422,28 +1422,32 @@ namespace Chem4Word.ACME
             }
 
             ScaleTransform flipTransform = new ScaleTransform(scaleX, scaleY, cx, cy);
+            ScaleTransform unFlipTransform = new ScaleTransform(-scaleX, -scaleY, cx, cy);
 
-            //UndoManager.BeginUndoBlock();
+            UndoManager.BeginUndoBlock();
 
-            foreach (Atom atomToFlip in selMolecule.Atoms.Values)
+            Action undo = () =>
             {
-                Point currentPos = atomToFlip.Position;
-                Point newPos = flipTransform.Transform(currentPos);
-                //Action undo = () =>
-                //{
-                //    atomToFlip.Position = currentPos;
-                //};
-                //Action redo = () =>
-                //{
-                //    atomToFlip.Position = newPos;
-                //};
-                Debug.WriteLine($"Setting {atomToFlip} to {newPos}");
-                atomToFlip.Position = newPos;
+                foreach (Atom atomToFlip in selMolecule.Atoms.Values)
+                {
+                    atomToFlip.Position = unFlipTransform.Transform(atomToFlip.Position);
+                }
+                selMolecule.ForceBondingUpdates();
+            };
 
-                //UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
-            }
-            selMolecule.ForceBondingUpdates();
-            //UndoManager.EndUndoBlock();
+            Action redo = () =>
+            {
+                foreach (Atom atomToFlip in selMolecule.Atoms.Values)
+                {
+                    atomToFlip.Position = flipTransform.Transform(atomToFlip.Position);
+                }
+                selMolecule.ForceBondingUpdates();
+            };
+
+            UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
+            redo();
+
+            UndoManager.EndUndoBlock();
         }
 
         public void AddToSelection(object thingToAdd)
