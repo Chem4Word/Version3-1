@@ -564,14 +564,14 @@ namespace Chem4Word.ACME.Controls
 
         #region Methods
 
-        private ChemicalVisual GetTargetedVisual(Point p)
+        public ChemicalVisual GetTargetedVisual(Point p)
         {
             _visuals.Clear();
             VisualTreeHelper.HitTest(this, null, ResultCallback, new PointHitTestParameters(p));
-            var selAtomVisual = _visuals.FirstOrDefault(v => v is AtomVisual);
-            if(selAtomVisual!=null)
+            var visual = _visuals.FirstOrDefault(v => v is AtomVisual);
+            if(visual!=null)
             {
-                return selAtomVisual;
+                return visual;
             }
             else
             {
@@ -580,7 +580,7 @@ namespace Chem4Word.ACME.Controls
 
         }
 
-        private HitTestResultBehavior ResultCallback(HitTestResult result)
+        public HitTestResultBehavior ResultCallback(HitTestResult result)
         {
             _visualHit = result.VisualHit as ChemicalVisual;
           _visuals.Add(_visualHit);

@@ -705,7 +705,7 @@ namespace Chem4Word.Model2
             RebuildRings();
         }
 
-        public void ForceBondingUpdates()
+        public void ForceUpdates()
         {
             foreach (var atom in Atoms.Values)
             {

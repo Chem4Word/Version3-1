@@ -292,11 +292,10 @@
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}" />
-        <Setter Property="Opacity" Value="0.75" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Rectangle Fill="{StaticResource GrabHandleFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" />
+                    <Ellipse Fill="{x:Static SystemColors.WindowBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -22,34 +23,42 @@ namespace Chem4Word.ACME.Adorners
     public class SingleAtomSelectionAdorner : Adorner
     {
         protected Thumb BigThumb; //this is the main grab area for the molecule
-
         protected readonly VisualCollection VisualChildren;
-
         //tracks the last operation performed
         protected Transform LastOperation;
-
         //status flag
         protected bool Dragging;
-
         //rendering variables
         protected readonly Pen BorderPen;
-
         protected readonly Brush RenderBrush;
-
         //tracks the amount of travel during drag operations
         protected double DragXTravel;
-
         protected double DragYTravel;
-
         public readonly EditViewModel CurrentModel;
-
         //where the dragging starts
         protected Point StartPos;
-        private EditorCanvas _editorCanvas;
+        private readonly EditorCanvas _editorCanvas;
+        protected bool IsWorking => Dragging;
+        // Override the VisualChildrenCount and GetVisualChild properties to interface with
+        // the adorner's visual collection.
+        protected override int VisualChildrenCount => VisualChildren.Count;
+        //public Molecule AdornedMolecule { get; set; }
+        public readonly List<Molecule> AdornedMolecules;
+        protected override Visual GetVisualChild(int index)
+        {
+            return VisualChildren[index];
+        }
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
-            : base(adornedElement)
+            : this(adornedElement, new List<Molecule> {molecule}, currentModel)
         {
+            
+        }
+
+        public SingleAtomSelectionAdorner(UIElement adornedElement, List<Molecule> molecules,
+            EditViewModel currentModel):base(adornedElement)
+        {
+            AdornedMolecules= new List<Molecule>();
             CurrentModel = currentModel;
 
             VisualChildren = new VisualCollection(this);
@@ -58,18 +67,18 @@ namespace Chem4Word.ACME.Adorners
 
             AttachHandler();
 
-            AdornedMolecule = molecule;
+            AdornedMolecules.AddRange(molecules);
 
             BorderPen = (Pen)FindResource("GrabHandlePen");
             RenderBrush = (Brush)FindResource("BigThumbFillBrush");
             Focusable = false;
             IsHitTestVisible = true;
 
-            _editorCanvas = (EditorCanvas) adornedElement;
+            _editorCanvas = (EditorCanvas)adornedElement;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
-
+        
         protected void AttachHandler()
         {
             //wire up the event handling
@@ -158,7 +167,7 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var ghost = _editorCanvas.GhostMolecule(AdornedMolecule);
+                var ghost = _editorCanvas.GhostMolecule(AdornedMolecules);
                 //Debug.WriteLine(LastOperation.ToString());
                 ghost.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
@@ -168,22 +177,12 @@ namespace Chem4Word.ACME.Adorners
             }
         }
 
-        protected bool IsWorking => Dragging;
-
-        // Override the VisualChildrenCount and GetVisualChild properties to interface with
-        // the adorner's visual collection.
-        protected override int VisualChildrenCount => VisualChildren.Count;
-
-        public Molecule AdornedMolecule { get; set; }
-
-        protected override Visual GetVisualChild(int index) => VisualChildren[index];
-
         // Arrange the Adorners.
         protected override Size ArrangeOverride(Size finalSize)
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = (AdornedElement as EditorCanvas).GetMoleculeBoundingBox(AdornedMolecule);
+            var bbb = (AdornedElement as EditorCanvas).GetMoleculeBoundingBox(AdornedMolecules);
 
             if (LastOperation != null)
             {
@@ -257,12 +256,21 @@ namespace Chem4Word.ACME.Adorners
             InvalidateVisual();
             _editorCanvas.SuppressRedraw = true;
             //move the molecule
-            CurrentModel.DoOperation(LastOperation, AdornedMolecule.Atoms.Values.ToList());
+            var atoms = from mol in AdornedMolecules
+                from atom in mol.Atoms.Values
+                select atom;
+
+                CurrentModel.DoOperation(LastOperation, atoms.ToList());
             
             RaiseDRCompleted(sender, e);
             Dragging = false;
             _editorCanvas.SuppressRedraw = false;
-            AdornedMolecule.ForceBondingUpdates();
+
+            foreach (Molecule adornedMolecule in AdornedMolecules)
+            {
+                 adornedMolecule.ForceUpdates();
+            }
+           
         }
 
         #endregion Dragging

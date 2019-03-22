@@ -25,7 +25,7 @@ namespace Chem4Word.ACME.Behaviors
         private readonly TranslateTransform _transform = new TranslateTransform();
         private AtomVisual _currentAtomVisual;
         private bool _flag;
-        private SnapGeometry _angleSnapper;
+        private Snapper _angleSnapper;
         //private Window _parent;
 
         private DrawBondAdorner _adorner;
@@ -292,12 +292,12 @@ namespace Chem4Word.ACME.Behaviors
             _currentAtomVisual = GetAtomUnderCursor(e);
             if (_currentAtomVisual == null)
             {
-                _angleSnapper = new SnapGeometry(e.GetPosition(relativeTo: AssociatedObject), ViewModel);
+                _angleSnapper = new Snapper(e.GetPosition(relativeTo: AssociatedObject), ViewModel);
             }
             else
             {
                 Mouse.Capture(AssociatedObject);
-                _angleSnapper = new SnapGeometry(_currentAtomVisual.ParentAtom.Position, ViewModel);
+                _angleSnapper = new Snapper(_currentAtomVisual.ParentAtom.Position, ViewModel);
                 _lastAtomVisual = _currentAtomVisual;
             }
             _flag = true;

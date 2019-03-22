@@ -491,6 +491,9 @@ namespace Chem4Word.Model2
             set { _internalId = value; }
         }
 
+        public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms.Values.First() == this;
+
+
         #endregion Constructors
 
         #region Methods
