@@ -61,10 +61,13 @@ namespace Chem4Word.Model2
 
         private void OnMoleculesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var temp = MoleculesChanged;
-            if (temp != null)
+            if (!InhibitEvents)
             {
-                temp.Invoke(sender, e);
+                var temp = MoleculesChanged;
+                if (temp != null)
+                {
+                    temp.Invoke(sender, e);
+                }
             }
         }
 
@@ -75,10 +78,13 @@ namespace Chem4Word.Model2
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var temp = PropertyChanged;
-            if (temp != null)
+            if (!InhibitEvents)
             {
-                temp.Invoke(sender, e);
+                var temp = PropertyChanged;
+                if (temp != null)
+                {
+                    temp.Invoke(sender, e);
+                }
             }
         }
 
@@ -89,10 +95,13 @@ namespace Chem4Word.Model2
 
         private void OnBondsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var temp = BondsChanged;
-            if (temp != null)
+            if (!InhibitEvents)
             {
-                temp.Invoke(sender, e);
+                var temp = BondsChanged;
+                if (temp != null)
+                {
+                    temp.Invoke(sender, e);
+                }
             }
         }
 
@@ -103,16 +112,21 @@ namespace Chem4Word.Model2
 
         private void OnAtomsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var temp = AtomsChanged;
-            if (temp != null)
+            if (!InhibitEvents)
             {
-                temp.Invoke(sender, e);
+                var temp = AtomsChanged;
+                if (temp != null)
+                {
+                    temp.Invoke(sender, e);
+                }
             }
         }
 
         #endregion Event handlers
 
         #region Properties
+
+        public bool InhibitEvents { get; set; }
 
         public bool HasFunctionalGroups
         {
@@ -188,6 +202,7 @@ namespace Chem4Word.Model2
                 return min;
             }
         }
+
         public int MaxAtomicNumber
         {
             get
