@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using System.Diagnostics;
 using System.Linq;
@@ -13,7 +14,6 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -24,6 +24,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private Point _startpoint;
         private Window _parent;
+        private EditorCanvas _editorCanvas;
         private bool _flag;
         private LassoAdorner _lassoAdorner;
         //private MoleculeSelectionAdorner _molAdorner;
@@ -33,6 +34,8 @@ namespace Chem4Word.ACME.Behaviors
             base.OnAttached();
 
             _parent = Application.Current.MainWindow;
+
+            _editorCanvas = (EditorCanvas)AssociatedObject;
 
             AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
@@ -62,6 +65,11 @@ namespace Chem4Word.ACME.Behaviors
             Mouse.Capture(AssociatedObject);
             _mouseTrack.Add(_startpoint);
 
+            if (e.ClickCount == 2 & ViewModel.SelectionType == EditViewModel.SelectionTypeCode.Molecule)
+            {
+                DoMolSelect(e);
+                e.Handled = true;
+            }
             if (e.ClickCount == 2)
             {
                 DoMolSelect(e);
@@ -71,6 +79,7 @@ namespace Chem4Word.ACME.Behaviors
             if (e.ClickCount == 1) //single click
             {
                 DoSingleSelect(e);
+                //e.Handled = true;
             }
         }
 
@@ -184,51 +193,57 @@ namespace Chem4Word.ACME.Behaviors
 
         private void DoMolSelect(MouseButtonEventArgs e)
         {
-            var hitTestResult = GetTarget(e);
-            Debug.Print(hitTestResult.ToString());
+            var activeVisual = _editorCanvas.ActiveVisual;
 
-            if (hitTestResult.VisualHit is AtomVisual)
+            switch (activeVisual)
             {
-                var atom = (AtomVisual)hitTestResult.VisualHit;
-                //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
+                case AtomVisual av:
+                    {
+                        var atom = av.ParentAtom;
+                        //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
-                ViewModel.AddToSelection(atom.ParentAtom.Parent);
-            }
-            else if (hitTestResult.VisualHit is BondVisual)
-            {
-                var bond = (BondVisual)hitTestResult.VisualHit;
-                //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
+                        ViewModel.AddToSelection(atom);
+                        break;
+                    }
+                case BondVisual bv:
+                    {
+                        var bond = bv.ParentBond;
+                        //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
-                ViewModel.AddToSelection(bond.ParentBond.Parent);
-            }
-            else
-            {
-                ViewModel.SelectedItems.Clear();
+                        ViewModel.AddToSelection(bond);
+                        break;
+                    }
+                default:
+                    ViewModel.SelectedItems.Clear();
+                    break;
             }
         }
 
         private void DoSingleSelect(MouseButtonEventArgs e)
         {
-            var hitTestResult = GetTarget(e);
-            Debug.Print(hitTestResult.ToString());
+            var activeVisual = _editorCanvas.ActiveVisual;
 
-            if (hitTestResult.VisualHit is AtomVisual)
+            switch (activeVisual)
             {
-                var atom = (AtomVisual)hitTestResult.VisualHit;
-                //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
+                case AtomVisual av:
+                    {
+                        var atom = av.ParentAtom;
+                        //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
-                ViewModel.AddToSelection(atom.ParentAtom);
-            }
-            else if (hitTestResult.VisualHit is BondVisual)
-            {
-                var bond = (BondVisual)hitTestResult.VisualHit;
-                //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
+                        ViewModel.AddToSelection(atom);
+                        break;
+                    }
+                case BondVisual bv:
+                    {
+                        var bond = bv.ParentBond;
+                        //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
-                ViewModel.AddToSelection(bond.ParentBond);
-            }
-            else
-            {
-                ViewModel.SelectedItems.Clear();
+                        ViewModel.AddToSelection(bond);
+                        break;
+                    }
+                default:
+                    ViewModel.SelectedItems.Clear();
+                    break;
             }
         }
 

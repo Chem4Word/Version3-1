@@ -17,7 +17,7 @@ namespace Chem4Word.ACME.Utils
     ///     Allows locking of sprouting bonds to fixed lengths and orientations depending on the
     ///     mouse location.
     /// </summary>
-    public class SnapGeometry
+    public class Snapper
     {
         private readonly Point _startPoint;
         private readonly int _lockAngle;
@@ -28,17 +28,17 @@ namespace Chem4Word.ACME.Utils
         ///     Creates a new SnapGeometry
         /// </summary>
         /// <param name="startPoint">location of the angle where the bond swings from.</param>
-        /// <param name="angleIncrement">Angle in degrees - must be a factor of 360</param>
-        public SnapGeometry(Point startPoint, EditViewModel viewModel, int angleIncrement = 15)
+        /// <param name="lockAngle">Angle in degrees - must be a factor of 360</param>
+        public Snapper(Point startPoint, EditViewModel viewModel, int lockAngle = 15)
         {
             ViewModel = viewModel;
             _startPoint = startPoint;
-            if (360 % angleIncrement != 0)
+            if (360 % lockAngle != 0)
             {
                 Debugger.Break();
                 throw new ArgumentException("Angle must divide into 360!");
             }
-            _lockAngle = angleIncrement;
+            _lockAngle = lockAngle;
         }
 
         /// <summary>

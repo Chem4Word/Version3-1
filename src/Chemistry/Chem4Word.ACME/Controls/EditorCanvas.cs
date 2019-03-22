@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -55,12 +56,26 @@ namespace Chem4Word.ACME.Controls
             return union;
         }
 
-        public Geometry GhostMolecule(Molecule adornedMolecule)
+        public Rect GetMoleculeBoundingBox(List<Molecule> adornedMolecules)
+        {
+            Rect union = Rect.Empty;
+            foreach (Molecule molecule in adornedMolecules)
+            {
+                union.Union(GetMoleculeBoundingBox(molecule));
+            }
+
+            return union;
+        }
+        public Geometry GhostMolecule(List<Molecule> adornedMolecules)
         {
             var atomList = new List<Atom>();
             List<Bond> bondList = new List<Bond>();
-            adornedMolecule.BuildAtomList(atomList);
-            adornedMolecule.BuildBondList(bondList);
+            foreach (Molecule mol in adornedMolecules)
+            {
+                  mol.BuildAtomList(atomList);
+                  mol.BuildBondList(bondList);
+            }
+          
             StreamGeometry ghostGeometry = new StreamGeometry();
 
             double atomRadius = this.Chemistry.Model.XamlBondLength / 7.50;
@@ -94,6 +109,7 @@ namespace Chem4Word.ACME.Controls
             return ghostGeometry;
         }
 
+       
         #endregion Methods
 
         #region Overrides
@@ -110,6 +126,7 @@ namespace Chem4Word.ACME.Controls
 
         #endregion Overrides
 
-     
+
+       
     }
 }

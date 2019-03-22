@@ -8,10 +8,12 @@
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -47,16 +49,16 @@ namespace Chem4Word.ACME.Adorners
         //private SnapGeometry _rotateSnapper;
         //private readonly Brush _renderBrush;
 
-        public MoleculeSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
-            : base(adornedElement, molecule, currentModel)
+        public MoleculeSelectionAdorner(UIElement adornedElement, List<Molecule> molecules, EditViewModel currentModel)
+            : base(adornedElement, molecules, currentModel)
         {
             _editorCanvas = (AdornedElement as EditorCanvas);
 
             if (_thumbWidth == null)
             {
-                _thumbWidth = (int)CurrentModel.Model.XamlBondLength / 10;
+                _thumbWidth = 15;
                 _halfThumbWidth = _thumbWidth.Value / 2;
-                _rotateThumbWidth = CurrentModel.Model.XamlBondLength / 7.5;
+                _rotateThumbWidth = _thumbWidth.Value;
             }
 
             BuildAdornerCorner(ref TopLeftHandle, Cursors.SizeNWSE);
@@ -97,7 +99,7 @@ namespace Chem4Word.ACME.Adorners
             Resizing = true;
             Dragging = false;
             Keyboard.Focus(this);
-            BoundingBox = AdornedMolecule.BoundingBox;
+            BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
         }
@@ -136,9 +138,14 @@ namespace Chem4Word.ACME.Adorners
 
         private void SetCentroid()
         {
-            _centroid = AdornedMolecule.Centroid;
+            _centroid = GetCentroid(_editorCanvas.GetMoleculeBoundingBox(AdornedMolecules));
             //create a snapper
             //_rotateSnapper = new SnapGeometry(_centroid, 15);
+        }
+
+        private Point GetCentroid(Rect mbb)
+        {
+            return mbb.TopLeft + (mbb.BottomRight - mbb.TopLeft) * 0.5;
         }
 
         private void RotateThumb_DragCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
@@ -149,7 +156,11 @@ namespace Chem4Word.ACME.Adorners
             {
                 _rotateAngle = ((RotateTransform)LastOperation).Angle;
 
-                AdornedMolecule.Move(LastOperation);
+                foreach (Molecule molecule in AdornedMolecules)
+                {
+                     molecule.Move(LastOperation);
+                }
+               
                 SetBoundingBox();
                 InvalidateVisual();
                 DragCompleted?.Invoke(this, dragCompletedEventArgs);
@@ -166,8 +177,16 @@ namespace Chem4Word.ACME.Adorners
 
             if (LastOperation != null && LastOperation is ScaleTransform)
             {
-                var atomList = AdornedMolecule.Atoms.Values.ToList();
+                var atomList = (
+                    from mol in AdornedMolecules
+                    from a in mol.Atoms.Values
+                    select a).ToList();
+
                 CurrentModel.DoOperation(LastOperation, atomList);
+                foreach (Molecule molecule in AdornedMolecules)
+                {
+                    molecule.ForceUpdates();
+                }
                 SetBoundingBox();
                 ResizeCompleted?.Invoke(this, dragCompletedEventArgs);
                 SetCentroid();
@@ -179,7 +198,7 @@ namespace Chem4Word.ACME.Adorners
         {
             //and work out the aspect ratio for later resizing
             //AdornedMolecule.ResetBoundingBox();
-            BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecule);
+            BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
@@ -202,7 +221,7 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var ghost = _editorCanvas.GhostMolecule(AdornedMolecule);
+                var ghost = _editorCanvas.GhostMolecule(AdornedMolecules);
                 //Debug.WriteLine(LastOperation.ToString());
                 ghost.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
@@ -239,7 +258,7 @@ namespace Chem4Word.ACME.Adorners
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecule);
+            var bbb = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
 
             if (LastOperation != null)
             {
