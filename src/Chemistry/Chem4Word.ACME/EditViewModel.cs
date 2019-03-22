@@ -1304,7 +1304,7 @@ namespace Chem4Word.ACME
         {
             foreach (var mol in mols)
             {
-                mol.ForceBondingUpdates();
+                mol.ForceUpdates();
             }
         }
 
@@ -1397,17 +1397,11 @@ namespace Chem4Word.ACME
 
                     if (mols.Any())
                     {
-                        foreach (var mol in mols)
-                        {
-                            mol.ForceBondingUpdates();
-                        }
+                        RefreshMolecules(mols);
                     }
                     else
                     {
-                        foreach (var mol in Model.Molecules.Values)
-                        {
-                            mol.ForceBondingUpdates();
-                        }
+                        RefreshMolecules(Model.Molecules.Values.ToList());
                     }
 
                     SelectedItems.Clear();
