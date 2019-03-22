@@ -1203,21 +1203,21 @@ namespace Chem4Word.ACME
                             Position = atom.Position + vector * (Model.XamlBondLength * Globals.ExplicitHydrogenBondPercentage)
                         };
                         newAtoms.Add(aa);
-                        if (!parents.ContainsKey(aa.Id))
+                        if (!parents.ContainsKey(aa.InternalId))
                         {
-                            parents.Add(aa.Id, atom.Parent);
+                            parents.Add(aa.InternalId, atom.Parent);
                         }
                         var bb = new Bond
                         {
-                            //StartAtom = atom,
-                            //EndAtom = aa,
+                            StartAtomInternalId = atom.InternalId,
+                            EndAtomInternalId = aa.InternalId,
                             Stereo = Globals.BondStereo.None,
                             Order = "S"
                         };
                         newBonds.Add(bb);
-                        if (!parents.ContainsKey(bb.Id))
+                        if (!parents.ContainsKey(bb.InternalId))
                         {
-                            parents.Add(bb.Id, atom.Parent);
+                            parents.Add(bb.InternalId, atom.Parent);
                         }
                     }
                 }
@@ -1226,7 +1226,8 @@ namespace Chem4Word.ACME
 
                 Action undoAction = () =>
                 {
-                    //this.Canvas.SuppressRedraw = true;
+                    //Model.InhibitEvents = true;
+
                     foreach (var bond in newBonds)
                     {
                         bond.Parent.RemoveBond(bond);
@@ -1235,6 +1236,8 @@ namespace Chem4Word.ACME
                     {
                         atom.Parent.RemoveAtom(atom);
                     }
+
+                    //Model.InhibitEvents = false;
 
                     if (mols.Any())
                     {
@@ -1250,16 +1253,20 @@ namespace Chem4Word.ACME
 
                 Action redoAction = () =>
                 {
+                    Model.InhibitEvents = true;
+
                     foreach (var atom in newAtoms)
                     {
-                        parents[atom.Id].AddAtom(atom);
-                        //atom.Parent = parents[atom.Id];
+                        parents[atom.InternalId].AddAtom(atom);
+                        atom.Parent = parents[atom.InternalId];
                     }
                     foreach (var bond in newBonds)
                     {
-                        parents[bond.Id].AddBond(bond);
-                        //bond.Parent = parents[bond.Id];
+                        parents[bond.InternalId].AddBond(bond);
+                        bond.Parent = parents[bond.InternalId];
                     }
+
+                    Model.InhibitEvents = false;
 
                     if (mols.Any())
                     {
@@ -1311,14 +1318,14 @@ namespace Chem4Word.ACME
                                 // Not Stereo
                                 if (hydrogen.Bonds.First().Stereo == Globals.BondStereo.None)
                                 {
-                                    if (!parents.ContainsKey(hydrogen.Id))
+                                    if (!parents.ContainsKey(hydrogen.InternalId))
                                     {
-                                        parents.Add(hydrogen.Id, hydrogen.Parent);
+                                        parents.Add(hydrogen.InternalId, hydrogen.Parent);
                                     }
                                     targetAtoms.Add(hydrogen);
-                                    if (!parents.ContainsKey(hydrogen.Bonds.First().Id))
+                                    if (!parents.ContainsKey(hydrogen.Bonds.First().InternalId))
                                     {
-                                        parents.Add(hydrogen.Bonds.First().Id, hydrogen.Parent);
+                                        parents.Add(hydrogen.Bonds.First().InternalId, hydrogen.Parent);
                                     }
                                     targetBonds.Add(hydrogen.Bonds.First());
                                 }
@@ -1340,14 +1347,14 @@ namespace Chem4Word.ACME
                             // Not Stereo
                             if (hydrogen.Bonds.First().Stereo == Globals.BondStereo.None)
                             {
-                                if (!parents.ContainsKey(hydrogen.Id))
+                                if (!parents.ContainsKey(hydrogen.InternalId))
                                 {
-                                    parents.Add(hydrogen.Id, hydrogen.Parent);
+                                    parents.Add(hydrogen.InternalId, hydrogen.Parent);
                                 }
                                 targetAtoms.Add(hydrogen);
-                                if (!parents.ContainsKey(hydrogen.Bonds.First().Id))
+                                if (!parents.ContainsKey(hydrogen.Bonds.First().InternalId))
                                 {
-                                    parents.Add(hydrogen.Bonds.First().Id, hydrogen.Parent);
+                                    parents.Add(hydrogen.Bonds.First().InternalId, hydrogen.Parent);
                                 }
                                 targetBonds.Add(hydrogen.Bonds.First());
                             }
@@ -1361,16 +1368,20 @@ namespace Chem4Word.ACME
                 UndoManager.BeginUndoBlock();
                 Action undoAction = () =>
                 {
+                    Model.InhibitEvents = true;
+
                     foreach (var atom in targetAtoms)
                     {
-                        parents[atom.Id].AddAtom(atom);
-                        atom.Parent = parents[atom.Id];
+                        parents[atom.InternalId].AddAtom(atom);
+                        atom.Parent = parents[atom.InternalId];
                     }
                     foreach (var bond in targetBonds)
                     {
-                        parents[bond.Id].AddBond(bond);
-                        bond.Parent = parents[bond.Id];
+                        parents[bond.InternalId].AddBond(bond);
+                        bond.Parent = parents[bond.InternalId];
                     }
+
+                    Model.InhibitEvents = false;
 
                     if (mols.Any())
                     {
@@ -1392,6 +1403,8 @@ namespace Chem4Word.ACME
 
                 Action redoAction = () =>
                 {
+                    //Model.InhibitEvents = true;
+
                     foreach (var bond in targetBonds)
                     {
                         bond.Parent.RemoveBond(bond);
@@ -1400,6 +1413,8 @@ namespace Chem4Word.ACME
                     {
                         atom.Parent.RemoveAtom(atom);
                     }
+
+                    //Model.InhibitEvents = false;
 
                     if (mols.Any())
                     {
