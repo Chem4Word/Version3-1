@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
@@ -19,7 +20,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
-using Chem4Word.ACME;
 
 namespace WinForms.TestHarness
 {
@@ -32,6 +32,8 @@ namespace WinForms.TestHarness
 
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
+        private string _lastCml = null;
 
         public FlexForm()
         {
@@ -55,6 +57,7 @@ namespace WinForms.TestHarness
                 openFileDialog1.Filter = sb.ToString();
                 openFileDialog1.FileName = "";
                 openFileDialog1.ShowHelp = false;
+
 
                 DialogResult dr = openFileDialog1.ShowDialog();
 
@@ -82,20 +85,19 @@ namespace WinForms.TestHarness
 
                     if (model != null)
                     {
-                        Model existing = Display.Chemistry as Model;
-                        if (existing != null)
-                        {
-                            Model copy = existing.Copy();
-                            copy.RescaleForCml();
-
-                            Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Stack");
-                            _undoStack.Push(copy);
-                        }
-
                         if (model.MeanBondLength < 2.5 || model.MeanBondLength > 97.5)
                         {
                             model.ScaleToAverageBondLength(20);
                         }
+
+                        if (!string.IsNullOrEmpty(_lastCml))
+                        {
+                            var clone = cmlConvertor.Import(_lastCml);
+                            Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
+                            _undoStack.Push(clone);
+                        }
+                        _lastCml = cmlConvertor.Export(model);
+
                         _telemetry.Write(module, "Information", $"File: {filename}");
                         ShowChemistry(filename, model);
                     }
@@ -124,20 +126,21 @@ namespace WinForms.TestHarness
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Model model = Display.Chemistry as Model;
-                if (model != null)
+                if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    Model copy = model.Copy();
-                    copy.RescaleForCml();
-
-                    CMLConverter cc = new CMLConverter();
-                    EditorHost editorHost = new EditorHost(cc.Export(copy), "ACME");
+                    EditorHost editorHost = new EditorHost(_lastCml, "ACME");
                     editorHost.ShowDialog(this);
                     if (editorHost.Result == DialogResult.OK)
                     {
-                        Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Stack");
-                        _undoStack.Push(copy);
+                        CMLConverter cc = new CMLConverter();
+                        var clone = cc.Import(_lastCml);
+                        Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
+                        _undoStack.Push(clone);
+
                         Model m = cc.Import(editorHost.OutputValue);
+                        m.Relabel(true);
+                        _lastCml = cc.Export(m);
+
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
                 }
@@ -199,6 +202,8 @@ namespace WinForms.TestHarness
             RemoveAtom.Enabled = true;
             RandomElement.Enabled = true;
             EditCml.Enabled = true;
+            ShowCml.Enabled = true;
+
             ListStacks();
         }
 
@@ -378,12 +383,11 @@ namespace WinForms.TestHarness
                 m.CheckIntegrity();
                 Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.0##")} from Undo Stack");
 
-                Model c = Display.Chemistry as Model;
-                if (c != null)
+                if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    Model copy = c.Copy();
-                    copy.CheckIntegrity();
-                    copy.RescaleForCml();
+                    CMLConverter cc = new CMLConverter();
+                    var copy = cc.Import(_lastCml);
+                    _lastCml = cc.Export(m);
 
                     Debug.WriteLine($"Pushing F: {copy.ConciseFormula} BL: {copy.MeanBondLength.ToString("#,##0.0##")} onto Redo Stack");
                     _redoStack.Push(copy);
@@ -407,11 +411,11 @@ namespace WinForms.TestHarness
                 Model m = _redoStack.Pop();
                 Debug.WriteLine($"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.0##")} from Redo Stack");
 
-                Model c = Display.Chemistry as Model;
-                if (c != null)
+                if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    Model clone = c.Copy();
-                    clone.RescaleForCml();
+                    CMLConverter cc = new CMLConverter();
+                    var clone = cc.Import(_lastCml);
+                    _lastCml = cc.Export(m);
 
                     Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Undo Stack");
                     _undoStack.Push(clone);
@@ -453,22 +457,43 @@ namespace WinForms.TestHarness
 
             try
             {
-                Model model = Display.Chemistry as Model;
-                if (model != null)
+                if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    Model clone = model.Copy();
-                    clone.RescaleForCml();
-
-                    CMLConverter cc = new CMLConverter();
-                    EditorHost editorHost = new EditorHost(cc.Export(clone), "CML");
+                    EditorHost editorHost = new EditorHost(_lastCml, "CML");
                     editorHost.ShowDialog(this);
                     if (editorHost.Result == DialogResult.OK)
                     {
+                        CMLConverter cc = new CMLConverter();
+                        var clone = cc.Import(_lastCml);
                         Debug.WriteLine($"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.0##")} onto Stack");
                         _undoStack.Push(clone);
+
                         Model m = cc.Import(editorHost.OutputValue);
+                        m.Relabel(true);
+                        _lastCml = cc.Export(m);
+
                         ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
+                }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
+            }
+        }
+
+        private void ShowCml_Click(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                if (!string.IsNullOrEmpty(_lastCml))
+                {
+                    var f = new ShowCml();
+                    f.Cml = _lastCml;
+                    f.ShowDialog(this);
                 }
             }
             catch (Exception exception)

@@ -414,7 +414,7 @@
                                 Stretch="Fill" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DrawBehavior ViewModel="{Binding}" />
+                        <behaviors:DrawBehavior ViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
 

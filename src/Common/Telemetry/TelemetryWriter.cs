@@ -102,6 +102,10 @@ namespace Chem4Word.Telemetry
 
             // Log Word
             WritePrivate("StartUp", "Information", _helper.WordProduct); // ** Used by Andy's Knime protocol
+            if (!string.IsNullOrEmpty(_helper.Click2RunProductIds))
+            {
+                WritePrivate("StartUp", "Information", _helper.Click2RunProductIds);
+            }
             WritePrivate("StartUp", "Information", Environment.GetCommandLineArgs()[0]);
 
             // Log System
@@ -143,6 +147,7 @@ namespace Chem4Word.Telemetry
             lines.Add($"CPU Cores: {_wmiHelper.LogicalProcessors}");
             lines.Add($"CPU Speed: {_wmiHelper.CpuSpeed}");
             lines.Add($"Physical Memory: {_wmiHelper.PhysicalMemory}");
+            lines.Add($"Booted Up: {_wmiHelper.LastLastBootUpTime}");
 
             // Log Screen Sizes
             lines.Add($"Screens: {_helper.Screens}");

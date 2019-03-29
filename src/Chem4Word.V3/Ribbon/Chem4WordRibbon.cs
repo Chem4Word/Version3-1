@@ -545,7 +545,7 @@ namespace Chem4Word
 
             try
             {
-                this.RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
+                RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
             }
             //catch (Exception ex)
             //{
@@ -640,19 +640,13 @@ namespace Chem4Word
 
                                     if (beforeModel.HasFunctionalGroups && !editor.CanEditFunctionalGroups)
                                     {
-                                        if (Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn.Contains("ChemDoodle"))
-                                        {
-                                            UserInteractions.InformUser("This chemistry item has Functional Groups!\nPlease use ACME to edit this structure.");
-                                            return;
-                                        }
+                                        UserInteractions.InformUser("This chemistry item has Functional Groups!\nPlease use ACME to edit this structure.");
+                                        return;
                                     }
                                     if (beforeModel.HasNestedMolecules && !editor.CanEditNestedMolecules)
                                     {
-                                        if (Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn.Contains("ChemDoodle"))
-                                        {
-                                            UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
-                                            return;
-                                        }
+                                        UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
+                                        return;
                                     }
 
                                     isNewDrawing = false;

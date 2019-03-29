@@ -490,13 +490,17 @@ namespace Chem4Word.Model2
                 OnMoleculesChanged(this, e);
                 UpdateMoleculeEventHandlers(e);
             }
+            else
+            {
+                throw new ArgumentException();
+            }
 
             return res;
         }
 
         public Molecule AddMolecule(Molecule newMol)
         {
-            _molecules[newMol.Id] = newMol;
+            _molecules[newMol.InternalId] = newMol;
             NotifyCollectionChangedEventArgs e =
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
                     new List<Molecule> { newMol });

@@ -679,5 +679,22 @@ namespace Chem4Word.Model2
         {
             OnPropertyChanged(nameof(Order));
         }
+        //gets the bond angle from the perspective of the designated atom
+        public double AngleStartingAt(Atom rootAtom)
+        {
+            if (rootAtom != StartAtom & rootAtom != EndAtom)
+            {
+                throw new ArgumentException("Atom not part of this bond.");
+            }
+
+            if (rootAtom == StartAtom)
+            {
+                return Angle;
+            }
+            else
+            {
+                return (Angle + 180d) % 360d;
+            }
+        }
     }
 }

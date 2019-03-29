@@ -101,7 +101,7 @@ namespace Chem4Word.Database
             {
                 var converter = new CMLConverter();
                 Model model = converter.Import(cmlFile);
-                
+
                 if (model.TotalAtomsCount > 0)
                 {
                     double before = model.MeanBondLength;

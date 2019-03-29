@@ -53,6 +53,10 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
+        public AtomVisual ActiveAtomVisual => (ActiveVisual as AtomVisual);
+
+        public BondVisual ActiveBondVisual => (ActiveVisual as BondVisual);
+
         public Model2.ChemistryBase ActiveChemistry
         {
             get
@@ -215,6 +219,25 @@ namespace Chem4Word.ACME.Controls
 
         private void Model_MoleculesChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            if (e.NewItems != null)
+            {
+                foreach (var eNewItem in e.NewItems)
+                {
+                    Molecule a= (Molecule)eNewItem;
+
+                    MoleculeAdded(a);
+                }
+            }
+
+            if (e.OldItems != null)
+            {
+                foreach (var eNewItem in e.OldItems)
+                {
+                    Molecule b = (Molecule)eNewItem;
+
+                    MoleculeRemoved(b);
+                }
+            }
         }
 
         private void Model_BondsChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -34,8 +33,8 @@ namespace Chem4Word.Model2
         private List<Bond> _bonds;
         private Dictionary<string, Molecule> _molecules;
         public readonly ReadOnlyDictionary<string, Molecule> Molecules;
-        public readonly ObservableCollection<Formula> Formulas;
-        public readonly ObservableCollection<ChemicalName> Names;
+        public ObservableCollection<Formula> Formulas { get; internal set; }
+        public ObservableCollection<ChemicalName> Names { get; internal set; }
         public List<string> Warnings { get; set; }
         public List<string> Errors { get; set; }
 
@@ -160,6 +159,7 @@ namespace Chem4Word.Model2
                     {
                         return Parent.Root;
                     }
+
                     return Parent;
                 }
 
@@ -204,6 +204,7 @@ namespace Chem4Word.Model2
             {
                 path = path.Substring(1); //strip off the first separator
             }
+
             string id = path.UpTo("/");
 
             string relativepath = Helpers.Utils.GetRelativePath(id, path);
@@ -225,6 +226,7 @@ namespace Chem4Word.Model2
             {
                 return bond;
             }
+
             throw new ArgumentException("Object not found");
         }
 
@@ -238,10 +240,7 @@ namespace Chem4Word.Model2
 
         public int? SpinMultiplicity
         {
-            get
-            {
-                return _spinMultiplicity;
-            }
+            get { return _spinMultiplicity; }
             set
             {
                 _spinMultiplicity = value;
@@ -255,10 +254,7 @@ namespace Chem4Word.Model2
 
         public int? FormalCharge
         {
-            get
-            {
-                return _formalCharge;
-            }
+            get { return _formalCharge; }
             set
             {
                 _formalCharge = value;
@@ -304,6 +300,7 @@ namespace Chem4Word.Model2
                                 {
                                     otherParts[symbol]++;
                                 }
+
                                 break;
                         }
 
@@ -324,9 +321,11 @@ namespace Chem4Word.Model2
                                 case "C":
                                     chParts["C"] += p.Value;
                                     break;
+
                                 case "H":
                                     chParts["H"] += p.Value;
                                     break;
+
                                 default:
                                     if (otherParts.ContainsKey(p.Key))
                                     {
@@ -336,6 +335,7 @@ namespace Chem4Word.Model2
                                     {
                                         otherParts.Add(p.Key, p.Value);
                                     }
+
                                     break;
                             }
                         }
@@ -350,6 +350,7 @@ namespace Chem4Word.Model2
                     result += $"{kvp.Key} {kvp.Value} ";
                 }
             }
+
             foreach (KeyValuePair<string, int> kvp in otherParts)
             {
                 result += $"{kvp.Key} {kvp.Value} ";
@@ -420,7 +421,9 @@ namespace Chem4Word.Model2
         public bool RemoveAtom(Atom toRemove)
         {
             bool bondsExist =
-                Bonds.Any(b => b.StartAtomInternalId.Equals(toRemove.InternalId) | b.EndAtomInternalId.Equals(toRemove.InternalId));
+                Bonds.Any(b =>
+                    b.StartAtomInternalId.Equals(toRemove.InternalId) |
+                    b.EndAtomInternalId.Equals(toRemove.InternalId));
             if (bondsExist)
             {
                 throw new InvalidOperationException("Cannot remove an Atom without first removing the attached Bonds.");
@@ -430,7 +433,8 @@ namespace Chem4Word.Model2
             if (result)
             {
                 NotifyCollectionChangedEventArgs e =
-                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Atom> { toRemove });
+                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
+                        new List<Atom> { toRemove });
                 OnAtomsChanged(this, e);
                 UpdateAtomPropertyHandlers(e);
             }
@@ -447,6 +451,7 @@ namespace Chem4Word.Model2
                     ((Atom)oldItem).PropertyChanged -= ChemObject_PropertyChanged;
                 }
             }
+
             if (e.NewItems != null)
             {
                 foreach (object newItem in e.NewItems)
@@ -462,7 +467,8 @@ namespace Chem4Word.Model2
             if (res)
             {
                 NotifyCollectionChangedEventArgs e =
-                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Molecule> { mol });
+                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
+                        new List<Molecule> { mol });
                 OnMoleculesChanged(this, e);
                 UpdateMoleculeHandlers(e);
             }
@@ -517,6 +523,7 @@ namespace Chem4Word.Model2
                     mol.PropertyChanged -= ChemObject_PropertyChanged;
                 }
             }
+
             if (e.NewItems != null)
             {
                 foreach (object newItem in e.NewItems)
@@ -594,11 +601,13 @@ namespace Chem4Word.Model2
                 {
                     temps.Add(Atoms[bond.EndAtomInternalId]);
                 }
+
                 if (bond.EndAtomInternalId.Equals(atom.InternalId))
                 {
                     temps.Add(Atoms[bond.StartAtomInternalId]);
                 }
             }
+
             return temps.ToList();
         }
 
@@ -717,6 +726,7 @@ namespace Chem4Word.Model2
                 bond.SendDummyNotif();
             }
         }
+
         public Molecule Copy()
         {
             Molecule copy = new Molecule();
@@ -786,7 +796,6 @@ namespace Chem4Word.Model2
             return copy;
         }
 
-       
         protected void ClearAll()
         {
             _molecules.Clear();
@@ -800,7 +809,7 @@ namespace Chem4Word.Model2
         /// </summary>
         public void CheckIntegrity()
         {
-            //first, check to see whether there aren't more than one region 
+            //first, check to see whether there aren't more than one region
             if (TheoreticalRings < 0) //we have a disconnected graph!
             {
                 throw new Exception($"Molecule {Path} is disconnected.");
@@ -865,14 +874,14 @@ namespace Chem4Word.Model2
             {
                 if (!HasRings)
                 {
-                    return true;  //don't bother recaculating the rings for a linear molecule
+                    return true; //don't bother recaculating the rings for a linear molecule
                 }
                 else
                 {
                     return Rings.Count > 0; //we have rings present, so why haven't we calculated them?
                 }
             }
-        }//have we calculated the rings yet?
+        } //have we calculated the rings yet?
 
         //private void RefreshRingBonds()
         //{
@@ -899,6 +908,7 @@ namespace Chem4Word.Model2
                     workingSet[neighbour] -= 1;
                 }
             }
+
             workingSet.Remove(toPrune);
         }
 
@@ -925,6 +935,7 @@ namespace Chem4Word.Model2
                         atomList.Add(kvp.Key);
                     }
                 }
+
                 hasPruned = atomList.Count > 0;
 
                 foreach (Atom a in atomList)
@@ -965,7 +976,8 @@ namespace Chem4Word.Model2
 
                     while (workingSet.Any()) //do we have any atoms left in the set
                     {
-                        Atom startAtom = workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
+                        Atom startAtom =
+                            workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
                         Ring nextRing = GetRing(startAtom); //identify a ring
                         if (nextRing != null) //bingo
                         {
@@ -982,6 +994,7 @@ namespace Chem4Word.Model2
                                 {
                                     workingSet.Remove(a);
                                 }
+
                                 //remove the atoms in the ring from the working set BUT NOT the graph!
                             }
                         }
@@ -1012,12 +1025,12 @@ namespace Chem4Word.Model2
                 {
                     _sortedRings = SortRingsForDBPlacement();
                 }
+
                 return _sortedRings;
             }
         }
 
         public Point Centroid { get; set; }
-
 
         private void WipeMoleculeRings()
         {
@@ -1115,6 +1128,7 @@ namespace Chem4Word.Model2
             {
                 path[atom] = new HashSet<Atom>();
             }
+
             //set up a new queue
             atomsSoFar = new Queue<AtomData>();
 
@@ -1126,6 +1140,7 @@ namespace Chem4Word.Model2
                 path[initialAtom] = new HashSet<Atom>() { startAtom, initialAtom };
                 atomsSoFar.Enqueue(node);
             }
+
             //now scan the Molecule and detect all rings
             while (atomsSoFar.Any())
             {
@@ -1160,6 +1175,7 @@ namespace Chem4Word.Model2
                     }
                 }
             }
+
             //no collisions therefore no rings detected
             return null;
         }
@@ -1229,17 +1245,7 @@ namespace Chem4Word.Model2
             throw new NotImplementedException();
         }
 
-        public System.Windows.Media.Geometry Ghost()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ResetBoundingBox()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Overlaps(List<Point> preferredPlacements, List<Atom> atoms =null)
+        public bool Overlaps(List<Point> preferredPlacements, List<Atom> atoms = null)
         {
             throw new NotImplementedException();
         }
@@ -1249,6 +1255,146 @@ namespace Chem4Word.Model2
             foreach (Atom atom in Atoms.Values)
             {
                 atom.Position = lastOperation.Transform(atom.Position);
+            }
+        }
+
+        public void ClearProperties()
+        {
+            Names.Clear();
+            Formulas.Clear();
+        }
+
+        /// <summary>
+        /// Joins two molecules into a third
+        /// </summary>
+        /// <param name="a">First Molecule</param>
+        /// <param name="b">Second Molecule</param>
+        /// <param name="bond">Bond (must have StartAtomInternalID, EndAtomIternalID set)</param>
+        /// <returns></returns>
+        public static Molecule Join(Molecule a, Molecule b, Bond bond)
+        {
+            var copy = new Molecule();
+            Transfer(a, copy);
+            Transfer(b, copy);
+
+            //finally add the joining bond
+            bond.Parent = copy;
+            copy.AddBond(bond);
+
+            copy.CheckIntegrity();
+            return copy;
+            //local function
+            void Transfer(Molecule source, Molecule dest)
+            {
+                //copy over and reparent the atoms and bonds
+                foreach (Atom atom in source.Atoms.Values)
+                {
+                    atom.Parent = dest;
+                    dest.AddAtom(atom);
+                }
+
+                foreach (Bond bondb in source.Bonds)
+                {
+                    bondb.Parent = dest;
+                    dest.AddBond(bondb);
+                }
+            }
+        }
+
+        /// <summary>
+        ///splits a molecule into two smaller ones but leaves original intact
+        /// </summary>
+        /// <param name="bond">Bond at which to split the molecule</param>
+        /// <returns></returns>
+
+        public (Molecule startMol, Molecule endMol) Split(Bond bond)
+        {
+            var startAtom = bond.StartAtom;
+            var endAtom = bond.EndAtom;
+
+            RemoveBond(bond);
+            bond.Parent = null;
+
+            HashSet<Atom> startAtoms = new HashSet<Atom>();
+            HashSet<Atom> endAtoms = new HashSet<Atom>();
+            Traverse(startAtom, atom => { startAtoms.Add(atom); }, a => !startAtoms.Contains(a));
+            Traverse(endAtom, atom => { endAtoms.Add(atom); }, a => !endAtoms.Contains(a));
+
+            var startMol = IsolateMolecule(startAtoms);
+            var endMol = IsolateMolecule(endAtoms);
+
+            return (startMol, endMol);
+
+            //local function
+            Molecule IsolateMolecule(HashSet<Atom> hashSet)
+            {
+                Molecule molecule = new Molecule();
+                foreach (Atom atom in hashSet)
+                {
+                    foreach (Atom atom1 in hashSet.Except(new[] { atom }))
+                    {
+                        Bond b;
+                        if ((b = atom1.BondBetween(atom)) != null)
+                        {
+                            b.Parent = molecule;
+                            molecule.AddBond(b);
+                        }
+                    }
+
+                    atom.Parent = molecule;
+                    molecule.AddAtom(atom);
+                }
+
+                return molecule;
+            }
+        }
+
+        private static Atom NextUnprocessedAtom(Atom seed, Predicate<Atom> isntProcessed)
+        {
+            return seed.Neighbours.First(a => isntProcessed(a));
+        }
+
+        /// <summary>
+        /// Traverses a molecular graph applying an operation to each and every atom.
+        /// Does not require that the atoms be already part of a Molecule.
+        /// </summary>
+        /// <param name="startAtom">start atom</param>
+        /// <param name="operation">delegate pointing to operation to perform</param>
+        /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
+        private void Traverse(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed)
+        {
+            operation(startAtom);
+
+            while (startAtom.UnprocessedDegree(isntProcessed) > 0)
+            {
+                if (startAtom.UnprocessedDegree(isntProcessed) == 1)
+                {
+                    startAtom = NextUnprocessedAtom(startAtom, isntProcessed);
+                    operation(startAtom);
+                }
+                else
+                {
+                    var unassignedAtom = from a in startAtom.Neighbours
+                                         where isntProcessed(a)
+                                         select a;
+                    foreach (Atom atom in unassignedAtom)
+                    {
+                        Traverse(atom, operation, isntProcessed);
+                    }
+                }
+            }
+        }
+
+        public void Reparent()
+        {
+            foreach (Atom atom in Atoms.Values)
+            {
+                atom.Parent = this;
+            }
+
+            foreach (Bond bond in Bonds)
+            {
+                bond.Parent = this;
             }
         }
     }

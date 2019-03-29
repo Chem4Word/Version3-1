@@ -470,6 +470,15 @@ namespace Chem4Word.Model2
             }
         }
 
+        public List<Atom> UnprocessedNeighbours(Predicate<Atom> unprocessedTest)
+        {
+            return Neighbours.Where(a => unprocessedTest(a)).ToList();
+        }
+
+        /// <summary>
+        /// How many atoms we haven't 'done' yet when we're traversing the graph
+        /// </summary>
+        public int UnprocessedDegree(Predicate<Atom> unprocessedTest) => UnprocessedNeighbours(unprocessedTest).Count;
         #endregion Properties
 
         #region Constructors

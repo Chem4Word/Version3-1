@@ -258,7 +258,7 @@ namespace Chem4Word.ACME
             //bondBinding.Source = vm;
             //BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
 
-            vm.Canvas = ChemCanvas;
+            vm.CurrentEditor = ChemCanvas;
         }
 
         private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

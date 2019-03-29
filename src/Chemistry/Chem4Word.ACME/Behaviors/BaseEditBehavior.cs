@@ -8,6 +8,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
+using Chem4Word.ACME.Controls;
 
 
 namespace Chem4Word.ACME.Behaviors
@@ -23,5 +24,7 @@ namespace Chem4Word.ACME.Behaviors
         // Using a DependencyProperty as the backing store for ViewModel.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register("ViewModel", typeof(EditViewModel), typeof(BaseEditBehavior), new PropertyMetadata(null));
+
+        public EditorCanvas CurrentEditor { get; set; }
     }
 }
