@@ -13,7 +13,6 @@ using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
 namespace Chem4Word.ACME.Controls
-
 {
     public class EditorCanvas : ChemistryCanvas
     {
