@@ -5,9 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
@@ -20,9 +22,31 @@ namespace Chem4Word.ACME.Controls
 
         public EditorCanvas() : base()
         {
+            MouseRightButtonUp += OnMouseRightButtonUp;
         }
 
         #endregion Constructors
+
+        #region Event handlers
+
+        private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ActiveVisual = GetTargetedVisual(e.GetPosition(this));
+
+            if (ActiveVisual is AtomVisual av)
+            {
+                var atom = av.ParentAtom;
+                MessageBox.Show($"Right Click on {atom}");
+            }
+
+            if (ActiveVisual is BondVisual bv)
+            {
+                var bond = bv.ParentBond;
+                MessageBox.Show($"Right Click on {bond}");
+            }
+        }
+
+        #endregion Event handlers
 
         #region Methods
 

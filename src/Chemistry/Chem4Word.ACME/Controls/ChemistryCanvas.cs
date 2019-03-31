@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -35,7 +36,6 @@ namespace Chem4Word.ACME.Controls
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
             MouseMove += Canvas_MouseMove;
-            MouseRightButtonUp += OnMouseRightButtonUp;
         }
 
         #endregion Constructors
@@ -572,26 +572,6 @@ namespace Chem4Word.ACME.Controls
         #endregion Drawing
 
         #region Event handlers
-
-        private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (this is EditorCanvas)
-            {
-                ActiveVisual = GetTargetedVisual(e.GetPosition(this));
-
-                if (ActiveVisual is AtomVisual av)
-                {
-                    var atom = av.ParentAtom;
-                    MessageBox.Show($"Right Click on Atom {atom}");
-                }
-
-                if (ActiveVisual is BondVisual bv)
-                {
-                    var bond = bv.ParentBond;
-                    MessageBox.Show($"Right Click on Bond {bond}");
-                }
-            }
-        }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
