@@ -68,6 +68,7 @@ namespace Chem4Word.ACME.Controls
 
             return union;
         }
+
         public Geometry GhostMolecule(List<Molecule> adornedMolecules)
         {
             var atomList = new List<Atom>();
