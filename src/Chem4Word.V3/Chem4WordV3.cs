@@ -359,11 +359,57 @@ namespace Chem4Word
                         var browser = new WebBrowser().Version;
                         if (browser.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion)
                         {
+                            Telemetry.Write(module, "Information", "IE 10+ not detected; Switching to ChemDoodle Web 7.0.2");
                             SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
                             string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
-                            Telemetry.Write(module, "Information", "IE 10+ not detected; Switching to ChemDoodle Web 7.0.2");
                             File.WriteAllText(optionsFile, temp);
                         }
+                    }
+                }
+                catch
+                {
+                    //
+                }
+
+                try
+                {
+                    bool settingsChanged = false;
+
+                    if (string.IsNullOrEmpty(SystemOptions.SelectedEditorPlugIn))
+                    {
+                        SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
+                    }
+                    else
+                    {
+                        var editor = GetEditorPlugIn(SystemOptions.SelectedEditorPlugIn);
+                        if (editor == null)
+                        {
+                            SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
+                            Telemetry.Write(module, "Information", $"Setting editor to {SystemOptions.SelectedEditorPlugIn}");
+                            settingsChanged = true;
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(SystemOptions.SelectedRendererPlugIn))
+                    {
+                        SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
+                    }
+                    else
+                    {
+                        var renderer = GetRendererPlugIn(SystemOptions.SelectedRendererPlugIn);
+                        if (renderer == null)
+                        {
+                            SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
+                            Telemetry.Write(module, "Information", $"Setting renderer to {SystemOptions.SelectedRendererPlugIn}");
+                            settingsChanged = true;
+                        }
+                    }
+
+                    if (settingsChanged)
+                    {
+                        Telemetry.Write(module, "Information", "Saving revised settings");
+                        string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
+                        File.WriteAllText(optionsFile, temp);
                     }
                 }
                 catch
