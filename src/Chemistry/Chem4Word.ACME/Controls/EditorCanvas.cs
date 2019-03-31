@@ -5,15 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Navigation;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -22,27 +17,15 @@ namespace Chem4Word.ACME.Controls
 {
     public class EditorCanvas : ChemistryCanvas
     {
-        #region Fields
-
-       
-
-        #endregion Fields
-
         #region Constructors
 
         public EditorCanvas() : base()
         {
-           
         }
-
-        
 
         #endregion Constructors
 
-      
-
         #region Methods
-
 
         public Rect GetMoleculeBoundingBox(Molecule mol)
         {
@@ -75,10 +58,10 @@ namespace Chem4Word.ACME.Controls
             List<Bond> bondList = new List<Bond>();
             foreach (Molecule mol in adornedMolecules)
             {
-                  mol.BuildAtomList(atomList);
-                  mol.BuildBondList(bondList);
+                mol.BuildAtomList(atomList);
+                mol.BuildBondList(bondList);
             }
-          
+
             StreamGeometry ghostGeometry = new StreamGeometry();
 
             double atomRadius = this.Chemistry.Model.XamlBondLength / 7.50;
@@ -112,7 +95,6 @@ namespace Chem4Word.ACME.Controls
             return ghostGeometry;
         }
 
-       
         #endregion Methods
 
         #region Overrides
@@ -128,8 +110,5 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion Overrides
-
-
-       
     }
 }
