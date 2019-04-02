@@ -31,6 +31,8 @@ namespace Chem4Word.ACME.Controls
 
         private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
+            var pp = PointToScreen(e.GetPosition(this));
+
             ActiveVisual = GetTargetedVisual(e.GetPosition(this));
 
             if (ActiveVisual is AtomVisual av)
