@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditorHost));
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.SuspendLayout();
@@ -53,6 +54,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(952, 536);
             this.Controls.Add(this.elementHost1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "EditorHost";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ACME Editor Host";

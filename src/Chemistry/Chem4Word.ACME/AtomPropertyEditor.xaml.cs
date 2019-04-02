@@ -4,6 +4,9 @@ using System.Windows.Controls;
 
 namespace Chem4Word.ACME
 {
+    // Source https://github.com/angelsix/fasetto-word
+    // Source https://www.youtube.com/watch?v=jrgT-fbV2tM
+
     /// <summary>
     /// Interaction logic for PropertyEditor.xaml
     /// </summary>

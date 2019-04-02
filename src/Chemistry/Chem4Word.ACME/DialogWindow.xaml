@@ -6,9 +6,10 @@
     xmlns:local="clr-namespace:Chem4Word.ACME"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     WindowStartupLocation="CenterScreen"
-    Width="100"
-    Height="100"
-    mc:Ignorable="d">
+    Width="200"
+    Height="200"
+    ResizeMode="NoResize"
+    mc:Ignorable="d" Icon="Resources/ms-word-16.ico" ShowInTaskbar="False">
     <Grid>
     </Grid>
 </Window>
