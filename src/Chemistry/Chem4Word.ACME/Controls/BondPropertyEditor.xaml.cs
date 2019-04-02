@@ -12,15 +12,22 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class BondPropertyEditor : UserControl
     {
+        public int WindowMinimumWidth { get; set; } = 250;
+
+        public int WindowMinimumHeight { get; set; } = 100;
+
         private DialogWindow mDialogWindow;
+        private BondPropertiesModel _bondPropertiesModel;
 
         public BondPropertyEditor()
         {
             InitializeComponent();
         }
 
-        public Task ShowDialog()
+        public Task ShowDialog(BondPropertiesModel bondPropertiesModel)
         {
+            _bondPropertiesModel = bondPropertiesModel;
+
             // Create a task to await the dialog closing
             var tcs = new TaskCompletionSource<bool>();
 
@@ -29,14 +36,23 @@ namespace Chem4Word.ACME.Controls
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             mDialogWindow = new DialogWindow();
+            mDialogWindow.ViewModel = _bondPropertiesModel;
+            DataContext = _bondPropertiesModel.Bond;
 
             // Run on UI thread
             Application.Current.Dispatcher.Invoke(() =>
                                                   {
                                                       try
                                                       {
-                                                          // Show dialog
+                                                          mDialogWindow.ViewModel = bondPropertiesModel;
 
+                                                          mDialogWindow.ViewModel.WindowMinimumWidth = WindowMinimumWidth;
+                                                          mDialogWindow.ViewModel.WindowMinimumHeight = WindowMinimumHeight;
+                                                          mDialogWindow.ViewModel.Title = string.IsNullOrEmpty(bondPropertiesModel.Title) ? "Bond Properties" : bondPropertiesModel.Title;
+
+                                                          mDialogWindow.Content = this;
+
+                                                          // Show dialog
                                                           mDialogWindow.ShowDialog();
                                                       }
                                                       finally
@@ -49,6 +65,12 @@ namespace Chem4Word.ACME.Controls
             Application.Current.ShutdownMode = mode;
 
             return tcs.Task;
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            _bondPropertiesModel.Save = true;
+            mDialogWindow.Close();
         }
     }
 }

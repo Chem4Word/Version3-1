@@ -4,11 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Chem4Word.ACME"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Width="100"
-    Height="100"
-    mc:Ignorable="d">
-    <Grid>
-        <TextBlock>Hello I am a Bond</TextBlock>
-    </Grid>
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+    <Border Margin="5">
+        <StackPanel>
+            <TextBlock FontSize="25">Hello; I am a Bond</TextBlock>
+            <TextBox Text="{Binding Path=Id, Mode=TwoWay}"></TextBox>
+            <Border Margin="25,5,25,5">
+                <Button Click="ButtonBase_OnClick">Save</Button>
+            </Border>
+        </StackPanel>
+    </Border>
 </UserControl>

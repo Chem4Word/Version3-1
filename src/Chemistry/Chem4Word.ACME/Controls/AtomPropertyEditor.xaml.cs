@@ -12,15 +12,22 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class AtomPropertyEditor : UserControl
     {
+        public int WindowMinimumWidth { get; set; } = 250;
+
+        public int WindowMinimumHeight { get; set; } = 100;
+
         private DialogWindow mDialogWindow;
+        private AtomPropertiesModel _atomPropertiesModel;
 
         public AtomPropertyEditor()
         {
             InitializeComponent();
         }
 
-        public Task ShowDialog()
+        public Task ShowDialog(AtomPropertiesModel atomPropertiesModel)
         {
+            _atomPropertiesModel = atomPropertiesModel;
+
             // Create a task to await the dialog closing
             var tcs = new TaskCompletionSource<bool>();
 
@@ -29,12 +36,19 @@ namespace Chem4Word.ACME.Controls
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             mDialogWindow = new DialogWindow();
+            mDialogWindow.ViewModel = _atomPropertiesModel;
+            DataContext = _atomPropertiesModel.Atom;
 
             // Run on UI thread
             Application.Current.Dispatcher.Invoke(() =>
             {
                 try
                 {
+                    mDialogWindow.ViewModel.WindowMinimumWidth = WindowMinimumWidth;
+                    mDialogWindow.ViewModel.WindowMinimumHeight = WindowMinimumHeight;
+                    mDialogWindow.ViewModel.Title = string.IsNullOrEmpty(atomPropertiesModel.Title) ? "Atom Properties" : atomPropertiesModel.Title;
+
+                    mDialogWindow.Content = this;
                     // Show dialog
                     mDialogWindow.ShowDialog();
                 }
@@ -48,6 +62,12 @@ namespace Chem4Word.ACME.Controls
             Application.Current.ShutdownMode = mode;
 
             return tcs.Task;
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            _atomPropertiesModel.Save = true;
+            mDialogWindow.Close();
         }
     }
 }

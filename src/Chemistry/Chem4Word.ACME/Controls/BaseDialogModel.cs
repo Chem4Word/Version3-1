@@ -5,18 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Chem4Word.ACME.Controls
 {
-    /// <summary>
-    /// Interaction logic for AtomPicker.xaml
-    /// </summary>
-    public partial class AtomPicker : UserControl
+    public class BaseDialogModel
     {
-        public AtomPicker()
-        {
-            InitializeComponent();
-        }
+        public Point Centre { get; set; }
+        public string Title { get; set; }
+        public bool Save { get; set; }
+        public Control Content { get; set; }
+        public int WindowMinimumWidth { get; set; }
+        public object WindowMinimumHeight { get; internal set; }
     }
 }

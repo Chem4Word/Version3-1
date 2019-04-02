@@ -40,7 +40,11 @@ namespace Chem4Word.ACME.Controls
                 var atom = av.ParentAtom;
                 //MessageBox.Show($"Right Click on {atom}");
                 AtomPropertyEditor pe = new AtomPropertyEditor();
-                pe.ShowDialog();
+                var model = new AtomPropertiesModel();
+                model.Atom = atom;
+                model.Title = atom.Path;
+                model.Centre = pp;
+                var result = pe.ShowDialog(model);
             }
 
             if (ActiveVisual is BondVisual bv)
@@ -48,7 +52,11 @@ namespace Chem4Word.ACME.Controls
                 var bond = bv.ParentBond;
                 //MessageBox.Show($"Right Click on {bond}");
                 BondPropertyEditor pe = new BondPropertyEditor();
-                pe.ShowDialog();
+                var model = new BondPropertiesModel();
+                model.Bond = bond;
+                model.Title = bond.Path;
+                model.Centre = pp;
+                var result = pe.ShowDialog(model);
             }
         }
 

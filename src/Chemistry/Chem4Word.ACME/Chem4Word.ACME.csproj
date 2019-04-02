@@ -78,6 +78,8 @@
     <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="BondLengthOption.cs" />
     <Compile Include="BondOption.cs" />
+    <Compile Include="Controls\BondPropertiesModel.cs" />
+    <Compile Include="Controls\AtomPropertiesModel.cs" />
     <Compile Include="Controls\BondPropertyEditor.xaml.cs">
       <DependentUpon>BondPropertyEditor.xaml</DependentUpon>
     </Compile>
@@ -98,6 +100,7 @@
     <Compile Include="Commands\SettingsCommand.cs" />
     <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="Commands\UnGroupCommand.cs" />
+    <Compile Include="Controls\BaseDialogModel.cs" />
     <Compile Include="Controls\EditorCanvas.cs" />
     <Compile Include="Controls\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
