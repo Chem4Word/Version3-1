@@ -12,6 +12,8 @@ namespace Chem4Word.ACME.Controls
 {
     public class AtomPropertiesModel : BaseDialogModel
     {
-        public Atom Atom { get; set; }
+        public string Symbol { get; set; }
+        public int Charge { get; set; }
+        public int Isotope { get; set; }
     }
 }

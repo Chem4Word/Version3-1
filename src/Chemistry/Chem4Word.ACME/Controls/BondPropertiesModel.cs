@@ -12,6 +12,6 @@ namespace Chem4Word.ACME.Controls
 {
     public class BondPropertiesModel : BaseDialogModel
     {
-        public Bond Bond { get; set; }
+        public string Order { get; set; }
     }
 }

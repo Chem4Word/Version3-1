@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model2.Helpers;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -41,10 +42,14 @@ namespace Chem4Word.ACME.Controls
                 //MessageBox.Show($"Right Click on {atom}");
                 AtomPropertyEditor pe = new AtomPropertyEditor();
                 var model = new AtomPropertiesModel();
-                model.Atom = atom;
+                model.Symbol = atom.Element.Symbol;
                 model.Title = atom.Path;
                 model.Centre = pp;
-                var result = pe.ShowDialog(model);
+                pe.ShowDialog(model);
+                if (model.Save)
+                {
+                    atom.Element = Globals.PeriodicTable[model.Symbol] as ElementBase;
+                }
             }
 
             if (ActiveVisual is BondVisual bv)
@@ -53,10 +58,14 @@ namespace Chem4Word.ACME.Controls
                 //MessageBox.Show($"Right Click on {bond}");
                 BondPropertyEditor pe = new BondPropertyEditor();
                 var model = new BondPropertiesModel();
-                model.Bond = bond;
+                model.Order = bond.Order;
                 model.Title = bond.Path;
                 model.Centre = pp;
-                var result = pe.ShowDialog(model);
+                pe.ShowDialog(model);
+                if (model.Save)
+                {
+                    bond.Order = model.Order;
+                }
             }
         }
 

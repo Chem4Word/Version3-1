@@ -37,7 +37,7 @@ namespace Chem4Word.ACME.Controls
 
             mDialogWindow = new DialogWindow();
             mDialogWindow.ViewModel = _atomPropertiesModel;
-            DataContext = _atomPropertiesModel.Atom;
+            DataContext = _atomPropertiesModel;
 
             // Run on UI thread
             Application.Current.Dispatcher.Invoke(() =>

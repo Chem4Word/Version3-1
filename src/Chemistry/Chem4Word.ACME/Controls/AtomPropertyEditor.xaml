@@ -8,7 +8,7 @@
     <Border Margin="5">
         <StackPanel>
             <TextBlock FontSize="25">Hello; I am an Atom</TextBlock>
-            <TextBox Text="{Binding Path=Id, Mode=TwoWay}"></TextBox>
+            <TextBox Text="{Binding Path=Symbol, Mode=TwoWay}"></TextBox>
             <Border Margin="25,5,25,5">
                 <Button Click="ButtonBase_OnClick">Save</Button>
             </Border>

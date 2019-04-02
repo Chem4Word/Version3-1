@@ -37,7 +37,7 @@ namespace Chem4Word.ACME.Controls
 
             mDialogWindow = new DialogWindow();
             mDialogWindow.ViewModel = _bondPropertiesModel;
-            DataContext = _bondPropertiesModel.Bond;
+            DataContext = _bondPropertiesModel;
 
             // Run on UI thread
             Application.Current.Dispatcher.Invoke(() =>
