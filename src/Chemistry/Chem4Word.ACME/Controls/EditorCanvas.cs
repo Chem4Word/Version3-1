@@ -36,13 +36,17 @@ namespace Chem4Word.ACME.Controls
             if (ActiveVisual is AtomVisual av)
             {
                 var atom = av.ParentAtom;
-                MessageBox.Show($"Right Click on {atom}");
+                //MessageBox.Show($"Right Click on {atom}");
+                AtomPropertyEditor pe = new AtomPropertyEditor();
+                pe.ShowDialog();
             }
 
             if (ActiveVisual is BondVisual bv)
             {
                 var bond = bv.ParentBond;
-                MessageBox.Show($"Right Click on {bond}");
+                //MessageBox.Show($"Right Click on {bond}");
+                BondPropertyEditor pe = new BondPropertyEditor();
+                pe.ShowDialog();
             }
         }
 
