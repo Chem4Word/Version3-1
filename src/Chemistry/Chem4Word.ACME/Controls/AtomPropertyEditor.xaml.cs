@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Controls
 {
     // Source https://github.com/angelsix/fasetto-word
     // Source https://www.youtube.com/watch?v=jrgT-fbV2tM

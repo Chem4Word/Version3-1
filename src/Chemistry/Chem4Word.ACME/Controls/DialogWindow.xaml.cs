@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Controls
 {
     /// <summary>
     /// Interaction logic for DialogWindow.xaml
