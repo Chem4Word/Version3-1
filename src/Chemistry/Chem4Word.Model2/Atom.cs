@@ -140,7 +140,8 @@ namespace Chem4Word.Model2
             {
                 switch (Element)
                 {
-                    case Element e when (e == Globals.PeriodicTable.C & IsotopeNumber != null | (FormalCharge ?? 0) != 0):
+                    case Element e
+                        when (e == Globals.PeriodicTable.C & IsotopeNumber != null | (FormalCharge ?? 0) != 0):
                         return true;
 
                     case Element e when (e == Globals.PeriodicTable.C):
@@ -210,9 +211,11 @@ namespace Chem4Word.Model2
                             shift = BasicGeometry.ScreenWest * fontSize;
                             break;
                     }
+
                     hydrogenBox.Offset(shift);
                     mainElementBox.Union(hydrogenBox);
                 }
+
                 //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
@@ -257,7 +260,9 @@ namespace Chem4Word.Model2
 
                                 if (a1 != null && a2 != null)
                                 {
-                                    double angle1 = Vector.AngleBetween(-(this.Position - a1.Position), this.Position - a2.Position);
+                                    double angle1 =
+                                        Vector.AngleBetween(-(this.Position - a1.Position),
+                                                            this.Position - a2.Position);
 
                                     if (Math.Abs(angle1) < 8)
                                     {
@@ -291,10 +296,7 @@ namespace Chem4Word.Model2
 
         public int? IsotopeNumber
         {
-            get
-            {
-                return _isotopeNumber;
-            }
+            get { return _isotopeNumber; }
             set
             {
                 _isotopeNumber = value;
@@ -306,10 +308,7 @@ namespace Chem4Word.Model2
 
         public int? SpinMultiplicity
         {
-            get
-            {
-                return _spinMultiplicity;
-            }
+            get { return _spinMultiplicity; }
             set
             {
                 _spinMultiplicity = value;
@@ -333,6 +332,61 @@ namespace Chem4Word.Model2
         private bool _doubletRadical;
         private Point _position;
 
+        public bool CanAddAtoms
+        {
+            get
+            {
+                if (Element is FunctionalGroup)
+                {
+                    return true;
+                }
+
+                if (Element is Element e)
+                {
+                    int bondCount = (int)Math.Truncate(this.BondOrders);
+                    int charge = FormalCharge ?? 0;
+                    foreach (int valency in e.Valencies)
+                    {
+                        if (valency - bondCount + charge > 0)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        public int AvailableValences
+        {
+            get
+            {
+                int iBondCount = (int)Math.Truncate(this.BondOrders);
+                int iCharge = 0;
+                iCharge = FormalCharge ?? 0;
+                int iValence = PeriodicTable.GetValence((Element as Element), iBondCount);
+                int iDiff = iValence - iBondCount;
+                if (iCharge > 0)
+                {
+                    int iVdiff = 4 - iValence;
+                    if (iCharge <= iVdiff)
+                    {
+                        iDiff += iCharge;
+                    }
+                    else
+                    {
+                        iDiff = 4 - iBondCount - iCharge + iVdiff;
+                    }
+                }
+                else
+                {
+                    iDiff += iCharge;
+                }
+
+                return iDiff;
+            }
+        }
+
         public int ImplicitHydrogenCount
         {
             get
@@ -352,27 +406,7 @@ namespace Chem4Word.Model2
 
                     if (appliesTo.Contains(Element.Symbol))
                     {
-                        int iBondCount = (int)Math.Floor(this.BondOrders);
-                        int iCharge = 0;
-                        iCharge = FormalCharge ?? 0;
-                        int iValence = PeriodicTable.GetValence((Element as Element), iBondCount);
-                        int iDiff = iValence - iBondCount;
-                        if (iCharge > 0)
-                        {
-                            int iVdiff = 4 - iValence;
-                            if (iCharge <= iVdiff)
-                            {
-                                iDiff += iCharge;
-                            }
-                            else
-                            {
-                                iDiff = 4 - iBondCount - iCharge + iVdiff;
-                            }
-                        }
-                        else
-                        {
-                            iDiff += iCharge;
-                        }
+                        var iDiff = AvailableValences;
                         // Ensure iHydrogenCount returned is never -ve
                         if (iDiff >= 0)
                         {
@@ -479,6 +513,7 @@ namespace Chem4Word.Model2
         /// How many atoms we haven't 'done' yet when we're traversing the graph
         /// </summary>
         public int UnprocessedDegree(Predicate<Atom> unprocessedTest) => UnprocessedNeighbours(unprocessedTest).Count;
+
         #endregion Properties
 
         #region Constructors
@@ -494,6 +529,7 @@ namespace Chem4Word.Model2
         /// The internal ID is what is used to tie atoms and bonds together
         /// </summary>
         private string _internalId;
+
         public string InternalId
         {
             get { return _internalId; }
@@ -501,7 +537,6 @@ namespace Chem4Word.Model2
         }
 
         public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms.Values.First() == this;
-
 
         #endregion Constructors
 
@@ -532,7 +567,6 @@ namespace Chem4Word.Model2
             }
             return null;
         }
-
 
         public CompassPoints GetDefaultHOrientation()
         {

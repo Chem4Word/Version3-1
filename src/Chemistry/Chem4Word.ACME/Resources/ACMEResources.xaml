@@ -191,6 +191,9 @@
         <acme:AtomOption Element="S" Foreground="{StaticResource SBrush}">
             S
         </acme:AtomOption>
+        <acme:AtomOption Element="F" Foreground="{StaticResource FBrush}">
+            F
+        </acme:AtomOption>
         <acme:AtomOption Element="Cl" Foreground="{StaticResource ClBrush}">
             Cl
         </acme:AtomOption>
@@ -202,7 +205,7 @@
         </acme:AtomOption>
         <acme:AtomOption Element="R" Foreground="Black">
             <TextBlock>
-                R<Run BaselineAlignment="Subscript" FontSize="8">
+                R<Run BaselineAlignment="Superscript" FontSize="8">
                     1
                 </Run>
             </TextBlock>

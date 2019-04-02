@@ -274,7 +274,7 @@ namespace Chem4Word.ACME.Drawing
             Vector labelOffset, GlyphText labelText, out Point labelCenter, CompassPoints defHOrientation)
         {
             Matrix rotator = new Matrix();
-            double angle = Globals.ClockDirections.Two.ToDegrees();
+            double angle = Globals.ClockDirections.II.ToDegrees();
             rotator.Rotate(angle);
 
             labelOffset = labelOffset * rotator;
@@ -323,7 +323,7 @@ namespace Chem4Word.ACME.Drawing
 
             Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphText.SymbolSize;
             Matrix rotator = new Matrix();
-            rotator.Rotate(Globals.ClockDirections.Ten.ToDegrees());
+            rotator.Rotate(Globals.ClockDirections.X.ToDegrees());
             isotopeOffsetVector = isotopeOffsetVector * rotator;
             Point isoCenter = mainAtomMetrics.Geocenter + isotopeOffsetVector;
             isotopeText.MeasureAtCenter(isoCenter);
