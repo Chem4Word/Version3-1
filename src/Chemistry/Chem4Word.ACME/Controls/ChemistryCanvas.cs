@@ -575,14 +575,14 @@ namespace Chem4Word.ACME.Controls
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (this is EditorCanvas)
-            {
-                //Debug.WriteLine($"EC: @ {e.GetPosition(this)}");
-            }
-            else
-            {
-                //Debug.WriteLine($"CC: @ {e.GetPosition(this)}");
-            }
+            //if (this is EditorCanvas ec)
+            //{
+            //    Debug.WriteLine($"EC: @ {e.GetPosition(this)}");
+            //}
+            //else
+            //{
+            //    Debug.WriteLine($"CC: @ {e.GetPosition(this)}");
+            //}
 
             ActiveVisual = GetTargetedVisual(e.GetPosition(this));
         }

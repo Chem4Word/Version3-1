@@ -18,18 +18,18 @@ namespace Chem4Word.Model2.Helpers
         public enum ClockDirections
         {
             Nothing = 0,
-            One,
-            Two,
-            Three,
-            Four,
-            Five,
-            Six,
-            Seven,
-            Eight,
-            Nine,
-            Ten,
-            Eleven,
-            Twelve
+            I,
+            II,
+            III,
+            IV,
+            V,
+            VI,
+            VII,
+            VIII,
+            IX,
+            X,
+            XI,
+            XII
         }
 
         #endregion Geometry Stuff

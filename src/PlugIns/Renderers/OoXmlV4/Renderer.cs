@@ -25,7 +25,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public string Name => "Open Office Xml Renderer V4";
-        public string Description => "This is the standard renderer used in Chem4Word V3 using Chem4Word.Model2";
+        public string Description => "This is the standard renderer used in Chem4Word V3.1 using Chem4Word.Model2";
         public bool HasSettings => true;
 
         public Point TopLeft { get; set; }
