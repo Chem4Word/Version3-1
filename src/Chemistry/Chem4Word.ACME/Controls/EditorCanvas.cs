@@ -43,12 +43,35 @@ namespace Chem4Word.ACME.Controls
                 AtomPropertyEditor pe = new AtomPropertyEditor();
                 var model = new AtomPropertiesModel();
                 model.Symbol = atom.Element.Symbol;
+                model.Charge = atom.FormalCharge.ToString();
+                model.Isotope = atom.IsotopeNumber.ToString();
                 model.Title = atom.Path;
                 model.Centre = pp;
                 pe.ShowDialog(model);
                 if (model.Save)
                 {
-                    atom.Element = Globals.PeriodicTable[model.Symbol] as ElementBase;
+                    // ToDo: Wrap this in Undo/Redo
+                    ElementBase eb;
+                    AtomHelpers.TryParse(model.Symbol, out eb);
+                    atom.Element = eb;
+
+                    if (!string.IsNullOrEmpty(model.Charge))
+                    {
+                        atom.FormalCharge = int.Parse(model.Charge);
+                    }
+                    else
+                    {
+                        atom.FormalCharge = null;
+                    }
+
+                    if (!string.IsNullOrEmpty(model.Isotope))
+                    {
+                        atom.IsotopeNumber = int.Parse(model.Isotope);
+                    }
+                    else
+                    {
+                        atom.IsotopeNumber = null;
+                    }
                 }
             }
 

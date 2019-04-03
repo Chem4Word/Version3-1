@@ -12,9 +12,9 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class BondPropertyEditor : UserControl
     {
-        public int WindowMinimumWidth { get; set; } = 250;
+        public double WindowMinimumWidth { get; set; } = 250;
 
-        public int WindowMinimumHeight { get; set; } = 100;
+        public double WindowMinimumHeight { get; set; } = 100;
 
         private DialogWindow mDialogWindow;
         private BondPropertiesModel _bondPropertiesModel;

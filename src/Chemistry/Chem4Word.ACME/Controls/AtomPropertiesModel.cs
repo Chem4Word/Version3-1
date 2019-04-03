@@ -13,7 +13,7 @@ namespace Chem4Word.ACME.Controls
     public class AtomPropertiesModel : BaseDialogModel
     {
         public string Symbol { get; set; }
-        public int Charge { get; set; }
-        public int Isotope { get; set; }
+        public string Charge { get; set; }
+        public string Isotope { get; set; }
     }
 }

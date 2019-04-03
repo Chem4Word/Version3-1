@@ -16,7 +16,7 @@ namespace Chem4Word.ACME.Controls
         public string Title { get; set; }
         public bool Save { get; set; }
         public Control Content { get; set; }
-        public int WindowMinimumWidth { get; set; }
-        public object WindowMinimumHeight { get; internal set; }
+        public double WindowMinimumWidth { get; set; }
+        public double WindowMinimumHeight { get; set; }
     }
 }

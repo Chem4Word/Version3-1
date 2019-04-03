@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -12,9 +14,9 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class AtomPropertyEditor : UserControl
     {
-        public int WindowMinimumWidth { get; set; } = 250;
+        public double WindowMinimumWidth { get; set; } = 250;
 
-        public int WindowMinimumHeight { get; set; } = 100;
+        public double WindowMinimumHeight { get; set; } = 100;
 
         private DialogWindow mDialogWindow;
         private AtomPropertiesModel _atomPropertiesModel;
@@ -66,8 +68,33 @@ namespace Chem4Word.ACME.Controls
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            _atomPropertiesModel.Save = true;
-            mDialogWindow.Close();
+            if (VaidateModel())
+            {
+                _atomPropertiesModel.Save = true;
+                mDialogWindow.Close();
+            }
+        }
+
+        private bool VaidateModel()
+        {
+            ElementBase eb;
+            bool b1 = AtomHelpers.TryParse(_atomPropertiesModel.Symbol, out eb);
+
+            int n;
+            bool b2 = string.IsNullOrEmpty(_atomPropertiesModel.Charge);
+            if (!b2)
+            {
+                b2 = int.TryParse(_atomPropertiesModel.Charge, out n);
+
+            }
+
+            bool b3 = string.IsNullOrEmpty(_atomPropertiesModel.Isotope);
+            if (!b3)
+            {
+                b3 = int.TryParse(_atomPropertiesModel.Isotope, out n);
+            }
+
+            return b1 && b2 && b3;
         }
     }
 }
