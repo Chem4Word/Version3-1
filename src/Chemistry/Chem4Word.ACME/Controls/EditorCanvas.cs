@@ -7,11 +7,11 @@
 
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model2.Helpers;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
