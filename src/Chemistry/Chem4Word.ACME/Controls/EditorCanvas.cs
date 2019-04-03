@@ -50,28 +50,8 @@ namespace Chem4Word.ACME.Controls
                 pe.ShowDialog(model);
                 if (model.Save)
                 {
-                    // ToDo: Wrap this in Undo/Redo
-                    ElementBase eb;
-                    AtomHelpers.TryParse(model.Symbol, out eb);
-                    atom.Element = eb;
-
-                    if (!string.IsNullOrEmpty(model.Charge))
-                    {
-                        atom.FormalCharge = int.Parse(model.Charge);
-                    }
-                    else
-                    {
-                        atom.FormalCharge = null;
-                    }
-
-                    if (!string.IsNullOrEmpty(model.Isotope))
-                    {
-                        atom.IsotopeNumber = int.Parse(model.Isotope);
-                    }
-                    else
-                    {
-                        atom.IsotopeNumber = null;
-                    }
+                    EditViewModel evm = (EditViewModel)((EditorCanvas)av.Parent).Chemistry;
+                    evm.UpdateAtom(atom, model);
                 }
             }
 
