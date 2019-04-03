@@ -39,13 +39,12 @@ namespace Chem4Word.ACME.Controls
             if (ActiveVisual is AtomVisual av)
             {
                 var atom = av.ParentAtom;
-                //MessageBox.Show($"Right Click on {atom}");
                 AtomPropertyEditor pe = new AtomPropertyEditor();
                 var model = new AtomPropertiesModel();
+                model.Title = atom.Path;
                 model.Symbol = atom.Element.Symbol;
                 model.Charge = atom.FormalCharge.ToString();
                 model.Isotope = atom.IsotopeNumber.ToString();
-                model.Title = atom.Path;
                 model.Centre = pp;
                 pe.ShowDialog(model);
                 if (model.Save)
@@ -58,15 +57,18 @@ namespace Chem4Word.ACME.Controls
             if (ActiveVisual is BondVisual bv)
             {
                 var bond = bv.ParentBond;
-                //MessageBox.Show($"Right Click on {bond}");
                 BondPropertyEditor pe = new BondPropertyEditor();
                 var model = new BondPropertiesModel();
-                model.Order = bond.Order;
                 model.Title = bond.Path;
+                model.Order = bond.Order;
+                model.Stereo = Globals.GetStereoString(bond.Stereo);
+                model.Placement = bond.ExplicitPlacement == null ? "" : bond.ExplicitPlacement.ToString();
                 model.Centre = pp;
                 pe.ShowDialog(model);
                 if (model.Save)
                 {
+                    EditViewModel evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
+                    evm.UpdateBond(bond, model);
                     bond.Order = model.Order;
                 }
             }

@@ -1801,6 +1801,45 @@ namespace Chem4Word.ACME
                 atom.IsotopeNumber = isotopeBefore;
                 atom.Parent.ForceUpdates();
             };
+
+            UndoManager.RecordAction(undo, redo);
+            UndoManager.EndUndoBlock();
+        }
+
+        public void UpdateBond(Bond bond, BondPropertiesModel model)
+        {
+            UndoManager.BeginUndoBlock();
+
+            string bondOrderBefore = bond.Order;
+            BondStereo stereoBefore = bond.Stereo;
+            BondDirection? directionBefore = bond.ExplicitPlacement;
+
+            string bondOrderAfter = model.Order;
+            BondStereo stereoAfter = Globals.StereoFromString(model.Stereo);
+            BondDirection? directionAfter = null;
+
+            BondDirection temp;
+            if (Enum.TryParse(model.Placement, out temp))
+            {
+                directionAfter = temp;
+            }
+
+            Action redo = () =>
+            {
+                bond.Order = bondOrderAfter;
+                bond.Stereo = stereoAfter;
+                bond.ExplicitPlacement = directionAfter;
+                bond.Parent.ForceUpdates();
+            };
+            redo();
+            Action undo = () =>
+            {
+                bond.Order = bondOrderBefore;
+                bond.Stereo = stereoBefore;
+                bond.ExplicitPlacement = directionBefore;
+                bond.Parent.ForceUpdates();
+            };
+
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
         }

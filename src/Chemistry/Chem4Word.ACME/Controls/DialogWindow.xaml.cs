@@ -13,24 +13,24 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        private BaseDialogModel mViewModel;
+        private BaseDialogModel _viewModel;
 
         public BaseDialogModel ViewModel
         {
-            get => mViewModel;
+            get => _viewModel;
             set
             {
                 // Set new value
-                mViewModel = value;
+                _viewModel = value;
 
                 // Update data context
-                DataContext = mViewModel;
+                DataContext = _viewModel;
             }
         }
 
         private void DialogWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            Left = ViewModel.Centre.X - ActualWidth /2;
+            Left = ViewModel.Centre.X - ActualWidth / 2;
             Top = ViewModel.Centre.Y - ActualHeight / 2;
         }
     }
