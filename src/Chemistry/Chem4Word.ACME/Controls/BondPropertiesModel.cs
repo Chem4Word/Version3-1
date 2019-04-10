@@ -5,24 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
+using System.Windows;
+using Chem4Word.Model2;
 
-namespace Chem4Word.ViewModel.Commands
+namespace Chem4Word.ACME.Controls
 {
-    public class SettingsCommand : BaseCommand
+    public class BondPropertiesModel : BaseDialogModel
     {
-        public SettingsCommand(EditViewModel vm) : base(vm)
-        {
-        }
-
-        public override bool CanExecute(object parameter)
-        {
-            return false;
-        }
-
-        public override void Execute(object parameter)
-        {
-            Debugger.Break();
-        }
+        public string Order { get; set; }
+        public string Stereo { get; set; }
+        public string Placement { get; set; }
     }
 }

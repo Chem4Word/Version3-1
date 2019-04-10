@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
-//
-
 namespace Chem4Word.ACME.Drawing
 {
     public class BondVisual : ChemicalVisual
@@ -50,7 +48,6 @@ namespace Chem4Word.ACME.Drawing
                         _hullGeometry = new CombinedGeometry(result,
                             result.GetWidenedPathGeometry(new Pen(Brushes.Black, BondThickness)));
                     }
-
                 }
 
                 return _hullGeometry;
@@ -210,9 +207,8 @@ namespace Chem4Word.ACME.Drawing
             Geometry startAtomGeometry;
             Geometry endAtomGeometry;
 
-
             startAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
-           
+
             endAtomGeometry = ((AtomVisual)ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
 
             _bondGeometry = bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
@@ -298,7 +294,7 @@ namespace Chem4Word.ACME.Drawing
 
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
-            if(HullGeometry!=null) //not single bond
+            if (HullGeometry != null) //not single bond
             {
                 if (HullGeometry.FillContains(hitTestParameters.HitPoint))
                 {
@@ -307,8 +303,8 @@ namespace Chem4Word.ACME.Drawing
             }
             else
             {
-                var widepen = new Pen(Brushes.Black, BondThickness *8.0);
-                if (_bondGeometry.GetWidenedPathGeometry(widepen,0.01, ToleranceType.Relative)
+                var widepen = new Pen(Brushes.Black, BondThickness * 8.0);
+                if (_bondGeometry.GetWidenedPathGeometry(widepen, 0.01, ToleranceType.Relative)
                     .FillContains(hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);

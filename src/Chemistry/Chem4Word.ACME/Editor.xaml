@@ -898,7 +898,6 @@
                     MinWidth="2000"
                     MinHeight="1500"
                     Background="White" />
-
             </ScrollViewer>
             <control:ZoomBox
                 x:Name="ZoomBox"
@@ -910,14 +909,4 @@
                 ScrollViewer="{Binding ElementName=DrawingArea}" />
         </Grid>
     </DockPanel>
-
-
-
-    <!--<Canvas Name="ZoomBox" Left="0" Top="0" Height="200" Width="400" Margin="5">
-            <Canvas.Background>
-                <VisualBrush Stretch="Uniform"
-                             Visual="{Binding ElementName=DrawingArea, Path=Content}" />
-            </Canvas.Background>
-        </Canvas>-->
-
 </UserControl>

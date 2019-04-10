@@ -225,44 +225,17 @@ namespace Chem4Word.Model2.Converters.CML
                     result = new XElement(CMLNamespaces.cml + CMLConstants.TagBondStereo,
                         new XAttribute(CMLConstants.TagAtomRefs4,
                             $"{firstAtom.Id} {bond.StartAtom.Id} {bond.EndAtom.Id} {lastAtom.Id}"),
-                        GetStereoString(bond.Stereo));
+                        Globals.GetStereoString(bond.Stereo));
                 }
                 else
                 {
                     result = new XElement(CMLNamespaces.cml + CMLConstants.TagBondStereo,
                         new XAttribute(CMLConstants.TagAtomRefs2, $"{bond.StartAtom.Id} {bond.EndAtom.Id}"),
-                        GetStereoString(bond.Stereo));
+                        Globals.GetStereoString(bond.Stereo));
                 }
             }
 
             return result;
-        }
-
-        private string GetStereoString(Globals.BondStereo stereo)
-        {
-            switch (stereo)
-            {
-                case Globals.BondStereo.None:
-                    return null;
-
-                case Globals.BondStereo.Hatch:
-                    return "H";
-
-                case Globals.BondStereo.Wedge:
-                    return "W";
-
-                case Globals.BondStereo.Cis:
-                    return "C";
-
-                case Globals.BondStereo.Trans:
-                    return "T";
-
-                case Globals.BondStereo.Indeterminate:
-                    return "S";
-
-                default:
-                    return null;
-            }
         }
 
         private XElement GetMoleculeElement(Molecule mol)
@@ -509,36 +482,7 @@ namespace Chem4Word.Model2.Converters.CML
             {
                 var stereo = stereoElems[0].Value;
 
-                switch (stereo)
-                {
-                    case "N":
-                        bond.Stereo = Globals.BondStereo.None;
-                        break;
-
-                    case "W":
-                        bond.Stereo = Globals.BondStereo.Wedge;
-                        break;
-
-                    case "H":
-                        bond.Stereo = Globals.BondStereo.Hatch;
-                        break;
-
-                    case "S":
-                        bond.Stereo = Globals.BondStereo.Indeterminate;
-                        break;
-
-                    case "C":
-                        bond.Stereo = Globals.BondStereo.Cis;
-                        break;
-
-                    case "T":
-                        bond.Stereo = Globals.BondStereo.Trans;
-                        break;
-
-                    default:
-                        bond.Stereo = Globals.BondStereo.None;
-                        break;
-                }
+                bond.Stereo = Globals.StereoFromString(stereo);
             }
             Globals.BondDirection? dir = null;
 

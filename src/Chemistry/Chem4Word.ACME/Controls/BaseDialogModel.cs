@@ -5,20 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model;
+using System.Windows;
+using System.Windows.Controls;
 
-namespace Chem4Word.ViewModel.Commands
+namespace Chem4Word.ACME.Controls
 {
-    public class FlipVerticalCommand : FlipCommand
+    public class BaseDialogModel
     {
-        public FlipVerticalCommand(EditViewModel vm) : base(vm)
-        {
-        }
-
-        public override void Execute(object parameter)
-        {
-            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
-            MyEditViewModel.FlipMolecule(selMolecule, true, false);
-        }
+        public Point Centre { get; set; }
+        public string Title { get; set; }
+        public bool Save { get; set; }
+        public Control Content { get; set; }
+        public double WindowMinimumWidth { get; set; }
+        public double WindowMinimumHeight { get; set; }
     }
 }

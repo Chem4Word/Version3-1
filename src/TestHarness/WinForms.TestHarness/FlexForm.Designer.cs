@@ -30,6 +30,7 @@ namespace WinForms.TestHarness
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FlexForm));
             this.LoadStructure = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.EditWithAcme = new System.Windows.Forms.Button();
@@ -278,6 +279,7 @@ namespace WinForms.TestHarness
             this.Controls.Add(this.ShowCarbons);
             this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.LoadStructure);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FlexForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Flexible Display";

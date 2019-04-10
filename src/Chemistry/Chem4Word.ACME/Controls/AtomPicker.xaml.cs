@@ -5,24 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
+using System.Windows.Controls;
 
-namespace Chem4Word.ViewModel.Commands
+namespace Chem4Word.ACME.Controls
 {
-    public class FuseCommand : BaseCommand
+    /// <summary>
+    /// Interaction logic for AtomPicker.xaml
+    /// </summary>
+    public partial class AtomPicker : UserControl
     {
-        public FuseCommand(EditViewModel vm) : base(vm)
+        public AtomPicker()
         {
-        }
-
-        public override bool CanExecute(object parameter)
-        {
-            return false;
-        }
-
-        public override void Execute(object parameter)
-        {
-            Debugger.Break();
+            InitializeComponent();
         }
     }
 }

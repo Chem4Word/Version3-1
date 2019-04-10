@@ -7,12 +7,14 @@
 
 using System.Collections.Generic;
 using System.Windows.Media;
-using Chem4Word.Model2;
 
 namespace Chem4Word.Model2.Helpers
 {
     public static class Globals
     {
+        public static PeriodicTable PeriodicTable = new PeriodicTable();
+        public static Dictionary<string, FunctionalGroup> FunctionalGroupsDictionary = FunctionalGroups.ShortcutList;
+
         #region Geometry Stuff
 
         public enum ClockDirections
@@ -63,8 +65,71 @@ namespace Chem4Word.Model2.Helpers
         public const string OrderDouble = "D";
         public const string OrderPartial23 = "partial23";
         public const string OrderTriple = "T";
-        
 
+        public static string GetStereoString(BondStereo stereo)
+        {
+            switch (stereo)
+            {
+                case BondStereo.None:
+                    return null;
+
+                case BondStereo.Hatch:
+                    return "H";
+
+                case BondStereo.Wedge:
+                    return "W";
+
+                case BondStereo.Cis:
+                    return "C";
+
+                case BondStereo.Trans:
+                    return "T";
+
+                case BondStereo.Indeterminate:
+                    return "S";
+
+                default:
+                    return null;
+            }
+        }
+
+        public static BondStereo StereoFromString(string stereo)
+        {
+            BondStereo result = BondStereo.None;
+
+            switch (stereo)
+            {
+                case "N":
+                    result = BondStereo.None;
+                    break;
+
+                case "W":
+                    result = BondStereo.Wedge;
+                    break;
+
+                case "H":
+                    result = BondStereo.Hatch;
+                    break;
+
+                case "S":
+                    result = BondStereo.Indeterminate;
+                    break;
+
+                case "C":
+                    result = BondStereo.Cis;
+                    break;
+
+                case "T":
+                    result = BondStereo.Trans;
+                    break;
+
+                default:
+                    result = BondStereo.None;
+                    break;
+            }
+
+            return result;
+        }
 
         public static string OrderValueToOrder(double val, bool isAromatic = false)
         {
@@ -111,7 +176,6 @@ namespace Chem4Word.Model2.Helpers
         }
 
         public static double? OrderToOrderValue(string order)
-
         {
             switch (order)
             {
@@ -175,9 +239,7 @@ namespace Chem4Word.Model2.Helpers
         public const double BondThickness = ScaleFactorForXaml * 0.8;
         public const double HoverAdornerThickness = 3.0;
         public static Color HoverAdornerColor => Colors.DarkOrange;
-        #endregion Layout Constants
 
-        public static PeriodicTable PeriodicTable = new PeriodicTable();
-        public static Dictionary<string, FunctionalGroup> FunctionalGroupsDictionary = FunctionalGroups.ShortcutList;
+        #endregion Layout Constants
     }
 }

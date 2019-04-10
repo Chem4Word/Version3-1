@@ -5,44 +5,78 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Navigation;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
 namespace Chem4Word.ACME.Controls
-
 {
     public class EditorCanvas : ChemistryCanvas
     {
-        #region Fields
-
-       
-
-        #endregion Fields
-
         #region Constructors
 
         public EditorCanvas() : base()
         {
-           
+            MouseRightButtonUp += OnMouseRightButtonUp;
         }
-
-        
 
         #endregion Constructors
 
-      
+        #region Event handlers
+
+        private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var pp = PointToScreen(e.GetPosition(this));
+
+            ActiveVisual = GetTargetedVisual(e.GetPosition(this));
+
+            if (ActiveVisual is AtomVisual av)
+            {
+                var atom = av.ParentAtom;
+                AtomPropertyEditor pe = new AtomPropertyEditor();
+                var model = new AtomPropertiesModel();
+                model.Title = atom.Path;
+                model.Symbol = atom.Element.Symbol;
+                model.Charge = atom.FormalCharge.ToString();
+                model.Isotope = atom.IsotopeNumber.ToString();
+                model.Centre = pp;
+                pe.ShowDialog(model);
+                if (model.Save)
+                {
+                    EditViewModel evm = (EditViewModel)((EditorCanvas)av.Parent).Chemistry;
+                    evm.UpdateAtom(atom, model);
+                }
+            }
+
+            if (ActiveVisual is BondVisual bv)
+            {
+                var bond = bv.ParentBond;
+                BondPropertyEditor pe = new BondPropertyEditor();
+                var model = new BondPropertiesModel();
+                model.Title = bond.Path;
+                model.Order = bond.Order;
+                model.Stereo = Globals.GetStereoString(bond.Stereo);
+                model.Placement = bond.ExplicitPlacement == null ? "" : bond.ExplicitPlacement.ToString();
+                model.Centre = pp;
+                pe.ShowDialog(model);
+                if (model.Save)
+                {
+                    EditViewModel evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
+                    evm.UpdateBond(bond, model);
+                    bond.Order = model.Order;
+                }
+            }
+        }
+
+        #endregion Event handlers
 
         #region Methods
-
 
         public Rect GetMoleculeBoundingBox(Molecule mol)
         {
@@ -68,16 +102,17 @@ namespace Chem4Word.ACME.Controls
 
             return union;
         }
+
         public Geometry GhostMolecule(List<Molecule> adornedMolecules)
         {
             var atomList = new List<Atom>();
             List<Bond> bondList = new List<Bond>();
             foreach (Molecule mol in adornedMolecules)
             {
-                  mol.BuildAtomList(atomList);
-                  mol.BuildBondList(bondList);
+                mol.BuildAtomList(atomList);
+                mol.BuildBondList(bondList);
             }
-          
+
             StreamGeometry ghostGeometry = new StreamGeometry();
 
             double atomRadius = this.Chemistry.Model.XamlBondLength / 7.50;
@@ -111,7 +146,6 @@ namespace Chem4Word.ACME.Controls
             return ghostGeometry;
         }
 
-       
         #endregion Methods
 
         #region Overrides
@@ -127,8 +161,5 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion Overrides
-
-
-       
     }
 }

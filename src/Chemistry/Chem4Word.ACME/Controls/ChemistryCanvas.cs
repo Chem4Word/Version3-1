@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -24,21 +25,25 @@ namespace Chem4Word.ACME.Controls
     public class ChemistryCanvas : Canvas
     {
         #region Fields
+
         private Adorner _highlightAdorner;
-         
-        #endregion
+
+        #endregion Fields
 
         #region Constructors
+
         public ChemistryCanvas()
         {
             chemicalVisuals = new Dictionary<object, DrawingVisual>();
             MouseMove += Canvas_MouseMove;
         }
-        #endregion
+
+        #endregion Constructors
 
         #region Properties
 
         private ChemicalVisual _activeVisual = null;
+
         public ChemicalVisual ActiveVisual
         {
             get { return _activeVisual; }
@@ -65,18 +70,19 @@ namespace Chem4Word.ACME.Controls
                 {
                     case BondVisual bv:
                         return bv.ParentBond;
+
                     case AtomVisual av:
                         return av.ParentAtom;
+
                     default:
                         return null;
                 }
-
             }
             set
             {
-                if (value==null)
+                if (value == null)
                 {
-                    ActiveVisual = null;   
+                    ActiveVisual = null;
                 }
                 else
                 {
@@ -84,9 +90,8 @@ namespace Chem4Word.ACME.Controls
                 }
             }
         }
-      
 
-        #endregion
+        #endregion Properties
 
         /// <summary>
         /// called during WPF layout phase
@@ -223,7 +228,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.NewItems)
                 {
-                    Molecule a= (Molecule)eNewItem;
+                    Molecule a = (Molecule)eNewItem;
 
                     MoleculeAdded(a);
                 }
@@ -381,6 +386,7 @@ namespace Chem4Word.ACME.Controls
 
             ;
         }
+
         //overrides
         protected override Visual GetVisualChild(int index)
         {
@@ -579,8 +585,6 @@ namespace Chem4Word.ACME.Controls
             //}
 
             ActiveVisual = GetTargetedVisual(e.GetPosition(this));
-
-           
         }
 
         #endregion Event handlers
@@ -592,7 +596,7 @@ namespace Chem4Word.ACME.Controls
             _visuals.Clear();
             VisualTreeHelper.HitTest(this, null, ResultCallback, new PointHitTestParameters(p));
             var visual = _visuals.FirstOrDefault(v => v is AtomVisual);
-            if(visual!=null)
+            if (visual != null)
             {
                 return visual;
             }
@@ -600,13 +604,12 @@ namespace Chem4Word.ACME.Controls
             {
                 return _visuals.FirstOrDefault();
             }
-
         }
 
         public HitTestResultBehavior ResultCallback(HitTestResult result)
         {
             _visualHit = result.VisualHit as ChemicalVisual;
-          _visuals.Add(_visualHit);
+            _visuals.Add(_visualHit);
 
             return HitTestResultBehavior.Continue;
         }
