@@ -20,15 +20,15 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return MyEditViewModel.SingleMolSelected;
+            return EditViewModel.SingleMolSelected;
         }
 
         public override void Execute(object parameter)
         {
-            Debug.Assert(MyEditViewModel.SelectedItems[0] is Molecule);
-            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
+            Debug.Assert(EditViewModel.SelectedItems[0] is Molecule);
+            var selMolecule = EditViewModel.SelectedItems[0] as Molecule;
 
-            MyEditViewModel.FlipMolecule(selMolecule, false, false);
+            EditViewModel.FlipMolecule(selMolecule, false, false);
         }
     }
 }

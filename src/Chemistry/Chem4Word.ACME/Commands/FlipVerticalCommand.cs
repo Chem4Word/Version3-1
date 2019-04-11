@@ -18,8 +18,8 @@ namespace Chem4Word.ACME.Commands
 
         public override void Execute(object parameter)
         {
-            var selMolecule = MyEditViewModel.SelectedItems[0] as Molecule;
-            MyEditViewModel.FlipMolecule(selMolecule, true, false);
+            var selMolecule = EditViewModel.SelectedItems[0] as Molecule;
+            EditViewModel.FlipMolecule(selMolecule, true, false);
         }
     }
 }

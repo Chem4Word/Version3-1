@@ -8,7 +8,7 @@
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-
+using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 
@@ -17,6 +17,7 @@ namespace Chem4Word.ACME.Adorners
     public class AtomSelectionAdorner : Adorner
     {
         private Atom _adornedAtom;
+        private EditorCanvas _currentEditor;
 
         public Atom AdornedAtom => _adornedAtom;
 
@@ -24,6 +25,7 @@ namespace Chem4Word.ACME.Adorners
         {
             //IsHitTestVisible = false;
             //this.MouseLeftButtonDown += AtomSelectionAdorner_MouseLeftButtonDown;
+            _currentEditor = (EditorCanvas) AdornedElement;
         }
 
         private void AtomSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -51,16 +53,17 @@ namespace Chem4Word.ACME.Adorners
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
             renderBrush.Opacity = 0.25;
 
-            Pen renderPen = new Pen(SystemColors.HighlightBrush, 1);
-            renderPen.DashStyle = DashStyles.Dash;
+            //Pen renderPen = new Pen(SystemColors.HighlightBrush, 1);
+            //renderPen.DashStyle = DashStyles.Dash;
 
             if (_adornedAtom.SymbolText == "")
             {
-                drawingContext.DrawEllipse(renderBrush, renderPen, _adornedAtom.Position, renderRadius, renderRadius);
+                drawingContext.DrawEllipse(renderBrush, null, _adornedAtom.Position, renderRadius, renderRadius);
             }
             else
             {
-                drawingContext.DrawRectangle(renderBrush, renderPen, _adornedAtom.BoundingBox(_adornedAtom.Parent.Model.FontSize));
+                drawingContext.DrawGeometry(renderBrush, null,_currentEditor.GetAtomVisual(AdornedAtom).HullGeometry);
+                //drawingContext.DrawRectangle(renderBrush, null, _adornedAtom.BoundingBox(_adornedAtom.Parent.Model.FontSize));
             }
         }
 

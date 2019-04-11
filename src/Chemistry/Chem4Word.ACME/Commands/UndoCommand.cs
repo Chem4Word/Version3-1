@@ -20,12 +20,12 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return MyEditViewModel.UndoManager.CanUndo;
+            return EditViewModel.UndoManager.CanUndo;
         }
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.UndoManager.Undo();
+            EditViewModel.UndoManager.Undo();
         }
 
         public override event EventHandler CanExecuteChanged;

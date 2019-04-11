@@ -18,12 +18,12 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return MyEditViewModel.SelectionType != EditViewModel.SelectionTypeCode.None;
+            return EditViewModel.SelectionType != EditViewModel.SelectionTypeCode.None;
         }
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.CopySelection();
+            EditViewModel.CopySelection();
         }
 
         public override void RaiseCanExecChanged()

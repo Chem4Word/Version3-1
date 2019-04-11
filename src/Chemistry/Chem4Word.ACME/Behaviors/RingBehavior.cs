@@ -50,7 +50,7 @@ namespace Chem4Word.ACME.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            ViewModel.SelectedItems?.Clear();
+            EditViewModel.SelectedItems?.Clear();
 
             _parent = Application.Current.MainWindow;
 
@@ -77,7 +77,7 @@ namespace Chem4Word.ACME.Behaviors
             List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
 
             List<Point> preferredPlacements;
-            var xamlBondSize = ViewModel.Model.XamlBondLength;
+            var xamlBondSize = EditViewModel.Model.XamlBondLength;
 
             if (hitAtom != null)
             {
@@ -147,7 +147,7 @@ namespace Chem4Word.ACME.Behaviors
                 newAtomPlacements.Add(nap);
             }
 
-            ViewModel.DrawRing(newAtomPlacements, Unsaturated);
+            EditViewModel.DrawRing(newAtomPlacements, Unsaturated);
         }
 
         private List<Point> PaceOut(Atom startAtom, Vector direction, double bondSize, int ringSize)

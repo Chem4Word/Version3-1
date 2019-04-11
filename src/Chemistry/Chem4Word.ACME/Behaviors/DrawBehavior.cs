@@ -45,7 +45,7 @@ namespace Chem4Word.ACME.Behaviors
 
             CurrentEditor = (EditorCanvas)AssociatedObject;
 
-            ViewModel.SelectedItems?.Clear();
+            EditViewModel.SelectedItems?.Clear();
 
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
@@ -88,8 +88,8 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
                         {
-                            Stereo = ViewModel.CurrentStereo,
-                            BondOrder = ViewModel.CurrentBondOrder
+                            Stereo = EditViewModel.CurrentStereo,
+                            BondOrder = EditViewModel.CurrentBondOrder
                         };
                     }
 
@@ -121,16 +121,16 @@ namespace Chem4Word.ACME.Behaviors
             {
                 //clicking on a stereo bond should just invert it
                 if (landedBondVisual.ParentBond.Stereo == BondStereo.Hatch &
-                    ViewModel.CurrentStereo == BondStereo.Hatch |
+                    EditViewModel.CurrentStereo == BondStereo.Hatch |
                     landedBondVisual.ParentBond.Stereo == BondStereo.Wedge &
-                    ViewModel.CurrentStereo == BondStereo.Wedge)
+                    EditViewModel.CurrentStereo == BondStereo.Wedge)
                 {
-                    ViewModel.SwapBondDirection(landedBondVisual.ParentBond);
+                    EditViewModel.SwapBondDirection(landedBondVisual.ParentBond);
                 }
                 else
                 {
                     //modify the bond attribute (order, stereo, whatever's selected really)
-                    ViewModel.SetBondAttributes(landedBondVisual.ParentBond);
+                    EditViewModel.SetBondAttributes(landedBondVisual.ParentBond);
                 }
             }
             else //we clicked on empty space or an atom
@@ -148,20 +148,20 @@ namespace Chem4Word.ACME.Behaviors
                         else if (_currentAtomVisual != null)
                         {
                             //so just sprout a chain off it at two-o-clock
-                            ViewModel.AddAtomChain(parentAtom, _angleSnapper.SnapBond(e.GetPosition(CurrentEditor), e),
+                            EditViewModel.AddAtomChain(parentAtom, _angleSnapper.SnapBond(e.GetPosition(CurrentEditor), e),
                                                    ClockDirections.II);
                         }
                         else
                         {
                             //otherwise create a singleton
-                            ViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
+                            EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
                         }
                     }
                     else
                     {
                         //create a singleton
                         //otherwise create a singleton
-                        ViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
+                        EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
                     }
                 }
                 else //we went mouse-up on an atom
@@ -176,7 +176,7 @@ namespace Chem4Word.ACME.Behaviors
                         else
                         {
                             var atomMetrics = GetNewChainEndPos(landedAtomVisual);
-                            ViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
+                            EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
                         }
                     }
                     else //we must have hit a different atom altogether
@@ -190,7 +190,7 @@ namespace Chem4Word.ACME.Behaviors
                         }
                         else if (existingBond != null) //it must be in the same molecule
                         {
-                            ViewModel.IncreaseBondOrder(existingBond);
+                            EditViewModel.IncreaseBondOrder(existingBond);
                         }
                         else //doesn't have a bond to the target atom
                         {
@@ -200,13 +200,13 @@ namespace Chem4Word.ACME.Behaviors
                             }
                             else if (sameMolecule)
                             {
-                                ViewModel.AddNewBond(parentAtom, lastAtom,
+                                EditViewModel.AddNewBond(parentAtom, lastAtom,
                                                      parentAtom.Parent);
                             }
                             else
                             {
-                                ViewModel.JoinMolecules(parentAtom, lastAtom, ViewModel.CurrentBondOrder,
-                                                        ViewModel.CurrentStereo);
+                                EditViewModel.JoinMolecules(parentAtom, lastAtom, EditViewModel.CurrentBondOrder,
+                                                        EditViewModel.CurrentStereo);
                             }
                         }
                     }
@@ -268,7 +268,7 @@ namespace Chem4Word.ACME.Behaviors
 
             if (lastAtom.Degree == 0) //isolated atom
             {
-                newDirection = ClockDirections.II.ToVector() * ViewModel.Model.XamlBondLength;
+                newDirection = ClockDirections.II.ToVector() * EditViewModel.Model.XamlBondLength;
                 newTag = ClockDirections.II;
             }
             else if (lastAtom.Degree == 1)
@@ -281,7 +281,7 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     //Tag is used to store the direction the atom sprouted from its previous atom
                     newTag = GetNewSproutDirection(hour);
-                    newDirection = newTag.ToVector() * ViewModel.Model.XamlBondLength;
+                    newDirection = newTag.ToVector() * EditViewModel.Model.XamlBondLength;
                 }
                 else //it has sprouted, so where to put the new branch?
                 {
@@ -293,19 +293,19 @@ namespace Chem4Word.ACME.Behaviors
                     var balancingVector = -(vecA + vecB);
                     balancingVector.Normalize();
                     newTag = GetGeneralDir(balancingVector);
-                    newDirection = balancingVector * ViewModel.Model.XamlBondLength;
+                    newDirection = balancingVector * EditViewModel.Model.XamlBondLength;
                 }
             }
             else if (lastAtom.Degree == 2)
             {
                 var balancingVector = lastAtom.BalancingVector;
                 balancingVector.Normalize();
-                newDirection = balancingVector * ViewModel.Model.XamlBondLength;
+                newDirection = balancingVector * EditViewModel.Model.XamlBondLength;
                 newTag = GetGeneralDir(balancingVector);
             }
             else //lastAtom.Degree >= 2:  could get congested
             {
-                FindOpenSpace(lastAtom, ViewModel.Model.XamlBondLength, out newDirection);
+                FindOpenSpace(lastAtom, EditViewModel.Model.XamlBondLength, out newDirection);
                 newTag = GetGeneralDir(newDirection);
             }
 
@@ -451,12 +451,12 @@ namespace Chem4Word.ACME.Behaviors
             _currentAtomVisual = CurrentEditor.GetTargetedVisual(position) as AtomVisual;
             if (_currentAtomVisual == null)
             {
-                _angleSnapper = new Snapper(position, ViewModel);
+                _angleSnapper = new Snapper(position, EditViewModel);
             }
             else
             {
                 Mouse.Capture(CurrentEditor);
-                _angleSnapper = new Snapper(_currentAtomVisual.ParentAtom.Position, ViewModel);
+                _angleSnapper = new Snapper(_currentAtomVisual.ParentAtom.Position, EditViewModel);
                 _lastAtomVisual = _currentAtomVisual;
             }
             _flag = true;

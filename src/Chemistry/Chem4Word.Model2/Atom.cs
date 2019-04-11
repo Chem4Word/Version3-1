@@ -648,5 +648,13 @@ namespace Chem4Word.Model2
         {
             OnPropertyChanged(nameof(SymbolText));
         }
+
+        public int UnprocessedDegree(Predicate<Atom> unprocessedTest, HashSet<Bond> excludeBonds)
+        {
+            var unproc = from a in UnprocessedNeighbours(unprocessedTest)
+                         where !excludeBonds.Contains(this.BondBetween(a)) && unprocessedTest(a)
+                         select a;
+            return unproc.Count();
+        }
     }
 }

@@ -196,7 +196,7 @@ namespace Chem4Word.ACME.Drawing
             endPoint = ParentBond.EndAtom.Position;
             Geometry bondGeometry = null;
             Vector bondVector = endPoint - startPoint;
-
+            var bondLength = ParentBond.Model.XamlBondLength;
             var cv1 = ChemicalVisuals.ContainsKey(ParentBond.StartAtom);
             var cv2 = ChemicalVisuals.ContainsKey(ParentBond.EndAtom);
             if (!cv1 || !cv2)
@@ -213,19 +213,31 @@ namespace Chem4Word.ACME.Drawing
 
             _bondGeometry = bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
 
-            _mainBondPen = new Pen(Brushes.Black, BondThickness);
-            _mainBondPen.Thickness = BondThickness;
+            _mainBondPen = new Pen(Brushes.Black, BondThickness)
+            {
 
-            _mainBondPen.StartLineCap = PenLineCap.Round;
-            _mainBondPen.EndLineCap = PenLineCap.Round;
+                StartLineCap = PenLineCap.Round,
+                EndLineCap = PenLineCap.Round
+            };
+
             _subsidiaryBondPen = _mainBondPen.Clone();
 
             if (ParentBond.OrderValue < 1.0d)
             {
                 _mainBondPen.DashStyle = DashStyles.Dash;
+                Point? centroid = null;
+                //grab the enclosing polygon as for a double bond - this overcomes a hit testing bug
+                _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
+                                                                  ParentBond.Placement, centroid, out _,
+                                                                  out _, out _, out _);
             }
             else if (ParentBond.OrderValue < 2.0)
             {
+                Point? centroid = null;
+                //grab the enclosing polygon as for a double bond - this overcomes a hit testing bug
+                _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
+                                                                  ParentBond.Placement, centroid, out _,
+                                                                  out _, out _, out _);
                 _subsidiaryBondPen.DashStyle = DashStyles.Dash;
             }
 
@@ -252,6 +264,12 @@ namespace Chem4Word.ACME.Drawing
                         bondBrush = new SolidColorBrush(Colors.Black);
                     }
                     dc.DrawGeometry(bondBrush, _mainBondPen, bondGeometry);
+                    if (ParentBond.OrderValue <= 1.0)
+                    {
+                        //we need to draw another transparent thicker line on top of the existing one
+                        dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4), _bondGeometry);
+                    }
+
                     dc.Close();
                 }
             }
@@ -265,7 +283,7 @@ namespace Chem4Word.ACME.Drawing
                     centroid = ParentBond.PrimaryRing?.Centroid;
                 }
 
-                var bondLength = ParentBond.Model.XamlBondLength;
+                
                 _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
                     ParentBond.Placement, centroid, out point1,
                     out point2, out point3, out point4);
@@ -287,6 +305,9 @@ namespace Chem4Word.ACME.Drawing
                 {
                     dc.DrawLine(_mainBondPen, point1, point2);
                     dc.DrawLine(_subsidiaryBondPen, point3, point4);
+                   
+                   
+
                     dc.Close();
                 }
             }
@@ -304,8 +325,7 @@ namespace Chem4Word.ACME.Drawing
             else
             {
                 var widepen = new Pen(Brushes.Black, BondThickness * 8.0);
-                if (_bondGeometry.GetWidenedPathGeometry(widepen, 0.01, ToleranceType.Relative)
-                    .FillContains(hitTestParameters.HitPoint))
+                if (_bondGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }

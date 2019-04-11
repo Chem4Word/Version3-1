@@ -11,7 +11,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Chem4Word.ACME;
 
 namespace Chem4Word.ACME
 {
@@ -52,10 +51,15 @@ namespace Chem4Word.ACME
             {
                 return Level == 0;
             }
+
+            public override string ToString()
+            {
+                return $"Level {Level}, Description {Description}";
+            }
         }
 
         //each block of transactions is bracketed by a buffer record at either end
-        private readonly UndoRecord _bufferRecord;
+        private readonly UndoRecord _startBracket, _endBracket;
 
         private EditViewModel _editViewModel;
 
@@ -74,9 +78,16 @@ namespace Chem4Word.ACME
             _editViewModel = vm;
 
             //set up the buffer record
-            _bufferRecord = new UndoRecord
+            _startBracket = new UndoRecord
             {
-                Description = "#buffer#",
+                Description = "#start#",
+                Level = 0,
+                UndoAction = null,
+                RedoAction = null
+            };
+            _endBracket = new UndoRecord
+            {
+                Description = "#end#",
                 Level = 0,
                 UndoAction = null,
                 RedoAction = null
@@ -96,7 +107,7 @@ namespace Chem4Word.ACME
             //push a buffer record onto the stack
             if (_transactionLevel == 0)
             {
-                _undoStack.Push(_bufferRecord);
+                _undoStack.Push(_startBracket);
             }
             _transactionLevel++;
         }
@@ -135,13 +146,13 @@ namespace Chem4Word.ACME
             if (_transactionLevel == 0)
 
             {
-                if (_undoStack.Peek().IsBufferRecord())
+                if (_undoStack.Peek().Equals(_startBracket))
                 {
-                    _undoStack.Pop();//no point in comitting an empty block so just remove it
+                    _undoStack.Pop();//no point in committing an empty block so just remove it
                 }
                 else
                 {
-                    _undoStack.Push(_bufferRecord);
+                    _undoStack.Push(_endBracket);
                 }
             }
             //tell the parent viewmodel the command status has changed
@@ -156,13 +167,13 @@ namespace Chem4Word.ACME
         public void RollbackUndoBlock()
         {
             var br = _undoStack.Pop();
-            if (br.IsBufferRecord())
+            if (br.Equals(_endBracket))
             {
                 Debugger.Break();
                 throw new InvalidDataException("First rollback action is a buffer record.");
             }
 
-            while (!br.IsBufferRecord())
+            while (!br.Equals(_startBracket))
             {
                 br.Undo();
                 br = _undoStack.Pop();
@@ -181,10 +192,10 @@ namespace Chem4Word.ACME
         {
             //the very first record on the undo stack should be a buffer record
             var br = _undoStack.Pop();
-            if (!br.IsBufferRecord())
+            if (!br.Equals(_endBracket))
             {
                 Debugger.Break();
-                throw new InvalidDataException("Undo stack is missing buffer record");
+                throw new InvalidDataException("Undo stack is missing start bracket record");
             }
             _redoStack.Push(br);
 
@@ -192,7 +203,7 @@ namespace Chem4Word.ACME
             {
                 br = _undoStack.Pop();
                 _redoStack.Push(br);
-                if (br.IsBufferRecord())
+                if (br.Equals(_startBracket))
                 {
                     break;
                 }
@@ -211,10 +222,10 @@ namespace Chem4Word.ACME
         {
             //the very first record on the redo stack should be a buffer record
             var br = _redoStack.Pop();
-            if (!br.IsBufferRecord())
+            if (!br.Equals(_startBracket))
             {
                 Debugger.Break();
-                throw new InvalidDataException("Redo stack is missing buffer record");
+                throw new InvalidDataException("Redo stack is missing end bracket record");
             }
             _undoStack.Push(br);
 
@@ -222,7 +233,7 @@ namespace Chem4Word.ACME
             {
                 br = _redoStack.Pop();
                 _undoStack.Push(br);
-                if (br.IsBufferRecord())
+                if (br.Equals(_endBracket))
                 {
                     break;
                 }

@@ -15,15 +15,15 @@ namespace Chem4Word.ACME.Behaviors
 {
     public class BaseEditBehavior : Behavior<Canvas>
     {
-        public EditViewModel ViewModel
+        public EditViewModel EditViewModel
         {
-            get { return (EditViewModel)GetValue(ViewModelProperty); }
-            set { SetValue(ViewModelProperty, value); }
+            get { return (EditViewModel)GetValue(EditViewModelProperty); }
+            set { SetValue(EditViewModelProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ViewModel.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ViewModelProperty =
-            DependencyProperty.Register("ViewModel", typeof(EditViewModel), typeof(BaseEditBehavior), new PropertyMetadata(null));
+        // Using a DependencyProperty as the backing store for EditViewModel.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty EditViewModelProperty =
+            DependencyProperty.Register("EditViewModel", typeof(EditViewModel), typeof(BaseEditBehavior), new PropertyMetadata(null));
 
         public EditorCanvas CurrentEditor { get; set; }
     }

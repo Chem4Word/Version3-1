@@ -361,5 +361,10 @@ namespace Chem4Word.ACME
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private void BondCombo_SelectionChanged()
+        {
+
+        }
     }
 }

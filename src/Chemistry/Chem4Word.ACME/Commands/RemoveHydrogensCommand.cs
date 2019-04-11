@@ -19,17 +19,17 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            var mols = MyEditViewModel.SelectedItems.OfType<Molecule>().ToList();
-            var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
-            var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
-            var nothingSelected = MyEditViewModel.SelectedItems.Count == 0;
+            var mols = EditViewModel.SelectedItems.OfType<Molecule>().ToList();
+            var atoms = EditViewModel.SelectedItems.OfType<Atom>().ToList();
+            var bonds = EditViewModel.SelectedItems.OfType<Bond>().ToList();
+            var nothingSelected = EditViewModel.SelectedItems.Count == 0;
 
             return nothingSelected || mols.Any() && !atoms.Any() && !bonds.Any();
         }
 
         public override void Execute(object parameter)
         {
-            MyEditViewModel.RemoveHydrogens();
+            EditViewModel.RemoveHydrogens();
         }
     }
 }

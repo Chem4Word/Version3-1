@@ -161,5 +161,11 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion Overrides
+
+
+        public AtomVisual GetAtomVisual(Atom adornedAtom)
+        {
+           return chemicalVisuals[adornedAtom] as AtomVisual;
+        }
     }
 }

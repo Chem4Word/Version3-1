@@ -1354,6 +1354,15 @@ namespace Chem4Word.Model2
             return seed.Neighbours.First(a => isntProcessed(a));
         }
 
+        private static Atom NextUnprocessedAtom(Atom seed, Predicate<Atom> isntProcessed, HashSet<Bond> excludeBonds)
+        {
+            var unprocessedNeighbours = from a in seed.Neighbours
+                                        where isntProcessed(a) && !excludeBonds.Contains(seed.BondBetween(a))
+                                        select a;
+
+            return unprocessedNeighbours.First();
+        }
+
         /// <summary>
         /// Traverses a molecular graph applying an operation to each and every atom.
         /// Does not require that the atoms be already part of a Molecule.
@@ -1361,7 +1370,7 @@ namespace Chem4Word.Model2
         /// <param name="startAtom">start atom</param>
         /// <param name="operation">delegate pointing to operation to perform</param>
         /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
-        private void Traverse(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed)
+        public void Traverse(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed)
         {
             operation(startAtom);
 
@@ -1385,6 +1394,82 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Traverses a molecular graph applying an operation to each and every atom.
+        /// Does not require that the atoms be already part of a Molecule.
+        /// Overload allows list of bonds to be excluded;
+        /// </summary>
+        /// <param name="startAtom">start atom</param>
+        /// <param name="operation">delegate pointing to operation to perform</param>
+        /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
+        /// <param name="excludeBonds">List of bonds to exclude from traversion</param>
+        public void Traverse(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed, HashSet<Bond> excludeBonds)
+        {
+            operation(startAtom);
+
+            while (startAtom.UnprocessedDegree(isntProcessed, excludeBonds) > 0)
+            {
+                if (startAtom.UnprocessedDegree(isntProcessed, excludeBonds) == 1)
+                {
+                    Atom nextAtom = NextUnprocessedAtom(startAtom, isntProcessed, excludeBonds);
+
+                    if (!excludeBonds.Contains(nextAtom.BondBetween(startAtom)))
+                    {
+                        operation(nextAtom);
+                    }
+                    Traverse(nextAtom, operation, isntProcessed, excludeBonds);
+                }
+                else
+                {
+                    var unassignedAtom = from a in startAtom.Neighbours
+                                         where isntProcessed(a) && !excludeBonds.Contains(startAtom.BondBetween(a))
+                                         select a;
+                    foreach (Atom atom in unassignedAtom)
+                    {
+                        Traverse(atom, operation, isntProcessed, excludeBonds);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Traverses a molecular graph applying an operation to each and every atom.
+        /// Uses breadth-first searching
+        /// Does not require that the atoms be already part of a Molecule.
+        /// Overload allows list of bonds to be excluded;
+        /// </summary>
+        /// <param name="startAtom">start atom</param>
+        /// <param name="operation">delegate pointing to operation to perform</param>
+        /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
+        /// <param name="excludeBonds">Optional ist of bonds to exclude from traversion</param>
+        public void TraverseBFS(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed,
+                                HashSet<Bond> excludeBonds=null)
+        {
+            if (excludeBonds == null)//then create an empty exclusion set
+            {
+                excludeBonds=new HashSet<Bond>();
+            }
+
+
+            Queue<Atom> toDo = new Queue<Atom>();
+
+            toDo.Enqueue(startAtom);
+            Atom next = null;
+            while(toDo.Count>0)
+            {
+                next = toDo.Dequeue();
+
+                operation(next);
+
+                var neighbours = from a in next.Neighbours
+                                 where isntProcessed(a) && !excludeBonds.Contains(next.BondBetween(a))
+                                 select a;
+                foreach (Atom atom in neighbours)
+                {
+                    toDo.Enqueue(atom);
+                }
+            }
+        }
         public void Reparent()
         {
             foreach (Atom atom in Atoms.Values)

@@ -18,47 +18,27 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return MyEditViewModel.SelectedItems.Any();
+            return EditViewModel.SelectedItems.Any();
         }
 
         public override void Execute(object parameter)
         {
-            var atoms = MyEditViewModel.SelectedItems.OfType<Atom>().ToList();
-            var bonds = MyEditViewModel.SelectedItems.OfType<Bond>().ToList();
-            var mols = MyEditViewModel.SelectedItems.OfType<Molecule>().ToList();
-            if (atoms.Any() | bonds.Any())
+            var atoms = EditViewModel.SelectedItems.OfType<Atom>().ToList();
+            var bonds = EditViewModel.SelectedItems.OfType<Bond>().ToList();
+            var mols = EditViewModel.SelectedItems.OfType<Molecule>().ToList();
+
+            if (mols.Any())
             {
-                MyEditViewModel.UndoManager.BeginUndoBlock();
-                //do any bonds remaining:  this is important if only bonds have been selected
+                EditViewModel.DeleteMolecules(mols);
+            }
+            else if (atoms.Any() | bonds.Any())
+            {
+                EditViewModel.UndoManager.BeginUndoBlock();
 
-                if (mols.Any())
-                {
-                    foreach (Molecule mol in mols)
-                    {
-                        MyEditViewModel.DeleteMolecule(mol);
-                    }
-                }
-                else
-                {
-                    if (bonds.Any())
-                    {
-                        foreach (Bond bond in bonds)
-                        {
-                            MyEditViewModel.DeleteBond(bond);
-                        }
-                    }
-
-                    //do the atom and any remaining associated bonds
-                    if (atoms.Any())
-                    {
-                        foreach (Atom atom in atoms)
-                        {
-                            MyEditViewModel.DeleteAtom(atom);
-                        }
-                    }
-                }
-                MyEditViewModel.UndoManager.EndUndoBlock();
-                MyEditViewModel.SelectedItems.Clear();
+                EditViewModel.DeleteAtomsAndBonds(atoms, bonds);
+               
+                EditViewModel.UndoManager.EndUndoBlock();
+                EditViewModel.SelectedItems.Clear();
             }
         }
 

@@ -1154,33 +1154,44 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
         }
 
+        public void DeleteMolecules(IEnumerable<Molecule> mols)
+        {
+            UndoManager.BeginUndoBlock();
+
+            foreach (Molecule mol in mols)
+            {
+               DeleteMolecule(mol);
+            }
+
+            UndoManager.EndUndoBlock();
+        }
+
         public void DeleteMolecule(Molecule mol)
         {
             UndoManager.BeginUndoBlock();
 
-            //Model.Model theModel = mol.Model;
             var atomList = mol.Atoms.ToList();
             var bondList = mol.Bonds.ToList();
 
-            bool isTopLevel = UndoManager.TransactionLevel == 1;
+            Action redo = () =>
+                          {
+                              RemoveFromSelection(mol);
+                              Model.RemoveMolecule(mol);
+                              mol.Parent = null;
+                          };
 
-            Action redoAction = () =>
-            {
-                mol.Parent = null;
-                //theModel.Molecules.Remove(mol);
-                RemoveFromSelection(mol);
-            };
+            Action undo = () =>
+                          {
+                              mol.Parent = Model;
+                              Model.AddMolecule(mol);
+                              AddToSelection(mol);
+                          };
 
-            Action undoAction = () =>
-            {
-                //mol.Parent = theModel;
-                //theModel.Molecules.Add(mol);
-                //AddToSelection(mol);
-            };
+            RemoveFromSelection(mol);
+            Model.RemoveMolecule(mol);
+            mol.Parent = null;
 
-            redoAction();
-
-            UndoManager.RecordAction(undoAction, redoAction);
+            UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
         }
 
@@ -1570,7 +1581,7 @@ namespace Chem4Word.ACME
                 {
                     Molecule parent = atom.Parent;
 
-                    if (!atom.Neighbours.Any())
+                    if (atom.Singleton)
                     {
                         SelectedItems.Add(parent);
                     }
@@ -1760,6 +1771,301 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
 
             ;
+        }
+
+        public void DeleteAtoms(IEnumerable<Atom> atoms)
+        {
+            var atomList = atoms.ToArray();
+            //Add all the selected atoms to a set A
+            if (atomList.Count() == 1 && atomList[0].Singleton)
+            {
+                var delAtom = atomList[0];
+                UndoManager.BeginUndoBlock();
+                var molecule = delAtom.Parent;
+                Model model = molecule.Model;
+                Action redo = () => { model.RemoveMolecule(molecule); };
+                Action undo = () => { model.AddMolecule(molecule); };
+                UndoManager.RecordAction(undo, redo);
+                redo();
+                UndoManager.EndUndoBlock();
+            }
+            else
+            {
+                DeleteAtomsAndBonds(atoms);
+            }
+        }
+
+        /// <summary>
+        /// Deletes a list of atoms and bonds, splitting them into separate molecules if required
+        /// </summary>
+        /// <param name="atomlist"></param>
+        /// <param name="bondList"></param>
+        ///
+
+        public void DeleteAtomsAndBonds(IEnumerable<Atom> atomlist = null, IEnumerable<Bond> bondList = null)
+        {
+            void RefreshRingBonds(int theoreticalRings, Molecule molecule, Bond deleteBond)
+            {
+                if (theoreticalRings != molecule.TheoreticalRings)
+                {
+                    molecule.RebuildRings();
+                    foreach (Ring bondRing in deleteBond.Rings)
+                    {
+                        foreach (Bond bond in bondRing.Bonds)
+                        {
+                            bond.NotifyBondingChanged();
+                        }
+                    }
+                }
+            }
+
+            HashSet<Atom> deleteAtoms = new HashSet<Atom>();
+            HashSet<Bond> deleteBonds = new HashSet<Bond>();
+            HashSet<Atom> neighbours = new HashSet<Atom>();
+
+            if (atomlist != null)
+            {
+                //Add all the selected atoms to a set A
+                foreach (Atom atom in atomlist)
+                {
+                    deleteAtoms.Add(atom);
+
+                    foreach (Bond bond in atom.Bonds)
+                    {
+                        //Add all the selected atoms' bonds to B
+                        deleteBonds.Add(bond);
+                        //Add start and end atoms B1s and B1E to neighbours
+                        neighbours.Add(bond.StartAtom);
+                        neighbours.Add(bond.EndAtom);
+                    }
+                }
+            }
+
+            if (bondList != null)
+            {
+                foreach (var bond in bondList)
+                {
+                    //Add all the selected bonds to deleteBonds
+                    deleteBonds.Add(bond);
+                    //Add start and end atoms B1s and B1E to neighbours
+                    neighbours.Add(bond.StartAtom);
+                    neighbours.Add(bond.EndAtom);
+                }
+            }
+
+            //ignore the atoms we are going to delete anyway
+            neighbours.ExceptWith(deleteAtoms);
+            HashSet<Atom> updateAtoms = new HashSet<Atom>(neighbours);
+
+            List<HashSet<Atom>> atomGroups = new List<HashSet<Atom>>();
+            Molecule mol = null;
+            //take a copy of the neighbouring atoms
+            HashSet<Atom> neighboursCopy = new HashSet<Atom>(neighbours);
+
+            //now, take groups of connected atoms from the remaining graph ignoring the excluded bonds
+            while (neighbours.Count > 0)
+            {
+                HashSet<Atom> atomGroup = new HashSet<Atom>();
+
+                //TODO: sort out the grouping of atoms
+                var firstAtom = neighbours.First();
+                mol = (Molecule)firstAtom.Parent;
+                mol.TraverseBFS(firstAtom, a1 =>
+                                        {
+                                            atomGroup.Add(a1);
+                                        }, a2 => !atomGroup.Contains(a2), deleteBonds);
+                atomGroups.Add(atomGroup);
+                //remove the list of atoms from the atom group
+                neighbours.ExceptWith(atomGroup);
+            }
+
+            //Debug.Assert(mol!=null);
+            //Debug.Assert(atomGroups.Count>=1);
+            //now, check to see whether there is a single atomgroup.  If so, then we still have one molecule
+            if (atomGroups.Count == 1)
+            {
+                MoleculePropertyBag mpb = new MoleculePropertyBag();
+                mpb.Store(mol);
+
+                UndoManager.BeginUndoBlock();
+                Action redo = () =>
+                              {
+                                  SelectedItems.Clear();
+                                  int theoreticalRings = mol.TheoreticalRings;
+                                  foreach (Bond deleteBond in deleteBonds)
+                                  {
+                                      mol.RemoveBond(deleteBond);
+                                      RefreshRingBonds(theoreticalRings, mol, deleteBond);
+                                      //deleteBond.NotifyBondingChanged();
+                                      deleteBond.StartAtom.NotifyBondingChanged();
+                                      deleteBond.EndAtom.NotifyBondingChanged();
+                                      foreach (Bond atomBond in deleteBond.StartAtom.Bonds)
+                                      {
+                                          atomBond.NotifyBondingChanged();
+                                      }
+                                      foreach (Bond atomBond in deleteBond.EndAtom.Bonds)
+                                      {
+                                          atomBond.NotifyBondingChanged();
+                                      }
+                                  }
+
+                                  foreach (Atom deleteAtom in deleteAtoms)
+                                  {
+                                      mol.RemoveAtom(deleteAtom);
+                                      //deleteAtom.NotifyBondingChanged();
+                                  }
+                                  mol.ClearProperties();
+                                  RefreshAtomVisuals(updateAtoms);
+                              };
+                Action undo = () =>
+                              {
+                                  SelectedItems.Clear();
+                                  foreach (Atom restoreAtom in deleteAtoms)
+                                  {
+                                      mol.AddAtom(restoreAtom);
+                                      restoreAtom.NotifyBondingChanged();
+                                      AddToSelection(restoreAtom);
+                                  }
+
+                                  foreach (Bond restoreBond in deleteBonds)
+                                  {
+                                      int theoreticalRings = mol.TheoreticalRings;
+                                      mol.AddBond(restoreBond);
+                                      RefreshRingBonds(theoreticalRings, mol, restoreBond);
+
+                                      restoreBond.StartAtom.NotifyBondingChanged();
+                                      restoreBond.EndAtom.NotifyBondingChanged();
+                                      foreach (Bond atomBond in restoreBond.StartAtom.Bonds)
+                                      {
+                                          atomBond.NotifyBondingChanged();
+                                      }
+                                      foreach (Bond atomBond in restoreBond.EndAtom.Bonds)
+                                      {
+                                          atomBond.NotifyBondingChanged();
+                                      }
+
+                                      restoreBond.NotifyBondingChanged();
+
+                                      AddToSelection(restoreBond);
+                                  }
+                                  mpb.Restore(mol);
+                              };
+                UndoManager.RecordAction(undo, redo);
+                redo();
+                UndoManager.EndUndoBlock();
+            }
+            else //we have multiple fragments
+            {
+                //    ImmutableList<Molecule> newMolecules, oldMolecules;
+                List<Molecule> newMolList = new List<Molecule>();
+                List<Molecule> oldmolList = new List<Molecule>();
+                //add all the relevant atoms and bonds to a new molecule;
+
+                //grab the model for future reference
+                Model parentModel = null;
+                foreach (HashSet<Atom> atomGroup in atomGroups)
+                {
+                    //assume that all atoms share the same parent model & molecule
+                    var parent = atomGroup.First().Parent;
+                    if (parentModel == null)
+                    {
+                        parentModel = parent.Model;
+                    }
+                    if (!oldmolList.Contains(parent))
+                    {
+                        oldmolList.Add(parent);
+                    }
+
+                    Molecule newMolecule = new Molecule();
+
+                    foreach (Atom atom in atomGroup)
+                    {
+                        newMolecule.AddAtom(atom);
+                        var bondsToAdd = from Bond bond in atom.Bonds
+                                         where !newMolecule.Bonds.Contains(bond) && !deleteBonds.Contains(bond)
+                                         select bond;
+                        foreach (Bond bond in bondsToAdd)
+                        {
+                            newMolecule.AddBond(bond);
+                        }
+                    }
+
+                    newMolecule.Parent = parentModel;
+                    newMolecule.Reparent();
+                    newMolList.Add(newMolecule);
+                    newMolecule.RebuildRings();
+                    //add the molecule to the model
+                    parentModel.AddMolecule(newMolecule);
+                }
+
+                foreach (Molecule oldMolecule in oldmolList)
+                {
+                    parentModel.RemoveMolecule(oldMolecule);
+                    oldMolecule.Parent = null;
+                }
+
+                //refresh the neighbouring atoms
+                RefreshAtomVisuals(updateAtoms);
+                UndoManager.BeginUndoBlock();
+                Action undo = () =>
+                              {
+                                  SelectedItems.Clear();
+                                  foreach (Molecule oldMol in oldmolList)
+                                  {
+                                      oldMol.Reparent();
+                                      oldMol.Parent = parentModel;
+                                      parentModel.AddMolecule(oldMol);
+                                      oldMol.ForceUpdates();
+                                  }
+
+                                  foreach (Molecule newMol in newMolList)
+                                  {
+                                      parentModel.RemoveMolecule(newMol);
+                                      newMol.Parent = null;
+                                  }
+
+                                  RefreshAtomVisuals(updateAtoms);
+                              };
+
+                Action redo = () =>
+                              {
+                                  SelectedItems.Clear();
+                                  foreach (Molecule newmol in newMolList)
+                                  {
+                                      newmol.Reparent();
+                                      newmol.Parent = parentModel;
+                                      parentModel.AddMolecule(newmol);
+                                      newmol.ForceUpdates();
+                                  }
+
+                                  foreach (Molecule oldMol in oldmolList)
+                                  {
+                                      parentModel.RemoveMolecule(oldMol);
+                                      oldMol.Parent = null;
+                                  }
+
+                                  RefreshAtomVisuals(updateAtoms);
+                              };
+                UndoManager.RecordAction(undo, redo);
+                UndoManager.EndUndoBlock();
+            }
+        }
+
+        private void RefreshAtomVisuals(HashSet<Atom> updateAtoms)
+        {
+            foreach (Atom updateAtom in updateAtoms)
+            {
+                updateAtom.NotifyBondingChanged();
+                foreach (Bond updateAtomBond in updateAtom.Bonds)
+                {
+                    updateAtomBond.NotifyBondingChanged();
+                }
+            }
+        }
+
+        public void DeleteBonds(IEnumerable<Bond> bonds)
+        {
+            DeleteAtomsAndBonds(bondList: bonds);
         }
 
         public void UpdateAtom(Atom atom, AtomPropertiesModel model)

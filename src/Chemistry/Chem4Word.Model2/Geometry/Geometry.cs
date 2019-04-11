@@ -112,30 +112,34 @@ namespace Chem4Word.Model2.Geometry
             double accumulatedArea = 0.0f;
             double centerX = 0.0f;
             double centerY = 0.0f;
-
-            var minX = poly.Min(p => getPosition(p).X);
-            var maxX = poly.Max(p => getPosition(p).X);
-            var minY = poly.Min(p => getPosition(p).Y);
-            var maxY = poly.Max(p => getPosition(p).Y);
-
-            for (int i = 0, j = poly.Length - 1; i < poly.Length; j = i++)
+            if (poly.Any())
             {
-                double temp = getPosition(poly[i]).X * getPosition(poly[j]).Y
-                    - getPosition(poly[j]).X * getPosition(poly[i]).Y;
-                accumulatedArea += temp;
-                centerX += (getPosition(poly[i]).X + getPosition(poly[j]).X) * temp;
-                centerY += (getPosition(poly[i]).Y + getPosition(poly[j]).Y) * temp;
+                var minX = poly.Min(p => getPosition(p).X);
+                var maxX = poly.Max(p => getPosition(p).X);
+                var minY = poly.Min(p => getPosition(p).Y);
+                var maxY = poly.Max(p => getPosition(p).Y);
+
+                for (int i = 0, j = poly.Length - 1; i < poly.Length; j = i++)
+                {
+                    double temp = getPosition(poly[i]).X * getPosition(poly[j]).Y
+                                  - getPosition(poly[j]).X * getPosition(poly[i]).Y;
+                    accumulatedArea += temp;
+                    centerX += (getPosition(poly[i]).X + getPosition(poly[j]).X) * temp;
+                    centerY += (getPosition(poly[i]).Y + getPosition(poly[j]).Y) * temp;
+                }
+
+                if (Math.Abs(accumulatedArea) < 1E-7f)
+                {
+                    return null; // Avoid division by zero
+                }
+
+                accumulatedArea *= 3f;
+                var centroid = new Point(centerX / accumulatedArea, centerY / accumulatedArea);
+                //Debug.Assert(centroid.X >= minX & centroid.X <= maxX & centroid.Y >= minY & centroid.Y <= maxY);
+                return centroid;
             }
 
-            if (Math.Abs(accumulatedArea) < 1E-7f)
-            {
-                return null; // Avoid division by zero
-            }
-
-            accumulatedArea *= 3f;
-            var centroid = new Point(centerX / accumulatedArea, centerY / accumulatedArea);
-            //Debug.Assert(centroid.X >= minX & centroid.X <= maxX & centroid.Y >= minY & centroid.Y <= maxY);
-            return centroid;
+            return null;
         }
     }
 }

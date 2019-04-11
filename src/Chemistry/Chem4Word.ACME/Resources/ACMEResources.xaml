@@ -13,6 +13,8 @@
 
     <!-- <model:ElementConverter x:Key="ElementConverter" /> -->
 
+
+
     <Style x:Key="TripleBondStyle" TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
@@ -354,4 +356,6 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+   
 </ResourceDictionary>

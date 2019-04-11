@@ -53,8 +53,8 @@ namespace Chem4Word.ACME.Adorners
             SolidColorBrush renderBrush = new SolidColorBrush(SystemColors.HighlightColor);
             renderBrush.Opacity = 0.25;
 
-            Pen renderPen = new Pen(SystemColors.HighlightBrush, 1);
-            renderPen.DashStyle = DashStyles.Dash;
+            //Pen renderPen = new Pen(SystemColors.HighlightBrush, 1);
+            //renderPen.DashStyle = DashStyles.Dash;
 
             Matrix toLeft = new Matrix();
             toLeft.Rotate(-90);
@@ -90,7 +90,7 @@ namespace Chem4Word.ACME.Adorners
             Geometry final = Geometry.Combine(pathGeometry, start, GeometryCombineMode.Exclude, null);
             final = Geometry.Combine(final, end, GeometryCombineMode.Exclude, null);
 
-            drawingContext.DrawGeometry(renderBrush, renderPen, final);
+            drawingContext.DrawGeometry(renderBrush, null, final);
         }
 
         ~BondSelectionAdorner()

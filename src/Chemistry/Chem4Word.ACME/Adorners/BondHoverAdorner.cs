@@ -46,7 +46,16 @@ namespace Chem4Word.ACME.Adorners
         {
             base.OnRender(drawingContext);
             StreamGeometry sg = new StreamGeometry();
-            double offset = Globals.BondOffsetPercentage * _targetedBond.BondLength * _targetedBond.OrderValue ?? 1.0;
+            double orderValue;
+            if (_targetedBond.OrderValue == null || _targetedBond.OrderValue < 1d)
+            {
+                orderValue = 1d;
+            }
+            else
+            {
+                orderValue = _targetedBond.OrderValue.Value;
+            }
+            double offset = Globals.BondOffsetPercentage * _targetedBond.BondLength * orderValue;
 
             //this tells us how much to rotate the brackets at the end of the bond
             double bondAngle = _targetedBond.Angle;
