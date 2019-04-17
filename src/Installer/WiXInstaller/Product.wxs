@@ -273,7 +273,6 @@
       </Component>
       <Component Id="System.Windows.Interactivity">
         <File Id="System.Windows.Interactivity.dll" Source="$(var.Chem4Word.V3.TargetDir)System.Windows.Interactivity.dll" />
-        <File Id="System.Windows.Interactivity.xml" Source="$(var.Chem4Word.V3.TargetDir)System.Windows.Interactivity.xml" />
       </Component>
       <!-- Azure -->
       <Component Id="Microsoft.ServiceBus">
@@ -296,7 +295,6 @@
       </Component>
       <Component Id="Microsoft.Office.Tools.Word.v4.0.Utilities">
         <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.v4.0.Utilities.dll" />
-        <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.v4.0.Utilities.xml" />
       </Component>
       <Component Id="Microsoft.VisualStudio.Tools.Applications.Runtime">
         <File Id="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll" />
