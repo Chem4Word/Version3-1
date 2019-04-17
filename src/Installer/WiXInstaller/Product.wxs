@@ -150,22 +150,22 @@
         <File Id="Chem4Word.ACME.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ACME.dll" />
         <File Id="Chem4Word.ACME.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ACME.pdb" />
       </Component>
-      <Component Id="Chem4Word.Model">
-        <File Id="Chem4Word.Model.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Model.dll" />
-        <File Id="Chem4Word.Model.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Model.pdb" />
+      <Component Id="Chem4Word.Core">
+        <File Id="Chem4Word.Core.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.dll" />
+        <File Id="Chem4Word.Core.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.pdb" />
       </Component>
-      <Component Id="Chem4Word.View">
+      <Component Id="Chem4Word.Model2">
+        <File Id="Chem4Word.Model2.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Model2.dll" />
+        <File Id="Chem4Word.Model2.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Model2.pdb" />
+      </Component>
+      <!--<Component Id="Chem4Word.View">
         <File Id="Chem4Word.View.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.View.dll" />
         <File Id="Chem4Word.View.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.View.pdb" />
       </Component>
       <Component Id="Chem4Word.ViewModel">
         <File Id="Chem4Word.ViewModel.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ViewModel.dll" />
         <File Id="Chem4Word.ViewModel.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.ViewModel.pdb" />
-      </Component>
-      <Component Id="Chem4Word.Core">
-        <File Id="Chem4Word.Core.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.dll" />
-        <File Id="Chem4Word.Core.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Core.pdb" />
-      </Component>
+      </Component>-->
       <Component Id="Chem4Word.Telemetry">
         <File Id="Chem4Word.Telemetry.dll" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Telemetry.dll" />
         <File Id="Chem4Word.Telemetry.pdb" Source="$(var.Chem4Word.V3.TargetDir)Chem4Word.Telemetry.pdb" />
@@ -187,9 +187,9 @@
         <File Id="Chem4Word.Editor.ChemDoodleWeb800.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb800.dll" />
         <File Id="Chem4Word.Editor.ChemDoodleWeb800.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb800.pdb" />
       </Component>
-      <Component Id="Chem4Word.Renderer.OoXmlV3">
-        <File Id="Chem4Word.Renderer.OoXmlV3.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Renderer.OoXmlV3.dll" />
-        <File Id="Chem4Word.Renderer.OoXmlV3.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Renderer.OoXmlV3.pdb" />
+      <Component Id="Chem4Word.Renderer.OoXmlV4">
+        <File Id="Chem4Word.Renderer.OoXmlV4.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Renderer.OoXmlV4.dll" />
+        <File Id="Chem4Word.Renderer.OoXmlV4.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Renderer.OoXmlV4.pdb" />
       </Component>
       <Component Id="Chem4Word.Searcher.ChEBIPlugin">
         <File Id="Chem4Word.Searcher.ChEBIPlugin.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Searcher.ChEBIPlugin.dll" />
@@ -209,7 +209,7 @@
   <Fragment>
     <ComponentGroup Id="Manual" Directory="MANUAL">
       <Component Id="Chem4Word.Version3.User.Manual">
-        <File Id="Chem4Word.Version3.User.Manual.docx" Source="$(var.Chem4Word.V3.TargetDir)..\..\..\..\doc\Chem4Word-Version3-User-Manual.docx" />
+        <File Id="Chem4Word.Version3.User.Manual.docx" Source="$(var.Chem4Word.V3.TargetDir)..\..\..\..\doc\Chem4Word-Version3-1-User-Manual.docx" />
       </Component>
     </ComponentGroup>
   </Fragment>
@@ -273,7 +273,6 @@
       </Component>
       <Component Id="System.Windows.Interactivity">
         <File Id="System.Windows.Interactivity.dll" Source="$(var.Chem4Word.V3.TargetDir)System.Windows.Interactivity.dll" />
-        <File Id="System.Windows.Interactivity.xml" Source="$(var.Chem4Word.V3.TargetDir)System.Windows.Interactivity.xml" />
       </Component>
       <!-- Azure -->
       <Component Id="Microsoft.ServiceBus">
@@ -296,7 +295,6 @@
       </Component>
       <Component Id="Microsoft.Office.Tools.Word.v4.0.Utilities">
         <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.v4.0.Utilities.dll" />
-        <File Id="Microsoft.Office.Tools.Word.v4.0.Utilities.xml" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.Office.Tools.Word.v4.0.Utilities.xml" />
       </Component>
       <Component Id="Microsoft.VisualStudio.Tools.Applications.Runtime">
         <File Id="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Source="$(var.Chem4Word.V3.TargetDir)Microsoft.VisualStudio.Tools.Applications.Runtime.dll" />
