@@ -233,7 +233,8 @@ namespace Chem4Word.ACME.Drawing
             }
             else if (ParentBond.OrderValue < 2.0)
             {
-                Point? centroid = null;
+                
+                Point? centroid = ParentBond.PrimaryRing?.Centroid;
                 //grab the enclosing polygon as for a double bond - this overcomes a hit testing bug
                 _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
                                                                   ParentBond.Placement, centroid, out _,
@@ -276,12 +277,9 @@ namespace Chem4Word.ACME.Drawing
             else
             {
                 Point point1, point2, point3, point4;
-
-                Point? centroid = null;
-                if (ParentBond.IsCyclic())
-                {
-                    centroid = ParentBond.PrimaryRing?.Centroid;
-                }
+               
+                Point? centroid = ParentBond.PrimaryRing?.Centroid;
+                
 
                 
                 _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,

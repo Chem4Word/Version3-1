@@ -72,6 +72,7 @@ namespace Chem4Word.ACME
         public bool CanRedo => _redoStack.Any(rr => rr.Level != 0);
 
         public bool CanUndo => _undoStack.Any(ur => ur.Level != 0);
+        public bool IsTopLevel => TransactionLevel == 1;
 
         public UndoHandler(EditViewModel vm)
         {

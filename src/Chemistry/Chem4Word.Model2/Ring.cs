@@ -142,9 +142,9 @@ namespace Chem4Word.Model2
 
        
 
-        internal void RingCentroidChanged()
+        public void RingCentroidChanged()
         {
-            OnPropertyChanged("Centroid");
+            OnPropertyChanged(nameof(Centroid));
         }
 
         /// <summary>

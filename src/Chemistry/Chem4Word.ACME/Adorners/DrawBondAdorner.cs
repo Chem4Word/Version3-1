@@ -69,7 +69,7 @@ namespace Chem4Word.ACME.Adorners
             drawingContext.DrawGeometry(_solidColorBrush, _dashPen, outline);
         }
 
-        public Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order)
+        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();

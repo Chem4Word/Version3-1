@@ -82,11 +82,9 @@ namespace Chem4Word.Model2
 
         public string InternalId
         {
-
             get { return _internalId; }
             set { _internalId = value; }
         }
-
 
         public override string Path
         {
@@ -267,14 +265,20 @@ namespace Chem4Word.Model2
                 {
                     return null;
                 }
-
-                List<Ring> ringList = Parent.SortedRings;
-                var firstRing = (
-                    from Ring r in ringList
-                    where r.Atoms.Contains(StartAtom) && r.Atoms.Contains(EndAtom)
-                    select r
-                ).FirstOrDefault();
-                return firstRing;
+                else if (Rings.Count == 1)
+                {
+                    return Rings[0];
+                }
+                else
+                {
+                    List<Ring> ringList = Parent.SortedRings;
+                    var firstRing = (
+                        from Ring r in ringList
+                        where r.Atoms.Contains(StartAtom) && r.Atoms.Contains(EndAtom)
+                        select r
+                    ).FirstOrDefault();
+                    return firstRing;
+                }
             }
         }
 
@@ -522,6 +526,39 @@ namespace Chem4Word.Model2
             return vector;
         }
 
+        public Vector? GetUncrowdedSideVector()
+        {
+            var dbv = GetPrettyDoubleBondVector();
+            if (dbv != null)
+            {
+                return dbv.Value;
+            }
+            else
+            {
+                return BondCentroid - MidPoint;
+            }
+        }
+
+        public Point? BondCentroid
+        {
+            get
+            {
+                if (StartAtom.Neighbours.Count() == 2 & EndAtom.Neighbours.Count() == 2)
+                {
+                    var firstLigand = StartAtom.NeighboursExcept(EndAtom)[0];
+                    var secondLigand = EndAtom.NeighboursExcept(StartAtom)[0];
+                    BasicGeometry.IntersectLines(
+                        out double t, out double u, StartAtom.Position, secondLigand.Position, EndAtom.Position,
+                        firstLigand.Position);
+                    if ((t >= 0d) & (t <= 1d) & (u >= 0d) & (u <= 1d))
+                    {
+                        return StartAtom.Position + (secondLigand.Position - StartAtom.Position) * t;
+                    }
+                }
+                return null;
+            }
+        }
+
         private BondDirection? GetPlacement()
         {
             BondDirection dir = BondDirection.None;
@@ -623,8 +660,6 @@ namespace Chem4Word.Model2
             }
         }
 
-       
-
         public void NotifyBondingChanged()
         {
             OnPropertyChanged(nameof(Order));
@@ -670,7 +705,6 @@ namespace Chem4Word.Model2
 
         #endregion Overrides
 
-
         /// <summary>
         /// Forces a notification event to be sent up the tree
         /// used to force a redraw
@@ -679,6 +713,7 @@ namespace Chem4Word.Model2
         {
             OnPropertyChanged(nameof(Order));
         }
+
         //gets the bond angle from the perspective of the designated atom
         public double AngleStartingAt(Atom rootAtom)
         {

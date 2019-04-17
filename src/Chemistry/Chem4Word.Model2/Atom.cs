@@ -450,7 +450,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public bool IsUnsaturated => BondOrders > Degree;
+        public bool IsUnsaturated => Bonds.Any(b => b.OrderValue >= 2);
 
         //drawing related properties
         public Vector BalancingVector

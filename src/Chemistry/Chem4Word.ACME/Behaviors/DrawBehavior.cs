@@ -169,7 +169,13 @@ namespace Chem4Word.ACME.Behaviors
                     Atom lastAtom = landedAtomVisual.ParentAtom;
                     if (sameAtom) //both are the same atom
                     {
-                        if (!lastAtom.CanAddAtoms)
+                        if (lastAtom.Element != EditViewModel.SelectedElement)
+                        {
+                            
+                            EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>(){lastAtom});
+                        }
+
+                        else {if (!lastAtom.CanAddAtoms)
                         {
                             Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
                         }
@@ -177,7 +183,7 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             var atomMetrics = GetNewChainEndPos(landedAtomVisual);
                             EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
-                        }
+                        }}
                     }
                     else //we must have hit a different atom altogether
                     {

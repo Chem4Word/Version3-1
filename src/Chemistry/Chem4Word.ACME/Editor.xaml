@@ -353,7 +353,7 @@
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, Mode=TwoWay}"
                     SelectedValuePath="Element"
-                    ToolTip="Current Atom Type" />
+                    ToolTip="Current Atom Type" SelectionChanged="AtomCombo_SelectionChanged_1" />
                 <ComboBox
                     x:Name="BondCombo"
                     Width="48"
@@ -437,7 +437,7 @@
                         <behaviors:RingBehavior
                             RingSize="6"
                             Unsaturated="True"
-                            EditViewModel="{Binding}" />
+                            EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
                 <Button
@@ -475,7 +475,7 @@
                                     <behaviors:RingBehavior
                                         RingSize="6"
                                         Unsaturated="True"
-                                        EditViewModel="{Binding}" />
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                             <Button
@@ -488,7 +488,7 @@
                                     <behaviors:RingBehavior
                                         RingSize="6"
                                         Unsaturated="False"
-                                        EditViewModel="{Binding}" />
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                             <Button
@@ -501,7 +501,7 @@
                                     <behaviors:RingBehavior
                                         RingSize="5"
                                         Unsaturated="False"
-                                        EditViewModel="{Binding}" />
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                             <Button
@@ -514,7 +514,7 @@
                                     <behaviors:RingBehavior
                                         RingSize="5"
                                         Unsaturated="True"
-                                        EditViewModel="{Binding}" />
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                             <Button
@@ -527,7 +527,7 @@
                                     <behaviors:RingBehavior
                                         RingSize="7"
                                         Unsaturated="False"
-                                        EditViewModel="{Binding}" />
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                             <Button
@@ -540,7 +540,7 @@
                                     <behaviors:RingBehavior
                                         RingSize="8"
                                         Unsaturated="False"
-                                        EditViewModel="{Binding}" />
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                         </Grid>

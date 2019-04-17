@@ -66,6 +66,7 @@
     <Compile Include="Adorners\AtomSelectionAdorner.cs" />
     <Compile Include="Adorners\BondSelectionAdorner.cs" />
     <Compile Include="Adorners\DrawBondAdorner.cs" />
+    <Compile Include="Adorners\FixedRingAdorner.cs" />
     <Compile Include="Adorners\LassoAdorner.cs" />
     <Compile Include="Adorners\MoleculeSelectionAdorner.cs" />
     <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />

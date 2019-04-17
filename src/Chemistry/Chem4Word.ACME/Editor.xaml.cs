@@ -340,10 +340,11 @@ namespace Chem4Word.ACME
                     ActiveViewModel.ActiveMode = null;
                 }
 
-                var behavior = (Behavior)((sender as RadioButton).Tag);
-                if (behavior != null)
+                var radioButton = (RadioButton)sender;
+               
+                if (radioButton.Tag is Behavior bh)
                 {
-                    ActiveViewModel.ActiveMode = behavior;
+                    ActiveViewModel.ActiveMode = bh;
                 }
             }
         }
@@ -363,6 +364,11 @@ namespace Chem4Word.ACME
         }
 
         private void BondCombo_SelectionChanged()
+        {
+
+        }
+
+        private void AtomCombo_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
 
         }

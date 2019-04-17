@@ -17,6 +17,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Shapes;
+using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.Model2
 {
@@ -711,7 +713,7 @@ namespace Chem4Word.Model2
                 child.Refresh();
             }
 
-            RebuildRings();
+            RebuildRings(true);
         }
 
         public void ForceUpdates()
@@ -858,7 +860,10 @@ namespace Chem4Word.Model2
         /// <summary>
         /// How many rings the molecule contains.  Non cyclic molecules ALWAYS have atoms = bonds +1
         /// </summary>
-        public int TheoreticalRings => Bonds.Count - Atoms.Count + 1;
+        public int TheoreticalRings
+        {
+            get { return Bonds.Count - Atoms.Count + 1; }
+        }
 
         /// <summary>
         /// If the molecule has more atoms than bonds, it doesn't have a ring. Test this before running ring perception.
@@ -950,7 +955,7 @@ namespace Chem4Word.Model2
             return Atoms.Values.ToDictionary(a => a, a => getProperty(a));
         }
 
-        public void RebuildRings()
+        public void RebuildRings(bool force = false)
         {
             RebuildRingsFigueras();
 
@@ -965,7 +970,7 @@ namespace Chem4Word.Model2
 #endif
                 Rings.Clear();
 
-                if (HasRings)
+                if (HasRings|force)
                 {
                     //working set of atoms
                     //it's a dictionary, because we initially store the degree of each atom against it
@@ -1245,9 +1250,75 @@ namespace Chem4Word.Model2
             throw new NotImplementedException();
         }
 
-        public bool Overlaps(List<Point> preferredPlacements, List<Atom> atoms = null)
+        public bool Overlaps(List<Point> placements, List<Atom> excludeAtoms = null)
         {
-            throw new NotImplementedException();
+            var area = OverlapArea(placements);
+
+            if (area.GetArea() >= 0.01)
+            {
+                return true;
+            }
+            else
+            {
+                var chainAtoms = Atoms.Values.Where(a => !a.Rings.Any()).ToList();
+                if (excludeAtoms != null)
+                {
+                    foreach (Atom excludeAtom in excludeAtoms)
+                    {
+                        if (chainAtoms.Contains(excludeAtom))
+                        {
+                            chainAtoms.Remove(excludeAtom);
+                        }
+                    }
+                }
+                var placementsArea = BasicGeometry.BuildPath(placements).Data;
+                foreach (var chainAtom in chainAtoms)
+                {
+                    if (placementsArea.FillContains(chainAtom.Position, 0.01, ToleranceType.Relative))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public PathGeometry OverlapArea(List<Point> placements)
+        {
+            PathGeometry ringsGeo = null;
+            foreach (Ring r in Rings)
+            {
+                Path ringHull = BasicGeometry.BuildPath(r.Traverse().Select(a => a.Position).ToList());
+                if (ringsGeo == null)
+                {
+                    ringsGeo = ringHull.Data.GetOutlinedPathGeometry();
+                }
+                else
+                {
+                    var hull = ringHull.Data;
+                    var hullGeo = hull.GetOutlinedPathGeometry();
+                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo, hullGeo).GetOutlinedPathGeometry();
+                }
+            }
+            Path otherGeo = BasicGeometry.BuildPath(placements);
+
+            var val1 = ringsGeo;
+            if (val1 != null)
+            {
+                val1.FillRule = FillRule.EvenOdd;
+            }
+            var val2 = otherGeo.Data.GetOutlinedPathGeometry();
+            if (val2 != null)
+            {
+                val2.FillRule = FillRule.EvenOdd;
+            }
+
+            var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2).GetOutlinedPathGeometry();
+            //return (id == IntersectionDetail.FullyContains | id == IntersectionDetail.FullyInside |
+            //        id == IntersectionDetail.Intersects);
+
+            return overlap;
         }
 
         public void Transform(Transform lastOperation)
