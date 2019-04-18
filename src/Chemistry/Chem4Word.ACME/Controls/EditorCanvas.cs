@@ -5,10 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -38,15 +40,35 @@ namespace Chem4Word.ACME.Controls
 
             if (ActiveVisual is AtomVisual av)
             {
+                var mode = Application.Current.ShutdownMode;
+
+                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
                 var atom = av.ParentAtom;
-                AtomPropertyEditor pe = new AtomPropertyEditor();
                 var model = new AtomPropertiesModel();
                 model.Title = atom.Path;
                 model.Symbol = atom.Element.Symbol;
                 model.Charge = atom.FormalCharge.ToString();
                 model.Isotope = atom.IsotopeNumber.ToString();
                 model.Centre = pp;
-                pe.ShowDialog(model);
+
+                var tcs = new TaskCompletionSource<bool>();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                                                      {
+                                                          try
+                                                          {
+                                                              var pe1 = new AtomPropertyEditor(model);
+                                                              var x = pe1.ShowDialog();
+                                                          }
+                                                          finally
+                                                          {
+                                                              tcs.TrySetResult(true);
+                                                          }
+                                                      });
+
+                Application.Current.ShutdownMode = mode;
+
                 if (model.Save)
                 {
                     EditViewModel evm = (EditViewModel)((EditorCanvas)av.Parent).Chemistry;
@@ -56,15 +78,35 @@ namespace Chem4Word.ACME.Controls
 
             if (ActiveVisual is BondVisual bv)
             {
+                var mode = Application.Current.ShutdownMode;
+
+                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
                 var bond = bv.ParentBond;
-                BondPropertyEditor pe = new BondPropertyEditor();
                 var model = new BondPropertiesModel();
                 model.Title = bond.Path;
                 model.Order = bond.Order;
                 model.Stereo = Globals.GetStereoString(bond.Stereo);
                 model.Placement = bond.ExplicitPlacement == null ? "" : bond.ExplicitPlacement.ToString();
                 model.Centre = pp;
-                pe.ShowDialog(model);
+
+                var tcs = new TaskCompletionSource<bool>();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                                                      {
+                                                          try
+                                                          {
+                                                              var pe1 = new BondPropertyEditor(model);
+                                                              var x = pe1.ShowDialog();
+                                                          }
+                                                          finally
+                                                          {
+                                                              tcs.TrySetResult(true);
+                                                          }
+                                                      });
+
+                Application.Current.ShutdownMode = mode;
+
                 if (model.Save)
                 {
                     EditViewModel evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
