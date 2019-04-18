@@ -43,6 +43,7 @@ namespace Chem4Word.ACME.Controls
                 var mode = Application.Current.ShutdownMode;
 
                 Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                var owner = Application.Current.MainWindow;
 
                 var atom = av.ParentAtom;
                 var model = new AtomPropertiesModel();
@@ -58,8 +59,8 @@ namespace Chem4Word.ACME.Controls
                                                       {
                                                           try
                                                           {
-                                                              var pe1 = new AtomPropertyEditor(model);
-                                                              var x = pe1.ShowDialog();
+                                                              var pe = new AtomPropertyEditor(model, owner);
+                                                              pe.ShowDialog();
                                                           }
                                                           finally
                                                           {
@@ -81,6 +82,7 @@ namespace Chem4Word.ACME.Controls
                 var mode = Application.Current.ShutdownMode;
 
                 Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                var owner = Application.Current.MainWindow;
 
                 var bond = bv.ParentBond;
                 var model = new BondPropertiesModel();
@@ -96,8 +98,8 @@ namespace Chem4Word.ACME.Controls
                                                       {
                                                           try
                                                           {
-                                                              var pe1 = new BondPropertyEditor(model);
-                                                              var x = pe1.ShowDialog();
+                                                              var pe = new BondPropertyEditor(model, owner);
+                                                              pe.ShowDialog();
                                                           }
                                                           finally
                                                           {

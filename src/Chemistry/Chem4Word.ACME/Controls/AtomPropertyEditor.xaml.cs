@@ -24,7 +24,7 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public AtomPropertyEditor(AtomPropertiesModel model)
+        public AtomPropertyEditor(AtomPropertiesModel model, Window owner)
         {
             InitializeComponent();
             if (!DesignerProperties.GetIsInDesignMode(this))
@@ -32,6 +32,7 @@ namespace Chem4Word.ACME.Controls
                 _model = model;
                 DataContext = _model;
                 Title = _model.Title;
+                Owner = owner;
             }
         }
 
