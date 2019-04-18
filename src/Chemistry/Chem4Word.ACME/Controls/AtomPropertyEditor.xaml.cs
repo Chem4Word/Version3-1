@@ -37,14 +37,14 @@ namespace Chem4Word.ACME.Controls
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
-            if (VaidateModel())
+            if (ValidateModel())
             {
                 _model.Save = true;
                 Close();
             }
         }
 
-        private bool VaidateModel()
+        private bool ValidateModel()
         {
             ElementBase eb;
             bool b1 = AtomHelpers.TryParse(_model.Symbol, out eb);
