@@ -1,82 +1,54 @@
-﻿using System.Threading.Tasks;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Chem4Word.ACME.Controls
 {
-    // Source https://github.com/angelsix/fasetto-word
-    // Source https://www.youtube.com/watch?v=jrgT-fbV2tM
-
     /// <summary>
     /// Interaction logic for BondPropertyEditor.xaml
     /// </summary>
-    public partial class BondPropertyEditor : UserControl
+    public partial class BondPropertyEditor : Window
     {
-        public double WindowMinimumWidth { get; set; } = 250;
-
-        public double WindowMinimumHeight { get; set; } = 100;
-
-        private DialogWindow mDialogWindow;
-        private BondPropertiesModel _bondPropertiesModel;
+        private BondPropertiesModel _model;
 
         public BondPropertyEditor()
         {
             InitializeComponent();
         }
 
-        public Task ShowDialog(BondPropertiesModel bondPropertiesModel)
+        public BondPropertyEditor(BondPropertiesModel model)
         {
-            _bondPropertiesModel = bondPropertiesModel;
-
-            // Create a task to await the dialog closing
-            var tcs = new TaskCompletionSource<bool>();
-
-            var mode = Application.Current.ShutdownMode;
-
-            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-            mDialogWindow = new DialogWindow();
-            mDialogWindow.ViewModel = _bondPropertiesModel;
-            DataContext = _bondPropertiesModel;
-
-            // Run on UI thread
-            Application.Current.Dispatcher.Invoke(() =>
+            InitializeComponent();
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                try
-                {
-                    mDialogWindow.ViewModel = bondPropertiesModel;
-
-                    mDialogWindow.ViewModel.WindowMinimumWidth = WindowMinimumWidth;
-                    mDialogWindow.ViewModel.WindowMinimumHeight = WindowMinimumHeight;
-                    mDialogWindow.ViewModel.Title = string.IsNullOrEmpty(bondPropertiesModel.Title) ? "Bond Properties" : bondPropertiesModel.Title;
-
-                    mDialogWindow.Content = this;
-
-                    // Show dialog
-                    mDialogWindow.ShowDialog();
-                }
-                finally
-                {
-                    // Let caller know we finished
-                    tcs.TrySetResult(true);
-                }
-            });
-
-            Application.Current.ShutdownMode = mode;
-
-            return tcs.Task;
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (VaidateModel())
-            {
-                _bondPropertiesModel.Save = true;
-                mDialogWindow.Close();
+                _model = model;
+                DataContext = _model;
+                Title = _model.Title;
             }
         }
 
-        private bool VaidateModel()
+        private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            Left = _model.Centre.X - ActualWidth / 2;
+            Top = _model.Centre.Y - ActualHeight / 2;
+        }
+
+        private void Save_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (ValidateModel())
+            {
+                _model.Save = true;
+                Close();
+            }
+        }
+
+        private bool ValidateModel()
         {
             return true;
         }

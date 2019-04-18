@@ -84,9 +84,6 @@
     <Compile Include="BondOption.cs" />
     <Compile Include="Controls\BondPropertiesModel.cs" />
     <Compile Include="Controls\AtomPropertiesModel.cs" />
-    <Compile Include="Controls\BondPropertyEditor.xaml.cs">
-      <DependentUpon>BondPropertyEditor.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Commands\AddAtomCommand.cs" />
     <Compile Include="Commands\AddHydrogensCommand.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
@@ -105,9 +102,12 @@
     <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="Commands\UnGroupCommand.cs" />
     <Compile Include="Controls\BaseDialogModel.cs" />
+    <Compile Include="Controls\BondPropertyEditor.xaml.cs">
+      <DependentUpon>BondPropertyEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\EditorCanvas.cs" />
-    <Compile Include="Controls\DialogWindow.xaml.cs">
-      <DependentUpon>DialogWindow.xaml</DependentUpon>
+    <Compile Include="Controls\AtomPropertyEditor.xaml.cs">
+      <DependentUpon>AtomPropertyEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Drawing\SuperscriptTextRunProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunProperties.cs" />
@@ -119,9 +119,6 @@
     <Compile Include="Drawing\SuperscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\LabelTextRunTypographyProperties.cs" />
-    <Compile Include="Controls\AtomPropertyEditor.xaml.cs">
-      <DependentUpon>AtomPropertyEditor.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -170,15 +167,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\BondPropertyEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="CmlEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Controls\DialogWindow.xaml">
+    <Page Include="Controls\BondPropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\AtomPropertyEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -189,10 +186,6 @@
     <Page Include="Editor.xaml">
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
-    </Page>
-    <Page Include="Controls\AtomPropertyEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\AdornerBrushes.xaml">
       <Generator>MSBuild:Compile</Generator>

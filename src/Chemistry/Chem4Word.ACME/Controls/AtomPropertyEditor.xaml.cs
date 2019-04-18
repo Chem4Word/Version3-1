@@ -1,100 +1,74 @@
-﻿using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using System.ComponentModel;
+using System.Windows;
 
 namespace Chem4Word.ACME.Controls
 {
-    // Source https://github.com/angelsix/fasetto-word
-    // Source https://www.youtube.com/watch?v=jrgT-fbV2tM
-
     /// <summary>
-    /// Interaction logic for PropertyEditor.xaml
+    /// Interaction logic for AtomPropertyEditor.xaml
     /// </summary>
-    public partial class AtomPropertyEditor : UserControl
+    public partial class AtomPropertyEditor : Window
     {
-        public double WindowMinimumWidth { get; set; } = 250;
-
-        public double WindowMinimumHeight { get; set; } = 100;
-
-        private DialogWindow mDialogWindow;
-        private AtomPropertiesModel _atomPropertiesModel;
+        private AtomPropertiesModel _model;
 
         public AtomPropertyEditor()
         {
             InitializeComponent();
         }
 
-        public Task ShowDialog(AtomPropertiesModel atomPropertiesModel)
+        public AtomPropertyEditor(AtomPropertiesModel model)
         {
-            _atomPropertiesModel = atomPropertiesModel;
-
-            // Create a task to await the dialog closing
-            var tcs = new TaskCompletionSource<bool>();
-
-            var mode = Application.Current.ShutdownMode;
-
-            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-            mDialogWindow = new DialogWindow();
-            mDialogWindow.ViewModel = _atomPropertiesModel;
-            DataContext = _atomPropertiesModel;
-
-            // Run on UI thread
-            Application.Current.Dispatcher.Invoke(() =>
+            InitializeComponent();
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                try
-                {
-                    mDialogWindow.ViewModel.WindowMinimumWidth = WindowMinimumWidth;
-                    mDialogWindow.ViewModel.WindowMinimumHeight = WindowMinimumHeight;
-                    mDialogWindow.ViewModel.Title = string.IsNullOrEmpty(atomPropertiesModel.Title) ? "Atom Properties" : atomPropertiesModel.Title;
-
-                    mDialogWindow.Content = this;
-                    // Show dialog
-                    mDialogWindow.ShowDialog();
-                }
-                finally
-                {
-                    // Let caller know we finished
-                    tcs.TrySetResult(true);
-                }
-            });
-
-            Application.Current.ShutdownMode = mode;
-
-            return tcs.Task;
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (VaidateModel())
-            {
-                _atomPropertiesModel.Save = true;
-                mDialogWindow.Close();
+                _model = model;
+                DataContext = _model;
+                Title = _model.Title;
             }
         }
 
-        private bool VaidateModel()
+        private void Save_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (ValidateModel())
+            {
+                _model.Save = true;
+                Close();
+            }
+        }
+
+        private bool ValidateModel()
         {
             ElementBase eb;
-            bool b1 = AtomHelpers.TryParse(_atomPropertiesModel.Symbol, out eb);
+            bool b1 = AtomHelpers.TryParse(_model.Symbol, out eb);
 
             int n;
-            bool b2 = string.IsNullOrEmpty(_atomPropertiesModel.Charge);
+            bool b2 = string.IsNullOrEmpty(_model.Charge);
             if (!b2)
             {
-                b2 = int.TryParse(_atomPropertiesModel.Charge, out n);
-
+                b2 = int.TryParse(_model.Charge, out n);
             }
 
-            bool b3 = string.IsNullOrEmpty(_atomPropertiesModel.Isotope);
+            bool b3 = string.IsNullOrEmpty(_model.Isotope);
             if (!b3)
             {
-                b3 = int.TryParse(_atomPropertiesModel.Isotope, out n);
+                b3 = int.TryParse(_model.Isotope, out n);
             }
 
             return b1 && b2 && b3;
+        }
+
+        private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            Left = _model.Centre.X - ActualWidth / 2;
+            Top = _model.Centre.Y - ActualHeight / 2;
         }
     }
 }

@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows;
-using System.Windows.Controls;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -15,8 +14,5 @@ namespace Chem4Word.ACME.Controls
         public Point Centre { get; set; }
         public string Title { get; set; }
         public bool Save { get; set; }
-        public Control Content { get; set; }
-        public double WindowMinimumWidth { get; set; }
-        public double WindowMinimumHeight { get; set; }
     }
 }
