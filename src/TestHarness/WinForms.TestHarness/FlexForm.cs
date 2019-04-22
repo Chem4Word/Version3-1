@@ -58,7 +58,6 @@ namespace WinForms.TestHarness
                 openFileDialog1.FileName = "";
                 openFileDialog1.ShowHelp = false;
 
-
                 DialogResult dr = openFileDialog1.ShowDialog();
 
                 if (dr == DialogResult.OK)

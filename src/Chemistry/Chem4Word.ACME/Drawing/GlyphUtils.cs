@@ -130,7 +130,7 @@ namespace Chem4Word.ACME.Drawing
                 {
                     if (s is PolyLineSegment)
                     {
-                        foreach (var pt in ((PolyLineSegment) s).Points)
+                        foreach (var pt in ((PolyLineSegment)s).Points)
                         {
                             retval.Add(pt);
                         }

@@ -1067,7 +1067,7 @@ namespace Chem4Word.ACME
         /// </summary>
         /// <param name="newAtomPlacements"></param>
         /// <param name="unsaturated"></param>
-        public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated, int startAt=0)
+        public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated, int startAt = 0)
         {
             UndoManager.BeginUndoBlock();
 
@@ -1129,7 +1129,7 @@ namespace Chem4Word.ACME
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
             //local function
-            void MakeRingUnsaturated(List<NewAtomPlacement> list, int StartAt=0)
+            void MakeRingUnsaturated(List<NewAtomPlacement> list, int StartAt = 0)
             {
                 for (int i = startAt; i < list.Count + startAt; i++)
                 {
@@ -1150,8 +1150,12 @@ namespace Chem4Word.ACME
                     }
                 }
             }
-
-            //local function
+            //just refresh the atoms to be on the safe side
+            foreach (var atomPlacement in newAtomPlacements)
+            {
+                atomPlacement.ExistingAtom.NotifyBondingChanged();
+            }
+            
         }
 
         public void DeleteMolecules(IEnumerable<Molecule> mols)

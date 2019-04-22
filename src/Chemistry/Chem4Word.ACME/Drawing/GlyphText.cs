@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +14,6 @@ using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -36,7 +36,6 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                
                 return _scriptSize.Value;
             }
             set { _scriptSize = value; }
@@ -48,11 +47,11 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-               
                 return _isotopeSize.Value;
             }
             set { _isotopeSize = value; }
         }
+
         public float PixelsPerDip { get; }
 
         protected GlyphTypeface _glyphTypeface;
@@ -148,10 +147,10 @@ namespace Chem4Word.ACME.Drawing
             Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, SymbolSize) +
                                 new Vector(0.0, -MaxBaselineOffset);
             //removed because labels were being canted too much to the left
-                                //+ new Vector(-FirstBearing(groupGlyphRun), 0.0);
+            //+ new Vector(-FirstBearing(groupGlyphRun), 0.0);
             var bb = groupGlyphRun.GetBoundingBox(center + mainOffset);
-            Vector textFormatterOffset = new Vector(mainOffset.X, -FirstBearing(groupGlyphRun) -bb.Height/2  );
-                                
+            Vector textFormatterOffset = new Vector(mainOffset.X, -FirstBearing(groupGlyphRun) - bb.Height / 2);
+
             TextRun = groupGlyphRun;
             TextMetrics = new AtomTextMetrics
             {
@@ -267,7 +266,6 @@ namespace Chem4Word.ACME.Drawing
                 return corners;
             }
         }
-
 
         public Vector OffsetVector { get; set; }
         public Vector TextFormatterOffset { get; set; }

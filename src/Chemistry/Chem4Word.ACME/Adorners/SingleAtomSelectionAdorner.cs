@@ -209,7 +209,7 @@ namespace Chem4Word.ACME.Adorners
 
         #endregion Events
 
-        #region Dragging
+        #region MouseIsDown
 
         private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
@@ -272,7 +272,7 @@ namespace Chem4Word.ACME.Adorners
            
         }
 
-        #endregion Dragging
+        #endregion MouseIsDown
 
         protected void RaiseDRCompleted(object sender, DragCompletedEventArgs dragCompletedEventArgs)
         {

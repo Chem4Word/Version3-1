@@ -34,13 +34,11 @@ namespace Chem4Word.ACME.Behaviors
             get { return _currentAdorner; }
             set
             {
-                
                 RemoveRingAdorner();
                 _currentAdorner = value;
                 if (_currentAdorner != null)
                 {
                     _currentAdorner.MouseLeftButtonDown += CurrentAdornerOnMouseLeftButtonDown;
-
                 }
                 //local function
                 void RemoveRingAdorner()
@@ -55,8 +53,6 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
         }
-
-      
 
         public RingBehavior()
         {
@@ -94,10 +90,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             List<Point> altPlacements;
 
-            List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
-
             CurrentAdorner = null;
-            
 
             List<Point> preferredPlacements;
             double xamlBondSize = EditViewModel.Model.XamlBondLength;
@@ -110,7 +103,6 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
                     }
-                    
 
                     break;
 
@@ -118,7 +110,7 @@ namespace Chem4Word.ACME.Behaviors
                     IdentifyPlacements(bv.ParentBond, out altPlacements, out preferredPlacements, RingSize);
                     if (preferredPlacements != null | altPlacements != null)
                     {
-                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements??altPlacements, Unsaturated);
+                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements ?? altPlacements, Unsaturated);
                     }
                     break;
 
@@ -128,8 +120,6 @@ namespace Chem4Word.ACME.Behaviors
                     break;
             }
         }
-
-       
 
         private void CurrentAdornerOnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -143,11 +133,10 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
             Atom hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
             Bond hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
 
-            List<Point> altPlacements=null;
+            List<Point> altPlacements = null;
             int startAt = 0; //used to change double bond positions in isolated odd numbered rings
             List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
 
@@ -165,7 +154,6 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     startAt = 1;
                 }
-               
             }
             else if (hitBond != null)
             {
@@ -191,19 +179,19 @@ namespace Chem4Word.ACME.Behaviors
             CurrentAdorner = null;
         }
 
-        public static void FillExistingAtoms(List<Point> preferredPlacements, 
-                                             List<Point> altPlacements, 
-                                             List<NewAtomPlacement> newAtomPlacements, 
+        public static void FillExistingAtoms(List<Point> preferredPlacements,
+                                             List<Point> altPlacements,
+                                             List<NewAtomPlacement> newAtomPlacements,
                                              EditorCanvas currentEditor)
         {
             foreach (Point placement in (preferredPlacements ?? altPlacements))
             {
                 NewAtomPlacement nap = new NewAtomPlacement
-                                       {
-                                           ExistingAtom =
+                {
+                    ExistingAtom =
                                                (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
-                                           Position = placement
-                                       };
+                    Position = placement
+                };
                 newAtomPlacements.Add(nap);
             }
         }

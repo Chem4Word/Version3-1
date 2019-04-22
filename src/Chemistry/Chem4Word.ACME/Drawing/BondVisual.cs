@@ -215,7 +215,6 @@ namespace Chem4Word.ACME.Drawing
 
             _mainBondPen = new Pen(Brushes.Black, BondThickness)
             {
-
                 StartLineCap = PenLineCap.Round,
                 EndLineCap = PenLineCap.Round
             };
@@ -233,7 +232,6 @@ namespace Chem4Word.ACME.Drawing
             }
             else if (ParentBond.OrderValue < 2.0)
             {
-                
                 Point? centroid = ParentBond.PrimaryRing?.Centroid;
                 //grab the enclosing polygon as for a double bond - this overcomes a hit testing bug
                 _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
@@ -277,11 +275,9 @@ namespace Chem4Word.ACME.Drawing
             else
             {
                 Point point1, point2, point3, point4;
-               
-                Point? centroid = ParentBond.PrimaryRing?.Centroid;
-                
 
-                
+                Point? centroid = ParentBond.PrimaryRing?.Centroid;
+
                 _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
                     ParentBond.Placement, centroid, out point1,
                     out point2, out point3, out point4);
@@ -303,8 +299,6 @@ namespace Chem4Word.ACME.Drawing
                 {
                     dc.DrawLine(_mainBondPen, point1, point2);
                     dc.DrawLine(_subsidiaryBondPen, point3, point4);
-                   
-                   
 
                     dc.Close();
                 }

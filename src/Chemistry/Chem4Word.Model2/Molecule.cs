@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
 using System;
@@ -18,7 +19,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.Model2
 {
@@ -970,7 +970,7 @@ namespace Chem4Word.Model2
 #endif
                 Rings.Clear();
 
-                if (HasRings|force)
+                if (HasRings | force)
                 {
                     //working set of atoms
                     //it's a dictionary, because we initially store the degree of each atom against it
@@ -1514,19 +1514,18 @@ namespace Chem4Word.Model2
         /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
         /// <param name="excludeBonds">Optional ist of bonds to exclude from traversion</param>
         public void TraverseBFS(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed,
-                                HashSet<Bond> excludeBonds=null)
+                                HashSet<Bond> excludeBonds = null)
         {
             if (excludeBonds == null)//then create an empty exclusion set
             {
-                excludeBonds=new HashSet<Bond>();
+                excludeBonds = new HashSet<Bond>();
             }
-
 
             Queue<Atom> toDo = new Queue<Atom>();
 
             toDo.Enqueue(startAtom);
             Atom next = null;
-            while(toDo.Count>0)
+            while (toDo.Count > 0)
             {
                 next = toDo.Dequeue();
 
@@ -1541,6 +1540,7 @@ namespace Chem4Word.Model2
                 }
             }
         }
+
         public void Reparent()
         {
             foreach (Atom atom in Atoms.Values)
