@@ -27,8 +27,6 @@
                                         Margin="1"
                                         Fill="Green" />
                                     <Ellipse Fill="Aqua" Margin="5" />
-                                    <!--<Line X1="12" Y1="12" X2="36" Y2="36" Stroke="Red" StrokeThickness="2" 
-                                          StrokeEndLineCap="Round" StrokeStartLineCap="Round"></Line>-->
                                     <ContentPresenter />
                                 </Grid>
                             </BulletDecorator.Bullet>
