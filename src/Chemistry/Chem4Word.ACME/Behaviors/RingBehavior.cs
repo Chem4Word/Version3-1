@@ -84,6 +84,8 @@ namespace Chem4Word.ACME.Behaviors
             {
                 _parent.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             }
+
+            CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
         }
 
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
@@ -102,7 +104,16 @@ namespace Chem4Word.ACME.Behaviors
                     if (preferredPlacements != null)
                     {
                         CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
+                        if (av.ParentAtom.Degree >= 2)
+                        {
+                            CurrentStatus="Click to spiro-fuse.";
+                        }
+                        else
+                        {
+                            CurrentStatus = "Click to draw a terminating ring.";
+                        }
                     }
+                    
 
                     break;
 
@@ -110,13 +121,15 @@ namespace Chem4Word.ACME.Behaviors
                     IdentifyPlacements(bv.ParentBond, out altPlacements, out preferredPlacements, RingSize);
                     if (preferredPlacements != null | altPlacements != null)
                     {
-                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements ?? altPlacements, Unsaturated);
+                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements??altPlacements, Unsaturated);
+                        CurrentStatus = "Click to fuse a ring";
                     }
                     break;
 
                 default:
                     preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth, xamlBondSize, RingSize);
                     CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
+                    CurrentStatus = "Click to draw a standalone ring";
                     break;
             }
         }
@@ -129,6 +142,7 @@ namespace Chem4Word.ACME.Behaviors
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //throw new System.NotImplementedException();
+            CurrentStatus = "";
         }
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

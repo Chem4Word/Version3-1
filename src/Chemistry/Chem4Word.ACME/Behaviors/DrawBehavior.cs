@@ -12,6 +12,7 @@ using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,6 +40,9 @@ namespace Chem4Word.ACME.Behaviors
 
         private AtomVisual _lastAtomVisual;
 
+        private const string DefaultText = "Click existing atom to sprout a chain or modify element.";
+        
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -52,6 +56,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseMove += CurrentEditor_MouseMove;
 
             CurrentEditor.IsHitTestVisible = true;
+            CurrentStatus = DefaultText;
         }
 
         ///
@@ -59,15 +64,20 @@ namespace Chem4Word.ACME.Behaviors
         ///
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
         {
+            var targetedVisual = CurrentEditor.ActiveVisual;
             //cherck to see if we have already got an atom remembered
             if (_currentAtomVisual != null)
             {
+                
+
                 Point lastPos;
 
                 if (Dragging(e))
                 {
+                    CurrentStatus = "[Shift] to unlock length; [Ctrl] to unlock angle; [Shift][Ctrl] to unlock both.";
                     //are we already on top of an atom?
-                    if (CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) is AtomVisual atomUnderCursor)
+                   
+                    if (targetedVisual is AtomVisual atomUnderCursor)
                     {
                         //if so. snap to the atom's position
                         lastPos = atomUnderCursor.Position;
@@ -96,6 +106,25 @@ namespace Chem4Word.ACME.Behaviors
                     _adorner.StartPoint = _currentAtomVisual.Position;
                     _adorner.EndPoint = lastPos;
                 }
+                
+            }
+            else
+            {
+                if (targetedVisual is AtomVisual av)
+                {
+                    if (EditViewModel.SelectedElement != av.ParentAtom.Element)
+                    {
+                        CurrentStatus = "Click to set element.";
+                    }
+                    else
+                    {
+                        CurrentStatus = "Click to sprout chain";
+                    }
+                }
+                else if (targetedVisual is BondVisual bv)
+                {
+                    CurrentStatus = "Click to modify bond";
+                }
             }
         }
 
@@ -107,7 +136,7 @@ namespace Chem4Word.ACME.Behaviors
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             CurrentEditor.ReleaseMouseCapture();
-
+            CurrentStatus = "";
             //first get the current active visuals
             var landedAtomVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as AtomVisual;
 
@@ -496,12 +525,8 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
             CurrentEditor.MouseMove -= CurrentEditor_MouseMove;
-
-            //AssociatedObject.IsHitTestVisible = false;
-            //if (_parent != null)
-            //{
-            //    _parent.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
-            //}
+            CurrentStatus = "";
+         
         }
     }
 }

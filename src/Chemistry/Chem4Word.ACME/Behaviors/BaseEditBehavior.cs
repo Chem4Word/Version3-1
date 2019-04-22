@@ -5,15 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Annotations;
 
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class BaseEditBehavior : Behavior<Canvas>
+    public class BaseEditBehavior : Behavior<Canvas>, INotifyPropertyChanged
     {
         public EditViewModel EditViewModel
         {
@@ -25,6 +28,29 @@ namespace Chem4Word.ACME.Behaviors
         public static readonly DependencyProperty EditViewModelProperty =
             DependencyProperty.Register("EditViewModel", typeof(EditViewModel), typeof(BaseEditBehavior), new PropertyMetadata(null));
 
+        private string _currentStatus;
+
         public EditorCanvas CurrentEditor { get; set; }
+
+        public virtual string CurrentStatus
+        {
+            get
+            {
+                return _currentStatus;
+            } 
+            protected set
+            {
+                _currentStatus = value;
+                OnPropertyChanged();
+            } 
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

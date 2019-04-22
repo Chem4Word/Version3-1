@@ -299,14 +299,20 @@
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
     </UserControl.InputBindings>
 
-    <DockPanel LastChildFill="True">
-        <DockPanel.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding ElementName=MainTray, Path=Height}"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <Grid.Resources>
             <converters:BoolToVisibilityConverter
                 x:Key="VisConverter"
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
-        </DockPanel.Resources>
-        <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
+        </Grid.Resources>
+
+        <ToolBarTray Name="MainTray" DockPanel.Dock="Top" IsLocked="True">
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
@@ -897,8 +903,10 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        <ToolBarTray />
-        <Grid>
+        <Grid Grid.Row="1" Height="Auto">
+            <Grid.Resources>
+                <converters:DoNothingConverter x:Key="SnoopConverter"/>
+            </Grid.Resources>
             <!--  actual drawing area  -->
             <ScrollViewer
                 Name="DrawingArea"
@@ -922,5 +930,10 @@
                 ChemistryCanvas="{Binding ElementName=ChemCanvas}"
                 ScrollViewer="{Binding ElementName=DrawingArea}" />
         </Grid>
-    </DockPanel>
+        <StatusBar Grid.Row="2" Height="25" Name="FeedbackBar" Background="{x:Static SystemColors.WindowBrush}">
+            <TextBlock FontFamily="Calibri" Text="{Binding ElementName=AcmeControl, 
+                Path=ActiveViewModel.ActiveMode.CurrentStatus}" Foreground="{StaticResource Chem4WordBrush}"/>
+
+        </StatusBar>
+    </Grid>
 </UserControl>

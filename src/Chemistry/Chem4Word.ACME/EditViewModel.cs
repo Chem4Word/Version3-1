@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Commands;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
@@ -25,7 +26,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Interactivity;
 using System.Windows.Media;
 using static Chem4Word.Model2.Helpers.Globals;
 
@@ -277,9 +277,9 @@ namespace Chem4Word.ACME
 
         #endregion Properties
 
-        private Behavior _activeMode;
+        private BaseEditBehavior _activeMode;
 
-        public Behavior ActiveMode
+        public BaseEditBehavior ActiveMode
         {
             get { return _activeMode; }
             set
@@ -291,6 +291,7 @@ namespace Chem4Word.ACME
                 }
                 _activeMode = value;
                 _activeMode?.Attach(CurrentEditor);
+                OnPropertyChanged();
             }
         }
 

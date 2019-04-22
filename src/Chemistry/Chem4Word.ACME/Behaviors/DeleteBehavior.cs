@@ -45,6 +45,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             //clear the current selection
             EditViewModel.SelectedItems.Clear();
+            CurrentStatus = "Click to remove an atom or bond.";
         }
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -53,12 +54,14 @@ namespace Chem4Word.ACME.Behaviors
             if (hitTestResult is AtomVisual atomVisual)
             {
                 var atom = atomVisual.ParentAtom;
-                this.EditViewModel.DeleteAtoms(new[] { atom });
+                this.EditViewModel.DeleteAtoms(new[] {atom});
+                CurrentStatus = "Atom deleted.";
             }
             else if (hitTestResult is BondVisual bondVisual)
             {
                 var bond = bondVisual.ParentBond;
-                this.EditViewModel.DeleteBonds(new[] { bond });
+                this.EditViewModel.DeleteBonds(new []{bond});
+                CurrentStatus = "Bond deleted";
             }
             EditViewModel.SelectedItems.Clear();
         }
@@ -71,6 +74,7 @@ namespace Chem4Word.ACME.Behaviors
                 CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
                 CurrentEditor.IsHitTestVisible = false;
                 CurrentEditor.Cursor = _cursor;
+                CurrentStatus = "";
             }
         }
     }

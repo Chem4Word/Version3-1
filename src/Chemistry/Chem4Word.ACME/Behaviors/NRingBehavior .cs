@@ -30,7 +30,7 @@ namespace Chem4Word.ACME.Behaviors
         private NRingAdorner _currentAdorner;
         private List<Point> _preferredPlacements;
         private List<Point> _altPlacements;
-
+        private const string DefaultStatusText = "Drag on atom, bond or free space to draw ring.";
         public NRingBehavior()
         {
         }
@@ -62,11 +62,13 @@ namespace Chem4Word.ACME.Behaviors
         private void _currentAdorner_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             CurrentEditor_MouseLeftButtonUp(sender, e);
+            
         }
 
         private void _currentAdorner_MouseMove(object sender, MouseEventArgs e)
         {
             CurrentEditor_MouseMove(sender, e);
+            CurrentStatus = DefaultStatusText;
         }
 
         private void RemoveRingAdorner()
@@ -94,6 +96,7 @@ namespace Chem4Word.ACME.Behaviors
             //check to see whether we've dragged off the target first
             if (MouseIsDown & IsDrawing)
             {
+                CurrentStatus = "Drag along arrow to size ring.";
                 double xamlBondSize = EditViewModel.Model.XamlBondLength;
                 if (Target != null & GetTargetedVisual(e) != Target) //dragging off a bond or atom
                 {
@@ -151,6 +154,22 @@ namespace Chem4Word.ACME.Behaviors
                                                         xamlBondSize, RingSize);
                     CurrentAdorner = new NRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
                                                       _preferredPlacements, FirstPoint, CurrentPoint);
+                }
+                else
+                {
+                    switch (CurrentEditor.ActiveVisual)
+                    {
+                        case AtomVisual av:
+                            CurrentStatus = "Drag from atom to size ring.";
+                            break;
+                        case BondVisual bv:
+                            CurrentStatus = "Drag from bond to size ring.";
+                            break;
+                        default:
+                            CurrentStatus = DefaultStatusText;
+                            break;
+                    }
+                    
                 }
             }
         }
@@ -257,6 +276,7 @@ namespace Chem4Word.ACME.Behaviors
             Target = null;
             MouseIsDown = false;
             IsDrawing = false;
+            CurrentStatus = DefaultStatusText;
         }
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -270,6 +290,7 @@ namespace Chem4Word.ACME.Behaviors
             Keyboard.Focus(CurrentEditor);
             MouseIsDown = true;
             IsDrawing = true;
+            CurrentStatus = "Drag to start sizing ring.";
         }
 
         protected override void OnAttached()

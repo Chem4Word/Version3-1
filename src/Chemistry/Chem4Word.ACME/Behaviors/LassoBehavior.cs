@@ -24,10 +24,11 @@ namespace Chem4Word.ACME.Behaviors
 
         private Point _startpoint;
         private Window _parent;
-        private EditorCanvas _editorCanvas;
         private bool _flag;
         private LassoAdorner _lassoAdorner;
         //private MoleculeSelectionAdorner _molAdorner;
+        private const string DefaultText = "Click to select; [Shift]-click to multselect; drag to select range; double-click to select molecule.";
+        private const string ActiveSelText = "Set atoms/bonds using selectors; [Delete] to remove.";
 
         protected override void OnAttached()
         {
@@ -35,20 +36,23 @@ namespace Chem4Word.ACME.Behaviors
 
             _parent = Application.Current.MainWindow;
 
-            _editorCanvas = (EditorCanvas)AssociatedObject;
+            CurrentEditor = (EditorCanvas)AssociatedObject;
 
-            AssociatedObject.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
-            AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
-            AssociatedObject.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
-            AssociatedObject.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
-            AssociatedObject.MouseRightButtonDown += AssociatedObjectOnMouseRightButtonDown;
-            AssociatedObject.MouseRightButtonUp += AssociatedObjectOnMouseRightButtonUp;
+            CurrentEditor.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
+            CurrentEditor.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
+            CurrentEditor.MouseLeftButtonUp += AssociatedObject_MouseLeftButtonUp;
+            CurrentEditor.PreviewMouseMove += AssociatedObject_PreviewMouseMove;
+            CurrentEditor.MouseRightButtonDown += AssociatedObjectOnMouseRightButtonDown;
+            CurrentEditor.MouseRightButtonUp += AssociatedObjectOnMouseRightButtonUp;
 
-            AssociatedObject.IsHitTestVisible = true;
+            CurrentEditor.IsHitTestVisible = true;
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown += AssociatedObject_MouseLeftButtonDown;
             }
+
+            
+            CurrentStatus = DefaultText;
         }
 
         private void AssociatedObject_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -59,10 +63,10 @@ namespace Chem4Word.ACME.Behaviors
             }
 
             _mouseTrack = new PointCollection();
-            _startpoint = Mouse.GetPosition(AssociatedObject);
+            _startpoint = Mouse.GetPosition(CurrentEditor);
             _flag = true;
 
-            Mouse.Capture(AssociatedObject);
+            Mouse.Capture(CurrentEditor);
             _mouseTrack.Add(_startpoint);
 
             if (e.ClickCount == 2 & EditViewModel.SelectionType == EditViewModel.SelectionTypeCode.Molecule)
@@ -85,12 +89,17 @@ namespace Chem4Word.ACME.Behaviors
 
         private void AssociatedObject_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            AssociatedObject.ReleaseMouseCapture();
+            CurrentEditor.ReleaseMouseCapture();
             _flag = false;
 
             if (_lassoAdorner != null)
             {
                 DisposeLasso();
+            }
+
+            if (EditViewModel.SelectedItems.Any())
+            {
+                CurrentStatus = ActiveSelText;
             }
         }
 
@@ -98,13 +107,13 @@ namespace Chem4Word.ACME.Behaviors
         {
             if (Dragging(e))
             {
-                var pos = Mouse.GetPosition(AssociatedObject);
+                var pos = Mouse.GetPosition(CurrentEditor);
                 _mouseTrack.Add(pos);
                 var outline = GetPolyGeometry();
 
                 if (_lassoAdorner == null)
                 {
-                    _lassoAdorner = new LassoAdorner(AssociatedObject, outline);
+                    _lassoAdorner = new LassoAdorner(CurrentEditor, outline);
                 }
 
                 _lassoAdorner.Outline = outline;
@@ -124,13 +133,13 @@ namespace Chem4Word.ACME.Behaviors
         private void AssociatedObjectOnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             Debug.WriteLine("AssociatedObjectOnMouseRightButtonUp");
-            AssociatedObject.ReleaseMouseCapture();
+            CurrentEditor.ReleaseMouseCapture();
         }
 
         private void AssociatedObjectOnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Debug.WriteLine("AssociatedObjectOnMouseRightButtonDown");
-            Mouse.Capture(AssociatedObject);
+            Mouse.Capture(CurrentEditor);
             if (e.ClickCount == 1)
             {
                 var hitTestResult = GetTarget(e);
@@ -142,7 +151,7 @@ namespace Chem4Word.ACME.Behaviors
                 else if (hitTestResult.VisualHit is BondVisual)
                 {
                     var bond = (BondVisual)hitTestResult.VisualHit;
-                    var pos = e.GetPosition(AssociatedObject);
+                    var pos = e.GetPosition(CurrentEditor);
                     Debug.WriteLine($"Right Click Bond {bond.ParentBond.Id} at ({pos.X},{pos.Y})");
                 }
             }
@@ -161,12 +170,12 @@ namespace Chem4Word.ACME.Behaviors
 
         private void ModifySelection(StreamGeometry outline)
         {
-            VisualTreeHelper.HitTest(AssociatedObject, null, HitTestCallback, new GeometryHitTestParameters(outline));
+            VisualTreeHelper.HitTest(CurrentEditor, null, HitTestCallback, new GeometryHitTestParameters(outline));
         }
 
         private void RemoveAdorner(Adorner adorner)
         {
-            var layer = AdornerLayer.GetAdornerLayer(AssociatedObject);
+            var layer = AdornerLayer.GetAdornerLayer(CurrentEditor);
 
             layer.Remove(adorner);
         }
@@ -193,7 +202,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void DoMolSelect(MouseButtonEventArgs e)
         {
-            var activeVisual = _editorCanvas.ActiveVisual;
+            var activeVisual = CurrentEditor.ActiveVisual;
 
             switch (activeVisual)
             {
@@ -203,6 +212,7 @@ namespace Chem4Word.ACME.Behaviors
                         //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
                         EditViewModel.AddToSelection(atom);
+                        CurrentStatus = ActiveSelText;
                         break;
                     }
                 case BondVisual bv:
@@ -211,17 +221,19 @@ namespace Chem4Word.ACME.Behaviors
                         //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
 
                         EditViewModel.AddToSelection(bond);
+                        CurrentStatus = ActiveSelText;
                         break;
                     }
                 default:
                     EditViewModel.SelectedItems.Clear();
+                    CurrentStatus = DefaultText;
                     break;
             }
         }
 
         private void DoSingleSelect(MouseButtonEventArgs e)
         {
-            var activeVisual = _editorCanvas.ActiveVisual;
+            var activeVisual = CurrentEditor.ActiveVisual;
 
             switch (activeVisual)
             {
@@ -231,25 +243,28 @@ namespace Chem4Word.ACME.Behaviors
                         //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
 
                         EditViewModel.AddToSelection(atom);
+                        CurrentStatus = ActiveSelText;
                         break;
                     }
                 case BondVisual bv:
                     {
                         var bond = bv.ParentBond;
-                        //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(AssociatedObject).X},{e.GetPosition(AssociatedObject).Y})");
+                        //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(CurrentEditor).X},{e.GetPosition(AssociatedObject).Y})");
 
                         EditViewModel.AddToSelection(bond);
+                        CurrentStatus = ActiveSelText;
                         break;
                     }
                 default:
                     EditViewModel.SelectedItems.Clear();
+                    CurrentStatus = DefaultText;
                     break;
             }
         }
 
         private HitTestResult GetTarget(MouseButtonEventArgs e)
         {
-            return VisualTreeHelper.HitTest(AssociatedObject, e.GetPosition(AssociatedObject));
+            return VisualTreeHelper.HitTest(CurrentEditor, e.GetPosition(CurrentEditor));
         }
 
         private HitTestResultBehavior HitTestCallback(HitTestResult result)
@@ -309,12 +324,12 @@ namespace Chem4Word.ACME.Behaviors
             base.OnDetaching();
             _parent = Application.Current.MainWindow;
 
-            AssociatedObject.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
-            AssociatedObject.PreviewMouseLeftButtonDown -= AssociatedObject_PreviewMouseLeftButtonDown;
-            AssociatedObject.MouseLeftButtonUp -= AssociatedObject_MouseLeftButtonUp;
-            AssociatedObject.PreviewMouseMove -= AssociatedObject_PreviewMouseMove;
-            AssociatedObject.MouseRightButtonDown -= AssociatedObjectOnMouseRightButtonDown;
-            AssociatedObject.MouseRightButtonUp -= AssociatedObjectOnMouseRightButtonUp;
+            CurrentEditor.MouseLeftButtonDown -= AssociatedObject_MouseLeftButtonDown;
+            CurrentEditor.PreviewMouseLeftButtonDown -= AssociatedObject_PreviewMouseLeftButtonDown;
+            CurrentEditor.MouseLeftButtonUp -= AssociatedObject_MouseLeftButtonUp;
+            CurrentEditor.PreviewMouseMove -= AssociatedObject_PreviewMouseMove;
+            CurrentEditor.MouseRightButtonDown -= AssociatedObjectOnMouseRightButtonDown;
+            CurrentEditor.MouseRightButtonUp -= AssociatedObjectOnMouseRightButtonUp;
 
             //AssociatedObject.IsHitTestVisible = false;
             if (_parent != null)

@@ -18,6 +18,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
 using System.Windows.Media;
+using System.Windows.Shapes;
+using Chem4Word.ACME.Behaviors;
 
 namespace Chem4Word.ACME
 {
@@ -346,8 +348,8 @@ namespace Chem4Word.ACME
                 }
 
                 var radioButton = (RadioButton)sender;
-
-                if (radioButton.Tag is Behavior bh)
+               
+                if (radioButton.Tag is BaseEditBehavior bh)
                 {
                     ActiveViewModel.ActiveMode = bh;
                 }

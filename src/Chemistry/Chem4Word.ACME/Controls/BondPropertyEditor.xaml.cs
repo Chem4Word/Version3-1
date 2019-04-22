@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.ComponentModel;
 using System.Windows;
 
@@ -30,7 +31,14 @@ namespace Chem4Word.ACME.Controls
                 _model = model;
                 DataContext = _model;
                 Title = _model.Title;
+                Deactivated += OnDeactivated;
             }
+        }
+
+        private void OnDeactivated(object sender, EventArgs e)
+        {
+            _model.Save = false;
+            Close();
         }
 
         private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
