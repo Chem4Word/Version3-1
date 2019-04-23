@@ -5,14 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Utils;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -22,6 +19,7 @@ namespace Chem4Word.ACME.Behaviors
         //private PointCollection _mouseTrack;
         //private Point _startpoint;
         private Window _parent;
+
         private Cursor _cursor;
 
         //private bool _flag;
@@ -40,7 +38,6 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.Cursor = CursorUtils.Eraser;
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
 
-
             CurrentEditor.IsHitTestVisible = true;
             if (_parent != null)
             {
@@ -48,6 +45,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             //clear the current selection
             EditViewModel.SelectedItems.Clear();
+            CurrentStatus = "Click to remove an atom or bond.";
         }
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -57,15 +55,16 @@ namespace Chem4Word.ACME.Behaviors
             {
                 var atom = atomVisual.ParentAtom;
                 this.EditViewModel.DeleteAtoms(new[] {atom});
+                CurrentStatus = "Atom deleted.";
             }
             else if (hitTestResult is BondVisual bondVisual)
             {
                 var bond = bondVisual.ParentBond;
                 this.EditViewModel.DeleteBonds(new []{bond});
+                CurrentStatus = "Bond deleted";
             }
             EditViewModel.SelectedItems.Clear();
         }
-
 
         protected override void OnDetaching()
         {
@@ -75,6 +74,7 @@ namespace Chem4Word.ACME.Behaviors
                 CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
                 CurrentEditor.IsHitTestVisible = false;
                 CurrentEditor.Cursor = _cursor;
+                CurrentStatus = "";
             }
         }
     }

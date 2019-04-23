@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Controls;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
@@ -17,10 +16,10 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Interactivity;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.ACME.Behaviors;
 
 namespace Chem4Word.ACME
 {
@@ -155,8 +154,9 @@ namespace Chem4Word.ACME
             set { SetValue(SliderVisibilityProperty, value); }
         }
 
-        private void EventSetter_OnHandler(object sender, RoutedEventArgs e)
+        private void Popup_Click(object sender, RoutedEventArgs e)
         {
+            RingButton.IsChecked = true;
         }
 
         private void RingDropdown_OnClick(object sender, RoutedEventArgs e)
@@ -169,14 +169,21 @@ namespace Chem4Word.ACME
 
         private void RingSelButton_OnClick(object sender, RoutedEventArgs e)
         {
-            Button selButton = sender as Button;
-            RingButtonPath.Style = (selButton.Content as Path).Style;
-
-            RingButton.Tag = selButton.Tag;
-
+            SetCurrentRing(sender);
             ModeButton_OnChecked(RingButton, null);
-
             RingPopup.IsOpen = false;
+        }
+
+        private void SetCurrentRing(object sender)
+        {
+            Button selButton = sender as Button;
+            var currentFace = new VisualBrush();
+            currentFace.AutoLayoutContent = true;
+            currentFace.Stretch = Stretch.Uniform;
+            
+            currentFace.Visual = selButton.Content as Visual;
+            RingPanel.Background = currentFace;
+            RingButton.Tag = selButton.Tag;
         }
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
@@ -190,18 +197,20 @@ namespace Chem4Word.ACME
                 var vm = new EditViewModel(tempModel);
                 ActiveViewModel = vm;
 
-                
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
 
                 ChemCanvas.Chemistry = vm;
 
                 ScrollIntoView();
                 BindControls(vm);
-                ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
 
                 // Hack: Couldn't find a better way to do this
                 ActiveViewModel.BondLengthCombo = BondLengthSelector;
             }
+            //refresh the ring button
+            SetCurrentRing(BenzeneButton);
+            //kludge:  need to do this to put the editor into the right mode after refreshing the ring button
+            ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
         }
 
         public static T FindChild<T>(DependencyObject parent)
@@ -242,7 +251,6 @@ namespace Chem4Word.ACME
             return foundChild;
         }
 
-
         /// <summary>
         /// Sets up data bindings between the dropdowns
         /// and the view model
@@ -275,7 +283,6 @@ namespace Chem4Word.ACME
             {
                 if (Math.Abs(ActiveViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
                 {
-                   
                     ActiveViewModel.SetAverageBondLength(blo.ChosenValue, new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
                     ScrollIntoView();
                 }
@@ -342,7 +349,7 @@ namespace Chem4Word.ACME
 
                 var radioButton = (RadioButton)sender;
                
-                if (radioButton.Tag is Behavior bh)
+                if (radioButton.Tag is BaseEditBehavior bh)
                 {
                     ActiveViewModel.ActiveMode = bh;
                 }
@@ -365,12 +372,10 @@ namespace Chem4Word.ACME
 
         private void BondCombo_SelectionChanged()
         {
-
         }
 
         private void AtomCombo_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-
         }
     }
 }

@@ -289,12 +289,14 @@ namespace Chem4Word.Model2.Geometry
                 }
             }
         }
+
         public static void DrawGeometry(StreamGeometryContext ctx, System.Windows.Media.Geometry geo)
         {
             var pathGeometry = geo as PathGeometry ?? PathGeometry.CreateFromGeometry(geo);
             foreach (var figure in pathGeometry.Figures)
                 DrawFigure(ctx, figure);
         }
+
         public static void DrawFigure(StreamGeometryContext ctx, PathFigure figure)
         {
             ctx.BeginFigure(figure.StartPoint, figure.IsFilled, figure.IsClosed);

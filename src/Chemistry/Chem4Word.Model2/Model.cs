@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
@@ -334,8 +333,6 @@ namespace Chem4Word.Model2
             }
         }
 
-
-
         private Dictionary<string, Molecule> _molecules { get; }
 
         //wraps up the above Molecules collection
@@ -541,8 +538,6 @@ namespace Chem4Word.Model2
 
             return copy;
         }
-
-      
 
         private void ClearMolecules()
         {

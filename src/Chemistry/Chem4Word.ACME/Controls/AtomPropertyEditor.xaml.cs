@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System.ComponentModel;
@@ -32,8 +33,14 @@ namespace Chem4Word.ACME.Controls
                 _model = model;
                 DataContext = _model;
                 Title = _model.Title;
-                Owner = owner;
+                Deactivated += OnDeactivated;
             }
+        }
+
+        private void OnDeactivated(object sender, EventArgs e)
+        {
+            _model.Save = false;
+            Close();
         }
 
         private void Save_OnClick(object sender, RoutedEventArgs e)

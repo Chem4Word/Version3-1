@@ -19,8 +19,8 @@ namespace Chem4Word.ACME.Utils
     /// </summary>
     public class Snapper
     {
-        private readonly Point _startPoint;
-        private readonly int _lockAngle;
+        public Point StartPoint { get; }
+        public int LockAngle { get; }
 
         public EditViewModel ViewModel { get; }
 
@@ -29,17 +29,24 @@ namespace Chem4Word.ACME.Utils
         /// </summary>
         /// <param name="startPoint">location of the angle where the bond swings from.</param>
         /// <param name="lockAngle">Angle in degrees - must be a factor of 360</param>
-        public Snapper(Point startPoint, EditViewModel viewModel, int lockAngle = 15)
+        public Snapper(Point startPoint, EditViewModel viewModel, int lockAngle = 15,
+            bool snapLength=true, bool snapAngle=true)
         {
             ViewModel = viewModel;
-            _startPoint = startPoint;
+            StartPoint = startPoint;
+            IsSnappingLength = snapLength;
+            IsSnappingAngle = snapAngle;
             if (360 % lockAngle != 0)
             {
                 Debugger.Break();
                 throw new ArgumentException("Angle must divide into 360!");
             }
-            _lockAngle = lockAngle;
+            LockAngle = lockAngle;
         }
+
+        public bool IsSnappingAngle { get; set; }
+
+        public bool IsSnappingLength { get; set; }
 
         /// <summary>
         ///     Locks the bond to a standard multiple of the
@@ -51,19 +58,19 @@ namespace Chem4Word.ACME.Utils
         /// <returns></returns>
         public Point SnapBond(Point currentCoords, MouseEventArgs e, double startAngle = 0d)
         {
-            Vector originalDisplacement = currentCoords - _startPoint;
+            Vector originalDisplacement = currentCoords - StartPoint;
             double angleInRads = 0.0;
 
             //snap the length if desired
-            double bondLength = SnapLength(originalDisplacement, ViewModel.Model.XamlBondLength, KeyboardUtils.HoldingDownShift());
+            double bondLength = SnapLength(originalDisplacement, ViewModel.Model.XamlBondLength, IsSnappingLength && KeyboardUtils.HoldingDownShift());
 
             //and then snap the angle
-            angleInRads = SnapAngle(startAngle, originalDisplacement, KeyboardUtils.HoldingDownControl());
+            angleInRads = SnapAngle(startAngle, originalDisplacement, IsSnappingAngle && KeyboardUtils.HoldingDownControl());
 
             //minus  for second parameter as the coordinates go down the page
             Vector offset = new Vector(bondLength * Math.Sin(angleInRads), -bondLength * Math.Cos(angleInRads));
 
-            return Vector.Add(offset, _startPoint);
+            return Vector.Add(offset, StartPoint);
         }
 
         public double SnapAngle(double startAngle, Vector originalDisplacement, bool holdingDownControl = false)
@@ -80,7 +87,7 @@ namespace Chem4Word.ACME.Utils
             }
             else
             {
-                double newangle = NormalizeBondAngle(originalAngle, _lockAngle) + startAngle;
+                double newangle = NormalizeBondAngle(originalAngle, LockAngle) + startAngle;
                 angleInRads = 2 * Math.PI * newangle / 360;
             }
             return angleInRads;

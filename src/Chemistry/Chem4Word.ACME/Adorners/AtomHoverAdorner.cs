@@ -7,10 +7,10 @@
 
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -29,7 +29,6 @@ namespace Chem4Word.ACME.Adorners
             _bracketPen.StartLineCap = PenLineCap.Round;
             _bracketPen.EndLineCap = PenLineCap.Round;
 
-
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
@@ -46,14 +45,14 @@ namespace Chem4Word.ACME.Adorners
 
             Rect atomBounds = _targetedVisual.Bounds;
             atomBounds.Inflate(2.0, 2.0);
-            Vector twiddle = new Vector(3,0.0);
+            Vector twiddle = new Vector(3, 0.0);
             using (StreamGeometryContext sgc = sg.Open())
             {
                 sgc.BeginFigure(atomBounds.TopLeft + twiddle, false, false);
                 sgc.LineTo(atomBounds.TopLeft, true, true);
-                sgc.LineTo(atomBounds.BottomLeft, true,true);
-                sgc.LineTo(atomBounds.BottomLeft+twiddle, true,true);
-                
+                sgc.LineTo(atomBounds.BottomLeft, true, true);
+                sgc.LineTo(atomBounds.BottomLeft + twiddle, true, true);
+
                 sgc.BeginFigure(atomBounds.TopRight - twiddle, false, false);
                 sgc.LineTo(atomBounds.TopRight, true, true);
                 sgc.LineTo(atomBounds.BottomRight, true, true);
@@ -61,9 +60,7 @@ namespace Chem4Word.ACME.Adorners
                 sgc.Close();
             }
 
-            drawingContext.DrawGeometry(_solidColorBrush, _bracketPen,sg);
-
-
+            drawingContext.DrawGeometry(_solidColorBrush, _bracketPen, sg);
         }
     }
 }

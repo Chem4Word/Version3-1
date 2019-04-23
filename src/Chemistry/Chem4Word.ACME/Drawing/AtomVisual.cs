@@ -25,7 +25,6 @@ namespace Chem4Word.ACME.Drawing
         #region private fields
 
         private static double MaskOffsetWidth = 0;
-        
 
         public double BondThickness { get; set; }
 
@@ -407,7 +406,6 @@ namespace Chem4Word.ACME.Drawing
                 Hull.AddRange(mainAtomMetrics.FlattenedPath);
             }
 
-
             //stage 3:  measure up the hydrogens
             //if we have implicit hydrogens and we have an explicit label, draw them
             if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
@@ -525,14 +523,13 @@ namespace Chem4Word.ACME.Drawing
 
                         dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), eg);
                         //very simple hull definition
-                        Hull=new List<Point>();
-                        
-                        Hull.AddRange(new []{eg.Bounds.BottomLeft, eg.Bounds.TopLeft, eg.Bounds.TopRight, eg.Bounds.BottomRight});
+                        Hull = new List<Point>();
+
+                        Hull.AddRange(new[] { eg.Bounds.BottomLeft, eg.Bounds.TopLeft, eg.Bounds.TopRight, eg.Bounds.BottomRight });
                         dc.Close();
                     }
                 }
             }
-          
         }
 
         protected void SetTextParams()
@@ -571,7 +568,6 @@ namespace Chem4Word.ACME.Drawing
                 {
                     hullList = Hull;
                 }
-              
 
                 //need to combine the actually filled atom area
                 //with a stroked outline of it, to give a sufficient margin
@@ -600,6 +596,7 @@ namespace Chem4Word.ACME.Drawing
                 return myBounds;
             }
         }
+
         public virtual Geometry WidenedHullGeometry
         {
             get
@@ -625,7 +622,6 @@ namespace Chem4Word.ACME.Drawing
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }
             }
-           
 
             return null;
         }
@@ -651,7 +647,5 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
-
-
     }
 }

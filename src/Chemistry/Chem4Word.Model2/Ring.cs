@@ -140,8 +140,6 @@ namespace Chem4Word.Model2
         /// <remarks>Do NOT set explicitly.  Add or remove the ring from a Molecule</remarks>
         public Molecule Parent { get; set; }
 
-       
-
         public void RingCentroidChanged()
         {
             OnPropertyChanged(nameof(Centroid));
@@ -155,7 +153,6 @@ namespace Chem4Word.Model2
             get
             {
                 return Geometry<Atom>.GetCentroid(Traverse().ToArray(), atom => atom.Position);
-                
             }
         }
 

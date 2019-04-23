@@ -66,11 +66,14 @@
     <Compile Include="Adorners\AtomSelectionAdorner.cs" />
     <Compile Include="Adorners\BondSelectionAdorner.cs" />
     <Compile Include="Adorners\DrawBondAdorner.cs" />
+    <Compile Include="Adorners\NRingAdorner.cs" />
     <Compile Include="Adorners\FixedRingAdorner.cs" />
     <Compile Include="Adorners\LassoAdorner.cs" />
     <Compile Include="Adorners\MoleculeSelectionAdorner.cs" />
+    <Compile Include="Adorners\RingDrawer.cs" />
     <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />
     <Compile Include="AtomOption.cs" />
+    <Compile Include="Behaviors\NRingBehavior .cs" />
     <Compile Include="Controls\AtomPicker.xaml.cs">
       <DependentUpon>AtomPicker.xaml</DependentUpon>
     </Compile>
@@ -109,6 +112,7 @@
     <Compile Include="Controls\AtomPropertyEditor.xaml.cs">
       <DependentUpon>AtomPropertyEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Drawing\FatArrowGeometry.cs" />
     <Compile Include="Drawing\SuperscriptTextRunProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunProperties.cs" />
     <Compile Include="Drawing\LabelTextRunProperties.cs" />

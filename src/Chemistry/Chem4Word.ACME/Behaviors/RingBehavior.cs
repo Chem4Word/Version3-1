@@ -34,13 +34,11 @@ namespace Chem4Word.ACME.Behaviors
             get { return _currentAdorner; }
             set
             {
-                
                 RemoveRingAdorner();
                 _currentAdorner = value;
                 if (_currentAdorner != null)
                 {
                     _currentAdorner.MouseLeftButtonDown += CurrentAdornerOnMouseLeftButtonDown;
-
                 }
                 //local function
                 void RemoveRingAdorner()
@@ -55,8 +53,6 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
         }
-
-      
 
         public RingBehavior()
         {
@@ -88,16 +84,15 @@ namespace Chem4Word.ACME.Behaviors
             {
                 _parent.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             }
+
+            CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
         }
 
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
         {
             List<Point> altPlacements;
 
-            List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
-
             CurrentAdorner = null;
-            
 
             List<Point> preferredPlacements;
             double xamlBondSize = EditViewModel.Model.XamlBondLength;
@@ -109,6 +104,14 @@ namespace Chem4Word.ACME.Behaviors
                     if (preferredPlacements != null)
                     {
                         CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
+                        if (av.ParentAtom.Degree >= 2)
+                        {
+                            CurrentStatus="Click to spiro-fuse.";
+                        }
+                        else
+                        {
+                            CurrentStatus = "Click to draw a terminating ring.";
+                        }
                     }
                     
 
@@ -119,17 +122,17 @@ namespace Chem4Word.ACME.Behaviors
                     if (preferredPlacements != null | altPlacements != null)
                     {
                         CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements??altPlacements, Unsaturated);
+                        CurrentStatus = "Click to fuse a ring";
                     }
                     break;
 
                 default:
                     preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth, xamlBondSize, RingSize);
                     CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
+                    CurrentStatus = "Click to draw a standalone ring";
                     break;
             }
         }
-
-       
 
         private void CurrentAdornerOnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -139,15 +142,15 @@ namespace Chem4Word.ACME.Behaviors
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             //throw new System.NotImplementedException();
+            CurrentStatus = "";
         }
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
             Atom hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
             Bond hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
 
-            List<Point> altPlacements=null;
+            List<Point> altPlacements = null;
             int startAt = 0; //used to change double bond positions in isolated odd numbered rings
             List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
 
@@ -165,7 +168,6 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     startAt = 1;
                 }
-               
             }
             else if (hitBond != null)
             {
@@ -191,19 +193,19 @@ namespace Chem4Word.ACME.Behaviors
             CurrentAdorner = null;
         }
 
-        public static void FillExistingAtoms(List<Point> preferredPlacements, 
-                                             List<Point> altPlacements, 
-                                             List<NewAtomPlacement> newAtomPlacements, 
+        public static void FillExistingAtoms(List<Point> preferredPlacements,
+                                             List<Point> altPlacements,
+                                             List<NewAtomPlacement> newAtomPlacements,
                                              EditorCanvas currentEditor)
         {
             foreach (Point placement in (preferredPlacements ?? altPlacements))
             {
                 NewAtomPlacement nap = new NewAtomPlacement
-                                       {
-                                           ExistingAtom =
+                {
+                    ExistingAtom =
                                                (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
-                                           Position = placement
-                                       };
+                    Position = placement
+                };
                 newAtomPlacements.Add(nap);
             }
         }
