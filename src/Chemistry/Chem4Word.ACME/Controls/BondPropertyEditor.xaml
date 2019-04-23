@@ -20,13 +20,14 @@
                         <BulletDecorator Background="Transparent">
                             <BulletDecorator.Bullet>
                                 <Grid Width="48" Height="48">
+                                    <Ellipse Fill="LightGray" Margin="1"/>
                                     <Ellipse
                                         x:Name="CheckMark"
                                         Width="Auto"
                                         Height="Auto"
                                         Margin="1"
-                                        Fill="Green" />
-                                    <Ellipse Fill="Aqua" Margin="5" />
+                                        Fill="Orange" />
+                                    <Ellipse Fill="White" Margin="5" />
                                     <ContentPresenter />
                                 </Grid>
                             </BulletDecorator.Bullet>
