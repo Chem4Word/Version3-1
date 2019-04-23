@@ -21,12 +21,8 @@
                             <BulletDecorator.Bullet>
                                 <Grid Width="48" Height="48">
                                     <Ellipse Fill="LightGray" Margin="1"/>
-                                    <Ellipse
-                                        x:Name="CheckMark"
-                                        Width="Auto"
-                                        Height="Auto"
-                                        Margin="1"
-                                        Fill="Orange" />
+                                    <Ellipse x:Name="CheckMark"
+                                             Fill="Orange" Margin="1" />
                                     <Ellipse Fill="White" Margin="5" />
                                     <ContentPresenter />
                                 </Grid>
