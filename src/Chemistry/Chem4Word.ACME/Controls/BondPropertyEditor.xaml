@@ -113,6 +113,8 @@
                             <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
                         </Canvas.RenderTransform>
                         <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
                         <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                         <Line X1="18" Y1="10" X2="18" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
@@ -123,6 +125,8 @@
                             <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
                         </Canvas.RenderTransform>
                         <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
                         <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                         <Line X1="30" Y1="10" X2="30" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
@@ -133,6 +137,8 @@
                             <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
                         </Canvas.RenderTransform>
                         <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
                         <Line X1="20" Y1="10" X2="20" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                         <Line X1="28" Y1="10" X2="28" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
