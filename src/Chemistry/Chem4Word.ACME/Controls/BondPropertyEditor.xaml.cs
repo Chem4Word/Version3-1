@@ -18,6 +18,8 @@ namespace Chem4Word.ACME.Controls
     {
         private BondPropertiesModel _model;
 
+        private bool _closing = false;
+
         public BondPropertyEditor()
         {
             InitializeComponent();
@@ -31,14 +33,23 @@ namespace Chem4Word.ACME.Controls
                 _model = model;
                 DataContext = _model;
                 Title = _model.Title;
+                Closing += OnClosing;
                 Deactivated += OnDeactivated;
             }
         }
 
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            _closing = true;
+        }
+
         private void OnDeactivated(object sender, EventArgs e)
         {
-            _model.Save = false;
-            Close();
+            if (!_closing)
+            {
+                _model.Save = false;
+                Close();
+            }
         }
 
         private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
@@ -52,6 +63,7 @@ namespace Chem4Word.ACME.Controls
             if (ValidateModel())
             {
                 _model.Save = true;
+                _closing = true;
                 Close();
             }
         }

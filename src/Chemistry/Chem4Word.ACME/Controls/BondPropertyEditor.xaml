@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="clr-namespace:Chem4Word.ACME.Converters"
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
     Loaded="Dialog_OnLoaded"
     ResizeMode="NoResize"
@@ -12,6 +13,10 @@
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">
     <Window.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="VisConverter"
+            FalseValue="Collapsed"
+            TrueValue="Visible" />
         <Style TargetType="{x:Type RadioButton}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -83,12 +88,14 @@
             <TextBlock
                 Grid.Row="3"
                 Grid.Column="0"
+                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
                 Margin="0,5,5,0">
                 Placement
             </TextBlock>
             <TextBox
                 Grid.Row="3"
                 Grid.Column="1"
+                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
                 Margin="0,5,0,0"
                 Text="{Binding Path=Placement, Mode=TwoWay}" />
             <TextBlock

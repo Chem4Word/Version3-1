@@ -19,6 +19,7 @@ namespace Chem4Word.ACME.Controls
     public partial class AtomPropertyEditor : Window
     {
         private AtomPropertiesModel _model;
+        private bool _closing;
 
         public AtomPropertyEditor()
         {
@@ -33,14 +34,23 @@ namespace Chem4Word.ACME.Controls
                 _model = model;
                 DataContext = _model;
                 Title = _model.Title;
+                Closing += OnClosing;
                 Deactivated += OnDeactivated;
             }
         }
 
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            _closing = true;
+        }
+
         private void OnDeactivated(object sender, EventArgs e)
         {
-            _model.Save = false;
-            Close();
+            if (!_closing)
+            {
+                _model.Save = false;
+                Close();
+            }
         }
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
@@ -48,6 +58,7 @@ namespace Chem4Word.ACME.Controls
             if (ValidateModel())
             {
                 _model.Save = true;
+                _closing = true;
                 Close();
             }
         }

@@ -16,5 +16,6 @@ namespace Chem4Word.ACME.Controls
         public string Stereo { get; set; }
         public string Placement { get; set; }
         public double Angle { get; set; }
+        public bool IsDouble { get; set; }
     }
 }
