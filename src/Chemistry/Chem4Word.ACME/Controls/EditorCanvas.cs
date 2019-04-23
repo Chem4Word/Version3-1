@@ -90,6 +90,7 @@ namespace Chem4Word.ACME.Controls
                 model.Order = bond.Order;
                 model.Stereo = Globals.GetStereoString(bond.Stereo);
                 model.Placement = bond.ExplicitPlacement == null ? "" : bond.ExplicitPlacement.ToString();
+                model.Angle = bond.Angle;
                 model.Centre = pp;
 
                 var tcs = new TaskCompletionSource<bool>();

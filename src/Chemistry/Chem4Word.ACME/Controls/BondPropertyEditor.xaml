@@ -107,19 +107,39 @@
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Orientation="Horizontal">
-                <RadioButton>
-                    <Line X1="12" Y1="12" X2="36" Y2="36" Stroke="Red" StrokeThickness="2" 
-                          StrokeEndLineCap="Round" StrokeStartLineCap="Round"></Line>
-                </RadioButton>
                 <RadioButton IsChecked="True">
-                    <Line X1="12" Y1="12" X2="36" Y2="36" Stroke="Blue" StrokeThickness="2" 
-                          StrokeEndLineCap="Round" StrokeStartLineCap="Round"></Line>
+                    <TextBlock FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,5">A</TextBlock>
                 </RadioButton>
                 <RadioButton>
-                    <Line X1="12" Y1="12" X2="36" Y2="36" Stroke="Green" StrokeThickness="2" 
-                          StrokeEndLineCap="Round" StrokeStartLineCap="Round"></Line>
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
+                        </Canvas.RenderTransform>
+                        <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="18" Y1="10" X2="18" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                    </Canvas>
                 </RadioButton>
-                <RadioButton><TextBlock FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center">A</TextBlock></RadioButton>
+                <RadioButton>
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
+                        </Canvas.RenderTransform>
+                        <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="30" Y1="10" X2="30" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                    </Canvas>
+                </RadioButton>
+                <RadioButton>
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
+                        </Canvas.RenderTransform>
+                        <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Line X1="20" Y1="10" X2="20" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="28" Y1="10" X2="28" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                    </Canvas>
+                </RadioButton>
             </StackPanel>
             <Button
                 Grid.Row="5"
