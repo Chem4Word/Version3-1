@@ -94,13 +94,10 @@ namespace Chem4Word.ACME.Controls
                     model.IsDouble = true;
                 }
 
+                model.PlacementChoice = PlacementChoice.Auto;
                 if (model.IsDouble)
                 {
-                    if (bond.ExplicitPlacement == null)
-                    {
-                        model.PlacementChoice = PlacementChoice.Auto;
-                    }
-                    else
+                    if (bond.ExplicitPlacement != null)
                     {
                         model.PlacementChoice = (PlacementChoice)bond.ExplicitPlacement.Value;
                     }
