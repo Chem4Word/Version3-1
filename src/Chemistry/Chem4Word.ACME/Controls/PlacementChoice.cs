@@ -5,16 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Helpers;
-
 namespace Chem4Word.ACME.Controls
 {
-    public class BondPropertiesModel : BaseDialogModel
+    public enum PlacementChoice
     {
-        public string Order { get; set; }
-        public string Stereo { get; set; }
-        public PlacementChoice PlacementChoice { get; set; }
-        public double Angle { get; set; }
-        public bool IsDouble { get; set; }
+        Anticlockwise = -1,
+        None = 0,
+        Clockwise = 1,
+        Auto = 999
     }
 }

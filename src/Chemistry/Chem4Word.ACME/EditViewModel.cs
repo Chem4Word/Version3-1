@@ -2129,10 +2129,13 @@ namespace Chem4Word.ACME
             BondStereo stereoAfter = Globals.StereoFromString(model.Stereo);
             BondDirection? directionAfter = null;
 
-            BondDirection temp;
-            if (Enum.TryParse(model.Placement, out temp))
+            if (model.PlacementChoice == PlacementChoice.Auto)
             {
-                directionAfter = temp;
+                directionAfter = null;
+            }
+            else
+            {
+                directionAfter = (BondDirection) model.PlacementChoice;
             }
 
             Action redo = () =>

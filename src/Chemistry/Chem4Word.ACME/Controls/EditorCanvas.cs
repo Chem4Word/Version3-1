@@ -88,12 +88,25 @@ namespace Chem4Word.ACME.Controls
                 var model = new BondPropertiesModel();
                 model.Title = bond.Path;
                 model.Order = bond.Order;
+
                 if (bond.OrderValue == 2.0)
                 {
                     model.IsDouble = true;
                 }
+
+                if (model.IsDouble)
+                {
+                    if (bond.ExplicitPlacement == null)
+                    {
+                        model.PlacementChoice = PlacementChoice.Auto;
+                    }
+                    else
+                    {
+                        model.PlacementChoice = (PlacementChoice)bond.ExplicitPlacement.Value;
+                    }
+
+                }
                 model.Stereo = Globals.GetStereoString(bond.Stereo);
-                model.Placement = bond.ExplicitPlacement == null ? "" : bond.ExplicitPlacement.ToString();
                 model.Angle = bond.Angle;
                 model.Centre = pp;
 

@@ -17,6 +17,7 @@
             x:Key="VisConverter"
             FalseValue="Collapsed"
             TrueValue="Visible" />
+        <converters:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
         <Style TargetType="{x:Type RadioButton}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -86,21 +87,9 @@
                 Margin="0,5,0,0"
                 Text="{Binding Path=Stereo, Mode=TwoWay}" />
             <TextBlock
-                Grid.Row="3"
-                Grid.Column="0"
-                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
-                Margin="0,5,5,0">
-                Placement
-            </TextBlock>
-            <TextBox
-                Grid.Row="3"
-                Grid.Column="1"
-                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
-                Margin="0,5,0,0"
-                Text="{Binding Path=Placement, Mode=TwoWay}" />
-            <TextBlock
                 Grid.Row="4"
                 Grid.Column="0"
+                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
                 Margin="0,5,5,0"
                 VerticalAlignment="Center">
                 Placement
@@ -108,12 +97,15 @@
             <StackPanel
                 Grid.Row="4"
                 Grid.Column="1"
+                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
                 Margin="0,5,0,0"
                 Orientation="Horizontal">
-                <RadioButton IsChecked="True">
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Auto}}"
+                             ToolTip="Automatic">
                     <TextBlock FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,5">A</TextBlock>
                 </RadioButton>
-                <RadioButton>
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Clockwise}}"
+                             ToolTip="Clockwise">
                     <Canvas>
                         <Canvas.RenderTransform>
                             <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
@@ -125,7 +117,8 @@
                         <Line X1="18" Y1="10" X2="18" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
                 </RadioButton>
-                <RadioButton>
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Anticlockwise}}"
+                             ToolTip="Anticlockwise">
                     <Canvas>
                         <Canvas.RenderTransform>
                             <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
@@ -137,7 +130,8 @@
                         <Line X1="30" Y1="10" X2="30" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
                 </RadioButton>
-                <RadioButton>
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.None}}"
+                             ToolTip="None">
                     <Canvas>
                         <Canvas.RenderTransform>
                             <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
