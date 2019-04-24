@@ -26,7 +26,7 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public AtomPropertyEditor(AtomPropertiesModel model, Window owner)
+        public AtomPropertyEditor(AtomPropertiesModel model)
         {
             InitializeComponent();
             if (!DesignerProperties.GetIsInDesignMode(this))

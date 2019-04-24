@@ -59,7 +59,7 @@ namespace Chem4Word.ACME.Controls
                                                       {
                                                           try
                                                           {
-                                                              var pe = new AtomPropertyEditor(model, owner);
+                                                              var pe = new AtomPropertyEditor(model);
                                                               pe.ShowDialog();
                                                           }
                                                           finally
@@ -82,7 +82,6 @@ namespace Chem4Word.ACME.Controls
                 var mode = Application.Current.ShutdownMode;
 
                 Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                var owner = Application.Current.MainWindow;
 
                 var bond = bv.ParentBond;
                 var model = new BondPropertiesModel();
@@ -113,7 +112,7 @@ namespace Chem4Word.ACME.Controls
                                                       {
                                                           try
                                                           {
-                                                              var pe = new BondPropertyEditor(model, owner);
+                                                              var pe = new BondPropertyEditor(model);
                                                               pe.ShowDialog();
                                                           }
                                                           finally

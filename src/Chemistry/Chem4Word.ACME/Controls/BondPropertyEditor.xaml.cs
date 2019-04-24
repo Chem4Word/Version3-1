@@ -25,7 +25,7 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public BondPropertyEditor(BondPropertiesModel model, Window owner)
+        public BondPropertyEditor(BondPropertiesModel model)
         {
             InitializeComponent();
             if (!DesignerProperties.GetIsInDesignMode(this))
