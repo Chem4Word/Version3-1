@@ -58,8 +58,8 @@ namespace Chem4Word.ACME.Controls
                                                       {
                                                           try
                                                           {
-                                                              var pe1 = new AtomPropertyEditor(model);
-                                                              var x = pe1.ShowDialog();
+                                                              var pe = new AtomPropertyEditor(model);
+                                                              pe.ShowDialog();
                                                           }
                                                           finally
                                                           {
@@ -86,8 +86,23 @@ namespace Chem4Word.ACME.Controls
                 var model = new BondPropertiesModel();
                 model.Title = bond.Path;
                 model.Order = bond.Order;
+
+                if (bond.OrderValue == 2.0)
+                {
+                    model.IsDouble = true;
+                }
+
+                model.PlacementChoice = PlacementChoice.Auto;
+                if (model.IsDouble)
+                {
+                    if (bond.ExplicitPlacement != null)
+                    {
+                        model.PlacementChoice = (PlacementChoice)bond.ExplicitPlacement.Value;
+                    }
+
+                }
                 model.Stereo = Globals.GetStereoString(bond.Stereo);
-                model.Placement = bond.ExplicitPlacement == null ? "" : bond.ExplicitPlacement.ToString();
+                model.Angle = bond.Angle;
                 model.Centre = pp;
 
                 var tcs = new TaskCompletionSource<bool>();
@@ -96,8 +111,8 @@ namespace Chem4Word.ACME.Controls
                                                       {
                                                           try
                                                           {
-                                                              var pe1 = new BondPropertyEditor(model);
-                                                              var x = pe1.ShowDialog();
+                                                              var pe = new BondPropertyEditor(model);
+                                                              pe.ShowDialog();
                                                           }
                                                           finally
                                                           {

@@ -1,36 +1,158 @@
-﻿<Window x:Class="Chem4Word.ACME.Controls.BondPropertyEditor"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
-             mc:Ignorable="d" 
-             Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
-             Loaded="Dialog_OnLoaded"
-             ResizeMode="NoResize"
-             ShowInTaskbar="False"
-             SizeToContent="WidthAndHeight">
+﻿<Window
+    x:Class="Chem4Word.ACME.Controls.BondPropertyEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="clr-namespace:Chem4Word.ACME.Converters"
+    Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
+    Loaded="Dialog_OnLoaded"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    SizeToContent="WidthAndHeight"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="VisConverter"
+            FalseValue="Collapsed"
+            TrueValue="Visible" />
+        <converters:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
+        <Style TargetType="{x:Type RadioButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <BulletDecorator Background="Transparent">
+                            <BulletDecorator.Bullet>
+                                <Grid Width="48" Height="48">
+                                    <Ellipse Fill="LightGray" Margin="1"/>
+                                    <Ellipse x:Name="CheckMark"
+                                             Fill="Orange" Margin="1" />
+                                    <Ellipse Fill="White" Margin="5" />
+                                    <ContentPresenter />
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="CheckMark" Property="Visibility" Value="Collapsed" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Border Margin="5">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  FontSize="25">Bond Properties</TextBlock>
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,5,5,0" >Order</TextBlock>
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" Text="{Binding Path=Order, Mode=TwoWay}"></TextBox>
-            <TextBlock Grid.Row="2" Grid.Column="0" Margin="0,5,5,0" >Stereo</TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,5,0,0" Text="{Binding Path=Stereo, Mode=TwoWay}"></TextBox>
-            <TextBlock Grid.Row="3" Grid.Column="0" Margin="0,5,5,0" >Placement</TextBlock>
-            <TextBox Grid.Row="3" Grid.Column="1" Margin="0,5,0,0" Text="{Binding Path=Placement, Mode=TwoWay}"></TextBox>
-            <Button  Grid.Row="4" Grid.Column="1" Margin="0,5,0,0" Width="50" Click="Save_OnClick" HorizontalAlignment="Right">Save</Button>
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                FontSize="25">
+                Bond Properties
+            </TextBlock>
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,5,5,0">
+                Order
+            </TextBlock>
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="0,5,0,0"
+                Text="{Binding Path=Order, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="0,5,5,0">
+                Stereo
+            </TextBlock>
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="0,5,0,0"
+                Text="{Binding Path=Stereo, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="0"
+                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
+                Margin="0,5,5,0"
+                VerticalAlignment="Center">
+                Placement
+            </TextBlock>
+            <StackPanel
+                Grid.Row="4"
+                Grid.Column="1"
+                Visibility="{Binding Path=IsDouble, Converter={StaticResource VisConverter}}"
+                Margin="0,5,0,0"
+                Orientation="Horizontal">
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Auto}}"
+                             ToolTip="Automatic">
+                    <TextBlock FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,5">A</TextBlock>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Clockwise}}"
+                             ToolTip="Clockwise">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
+                        </Canvas.RenderTransform>
+                        <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
+                        <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="18" Y1="10" X2="18" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                    </Canvas>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Anticlockwise}}"
+                             ToolTip="Anticlockwise">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
+                        </Canvas.RenderTransform>
+                        <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
+                        <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="30" Y1="10" X2="30" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                    </Canvas>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.None}}"
+                             ToolTip="None">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform CenterX="24" CenterY="24" Angle="{Binding Path=Angle}"></RotateTransform>
+                        </Canvas.RenderTransform>
+                        <Line X1="24" Y1="6" X2="24" Y2="42" Stroke="Red" StrokeThickness="1" StrokeDashArray="1,1"></Line>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
+                        <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
+                        <Line X1="20" Y1="10" X2="20" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="28" Y1="10" X2="28" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                    </Canvas>
+                </RadioButton>
+            </StackPanel>
+            <Button
+                Grid.Row="5"
+                Grid.Column="1"
+                Width="50"
+                Margin="0,5,0,0"
+                HorizontalAlignment="Right"
+                Click="Save_OnClick">
+                Save
+            </Button>
         </Grid>
     </Border>
 </Window>

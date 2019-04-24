@@ -112,6 +112,8 @@
     <Compile Include="Controls\AtomPropertyEditor.xaml.cs">
       <DependentUpon>AtomPropertyEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PlacementChoice.cs" />
+    <Compile Include="Converters\EnumToBooleanConverter.cs" />
     <Compile Include="Drawing\FatArrowGeometry.cs" />
     <Compile Include="Drawing\SuperscriptTextRunProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunProperties.cs" />
