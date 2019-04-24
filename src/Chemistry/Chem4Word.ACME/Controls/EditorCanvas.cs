@@ -43,7 +43,6 @@ namespace Chem4Word.ACME.Controls
                 var mode = Application.Current.ShutdownMode;
 
                 Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                var owner = Application.Current.MainWindow;
 
                 var atom = av.ParentAtom;
                 var model = new AtomPropertiesModel();
