@@ -544,6 +544,25 @@ namespace Chem4Word.Model2
             _molecules.Clear();
         }
 
+        public void ScaleToAverageBondLength(double newLength, Point centre)
+        {
+            if (MeanBondLength > 0)
+            {
+                double scale = newLength / MeanBondLength;
+                var allAtoms = GetAllAtoms();
+                foreach (var atom in allAtoms)
+                {
+                    atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
+                }
+
+                _boundingBox = Rect.Empty;
+                var bb = BoundingBox;
+                var c = new Point(bb.Left + bb.Width / 2, bb.Top + bb.Height / 2);
+                RepositionAll(c.X - centre.X, c.Y - centre.Y);
+                _boundingBox = Rect.Empty;
+            }
+        }
+
         public void ScaleToAverageBondLength(double newLength)
         {
             if (MeanBondLength > 0)

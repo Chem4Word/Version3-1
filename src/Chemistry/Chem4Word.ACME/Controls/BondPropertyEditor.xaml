@@ -114,7 +114,7 @@
                         <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
                         <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
                         <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
-                        <Line X1="18" Y1="10" X2="18" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="17" Y1="10" X2="17" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
                 </RadioButton>
                 <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.Anticlockwise}}"
@@ -127,7 +127,7 @@
                         <Ellipse Height="4" Width="4" Fill="Red" Margin="22,1,0,0"></Ellipse>
                         <Ellipse Height="4" Width="4" Fill="Red" Margin="22,43,0,0"></Ellipse>
                         <Line X1="24" Y1="10" X2="24" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
-                        <Line X1="30" Y1="10" X2="30" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
+                        <Line X1="31" Y1="10" X2="31" Y2="38" Stroke="Black" StrokeThickness="2" ></Line>
                     </Canvas>
                 </RadioButton>
                 <RadioButton IsChecked="{Binding Path=PlacementChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:PlacementChoice.None}}"

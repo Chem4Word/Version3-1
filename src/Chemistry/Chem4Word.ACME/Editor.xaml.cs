@@ -188,7 +188,7 @@ namespace Chem4Word.ACME
 
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(_cml))
+            if (!String.IsNullOrEmpty(_cml))
             {
                 CMLConverter cc = new CMLConverter();
                 Model tempModel = cc.Import(_cml);
@@ -201,12 +201,16 @@ namespace Chem4Word.ACME
 
                 ChemCanvas.Chemistry = vm;
 
+                vm.Loading = true;
+                var mean = ActiveViewModel.Model.MeanBondLength / Globals.ScaleFactorForXaml;
+                var average = Math.Round(mean / 5.0) * 5;
+                vm.CurrentBondLength = average;
+                vm.Loading = false;
+
                 ScrollIntoView();
                 BindControls(vm);
-
-                // Hack: Couldn't find a better way to do this
-                ActiveViewModel.BondLengthCombo = BondLengthSelector;
             }
+
             //refresh the ring button
             SetCurrentRing(BenzeneButton);
             //kludge:  need to do this to put the editor into the right mode after refreshing the ring button
@@ -258,48 +262,7 @@ namespace Chem4Word.ACME
         /// <param name="vm">EditViewModel for ACME</param>
         private void BindControls(EditViewModel vm)
         {
-            //Binding atomBinding = new Binding("SelectedAtomOption");
-            //atomBinding.Source = vm;
-            //AtomCombo.SetBinding(ComboBox.SelectedItemProperty, atomBinding);
-
-            //Binding bondBinding = new Binding("SelectedBondOption");
-            //bondBinding.Source = vm;
-            //BondCombo.SetBinding(ComboBox.SelectedItemProperty, bondBinding);
-
             vm.CurrentEditor = ChemCanvas;
-        }
-
-        private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-        }
-
-        private void DrawingArea_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void BondLengthCombo_OnChange(object sender, RoutedEventArgs e)
-        {
-            if (BondLengthSelector.SelectedItem is BondLengthOption blo)
-            {
-                if (Math.Abs(ActiveViewModel.Model.XamlBondLength - blo.ChosenValue) > 2.5 * Globals.ScaleFactorForXaml)
-                {
-                    ActiveViewModel.SetAverageBondLength(blo.ChosenValue, new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
-                    ScrollIntoView();
-                }
-            }
-        }
-
-        private void ZoomFactorCombo_OnChange(object sender, RoutedEventArgs e)
-        {
-            // ToDo: Plumbing in place ready to use ...
-            ComboBox cb = sender as ComboBox;
-            ComboBoxItem cbi = cb?.SelectedItem as ComboBoxItem;
-            string selected = cbi?.Content as string;
-            switch (selected)
-            {
-                case "100%":
-                    break;
-            }
         }
 
         /// <summary>
@@ -368,14 +331,6 @@ namespace Chem4Word.ACME
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void BondCombo_SelectionChanged()
-        {
-        }
-
-        private void AtomCombo_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
-        {
         }
     }
 }

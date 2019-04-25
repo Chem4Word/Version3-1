@@ -55,11 +55,11 @@ namespace Chem4Word.ACME
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
-        public ComboBox BondLengthCombo { get; set; }
-
         #endregion Fields
 
         #region Properties
+
+        public bool Loading { get; set; }
 
         public string CurrentBondOrder
         {
@@ -70,9 +70,6 @@ namespace Chem4Word.ACME
         {
             get { return _bondOptions[_selectedBondOptionId.Value].Stereo.Value; }
         }
-
-        public List<BondLengthOption> BondLengthOptions { get; } = new List<BondLengthOption>();
-        public BondLengthOption SelectedBondLengthOption { get; set; }
 
         public double EditBondThickness
         {
@@ -119,6 +116,26 @@ namespace Chem4Word.ACME
         public ObservableCollection<object> SelectedItems { get; }
 
         public UndoHandler UndoManager { get; }
+
+        private double _currentBondLength;
+
+        public double CurrentBondLength
+        {
+            get
+            {
+                return _currentBondLength;
+            }
+            set
+            {
+                _currentBondLength = value;
+                OnPropertyChanged();
+                var scaled = value * ScaleFactorForXaml;
+                if (!Loading && Math.Abs(Model.MeanBondLength - scaled) > 2.5)
+                {
+                    SetAverageBondLength(scaled);
+                }
+            }
+        }
 
         private ElementBase _selectedElement;
 
@@ -346,24 +363,6 @@ namespace Chem4Word.ACME
             _selectedBondOptionId = 1;
 
             LoadBondOptions();
-            LoadBondLengthOptions();
-        }
-
-        private void LoadBondLengthOptions()
-        {
-            for (int i = 5; i <= 95; i += 5)
-            {
-                var option = new BondLengthOption
-                {
-                    ChosenValue = (int)(i * ScaleFactorForXaml),
-                    DisplayAs = i.ToString("0")
-                };
-                BondLengthOptions.Add(option);
-                if (Math.Abs(i * ScaleFactorForXaml - Model.XamlBondLength) < 2.5 * ScaleFactorForXaml)
-                {
-                    SelectedBondLengthOption = option;
-                }
-            }
         }
 
         /// <summary>
@@ -787,42 +786,36 @@ namespace Chem4Word.ACME
             redoAction();
         }
 
-        public void SetAverageBondLength(double newLength, Size canvas)
+        public void SetAverageBondLength(double newLength)
         {
             UndoManager.BeginUndoBlock();
             double currentLength = Model.MeanBondLength;
-            SelectedBondLengthOption = null;
-            BondLengthOption blo = null;
-            foreach (var option in BondLengthOptions)
-            {
-                if (Math.Abs(option.ChosenValue - currentLength) < 2.5 * ScaleFactorForXaml)
-                {
-                    blo = option;
-                    break;
-                }
-            }
 
-            Action undoAction = () =>
-            {
-                //Model2.Model.ScaleToAverageBondLength(currentLength);
-                //Model2.Model.CentreInCanvas(canvas);
+            var centre = new Point(Model.BoundingBox.Left + Model.BoundingBox.Width / 2,
+                                    Model.BoundingBox.Top + Model.BoundingBox.Height / 2);
 
-                //FontSize = currentLength * Globals.FontSizePercentageBond;
-                SelectedBondLengthOption = blo;
-                // Hack: Couldn't find a better way to do this
-                BondLengthCombo.SelectedItem = blo;
-            };
             Action redoAction = () =>
-            {
-                //Model2.Model.ScaleToAverageBondLength(newLength);
-                //Model2.Model.CentreInCanvas(canvas);
-
-                //FontSize = newLength * Globals.FontSizePercentageBond;
-            };
+                                {
+                                    Model.ScaleToAverageBondLength(newLength, centre);
+                                    Model.XamlBondLength = newLength;
+                                    RefreshMolecules(Model.Molecules.Values.ToList());
+                                    Loading = true;
+                                    CurrentBondLength = newLength / ScaleFactorForXaml;
+                                    Loading = false;
+                                };
+            Action undoAction = () =>
+                                {
+                                    Model.ScaleToAverageBondLength(currentLength, centre);
+                                    Model.XamlBondLength = currentLength;
+                                    RefreshMolecules(Model.Molecules.Values.ToList());
+                                    Loading = true;
+                                    CurrentBondLength = currentLength / ScaleFactorForXaml;
+                                    Loading = false;
+                                };
 
             UndoManager.RecordAction(undoAction, redoAction);
 
-            redoAction.Invoke();
+            redoAction();
 
             UndoManager.EndUndoBlock();
         }

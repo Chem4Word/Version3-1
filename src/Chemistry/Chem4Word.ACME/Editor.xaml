@@ -23,7 +23,7 @@
                 <ResourceDictionary Source="Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!--styles-->
+            <!--  styles  -->
 
             <Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}">
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -277,10 +277,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <converters:BoolToVisibilityConverter
-                x:Key="VisConverter"
-                FalseValue="Collapsed"
-                TrueValue="Visible" />
             <converters:EnabledConverter x:Key="EnabledConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -294,16 +290,14 @@
             Key="Y"
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand}"
             Modifiers="Control" />
-        <KeyBinding
-            Key="Delete"
-            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
     </UserControl.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="{Binding ElementName=MainTray, Path=Height}"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="{Binding ElementName=MainTray, Path=Height}" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Grid.Resources>
             <converters:BoolToVisibilityConverter
@@ -312,7 +306,10 @@
                 TrueValue="Visible" />
         </Grid.Resources>
 
-        <ToolBarTray Name="MainTray" DockPanel.Dock="Top" IsLocked="True">
+        <ToolBarTray
+            Name="MainTray"
+            DockPanel.Dock="Top"
+            IsLocked="True">
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
@@ -358,7 +355,7 @@
                     ItemsSource="{StaticResource AtomItems}"
                     SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, Mode=TwoWay}"
                     SelectedValuePath="Element"
-                    ToolTip="Current Atom Type" SelectionChanged="AtomCombo_SelectionChanged_1" />
+                    ToolTip="Current Atom Type" />
                 <ComboBox
                     x:Name="BondCombo"
                     Width="48"
@@ -425,13 +422,19 @@
 
                 <RadioButton
                     Name="RingButton"
+                    Width="30"
+                    Height="30"
                     Checked="ModeButton_OnChecked"
                     GroupName="Actions"
-                    ToolTip="Insert a ring"
-                    Height="30"
-                    Width="30">
-                    <Viewbox Stretch="Uniform" Width="24" Height="24">
-                        <StackPanel Name="RingPanel" Height="24" Width="24" />
+                    ToolTip="Insert a ring">
+                    <Viewbox
+                        Width="24"
+                        Height="24"
+                        Stretch="Uniform">
+                        <StackPanel
+                            Name="RingPanel"
+                            Width="24"
+                            Height="24" />
                     </Viewbox>
                 </RadioButton>
                 <Button
@@ -456,110 +459,123 @@
                                         <Setter Property="Background" Value="Transparent" />
 
                                         <Setter Property="BorderBrush" Value="Transparent" />
-                                        <Setter Property="Height" Value="Auto"></Setter>
+                                        <Setter Property="Height" Value="Auto" />
                                         <EventSetter Event="Click" Handler="RingSelButton_OnClick" />
                                     </Style.Setters>
                                 </Style>
                             </UniformGrid.Resources>
-                            <Button Name="BenzeneButton"
-                                ToolTip="Benzene">
+                            <Button Name="BenzeneButton" ToolTip="Benzene">
                                 <Viewbox>
                                     <Path Style="{StaticResource BenzeneStyle}" />
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="6"
-                                        Unsaturated="True"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="True" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Cyclohexane">
+                            <Button ToolTip="Cyclohexane">
                                 <Path Style="{StaticResource CyclohexStyle}" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="6"
-                                        Unsaturated="False"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="False" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Cyclopentane">
+                            <Button ToolTip="Cyclopentane">
                                 <Path Style="{StaticResource CyclopentStyle}" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="5"
-                                        Unsaturated="False"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="False" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Cyclopentadiene">
+                            <Button ToolTip="Cyclopentadiene">
                                 <Path Style="{StaticResource CyclopentadieneStyle}" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="5"
-                                        Unsaturated="True"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="True" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Cycloheptane">
+                            <Button ToolTip="Cycloheptane">
                                 <Path Style="{StaticResource CycloheptaneStyle}" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="7"
-                                        Unsaturated="False"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="False" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Cyclobutane">
-                                <Viewbox Height="16" Width="16" Stretch="Uniform">
-                                    <Rectangle Width="16" Height="16" Stroke="{StaticResource Chem4WordBrush}" />
+                            <Button ToolTip="Cyclobutane">
+                                <Viewbox
+                                    Width="16"
+                                    Height="16"
+                                    Stretch="Uniform">
+                                    <Rectangle
+                                        Width="16"
+                                        Height="16"
+                                        Stroke="{StaticResource Chem4WordBrush}" />
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="4"
-                                        Unsaturated="False"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="False" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Cyclopropane">
+                            <Button ToolTip="Cyclopropane">
                                 <Viewbox Stretch="UniformToFill">
                                     <Path Data="M0,15 L20,15 L10,-2.32 Z" Stroke="{StaticResource Chem4WordBrush}" />
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
+                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
                                         RingSize="3"
-                                        Unsaturated="False"
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                        Unsaturated="False" />
                                 </Button.Tag>
                             </Button>
-                            <Button
-                                ToolTip="Variable">
+                            <Button ToolTip="Variable">
                                 <Viewbox>
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*" />
                                             <RowDefinition Height="2*" />
-                                            <RowDefinition Height="*"></RowDefinition>
+                                            <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
-                                        <Ellipse Height="20" Width="20" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"  Stroke="{StaticResource ResourceKey=Chem4WordBrush}" Grid.RowSpan="3" Margin="0,3"  />
-                                        <TextBlock TextAlignment="Center" VerticalAlignment="Top"
-                                               Foreground="{StaticResource Chem4WordBrush}"  HorizontalAlignment="Center"
-                                                Text="n" FontSize="16" Background="{Binding RelativeSource={RelativeSource AncestorType={x:Type Viewbox} }, Path=Background}" Grid.Row="1" Grid.Column="1" Margin="0"  />
+                                        <Ellipse
+                                            Grid.Row="0"
+                                            Grid.RowSpan="3"
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="3"
+                                            Width="20"
+                                            Height="20"
+                                            Margin="0,3"
+                                            Stroke="{StaticResource ResourceKey=Chem4WordBrush}" />
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Top"
+                                            Background="{Binding RelativeSource={RelativeSource AncestorType={x:Type Viewbox}}, Path=Background}"
+                                            FontSize="16"
+                                            Foreground="{StaticResource Chem4WordBrush}"
+                                            Text="n"
+                                            TextAlignment="Center" />
                                     </Grid>
                                 </Viewbox>
                                 <Button.Tag>
-                                    <behaviors:NRingBehavior
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                    <behaviors:NRingBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                         </UniformGrid>
@@ -841,29 +857,12 @@
                 <ComboBox
                     x:Name="BondLengthSelector"
                     Width="50"
-                    DisplayMemberPath="DisplayAs"
                     FontFamily="Arial"
                     FontSize="16"
-                    ItemsSource="{Binding Path=BondLengthOptions}"
-                    SelectedItem="{Binding Path=SelectedBondLengthOption, Mode=TwoWay}"
-                    SelectionChanged="BondLengthCombo_OnChange"
+                    ItemsSource="{StaticResource AllowedBondLengths}"
+                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CurrentBondLength, Mode=TwoWay}"
+                    SelectedValuePath="Content"
                     ToolTip="Change Bond Length" />
-                <ComboBox
-                    x:Name="ZoomFactor"
-                    Width="65"
-                    FontFamily="Arial"
-                    FontSize="16"
-                    SelectedIndex="3"
-                    SelectionChanged="ZoomFactorCombo_OnChange"
-                    ToolTip="Change Zoom"
-                    Visibility="Collapsed">
-                    <ComboBoxItem>25%</ComboBoxItem>
-                    <ComboBoxItem>50%</ComboBoxItem>
-                    <ComboBoxItem>75%</ComboBoxItem>
-                    <ComboBoxItem>100%</ComboBoxItem>
-                    <ComboBoxItem>200%</ComboBoxItem>
-                    <ComboBoxItem>400%</ComboBoxItem>
-                </ComboBox>
             </ToolBar>
             <ToolBar
                 x:Name="ImportantToolbar"
@@ -905,7 +904,7 @@
         </ToolBarTray>
         <Grid Grid.Row="1" Height="Auto">
             <Grid.Resources>
-                <converters:DoNothingConverter x:Key="SnoopConverter"/>
+                <converters:DoNothingConverter x:Key="SnoopConverter" />
             </Grid.Resources>
             <!--  actual drawing area  -->
             <ScrollViewer
@@ -930,9 +929,15 @@
                 ChemistryCanvas="{Binding ElementName=ChemCanvas}"
                 ScrollViewer="{Binding ElementName=DrawingArea}" />
         </Grid>
-        <StatusBar Grid.Row="2" Height="25" Name="FeedbackBar" Background="{x:Static SystemColors.WindowBrush}">
-            <TextBlock FontFamily="Calibri" Text="{Binding ElementName=AcmeControl, 
-                Path=ActiveViewModel.ActiveMode.CurrentStatus}" Foreground="{StaticResource Chem4WordBrush}"/>
+        <StatusBar
+            Name="FeedbackBar"
+            Grid.Row="2"
+            Height="25"
+            Background="{x:Static SystemColors.WindowBrush}">
+            <TextBlock
+                FontFamily="Calibri"
+                Foreground="{StaticResource Chem4WordBrush}"
+                Text="{Binding ElementName=AcmeControl, Path=ActiveViewModel.ActiveMode.CurrentStatus}" />
 
         </StatusBar>
     </Grid>

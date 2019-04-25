@@ -1904,7 +1904,7 @@ namespace Chem4Word
 
                 try
                 {
-                    string userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, "Manual", "Chem4Word-Version3-User-Manual.docx");
+                    string userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, "Manual", "Chem4Word-Version3-1-User-Manual.docx");
                     if (File.Exists(userManual))
                     {
                         Globals.Chem4WordV3.Telemetry.Write(module, "ReadManual", userManual);
@@ -1912,7 +1912,7 @@ namespace Chem4Word
                     }
                     else
                     {
-                        userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, @"..\..\..\..\doc", "Chem4Word-Version3-User-Manual.docx");
+                        userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, @"..\..\..\..\doc", "Chem4Word-Version3-1-User-Manual.docx");
                         if (File.Exists(userManual))
                         {
                             Globals.Chem4WordV3.Telemetry.Write(module, "ReadManual", userManual);

@@ -83,7 +83,6 @@
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\LassoBehavior.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
-    <Compile Include="BondLengthOption.cs" />
     <Compile Include="BondOption.cs" />
     <Compile Include="Controls\BondPropertiesModel.cs" />
     <Compile Include="Controls\AtomPropertiesModel.cs" />
