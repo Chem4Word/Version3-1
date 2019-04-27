@@ -5,15 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Windows;
-using Chem4Word.Model2;
-
 namespace Chem4Word.ACME.Controls
 {
-    public class AtomPropertiesModel : BaseDialogModel
+    public enum DoubleBondType
     {
-        public string Symbol { get; set; }
-        public string Charge { get; set; }
-        public string Isotope { get; set; }
+        Auto = -2,
+        Anticlockwise = -1,
+        None = 0,
+        Clockwise = 1,
+        Indeterminate = 2
     }
 }

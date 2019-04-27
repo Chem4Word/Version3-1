@@ -5,16 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Helpers;
+using System;
 
-namespace Chem4Word.ACME.Controls
+namespace Chem4Word.ACME.Enums
 {
-    public class BondPropertiesModel : BaseDialogModel
+    [Flags]
+    public enum SelectionTypeCode
     {
-        public string Order { get; set; }
-        public string Stereo { get; set; }
-        public PlacementChoice PlacementChoice { get; set; }
-        public double Angle { get; set; }
-        public bool IsDouble { get; set; }
+        None = 0,
+        Atom = 1,
+        Bond = 2,
+        Molecule = 4,
+        Reaction = 8
     }
 }

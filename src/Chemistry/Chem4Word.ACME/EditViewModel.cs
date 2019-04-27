@@ -27,6 +27,8 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Enums;
+using Chem4Word.ACME.Models;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME
@@ -39,16 +41,6 @@ namespace Chem4Word.ACME
 
     public class EditViewModel : ViewModel, INotifyPropertyChanged
     {
-        [Flags]
-        public enum SelectionTypeCode
-        {
-            None = 0,
-            Atom = 1,
-            Bond = 2,
-            Molecule = 4,
-            Reaction = 8
-        }
-
         #region Fields
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
@@ -2097,7 +2089,9 @@ namespace Chem4Word.ACME
                 atom.IsotopeNumber = isotopeAfter;
                 atom.Parent.ForceUpdates();
             };
+
             redo();
+
             Action undo = () =>
             {
                 atom.Element = elementBaseBefore;
@@ -2114,37 +2108,93 @@ namespace Chem4Word.ACME
         {
             UndoManager.BeginUndoBlock();
 
-            string bondOrderBefore = bond.Order;
+            double bondOrderBefore = bond.OrderValue.Value;
             BondStereo stereoBefore = bond.Stereo;
             BondDirection? directionBefore = bond.ExplicitPlacement;
 
-            string bondOrderAfter = model.Order;
-            BondStereo stereoAfter = Globals.StereoFromString(model.Stereo);
+            double bondOrderAfter = model.BondOrderValue;
+            BondStereo stereoAfter = BondStereo.None;
             BondDirection? directionAfter = null;
 
-            if (model.PlacementChoice == PlacementChoice.Auto)
+            var startAtom = bond.StartAtom;
+            var endAtom = bond.EndAtom;
+
+            bool swapAtoms = false;
+
+            if (model.IsSingle)
             {
-                directionAfter = null;
+                switch (model.SingleBondChoice)
+                {
+                    case SingleBondType.None:
+                        stereoAfter = BondStereo.None;
+                        break;
+                    case SingleBondType.Wedge:
+                        stereoAfter = BondStereo.Wedge;
+                        break;
+                    case SingleBondType.BackWedge:
+                        stereoAfter = BondStereo.Wedge;
+                        swapAtoms = true;
+                        break;
+                    case SingleBondType.Hatch:
+                        stereoAfter = BondStereo.Hatch;
+                        break;
+                    case SingleBondType.BackHatch:
+                        stereoAfter = BondStereo.Hatch;
+                        swapAtoms = true;
+                        break;
+                    case SingleBondType.Indeterminate:
+                        stereoAfter = BondStereo.Indeterminate;
+                        break;
+                    default:
+                        stereoAfter = BondStereo.None;
+                        break;
+                }
             }
-            else
+
+            if (model.IsDouble)
             {
-                directionAfter = (BondDirection) model.PlacementChoice;
+                if (model.DoubleBondChoice == DoubleBondType.Indeterminate)
+                {
+                    stereoAfter = BondStereo.Indeterminate;
+                }
+                else
+                {
+                    stereoAfter = BondStereo.None;
+                    if (model.DoubleBondChoice != DoubleBondType.Auto)
+                    {
+                        directionAfter = (BondDirection)model.DoubleBondChoice;
+                    }
+                }
             }
 
             Action redo = () =>
             {
-                bond.Order = bondOrderAfter;
+                bond.Order = OrderValueToOrder(bondOrderAfter);
                 bond.Stereo = stereoAfter;
                 bond.ExplicitPlacement = directionAfter;
                 bond.Parent.ForceUpdates();
+                if (swapAtoms)
+                {
+                    bond.EndAtomInternalId = startAtom.InternalId;
+                    bond.StartAtomInternalId = endAtom.InternalId;
+                }
+                bond.NotifyBondingChanged();
             };
+
             redo();
+
             Action undo = () =>
             {
-                bond.Order = bondOrderBefore;
+                bond.Order = OrderValueToOrder(bondOrderBefore);
                 bond.Stereo = stereoBefore;
                 bond.ExplicitPlacement = directionBefore;
                 bond.Parent.ForceUpdates();
+                if (swapAtoms)
+                {
+                    bond.StartAtomInternalId = startAtom.InternalId;
+                    bond.EndAtomInternalId = endAtom.InternalId;
+                }
+                bond.NotifyBondingChanged();
             };
 
             UndoManager.RecordAction(undo, redo);

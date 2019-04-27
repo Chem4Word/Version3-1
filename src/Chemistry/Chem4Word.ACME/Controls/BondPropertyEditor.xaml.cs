@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using Chem4Word.ACME.Models;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -32,7 +33,7 @@ namespace Chem4Word.ACME.Controls
             {
                 _model = model;
                 DataContext = _model;
-                Title = _model.Title;
+                BondPath.Text = _model.Path;
                 Closing += OnClosing;
                 Deactivated += OnDeactivated;
             }

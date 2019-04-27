@@ -5,15 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Models;
+using Chem4Word.Model2.Geometry;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -46,11 +48,13 @@ namespace Chem4Word.ACME.Controls
 
                 var atom = av.ParentAtom;
                 var model = new AtomPropertiesModel();
-                model.Title = atom.Path;
+
+                model.Centre = pp;
+                model.Path = atom.Path;
+
                 model.Symbol = atom.Element.Symbol;
                 model.Charge = atom.FormalCharge.ToString();
                 model.Isotope = atom.IsotopeNumber.ToString();
-                model.Centre = pp;
 
                 var tcs = new TaskCompletionSource<bool>();
 
@@ -84,26 +88,52 @@ namespace Chem4Word.ACME.Controls
 
                 var bond = bv.ParentBond;
                 var model = new BondPropertiesModel();
-                model.Title = bond.Path;
-                model.Order = bond.Order;
 
-                if (bond.OrderValue == 2.0)
-                {
-                    model.IsDouble = true;
-                }
+                model.Centre = pp;
+                model.Path = bond.Path;
+                model.Angle = bond.Angle;
 
-                model.PlacementChoice = PlacementChoice.Auto;
+                model.BondOrderValue = bond.OrderValue.Value;
+                model.IsSingle = bond.Order.Equals(Globals.OrderSingle);
+                model.IsDouble = bond.Order.Equals(Globals.OrderDouble);
+
                 if (model.IsDouble)
                 {
-                    if (bond.ExplicitPlacement != null)
-                    {
-                        model.PlacementChoice = (PlacementChoice)bond.ExplicitPlacement.Value;
-                    }
+                    model.DoubleBondChoice = DoubleBondType.Auto;
 
+                    if (bond.Stereo == Globals.BondStereo.Indeterminate)
+                    {
+                        model.DoubleBondChoice = DoubleBondType.Indeterminate;
+                    }
+                    else if (bond.ExplicitPlacement != null)
+                    {
+                        model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
+                    }
                 }
-                model.Stereo = Globals.GetStereoString(bond.Stereo);
-                model.Angle = bond.Angle;
-                model.Centre = pp;
+
+                if (model.IsSingle)
+                {
+                    model.SingleBondChoice = SingleBondType.None;
+
+                    switch (bond.Stereo)
+                    {
+                        case Globals.BondStereo.Wedge:
+                            model.SingleBondChoice = SingleBondType.Wedge;
+                            break;
+
+                        case Globals.BondStereo.Hatch:
+                            model.SingleBondChoice = SingleBondType.Hatch;
+                            break;
+
+                        case Globals.BondStereo.Indeterminate:
+                            model.SingleBondChoice = SingleBondType.Indeterminate;
+                            break;
+
+                        default:
+                            model.SingleBondChoice = SingleBondType.None;
+                            break;
+                    }
+                }
 
                 var tcs = new TaskCompletionSource<bool>();
 
@@ -126,7 +156,7 @@ namespace Chem4Word.ACME.Controls
                 {
                     EditViewModel evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
                     evm.UpdateBond(bond, model);
-                    bond.Order = model.Order;
+                    bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
                 }
             }
         }
@@ -219,10 +249,9 @@ namespace Chem4Word.ACME.Controls
 
         #endregion Overrides
 
-
         public AtomVisual GetAtomVisual(Atom adornedAtom)
         {
-           return chemicalVisuals[adornedAtom] as AtomVisual;
+            return chemicalVisuals[adornedAtom] as AtomVisual;
         }
     }
 }

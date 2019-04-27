@@ -5,19 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.ACME
+namespace Chem4Word.ACME.Models
 {
-    public class ViewModel
+    public class AtomPropertiesModel : BaseDialogModel
     {
-        public ViewModel(Model2.Model chemistryModel)
-        {
-            Model = chemistryModel;
-        }
-
-        #region Properties
-
-        public Model2.Model Model { get; }
-
-        #endregion Properties
+        public string Symbol { get; set; }
+        public string Charge { get; set; }
+        public string Isotope { get; set; }
     }
 }

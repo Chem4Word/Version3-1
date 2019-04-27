@@ -10,6 +10,8 @@
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
+    Title="Atom Properties"
+    MinWidth="200"
     mc:Ignorable="d">
     <Border Margin="5">
         <Grid>
@@ -25,10 +27,10 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock
+                x:Name="AtomPath"
                 Grid.Row="0"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
-                FontSize="25">
+                Grid.ColumnSpan="2">
                 Atom Properties
             </TextBlock>
             <TextBlock

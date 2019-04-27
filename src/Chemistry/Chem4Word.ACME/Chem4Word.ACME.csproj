@@ -84,8 +84,9 @@
     <Compile Include="Behaviors\LassoBehavior.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="BondOption.cs" />
-    <Compile Include="Controls\BondPropertiesModel.cs" />
-    <Compile Include="Controls\AtomPropertiesModel.cs" />
+    <Compile Include="Enums\SelectionTypeCode.cs" />
+    <Compile Include="Models\BondPropertiesModel.cs" />
+    <Compile Include="Models\AtomPropertiesModel.cs" />
     <Compile Include="Commands\AddAtomCommand.cs" />
     <Compile Include="Commands\AddHydrogensCommand.cs" />
     <Compile Include="Commands\BaseCommand.cs" />
@@ -103,7 +104,7 @@
     <Compile Include="Commands\SettingsCommand.cs" />
     <Compile Include="Commands\UndoCommand.cs" />
     <Compile Include="Commands\UnGroupCommand.cs" />
-    <Compile Include="Controls\BaseDialogModel.cs" />
+    <Compile Include="Models\BaseDialogModel.cs" />
     <Compile Include="Controls\BondPropertyEditor.xaml.cs">
       <DependentUpon>BondPropertyEditor.xaml</DependentUpon>
     </Compile>
@@ -111,7 +112,8 @@
     <Compile Include="Controls\AtomPropertyEditor.xaml.cs">
       <DependentUpon>AtomPropertyEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\PlacementChoice.cs" />
+    <Compile Include="Enums\DoubleBondType.cs" />
+    <Compile Include="Enums\SingleBondType.cs" />
     <Compile Include="Converters\EnumToBooleanConverter.cs" />
     <Compile Include="Drawing\FatArrowGeometry.cs" />
     <Compile Include="Drawing\SuperscriptTextRunProperties.cs" />

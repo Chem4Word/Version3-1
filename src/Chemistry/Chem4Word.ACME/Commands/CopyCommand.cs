@@ -7,6 +7,7 @@
 
 using System;
 using Chem4Word.ACME;
+using Chem4Word.ACME.Enums;
 
 namespace Chem4Word.ACME.Commands
 {
@@ -18,7 +19,7 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return EditViewModel.SelectionType != EditViewModel.SelectionTypeCode.None;
+            return EditViewModel.SelectionType != SelectionTypeCode.None;
         }
 
         public override void Execute(object parameter)

@@ -10,6 +10,7 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System.ComponentModel;
 using System.Windows;
+using Chem4Word.ACME.Models;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -33,7 +34,7 @@ namespace Chem4Word.ACME.Controls
             {
                 _model = model;
                 DataContext = _model;
-                Title = _model.Title;
+                AtomPath.Text = _model.Path;
                 Closing += OnClosing;
                 Deactivated += OnDeactivated;
             }

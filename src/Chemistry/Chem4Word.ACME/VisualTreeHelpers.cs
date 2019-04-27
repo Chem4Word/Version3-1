@@ -85,7 +85,10 @@ namespace Chem4Word.ACME
         where T : DependencyObject
         {
             // Confirm parent and childName are valid.
-            if (parent == null) return null;
+            if (parent == null)
+            {
+                return null;
+            }
 
             T foundChild = null;
 
@@ -101,7 +104,10 @@ namespace Chem4Word.ACME
                     foundChild = FindChild<T>(child, childName);
 
                     // If the child is found, break so we do not overwrite the found child.
-                    if (foundChild != null) break;
+                    if (foundChild != null)
+                    {
+                        break;
+                    }
                 }
                 else if (!string.IsNullOrEmpty(childName))
                 {
@@ -119,7 +125,10 @@ namespace Chem4Word.ACME
                         foundChild = FindChild<T>(child, childName);
 
                         // If the child is found, break so we do not overwrite the found child.
-                        if (foundChild != null) break;
+                        if (foundChild != null)
+                        {
+                            break;
+                        }
                     }
                 }
                 else
@@ -140,7 +149,10 @@ namespace Chem4Word.ACME
             where T : DependencyObject
         {
             // Confirm parent is valid.
-            if (parent == null) return null;
+            if (parent == null)
+            {
+                return null;
+            }
 
             T foundChild = null;
 
@@ -156,7 +168,10 @@ namespace Chem4Word.ACME
                     foundChild = FindChild<T>(child);
 
                     // If the child is found, break so we do not overwrite the found child.
-                    if (foundChild != null) break;
+                    if (foundChild != null)
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -176,7 +191,10 @@ namespace Chem4Word.ACME
         {
             HashSet<T> allChildren = new HashSet<T>();
             // Confirm parent is valid.
-            if (parent == null) return allChildren;
+            if (parent == null)
+            {
+                return allChildren;
+            }
 
             int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
             for (int i = 0; i < childrenCount; i++)

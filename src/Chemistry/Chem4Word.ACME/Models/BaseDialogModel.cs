@@ -5,13 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.ACME.Controls
+using System.Windows;
+
+namespace Chem4Word.ACME.Models
 {
-    public enum PlacementChoice
+    public class BaseDialogModel
     {
-        Anticlockwise = -1,
-        None = 0,
-        Clockwise = 1,
-        Auto = 999
+        public Point Centre { get; set; }
+        public string Path { get; set; }
+        public bool Save { get; set; }
     }
 }

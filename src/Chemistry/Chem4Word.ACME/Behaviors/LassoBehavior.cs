@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Enums;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -69,7 +70,7 @@ namespace Chem4Word.ACME.Behaviors
             Mouse.Capture(CurrentEditor);
             _mouseTrack.Add(_startpoint);
 
-            if (e.ClickCount == 2 & EditViewModel.SelectionType == EditViewModel.SelectionTypeCode.Molecule)
+            if (e.ClickCount == 2 & EditViewModel.SelectionType == SelectionTypeCode.Molecule)
             {
                 DoMolSelect(e);
                 e.Handled = true;

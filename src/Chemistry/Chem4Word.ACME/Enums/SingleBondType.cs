@@ -5,14 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Windows;
-
 namespace Chem4Word.ACME.Controls
 {
-    public class BaseDialogModel
+    public enum SingleBondType
     {
-        public Point Centre { get; set; }
-        public string Title { get; set; }
-        public bool Save { get; set; }
+        None = 0,
+        Wedge,
+        Hatch,
+        BackWedge,
+        BackHatch,
+        Indeterminate
     }
 }
