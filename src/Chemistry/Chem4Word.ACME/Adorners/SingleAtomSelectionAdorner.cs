@@ -147,9 +147,9 @@ namespace Chem4Word.ACME.Adorners
 
             BigThumb.Style = (Style)FindResource("BigThumbStyle");
             BigThumb.Cursor = Cursors.Hand;
-            BigThumb.DragStarted += _bigThumb_DragStarted;
-            BigThumb.DragCompleted += _bigThumb_DragCompleted;
-            BigThumb.DragDelta += _bigThumb_DragDelta;
+            BigThumb.DragStarted += BigThumb_DragStarted;
+            BigThumb.DragCompleted += BigThumb_DragCompleted;
+            BigThumb.DragDelta += BigThumb_DragDelta;
             BigThumb.MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
         }
 
@@ -211,7 +211,7 @@ namespace Chem4Word.ACME.Adorners
 
         #region MouseIsDown
 
-        private void _bigThumb_DragStarted(object sender, DragStartedEventArgs e)
+        private void BigThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
             Dragging = true;
 
@@ -222,7 +222,7 @@ namespace Chem4Word.ACME.Adorners
             LastOperation = new TranslateTransform();
         }
 
-        private void _bigThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        private void BigThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             DragXTravel += e.HorizontalChange;
             DragYTravel += e.VerticalChange;
@@ -244,7 +244,7 @@ namespace Chem4Word.ACME.Adorners
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void _bigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        private void BigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             //wire up the event handling
             var lastTranslation = (TranslateTransform)LastOperation;
@@ -259,7 +259,7 @@ namespace Chem4Word.ACME.Adorners
                 from atom in mol.Atoms.Values
                 select atom;
 
-                CurrentModel.DoOperation(LastOperation, atoms.ToList());
+                CurrentModel.DoTransform(LastOperation, atoms.ToList());
             
             RaiseDRCompleted(sender, e);
             Dragging = false;

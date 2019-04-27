@@ -18,6 +18,9 @@ using static Chem4Word.ACME.Drawing.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
 {
+    /// <summary>
+    /// DrawingVisual based class for rendering an Atom label
+    /// </summary>
     public class AtomVisual : ChemicalVisual
     {
         #region Fields
@@ -36,6 +39,9 @@ namespace Chem4Word.ACME.Drawing
 
         #region Text Classes
 
+        /// <summary>
+        /// handles a subscripted text annotation
+        /// </summary>
         private class SubscriptedGroup
         {
             //how many atoms in the group
@@ -209,6 +215,9 @@ namespace Chem4Word.ACME.Drawing
 
         public virtual List<Point> Hull { get; protected set; }
 
+        /// <summary>
+        /// Distance between an atom visual and any bond ends
+        /// </summary>
         protected double Standoff => GlyphText.SymbolSize / 4;
 
         #endregion Visual Properties
@@ -484,6 +493,9 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
+        /// <summary>
+        /// Draws the atom and all associated decorations
+        /// </summary>
         public override void Render()
         {
             Point centre = ParentAtom.Position;

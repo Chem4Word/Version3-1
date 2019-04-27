@@ -5,18 +5,20 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
     public class BondSelectionAdorner : Adorner
     {
         private Bond _adornedBond;
+        public EditorCanvas CurrentEditor { get; set; }
 
         public Bond AdornedBond
         {
@@ -25,22 +27,43 @@ namespace Chem4Word.ACME.Adorners
 
         public BondSelectionAdorner(UIElement adornedElement) : base(adornedElement)
         {
-            //this.MouseLeftButtonDown += BondSelectionAdorner_MouseLeftButtonDown;
-        }
-
-        private void BondSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (e.ClickCount == 2)
-            {
-                RaiseEvent(e);
-            }
         }
 
         public BondSelectionAdorner(UIElement adornedElement, Bond adornedBond) : this(adornedElement)
         {
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
+            CurrentEditor = (EditorCanvas)adornedElement;
+
             _adornedBond = adornedBond;
             myAdornerLayer.Add(this);
+            MouseLeftButtonDown += BondSelectionAdorner_MouseLeftButtonDown;
+            MouseMove += BondSelectionAdorner_MouseMove;
+            PreviewMouseMove += BondSelectionAdorner_PreviewMouseMove;
+            MouseLeftButtonUp += BondSelectionAdorner_MouseLeftButtonUp;
+        }
+
+        private void BondSelectionAdorner_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            //transmit the event to the current editor
+            CurrentEditor.RaiseEvent(e);
+        }
+
+        private void BondSelectionAdorner_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            //transmit the event to the current editor
+            CurrentEditor.RaiseEvent(e);
+        }
+
+        private void BondSelectionAdorner_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //transmit the event to the current editor
+            CurrentEditor.RaiseEvent(e);
+        }
+
+        private void BondSelectionAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //transmit the event to the current editor
+            CurrentEditor.RaiseEvent(e);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

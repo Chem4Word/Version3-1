@@ -13,5 +13,7 @@ namespace Chem4Word.ACME.Utils
         public static bool HoldingDownControl() => Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
         public static bool HoldingDownShift() => Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+
+        public static bool HoldingDownAlt() => Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
     }
 }

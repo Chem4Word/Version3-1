@@ -302,26 +302,36 @@ namespace Chem4Word.Model2.Geometry
             ctx.BeginFigure(figure.StartPoint, figure.IsFilled, figure.IsClosed);
             foreach (var segment in figure.Segments)
             {
-                var lineSegment = segment as LineSegment;
-                if (lineSegment != null) { ctx.LineTo(lineSegment.Point, lineSegment.IsStroked, lineSegment.IsSmoothJoin); continue; }
+                switch (segment)
+                {
+                    case LineSegment lineSegment:
+                        ctx.LineTo(lineSegment.Point, lineSegment.IsStroked, lineSegment.IsSmoothJoin);
+                        break;
 
-                var bezierSegment = segment as BezierSegment;
-                if (bezierSegment != null) { ctx.BezierTo(bezierSegment.Point1, bezierSegment.Point2, bezierSegment.Point3, bezierSegment.IsStroked, bezierSegment.IsSmoothJoin); continue; }
+                    case BezierSegment bezierSegment:
+                        ctx.BezierTo(bezierSegment.Point1, bezierSegment.Point2, bezierSegment.Point3, bezierSegment.IsStroked, bezierSegment.IsSmoothJoin);
+                        break;
 
-                var quadraticSegment = segment as QuadraticBezierSegment;
-                if (quadraticSegment != null) { ctx.QuadraticBezierTo(quadraticSegment.Point1, quadraticSegment.Point2, quadraticSegment.IsStroked, quadraticSegment.IsSmoothJoin); continue; }
+                    case QuadraticBezierSegment quadraticSegment:
+                        ctx.QuadraticBezierTo(quadraticSegment.Point1, quadraticSegment.Point2, quadraticSegment.IsStroked, quadraticSegment.IsSmoothJoin);
+                        break;
 
-                var polyLineSegment = segment as PolyLineSegment;
-                if (polyLineSegment != null) { ctx.PolyLineTo(polyLineSegment.Points, polyLineSegment.IsStroked, polyLineSegment.IsSmoothJoin); continue; }
+                    case PolyLineSegment polyLineSegment:
+                        ctx.PolyLineTo(polyLineSegment.Points, polyLineSegment.IsStroked, polyLineSegment.IsSmoothJoin);
+                        break;
 
-                var polyBezierSegment = segment as PolyBezierSegment;
-                if (polyBezierSegment != null) { ctx.PolyBezierTo(polyBezierSegment.Points, polyBezierSegment.IsStroked, polyBezierSegment.IsSmoothJoin); continue; }
+                    case PolyBezierSegment polyBezierSegment:
+                        ctx.PolyBezierTo(polyBezierSegment.Points, polyBezierSegment.IsStroked, polyBezierSegment.IsSmoothJoin);
+                        break;
 
-                var polyQuadraticSegment = segment as PolyQuadraticBezierSegment;
-                if (polyQuadraticSegment != null) { ctx.PolyQuadraticBezierTo(polyQuadraticSegment.Points, polyQuadraticSegment.IsStroked, polyQuadraticSegment.IsSmoothJoin); continue; }
+                    case PolyQuadraticBezierSegment polyQuadraticSegment:
+                        ctx.PolyQuadraticBezierTo(polyQuadraticSegment.Points, polyQuadraticSegment.IsStroked, polyQuadraticSegment.IsSmoothJoin);
+                        break;
 
-                var arcSegment = segment as ArcSegment;
-                if (arcSegment != null) { ctx.ArcTo(arcSegment.Point, arcSegment.Size, arcSegment.RotationAngle, arcSegment.IsLargeArc, arcSegment.SweepDirection, arcSegment.IsStroked, arcSegment.IsSmoothJoin); continue; }
+                    case ArcSegment arcSegment:
+                        ctx.ArcTo(arcSegment.Point, arcSegment.Size, arcSegment.RotationAngle, arcSegment.IsLargeArc, arcSegment.SweepDirection, arcSegment.IsStroked, arcSegment.IsSmoothJoin);
+                        break;
+                }
             }
         }
     }

@@ -67,7 +67,7 @@ namespace Chem4Word.ACME.Drawing
             var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
 
             if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength,
-                out var singleBondGeometry, ParentBond, ref _enclosingPoly))
+                out var singleBondGeometry, ParentBond, out _enclosingPoly))
             {
                 return singleBondGeometry;
             }
@@ -76,8 +76,9 @@ namespace Chem4Word.ACME.Drawing
         }
 
         public static bool GetBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry, Geometry endAtomGeometry,
-            double modelXamlBondLength, out Geometry singleBondGeometry, Bond parentBond, ref List<Point> enclosingPoly)
+            double modelXamlBondLength, out Geometry singleBondGeometry, Bond parentBond, out List<Point> enclosingPoly, bool ignoreCentroid=false)
         {
+            enclosingPoly = null;
             //check to see if it's a wedge or a hatch yet
             if (parentBond.Stereo == Globals.BondStereo.Wedge | parentBond.Stereo == Globals.BondStereo.Hatch)
             {
@@ -138,10 +139,20 @@ namespace Chem4Word.ACME.Drawing
                 }
 
                 {
-                    singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                    if(!ignoreCentroid)
+                    { singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
                         parentBond.Placement,
                         ref enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
-                    return true;
+                        return true;
+                    }
+                    else
+                    {
+                        singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                                                                             parentBond.Placement,
+                                                                             ref enclosingPoly, null, startAtomGeometry, endAtomGeometry);
+                        return true;
+                    }
+                    
                 }
             }
 

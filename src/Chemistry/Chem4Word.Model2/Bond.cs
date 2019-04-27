@@ -660,7 +660,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void NotifyBondingChanged()
+        public void UpdateVisual()
         {
             OnPropertyChanged(nameof(Order));
         }

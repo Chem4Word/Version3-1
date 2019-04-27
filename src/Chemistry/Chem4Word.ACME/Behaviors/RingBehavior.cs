@@ -187,9 +187,13 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
 
-            FillExistingAtoms(preferredPlacements, altPlacements, newAtomPlacements, CurrentEditor);
+            if ((preferredPlacements ?? altPlacements) != null)
+            {
+                FillExistingAtoms(preferredPlacements, altPlacements, newAtomPlacements, CurrentEditor);
 
-            EditViewModel.DrawRing(newAtomPlacements, Unsaturated, startAt);
+                EditViewModel.DrawRing(newAtomPlacements, Unsaturated, startAt);
+            }
+
             CurrentAdorner = null;
         }
 

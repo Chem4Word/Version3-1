@@ -190,14 +190,63 @@ namespace Chem4Word.ACME.Controls
             return union;
         }
 
-        public Geometry GhostMolecule(List<Molecule> adornedMolecules)
+        /// <summary>
+        /// Draws a 'ghost image' of the selected molecules.
+        /// Useful in visual operations
+        /// </summary>
+        /// <param name="adornedMolecules">List of molecules to ghost</param>
+        /// <returns></returns>
+        public Geometry GhostMolecule(List<Molecule> adornedMolecules, Transform operation = null)
         {
             var atomList = new List<Atom>();
             List<Bond> bondList = new List<Bond>();
             foreach (Molecule mol in adornedMolecules)
             {
                 mol.BuildAtomList(atomList);
-                mol.BuildBondList(bondList);
+            }
+
+            return PartialGhost(atomList, operation);
+        }
+
+        /// <summary>
+        /// Use for 'rubber-banding' atoms during drag operations
+        /// </summary>
+        /// <param name="selectedAtoms">List of selected atoms to rubber-band</param>
+        /// <param name="shear">TranslateTransform describing how atoms are shifted. Omit to obtain an overlay to transform later</param>
+        /// <returns>Geometry of deformed atoms</returns>
+        public Geometry PartialGhost(List<Atom> selectedAtoms, Transform shear=null)
+        {
+            //var neighbourSet = new HashSet<Atom>();
+            HashSet<Bond> bondSet = new HashSet<Bond>();
+            Dictionary<Atom, Point> transformedPositions = new Dictionary<Atom, Point>();
+            //compile a set of all the neighbours of the selected atoms
+            foreach (Atom atom in selectedAtoms)
+            {
+                foreach (Atom neighbour in atom.Neighbours)
+                {
+                    //add in all the existing position for neigbours not in selected atoms
+                    if (!selectedAtoms.Contains(neighbour))
+                    {
+                        //neighbourSet.Add(neighbour); //don't worry about adding them twice
+                        transformedPositions[neighbour] = neighbour.Position;
+                    }
+                }
+                //add in the bonds
+                foreach (Bond bond in atom.Bonds)
+                {
+                    bondSet.Add(bond);//don't worry about adding them twice
+                }
+                //and while we're at it, work out the new locations
+
+                //if we're just getting an overlay then don't bother transforming
+                if (shear != null)
+                {
+                    transformedPositions[atom] = shear.Transform(atom.Position);
+                }
+                else
+                {
+                    transformedPositions[atom] = atom.Position;
+                }
             }
 
             StreamGeometry ghostGeometry = new StreamGeometry();
@@ -205,26 +254,32 @@ namespace Chem4Word.ACME.Controls
             double atomRadius = this.Chemistry.Model.XamlBondLength / 7.50;
             using (StreamGeometryContext ghostContext = ghostGeometry.Open())
             {
-                Dictionary<Atom, Geometry> lookups = new Dictionary<Atom, Geometry>();
-                foreach (Atom atom in atomList)
+                Dictionary<Atom, Geometry> atomGeometries = new Dictionary<Atom, Geometry>();
+
+                foreach (Atom atom in transformedPositions.Keys)
                 {
+                    var newPosition = transformedPositions[atom];
+
                     if (atom.SymbolText != "")
                     {
-                        EllipseGeometry atomCircle = new EllipseGeometry(atom.Position, atomRadius, atomRadius);
+                        EllipseGeometry atomCircle = new EllipseGeometry(newPosition, atomRadius, atomRadius);
                         DrawGeometry(ghostContext, atomCircle);
-                        lookups[atom] = atomCircle;
+                        atomGeometries[atom] = atomCircle;
                     }
                     else
                     {
-                        lookups[atom] = Geometry.Empty;
+                        atomGeometries[atom] = Geometry.Empty;
                     }
                 }
-                foreach (Bond bond in bondList)
+                foreach (Bond bond in bondSet)
                 {
                     List<Point> throwaway = new List<Point>();
-                    bool ok = GetBondGeometry(bond.StartAtom.Position, bond.EndAtom.Position,
-                        lookups[bond.StartAtom], lookups[bond.EndAtom], this.Chemistry.Model.XamlBondLength,
-                        out Geometry bondGeom, bond, ref throwaway);
+                    var startAtomPosition = transformedPositions[bond.StartAtom];
+                    var endAtomPosition = transformedPositions[bond.EndAtom];
+
+                    bool ok = GetBondGeometry(startAtomPosition, endAtomPosition,
+                                              atomGeometries[bond.StartAtom], atomGeometries[bond.EndAtom], this.Chemistry.Model.XamlBondLength,
+                                              out Geometry bondGeom, bond, out _, true);
                     DrawGeometry(ghostContext, bondGeom);
                 }
                 ghostContext.Close();

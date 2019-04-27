@@ -70,6 +70,7 @@
     <Compile Include="Adorners\FixedRingAdorner.cs" />
     <Compile Include="Adorners\LassoAdorner.cs" />
     <Compile Include="Adorners\MoleculeSelectionAdorner.cs" />
+    <Compile Include="Adorners\PartialGhostAdorner.cs" />
     <Compile Include="Adorners\RingDrawer.cs" />
     <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />
     <Compile Include="AtomOption.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />
     <Compile Include="Behaviors\DrawBehavior.cs" />
-    <Compile Include="Behaviors\LassoBehavior.cs" />
+    <Compile Include="Behaviors\LassoBehaviour.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
     <Compile Include="BondOption.cs" />
     <Compile Include="Enums\SelectionTypeCode.cs" />

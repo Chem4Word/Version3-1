@@ -39,12 +39,12 @@ namespace Chem4Word.Model2
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SymbolText));
                 OnPropertyChanged(nameof(ImplicitHydrogenCount));
-                NotifyBondingChanged();
+                UpdateVisual();
                 if (Bonds.Any())
                 {
                     foreach (Bond bond in Bonds)
                     {
-                        bond.NotifyBondingChanged();
+                        bond.UpdateVisual();
                     }
                 }
             }
@@ -128,7 +128,7 @@ namespace Chem4Word.Model2
                 {
                     foreach (Bond bond in Bonds)
                     {
-                        bond.NotifyBondingChanged();
+                        bond.UpdateVisual();
                     }
                 }
             }
@@ -607,7 +607,7 @@ namespace Chem4Word.Model2
         }
 
         //notification methods
-        public void NotifyBondingChanged()
+        public void UpdateVisual()
         {
             OnPropertyChanged(nameof(Degree));
             OnPropertyChanged(nameof(ImplicitHydrogenCount));

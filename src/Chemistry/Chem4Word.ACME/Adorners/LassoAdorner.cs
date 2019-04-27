@@ -5,10 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Annotations;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.Model2.Annotations;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -17,6 +18,7 @@ namespace Chem4Word.ACME.Adorners
         private StreamGeometry _outline;
         private SolidColorBrush _solidColorBrush;
         private Pen _dashPen;
+        private EditorCanvas CurrentEditor { get; }
 
         public LassoAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
@@ -25,9 +27,18 @@ namespace Chem4Word.ACME.Adorners
 
             _dashPen = new Pen(SystemColors.HighlightBrush, 1);
             _dashPen.DashStyle = DashStyles.Dash;
+            CurrentEditor = (EditorCanvas)adornedElement;
+            PreviewMouseLeftButtonUp += LassoAdorner_PreviewMouseLeftButtonUp;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
+
+        private void LassoAdorner_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
+        }
+
+       
 
         public LassoAdorner([NotNull] UIElement adornedElement, StreamGeometry outline) : this(adornedElement)
         {

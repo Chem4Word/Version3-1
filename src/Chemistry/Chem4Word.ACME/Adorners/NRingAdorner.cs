@@ -21,8 +21,20 @@ namespace Chem4Word.ACME.Adorners
         public NRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, Point startPoint, Point endPoint) : base(adornedElement, bondThickness, placements)
         {
             MouseLeftButtonDown += FixedRingAdorner_MouseLeftButtonDown;
+            PreviewMouseUp += NRingAdorner_PreviewMouseUp;
+            MouseUp += NRingAdorner_MouseUp;
             StartPoint = startPoint;
             EndPoint = endPoint;
+        }
+
+        private void NRingAdorner_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
+        }
+
+        private void NRingAdorner_PreviewMouseUp(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
         }
 
         private void FixedRingAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

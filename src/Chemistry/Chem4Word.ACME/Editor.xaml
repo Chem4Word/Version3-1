@@ -394,7 +394,7 @@
                             Stretch="Fill" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:LassoBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                        <behaviors:LassoBehaviour EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
 

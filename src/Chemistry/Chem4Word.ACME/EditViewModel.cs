@@ -22,7 +22,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -182,10 +181,10 @@ namespace Chem4Word.ACME
                         };
                         UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
                         selectedAtom.Element = value;
-                        selectedAtom.NotifyBondingChanged();
+                        selectedAtom.UpdateVisual();
                         foreach (Bond bond in selectedAtom.Bonds)
                         {
-                            bond.NotifyBondingChanged();
+                            bond.UpdateVisual();
                         }
                     }
                 }
@@ -399,33 +398,33 @@ namespace Chem4Word.ACME
                 if (existingBond.Order == OrderZero)
                 {
                     existingBond.Order = OrderSingle;
-                    existingBond.NotifyBondingChanged();
+                    existingBond.UpdateVisual();
                 }
                 if (existingBond.Order == OrderSingle)
                 {
                     existingBond.Order = OrderDouble;
-                    existingBond.NotifyBondingChanged();
+                    existingBond.UpdateVisual();
                 }
                 else if (existingBond.Order == OrderDouble)
                 {
                     existingBond.Order = OrderTriple;
-                    existingBond.NotifyBondingChanged();
+                    existingBond.UpdateVisual();
                 }
                 else if (existingBond.Order == OrderTriple)
                 {
                     existingBond.Order = OrderSingle;
-                    existingBond.NotifyBondingChanged();
+                    existingBond.UpdateVisual();
                 }
-                existingBond.StartAtom.NotifyBondingChanged();
-                existingBond.EndAtom.NotifyBondingChanged();
+                existingBond.StartAtom.UpdateVisual();
+                existingBond.EndAtom.UpdateVisual();
             };
             Action undo = () =>
             {
                 existingBond.Stereo = stereo;
                 existingBond.Order = order;
                 //existingBond.NotifyPlacementChanged();
-                existingBond.StartAtom.NotifyBondingChanged();
-                existingBond.EndAtom.NotifyBondingChanged();
+                existingBond.StartAtom.UpdateVisual();
+                existingBond.EndAtom.UpdateVisual();
             };
 
             UndoManager.RecordAction(undo, redo);
@@ -434,29 +433,44 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
         }
 
-        public void DoOperation(Transform lastOperation, List<Atom> toList)
+        public void DoTransform(Transform operation, List<Atom> toList)
         {
             UndoManager.BeginUndoBlock();
-            foreach (Atom atom in toList)
-            {
-                var lastPosition = atom.Position;
-                var newPosition = lastOperation.Transform(lastPosition);
-                Action undo = () =>
+            var inverse = operation.Inverse;
+            object[] sel = SelectedItems.ToArray();
+
+            Action undo = () =>
+                          {
+                              SelectedItems.Clear();
+                              foreach (Atom atom in toList)
+                              {
+                                  atom.Position = inverse.Transform(atom.Position);
+                                  atom.UpdateVisual();
+                              }
+                              toList[0].Parent.ForceUpdates();
+                              foreach (var o in sel)
+                              {
+                                  AddToSelection(o);
+                              }
+                          };
+            Action redo = () =>
                 {
                     SelectedItems.Clear();
-                    atom.Position = lastPosition;
+                    foreach (var atom in toList)
+                    {
+                        atom.Position = operation.Transform(atom.Position);
+                        atom.UpdateVisual();
+                    }
+                    toList[0].Parent.ForceUpdates();
+                    foreach (var o in sel)
+                    {
+                        AddToSelection(o);
+                    }
                 };
 
-                Action redo = () =>
-                {
-                    SelectedItems.Clear();
-                    atom.Position = newPosition;
-                };
+            UndoManager.RecordAction(undo, redo);
 
-                UndoManager.RecordAction(undo, redo);
-
-                redo();
-            }
+            redo();
 
             UndoManager.EndUndoBlock();
         }
@@ -474,14 +488,14 @@ namespace Chem4Word.ACME
             {
                 parentBond.StartAtomInternalId = startAtom.InternalId;
                 parentBond.EndAtomInternalId = endAtom.InternalId;
-                parentBond.NotifyBondingChanged();
+                parentBond.UpdateVisual();
             };
 
             Action redo = () =>
             {
                 parentBond.EndAtomInternalId = startAtom.InternalId;
                 parentBond.StartAtomInternalId = endAtom.InternalId;
-                parentBond.NotifyBondingChanged();
+                parentBond.UpdateVisual();
             };
             UndoManager.RecordAction(undo, redo);
 
@@ -517,16 +531,16 @@ namespace Chem4Word.ACME
         {
             void RefreshAtoms(Atom startAtom, Atom endAtom)
             {
-                startAtom.NotifyBondingChanged();
-                endAtom.NotifyBondingChanged();
+                startAtom.UpdateVisual();
+                endAtom.UpdateVisual();
                 foreach (Bond bond in startAtom.Bonds)
                 {
-                    bond.NotifyBondingChanged();
+                    bond.UpdateVisual();
                 }
 
                 foreach (Bond bond in endAtom.Bonds)
                 {
-                    bond.NotifyBondingChanged();
+                    bond.UpdateVisual();
                 }
             }
             //keep a handle on some current properties
@@ -573,7 +587,7 @@ namespace Chem4Word.ACME
                     theoreticalRings = mol.TheoreticalRings;
                 }
                 RefreshAtoms(newbond.StartAtom, newbond.EndAtom);
-                newbond.NotifyBondingChanged();
+                newbond.UpdateVisual();
                 mol.ClearProperties();
             };
 
@@ -625,18 +639,18 @@ namespace Chem4Word.ACME
                     lastAtom.Tag = tag;//save the last sprouted direction in the tag object
                     newAtom.Parent = currentMol;
                     currentMol.AddAtom(newAtom);
-                    newAtom.NotifyBondingChanged();
+                    newAtom.UpdateVisual();
                 };
                 UndoManager.RecordAction(undo, redo);
 
                 redo();
 
                 AddNewBond(lastAtom, newAtom, currentMol);
-                lastAtom.NotifyBondingChanged();
-                newAtom.NotifyBondingChanged();
+                lastAtom.UpdateVisual();
+                newAtom.UpdateVisual();
                 foreach (Bond lastAtomBond in lastAtom.Bonds)
                 {
-                    lastAtomBond.NotifyBondingChanged();
+                    lastAtomBond.UpdateVisual();
                 }
                 UndoManager.EndUndoBlock();
             }
@@ -680,102 +694,6 @@ namespace Chem4Word.ACME
             }
 
             return newAtom;
-        }
-
-        public void DeleteBond(Bond bond)
-        {
-            UndoManager.BeginUndoBlock();
-            var a1 = bond.StartAtom;
-            var a2 = bond.EndAtom;
-            Molecule parent = bond.Parent;
-
-            Model mod = bond.Model;
-
-            bool isTopLevel = UndoManager.TransactionLevel == 1;
-            Action redoAction = () =>
-            {
-                //if (SelectedItems.Contains(bond))
-                //{
-                //    RemoveFromSelection(bond);
-                //}
-                //bond.StartAtom = null;
-                //bond.EndAtom = null;
-                //parent?.RemoveBond(bond);
-
-                //parent?.Split(a1, a2);
-                //if (isTopLevel)
-                //{
-                //    parent?.RebuildRings();
-                //}
-            };
-
-            Action undoAction = () =>
-            {
-                //bond.StartAtom = a1;
-                //bond.EndAtom = a2;
-                //a1.Parent.Bonds.Add(bond);
-                ////AddToSelection(bond);
-
-                //if (a2.Parent != a1.Parent)
-                //{
-                //    a1.Parent.Merge(a2.Parent);
-                //}
-                //if (isTopLevel)
-                //{
-                //    a1.Parent.RebuildRings();
-                //}
-            };
-
-            redoAction();
-
-            UndoManager.RecordAction(undoAction, redoAction);
-            UndoManager.EndUndoBlock();
-        }
-
-        public void DeleteAtom(Atom atom)
-        {
-            UndoManager.BeginUndoBlock();
-            var bondlist = atom.Bonds.ToList();
-            var parent = atom.Parent;
-
-            Dictionary<Bond, Atom> startAtoms = new Dictionary<Bond, Atom>();
-            Dictionary<Bond, Atom> endAtoms = new Dictionary<Bond, Atom>();
-
-            Action undoAction = () =>
-            {
-                parent.AddAtom(atom);
-                //SelectedItems.Clear();
-                foreach (Bond bond in bondlist)
-                {
-                    //bond.StartAtom = startAtoms[bond];
-                    //bond.EndAtom = endAtoms[bond];
-                    //parent.Bonds.Add(bond);
-                }
-                //if (!SelectedItems.Contains(atom))
-                //{
-                //    AddToSelection(atom);
-                //}
-            };
-            Action redoAction = () =>
-            {
-                foreach (Bond bond in bondlist)
-                {
-                    //startAtoms[bond] = bond.StartAtom;
-                    //endAtoms[bond] = bond.EndAtom;
-                    //bond.StartAtom = null;
-                    //bond.EndAtom = null;
-                    //parent.RemoveBond(bond);
-                }
-                parent.RemoveAtom(atom);
-                if (SelectedItems.Contains(atom))
-                {
-                    RemoveFromSelection(atom);
-                }
-            };
-
-            UndoManager.RecordAction(undoAction, redoAction);
-            UndoManager.EndUndoBlock();
-            redoAction();
         }
 
         public void SetAverageBondLength(double newLength)
@@ -1131,17 +1049,16 @@ namespace Chem4Word.ACME
                         SetBondAttributes(bondBetween,
                                           OrderDouble, Globals.BondStereo.None);
                         bondBetween.Placement = BondDirection.Anticlockwise;
-                        bondBetween.NotifyBondingChanged();
-                        thisAtom.NotifyBondingChanged();
+                        bondBetween.UpdateVisual();
+                        thisAtom.UpdateVisual();
                     }
                 }
             }
             //just refresh the atoms to be on the safe side
             foreach (var atomPlacement in newAtomPlacements)
             {
-                atomPlacement.ExistingAtom.NotifyBondingChanged();
+                atomPlacement.ExistingAtom.UpdateVisual();
             }
-            
         }
 
         public void DeleteMolecules(IEnumerable<Molecule> mols)
@@ -1290,9 +1207,9 @@ namespace Chem4Word.ACME
 
                 Action undoAction = () =>
                 {
-                    //Model.InhibitEvents = true;
+                //Model.InhibitEvents = true;
 
-                    foreach (var bond in newBonds)
+                foreach (var bond in newBonds)
                     {
                         bond.Parent.RemoveBond(bond);
                     }
@@ -1301,9 +1218,9 @@ namespace Chem4Word.ACME
                         atom.Parent.RemoveAtom(atom);
                     }
 
-                    //Model.InhibitEvents = false;
+                //Model.InhibitEvents = false;
 
-                    if (mols.Any())
+                if (mols.Any())
                     {
                         RefreshMolecules(mols);
                     }
@@ -1461,9 +1378,9 @@ namespace Chem4Word.ACME
 
                 Action redoAction = () =>
                 {
-                    //Model.InhibitEvents = true;
+                //Model.InhibitEvents = true;
 
-                    foreach (var bond in targetBonds)
+                foreach (var bond in targetBonds)
                     {
                         bond.Parent.RemoveBond(bond);
                     }
@@ -1472,9 +1389,9 @@ namespace Chem4Word.ACME
                         atom.Parent.RemoveAtom(atom);
                     }
 
-                    //Model.InhibitEvents = false;
+                //Model.InhibitEvents = false;
 
-                    if (mols.Any())
+                if (mols.Any())
                     {
                         RefreshMolecules(mols);
                     }
@@ -1743,9 +1660,9 @@ namespace Chem4Word.ACME
             redo();
             Action undo = () =>
             {
-                //Model.InhibitEvents = true;
+            //Model.InhibitEvents = true;
 
-                molA.Parent = parent;
+            molA.Parent = parent;
                 molA.Reparent();
                 parent.AddMolecule(molA);
                 molB.Parent = parent;
@@ -1753,8 +1670,8 @@ namespace Chem4Word.ACME
                 parent.AddMolecule(molB);
                 parent.RemoveMolecule(newMol);
                 newMol.Parent = null;
-                //Model.InhibitEvents = false;
-                molA.ForceUpdates();
+            //Model.InhibitEvents = false;
+            molA.ForceUpdates();
                 molB.ForceUpdates();
             };
             UndoManager.RecordAction(undo, redo);
@@ -1803,7 +1720,7 @@ namespace Chem4Word.ACME
                     {
                         foreach (Bond bond in bondRing.Bonds)
                         {
-                            bond.NotifyBondingChanged();
+                            bond.UpdateVisual();
                         }
                     }
                 }
@@ -1886,24 +1803,24 @@ namespace Chem4Word.ACME
                                   {
                                       mol.RemoveBond(deleteBond);
                                       RefreshRingBonds(theoreticalRings, mol, deleteBond);
-                                      //deleteBond.NotifyBondingChanged();
-                                      deleteBond.StartAtom.NotifyBondingChanged();
-                                      deleteBond.EndAtom.NotifyBondingChanged();
+                                  //deleteBond.UpdateVisual();
+                                  deleteBond.StartAtom.UpdateVisual();
+                                      deleteBond.EndAtom.UpdateVisual();
                                       foreach (Bond atomBond in deleteBond.StartAtom.Bonds)
                                       {
-                                          atomBond.NotifyBondingChanged();
+                                          atomBond.UpdateVisual();
                                       }
                                       foreach (Bond atomBond in deleteBond.EndAtom.Bonds)
                                       {
-                                          atomBond.NotifyBondingChanged();
+                                          atomBond.UpdateVisual();
                                       }
                                   }
 
                                   foreach (Atom deleteAtom in deleteAtoms)
                                   {
                                       mol.RemoveAtom(deleteAtom);
-                                      //deleteAtom.NotifyBondingChanged();
-                                  }
+                                  //deleteAtom.UpdateVisual();
+                              }
                                   mol.ClearProperties();
                                   RefreshAtomVisuals(updateAtoms);
                               };
@@ -1913,7 +1830,7 @@ namespace Chem4Word.ACME
                                   foreach (Atom restoreAtom in deleteAtoms)
                                   {
                                       mol.AddAtom(restoreAtom);
-                                      restoreAtom.NotifyBondingChanged();
+                                      restoreAtom.UpdateVisual();
                                       AddToSelection(restoreAtom);
                                   }
 
@@ -1923,18 +1840,18 @@ namespace Chem4Word.ACME
                                       mol.AddBond(restoreBond);
                                       RefreshRingBonds(theoreticalRings, mol, restoreBond);
 
-                                      restoreBond.StartAtom.NotifyBondingChanged();
-                                      restoreBond.EndAtom.NotifyBondingChanged();
+                                      restoreBond.StartAtom.UpdateVisual();
+                                      restoreBond.EndAtom.UpdateVisual();
                                       foreach (Bond atomBond in restoreBond.StartAtom.Bonds)
                                       {
-                                          atomBond.NotifyBondingChanged();
+                                          atomBond.UpdateVisual();
                                       }
                                       foreach (Bond atomBond in restoreBond.EndAtom.Bonds)
                                       {
-                                          atomBond.NotifyBondingChanged();
+                                          atomBond.UpdateVisual();
                                       }
 
-                                      restoreBond.NotifyBondingChanged();
+                                      restoreBond.UpdateVisual();
 
                                       AddToSelection(restoreBond);
                                   }
@@ -2045,10 +1962,10 @@ namespace Chem4Word.ACME
         {
             foreach (Atom updateAtom in updateAtoms)
             {
-                updateAtom.NotifyBondingChanged();
+                updateAtom.UpdateVisual();
                 foreach (Bond updateAtomBond in updateAtom.Bonds)
                 {
-                    updateAtomBond.NotifyBondingChanged();
+                    updateAtomBond.UpdateVisual();
                 }
             }
         }
@@ -2178,7 +2095,7 @@ namespace Chem4Word.ACME
                     bond.EndAtomInternalId = startAtom.InternalId;
                     bond.StartAtomInternalId = endAtom.InternalId;
                 }
-                bond.NotifyBondingChanged();
+                bond.UpdateVisual();
             };
 
             redo();
@@ -2194,7 +2111,7 @@ namespace Chem4Word.ACME
                     bond.StartAtomInternalId = startAtom.InternalId;
                     bond.EndAtomInternalId = endAtom.InternalId;
                 }
-                bond.NotifyBondingChanged();
+                bond.UpdateVisual();
             };
 
             UndoManager.RecordAction(undo, redo);

@@ -181,7 +181,7 @@ namespace Chem4Word.ACME.Adorners
                     from a in mol.Atoms.Values
                     select a).ToList();
 
-                CurrentModel.DoOperation(LastOperation, atomList);
+                CurrentModel.DoTransform(LastOperation, atomList);
                 foreach (Molecule molecule in AdornedMolecules)
                 {
                     molecule.ForceUpdates();

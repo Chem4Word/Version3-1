@@ -285,10 +285,10 @@ namespace WinForms.TestHarness
                         foreach (var neighbouringBond in bondList)
                         {
                             modelMolecule.RemoveBond(neighbouringBond);
-                            neighbouringBond.OtherAtom(atom).NotifyBondingChanged();
+                            neighbouringBond.OtherAtom(atom).UpdateVisual();
                             foreach (Bond bond in neighbouringBond.OtherAtom(atom).Bonds)
                             {
-                                bond.NotifyBondingChanged();
+                                bond.UpdateVisual();
                             }
                         }
 
@@ -343,11 +343,11 @@ namespace WinForms.TestHarness
                             allAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
                         }
 
-                        allAtoms[targetAtom].NotifyBondingChanged();
+                        allAtoms[targetAtom].UpdateVisual();
 
                         foreach (Bond b in allAtoms[targetAtom].Bonds)
                         {
-                            b.NotifyBondingChanged();
+                            b.UpdateVisual();
                         }
 
                         //foreach (var mol in model.Molecules)

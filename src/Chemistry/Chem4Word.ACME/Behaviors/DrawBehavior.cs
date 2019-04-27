@@ -52,8 +52,8 @@ namespace Chem4Word.ACME.Behaviors
             EditViewModel.SelectedItems?.Clear();
 
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
-            CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
-            CurrentEditor.MouseMove += CurrentEditor_MouseMove;
+            CurrentEditor.PreviewMouseLeftButtonUp += CurrentEditor_PreviewMouseLeftButtonUp;
+            CurrentEditor.PreviewMouseMove += CurrentEditor_PreviewMouseMove;
 
             CurrentEditor.IsHitTestVisible = true;
             CurrentStatus = DefaultText;
@@ -62,7 +62,7 @@ namespace Chem4Word.ACME.Behaviors
         ///
         /// what happens when we move the mouse
         ///
-        private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
+        private void CurrentEditor_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             var targetedVisual = CurrentEditor.ActiveVisual;
             //cherck to see if we have already got an atom remembered
@@ -133,7 +133,7 @@ namespace Chem4Word.ACME.Behaviors
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void CurrentEditor_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             CurrentEditor.ReleaseMouseCapture();
             CurrentStatus = "";
@@ -361,7 +361,7 @@ namespace Chem4Word.ACME.Behaviors
         /// Tries to find the best pace to put a bond
         /// by placing it in uncongested space
         /// </summary>
-        /// <param name="lastAtom"></param>
+        /// <param name="rootAtom"></param>
         /// <param name="modelXamlBondLength"></param>
         /// <param name="vector"></param>
         /// <returns></returns>
@@ -523,8 +523,8 @@ namespace Chem4Word.ACME.Behaviors
         {
             base.OnDetaching();
             CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
-            CurrentEditor.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
-            CurrentEditor.MouseMove -= CurrentEditor_MouseMove;
+            CurrentEditor.PreviewMouseLeftButtonUp -= CurrentEditor_PreviewMouseLeftButtonUp;
+            CurrentEditor.PreviewMouseMove -= CurrentEditor_PreviewMouseMove;
             CurrentStatus = "";
          
         }

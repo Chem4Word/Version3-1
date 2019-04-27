@@ -12,6 +12,7 @@ using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -21,16 +22,18 @@ namespace Chem4Word.ACME.Adorners
         private Pen _bracketPen;
         private BondVisual _targetedVisual;
         private Bond _targetedBond;
+        public EditorCanvas CurrentEditor { get; }
 
         public BondHoverAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
             _solidColorBrush = new SolidColorBrush(Globals.HoverAdornerColor);
             //_solidColorBrush.Opacity = 0.25;
 
-            
+
             _bracketPen = new Pen(_solidColorBrush, Globals.HoverAdornerThickness);
             _bracketPen.StartLineCap = PenLineCap.Round;
             _bracketPen.EndLineCap = PenLineCap.Round;
+
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
@@ -42,6 +45,11 @@ namespace Chem4Word.ACME.Adorners
             _targetedBond = _targetedVisual.ParentBond;
         }
 
+
+        /// <summary>
+        /// Draws the adorner on top of the editor
+        /// </summary>
+        /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
