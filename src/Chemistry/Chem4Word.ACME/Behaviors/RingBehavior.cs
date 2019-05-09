@@ -5,33 +5,44 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Core;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
     /// <summary>
-    /// Puts the editor into fixed ring mode.
+    ///     Puts the editor into fixed ring mode.
     /// </summary>
     public class RingBehavior : BaseEditBehavior
     {
-        public int RingSize { get; set; }
+        private FixedRingAdorner _currentAdorner;
 
         private Window _parent;
-        private FixedRingAdorner _currentAdorner;
+
+        public RingBehavior()
+        {
+        }
+
+        public RingBehavior(string ringspec) : this()
+        {
+            RingSize = int.Parse(ringspec[0].ToString());
+            Unsaturated = ringspec[1] == 'U';
+        }
+
+        public int RingSize { get; set; }
 
         public FixedRingAdorner CurrentAdorner
         {
-            get { return _currentAdorner; }
+            get => _currentAdorner;
             set
             {
                 RemoveRingAdorner();
@@ -40,6 +51,7 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     _currentAdorner.MouseLeftButtonDown += CurrentAdornerOnMouseLeftButtonDown;
                 }
+
                 //local function
                 void RemoveRingAdorner()
                 {
@@ -54,16 +66,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        public RingBehavior()
-        {
-        }
-
-        public RingBehavior(string ringspec) : this()
-        {
-            RingSize = int.Parse(ringspec[0].ToString());
-            Unsaturated = ringspec[1] == 'U';
-        }
-
         public bool Unsaturated { get; set; }
 
         protected override void OnAttached()
@@ -71,18 +73,18 @@ namespace Chem4Word.ACME.Behaviors
             base.OnAttached();
             EditViewModel.SelectedItems?.Clear();
 
-            CurrentEditor = (EditorCanvas)AssociatedObject;
+            CurrentEditor = (EditorCanvas) AssociatedObject;
 
             _parent = Application.Current.MainWindow;
 
-            CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
+            CurrentEditor.MouseLeftButtonDown += (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
             CurrentEditor.MouseMove += CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
             AssociatedObject.IsHitTestVisible = true;
 
             if (_parent != null)
             {
-                _parent.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
+                _parent.MouseLeftButtonDown += (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
             }
 
             CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
@@ -91,11 +93,12 @@ namespace Chem4Word.ACME.Behaviors
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
         {
             List<Point> altPlacements;
+            List<Point> preferredPlacements;
 
             CurrentAdorner = null;
 
-            List<Point> preferredPlacements;
-            double xamlBondSize = EditViewModel.Model.XamlBondLength;
+
+            var xamlBondSize = EditViewModel.Model.XamlBondLength;
 
             switch (CurrentEditor.ActiveVisual)
             {
@@ -103,32 +106,37 @@ namespace Chem4Word.ACME.Behaviors
                     IdentifyPlacements(av.ParentAtom, xamlBondSize, out preferredPlacements, RingSize);
                     if (preferredPlacements != null)
                     {
-                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
+                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
+                                                              preferredPlacements, Unsaturated);
                         if (av.ParentAtom.Degree >= 2)
                         {
-                            CurrentStatus="Click to spiro-fuse.";
+                            CurrentStatus = "Click to spiro-fuse.";
                         }
                         else
                         {
                             CurrentStatus = "Click to draw a terminating ring.";
                         }
                     }
-                    
+
 
                     break;
 
                 case BondVisual bv:
-                    IdentifyPlacements(bv.ParentBond, out altPlacements, out preferredPlacements, RingSize);
-                    if (preferredPlacements != null | altPlacements != null)
+                    IdentifyPlacements(bv.ParentBond, out altPlacements, out preferredPlacements, RingSize, e.GetPosition(CurrentEditor));
+                    if ((preferredPlacements != null) | (altPlacements != null))
                     {
-                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements??altPlacements, Unsaturated);
+                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
+                                                              preferredPlacements ?? altPlacements, Unsaturated);
                         CurrentStatus = "Click to fuse a ring";
                     }
+
                     break;
 
                 default:
-                    preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth, xamlBondSize, RingSize);
-                    CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness, preferredPlacements, Unsaturated);
+                    preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth,
+                                                       xamlBondSize, RingSize);
+                    CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
+                                                          preferredPlacements, Unsaturated);
                     CurrentStatus = "Click to draw a standalone ring";
                     break;
             }
@@ -136,7 +144,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentAdornerOnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.CurrentEditor_MouseLeftButtonDown(sender, e);
+            CurrentEditor_MouseLeftButtonDown(sender, e);
         }
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -147,15 +155,16 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Atom hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
-            Bond hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
+            var hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
+            var hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
+            var position = e.GetPosition(CurrentEditor);
 
             List<Point> altPlacements = null;
-            int startAt = 0; //used to change double bond positions in isolated odd numbered rings
-            List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
+            var startAt = 0; //used to change double bond positions in isolated odd numbered rings
+            var newAtomPlacements = new List<NewAtomPlacement>();
 
             List<Point> preferredPlacements;
-            double xamlBondSize = EditViewModel.Model.XamlBondLength;
+            var xamlBondSize = EditViewModel.Model.XamlBondLength;
 
             if (hitAtom != null)
             {
@@ -171,15 +180,16 @@ namespace Chem4Word.ACME.Behaviors
             }
             else if (hitBond != null)
             {
-                IdentifyPlacements(hitBond, out altPlacements, out preferredPlacements, RingSize);
-                if (altPlacements == null & preferredPlacements == null)
+                IdentifyPlacements(hitBond, out altPlacements, out preferredPlacements, RingSize, position);
+                if ((altPlacements == null) & (preferredPlacements == null))
                 {
                     UserInteractions.AlertUser("No room left to draw any more rings!");
                 }
             }
             else //clicked on empty space
             {
-                preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth, xamlBondSize, RingSize);
+                preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth,
+                                                   xamlBondSize, RingSize);
                 //al4tPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenSouth, xamlBondSize, RingSize);
                 if (preferredPlacements.Count % 2 == 1)
                 {
@@ -202,19 +212,20 @@ namespace Chem4Word.ACME.Behaviors
                                              List<NewAtomPlacement> newAtomPlacements,
                                              EditorCanvas currentEditor)
         {
-            foreach (Point placement in (preferredPlacements ?? altPlacements))
+            foreach (var placement in preferredPlacements ?? altPlacements)
             {
-                NewAtomPlacement nap = new NewAtomPlacement
-                {
-                    ExistingAtom =
-                                               (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
-                    Position = placement
-                };
+                var nap = new NewAtomPlacement
+                          {
+                              ExistingAtom =
+                                  (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
+                              Position = placement
+                          };
                 newAtomPlacements.Add(nap);
             }
         }
 
-        public static void IdentifyPlacements(Atom hitAtom, double xamlBondSize, out List<Point> preferredPlacements, int ringSize)
+        public static void IdentifyPlacements(Atom hitAtom, double xamlBondSize, out List<Point> preferredPlacements,
+                                              int ringSize)
         {
             Molecule parentMolecule;
             parentMolecule = hitAtom.Parent;
@@ -231,25 +242,35 @@ namespace Chem4Word.ACME.Behaviors
             //try to work out exactly where best to place the ring
 
             preferredPlacements = MarkOutAtoms(hitAtom, direction, xamlBondSize, ringSize);
-            if (parentMolecule.Overlaps(preferredPlacements, new List<Atom> { hitAtom }))
+            if (parentMolecule.Overlaps(preferredPlacements, new List<Atom> {hitAtom}))
             {
                 preferredPlacements = null;
             }
         }
 
-        public static void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements, out List<Point> preferredPlacements, int ringSize)
+        public static void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements,
+                                              out List<Point> preferredPlacements, int ringSize, Point position)
         {
             Molecule parentMolecule;
             List<Point> placements;
-            parentMolecule = hitBond.Parent;
-            Vector bondDirection = hitBond.BondVector;
+            PathGeometry firstOverlap;
+            PathGeometry secondOverlap;
+            double firstOverlapArea;
+            double secondOverlapArea;
 
-            placements = MarkOutAtoms(hitBond, true, ringSize: ringSize);
-            PathGeometry firstOverlap = parentMolecule.OverlapArea(placements);
-            double firstOverlapArea = firstOverlap.GetArea();
-            altPlacements = MarkOutAtoms(hitBond, false, ringSize: ringSize);
-            PathGeometry secondOverlap = parentMolecule.OverlapArea(altPlacements);
-            double secondOverlapArea = secondOverlap.GetArea();
+
+            parentMolecule = hitBond.Parent;
+            var bondDirection = hitBond.BondVector;
+            var mouseDirection = position - hitBond.StartAtom.Position;
+            bool followsBond = Vector.AngleBetween(bondDirection, mouseDirection) > 0;
+
+            placements = MarkOutAtoms(hitBond, followsBond, ringSize);
+            firstOverlap = parentMolecule.OverlapArea(placements);
+            firstOverlapArea = firstOverlap.GetArea();
+
+            altPlacements = MarkOutAtoms(hitBond, !followsBond, ringSize);
+            secondOverlap = parentMolecule.OverlapArea(altPlacements);
+            secondOverlapArea = secondOverlap.GetArea();
 
             //get a point on the less crowded side of the bond
             var perpvector = hitBond.GetUncrowdedSideVector();
@@ -258,7 +279,7 @@ namespace Chem4Word.ACME.Behaviors
                 var vec = perpvector.Value;
                 vec.Normalize();
                 vec *= hitBond.BondVector.Length / 2;
-                Point placementPoint = hitBond.MidPoint + vec;
+                var placementPoint = hitBond.MidPoint + vec;
 
                 if (!firstOverlap.FillContains(placementPoint))
                 {
@@ -293,7 +314,7 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         /// <summary>
-        /// Paces out the proposed placement points for a ring attached to one atom
+        ///     Paces out the proposed placement points for a ring attached to one atom
         /// </summary>
         /// <param name="startAtom"></param>
         /// <param name="direction"></param>
@@ -302,40 +323,41 @@ namespace Chem4Word.ACME.Behaviors
         /// <returns></returns>
         public static List<Point> MarkOutAtoms(Atom startAtom, Vector direction, double bondSize, int ringSize)
         {
-            List<Point> placements = new List<Point>();
+            var placements = new List<Point>();
 
             //the direction vector points towards the centre of the ring from the start atom
             //so, assuming we are going clockwise, we take the perpendicular of the vector
             //rotate through -90 degrees and then clockwise through half the angle.
             //subsequent rotations are through the full exterior angle
 
-            double exteriorAngle = 360.0 / ringSize;
-            Matrix rotator = new Matrix();
+            var exteriorAngle = 360.0 / ringSize;
+            var rotator = new Matrix();
 
             //do the initial rotation
             rotator.Rotate(-90);
             rotator.Rotate(exteriorAngle / 2);
 
-            Vector bondVector = direction;
+            var bondVector = direction;
             bondVector.Normalize();
             bondVector *= bondSize;
 
-            Point lastPos = startAtom.Position;
+            var lastPos = startAtom.Position;
             placements.Add(startAtom.Position);
 
-            for (int i = 1; i < ringSize; i++)
+            for (var i = 1; i < ringSize; i++)
             {
-                Vector newBondVector = bondVector * rotator;
+                var newBondVector = bondVector * rotator;
                 lastPos = lastPos + newBondVector;
                 placements.Add(lastPos);
                 rotator.Rotate(exteriorAngle);
             }
+
             return placements;
         }
 
         public static List<Point> MarkOutAtoms(Bond startBond, bool followsBond, int ringSize)
         {
-            List<Point> placements = new List<Point>();
+            var placements = new List<Point>();
 
             Point lastPos, nextPos;
 
@@ -353,64 +375,66 @@ namespace Chem4Word.ACME.Behaviors
                 nextPos = startBond.StartAtom.Position;
             }
 
-            double exteriorAngle = 360.0 / ringSize;
-            Matrix rotator = new Matrix();
+            var exteriorAngle = 360.0 / ringSize;
+            var rotator = new Matrix();
 
             placements.Add(lastPos);
 
-            for (int i = 1; i < ringSize; i++)
+            for (var i = 1; i < ringSize; i++)
             {
-                Vector newBondVector = bondVector * rotator;
+                var newBondVector = bondVector * rotator;
                 lastPos = lastPos + newBondVector;
                 placements.Add(lastPos);
                 rotator.Rotate(exteriorAngle);
             }
+
             return placements;
         }
 
         public static List<Point> MarkOutAtoms(Point start, Vector direction, double bondSize, int ringSize)
         {
-            List<Point> placements = new List<Point>();
+            var placements = new List<Point>();
 
             //the direction vector points towards the centre of the ring from the start atom
             //so, assuming we are going clockwise, we take the perpendicular of the vector
             //rotate through -90 degrees and then clockwise through half the angle.
             //subsequent rotations are through the full exterior angle
 
-            double exteriorAngle = 360.0 / ringSize;
-            Matrix rotator = new Matrix();
+            var exteriorAngle = 360.0 / ringSize;
+            var rotator = new Matrix();
 
             //do the initial rotation
             rotator.Rotate(-90);
             rotator.Rotate(exteriorAngle / 2);
 
-            Vector bondVector = direction;
+            var bondVector = direction;
             bondVector.Normalize();
             bondVector *= bondSize;
 
-            Point lastPos = start;
+            var lastPos = start;
             placements.Add(start);
 
-            for (int i = 1; i < ringSize; i++)
+            for (var i = 1; i < ringSize; i++)
             {
-                Vector newBondVector = bondVector * rotator;
+                var newBondVector = bondVector * rotator;
                 lastPos = lastPos + newBondVector;
                 placements.Add(lastPos);
                 rotator.Rotate(exteriorAngle);
             }
+
             return placements;
         }
 
         protected override void OnDetaching()
         {
             CurrentAdorner = null;
-            CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
+            CurrentEditor.MouseLeftButtonDown -= (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
             CurrentEditor.MouseMove -= CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
             CurrentEditor = null;
             if (_parent != null)
             {
-                _parent.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
+                _parent.MouseLeftButtonDown -= (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
             }
 
             _parent = null;
