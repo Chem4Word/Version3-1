@@ -8,16 +8,20 @@
 using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
+using Chem4Word.ACME.Enums;
+using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Enums;
+
 namespace Chem4Word.ACME.Behaviors
 {
     public class LassoBehaviour : BaseEditBehavior
@@ -54,14 +58,168 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.PreviewMouseLeftButtonDown += CurrentEditor_PreviewMouseLeftButtonDown;
             CurrentEditor.PreviewMouseLeftButtonUp += CurrentEditor_PreviewMouseLeftButtonUp;
             CurrentEditor.PreviewMouseMove += CurrentEditor_PreviewMouseMove;
-            CurrentEditor.MouseRightButtonDown += CurrentEditorOnMouseRightButtonDown;
-            CurrentEditor.MouseRightButtonUp += CurrentEditorOnMouseRightButtonUp;
-
+            CurrentEditor.MouseRightButtonDown += CurrentEditor_MouseRightButtonDown;
+            CurrentEditor.MouseRightButtonUp += CurrentEditor_MouseRightButtonUp;
+            CurrentEditor.PreviewMouseRightButtonUp += CurrentEditor_PreviewMouseRightButtonUp;
             CurrentEditor.IsHitTestVisible = true;
 
             _bondLength = CurrentEditor.Chemistry.Model.MeanBondLength;
 
             CurrentStatus = DefaultText;
+        }
+
+        private void CurrentEditor_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            DoPropertyEdit(e, CurrentEditor);
+        }
+
+        public static void DoPropertyEdit(MouseButtonEventArgs e, EditorCanvas currentEditor)
+        {
+            var pp = currentEditor.PointToScreen(e.GetPosition(currentEditor));
+
+            EditViewModel evm;
+            var activeVisual = currentEditor.GetTargetedVisual(e.GetPosition(currentEditor));
+
+            if (activeVisual is AtomVisual av)
+            {
+                evm = (EditViewModel)((EditorCanvas)av.Parent).Chemistry;
+                var mode = Application.Current.ShutdownMode;
+
+                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+                var atom = av.ParentAtom;
+                var model = new AtomPropertiesModel
+                            {
+                                Centre = pp,
+                                Path = atom.Path,
+                                Element = atom.Element,
+                                Charge = atom.FormalCharge??0,
+                                Isotope = atom.IsotopeNumber.ToString(),
+                                ShowSymbol = atom.ShowSymbol
+                            };
+
+
+                var pe = new AtomPropertyEditor(model, evm);
+                var result = pe.ShowDialog();
+                if (result ?? false)
+                {
+                    evm.SelectedElement = model.Element;
+                }
+                //var tcs = new TaskCompletionSource<bool>();
+
+                //Application.Current.Dispatcher.Invoke(() =>
+                //                                      {
+                //                                          try
+                //                                          {
+                                                              
+                //                                              var pe = new AtomPropertyEditor(model, evm);
+                //                                              var result = pe.ShowDialog();
+                //                                              if (result ?? false)
+                //                                              {
+                //                                                  evm.SelectedElement = model.Element;
+                //                                              }
+                //                                          }
+                //                                          finally
+                //                                          {
+                //                                              tcs.TrySetResult(true);
+
+                //                                          }
+                //                                      });
+
+                Application.Current.ShutdownMode = mode;
+
+                if (model.Save)
+                {
+                    evm.UpdateAtom(atom, model);
+                    evm.SelectedItems.Clear();
+                    evm.AddToSelection(atom);
+                }
+            }
+
+            if (activeVisual is BondVisual bv)
+            {
+                evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
+                var mode = Application.Current.ShutdownMode;
+
+                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+                var bond = bv.ParentBond;
+                var model = new BondPropertiesModel
+                            {
+                                Centre = pp,
+                                Path = bond.Path,
+                                Angle = bond.Angle,
+                                BondOrderValue = bond.OrderValue.Value,
+                                IsSingle = bond.Order.Equals(Globals.OrderSingle),
+                                IsDouble = bond.Order.Equals(Globals.OrderDouble)
+                            };
+
+
+
+                if (model.IsDouble)
+                {
+                    model.DoubleBondChoice = DoubleBondType.Auto;
+
+                    if (bond.Stereo == Globals.BondStereo.Indeterminate)
+                    {
+                        model.DoubleBondChoice = DoubleBondType.Indeterminate;
+                    }
+                    else if (bond.ExplicitPlacement != null)
+                    {
+                        model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
+                    }
+                }
+
+                if (model.IsSingle)
+                {
+                    model.SingleBondChoice = SingleBondType.None;
+
+                    switch (bond.Stereo)
+                    {
+                        case Globals.BondStereo.Wedge:
+                            model.SingleBondChoice = SingleBondType.Wedge;
+                            break;
+
+                        case Globals.BondStereo.Hatch:
+                            model.SingleBondChoice = SingleBondType.Hatch;
+                            break;
+
+                        case Globals.BondStereo.Indeterminate:
+                            model.SingleBondChoice = SingleBondType.Indeterminate;
+                            break;
+
+                        default:
+                            model.SingleBondChoice = SingleBondType.None;
+                            break;
+                    }
+                }
+
+                var tcs = new TaskCompletionSource<bool>();
+
+                Application.Current.Dispatcher.Invoke(() =>
+                                                      {
+                                                          try
+                                                          {
+                                                              var pe = new BondPropertyEditor(model);
+                                                              pe.ShowDialog();
+                                                          }
+                                                          finally
+                                                          {
+                                                              tcs.TrySetResult(true);
+                                                          }
+                                                      });
+
+                Application.Current.ShutdownMode = mode;
+
+                if (model.Save)
+                {
+                    evm.UpdateBond(bond, model);
+                    bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
+                }
+
+                evm.SelectedItems.Clear();
+                evm.AddToSelection(bond);
+            }
         }
 
         public Point StartPoint { get; set; }
@@ -143,7 +301,6 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
 
-            
             _initialTarget = null;
             _mouseTrack = null;
 
@@ -189,7 +346,7 @@ namespace Chem4Word.ACME.Behaviors
                         _lassoAdorner = new LassoAdorner(CurrentEditor, outline);
                     }
 
-                    if (Mouse.Captured!=(CurrentEditor))
+                    if (Mouse.Captured != (CurrentEditor))
                     {
                         Mouse.Capture(CurrentEditor);
                     }
@@ -238,7 +395,7 @@ namespace Chem4Word.ACME.Behaviors
                         //now identify the connecting bond with the moving fragment
                         Bond connectingBond = null;
                         var staticAtomBonds = staticAtom.Bonds.ToArray();
-                        for(int i=0; i<staticAtomBonds.Count() & connectingBond==null; i++)
+                        for (int i = 0; i < staticAtomBonds.Count() & connectingBond == null; i++)
                         {
                             var bond = staticAtomBonds[i];
                             var otherAtom = bond.OtherAtom(staticAtom);
@@ -254,10 +411,10 @@ namespace Chem4Word.ACME.Behaviors
                         //get the location of the neighbour of the static atom that is going to move
                         Point movingPoint = movingAtom.Position;
                         //now work out the separation between the current position and the moving atom
-                        Vector fragmentSpan = StartPoint - movingPoint; //this gives us the span of the deforing fragment
+                        Vector fragmentSpan = StartPoint - movingPoint; //this gives us the span of the deforming fragment
                         Vector originalDistance = pos - staticPoint;
                         //now we need to work out how far away from the static atom the moving atom should be
-                        Vector desiredDisplacement = originalDistance-fragmentSpan;
+                        Vector desiredDisplacement = originalDistance - fragmentSpan;
                         //then we snap it
 
                         Snapper bondSnapper = new Snapper(staticPoint, EditViewModel, bondLength: _bondLength, lockAngle: 10);
@@ -265,10 +422,10 @@ namespace Chem4Word.ACME.Behaviors
                         Vector snappedBondVector = bondSnapper.SnapVector(connectingBond.Angle, desiredDisplacement);
                         //Vector snappedBondVector = desiredDisplacement;
                         //subtract the original bond vector to get the actual desired, snapped shift
-                        Vector bondVector = (movingPoint-staticPoint);
+                        Vector bondVector = (movingPoint - staticPoint);
                         //now calculate the angle between the starting bond and the snapped vector
                         double rotation = Vector.AngleBetween(bondVector, snappedBondVector);
-                        
+
                         shift = snappedBondVector - bondVector;
                         //shift the atom and rotate the group around the new terminus
                         Point pivot = staticPoint + snappedBondVector;
@@ -287,7 +444,6 @@ namespace Chem4Word.ACME.Behaviors
                         tg.Children.Add(rt);
 
                         _shift = tg;
-
                     }
                     else //moving an atom linked to two other neighbours
                     {
@@ -297,9 +453,7 @@ namespace Chem4Word.ACME.Behaviors
                         _shift = new TransformGroup();
                         _shift.Children.Add(tt);
                     }
-                    
                 }
-                    
 
                 RemoveGhost();
                 _ghostAdorner = new PartialGhostAdorner(CurrentEditor, _atomList, _shift);
@@ -358,18 +512,17 @@ namespace Chem4Word.ACME.Behaviors
             //}
             //else
             //{
-                StartPoint = e.GetPosition(CurrentEditor);
+            StartPoint = e.GetPosition(CurrentEditor);
             //}
 
             _initialTarget = CurrentObject(e);
         }
 
-        private void CurrentEditorOnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void CurrentEditor_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            CurrentEditor.ReleaseMouseCapture();
         }
 
-        private void CurrentEditorOnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void CurrentEditor_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             Debug.WriteLine("CurrentEditorOnMouseRightButtonDown");
             Mouse.Capture(CurrentEditor);
@@ -572,9 +725,9 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.PreviewMouseLeftButtonDown -= CurrentEditor_PreviewMouseLeftButtonDown;
             CurrentEditor.MouseLeftButtonUp -= CurrentEditor_PreviewMouseLeftButtonUp;
             CurrentEditor.PreviewMouseMove -= CurrentEditor_PreviewMouseMove;
-            CurrentEditor.MouseRightButtonDown -= CurrentEditorOnMouseRightButtonDown;
-            CurrentEditor.MouseRightButtonUp -= CurrentEditorOnMouseRightButtonUp;
-
+            CurrentEditor.MouseRightButtonDown -= CurrentEditor_MouseRightButtonDown;
+            CurrentEditor.MouseRightButtonUp -= CurrentEditor_MouseRightButtonUp;
+            CurrentEditor.PreviewMouseRightButtonUp -= CurrentEditor_PreviewMouseRightButtonUp;
             //CurrentEditor.IsHitTestVisible = false;
 
             _lassoAdorner = null;

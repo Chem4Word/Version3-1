@@ -331,7 +331,14 @@ namespace Chem4Word.ACME.Drawing
 
             Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphText.SymbolSize;
             Matrix rotator = new Matrix();
-            rotator.Rotate(Globals.ClockDirections.X.ToDegrees());
+            double angle = -60;
+            //avoid overlap of label and hydrogens
+            if (hMetrics != null && ParentAtom.GetDefaultHOrientation() == CompassPoints.West)
+            {
+                angle = -35;
+            }
+
+            rotator.Rotate(angle);
             isotopeOffsetVector = isotopeOffsetVector * rotator;
             Point isoCenter = mainAtomMetrics.Geocenter + isotopeOffsetVector;
             isotopeText.MeasureAtCenter(isoCenter);

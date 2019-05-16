@@ -19,7 +19,7 @@ using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Adorners
 {
-    public class SingleAtomSelectionAdorner : Adorner
+    public class SingleAtomSelectionAdorner :Adorner
     {
         protected Thumb BigThumb; //this is the main grab area for the molecule
         protected readonly VisualCollection VisualChildren;
@@ -74,10 +74,20 @@ namespace Chem4Word.ACME.Adorners
             IsHitTestVisible = true;
 
             _editorCanvas = (EditorCanvas)adornedElement;
+            PreviewMouseRightButtonUp += SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
         }
-        
+
+        private void SingleAtomSelectionAdorner_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _editorCanvas?.RaiseEvent(e);
+        }
+
+         ~SingleAtomSelectionAdorner()
+        {
+            PreviewMouseRightButtonUp -= SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
+        }
         protected void AttachHandler()
         {
             //wire up the event handling

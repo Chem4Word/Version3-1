@@ -111,6 +111,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Snippets\You may need these files.txt = Snippets\You may need these files.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PeriodicTableHarness", "TestHarness\PeriodicTableHarness\PeriodicTableHarness.csproj", "{838CF41E-5084-4D35-BE73-DE170D48D2C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -655,6 +657,30 @@ Global
 		{A73732B0-FF0A-488E-B353-C238A9085C63}.Vso-Ci|x64.Build.0 = Release|Any CPU
 		{A73732B0-FF0A-488E-B353-C238A9085C63}.Vso-Ci|x86.ActiveCfg = Release|Any CPU
 		{A73732B0-FF0A-488E-B353-C238A9085C63}.Vso-Ci|x86.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Debug|x64.Build.0 = Debug|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Debug|x86.Build.0 = Debug|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Release|x64.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Release|x64.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Release|x86.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Release|x86.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Setup|Any CPU.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Setup|Any CPU.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Setup|x64.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Setup|x64.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Setup|x86.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Setup|x86.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Vso-Ci|Any CPU.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Vso-Ci|Any CPU.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Vso-Ci|x64.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Vso-Ci|x64.Build.0 = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Vso-Ci|x86.ActiveCfg = Release|Any CPU
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9}.Vso-Ci|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -685,6 +711,7 @@ Global
 		{09953DCD-9ECC-454F-9516-A6F737DF3FE1} = {2E9CE94F-9664-44CB-90B5-D1E0253E528C}
 		{70ACE106-9763-4055-A051-3CE6FBFB9437} = {2E9CE94F-9664-44CB-90B5-D1E0253E528C}
 		{A73732B0-FF0A-488E-B353-C238A9085C63} = {77402065-C813-43A2-B02F-A130EC546A90}
+		{838CF41E-5084-4D35-BE73-DE170D48D2C9} = {2E9CE94F-9664-44CB-90B5-D1E0253E528C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4E59A5EC-4690-42FA-8DBE-E152256F1D44}

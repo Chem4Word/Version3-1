@@ -1,81 +1,206 @@
-﻿<Window
-    x:Class="Chem4Word.ACME.Controls.AtomPropertyEditor"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
-    Loaded="Dialog_OnLoaded"
-    ResizeMode="NoResize"
-    ShowInTaskbar="False"
-    SizeToContent="WidthAndHeight"
-    Title="Atom Properties"
-    MinWidth="200"
-    mc:Ignorable="d">
-    <Border Margin="5">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <TextBlock
-                x:Name="AtomPath"
-                Grid.Row="0"
-                Grid.Column="0"
-                Grid.ColumnSpan="2">
-                Atom Properties
-            </TextBlock>
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="0"
-                Margin="0,5,5,0">
-                Symbol
-            </TextBlock>
-            <TextBox
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="0,5,0,0"
-                Text="{Binding Path=Symbol, Mode=TwoWay}" />
-            <TextBlock
-                Grid.Row="2"
-                Grid.Column="0"
-                Margin="0,5,5,0">
-                Charge
-            </TextBlock>
-            <TextBox
-                Grid.Row="2"
-                Grid.Column="1"
-                Margin="0,5,0,0"
-                Text="{Binding Path=Charge, Mode=TwoWay}" />
-            <TextBlock
-                Grid.Row="3"
-                Grid.Column="0"
-                Margin="0,5,5,0">
-                Isotope
-            </TextBlock>
-            <TextBox
-                Grid.Row="3"
-                Grid.Column="1"
-                Margin="0,5,0,0"
-                Text="{Binding Path=Isotope, Mode=TwoWay}" />
-            <Button
-                Grid.Row="4"
-                Grid.Column="1"
-                Width="50"
-                Height="25"
-                Margin="0,5,0,0"
-                HorizontalAlignment="Right"
-                Click="Save_OnClick">
-                Save
-            </Button>
-        </Grid>
-    </Border>
+﻿<Window xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        x:Class="Chem4Word.ACME.Controls.AtomPropertyEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
+        xmlns:models="clr-namespace:Chem4Word.ACME.Models"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:conv="clr-namespace:Chem4Word.ACME.Converters"
+        Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
+        Loaded="Dialog_OnLoaded"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+
+        SizeToContent="WidthAndHeight"
+        Title="Atom Properties"
+        d:DataContext="{d:DesignInstance models:AtomPropertiesModel}"
+        MinWidth="200"
+        mc:Ignorable="d"
+        FontFamily="Arial"
+        Name="PropertyEditor">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="Background" Value="{x:Static SystemColors.WindowBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource Chem4WordBrush}" />
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Foreground" Value="{StaticResource Chem4WordBrush}" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
+
+            <conv:ValueToForegroundColorConverter x:Key="PositiveConverter" />
+
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Border>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    x:Name="AtomPath"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Left"
+                    Margin="5"
+                    Foreground="Black">
+                    Atom Properties
+                </TextBlock>
+
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="5">
+                    Symbol
+                </TextBlock>
+
+                <Grid Grid.Column="1" Grid.Row="1" Margin="0">
+
+                    <Grid.Resources>
+
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=PeriodicTableExpander, Path=IsExpanded}"
+                                             Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=PeriodicTableExpander, Path=IsExpanded}"
+                                             Value="False">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Margin="5" Name="AtomPicker"
+                              Background="{x:Static  SystemColors.WindowBrush}"
+                              Height="Auto"
+                              Width="50"
+                              FontFamily="Arial" FontWeight="Bold"
+                              ItemsSource="{Binding ElementName=PropertyEditor, Path=EditViewModel.AtomOptions}"
+                              SelectedValue="{Binding Element}"
+                              Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
+                              SelectedValuePath="Element"
+                              ToolTip="Click to choose element" />
+                    <Expander Foreground="{StaticResource Chem4WordBrush}" Margin="4" Grid.Column="1"
+                              Name="PeriodicTableExpander" ToolTip="Click to display Periodic Table" IsExpanded="False">
+                        <local:VisualPeriodicTable x:Name="AtomTable" SelectedElement="{Binding Element}"
+                                                   ElementSelected="AtomTable_OnElementSelected" />
+                    </Expander>
+                    <CheckBox IsThreeState="True" IsChecked="{Binding ShowSymbol}" Name="ExplicitCheckBox"
+                              Grid.Column="2" VerticalAlignment="Center">
+                        Explicit
+                        <CheckBox.Style>
+                            <Style TargetType="{x:Type CheckBox}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Setter Property="Margin" Value="4" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Element.Symbol}" Value="C">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ShowSymbol}" Value="{x:Null}">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip>Auto: carbon display is determined automatically.</ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ShowSymbol}" Value="True">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip>
+                                                    <TextBlock>On: Carbon will display as <Bold>C</Bold></TextBlock>
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ShowSymbol}" Value="False">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip>
+                                                    <TextBlock>Off: Carbon will not display.</TextBlock>
+                                                </ToolTip>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
+                </Grid>
+
+                <TextBlock
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Margin="5">
+                    Charge
+                </TextBlock>
+
+                <ComboBox Margin="5" x:Name="ChargeCombo" Grid.Row="2"
+                          Grid.Column="1" Width="50" HorizontalAlignment="Left"
+                          ToolTip=" Click Up/Down to increase or decrease charge"
+                          ItemsSource="{Binding Charges}"
+                          Foreground="{Binding ElementName=ChargeCombo, Path=SelectedValue, Converter={StaticResource PositiveConverter}}"
+                          SelectedValue="{Binding Charge}"
+                          SelectedValuePath="Value">
+
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Label}" Foreground="{Binding Value, Converter={StaticResource PositiveConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Margin="5">
+                    Isotope
+                </TextBlock>
+                <ComboBox Grid.Row="3" Grid.Column="1" Margin="5,5,0,5"
+                          SelectedValue="{Binding Isotope}"
+                          Name="IsotopePicker"
+                          DisplayMemberPath="Label"
+                          SelectedValuePath="Label"
+                          Width="50"
+                          FontWeight="Bold"
+                          HorizontalAlignment="Left"
+                          ItemsSource="{Binding IsotopeMasses}"
+                          IsEnabled="{Binding HasIsotopes}" />
+
+                <Button
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Width="50"
+                    Height="25"
+                    Margin="5"
+                    HorizontalAlignment="Right"
+                    Click="Save_OnClick">
+                    Save
+                </Button>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

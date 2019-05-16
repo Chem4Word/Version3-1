@@ -5,10 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Models;
 using System;
 using System.ComponentModel;
 using System.Windows;
-using Chem4Word.ACME.Models;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -26,16 +26,18 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public BondPropertyEditor(BondPropertiesModel model)
+        public BondPropertyEditor(BondPropertiesModel model) : this()
         {
-            InitializeComponent();
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 _model = model;
                 DataContext = _model;
                 BondPath.Text = _model.Path;
                 Closing += OnClosing;
+#if DEBUG
+#else
                 Deactivated += OnDeactivated;
+#endif
             }
         }
 

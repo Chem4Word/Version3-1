@@ -21,21 +21,37 @@ namespace Chem4Word.ACME.Drawing
         public FunctionalGroup ParentGroup { get; }
         public bool Flipped => ParentAtom.BalancingVector.X < 0d;
 
-        public FunctionalGroupVisual( Atom parent)
+        public FunctionalGroupVisual( Atom parent) :this((FunctionalGroup)parent.Element)
         {
-            ParentGroup = (FunctionalGroup)parent.Element;
-            ParentAtom = parent;
+            ParentAtom = parent;   
+        }
+
+        public FunctionalGroupVisual(FunctionalGroup fg)
+        {
+            ParentGroup = fg;
             ComponentRuns = new List<LabelTextSourceRun>();
         }
 
         public override void Render()
         {
             SetTextParams();
-            var parentAtomPosition = ParentAtom.Position;
+            Render(ParentAtom.Position);
+        }
 
+        private void Render(Point location)
+        {
             int textStorePosition = 0;
+            bool flipped;
 
-            var textStore = new FunctionalGroupTextSource(ParentGroup, Flipped);
+            if (ParentAtom == null)
+            {
+                flipped = false;
+            }
+            else
+            {
+                flipped = Flipped;
+            }
+            var textStore = new FunctionalGroupTextSource(ParentGroup, flipped);
 
             //main textformatter - this does the writing of the visual
             TextFormatter textFormatter = TextFormatter.Create();
@@ -71,15 +87,13 @@ namespace Chem4Word.ACME.Drawing
             Vector dispVector;
             IEnumerable<IndexedGlyphRun> glyphRuns;
             using (TextLine myTextLine = textFormatter.FormatLine(textStore, textStorePosition, 60,
-                paraprops,
-                null))
+                                                                  paraprops,
+                                                                  null))
             {
                 IList<TextBounds> textBounds;
-
                 Rect firstRect = Rect.Empty;
-
                 //dummy.Length is used to isolate the anchor group's characters' text bounding rectangle
-                if (!Flipped)//isolate them at the beginning
+                if (!Flipped) //isolate them at the beginning
                 {
                     textBounds = myTextLine.GetTextBounds(0, anchorString.Length);
                 }
@@ -88,6 +102,7 @@ namespace Chem4Word.ACME.Drawing
                     //isolate them at the end
                     textBounds = myTextLine.GetTextBounds(myTextLine.Length - 1 - anchorString.Length, anchorString.Length);
                 }
+
                 //add all the bounds together
                 foreach (TextBounds anchorBound in textBounds)
                 {
@@ -97,7 +112,7 @@ namespace Chem4Word.ACME.Drawing
                 //center will be position close to the origin 0,0
                 Point center = new Point((firstRect.Left + firstRect.Right) / 2, (firstRect.Top + firstRect.Bottom) / 2);
                 //the dispvector will be added to each relative coordinate for the glyphrun
-                dispVector = parentAtomPosition - center;
+                dispVector = location - center;
 
                 //locus is where the textline is drawn
                 var locus = new Point(0, 0) + dispVector;
@@ -132,8 +147,8 @@ namespace Chem4Word.ACME.Drawing
                     }
 
                     var sortedOutline = (from Point p in outline
-                        orderby p.X ascending, p.Y descending
-                        select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+                                         orderby p.X ascending, p.Y descending
+                                         select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
 
                     Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
 
@@ -142,7 +157,9 @@ namespace Chem4Word.ACME.Drawing
                     //dc.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
                     dc.Close();
                 }
-            };
+            }
+
+            ;
         }
 
         public override Geometry HullGeometry

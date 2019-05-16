@@ -77,14 +77,14 @@ namespace Chem4Word.ACME.Behaviors
 
             _parent = Application.Current.MainWindow;
 
-            CurrentEditor.MouseLeftButtonDown += (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
+            CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseMove += CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
             AssociatedObject.IsHitTestVisible = true;
 
             if (_parent != null)
             {
-                _parent.MouseLeftButtonDown += (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
+                _parent.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             }
 
             CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
@@ -117,7 +117,6 @@ namespace Chem4Word.ACME.Behaviors
                             CurrentStatus = "Click to draw a terminating ring.";
                         }
                     }
-
 
                     break;
 
@@ -214,12 +213,11 @@ namespace Chem4Word.ACME.Behaviors
         {
             foreach (var placement in preferredPlacements ?? altPlacements)
             {
-                var nap = new NewAtomPlacement
-                          {
-                              ExistingAtom =
-                                  (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
-                              Position = placement
-                          };
+                NewAtomPlacement nap = new NewAtomPlacement
+                {
+                    ExistingAtom =(currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
+                    Position = placement
+                };
                 newAtomPlacements.Add(nap);
             }
         }
@@ -428,13 +426,13 @@ namespace Chem4Word.ACME.Behaviors
         protected override void OnDetaching()
         {
             CurrentAdorner = null;
-            CurrentEditor.MouseLeftButtonDown -= (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
+            CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseMove -= CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
-            CurrentEditor = null;
+            //CurrentEditor = null;
             if (_parent != null)
             {
-                _parent.MouseLeftButtonDown -= (sender, e) => CurrentEditor_MouseLeftButtonDown(sender, e);
+                _parent.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             }
 
             _parent = null;

@@ -5,12 +5,111 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Runtime.InteropServices;
+using Chem4Word.Model2;
+
 namespace Chem4Word.ACME.Models
 {
     public class AtomPropertiesModel : BaseDialogModel
     {
-        public string Symbol { get; set; }
-        public string Charge { get; set; }
-        public string Isotope { get; set; }
+        private ElementBase _element;
+        private int? _charge;
+        private string _isotope;
+        private bool? _showSymbol;
+
+        public ElementBase Element
+        {
+            get => _element;
+            set
+            {
+                _element = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsotopeMasses));
+                OnPropertyChanged(nameof(HasIsotopes));
+            }
+        }
+
+        public int? Charge
+        {
+            get => _charge;
+            set
+            {
+                _charge = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<ChargeValue> Charges
+        {
+            get
+            {
+                List<ChargeValue> charges = new List<ChargeValue>();
+                for (int charge = -8; charge < 9; charge++)
+                {
+                    charges.Add(new ChargeValue{Value = charge, Label = charge.ToString() });
+                }
+
+                return charges;
+            }
+        }
+
+        public string Isotope
+        {
+            get => _isotope;
+            set
+            {
+                _isotope = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? ShowSymbol
+        {
+            get => _showSymbol;
+            set
+            {
+                _showSymbol = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public List<IsotopeValue> IsotopeMasses
+        {
+            get
+            {
+                List<IsotopeValue> temp = new List<IsotopeValue>();
+
+                var e = Element as Element;
+                temp.Add(new IsotopeValue{Label="", Mass = null});
+                if (e != null && e.IsotopeMasses!=null)
+                {
+                    foreach (int mass in e.IsotopeMasses)
+                    {
+                        temp.Add(new IsotopeValue{Label = mass.ToString(), Mass = mass});
+                    }
+                }
+
+                return temp;
+            }
+        }
+
+        public bool HasIsotopes
+        {
+            get { return IsotopeMasses.Count >1; }
+        }
+
+        public class IsotopeValue
+        {
+            public string Label { get; set; }
+            public int? Mass { get; set; }
+        }
+
+        public class ChargeValue
+        {
+            public string Label { get; set; }
+            public int Value { get; set; }
+        }
     }
 }

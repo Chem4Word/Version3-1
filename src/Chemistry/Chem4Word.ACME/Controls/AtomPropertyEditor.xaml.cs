@@ -5,39 +5,84 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
+using Chem4Word.ACME.Annotations;
+using Chem4Word.ACME.Models;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using System;
 using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
-using Chem4Word.ACME.Models;
 
 namespace Chem4Word.ACME.Controls
 {
     /// <summary>
     /// Interaction logic for AtomPropertyEditor.xaml
     /// </summary>
-    public partial class AtomPropertyEditor : Window
+    public partial class AtomPropertyEditor : Window, INotifyPropertyChanged
     {
         private AtomPropertiesModel _model;
         private bool _closing;
+        private EditViewModel _editViewModel;
+
+        public AtomPropertiesModel Model
+        {
+            get { return _model; }
+            set
+            {
+                _model = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public EditViewModel EditViewModel
+        {
+            get
+            {
+                return _editViewModel;
+            }
+            set
+            {
+                _editViewModel = value;
+                OnPropertyChanged();
+            }
+        }
 
         public AtomPropertyEditor()
         {
             InitializeComponent();
         }
 
-        public AtomPropertyEditor(AtomPropertiesModel model)
+        public AtomPropertyEditor(AtomPropertiesModel model, EditViewModel evm) : this()
         {
-            InitializeComponent();
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                _model = model;
-                DataContext = _model;
-                AtomPath.Text = _model.Path;
+                EditViewModel = evm;
+                Model = model;
+                DataContext = Model;
+                AtomPath.Text = Model.Path;
+
                 Closing += OnClosing;
+                ContentRendered += AtomPropertyEditor_ContentRendered;
+#if DEBUG
+#else
                 Deactivated += OnDeactivated;
+#endif
             }
+        }
+
+        private void AtomPropertyEditor_ContentRendered(object sender, EventArgs e)
+        {
+            Activate();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void OnClosing(object sender, CancelEventArgs e)
@@ -49,7 +94,7 @@ namespace Chem4Word.ACME.Controls
         {
             if (!_closing)
             {
-                _model.Save = false;
+                Model.Save = false;
                 Close();
             }
         }
@@ -58,7 +103,7 @@ namespace Chem4Word.ACME.Controls
         {
             if (ValidateModel())
             {
-                _model.Save = true;
+                Model.Save = true;
                 _closing = true;
                 Close();
             }
@@ -67,28 +112,35 @@ namespace Chem4Word.ACME.Controls
         private bool ValidateModel()
         {
             ElementBase eb;
-            bool b1 = AtomHelpers.TryParse(_model.Symbol, out eb);
+            bool b1 = AtomHelpers.TryParse(Model.Element.Symbol, out eb);
 
             int n;
-            bool b2 = string.IsNullOrEmpty(_model.Charge);
-            if (!b2)
-            {
-                b2 = int.TryParse(_model.Charge, out n);
-            }
+       
 
-            bool b3 = string.IsNullOrEmpty(_model.Isotope);
+            bool b3 = string.IsNullOrEmpty(Model.Isotope);
             if (!b3)
             {
-                b3 = int.TryParse(_model.Isotope, out n);
+                b3 = int.TryParse(Model.Isotope, out n);
             }
 
-            return b1 && b2 && b3;
+            return b1  && b3;
         }
 
         private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
         {
-            Left = _model.Centre.X - ActualWidth / 2;
-            Top = _model.Centre.Y - ActualHeight / 2;
+            Left = Model.Centre.X - ActualWidth / 2;
+            Top = Model.Centre.Y - ActualHeight / 2;
         }
+
+        private void AtomTable_OnElementSelected(object sender, VisualPeriodicTable.ElementEventArgs e)
+        {
+            var addition = e.SelectedElement as Element;
+            Model.Element = addition;
+            PeriodicTableExpander.IsExpanded = false;
+            EditViewModel.LoadAtomOptions(addition);
+            var atomPickerSelectedItem = EditViewModel.AtomOptions.FirstOrDefault(ao => ao.Element.Equals(addition));
+            AtomPicker.SelectedItem = atomPickerSelectedItem;
+        }
+
     }
 }

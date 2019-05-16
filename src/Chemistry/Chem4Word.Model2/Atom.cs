@@ -21,7 +21,7 @@ namespace Chem4Word.Model2
     {
         #region Fields
 
-        private bool _explicitC;
+        private bool? _explicitC;
         public List<string> Messages = new List<string>();
 
         #endregion Fields
@@ -134,7 +134,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public bool ShowSymbol
+        public bool? ShowSymbol
         {
             get
             {
@@ -240,11 +240,18 @@ namespace Chem4Word.Model2
                     {
                         if (Element.Symbol.Equals("C"))
                         {
-                            if (ShowSymbol)
+                            if (ShowSymbol!=null)
                             {
-                                return "C";
+                                if (ShowSymbol.Value)
+                                {
+                                    return "C";
+                                }
+                                else
+                                {
+                                    return "";
+                                }
                             }
-
+                            //if it's null then we have to work it out ourselves
                             if (Degree <= 1)
                             {
                                 return "C";
@@ -345,7 +352,7 @@ namespace Chem4Word.Model2
                 {
                     int bondCount = (int)Math.Truncate(this.BondOrders);
                     int charge = FormalCharge ?? 0;
-                    foreach (int valency in e.Valencies)
+                    foreach (int valency in e.Valencies??new []{0})
                     {
                         if (valency - bondCount + charge > 0)
                         {

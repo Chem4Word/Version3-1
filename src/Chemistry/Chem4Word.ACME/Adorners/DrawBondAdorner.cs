@@ -45,6 +45,8 @@ namespace Chem4Word.ACME.Adorners
             set { SetValue(EndPointProperty, value); }
         }
 
+        public Bond ExistingBond { get; set; }
+
         // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndPointProperty =
             DependencyProperty.Register("EndPoint", typeof(Point), typeof(DrawBondAdorner), new FrameworkPropertyMetadata(new Point(0d, 0d), FrameworkPropertyMetadataOptions.AffectsRender));
@@ -62,14 +64,21 @@ namespace Chem4Word.ACME.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
+            Geometry outline;
             // ToDo: This may not be accurate
             var length = (StartPoint - EndPoint).Length;
-            var outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder);
-
+            if(ExistingBond==null || !ExistingBond.IsCyclic())
+            {
+                outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder);
+            }
+            else
+            {
+                outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder, ExistingBond.PrimaryRing);
+            }
             drawingContext.DrawGeometry(_solidColorBrush, _dashPen, outline);
         }
 
-        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order)
+        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order, Ring existingRing=null)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
@@ -105,7 +114,8 @@ namespace Chem4Word.ACME.Adorners
                 {
                     return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, bondLength, ref dummy);
                 }
-                Point? centroid = null;
+
+                Point? centroid = existingRing?.Centroid;
 
                 return BondGeometry.DoubleBondGeometry(startPoint, endPoint, bondLength, Globals.BondDirection.None,
                     ref dummy, centroid);

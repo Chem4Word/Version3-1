@@ -123,7 +123,10 @@ namespace WinForms.TestHarness
         private void EditWithAcme_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+#if !DEBUG
             try
+
+#endif
             {
                 if (!string.IsNullOrEmpty(_lastCml))
                 {
@@ -144,12 +147,14 @@ namespace WinForms.TestHarness
                     }
                 }
             }
+#if !DEBUG
             catch (Exception exception)
             {
                 _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
                 _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
                 MessageBox.Show(exception.StackTrace, exception.Message);
             }
+#endif
         }
 
         private void ShowChemistry(string filename, Model model)

@@ -6,16 +6,14 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Drawing;
+using Chem4Word.ACME.Models;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Models;
-using Chem4Word.Model2.Geometry;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -27,139 +25,14 @@ namespace Chem4Word.ACME.Controls
 
         public EditorCanvas() : base()
         {
-            MouseRightButtonUp += OnMouseRightButtonUp;
+           
         }
 
         #endregion Constructors
 
         #region Event handlers
 
-        private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            var pp = PointToScreen(e.GetPosition(this));
-
-            ActiveVisual = GetTargetedVisual(e.GetPosition(this));
-
-            if (ActiveVisual is AtomVisual av)
-            {
-                var mode = Application.Current.ShutdownMode;
-
-                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-                var atom = av.ParentAtom;
-                var model = new AtomPropertiesModel();
-
-                model.Centre = pp;
-                model.Path = atom.Path;
-
-                model.Symbol = atom.Element.Symbol;
-                model.Charge = atom.FormalCharge.ToString();
-                model.Isotope = atom.IsotopeNumber.ToString();
-
-                var tcs = new TaskCompletionSource<bool>();
-
-                Application.Current.Dispatcher.Invoke(() =>
-                                                      {
-                                                          try
-                                                          {
-                                                              var pe = new AtomPropertyEditor(model);
-                                                              pe.ShowDialog();
-                                                          }
-                                                          finally
-                                                          {
-                                                              tcs.TrySetResult(true);
-                                                          }
-                                                      });
-
-                Application.Current.ShutdownMode = mode;
-
-                if (model.Save)
-                {
-                    EditViewModel evm = (EditViewModel)((EditorCanvas)av.Parent).Chemistry;
-                    evm.UpdateAtom(atom, model);
-                }
-            }
-
-            if (ActiveVisual is BondVisual bv)
-            {
-                var mode = Application.Current.ShutdownMode;
-
-                Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-                var bond = bv.ParentBond;
-                var model = new BondPropertiesModel();
-
-                model.Centre = pp;
-                model.Path = bond.Path;
-                model.Angle = bond.Angle;
-
-                model.BondOrderValue = bond.OrderValue.Value;
-                model.IsSingle = bond.Order.Equals(Globals.OrderSingle);
-                model.IsDouble = bond.Order.Equals(Globals.OrderDouble);
-
-                if (model.IsDouble)
-                {
-                    model.DoubleBondChoice = DoubleBondType.Auto;
-
-                    if (bond.Stereo == Globals.BondStereo.Indeterminate)
-                    {
-                        model.DoubleBondChoice = DoubleBondType.Indeterminate;
-                    }
-                    else if (bond.ExplicitPlacement != null)
-                    {
-                        model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
-                    }
-                }
-
-                if (model.IsSingle)
-                {
-                    model.SingleBondChoice = SingleBondType.None;
-
-                    switch (bond.Stereo)
-                    {
-                        case Globals.BondStereo.Wedge:
-                            model.SingleBondChoice = SingleBondType.Wedge;
-                            break;
-
-                        case Globals.BondStereo.Hatch:
-                            model.SingleBondChoice = SingleBondType.Hatch;
-                            break;
-
-                        case Globals.BondStereo.Indeterminate:
-                            model.SingleBondChoice = SingleBondType.Indeterminate;
-                            break;
-
-                        default:
-                            model.SingleBondChoice = SingleBondType.None;
-                            break;
-                    }
-                }
-
-                var tcs = new TaskCompletionSource<bool>();
-
-                Application.Current.Dispatcher.Invoke(() =>
-                                                      {
-                                                          try
-                                                          {
-                                                              var pe = new BondPropertyEditor(model);
-                                                              pe.ShowDialog();
-                                                          }
-                                                          finally
-                                                          {
-                                                              tcs.TrySetResult(true);
-                                                          }
-                                                      });
-
-                Application.Current.ShutdownMode = mode;
-
-                if (model.Save)
-                {
-                    EditViewModel evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
-                    evm.UpdateBond(bond, model);
-                    bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
-                }
-            }
-        }
+        
 
         #endregion Event handlers
 
@@ -214,7 +87,7 @@ namespace Chem4Word.ACME.Controls
         /// <param name="selectedAtoms">List of selected atoms to rubber-band</param>
         /// <param name="shear">TranslateTransform describing how atoms are shifted. Omit to obtain an overlay to transform later</param>
         /// <returns>Geometry of deformed atoms</returns>
-        public Geometry PartialGhost(List<Atom> selectedAtoms, Transform shear=null)
+        public Geometry PartialGhost(List<Atom> selectedAtoms, Transform shear = null)
         {
             //var neighbourSet = new HashSet<Atom>();
             HashSet<Bond> bondSet = new HashSet<Bond>();

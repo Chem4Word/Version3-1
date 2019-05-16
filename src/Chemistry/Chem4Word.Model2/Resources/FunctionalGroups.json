@@ -197,6 +197,72 @@
       }
     ]
   },
+  "Uut": {
+    "Symbol": "Uut",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "Nh",
+        "Count": 1
+      }
+    ]
+  },
+  "Uuq": {
+    "Symbol": "Uuq",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "Fl",
+        "Count": 1
+      }
+    ]
+  },
+  "Uup": {
+    "Symbol": "Uup",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "Mc",
+        "Count": 1
+      }
+    ]
+  },
+  "Uuh": {
+    "Symbol": "Uuh",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "Lv",
+        "Count": 1
+      }
+    ]
+  },
+  "Uus": {
+    "Symbol": "Uus",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "Ts",
+        "Count": 1
+      }
+    ]
+  },
+  "Uuo": {
+    "Symbol": "Uuo",
+    "ShowAsSymbol": true,
+    "Flippable": false,
+    "Components": [
+      {
+        "Component": "Og",
+        "Count": 1
+      }
+    ]
+  },
   "OH": {
     "Symbol": "OH",
     "ShowAsSymbol": false,

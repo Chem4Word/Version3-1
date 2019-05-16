@@ -214,7 +214,7 @@ namespace Chem4Word.ACME
             //refresh the ring button
             SetCurrentRing(BenzeneButton);
             //kludge:  need to do this to put the editor into the right mode after refreshing the ring button
-            ModeButton_OnChecked(SelectionButton, new RoutedEventArgs());
+            ModeButton_OnChecked(DrawButton, new RoutedEventArgs());
         }
 
         public static T FindChild<T>(DependencyObject parent)

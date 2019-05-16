@@ -9,6 +9,8 @@ using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Commands;
 using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Enums;
+using Chem4Word.ACME.Models;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Helpers;
@@ -26,8 +28,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Enums;
-using Chem4Word.ACME.Models;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME
@@ -154,7 +154,10 @@ namespace Chem4Word.ACME
 
                 var selAtoms = SelectedItems.OfType<Atom>().ToList();
                 SelectedItems.Clear();
-                SetElement(value, selAtoms);
+                if (value != null)
+                {
+                    SetElement(value, selAtoms);
+                }
             }
         }
 
@@ -179,7 +182,7 @@ namespace Chem4Word.ACME
                         {
                             selectedAtom.Element = lastElement;
                         };
-                        UndoManager.RecordAction(undo, redo, $"Set Element to {value.Symbol}");
+                        UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol??"null"}");
                         selectedAtom.Element = value;
                         selectedAtom.UpdateVisual();
                         foreach (Bond bond in selectedAtom.Bonds)
@@ -200,7 +203,19 @@ namespace Chem4Word.ACME
         {
             get
             {
-                return SelectedItems.OfType<Atom>().Select(a => a.Element).Distinct().ToList();
+                var singletons = from Molecule m in SelectedItems.OfType<Molecule>()
+                                 where m.Atoms.Count == 1
+                                 select m;
+
+                var allSelAtoms = (from Atom a in SelectedItems.OfType<Atom>()
+                                   select a)
+                    .Union<Atom>(
+                        from Molecule m in singletons
+                        from Atom a1 in m.Atoms.Values
+                        select a1);
+                var elements = (from selAtom in allSelAtoms
+                                select (ElementBase)selAtom.Element).Distinct();
+                return elements.ToList();
             }
         }
 
@@ -286,6 +301,7 @@ namespace Chem4Word.ACME
         #endregion Properties
 
         private BaseEditBehavior _activeMode;
+        private readonly ObservableCollection<AtomOption> _atomOptions;
 
         public BaseEditBehavior ActiveMode
         {
@@ -302,6 +318,8 @@ namespace Chem4Word.ACME
                 OnPropertyChanged();
             }
         }
+
+        public ObservableCollection<AtomOption> AtomOptions => _atomOptions;
 
         #region Commands
 
@@ -327,6 +345,8 @@ namespace Chem4Word.ACME
 
         public EditViewModel(Model model) : base(model)
         {
+            _atomOptions = new ObservableCollection<AtomOption>();
+            LoadAtomOptions();
             RedoCommand = new RedoCommand(this);
             UndoCommand = new UndoCommand(this);
 
@@ -354,6 +374,114 @@ namespace Chem4Word.ACME
             _selectedBondOptionId = 1;
 
             LoadBondOptions();
+        }
+
+        public void LoadAtomOptions()
+        {
+            AtomOptions.Clear();
+            LoadStandardAtomOptions();
+            LoadModelAtomOptions();
+            LoadModelFGs();
+        }
+
+        public void LoadAtomOptions(Element addition)
+        {
+            AtomOptions.Clear();
+            LoadStandardAtomOptions();
+            LoadModelAtomOptions(addition);
+            LoadModelFGs();
+        }
+
+        private void LoadModelFGs()
+        {
+            var modelFGs = (from a in Model.GetAllAtoms()
+                            where a.Element is FunctionalGroup && !(from ao in AtomOptions
+                                                                    select ao.Element).Contains(a.Element)
+                            orderby a.SymbolText
+                            select a.Element).Distinct();
+
+            var newOptions = from mfg in modelFGs
+                             select new AtomOption
+                             {
+                                 Element = mfg,
+                                 Foreground = new SolidColorBrush(Colors.Black),
+                                 Content = (mfg as FunctionalGroup).Symbol
+                             };
+            foreach (var newOption in newOptions)
+            {
+                try
+                {
+                    AtomOptions.Add(newOption);
+                }
+                catch
+                {
+                    // Something is recursively calling LoadModelFGs()
+                }
+            }
+        }
+
+        private void LoadModelAtomOptions(Element addition = null)
+        {
+            var modelElements = (from a in Model.GetAllAtoms()
+                                 where a.Element is Element && !(from ao in AtomOptions
+                                                                 select ao.Element).Contains(a.Element)
+                                 orderby a.SymbolText
+                                 select a.Element).Distinct();
+            var pt = new PeriodicTable();
+            var newOptions = from e in pt.ElementsSource
+                             join me in modelElements
+                                 on e equals me
+                             select new AtomOption
+                             {
+                                 Element = e,
+                                 Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour)),
+                                 Content = e.Symbol
+                             };
+            foreach (var newOption in newOptions)
+            {
+                try
+                {
+                    AtomOptions.Add(newOption);
+                }
+                catch
+                {
+                    // Something is recursively calling LoadModelAtomOptions()
+                }
+            }
+
+            if (addition != null && !AtomOptions.Select(ao => ao.Element).Contains(addition))
+            {
+                try
+                {
+                    AtomOptions.Add(new AtomOption
+                    {
+                        Element = addition,
+                        Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(addition.Colour)),
+                        Content = addition.Symbol
+                    });
+                }
+                catch
+                {
+                    // Something is recursively calling LoadModelAtomOptions()
+                }
+            }
+        }
+
+        private void LoadStandardAtomOptions()
+        {
+            object resourceOptions = Application.Current.FindResource("AtomItems");
+            AtomOption[] standardOptions = (AtomOption[])resourceOptions;
+            foreach (AtomOption option in standardOptions)
+            {
+                try
+                {
+                    AtomOptions.Add(option);
+                }
+                catch
+                {
+                    // Something is recursively calling LoadStandardAtomOptions()
+                }
+            }
         }
 
         /// <summary>
@@ -973,6 +1101,7 @@ namespace Chem4Word.ACME
         /// <param name="unsaturated"></param>
         public void DrawRing(List<NewAtomPlacement> newAtomPlacements, bool unsaturated, int startAt = 0)
         {
+            var pt = new PeriodicTable();
             UndoManager.BeginUndoBlock();
 
             //work around the ring adding atoms
@@ -989,7 +1118,7 @@ namespace Chem4Word.ACME
                 {
                     Atom insertAtom = null;
 
-                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position, ClockDirections.Nothing);
+                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position, ClockDirections.Nothing, pt.C);
                     if (insertAtom == null)
                     {
                         Debugger.Break();
@@ -1207,9 +1336,9 @@ namespace Chem4Word.ACME
 
                 Action undoAction = () =>
                 {
-                //Model.InhibitEvents = true;
+                    //Model.InhibitEvents = true;
 
-                foreach (var bond in newBonds)
+                    foreach (var bond in newBonds)
                     {
                         bond.Parent.RemoveBond(bond);
                     }
@@ -1218,9 +1347,9 @@ namespace Chem4Word.ACME
                         atom.Parent.RemoveAtom(atom);
                     }
 
-                //Model.InhibitEvents = false;
+                    //Model.InhibitEvents = false;
 
-                if (mols.Any())
+                    if (mols.Any())
                     {
                         RefreshMolecules(mols);
                     }
@@ -1378,9 +1507,9 @@ namespace Chem4Word.ACME
 
                 Action redoAction = () =>
                 {
-                //Model.InhibitEvents = true;
+                    //Model.InhibitEvents = true;
 
-                foreach (var bond in targetBonds)
+                    foreach (var bond in targetBonds)
                     {
                         bond.Parent.RemoveBond(bond);
                     }
@@ -1389,9 +1518,9 @@ namespace Chem4Word.ACME
                         atom.Parent.RemoveAtom(atom);
                     }
 
-                //Model.InhibitEvents = false;
+                    //Model.InhibitEvents = false;
 
-                if (mols.Any())
+                    if (mols.Any())
                     {
                         RefreshMolecules(mols);
                     }
@@ -1660,9 +1789,9 @@ namespace Chem4Word.ACME
             redo();
             Action undo = () =>
             {
-            //Model.InhibitEvents = true;
+                //Model.InhibitEvents = true;
 
-            molA.Parent = parent;
+                molA.Parent = parent;
                 molA.Reparent();
                 parent.AddMolecule(molA);
                 molB.Parent = parent;
@@ -1670,8 +1799,8 @@ namespace Chem4Word.ACME
                 parent.AddMolecule(molB);
                 parent.RemoveMolecule(newMol);
                 newMol.Parent = null;
-            //Model.InhibitEvents = false;
-            molA.ForceUpdates();
+                //Model.InhibitEvents = false;
+                molA.ForceUpdates();
                 molB.ForceUpdates();
             };
             UndoManager.RecordAction(undo, redo);
@@ -1803,8 +1932,8 @@ namespace Chem4Word.ACME
                                   {
                                       mol.RemoveBond(deleteBond);
                                       RefreshRingBonds(theoreticalRings, mol, deleteBond);
-                                  //deleteBond.UpdateVisual();
-                                  deleteBond.StartAtom.UpdateVisual();
+                                      //deleteBond.UpdateVisual();
+                                      deleteBond.StartAtom.UpdateVisual();
                                       deleteBond.EndAtom.UpdateVisual();
                                       foreach (Bond atomBond in deleteBond.StartAtom.Bonds)
                                       {
@@ -1819,8 +1948,8 @@ namespace Chem4Word.ACME
                                   foreach (Atom deleteAtom in deleteAtoms)
                                   {
                                       mol.RemoveAtom(deleteAtom);
-                                  //deleteAtom.UpdateVisual();
-                              }
+                                      //deleteAtom.UpdateVisual();
+                                  }
                                   mol.ClearProperties();
                                   RefreshAtomVisuals(updateAtoms);
                               };
@@ -1982,18 +2111,16 @@ namespace Chem4Word.ACME
             ElementBase elementBaseBefore = atom.Element;
             int? chargeBefore = atom.FormalCharge;
             int? isotopeBefore = atom.IsotopeNumber;
+            bool? showSymbolBefore = atom.ShowSymbol;
 
             ElementBase elementBaseAfter;
             int? chargeAfter = null;
             int? isotopeAfter = null;
+            bool? showSymbolAfter = null;
+            AtomHelpers.TryParse(model.Element.Symbol, out elementBaseAfter);
 
-            AtomHelpers.TryParse(model.Symbol, out elementBaseAfter);
-
-            if (!string.IsNullOrEmpty(model.Charge))
-            {
-                chargeAfter = int.Parse(model.Charge);
-            }
-
+            chargeAfter = model.Charge;
+            showSymbolAfter = model.ShowSymbol;
             if (!string.IsNullOrEmpty(model.Isotope))
             {
                 isotopeAfter = int.Parse(model.Isotope);
@@ -2004,6 +2131,7 @@ namespace Chem4Word.ACME
                 atom.Element = elementBaseAfter;
                 atom.FormalCharge = chargeAfter;
                 atom.IsotopeNumber = isotopeAfter;
+                atom.ShowSymbol = showSymbolAfter;
                 atom.Parent.ForceUpdates();
             };
 
@@ -2014,6 +2142,7 @@ namespace Chem4Word.ACME
                 atom.Element = elementBaseBefore;
                 atom.FormalCharge = chargeBefore;
                 atom.IsotopeNumber = isotopeBefore;
+                atom.ShowSymbol = showSymbolBefore;
                 atom.Parent.ForceUpdates();
             };
 
@@ -2045,23 +2174,29 @@ namespace Chem4Word.ACME
                     case SingleBondType.None:
                         stereoAfter = BondStereo.None;
                         break;
+
                     case SingleBondType.Wedge:
                         stereoAfter = BondStereo.Wedge;
                         break;
+
                     case SingleBondType.BackWedge:
                         stereoAfter = BondStereo.Wedge;
                         swapAtoms = true;
                         break;
+
                     case SingleBondType.Hatch:
                         stereoAfter = BondStereo.Hatch;
                         break;
+
                     case SingleBondType.BackHatch:
                         stereoAfter = BondStereo.Hatch;
                         swapAtoms = true;
                         break;
+
                     case SingleBondType.Indeterminate:
                         stereoAfter = BondStereo.Indeterminate;
                         break;
+
                     default:
                         stereoAfter = BondStereo.None;
                         break;

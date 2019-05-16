@@ -19,6 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Behaviors;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME.Behaviors
@@ -54,9 +55,14 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.PreviewMouseLeftButtonUp += CurrentEditor_PreviewMouseLeftButtonUp;
             CurrentEditor.PreviewMouseMove += CurrentEditor_PreviewMouseMove;
-
+            CurrentEditor.PreviewMouseRightButtonUp += CurrentEditor_PreviewMouseRightButtonUp;
             CurrentEditor.IsHitTestVisible = true;
             CurrentStatus = DefaultText;
+        }
+
+        private void CurrentEditor_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            LassoBehaviour.DoPropertyEdit(e,CurrentEditor);
         }
 
         ///
@@ -64,8 +70,19 @@ namespace Chem4Word.ACME.Behaviors
         ///
         private void CurrentEditor_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+
+            Bond existingBond = null;
+
+            if (_adorner != null)
+            {
+                RemoveAdorner(ref _adorner);
+            }
+
             var targetedVisual = CurrentEditor.ActiveVisual;
             //cherck to see if we have already got an atom remembered
+
+            string bondOrder = EditViewModel.CurrentBondOrder;
+
             if (_currentAtomVisual != null)
             {
                 
@@ -81,6 +98,32 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         //if so. snap to the atom's position
                         lastPos = atomUnderCursor.Position;
+                        //if we are stroking over an existing bond
+                        //then draw a double bond adorner
+
+                        
+                        existingBond = _lastAtomVisual.ParentAtom.BondBetween(atomUnderCursor.ParentAtom);
+                        if (_lastAtomVisual != null &&
+                            existingBond != null)
+                        {
+                            
+                           
+                            if (existingBond.Order == OrderSingle)
+                            {
+                                bondOrder = OrderDouble;
+                               
+                            }
+                            else if (existingBond.Order == OrderDouble)
+                            {
+                                bondOrder = OrderTriple;
+                                
+                            }
+                            else if (existingBond.Order == OrderTriple)
+                            {
+                                bondOrder = OrderSingle;
+                               
+                            }
+                        }
                     }
                     else //or dangling over free space?
                     {
@@ -94,14 +137,14 @@ namespace Chem4Word.ACME.Behaviors
                         lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
                     }
 
-                    if (_adorner == null)
+                   
+                    _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
                     {
-                        _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
-                        {
-                            Stereo = EditViewModel.CurrentStereo,
-                            BondOrder = EditViewModel.CurrentBondOrder
-                        };
-                    }
+                        Stereo = EditViewModel.CurrentStereo,
+                        BondOrder = bondOrder,
+                        ExistingBond = existingBond
+                    };
+                
 
                     _adorner.StartPoint = _currentAtomVisual.Position;
                     _adorner.EndPoint = lastPos;
@@ -135,6 +178,8 @@ namespace Chem4Word.ACME.Behaviors
         /// <param name="e"></param>
         private void CurrentEditor_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            
+
             CurrentEditor.ReleaseMouseCapture();
             CurrentStatus = "";
             //first get the current active visuals
@@ -525,6 +570,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.PreviewMouseLeftButtonUp -= CurrentEditor_PreviewMouseLeftButtonUp;
             CurrentEditor.PreviewMouseMove -= CurrentEditor_PreviewMouseMove;
+            CurrentEditor.PreviewMouseRightButtonUp-=CurrentEditor_PreviewMouseRightButtonUp;
             CurrentStatus = "";
          
         }
