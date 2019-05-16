@@ -28,12 +28,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         private Dictionary<char, TtfCharacter> _TtfCharacterSet;
 
         private List<AtomLabelCharacter> _AtomLabelCharacters;
+        private Dictionary<string, List<Point>> _convexhHulls;
         private IChem4WordTelemetry _telemetry;
 
-        public AtomLabelPositioner(List<AtomLabelCharacter> atomLabelCharacters, Dictionary<char, TtfCharacter> characterset, IChem4WordTelemetry telemetry)
+        public AtomLabelPositioner(List<AtomLabelCharacter> atomLabelCharacters, Dictionary<string, List<Point>> convexHulls, Dictionary<char, TtfCharacter> characterset, IChem4WordTelemetry telemetry)
         {
             _AtomLabelCharacters = atomLabelCharacters;
             _TtfCharacterSet = characterset;
+            _convexhHulls = convexHulls;
             _telemetry = telemetry;
         }
 
@@ -379,7 +381,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                 #endregion Step 5 - Add Implicit H if required
 
-                #region Step 6 Add IsoTope Number if required
+                #region Step 6 - Add IsoTope Number if required
 
                 if (isoValue > 0)
                 {
@@ -434,7 +436,52 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 }
 
                 #endregion Step 6 Add IsoTope Number if required
+
+                #region Step 7 - Create Convex Hull
+
+                _convexhHulls.Add(atom.Path, ConvexHull(atom.Path));
+
+                #endregion
             }
+        }
+
+        private List<Point> ConvexHull(string atomPath)
+        {
+            List<Point> points = new List<Point>();
+
+            var chars = _AtomLabelCharacters.Where(m => m.ParentAtom == atomPath);
+            double margin = OoXmlHelper.CHARACTER_CLIPPING_MARGIN;
+            foreach (var c in chars)
+            {
+                // Top Left --
+                points.Add(new Point(c.Position.X - margin, c.Position.Y - margin));
+                if (c.IsSmaller)
+                {
+                    // Top Right +-
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
+                                        c.Position.Y - margin));
+                    // Bottom Right ++
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
+                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
+                    // Bottom Left -+
+                    points.Add(new Point(c.Position.X - margin,
+                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
+                }
+                else
+                {
+                    // Top Right +-
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) + margin,
+                                        c.Position.Y - margin));
+                    // Bottom Right ++
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) + margin,
+                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) + margin));
+                    // Bottom Left -+
+                    points.Add(new Point(c.Position.X - margin,
+                                          c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) + margin));
+                }
+            }
+
+            return GeometryTool.MakeConvexHull(points);
         }
 
         private Point GetCharacterPosition(Point cursorPosition, TtfCharacter character)
@@ -593,6 +640,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             }
 
             #endregion Step 4 - Transfer characters into main list
+
+            #region Step 5 - Convex Hull
+
+            _convexhHulls.Add(atom.Path, ConvexHull(atom.Path));
+
+            #endregion
 
             #region Local Functions
 

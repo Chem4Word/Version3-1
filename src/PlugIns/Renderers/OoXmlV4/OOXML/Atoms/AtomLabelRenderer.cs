@@ -17,23 +17,23 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 {
     public class AtomLabelRenderer
     {
-        private Rect m_canvasExtents;
-        private long m_ooxmlId;
-        private Options m_options;
+        private Rect _canvasExtents;
+        private long _ooxmlId;
+        private Options _options;
 
         public AtomLabelRenderer(Rect canvasExtents, ref long ooxmlId, Options opts)
         {
-            m_canvasExtents = canvasExtents;
-            m_ooxmlId = ooxmlId;
-            m_options = opts;
+            _canvasExtents = canvasExtents;
+            _ooxmlId = ooxmlId;
+            _options = opts;
         }
 
         public void DrawCharacter(Wpg.WordprocessingGroup wordprocessingGroup1, AtomLabelCharacter alc)
         {
             Point characterPosition = new Point(alc.Position.X, alc.Position.Y);
-            characterPosition.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
+            characterPosition.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
 
-            UInt32Value atomLabelId = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value atomLabelId = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string atomLabelName = "Atom " + alc.ParentAtom;
 
             Int64Value width = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Width);
@@ -47,7 +47,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(characterPosition.X);
 
             // Set variable true to show bounding box of (every) character
-            if (m_options.ShowCharacterBoundingBoxes)
+            if (_options.ShowCharacterBoundingBoxes)
             {
                 Rect boundingBox = new Rect(new Point(left, top), new Size(width, height));
                 DrawCharacterBox(wordprocessingGroup1, boundingBox, "00ff00", 0.25);
@@ -226,8 +226,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
         private void DrawCharacterBox(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, double points)
         {
-            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)m_ooxmlId++);
-            string bondLineName = "box" + bondLineId;
+            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string bondLineName = "char-diag-box-" + bondLineId;
 
             Int64Value width = (Int64Value)extents.Width;
             Int64Value height = (Int64Value)extents.Height;

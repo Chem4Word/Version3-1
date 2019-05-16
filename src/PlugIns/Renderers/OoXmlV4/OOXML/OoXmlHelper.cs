@@ -17,7 +17,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         // Margins are in CML Points
         public const double DRAWING_MARGIN = 5; // 5 is a good value to use (Use 0 to compare with AMC diagrams)
 
-        public const double CHARACTER_CLIPPING_MARGIN = 1.5;
+        public const double CHARACTER_CLIPPING_MARGIN = 1.25;
 
         // Percentage of average (median) bond length
         public const double MULTIPLE_BOND_OFFSET_PERCENTAGE = 0.2;

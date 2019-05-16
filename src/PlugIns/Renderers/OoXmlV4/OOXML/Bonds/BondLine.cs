@@ -17,6 +17,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private Point _start;
         private Point _end;
+        public string StartAtomPath;
+        public string EndAtomPath;
 
         public BondLineStyle Type { get; set; }
 
@@ -42,7 +44,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         public Rect BoundingBox { get; set; }
 
-        public BondLine(Point startPoint, Point endPoint, BondLineStyle type, string parentBond, string parentMolecule)
+        public BondLine(Point startPoint, Point endPoint, BondLineStyle type, string parentBond, string parentMolecule, string startAtomPath, string endAtomPath)
         {
             _start = startPoint;
             _end = endPoint;
@@ -50,6 +52,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Type = type;
             ParentBond = parentBond;
             ParentMolecule = parentMolecule;
+            StartAtomPath = startAtomPath;
+            EndAtomPath = endAtomPath;
         }
 
         public BondLine GetParallel(double offset)
@@ -63,7 +67,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point newEndPoint = new Point((float)(_end.X - offset * yDifference / length),
                                           (float)(_end.Y + offset * xDifference / length));
 
-            return new BondLine(newStartPoint, newEndPoint, Type, ParentBond, ParentMolecule);
+            return new BondLine(newStartPoint, newEndPoint, Type, ParentBond, ParentMolecule, StartAtomPath, EndAtomPath);
         }
     }
 
