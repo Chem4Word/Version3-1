@@ -6,13 +6,9 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Drawing;
-using Chem4Word.ACME.Models;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
@@ -25,16 +21,11 @@ namespace Chem4Word.ACME.Controls
 
         public EditorCanvas() : base()
         {
-           
         }
 
         #endregion Constructors
 
-        #region Event handlers
 
-        
-
-        #endregion Event handlers
 
         #region Methods
 

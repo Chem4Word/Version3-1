@@ -1,11 +1,18 @@
-﻿using Chem4Word.ACME.Controls;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -20,7 +27,7 @@ namespace Chem4Word.ACME.Adorners
         {
             _ghostBrush = new SolidColorBrush(SystemColors.HighlightColor);
             _ghostBrush.Opacity = 0.25;
-            
+
             _ghostPen = new Pen(SystemColors.HighlightBrush, Globals.BondThickness);
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(currentEditor);
             Ghost = currentEditor.PartialGhost(atomList.ToList(), shear);
@@ -28,14 +35,12 @@ namespace Chem4Word.ACME.Adorners
             PreviewMouseMove += PartialGhostAdorner_PreviewMouseMove;
             PreviewMouseUp += PartialGhostAdorner_PreviewMouseUp;
             CurrentEditor = currentEditor;
-
         }
 
         private void PartialGhostAdorner_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             CurrentEditor.RaiseEvent(e);
         }
-
 
         private void PartialGhostAdorner_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {

@@ -5,24 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
+using System.Windows;
+using Chem4Word.Model2;
 
-namespace Chem4Word.ACME.Commands
+namespace Chem4Word.ACME
 {
-    public class UnGroupCommand : ACME.Commands.BaseCommand
+    public class NewAtomPlacement
     {
-        public UnGroupCommand(EditViewModel vm) : base(vm)
-        {
-        }
-
-        public override bool CanExecute(object parameter)
-        {
-            return false;
-        }
-
-        public override void Execute(object parameter)
-        {
-            Debugger.Break();
-        }
+        public Point Position { get; set; }
+        public Atom ExistingAtom { get; set; }
     }
 }

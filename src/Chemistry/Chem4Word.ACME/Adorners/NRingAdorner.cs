@@ -65,14 +65,14 @@ namespace Chem4Word.ACME.Adorners
                                            GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
             Brush fillBrush = BondPen.Brush.Clone();
 
-            Pen boundaryPen = new Pen(fillBrush,2.0);
+            Pen boundaryPen = new Pen(fillBrush, 2.0);
 
             symbolText.MeasureAtCenter(pos);
             var textMetricsBoundingBox = symbolText.TextMetrics.BoundingBox;
             double radius =
                 (textMetricsBoundingBox.BottomRight - textMetricsBoundingBox.TopLeft).Length /
                 2 * 1.1;
-            drawingContext.DrawEllipse(new SolidColorBrush(SystemColors.WindowColor),boundaryPen,pos,radius,radius );
+            drawingContext.DrawEllipse(new SolidColorBrush(SystemColors.WindowColor), boundaryPen, pos, radius, radius);
             symbolText.Fill = fillBrush;
             symbolText.DrawAtBottomLeft(textMetricsBoundingBox.BottomLeft, drawingContext);
         }

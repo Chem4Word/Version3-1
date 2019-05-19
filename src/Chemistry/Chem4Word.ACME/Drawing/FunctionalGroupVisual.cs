@@ -21,9 +21,9 @@ namespace Chem4Word.ACME.Drawing
         public FunctionalGroup ParentGroup { get; }
         public bool Flipped => ParentAtom.BalancingVector.X < 0d;
 
-        public FunctionalGroupVisual( Atom parent) :this((FunctionalGroup)parent.Element)
+        public FunctionalGroupVisual(Atom parent) : this((FunctionalGroup)parent.Element)
         {
-            ParentAtom = parent;   
+            ParentAtom = parent;
         }
 
         public FunctionalGroupVisual(FunctionalGroup fg)
@@ -118,7 +118,7 @@ namespace Chem4Word.ACME.Drawing
                 var locus = new Point(0, 0) + dispVector;
 
                 using (DrawingContext dc = RenderOpen())
-                    //draw the line
+                //draw the line
                 {
                     myTextLine.Draw(dc, locus, InvertAxes.None);
 
@@ -189,7 +189,6 @@ namespace Chem4Word.ACME.Drawing
                 return new PointHitTestResult(this, hitTestParameters.HitPoint);
             }
             return null;
-
         }
     }
 }

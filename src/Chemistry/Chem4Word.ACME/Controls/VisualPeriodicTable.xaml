@@ -68,7 +68,6 @@
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter Property="Foreground" Value="Black" />
                         <Setter Property="Background" Value="Red" />
-
                     </Trigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="halogen">
                         <Setter Property="Foreground" Value="White" />

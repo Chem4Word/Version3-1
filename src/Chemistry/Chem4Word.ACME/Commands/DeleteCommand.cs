@@ -5,10 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
 using System;
 using System.Linq;
-using Chem4Word.Model2;
-
 
 namespace Chem4Word.ACME.Commands
 {
@@ -36,7 +35,7 @@ namespace Chem4Word.ACME.Commands
                 EditViewModel.UndoManager.BeginUndoBlock();
 
                 EditViewModel.DeleteAtomsAndBonds(atoms, bonds);
-               
+
                 EditViewModel.UndoManager.EndUndoBlock();
                 EditViewModel.SelectedItems.Clear();
             }

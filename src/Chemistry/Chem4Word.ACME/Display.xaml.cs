@@ -5,17 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Drawing;
 using Chem4Word.Core;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.Model2.Helpers;
 using ChemistryModel = Chem4Word.Model2.Model;
 
 namespace Chem4Word.ACME
@@ -151,7 +148,7 @@ namespace Chem4Word.ACME
             //assuming we've got this far, we should have something we can draw
             if (chemistryModel != null)
             {
-                if (chemistryModel.TotalAtomsCount> 0)
+                if (chemistryModel.TotalAtomsCount > 0)
                 {
                     chemistryModel.RescaleForXaml(true);
 

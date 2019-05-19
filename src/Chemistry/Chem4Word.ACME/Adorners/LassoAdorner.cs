@@ -38,8 +38,6 @@ namespace Chem4Word.ACME.Adorners
             CurrentEditor.RaiseEvent(e);
         }
 
-       
-
         public LassoAdorner([NotNull] UIElement adornedElement, StreamGeometry outline) : this(adornedElement)
         {
             _outline = outline;

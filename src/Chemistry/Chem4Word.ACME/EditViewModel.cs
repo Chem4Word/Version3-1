@@ -28,16 +28,11 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Resources;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME
 {
-    public class NewAtomPlacement
-    {
-        public Point Position { get; set; }
-        public Atom ExistingAtom { get; set; }
-    }
-
     public class EditViewModel : ViewModel, INotifyPropertyChanged
     {
         #region Fields
@@ -153,11 +148,11 @@ namespace Chem4Word.ACME
                 _selectedElement = value;
 
                 var selAtoms = SelectedItems.OfType<Atom>().ToList();
-                SelectedItems.Clear();
                 if (value != null)
                 {
                     SetElement(value, selAtoms);
                 }
+                OnPropertyChanged();
             }
         }
 
@@ -182,7 +177,7 @@ namespace Chem4Word.ACME
                         {
                             selectedAtom.Element = lastElement;
                         };
-                        UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol??"null"}");
+                        UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol ?? "null"}");
                         selectedAtom.Element = value;
                         selectedAtom.UpdateVisual();
                         foreach (Bond bond in selectedAtom.Bonds)
@@ -378,15 +373,24 @@ namespace Chem4Word.ACME
 
         public void LoadAtomOptions()
         {
-            AtomOptions.Clear();
+            ClearAtomOptions();
             LoadStandardAtomOptions();
             LoadModelAtomOptions();
             LoadModelFGs();
         }
 
+        private void ClearAtomOptions()
+        {
+            int limit = AtomOptions.Count - 1;
+            for (int i = limit; i >= 0; i--)
+            {
+                AtomOptions.RemoveAt(i);
+            }
+        }
+
         public void LoadAtomOptions(Element addition)
         {
-            AtomOptions.Clear();
+            ClearAtomOptions();
             LoadStandardAtomOptions();
             LoadModelAtomOptions(addition);
             LoadModelFGs();
@@ -401,22 +405,10 @@ namespace Chem4Word.ACME
                             select a.Element).Distinct();
 
             var newOptions = from mfg in modelFGs
-                             select new AtomOption
-                             {
-                                 Element = mfg,
-                                 Foreground = new SolidColorBrush(Colors.Black),
-                                 Content = (mfg as FunctionalGroup).Symbol
-                             };
+                             select new AtomOption((mfg as FunctionalGroup));
             foreach (var newOption in newOptions)
             {
-                try
-                {
-                    AtomOptions.Add(newOption);
-                }
-                catch
-                {
-                    // Something is recursively calling LoadModelFGs()
-                }
+                AtomOptions.Add(newOption);
             }
         }
 
@@ -427,60 +419,33 @@ namespace Chem4Word.ACME
                                                                  select ao.Element).Contains(a.Element)
                                  orderby a.SymbolText
                                  select a.Element).Distinct();
-            var pt = new PeriodicTable();
-            var newOptions = from e in pt.ElementsSource
+
+            var newOptions = from e in Globals.PeriodicTable.ElementsSource
                              join me in modelElements
                                  on e equals me
-                             select new AtomOption
-                             {
-                                 Element = e,
-                                 Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour)),
-                                 Content = e.Symbol
-                             };
+                             select new AtomOption(e);
+
             foreach (var newOption in newOptions)
             {
-                try
-                {
-                    AtomOptions.Add(newOption);
-                }
-                catch
-                {
-                    // Something is recursively calling LoadModelAtomOptions()
-                }
+                AtomOptions.Add(newOption);
             }
 
             if (addition != null && !AtomOptions.Select(ao => ao.Element).Contains(addition))
             {
-                try
-                {
-                    AtomOptions.Add(new AtomOption
-                    {
-                        Element = addition,
-                        Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString(addition.Colour)),
-                        Content = addition.Symbol
-                    });
-                }
-                catch
-                {
-                    // Something is recursively calling LoadModelAtomOptions()
-                }
+                AtomOptions.Add(new AtomOption(addition));
             }
         }
 
         private void LoadStandardAtomOptions()
         {
-            object resourceOptions = Application.Current.FindResource("AtomItems");
-            AtomOption[] standardOptions = (AtomOption[])resourceOptions;
-            foreach (AtomOption option in standardOptions)
+            foreach (var atom in Constants.StandardAtoms)
             {
-                try
-                {
-                    AtomOptions.Add(option);
-                }
-                catch
-                {
-                    // Something is recursively calling LoadStandardAtomOptions()
-                }
+                AtomOptions.Add(new AtomOption(Globals.PeriodicTable.Elements[atom]));
+            }
+
+            foreach (var fg in Constants.StandardFunctionalGroups)
+            {
+                AtomOptions.Add(new AtomOption(FunctionalGroupsDictionary[fg]));
             }
         }
 
@@ -1091,8 +1056,7 @@ namespace Chem4Word.ACME
 
         #endregion Event Handlers
 
-        public bool Dirty =>
-            UndoManager.CanUndo;
+        public bool Dirty => UndoManager.CanUndo;
 
         /// <summary>
         /// Draws a ring as specfied by the new atom placements

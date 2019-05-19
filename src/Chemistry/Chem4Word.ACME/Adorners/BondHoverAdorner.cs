@@ -4,6 +4,7 @@
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
 // ---------------------
+using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
@@ -12,7 +13,6 @@ using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.ACME.Controls;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -29,11 +29,9 @@ namespace Chem4Word.ACME.Adorners
             _solidColorBrush = new SolidColorBrush(Globals.HoverAdornerColor);
             //_solidColorBrush.Opacity = 0.25;
 
-
             _bracketPen = new Pen(_solidColorBrush, Globals.HoverAdornerThickness);
             _bracketPen.StartLineCap = PenLineCap.Round;
             _bracketPen.EndLineCap = PenLineCap.Round;
-
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
@@ -44,7 +42,6 @@ namespace Chem4Word.ACME.Adorners
             _targetedVisual = targetedVisual;
             _targetedBond = _targetedVisual.ParentBond;
         }
-
 
         /// <summary>
         /// Draws the adorner on top of the editor
@@ -75,22 +72,21 @@ namespace Chem4Word.ACME.Adorners
 
             offsetVector1 = offsetVector1 * rotator;
 
-            Vector twiddle = - offsetVector1.Perpendicular();
+            Vector twiddle = -offsetVector1.Perpendicular();
             twiddle.Normalize();
             twiddle *= 3.0;
 
             using (StreamGeometryContext sgc = sg.Open())
             {
-                sgc.BeginFigure(_targetedBond.StartAtom.Position+ offsetVector1 + twiddle, false, false);
-                sgc.LineTo(_targetedBond.StartAtom.Position + offsetVector1, true,true);
-                sgc.LineTo(_targetedBond.StartAtom.Position- offsetVector1, true, true);
-                sgc.LineTo(_targetedBond.StartAtom.Position-offsetVector1 + twiddle,true,true);
+                sgc.BeginFigure(_targetedBond.StartAtom.Position + offsetVector1 + twiddle, false, false);
+                sgc.LineTo(_targetedBond.StartAtom.Position + offsetVector1, true, true);
+                sgc.LineTo(_targetedBond.StartAtom.Position - offsetVector1, true, true);
+                sgc.LineTo(_targetedBond.StartAtom.Position - offsetVector1 + twiddle, true, true);
 
                 sgc.BeginFigure(_targetedBond.EndAtom.Position + offsetVector1 - twiddle, false, false);
                 sgc.LineTo(_targetedBond.EndAtom.Position + offsetVector1, true, true);
                 sgc.LineTo(_targetedBond.EndAtom.Position - offsetVector1, true, true);
                 sgc.LineTo(_targetedBond.EndAtom.Position - offsetVector1 - twiddle, true, true);
-
 
                 sgc.Close();
             }

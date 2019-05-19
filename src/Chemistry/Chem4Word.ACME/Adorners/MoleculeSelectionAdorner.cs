@@ -157,9 +157,9 @@ namespace Chem4Word.ACME.Adorners
 
                 foreach (Molecule molecule in AdornedMolecules)
                 {
-                     molecule.Move(LastOperation);
+                    molecule.Move(LastOperation);
                 }
-               
+
                 SetBoundingBox();
                 InvalidateVisual();
                 DragCompleted?.Invoke(this, dragCompletedEventArgs);

@@ -5,16 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using Chem4Word.ACME.Drawing;
-
-using Chem4Word.Model2;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Helpers;
-
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -67,7 +65,7 @@ namespace Chem4Word.ACME.Adorners
             Geometry outline;
             // ToDo: This may not be accurate
             var length = (StartPoint - EndPoint).Length;
-            if(ExistingBond==null || !ExistingBond.IsCyclic())
+            if (ExistingBond == null || !ExistingBond.IsCyclic())
             {
                 outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder);
             }
@@ -78,7 +76,7 @@ namespace Chem4Word.ACME.Adorners
             drawingContext.DrawGeometry(_solidColorBrush, _dashPen, outline);
         }
 
-        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order, Ring existingRing=null)
+        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order, Ring existingRing = null)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();

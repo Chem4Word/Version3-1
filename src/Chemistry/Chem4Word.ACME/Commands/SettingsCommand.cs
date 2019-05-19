@@ -7,7 +7,6 @@
 
 using System.Diagnostics;
 
-
 namespace Chem4Word.ACME.Commands
 {
     public class SettingsCommand : ACME.Commands.BaseCommand

@@ -4,12 +4,11 @@
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
 
-
+using Chem4Word.Model2.Geometry;
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Utils
 {
@@ -30,8 +29,8 @@ namespace Chem4Word.ACME.Utils
         /// </summary>
         /// <param name="startPoint">location of the angle where the bond swings from.</param>
         /// <param name="lockAngle">Angle in degrees - must be a factor of 360</param>
-        public Snapper(Point startPoint, EditViewModel viewModel, int lockAngle = 15, double bondLength =0,
-            bool snapLength=true, bool snapAngle=true)
+        public Snapper(Point startPoint, EditViewModel viewModel, int lockAngle = 15, double bondLength = 0,
+            bool snapLength = true, bool snapAngle = true)
         {
             ViewModel = viewModel;
             StartPoint = startPoint;
@@ -141,7 +140,7 @@ namespace Chem4Word.ACME.Utils
 
         private static double NormalizeBondLength(Vector originalDisplacement, double defaultLength)
         {
-            return (Math.Floor(originalDisplacement.Length / defaultLength)+1) * defaultLength;
+            return (Math.Floor(originalDisplacement.Length / defaultLength) + 1) * defaultLength;
         }
     }
 }

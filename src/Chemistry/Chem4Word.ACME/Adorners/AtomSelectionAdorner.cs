@@ -40,7 +40,6 @@ namespace Chem4Word.ACME.Adorners
         private void AtomSelectionAdorner_PreviewMouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             CurrentEditor.RaiseEvent(e);
-            ;
         }
 
         private void AtomSelectionAdorner_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

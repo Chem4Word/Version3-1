@@ -5,10 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Chem4Word.ACME.Controls;
-using Chem4Word.Model2.Annotations;
+using System.ComponentModel;
 
 namespace Chem4Word.ACME.Models
 {
@@ -16,6 +14,7 @@ namespace Chem4Word.ACME.Models
     {
         //public string Stereo { get; set; }
         public DoubleBondType DoubleBondChoice { get; set; }
+
         public SingleBondType SingleBondChoice { get; set; }
         public double Angle { get; set; }
         public bool IsSingle { get; set; }

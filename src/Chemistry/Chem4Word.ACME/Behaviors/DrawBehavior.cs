@@ -12,14 +12,11 @@ using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Behaviors;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME.Behaviors
@@ -42,7 +39,6 @@ namespace Chem4Word.ACME.Behaviors
         private AtomVisual _lastAtomVisual;
 
         private const string DefaultText = "Click existing atom to sprout a chain or modify element.";
-        
 
         protected override void OnAttached()
         {
@@ -62,7 +58,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            LassoBehaviour.DoPropertyEdit(e,CurrentEditor);
+            UIUtils.DoPropertyEdit(e, CurrentEditor);
         }
 
         ///
@@ -70,7 +66,6 @@ namespace Chem4Word.ACME.Behaviors
         ///
         private void CurrentEditor_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-
             Bond existingBond = null;
 
             if (_adorner != null)
@@ -85,15 +80,13 @@ namespace Chem4Word.ACME.Behaviors
 
             if (_currentAtomVisual != null)
             {
-                
-
                 Point lastPos;
 
                 if (Dragging(e))
                 {
                     CurrentStatus = "[Shift] to unlock length; [Ctrl] to unlock angle; [Shift][Ctrl] to unlock both.";
                     //are we already on top of an atom?
-                   
+
                     if (targetedVisual is AtomVisual atomUnderCursor)
                     {
                         //if so. snap to the atom's position
@@ -101,27 +94,21 @@ namespace Chem4Word.ACME.Behaviors
                         //if we are stroking over an existing bond
                         //then draw a double bond adorner
 
-                        
                         existingBond = _lastAtomVisual.ParentAtom.BondBetween(atomUnderCursor.ParentAtom);
                         if (_lastAtomVisual != null &&
                             existingBond != null)
                         {
-                            
-                           
                             if (existingBond.Order == OrderSingle)
                             {
                                 bondOrder = OrderDouble;
-                               
                             }
                             else if (existingBond.Order == OrderDouble)
                             {
                                 bondOrder = OrderTriple;
-                                
                             }
                             else if (existingBond.Order == OrderTriple)
                             {
                                 bondOrder = OrderSingle;
-                               
                             }
                         }
                     }
@@ -137,19 +124,16 @@ namespace Chem4Word.ACME.Behaviors
                         lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
                     }
 
-                   
                     _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
                     {
                         Stereo = EditViewModel.CurrentStereo,
                         BondOrder = bondOrder,
                         ExistingBond = existingBond
                     };
-                
 
                     _adorner.StartPoint = _currentAtomVisual.Position;
                     _adorner.EndPoint = lastPos;
                 }
-                
             }
             else
             {
@@ -178,8 +162,6 @@ namespace Chem4Word.ACME.Behaviors
         /// <param name="e"></param>
         private void CurrentEditor_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            
-
             CurrentEditor.ReleaseMouseCapture();
             CurrentStatus = "";
             //first get the current active visuals
@@ -245,19 +227,20 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         if (lastAtom.Element != EditViewModel.SelectedElement)
                         {
-                            
-                            EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>(){lastAtom});
-                        }
-
-                        else {if (!lastAtom.CanAddAtoms)
-                        {
-                            Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
+                            EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() { lastAtom });
                         }
                         else
                         {
-                            var atomMetrics = GetNewChainEndPos(landedAtomVisual);
-                            EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
-                        }}
+                            if (!lastAtom.CanAddAtoms)
+                            {
+                                Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
+                            }
+                            else
+                            {
+                                var atomMetrics = GetNewChainEndPos(landedAtomVisual);
+                                EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
+                            }
+                        }
                     }
                     else //we must have hit a different atom altogether
                     {
@@ -453,8 +436,8 @@ namespace Chem4Word.ACME.Behaviors
             }
 
             var sortedPlacements = (from p in possiblePlacements
-                                    orderby p.Crowding ascending , p.NeighbourWeights, p.Separation descending
-                                    
+                                    orderby p.Crowding ascending, p.NeighbourWeights, p.Separation descending
+
                                     select p);
 
             Vector newPlacement = sortedPlacements.First().Orientation;
@@ -570,9 +553,8 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.PreviewMouseLeftButtonUp -= CurrentEditor_PreviewMouseLeftButtonUp;
             CurrentEditor.PreviewMouseMove -= CurrentEditor_PreviewMouseMove;
-            CurrentEditor.PreviewMouseRightButtonUp-=CurrentEditor_PreviewMouseRightButtonUp;
+            CurrentEditor.PreviewMouseRightButtonUp -= CurrentEditor_PreviewMouseRightButtonUp;
             CurrentStatus = "";
-         
         }
     }
 }

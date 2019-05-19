@@ -7,6 +7,7 @@
     xmlns:control="clr-namespace:Chem4Word.ACME.Controls"
     xmlns:converters="clr-namespace:Chem4Word.ACME.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:diag="clr-namespace:System.Diagnostics;assembly=System"
     xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="AcmeControl"
@@ -23,6 +24,7 @@
                 <ResourceDictionary Source="Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <converters:DoNothingConverter x:Key="DoNothing" />
             <!--  styles  -->
 
             <Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}">
@@ -347,14 +349,14 @@
                 <ComboBox
                     x:Name="AtomCombo"
                     Width="Auto"
-                    MinWidth="48"
                     Height="25"
+                    MinWidth="48"
                     FontFamily="Arial"
                     FontSize="16"
                     FontWeight="DemiBold"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
                     ItemsSource="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AtomOptions}"
-                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, Mode=TwoWay}"
+                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, PresentationTraceSources.TraceLevel=High, Mode=TwoWay, Converter={StaticResource DoNothing}}"
                     SelectedValuePath="Element"
                     ToolTip="Current Atom Type" />
                 <ComboBox
@@ -376,16 +378,15 @@
                 x:Name="ActionToolBar"
                 Height="40"
                 BandIndex="1">
-               
 
                 <RadioButton
                     x:Name="DrawButton"
                     Click="ModeButton_OnChecked"
                     GroupName="Actions"
+                    IsChecked="True"
                     Style="{StaticResource ToolbarButtonStyle}"
-                    ToolTip="Draw"
-                    IsChecked="True">
-                    
+                    ToolTip="Draw">
+
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -406,7 +407,6 @@
                     x:Name="SelectionButton"
                     Checked="ModeButton_OnChecked"
                     GroupName="Actions"
-                   
                     Style="{StaticResource ToolbarButtonStyle}"
                     ToolTip="Select">
                     <Viewbox
@@ -942,7 +942,6 @@
                 FontFamily="Tahoma"
                 Foreground="{StaticResource Chem4WordBrush}"
                 Text="{Binding ElementName=AcmeControl, Path=ActiveViewModel.ActiveMode.CurrentStatus}" />
-
         </StatusBar>
     </Grid>
 </UserControl>

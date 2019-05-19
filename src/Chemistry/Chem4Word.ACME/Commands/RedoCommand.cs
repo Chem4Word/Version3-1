@@ -5,8 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-
-
 namespace Chem4Word.ACME.Commands
 {
     public class RedoCommand : ACME.Commands.BaseCommand

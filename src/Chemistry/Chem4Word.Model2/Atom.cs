@@ -472,6 +472,14 @@ namespace Chem4Word.Model2
                     foreach (var bond in Bonds)
                     {
                         Vector v = bond.OtherAtom(this).Position - this.Position;
+
+                        // Multiply by bond order to bias away from double or triple bonds
+                        double order = bond.OrderValue.Value;
+                        if (order > 0.1)
+                        {
+                            v = v * bond.OrderValue.Value;
+                        }
+
                         sumOfLengths += v.Length;
                         vsumVector += v;
                     }

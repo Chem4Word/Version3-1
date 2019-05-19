@@ -7,7 +7,6 @@
 
 using System;
 
-
 namespace Chem4Word.ACME.Commands
 {
     public class UndoCommand : ACME.Commands.BaseCommand

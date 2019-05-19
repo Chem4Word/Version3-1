@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Models;
-using System;
 using System.ComponentModel;
 using System.Windows;
 
@@ -18,8 +17,6 @@ namespace Chem4Word.ACME.Controls
     public partial class BondPropertyEditor : Window
     {
         private BondPropertiesModel _model;
-
-        private bool _closing = false;
 
         public BondPropertyEditor()
         {
@@ -33,25 +30,6 @@ namespace Chem4Word.ACME.Controls
                 _model = model;
                 DataContext = _model;
                 BondPath.Text = _model.Path;
-                Closing += OnClosing;
-#if DEBUG
-#else
-                Deactivated += OnDeactivated;
-#endif
-            }
-        }
-
-        private void OnClosing(object sender, CancelEventArgs e)
-        {
-            _closing = true;
-        }
-
-        private void OnDeactivated(object sender, EventArgs e)
-        {
-            if (!_closing)
-            {
-                _model.Save = false;
-                Close();
             }
         }
 
@@ -66,7 +44,6 @@ namespace Chem4Word.ACME.Controls
             if (ValidateModel())
             {
                 _model.Save = true;
-                _closing = true;
                 Close();
             }
         }

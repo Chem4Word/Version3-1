@@ -6,14 +6,13 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Annotations;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace Chem4Word.ACME.Models
 {
-    public class BaseDialogModel: INotifyPropertyChanged
+    public class BaseDialogModel : INotifyPropertyChanged
     {
         public Point Centre { get; set; }
         public string Path { get; set; }

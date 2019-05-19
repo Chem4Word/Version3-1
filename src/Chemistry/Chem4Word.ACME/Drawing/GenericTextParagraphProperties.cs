@@ -91,6 +91,7 @@ namespace Chem4Word.ACME.Drawing
             private TextRunProperties _defaultTextRunProperties;
             private TextWrapping _textWrap;
             private double _indent;
+
             //private double _paragraphIndent;
             private double _lineHeight;
         }

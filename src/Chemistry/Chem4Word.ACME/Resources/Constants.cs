@@ -5,18 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Windows.Controls;
+using System.Collections.Generic;
+using System.Windows.Documents;
 
-namespace Chem4Word.ACME.Controls
+namespace Chem4Word.ACME.Resources
 {
-    /// <summary>
-    /// Interaction logic for AtomPicker.xaml
-    /// </summary>
-    public partial class AtomPicker : UserControl
+    public static class Constants
     {
-        public AtomPicker()
-        {
-            InitializeComponent();
-        }
+        public static string[] StandardAtoms = {"C","H","N","O","P","S","F","Cl","Br","I"};
+        public static string[] StandardFunctionalGroups = { "R1" };
     }
 }

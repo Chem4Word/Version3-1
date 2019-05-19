@@ -33,7 +33,6 @@ namespace Chem4Word.ACME.Drawing
 
                 foreach (Match match in super)
                 {
-                    
                     if (match.Value.Contains("{"))//it's a superscript
                     {
                         Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsSuperscript = true, IsEndParagraph = false, Text = match.Value.TrimStart('{').TrimEnd('}') });

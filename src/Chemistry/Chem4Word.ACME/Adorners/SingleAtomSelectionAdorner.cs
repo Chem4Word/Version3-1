@@ -5,6 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -13,51 +15,58 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2;
-
 
 namespace Chem4Word.ACME.Adorners
 {
-    public class SingleAtomSelectionAdorner :Adorner
+    public class SingleAtomSelectionAdorner : Adorner
     {
         protected Thumb BigThumb; //this is the main grab area for the molecule
         protected readonly VisualCollection VisualChildren;
+
         //tracks the last operation performed
         protected Transform LastOperation;
+
         //status flag
         protected bool Dragging;
+
         //rendering variables
         protected readonly Pen BorderPen;
+
         protected readonly Brush RenderBrush;
+
         //tracks the amount of travel during drag operations
         protected double DragXTravel;
+
         protected double DragYTravel;
         public readonly EditViewModel CurrentModel;
+
         //where the dragging starts
         protected Point StartPos;
+
         private readonly EditorCanvas _editorCanvas;
         protected bool IsWorking => Dragging;
+
         // Override the VisualChildrenCount and GetVisualChild properties to interface with
         // the adorner's visual collection.
         protected override int VisualChildrenCount => VisualChildren.Count;
+
         //public Molecule AdornedMolecule { get; set; }
         public readonly List<Molecule> AdornedMolecules;
+
         protected override Visual GetVisualChild(int index)
         {
             return VisualChildren[index];
         }
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
-            : this(adornedElement, new List<Molecule> {molecule}, currentModel)
+            : this(adornedElement, new List<Molecule> { molecule }, currentModel)
         {
-            
         }
 
         public SingleAtomSelectionAdorner(UIElement adornedElement, List<Molecule> molecules,
-            EditViewModel currentModel):base(adornedElement)
+            EditViewModel currentModel) : base(adornedElement)
         {
-            AdornedMolecules= new List<Molecule>();
+            AdornedMolecules = new List<Molecule>();
             CurrentModel = currentModel;
 
             VisualChildren = new VisualCollection(this);
@@ -84,10 +93,11 @@ namespace Chem4Word.ACME.Adorners
             _editorCanvas?.RaiseEvent(e);
         }
 
-         ~SingleAtomSelectionAdorner()
+        ~SingleAtomSelectionAdorner()
         {
             PreviewMouseRightButtonUp -= SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
         }
+
         protected void AttachHandler()
         {
             //wire up the event handling
@@ -266,20 +276,19 @@ namespace Chem4Word.ACME.Adorners
             _editorCanvas.SuppressRedraw = true;
             //move the molecule
             var atoms = from mol in AdornedMolecules
-                from atom in mol.Atoms.Values
-                select atom;
+                        from atom in mol.Atoms.Values
+                        select atom;
 
-                CurrentModel.DoTransform(LastOperation, atoms.ToList());
-            
+            CurrentModel.DoTransform(LastOperation, atoms.ToList());
+
             RaiseDRCompleted(sender, e);
             Dragging = false;
             _editorCanvas.SuppressRedraw = false;
 
             foreach (Molecule adornedMolecule in AdornedMolecules)
             {
-                 adornedMolecule.ForceUpdates();
+                adornedMolecule.ForceUpdates();
             }
-           
         }
 
         #endregion MouseIsDown

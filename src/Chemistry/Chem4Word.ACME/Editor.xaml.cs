@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Behaviors;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
@@ -16,10 +17,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interactivity;
 using System.Windows.Media;
-using System.Windows.Shapes;
-using Chem4Word.ACME.Behaviors;
 
 namespace Chem4Word.ACME
 {
@@ -180,7 +178,7 @@ namespace Chem4Word.ACME
             var currentFace = new VisualBrush();
             currentFace.AutoLayoutContent = true;
             currentFace.Stretch = Stretch.Uniform;
-            
+
             currentFace.Visual = selButton.Content as Visual;
             RingPanel.Background = currentFace;
             RingButton.Tag = selButton.Tag;
@@ -311,7 +309,7 @@ namespace Chem4Word.ACME
                 }
 
                 var radioButton = (RadioButton)sender;
-               
+
                 if (radioButton.Tag is BaseEditBehavior bh)
                 {
                     ActiveViewModel.ActiveMode = bh;
@@ -331,6 +329,10 @@ namespace Chem4Word.ACME
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
         }
     }
 }

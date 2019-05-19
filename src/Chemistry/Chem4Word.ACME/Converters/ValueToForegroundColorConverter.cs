@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System;
 using System.Windows.Data;
 using System.Windows.Media;
 
 namespace Chem4Word.ACME.Converters
 {
-    class ValueToForegroundColorConverter : IValueConverter
+    internal class ValueToForegroundColorConverter : IValueConverter
     {
         #region IValueConverter Members
 
@@ -28,7 +31,7 @@ namespace Chem4Word.ACME.Converters
                 brush = new SolidColorBrush(Colors.Blue);
             else if (doubleValue == 0.0)
             {
-                brush=new SolidColorBrush(Colors.Black);
+                brush = new SolidColorBrush(Colors.Black);
             }
 
             return brush;
@@ -39,6 +42,6 @@ namespace Chem4Word.ACME.Converters
             throw new NotImplementedException();
         }
 
-        #endregion
+        #endregion IValueConverter Members
     }
 }

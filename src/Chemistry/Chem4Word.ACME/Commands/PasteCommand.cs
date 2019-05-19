@@ -7,7 +7,6 @@
 
 using System.Diagnostics;
 
-
 namespace Chem4Word.ACME.Commands
 {
     public class PasteCommand : ACME.Commands.BaseCommand

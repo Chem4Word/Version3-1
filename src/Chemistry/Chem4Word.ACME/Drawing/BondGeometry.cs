@@ -399,7 +399,6 @@ namespace Chem4Word.ACME.Drawing
         {
             if (startPoint != endPoint)
             {
-
                 Vector bondVector = endPoint - startPoint;
 
                 Point tempStartPoint = startPoint;
@@ -413,7 +412,6 @@ namespace Chem4Word.ACME.Drawing
                 startPoint = tempStartPoint;
             }
         }
-    
 
         private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
         {

@@ -76,7 +76,7 @@ namespace Chem4Word.ACME.Drawing
         }
 
         public static bool GetBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry, Geometry endAtomGeometry,
-            double modelXamlBondLength, out Geometry singleBondGeometry, Bond parentBond, out List<Point> enclosingPoly, bool ignoreCentroid=false)
+            double modelXamlBondLength, out Geometry singleBondGeometry, Bond parentBond, out List<Point> enclosingPoly, bool ignoreCentroid = false)
         {
             enclosingPoly = null;
             //check to see if it's a wedge or a hatch yet
@@ -139,10 +139,11 @@ namespace Chem4Word.ACME.Drawing
                 }
 
                 {
-                    if(!ignoreCentroid)
-                    { singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                        parentBond.Placement,
-                        ref enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
+                    if (!ignoreCentroid)
+                    {
+                        singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
+                          parentBond.Placement,
+                          ref enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
                         return true;
                     }
                     else
@@ -152,7 +153,6 @@ namespace Chem4Word.ACME.Drawing
                                                                              ref enclosingPoly, null, startAtomGeometry, endAtomGeometry);
                         return true;
                     }
-                    
                 }
             }
 

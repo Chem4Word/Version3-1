@@ -5,14 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Annotations;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2.Annotations;
-
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -37,12 +36,12 @@ namespace Chem4Word.ACME.Behaviors
             get
             {
                 return _currentStatus;
-            } 
+            }
             protected set
             {
                 _currentStatus = value;
                 OnPropertyChanged();
-            } 
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

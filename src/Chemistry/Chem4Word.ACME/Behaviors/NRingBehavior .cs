@@ -31,6 +31,7 @@ namespace Chem4Word.ACME.Behaviors
         private List<Point> _preferredPlacements;
         private List<Point> _altPlacements;
         private const string DefaultStatusText = "Drag on atom, bond or free space to draw ring.";
+
         public NRingBehavior()
         {
         }
@@ -62,7 +63,6 @@ namespace Chem4Word.ACME.Behaviors
         private void _currentAdorner_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             CurrentEditor_MouseLeftButtonUp(sender, e);
-            
         }
 
         private void _currentAdorner_MouseMove(object sender, MouseEventArgs e)
@@ -162,14 +162,15 @@ namespace Chem4Word.ACME.Behaviors
                         case AtomVisual av:
                             CurrentStatus = "Drag from atom to size ring.";
                             break;
+
                         case BondVisual bv:
                             CurrentStatus = "Drag from bond to size ring.";
                             break;
+
                         default:
                             CurrentStatus = DefaultStatusText;
                             break;
                     }
-                    
                 }
             }
         }

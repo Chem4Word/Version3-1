@@ -5,10 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Runtime.InteropServices;
 using Chem4Word.Model2;
+using System.Collections.Generic;
 
 namespace Chem4Word.ACME.Models
 {
@@ -31,6 +29,8 @@ namespace Chem4Word.ACME.Models
             }
         }
 
+        public ElementBase AddedElement { get; set; }
+
         public int? Charge
         {
             get => _charge;
@@ -48,7 +48,7 @@ namespace Chem4Word.ACME.Models
                 List<ChargeValue> charges = new List<ChargeValue>();
                 for (int charge = -8; charge < 9; charge++)
                 {
-                    charges.Add(new ChargeValue{Value = charge, Label = charge.ToString() });
+                    charges.Add(new ChargeValue { Value = charge, Label = charge.ToString() });
                 }
 
                 return charges;
@@ -82,12 +82,12 @@ namespace Chem4Word.ACME.Models
                 List<IsotopeValue> temp = new List<IsotopeValue>();
 
                 var e = Element as Element;
-                temp.Add(new IsotopeValue{Label="", Mass = null});
-                if (e != null && e.IsotopeMasses!=null)
+                temp.Add(new IsotopeValue { Label = "", Mass = null });
+                if (e != null && e.IsotopeMasses != null)
                 {
                     foreach (int mass in e.IsotopeMasses)
                     {
-                        temp.Add(new IsotopeValue{Label = mass.ToString(), Mass = mass});
+                        temp.Add(new IsotopeValue { Label = mass.ToString(), Mass = mass });
                     }
                 }
 
@@ -97,7 +97,7 @@ namespace Chem4Word.ACME.Models
 
         public bool HasIsotopes
         {
-            get { return IsotopeMasses.Count >1; }
+            get { return IsotopeMasses.Count > 1; }
         }
 
         public class IsotopeValue

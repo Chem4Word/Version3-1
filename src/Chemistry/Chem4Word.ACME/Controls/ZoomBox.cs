@@ -115,7 +115,6 @@ namespace Chem4Word.ACME.Controls
 
         private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            
             double scale = e.NewValue / e.OldValue;
             double halfViewportHeight = ScrollViewer.ViewportHeight / 2;
             double newVerticalOffset = ((ScrollViewer.VerticalOffset + halfViewportHeight) * scale - halfViewportHeight);

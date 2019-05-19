@@ -5,17 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Core;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -73,7 +73,7 @@ namespace Chem4Word.ACME.Behaviors
             base.OnAttached();
             EditViewModel.SelectedItems?.Clear();
 
-            CurrentEditor = (EditorCanvas) AssociatedObject;
+            CurrentEditor = (EditorCanvas)AssociatedObject;
 
             _parent = Application.Current.MainWindow;
 
@@ -96,7 +96,6 @@ namespace Chem4Word.ACME.Behaviors
             List<Point> preferredPlacements;
 
             CurrentAdorner = null;
-
 
             var xamlBondSize = EditViewModel.Model.XamlBondLength;
 
@@ -215,7 +214,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 NewAtomPlacement nap = new NewAtomPlacement
                 {
-                    ExistingAtom =(currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
+                    ExistingAtom = (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
                     Position = placement
                 };
                 newAtomPlacements.Add(nap);
@@ -240,7 +239,7 @@ namespace Chem4Word.ACME.Behaviors
             //try to work out exactly where best to place the ring
 
             preferredPlacements = MarkOutAtoms(hitAtom, direction, xamlBondSize, ringSize);
-            if (parentMolecule.Overlaps(preferredPlacements, new List<Atom> {hitAtom}))
+            if (parentMolecule.Overlaps(preferredPlacements, new List<Atom> { hitAtom }))
             {
                 preferredPlacements = null;
             }
@@ -255,7 +254,6 @@ namespace Chem4Word.ACME.Behaviors
             PathGeometry secondOverlap;
             double firstOverlapArea;
             double secondOverlapArea;
-
 
             parentMolecule = hitBond.Parent;
             var bondDirection = hitBond.BondVector;

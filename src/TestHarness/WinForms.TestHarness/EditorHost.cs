@@ -7,9 +7,12 @@
 
 using System;
 using System.Drawing;
+using System.Text;
 using System.Windows.Forms;
 using Chem4Word.ACME;
+using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2.Converters.CML;
 
 namespace WinForms.TestHarness
 {
@@ -54,6 +57,51 @@ namespace WinForms.TestHarness
                 Result = DialogResult.OK;
                 OutputValue = args.OutputValue;
                 Hide();
+            }
+        }
+
+        private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (Result != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
+            {
+                Editor ec = elementHost1.Child as Editor;
+                if (ec != null)
+                {
+                    if (ec.Dirty)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine("Do you wish to save your changes?");
+                        sb.AppendLine("  Click 'Yes' to save your changes and exit.");
+                        sb.AppendLine("  Click 'No' to discard your changes and exit.");
+                        sb.AppendLine("  Click 'Cancel' to return to the form.");
+                        DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                        switch (dr)
+                        {
+                            case DialogResult.Cancel:
+                                e.Cancel = true;
+                                break;
+
+                            case DialogResult.Yes:
+                                Result = DialogResult.OK;
+                                CMLConverter cc = new CMLConverter();
+                                OutputValue = cc.Export(ec.Data);
+                                Hide();
+                                ec.OnOkButtonClick -= OnWpfButtonClick;
+                                ec = null;
+                                break;
+
+                            case DialogResult.No:
+                                ec = null;
+                                break;
+                        }
+                    }
+                }
+
+                CmlEditor ce = elementHost1.Child as CmlEditor;
+                if (ce != null)
+                {
+                    // We don't care just ignore it
+                }
             }
         }
     }

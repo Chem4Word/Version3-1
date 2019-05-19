@@ -135,7 +135,11 @@ namespace Chem4Word.Renderer.OoXmlV4
                 ymax = ll.Y;
             }
 
-            Rect result = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
+            Rect result = new Rect();
+            if (xmax - xmin > 0 && ymax - ymin > 0)
+            {
+                result = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
+            }
             _minMaxBox = result;    // For debugging.
             return result;
         }

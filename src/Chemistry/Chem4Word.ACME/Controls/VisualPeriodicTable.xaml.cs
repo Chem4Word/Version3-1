@@ -46,18 +46,16 @@ namespace Chem4Word.ACME.Controls
         {
             var newElement = e.NewValue as Element;
             var control = d as VisualPeriodicTable;
-
-            
         }
-        
 
         private void ItemContainerGenerator_StatusChanged(object sender, EventArgs e)
         {
             if (ElementGrid.ItemContainerGenerator.Status == GeneratorStatus.ContainersGenerated)
             {
-                 HighlightSelectedElement(SelectedElement, this);
+                HighlightSelectedElement(SelectedElement, this);
             }
         }
+
         public static void HighlightSelectedElement(Element newElement, VisualPeriodicTable vpt)
         {
             for (int i = 0; i < vpt.ElementGrid.Items.Count; i++)
@@ -89,8 +87,6 @@ namespace Chem4Word.ACME.Controls
         public delegate void ElementSelectedEvent(object sender, ElementEventArgs e);
 
         public event ElementSelectedEvent ElementSelected;
-
-       
 
         private void ElementSquare_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

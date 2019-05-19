@@ -8,7 +8,6 @@
 using System;
 using System.Windows.Input;
 
-
 namespace Chem4Word.ACME.Commands
 {
     public abstract class BaseCommand : ICommand
