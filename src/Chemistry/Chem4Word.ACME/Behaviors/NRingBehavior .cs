@@ -29,7 +29,6 @@ namespace Chem4Word.ACME.Behaviors
         private Window _parent;
         private NRingAdorner _currentAdorner;
         private List<Point> _preferredPlacements;
-        private List<Point> _altPlacements;
         private const string DefaultStatusText = "Drag on atom, bond or free space to draw ring.";
 
         public NRingBehavior()
@@ -121,8 +120,11 @@ namespace Chem4Word.ACME.Behaviors
 
                         case BondVisual bv:
                             RingSize = GetRingSizeFromEdge(bv, CurrentPoint);
-                            IdentifyPlacements(bv.ParentBond, out _altPlacements, out _preferredPlacements, RingSize);
-                            if (_preferredPlacements != null | _altPlacements != null)
+                            Vector perpToBV =
+                                GetProjection(bv.ParentBond.BondVector.Perpendicular(), bv.ParentBond.MidPoint, CurrentPoint);
+
+                            IdentifyPlacements(bv.ParentBond, out _preferredPlacements, RingSize, perpToBV);
+                            if (_preferredPlacements != null)
                             {
                                 Vector? perpToAV = bv.ParentBond.GetUncrowdedSideVector();
                                 if (perpToAV != null)
@@ -132,7 +134,7 @@ namespace Chem4Word.ACME.Behaviors
                                         GetProjection(perpToAV.Value, parentBondMidPoint, CurrentPoint);
                                     Point endPoint = parentBondMidPoint + parallelToPerp;
                                     CurrentAdorner = new NRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
-                                                                  _preferredPlacements ?? _altPlacements,
+                                                                  _preferredPlacements,
                                                                   parentBondMidPoint, endPoint);
                                 }
                                 else
@@ -199,7 +201,7 @@ namespace Chem4Word.ACME.Behaviors
         private static Vector GetProjection(Vector input, Vector offset)
         {
             input.Normalize();
-            var projection = Vector.Multiply(input, offset) * input;
+            var projection = (input * offset) * input;
             return projection;
         }
 
@@ -264,10 +266,10 @@ namespace Chem4Word.ACME.Behaviors
         {
             if (MouseIsDown)
             {
-                if (_altPlacements != null | _preferredPlacements != null)
+                if ( _preferredPlacements != null)
                 {
                     List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
-                    FillExistingAtoms(_preferredPlacements, _altPlacements, newAtomPlacements, CurrentEditor);
+                    FillExistingAtoms(_preferredPlacements, newAtomPlacements, CurrentEditor);
                     EditViewModel.DrawRing(newAtomPlacements, false);
                 }
             }
@@ -343,11 +345,11 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         public static void FillExistingAtoms(List<Point> preferredPlacements,
-                                             List<Point> altPlacements,
+                                            
                                              List<NewAtomPlacement> newAtomPlacements,
                                              EditorCanvas currentEditor)
         {
-            foreach (Point placement in (preferredPlacements ?? altPlacements))
+            foreach (Point placement in preferredPlacements)
             {
                 NewAtomPlacement nap = new NewAtomPlacement
                 {
@@ -382,59 +384,19 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        public static void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements, out List<Point> preferredPlacements, int ringSize)
+        public static void IdentifyPlacements(Bond hitBond, out List<Point> preferredPlacements, int ringSize, Vector? perpvector=null)
         {
-            Molecule parentMolecule;
-            List<Point> placements;
-            parentMolecule = hitBond.Parent;
+
+            if (perpvector == null)
+            {
+                //get a point on the less crowded side of the bond
+                perpvector = hitBond.GetUncrowdedSideVector();
+            }
+
             Vector bondDirection = hitBond.BondVector;
+            bool followsBond = Vector.AngleBetween(hitBond.BondVector, perpvector.Value) > 0;
 
-            placements = MarkOutAtoms(hitBond, true, ringSize: ringSize);
-            PathGeometry firstOverlap = parentMolecule.OverlapArea(placements);
-            double firstOverlapArea = firstOverlap.GetArea();
-            altPlacements = MarkOutAtoms(hitBond, false, ringSize: ringSize);
-            PathGeometry secondOverlap = parentMolecule.OverlapArea(altPlacements);
-            double secondOverlapArea = secondOverlap.GetArea();
-
-            //get a point on the less crowded side of the bond
-            var perpvector = hitBond.GetUncrowdedSideVector();
-            if (perpvector != null)
-            {
-                var vec = perpvector.Value;
-                vec.Normalize();
-                vec *= hitBond.BondVector.Length / 2;
-                Point placementPoint = hitBond.MidPoint + vec;
-
-                if (!firstOverlap.FillContains(placementPoint))
-                {
-                    preferredPlacements = placements;
-                }
-                else if (!secondOverlap.FillContains(placementPoint))
-                {
-                    preferredPlacements = altPlacements;
-                }
-                else
-                {
-                    if (firstOverlapArea <= secondOverlapArea)
-                    {
-                        preferredPlacements = placements;
-                    }
-                    else if (!parentMolecule.Overlaps(altPlacements))
-                    {
-                        preferredPlacements = altPlacements;
-                    }
-                    else
-                    {
-                        preferredPlacements = null;
-                        altPlacements = null;
-                    }
-                }
-            }
-            else
-            {
-                preferredPlacements = null;
-                altPlacements = null;
-            }
+            preferredPlacements = MarkOutAtoms(hitBond, followsBond, ringSize: ringSize);
         }
 
         /// <summary>

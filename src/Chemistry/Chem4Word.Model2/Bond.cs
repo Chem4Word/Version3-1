@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -535,7 +536,32 @@ namespace Chem4Word.Model2
             }
             else
             {
-                return BondCentroid - MidPoint;
+                if (BondCentroid != null)
+                {
+                    return BondCentroid - MidPoint;
+                }
+                else
+                {
+                    if (StartAtom.Neighbours.Count() == 1 & EndAtom.Neighbours.Count() == 2)
+                    {
+                        var tempvector = EndAtom.NeighboursExcept(StartAtom)[0].Position - StartAtom.Position;
+                        var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector)*BondVector.Perpendicular();
+                        return perp;
+                    }
+                    else if (StartAtom.Neighbours.Count() == 2 & EndAtom.Neighbours.Count() == 1)
+                    {
+                        var tempvector = StartAtom.NeighboursExcept(EndAtom)[0].Position - EndAtom.Position;
+                        var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector) * BondVector.Perpendicular();
+                        return perp;
+                    }
+
+                    else
+                    {
+                        return BondVector.Perpendicular();
+                    }
+                    
+                }
+
             }
         }
 

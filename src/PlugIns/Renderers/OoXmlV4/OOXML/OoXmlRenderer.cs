@@ -183,9 +183,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             // Create Inline Drawing using canvas extents
             Wp.Inline inline1 = CreateInline(graphicData1, wordprocessingGroup1);
 
-            // Right-Click Issues - Step 1 of hopefull fix - Add background to force whole object select
-            //DrawShape(wordprocessingGroup1, _boundingBoxOfAllCharacters, A.ShapeTypeValues.Rectangle, "eeeeee");
-
             #endregion Step 5 - Create main OoXml drawing objects
 
             Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
@@ -195,16 +192,22 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             #region Step 5a - Diagnostics
 
+            if (_options.ShowMoleculeGroups)
+            {
+                foreach (var box in _boundingBoxesOfMoleculesWithAtLeastTwoChildren)
+                {
+                    double offset = OoXmlHelper.DRAWING_MARGIN / 2;
+                    Rect bb = new Rect(new Point(box.TopLeft.X - offset, box.TopLeft.Y - offset),
+                                       new Point(box.BottomRight.X + offset, box.BottomRight.Y + offset));
+                    DrawBrackets(wordprocessingGroup1, bb, "909090", .75);
+                }
+            }
+
             if (_options.ShowMoleculeBoundingBoxes)
             {
                 foreach (var box in _boundingBoxesOfMoleculeAtoms)
                 {
                     DrawBox(wordprocessingGroup1, box, "ff0000", .75);
-                }
-
-                foreach (var box in _boundingBoxesOfMoleculesWithAtLeastTwoChildren)
-                {
-                    DrawBox(wordprocessingGroup1, box, "00ffff", .75);
                 }
 
                 foreach (var box in _boundingBoxesOfMoleculesIncludingCharacters)
@@ -370,14 +373,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             foreach (var hull in _convexHulls)
             {
                 var points = hull.Value.ToList();
-                for (int i = 0; i < points.Count - 1; i++)
-                {
-                    Rect bb = new Rect(points[i], points[i + 1]);
-                    DrawLine(wordprocessingGroup1, bb, points[i], points[i + 1], "ff0000", 0.25);
-                }
-
-                Rect bb2 = new Rect(points[points.Count - 1], points[0]);
-                DrawLine(wordprocessingGroup1, bb2, points[points.Count - 1], points[0], "ff0000", 0.25);
+                DrawPolygon(wordprocessingGroup1, points, "ff0000", 0.25);
             }
         }
 
@@ -528,26 +524,27 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     bool outside;
                     var r = GeometryTool.ClipLineWithPolygon(start, end, hull.Value, out outside);
 
-                    if (r.Length == 3)
+                    switch (r.Length)
                     {
-                        if (outside)
-                        {
-                            bl.Start = new Point(r[0].X, r[0].Y);
-                            bl.End = new Point(r[1].X, r[1].Y);
-                        }
-                        else
-                        {
-                            bl.Start = new Point(r[1].X, r[1].Y);
-                            bl.End = new Point(r[2].X, r[2].Y);
-                        }
-                    }
-                    else
-                    {
-                        if (!outside)
-                        {
-                            // This line is totally inside so remove it!
-                            _bondLines.Remove(bl);
-                        }
+                        case 3:
+                            if (outside)
+                            {
+                                bl.Start = new Point(r[0].X, r[0].Y);
+                                bl.End = new Point(r[1].X, r[1].Y);
+                            }
+                            else
+                            {
+                                bl.Start = new Point(r[1].X, r[1].Y);
+                                bl.End = new Point(r[2].X, r[2].Y);
+                            }
+                            break;
+                        case 2:
+                            if (!outside)
+                            {
+                                // This line is totally inside so remove it!
+                                _bondLines.Remove(bl);
+                            }
+                            break;
                     }
                 }
             }
@@ -918,6 +915,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value height1 = OoXmlHelper.ScaleCmlToEmu(extents.Height);
             Int64Value top1 = OoXmlHelper.ScaleCmlToEmu(extents.Top);
             Int64Value left1 = OoXmlHelper.ScaleCmlToEmu(extents.Left);
+
             Point pp1 = new Point(left1, top1);
             Size ss2 = new Size(width1, height1);
             pp1.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
@@ -1025,10 +1023,267 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             wordprocessingGroup1.Append(wordprocessingShape1);
         }
 
-        private void DrawLine(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, Point startPoint, Point endPoint, string colour, double points)
+        private void DrawBrackets(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, double points)
+        {
+            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string bondLineName = "box" + bondLineId;
+
+            Int64Value width1 = OoXmlHelper.ScaleCmlToEmu(extents.Width);
+            Int64Value height1 = OoXmlHelper.ScaleCmlToEmu(extents.Height);
+            Int64Value top1 = OoXmlHelper.ScaleCmlToEmu(extents.Top);
+            Int64Value left1 = OoXmlHelper.ScaleCmlToEmu(extents.Left);
+
+            Point pp1 = new Point(left1, top1);
+            Size ss2 = new Size(width1, height1);
+            pp1.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
+            Rect boundingBox = new Rect(pp1, ss2);
+
+            Int64Value width = (Int64Value)boundingBox.Width;
+            Int64Value height = (Int64Value)boundingBox.Height;
+            Int64Value top = (Int64Value)boundingBox.Top;
+            Int64Value left = (Int64Value)boundingBox.Left;
+
+            Wps.WordprocessingShape wordprocessingShape1 = new Wps.WordprocessingShape();
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties1 = new Wps.NonVisualDrawingProperties()
+            {
+                Id = bondLineId,
+                Name = bondLineName
+            };
+            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties1 = new Wps.NonVisualDrawingShapeProperties();
+
+            Wps.ShapeProperties shapeProperties1 = new Wps.ShapeProperties();
+
+            A.Transform2D transform2D1 = new A.Transform2D();
+            A.Offset offset2 = new A.Offset() { X = left, Y = top };
+            A.Extents extents2 = new A.Extents() { Cx = width, Cy = height };
+
+            transform2D1.Append(offset2);
+            transform2D1.Append(extents2);
+
+            A.CustomGeometry customGeometry1 = new A.CustomGeometry();
+            A.AdjustValueList adjustValueList1 = new A.AdjustValueList();
+            A.Rectangle rectangle1 = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+
+            A.PathList pathList1 = new A.PathList();
+
+            double gap = boundingBox.Width * 0.8;
+            double leftSide = (width - gap) / 2;
+            double rightSide = width - leftSide;
+
+            // Left Path
+            A.Path path1 = new A.Path() { Width = width, Height = height };
+
+            A.MoveTo moveTo1 = new A.MoveTo();
+            A.Point point1 = new A.Point() { X = leftSide.ToString("0"), Y = "0" };
+            moveTo1.Append(point1);
+
+            // Mid Point
+            A.LineTo lineTo1 = new A.LineTo();
+            A.Point point2 = new A.Point() { X = "0", Y = "0" };
+            lineTo1.Append(point2);
+
+            // Last Point
+            A.LineTo lineTo2 = new A.LineTo();
+            A.Point point3 = new A.Point() { X = "0", Y = boundingBox.Height.ToString("0") };
+            lineTo2.Append(point3);
+
+            // Mid Point
+            A.LineTo lineTo3 = new A.LineTo();
+            A.Point point4 = new A.Point() { X = leftSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            lineTo3.Append(point4);
+
+            path1.Append(moveTo1);
+            path1.Append(lineTo1);
+            path1.Append(lineTo2);
+            path1.Append(lineTo3);
+
+            pathList1.Append(path1);
+
+            // Right Path
+
+            A.Path path2 = new A.Path() { Width = width, Height = height };
+
+            A.MoveTo moveTo2 = new A.MoveTo();
+            A.Point point5 = new A.Point() { X = rightSide.ToString("0"), Y = "0" };
+            moveTo2.Append(point5);
+
+            // Mid Point
+            A.LineTo lineTo4 = new A.LineTo();
+            A.Point point6 = new A.Point() { X = boundingBox.Width.ToString("0"), Y = "0" };
+            lineTo4.Append(point6);
+
+            // Last Point
+            A.LineTo lineTo5 = new A.LineTo();
+            A.Point point7 = new A.Point() { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            lineTo5.Append(point7);
+
+            // Mid Point
+            A.LineTo lineTo6 = new A.LineTo();
+            A.Point point8 = new A.Point() { X = rightSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            lineTo6.Append(point8);
+
+            path2.Append(moveTo2);
+            path2.Append(lineTo4);
+            path2.Append(lineTo5);
+            path2.Append(lineTo6);
+
+            pathList1.Append(path2);
+
+            customGeometry1.Append(adjustValueList1);
+            customGeometry1.Append(rectangle1);
+            customGeometry1.Append(pathList1);
+
+            Int32Value emus = (Int32Value)(points * 12700);
+            A.Outline outline1 = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+
+            A.SolidFill solidFill1 = new A.SolidFill();
+
+            A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
+            solidFill1.Append(rgbColorModelHex1);
+
+            outline1.Append(solidFill1);
+
+            shapeProperties1.Append(transform2D1);
+            shapeProperties1.Append(customGeometry1);
+            shapeProperties1.Append(outline1);
+
+            Wps.ShapeStyle shapeStyle1 = new Wps.ShapeStyle();
+            A.LineReference lineReference1 = new A.LineReference() { Index = (UInt32Value)0U };
+            A.FillReference fillReference1 = new A.FillReference() { Index = (UInt32Value)0U };
+            A.EffectReference effectReference1 = new A.EffectReference() { Index = (UInt32Value)0U };
+            A.FontReference fontReference1 = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+
+            shapeStyle1.Append(lineReference1);
+            shapeStyle1.Append(fillReference1);
+            shapeStyle1.Append(effectReference1);
+            shapeStyle1.Append(fontReference1);
+            Wps.TextBodyProperties textBodyProperties1 = new Wps.TextBodyProperties();
+
+            wordprocessingShape1.Append(nonVisualDrawingProperties1);
+            wordprocessingShape1.Append(nonVisualDrawingShapeProperties1);
+            wordprocessingShape1.Append(shapeProperties1);
+            wordprocessingShape1.Append(shapeStyle1);
+            wordprocessingShape1.Append(textBodyProperties1);
+
+            wordprocessingGroup1.Append(wordprocessingShape1);
+        }
+
+        private void DrawPolygon(Wpg.WordprocessingGroup wordprocessingGroup1, List<Point> vertices, string colour, double points)
+        {
+            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string bondLineName = "diag-polygon-" + bondLineId;
+
+            Rect extents = new Rect(vertices[0], vertices[vertices.Count-1]);
+
+            for (int i = 0; i < vertices.Count -1; i++)
+            {
+                extents.Union(new Rect(vertices[i], vertices[i+1]));
+            }
+
+            // Move Extents to have 0,0 Top Left Reference
+            extents.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
+
+            Int64Value width = OoXmlHelper.ScaleCmlToEmu(extents.Width);
+            Int64Value height = OoXmlHelper.ScaleCmlToEmu(extents.Height);
+            Int64Value top = OoXmlHelper.ScaleCmlToEmu(extents.Top);
+            Int64Value left = OoXmlHelper.ScaleCmlToEmu(extents.Left);
+
+            Wps.WordprocessingShape wordprocessingShape1 = new Wps.WordprocessingShape();
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties1 = new Wps.NonVisualDrawingProperties() { Id = bondLineId, Name = bondLineName };
+            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties1 = new Wps.NonVisualDrawingShapeProperties();
+
+            Wps.ShapeProperties shapeProperties1 = new Wps.ShapeProperties();
+
+            A.Transform2D transform2D1 = new A.Transform2D();
+            A.Offset offset2 = new A.Offset() { X = left, Y = top };
+            A.Extents extents2 = new A.Extents() { Cx = width, Cy = height };
+
+            transform2D1.Append(offset2);
+            transform2D1.Append(extents2);
+
+            A.CustomGeometry customGeometry1 = new A.CustomGeometry();
+            A.AdjustValueList adjustValueList1 = new A.AdjustValueList();
+            A.Rectangle rectangle1 = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+
+            A.PathList pathList1 = new A.PathList();
+
+            A.Path path1 = new A.Path() { Width = width, Height = height };
+
+            // First point
+            A.MoveTo moveTo1 = new A.MoveTo();
+            Point startPoint = vertices[0];
+            startPoint.Offset(- _boundingBoxOfAllCharacters.Left, - _boundingBoxOfAllCharacters.Top);
+            startPoint.Offset(- extents.Left, - extents.Top);
+            A.Point point1 = new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
+            moveTo1.Append(point1);
+            path1.Append(moveTo1);
+
+            for (int i = 1; i < vertices.Count; i++)
+            {
+                Point thisPoint = vertices[i];
+                thisPoint.Offset(- _boundingBoxOfAllCharacters.Left, - _boundingBoxOfAllCharacters.Top);
+                thisPoint.Offset(-extents.Left, -extents.Top);
+                A.LineTo lineTo1 = new A.LineTo();
+                A.Point point2 = new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(thisPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(thisPoint.Y).ToString() };
+                lineTo1.Append(point2);
+                path1.Append(lineTo1);
+            }
+
+            // Close the path
+            A.CloseShapePath closeShapePath1 = new A.CloseShapePath();
+            path1.Append(closeShapePath1);
+
+            pathList1.Append(path1);
+
+            customGeometry1.Append(adjustValueList1);
+            customGeometry1.Append(rectangle1);
+            customGeometry1.Append(pathList1);
+
+            Int32Value emus = (Int32Value)(points * 12700);
+            A.Outline outline1 = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+
+            A.SolidFill solidFill1 = new A.SolidFill();
+
+            A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
+            A.Alpha alpha1 = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
+
+            rgbColorModelHex1.Append(alpha1);
+
+            solidFill1.Append(rgbColorModelHex1);
+
+            outline1.Append(solidFill1);
+
+            shapeProperties1.Append(transform2D1);
+            shapeProperties1.Append(customGeometry1);
+            shapeProperties1.Append(outline1);
+
+            Wps.ShapeStyle shapeStyle1 = new Wps.ShapeStyle();
+            A.LineReference lineReference1 = new A.LineReference() { Index = (UInt32Value)0U };
+            A.FillReference fillReference1 = new A.FillReference() { Index = (UInt32Value)0U };
+            A.EffectReference effectReference1 = new A.EffectReference() { Index = (UInt32Value)0U };
+            A.FontReference fontReference1 = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+
+            shapeStyle1.Append(lineReference1);
+            shapeStyle1.Append(fillReference1);
+            shapeStyle1.Append(effectReference1);
+            shapeStyle1.Append(fontReference1);
+            Wps.TextBodyProperties textBodyProperties1 = new Wps.TextBodyProperties();
+
+            wordprocessingShape1.Append(nonVisualDrawingProperties1);
+            wordprocessingShape1.Append(nonVisualDrawingShapeProperties1);
+            wordprocessingShape1.Append(shapeProperties1);
+            wordprocessingShape1.Append(shapeStyle1);
+            wordprocessingShape1.Append(textBodyProperties1);
+
+            wordprocessingGroup1.Append(wordprocessingShape1);
+        }
+
+        private void DrawLine(Wpg.WordprocessingGroup wordprocessingGroup1, Point startPoint, Point endPoint, string colour, double points)
         {
             UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "diag-line-" + bondLineId;
+
+            Rect extents = new Rect(startPoint, endPoint);
 
             // Move Bond Line Extents and Points to have 0,0 Top Left Reference
             startPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);

@@ -31,6 +31,10 @@ namespace Chem4Word.Renderer.OoXmlV4
 
         // Debugging
         [JsonProperty]
+        public bool ShowMoleculeGroups { get; set; }
+
+        // Debugging
+        [JsonProperty]
         public bool ShowMoleculeBoundingBoxes { get; set; }
 
         // Debugging
@@ -65,6 +69,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             clone.ShowRingCentres = ShowRingCentres;
             clone.ShowAtomPositions = ShowAtomPositions;
             clone.ShowHulls = ShowHulls;
+            clone.ShowMoleculeGroups = ShowMoleculeGroups;
 
             return clone;
         }
@@ -81,6 +86,8 @@ namespace Chem4Word.Renderer.OoXmlV4
             ShowRingCentres = false;
             ShowAtomPositions = false;
             ShowCarbons = false;
+            ShowHulls = false;
+            ShowMoleculeGroups = false;
         }
     }
 }
