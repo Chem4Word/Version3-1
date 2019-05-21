@@ -470,7 +470,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             foreach (BondLine bl in _bondLines)
             {
                 pb.Increment(1);
-                switch (bl.Type)
+                switch (bl.Style)
                 {
                     case BondLineStyle.Wedge:
                     case BondLineStyle.Hatch:
@@ -633,7 +633,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         {
                             // Line was clipped at both ends;
                             // 1. Generate new line
-                            BondLine extraLine = new BondLine(new Point(end.X, end.Y), new Point(bl.End.X, bl.End.Y), bl.Type, bl.ParentBond, bl.ParentMolecule, bl.StartAtomPath, bl.EndAtomPath);
+                            BondLine extraLine = new BondLine(new Point(end.X, end.Y), new Point(bl.End.X, bl.End.Y), bl.Style, bl.ParentBond, bl.ParentMolecule, bl.StartAtomPath, bl.EndAtomPath);
                             extraBondLines.Add(extraLine);
                             // 2. Trim existing line
                             bl.End = new Point(start.X, start.Y);

@@ -620,7 +620,7 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
         }
 
-        public void AddNewBond(Atom a, Atom b, Molecule mol)
+        public void AddNewBond(Atom a, Atom b, Molecule mol, string order=null, BondStereo? stereo =null )
         {
             void RefreshAtoms(Atom startAtom, Atom endAtom)
             {
@@ -639,15 +639,22 @@ namespace Chem4Word.ACME
             //keep a handle on some current properties
 
             int theoreticalRings = mol.TheoreticalRings;
-            BondStereo stereo = CurrentStereo;
-            string order = CurrentBondOrder;
+            if (stereo == null)
+            {
+                stereo = CurrentStereo;
+            }
+
+            if (order == null)
+            {
+                order = CurrentBondOrder;
+            }
             //stash the current molecule properties
             MoleculePropertyBag mpb = new MoleculePropertyBag();
             mpb.Store(mol);
 
             Bond newbond = new Bond();
 
-            newbond.Stereo = stereo;
+            newbond.Stereo = stereo.Value;
             newbond.Order = order;
             newbond.Parent = mol;
 
@@ -698,8 +705,10 @@ namespace Chem4Word.ACME
         /// <param name="newAtomPos">Position of new atom</param>
         /// <param name="dir">ClockDirection in which to add the atom</param>
         /// <param name="elem">Element of atom (can be a FunctionalGroup).  eefaults to current selection</param>
+        /// <param name="bondOrder"></param>
+        /// <param name="stereo"></param>
         /// <returns></returns>
-        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir, ElementBase elem = null)
+        public Atom AddAtomChain(Atom lastAtom, Point newAtomPos, ClockDirections dir, ElementBase elem = null, string bondOrder = null, BondStereo? stereo=null)
         {
             //create the new atom based on the current selection
             Atom newAtom = new Atom { Element = elem ?? _selectedElement, Position = newAtomPos };
@@ -738,7 +747,7 @@ namespace Chem4Word.ACME
 
                 redo();
 
-                AddNewBond(lastAtom, newAtom, currentMol);
+                AddNewBond(lastAtom, newAtom, currentMol, bondOrder, stereo);
                 lastAtom.UpdateVisual();
                 newAtom.UpdateVisual();
                 foreach (Bond lastAtomBond in lastAtom.Bonds)
@@ -1082,7 +1091,7 @@ namespace Chem4Word.ACME
                 {
                     Atom insertAtom = null;
 
-                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position, ClockDirections.Nothing, pt.C);
+                    insertAtom = AddAtomChain(previousAtom, currentPlacement.Position, ClockDirections.Nothing, pt.C, OrderSingle, BondStereo.None);
                     if (insertAtom == null)
                     {
                         Debugger.Break();
@@ -1091,7 +1100,7 @@ namespace Chem4Word.ACME
                 }
                 else if (previousAtom != null && previousAtom.BondBetween(currentAtom) == null)
                 {
-                    AddNewBond(previousAtom, currentAtom, previousAtom.Parent);
+                    AddNewBond(previousAtom, currentAtom, previousAtom.Parent, OrderSingle, BondStereo.None);
                 }
             }
             //join up the ring if there is no last bond
@@ -1100,7 +1109,7 @@ namespace Chem4Word.ACME
             if (firstAtom
                     .BondBetween(nextAtom) == null)
             {
-                AddNewBond(firstAtom, nextAtom, firstAtom.Parent);
+                AddNewBond(firstAtom, nextAtom, firstAtom.Parent, OrderSingle,BondStereo.None);
             }
             //set the alternating single and double bonds if unsaturated
 
@@ -1125,8 +1134,16 @@ namespace Chem4Word.ACME
 
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
+
+ 
+            //just refresh the atoms to be on the safe side
+            foreach (var atomPlacement in newAtomPlacements)
+            {
+                atomPlacement.ExistingAtom.UpdateVisual();
+            }
+
             //local function
-            void MakeRingUnsaturated(List<NewAtomPlacement> list, int StartAt = 0)
+            void MakeRingUnsaturated(List<NewAtomPlacement> list)
             {
                 for (int i = startAt; i < list.Count + startAt; i++)
                 {
@@ -1147,11 +1164,7 @@ namespace Chem4Word.ACME
                     }
                 }
             }
-            //just refresh the atoms to be on the safe side
-            foreach (var atomPlacement in newAtomPlacements)
-            {
-                atomPlacement.ExistingAtom.UpdateVisual();
-            }
+           
         }
 
         public void DeleteMolecules(IEnumerable<Molecule> mols)

@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics.PerformanceData;
 using System.Windows;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
@@ -20,7 +21,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
         public string StartAtomPath;
         public string EndAtomPath;
 
-        public BondLineStyle Type { get; set; }
+        public BondLineStyle Style { get; set; }
 
         public Point Start
         {
@@ -44,12 +45,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         public Rect BoundingBox { get; set; }
 
-        public BondLine(Point startPoint, Point endPoint, BondLineStyle type, string parentBond, string parentMolecule, string startAtomPath, string endAtomPath)
+        public BondLine(Point startPoint, Point endPoint, BondLineStyle style, string parentBond, string parentMolecule, string startAtomPath, string endAtomPath)
         {
             _start = startPoint;
             _end = endPoint;
             BoundingBox = new Rect(startPoint, endPoint);
-            Type = type;
+            Style = style;
             ParentBond = parentBond;
             ParentMolecule = parentMolecule;
             StartAtomPath = startAtomPath;
@@ -67,7 +68,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point newEndPoint = new Point((float)(_end.X - offset * yDifference / length),
                                           (float)(_end.Y + offset * xDifference / length));
 
-            return new BondLine(newStartPoint, newEndPoint, Type, ParentBond, ParentMolecule, StartAtomPath, EndAtomPath);
+            return new BondLine(newStartPoint, newEndPoint, Style, ParentBond, ParentMolecule, StartAtomPath, EndAtomPath);
+        }
+
+        public void SetLineStyle(BondLineStyle style)
+        {
+            Style = style;
         }
     }
 

@@ -94,14 +94,40 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
                 case Globals.OrderPartial12:
                 case Globals.OrderAromatic:
-                    BondLine a = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
-                    m_BondLines.Add(a.GetParallel(-(BondOffset() / 2)));
-                    BondLine a1 = a.GetParallel(BondOffset() / 2);
-                    Point newStarta = new Point(a1.Start.X, a1.Start.Y);
-                    Point newEnda = new Point(a1.End.X, a1.End.Y);
-                    CoordinateTool.AdjustLineAboutMidpoint(ref newStarta, ref newEnda, -(BondOffset() / 1.75));
-                    a1 = new BondLine(newStarta, newEnda, BondLineStyle.Dotted, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
-                    m_BondLines.Add(a1);
+                    BondLine onePointFive;
+                    BondLine onePointFiveDotted;
+                    Point onePointFiveStart;
+                    Point onePointFiveEnd;
+                    switch (bond.Placement)
+                    {
+                        case Globals.BondDirection.Clockwise:
+                            onePointFive = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(onePointFive);
+                            onePointFiveDotted = onePointFive.GetParallel(BondOffset());
+                            onePointFiveStart = new Point(onePointFiveDotted.Start.X, onePointFiveDotted.Start.Y);
+                            onePointFiveEnd = new Point(onePointFiveDotted.End.X, onePointFiveDotted.End.Y);
+                            CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / 1.75));
+                            onePointFiveDotted = new BondLine(onePointFiveStart, onePointFiveEnd, BondLineStyle.Dotted, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(onePointFiveDotted);
+                            break;
+                        case Globals.BondDirection.Anticlockwise:
+                            onePointFive = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(onePointFive);
+                            onePointFiveDotted = onePointFive.GetParallel(-BondOffset());
+                            onePointFiveStart = new Point(onePointFiveDotted.Start.X, onePointFiveDotted.Start.Y);
+                            onePointFiveEnd = new Point(onePointFiveDotted.End.X, onePointFiveDotted.End.Y);
+                            CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / 1.75));
+                            onePointFiveDotted = new BondLine(onePointFiveStart, onePointFiveEnd, BondLineStyle.Dotted, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(onePointFiveDotted);
+                            break;
+                        case Globals.BondDirection.None:
+                            onePointFive = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Id, bond.Parent.Id, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(onePointFive.GetParallel(-(BondOffset() / 2)));
+                            onePointFiveDotted = onePointFive.GetParallel(BondOffset() / 2);
+                            onePointFiveDotted.SetLineStyle(BondLineStyle.Dotted);
+                            m_BondLines.Add(onePointFiveDotted);
+                            break;
+                    }
                     break;
 
                 case "2":
@@ -185,7 +211,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                                     BondLine dc = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
                                     m_BondLines.Add(dc);
 
-                                    BondLine blc = dc.GetParallel(+BondOffset());
+                                    BondLine blc = dc.GetParallel(BondOffset());
                                     Point startPointc = blc.Start;
                                     Point endPointc = blc.End;
 
@@ -216,7 +242,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                                         case Globals.BondStereo.Cis:
                                             BondLine dcc = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
                                             m_BondLines.Add(dcc);
-                                            BondLine blnewc = dcc.GetParallel(+BondOffset());
+                                            BondLine blnewc = dcc.GetParallel(BondOffset());
                                             Point startPointn = blnewc.Start;
                                             Point endPointn = blnewc.End;
                                             CoordinateTool.AdjustLineAboutMidpoint(ref startPointn, ref endPointn, -(BondOffset() / 1.75));
@@ -226,7 +252,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                                         case Globals.BondStereo.Trans:
                                             BondLine dtt = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
                                             m_BondLines.Add(dtt);
-                                            BondLine blnewt = dtt.GetParallel(+BondOffset());
+                                            BondLine blnewt = dtt.GetParallel(BondOffset());
                                             Point startPointt = blnewt.Start;
                                             Point endPointt = blnewt.End;
                                             CoordinateTool.AdjustLineAboutMidpoint(ref startPointt, ref endPointt, -(BondOffset() / 1.75));
@@ -245,16 +271,74 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                     }
                     break;
 
-                case "3":
-                case Globals.OrderTriple:
-                    // Draw main bond line
-                    BondLine t = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
-                    m_BondLines.Add(t);
-                    m_BondLines.Add(t.GetParallel(BondOffset()));
-                    m_BondLines.Add(t.GetParallel(-BondOffset()));
+                case Globals.OrderPartial23:
+                    BondLine twoPointFive;
+                    BondLine twoPointFiveDotted;
+                    BondLine twoPointFiveParallel;
+                    Point twoPointFiveStart;
+                    Point twoPointFiveEnd;
+                    switch (bond.Placement)
+                    {
+                        case Globals.BondDirection.Clockwise:
+                            // Central bond line
+                            twoPointFive = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFive);
+                            // Solid bond line
+                            twoPointFiveParallel = twoPointFive.GetParallel(-BondOffset());
+                            twoPointFiveStart = new Point(twoPointFiveParallel.Start.X, twoPointFiveParallel.Start.Y);
+                            twoPointFiveEnd = new Point(twoPointFiveParallel.End.X, twoPointFiveParallel.End.Y);
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            twoPointFiveParallel = new BondLine(twoPointFiveStart, twoPointFiveEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFiveParallel);
+                            // Dotted bond line
+                            twoPointFiveDotted = twoPointFive.GetParallel(BondOffset());
+                            twoPointFiveStart = new Point(twoPointFiveDotted.Start.X, twoPointFiveDotted.Start.Y);
+                            twoPointFiveEnd = new Point(twoPointFiveDotted.End.X, twoPointFiveDotted.End.Y);
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            twoPointFiveDotted = new BondLine(twoPointFiveStart, twoPointFiveEnd, BondLineStyle.Dotted, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFiveDotted);
+                            break;
+                        case Globals.BondDirection.Anticlockwise:
+                            // Central bond line
+                            twoPointFive = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFive);
+                            // Dotted bond line
+                            twoPointFiveDotted = twoPointFive.GetParallel(-BondOffset());
+                            twoPointFiveStart = new Point(twoPointFiveDotted.Start.X, twoPointFiveDotted.Start.Y);
+                            twoPointFiveEnd = new Point(twoPointFiveDotted.End.X, twoPointFiveDotted.End.Y);
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            twoPointFiveDotted = new BondLine(twoPointFiveStart, twoPointFiveEnd, BondLineStyle.Dotted, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFiveDotted);
+                            // Solid bond line
+                            twoPointFiveParallel = twoPointFive.GetParallel(BondOffset());
+                            twoPointFiveStart = new Point(twoPointFiveParallel.Start.X, twoPointFiveParallel.Start.Y);
+                            twoPointFiveEnd = new Point(twoPointFiveParallel.End.X, twoPointFiveParallel.End.Y);
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            twoPointFiveParallel = new BondLine(twoPointFiveStart, twoPointFiveEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFiveParallel);
+                            break;
+                        case Globals.BondDirection.None:
+                            twoPointFive = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                            m_BondLines.Add(twoPointFive);
+                            m_BondLines.Add(twoPointFive.GetParallel(-BondOffset()));
+                            twoPointFiveDotted = twoPointFive.GetParallel(BondOffset());
+                            twoPointFiveDotted.SetLineStyle(BondLineStyle.Dotted);
+                            m_BondLines.Add(twoPointFiveDotted);
+                            break;
+                    }
                     break;
 
+                case "3":
+                case Globals.OrderTriple:
+                    BondLine tripple = new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path);
+                    m_BondLines.Add(tripple);
+                    m_BondLines.Add(tripple.GetParallel(BondOffset()));
+                    m_BondLines.Add(tripple.GetParallel(-BondOffset()));
+                    break;
+
+
                 default:
+                    // Draw a single line, so that there is something to see
                     m_BondLines.Add(new BondLine(bondStart, bondEnd, BondLineStyle.Solid, bond.Path, bond.Parent.Path, bond.StartAtom.Path, bond.EndAtom.Path));
                     break;
             }

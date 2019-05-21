@@ -206,7 +206,7 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (OrderValue == 2)
+                if (OrderValue == 2 || OrderValue == 1.5 || OrderValue == 2.5)
                 {
                     //force a recalc of the rings if necessary
                     if (!Parent.RingsCalculated)

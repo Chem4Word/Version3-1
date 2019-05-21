@@ -41,7 +41,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             points.Add(new Point(wedgeLeft.End.X, wedgeLeft.End.Y));
             points.Add(new Point(wedgeRight.End.X, wedgeRight.End.Y));
 
-            switch (bl.Type)
+            switch (bl.Style)
             {
                 case BondLineStyle.Wedge:
                     DrawFilledTriangle(wordprocessingGroup1, points);
@@ -72,7 +72,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             startPoint.Offset(-extents.Left, -extents.Top);
             endPoint.Offset(-extents.Left, -extents.Top);
 
-            switch (bl.Type)
+            switch (bl.Style)
             {
                 case BondLineStyle.Solid:
                     DrawSolidLine(wordprocessingGroup1, extents, startPoint, endPoint);
