@@ -615,6 +615,15 @@ namespace Chem4Word
                         CustomXMLPart customXmlPart = null;
                         string beforeCml = Properties.Resources.EmptyStructure_cml;
 
+                        if (editor.RequiresSeedAtom)
+                        {
+                            beforeCml = Properties.Resources.SingleCarbon_cml;
+                        }
+                        else
+                        {
+                            beforeCml = Properties.Resources.EmptyStructure_cml;
+                        }
+
                         bool isNewDrawing = true;
 
                         Word.Selection sel = app.Selection;

@@ -31,6 +31,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
         public bool HasSettings => true;
         public bool CanEditNestedMolecules => false;
         public bool CanEditFunctionalGroups => false;
+        public bool RequiresSeedAtom => true;
 
         public Point TopLeft { get; set; }
 

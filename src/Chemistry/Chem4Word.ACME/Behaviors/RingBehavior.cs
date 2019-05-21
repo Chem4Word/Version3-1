@@ -277,29 +277,19 @@ namespace Chem4Word.ACME.Behaviors
                 vec *= hitBond.BondVector.Length / 2;
                 var placementPoint = hitBond.MidPoint + vec;
 
-                if (!firstOverlap.FillContains(placementPoint))
+                if (firstOverlapArea < 0.001)
                 {
                     preferredPlacements = placements;
                 }
-                else if (!secondOverlap.FillContains(placementPoint))
+                else if (secondOverlapArea < 0.001)
                 {
                     preferredPlacements = altPlacements;
                 }
                 else
                 {
-                    if (firstOverlapArea <= secondOverlapArea)
-                    {
-                        preferredPlacements = placements;
-                    }
-                    else if (!parentMolecule.Overlaps(altPlacements))
-                    {
-                        preferredPlacements = altPlacements;
-                    }
-                    else
-                    {
                         preferredPlacements = null;
                         altPlacements = null;
-                    }
+                   
                 }
             }
             else

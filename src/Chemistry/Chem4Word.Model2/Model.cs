@@ -302,11 +302,16 @@ namespace Chem4Word.Model2
                 {
                     var allAtoms = GetAllAtoms();
 
-                    var modelRect = allAtoms[0].BoundingBox(FontSize);
-                    for (int i = 1; i < allAtoms.Count; i++)
+                    Rect modelRect = Rect.Empty;
+
+                    if (allAtoms.Count > 0)
                     {
-                        var atom = allAtoms[i];
-                        modelRect.Union(atom.BoundingBox(FontSize));
+                        modelRect = allAtoms[0].BoundingBox(FontSize);
+                        for (int i = 1; i < allAtoms.Count; i++)
+                        {
+                            var atom = allAtoms[i];
+                            modelRect.Union(atom.BoundingBox(FontSize));
+                        }
                     }
 
                     _boundingBox = modelRect;

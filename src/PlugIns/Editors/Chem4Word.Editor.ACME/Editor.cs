@@ -31,6 +31,7 @@ namespace Chem4Word.Editor.ACME
 
         public bool CanEditNestedMolecules => true;
         public bool CanEditFunctionalGroups => true;
+        public bool RequiresSeedAtom => false;
 
         public Point TopLeft { get; set; }
 

@@ -31,6 +31,7 @@ namespace Chem4Word.Editor.SimpleWpfEditor
         public bool HasSettings => false;
         public bool CanEditNestedMolecules => true;
         public bool CanEditFunctionalGroups => true;
+        public bool RequiresSeedAtom => false;
 
         public string Cml { get; set; }
 

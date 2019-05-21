@@ -15,5 +15,6 @@ namespace IChem4Word.Contracts
 
         bool CanEditNestedMolecules { get; }
         bool CanEditFunctionalGroups { get; }
+        bool RequiresSeedAtom { get; }
     }
 }
