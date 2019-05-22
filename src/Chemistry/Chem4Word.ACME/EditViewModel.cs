@@ -1158,7 +1158,7 @@ namespace Chem4Word.ACME
                         Bond bondBetween = thisAtom.BondBetween(otherAtom);
                         SetBondAttributes(bondBetween,
                                           OrderDouble, Globals.BondStereo.None);
-                        bondBetween.Placement = BondDirection.Anticlockwise;
+                        //bondBetween.Placement = BondDirection.Anticlockwise;
                         bondBetween.UpdateVisual();
                         thisAtom.UpdateVisual();
                     }
