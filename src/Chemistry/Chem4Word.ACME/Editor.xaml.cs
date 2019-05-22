@@ -30,10 +30,7 @@ namespace Chem4Word.ACME
 
         public EditViewModel ActiveViewModel
         {
-            get
-            {
-                return _activeViewModel;
-            }
+            get { return _activeViewModel; }
             set
             {
                 _activeViewModel = value;
@@ -41,7 +38,9 @@ namespace Chem4Word.ACME
             }
         }
 
-        public static readonly DependencyProperty SliderVisibilityProperty = DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor), new PropertyMetadata(default(Visibility)));
+        public static readonly DependencyProperty SliderVisibilityProperty =
+            DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor),
+                                        new PropertyMetadata(default(Visibility)));
 
         public event EventHandler<WpfEventArgs> OnOkButtonClick;
 
@@ -96,7 +95,7 @@ namespace Chem4Word.ACME
 
         public bool ShowSave
         {
-            get { return (bool)GetValue(ShowSaveProperty); }
+            get { return (bool) GetValue(ShowSaveProperty); }
             set { SetValue(ShowSaveProperty, value); }
         }
 
@@ -116,39 +115,40 @@ namespace Chem4Word.ACME
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
+                                UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/AdornerBrushes.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
+                                UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
+                                UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
+                                UriKind.Relative)) as ResourceDictionary);
                 Application.Current.Resources.MergedDictionaries.Add(
                     Application.LoadComponent(
                         new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
-                            UriKind.Relative)) as ResourceDictionary);
+                                UriKind.Relative)) as ResourceDictionary);
             }
         }
 
         public AtomOption SelectedAtomOption
         {
-            get { return (AtomOption)GetValue(SelectedAtomOptionProperty); }
+            get { return (AtomOption) GetValue(SelectedAtomOptionProperty); }
             set { SetValue(SelectedAtomOptionProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for SelectedAtomOption.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedAtomOptionProperty =
-            DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor), new PropertyMetadata(default(AtomOption)));
+            DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor),
+                                        new PropertyMetadata(default(AtomOption)));
 
         public Visibility SliderVisibility
         {
-            get { return (Visibility)GetValue(SliderVisibilityProperty); }
+            get { return (Visibility) GetValue(SliderVisibilityProperty); }
             set { SetValue(SliderVisibilityProperty, value); }
         }
 
@@ -160,9 +160,7 @@ namespace Chem4Word.ACME
         private void RingDropdown_OnClick(object sender, RoutedEventArgs e)
         {
             RingPopup.IsOpen = true;
-            RingPopup.Closed += (senderClosed, eClosed) =>
-            {
-            };
+            RingPopup.Closed += (senderClosed, eClosed) => { };
         }
 
         private void RingSelButton_OnClick(object sender, RoutedEventArgs e)
@@ -246,10 +244,11 @@ namespace Chem4Word.ACME
                 else
                 {
                     // child element found.
-                    foundChild = (T)child;
+                    foundChild = (T) child;
                     break;
                 }
             }
+
             return foundChild;
         }
 
@@ -308,7 +307,7 @@ namespace Chem4Word.ACME
                     ActiveViewModel.ActiveMode = null;
                 }
 
-                var radioButton = (RadioButton)sender;
+                var radioButton = (RadioButton) sender;
 
                 if (radioButton.Tag is BaseEditBehavior bh)
                 {
@@ -331,8 +330,5 @@ namespace Chem4Word.ACME
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void AtomCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-        }
     }
 }

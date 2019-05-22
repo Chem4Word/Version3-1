@@ -10,6 +10,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
 
 namespace Chem4Word.ACME
 {
@@ -33,7 +34,7 @@ namespace Chem4Word.ACME
         {
             Element = fg;
             Foreground = new SolidColorBrush(Colors.Black);
-            Content = (fg as FunctionalGroup).Symbol;
+            Content = new FunctionalGroupBlock{ParentGroup = fg};
         }
 
         public AtomOption(Element elem)

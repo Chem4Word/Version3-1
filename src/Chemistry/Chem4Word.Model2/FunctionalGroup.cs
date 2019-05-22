@@ -12,6 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace Chem4Word.Model2
 {

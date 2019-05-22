@@ -349,7 +349,8 @@
                 <ComboBox
                     x:Name="AtomCombo"
                     Width="Auto"
-                    Height="25"
+                    Height="Auto"
+                    MinHeight="25"
                     MinWidth="48"
                     FontFamily="Arial"
                     FontSize="16"
@@ -738,7 +739,6 @@
                 x:Name="ManipulationsToolbar"
                 Height="40"
                 BandIndex="3">
-
                 <Button
                     x:Name="FlipHorizontalButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipHorizontalCommand}"
