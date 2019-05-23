@@ -744,6 +744,7 @@ namespace Chem4Word.Model2
                 a.Element = atom.Element;
                 a.FormalCharge = atom.FormalCharge;
                 a.IsotopeNumber = atom.IsotopeNumber;
+                a.ShowSymbol = atom.ShowSymbol;
 
                 copy.AddAtom(a);
                 a.Parent = copy;

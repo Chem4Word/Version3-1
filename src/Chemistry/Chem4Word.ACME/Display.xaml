@@ -8,6 +8,7 @@
         <controls:ChemistryCanvas
             x:Name="ChemCanvas"
             Margin="5"
-            Background="White" />
+            Background="White"
+            HighlightActive="{Binding ElementName=ACMEDisplay, Path=HighlightActive}"/>
     </Viewbox>
 </UserControl>

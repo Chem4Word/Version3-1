@@ -49,10 +49,53 @@ namespace Chem4Word.ACME.Utils
                     Centre = pp,
                     Path = atom.Path,
                     Element = atom.Element,
-                    Charge = atom.FormalCharge ?? 0,
-                    Isotope = atom.IsotopeNumber.ToString(),
-                    ShowSymbol = atom.ShowSymbol
                 };
+
+                if (atom.Element is Element)
+                {
+                    model.IsFunctionalGroup = false;
+                    model.IsElement = true;
+
+                    model.Charge = atom.FormalCharge ?? 0;
+                    model.Isotope = atom.IsotopeNumber.ToString();
+                    model.ShowSymbol = atom.ShowSymbol;
+                }
+
+                if (atom.Element is FunctionalGroup)
+                {
+                    model.IsElement = false;
+                    model.IsFunctionalGroup = true;
+                }
+
+                model.MicroModel = new Model();
+
+                Molecule m = new Molecule();
+                model.MicroModel.AddMolecule(m);
+                m.Parent = model.MicroModel;
+
+                Atom a = new Atom();
+                a.Element = atom.Element;
+                a.Position = atom.Position;
+                a.FormalCharge = atom.FormalCharge;
+                a.IsotopeNumber = atom.IsotopeNumber;
+                m.AddAtom(a);
+                a.Parent = m;
+
+                foreach (var bond in atom.Bonds)
+                {
+                    Atom ac = new Atom();
+                    ac.Element = Globals.PeriodicTable.C;
+                    ac.ShowSymbol = false;
+                    ac.Position = bond.OtherAtom(atom).Position;
+                    m.AddAtom(ac);
+                    ac.Parent = m;
+                    Bond b = new Bond(a, ac);
+                    b.Order = bond.Order;
+                    b.Stereo = bond.Stereo;
+                    m.AddBond(b);
+                    b.Parent = m;
+                }
+                model.MicroModel.ScaleToAverageBondLength(20);
 
                 var pe = new AtomPropertyEditor(model);
                 UIUtils.ShowDialog(pe, currentEditor);
@@ -65,10 +108,18 @@ namespace Chem4Word.ACME.Utils
                     evm.AddToSelection(atom);
                     if (model.AddedElement != null)
                     {
-                        var newOption = new AtomOption((model.AddedElement as Element));
-                        evm.AtomOptions.Add(newOption);
-                    }
+                        if (model.IsElement)
+                        {
+                            var newOption = new AtomOption(model.AddedElement as Element);
+                            evm.AtomOptions.Add(newOption);
+                        }
 
+                        if (model.IsFunctionalGroup)
+                        {
+                            var newOption = new AtomOption(model.AddedElement as FunctionalGroup);
+                            evm.AtomOptions.Add(newOption);
+                        }
+                    }
                     evm.SelectedElement = model.Element;
                 }
             }

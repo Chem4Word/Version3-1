@@ -56,7 +56,5 @@ namespace Chem4Word.ACME
             get => (Style)GetValue(DisplayStyleProperty);
             set => SetValue(DisplayStyleProperty, value);
         }
-
-        //public object Clone() => MemberwiseClone();
     }
 }

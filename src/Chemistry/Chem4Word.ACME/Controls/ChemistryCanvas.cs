@@ -51,7 +51,10 @@ namespace Chem4Word.ACME.Controls
                 if (_activeVisual != value)
                 {
                     RemoveActiveAdorner();
-                    SetActiveAdorner(value);
+                    if (HighlightActive)
+                    {
+                        SetActiveAdorner(value);
+                    }
                     _activeVisual = value;
                 }
             }
@@ -89,6 +92,20 @@ namespace Chem4Word.ACME.Controls
                 }
             }
         }
+
+
+
+
+        public bool HighlightActive
+        {
+            get { return (bool)GetValue(HighlightActiveProperty); }
+            set { SetValue(HighlightActiveProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for HighlightActive.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HighlightActiveProperty =
+            DependencyProperty.Register("HighlightActive", typeof(bool), typeof(ChemistryCanvas), new PropertyMetadata(true));
+
 
         #endregion Properties
 

@@ -7,6 +7,7 @@
 
 using Chem4Word.Model2;
 using System.Collections.Generic;
+using Chem4Word.ACME.Entities;
 
 namespace Chem4Word.ACME.Models
 {
@@ -16,6 +17,37 @@ namespace Chem4Word.ACME.Models
         private int? _charge;
         private string _isotope;
         private bool? _showSymbol;
+        private bool _isFunctionalGroup;
+        private bool _isElement;
+
+        public ElementBase AddedElement { get; set; }
+
+        public bool IsFunctionalGroup
+        {
+            get => _isFunctionalGroup;
+            set
+            {
+                _isFunctionalGroup = value; 
+                OnPropertyChanged();
+            }
+        }
+
+        public bool IsElement
+        {
+            get => _isElement;
+            set
+            {
+                _isElement = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Model MicroModel { get; set; }
+
+        public bool HasIsotopes
+        {
+            get { return IsotopeMasses.Count > 1; }
+        }
 
         public ElementBase Element
         {
@@ -29,8 +61,6 @@ namespace Chem4Word.ACME.Models
             }
         }
 
-        public ElementBase AddedElement { get; set; }
-
         public int? Charge
         {
             get => _charge;
@@ -38,20 +68,6 @@ namespace Chem4Word.ACME.Models
             {
                 _charge = value;
                 OnPropertyChanged();
-            }
-        }
-
-        public List<ChargeValue> Charges
-        {
-            get
-            {
-                List<ChargeValue> charges = new List<ChargeValue>();
-                for (int charge = -8; charge < 9; charge++)
-                {
-                    charges.Add(new ChargeValue { Value = charge, Label = charge.ToString() });
-                }
-
-                return charges;
             }
         }
 
@@ -75,6 +91,20 @@ namespace Chem4Word.ACME.Models
             }
         }
 
+        public List<ChargeValue> Charges
+        {
+            get
+            {
+                List<ChargeValue> charges = new List<ChargeValue>();
+                for (int charge = -8; charge < 9; charge++)
+                {
+                    charges.Add(new ChargeValue { Value = charge, Label = charge.ToString() });
+                }
+
+                return charges;
+            }
+        }
+
         public List<IsotopeValue> IsotopeMasses
         {
             get
@@ -93,23 +123,6 @@ namespace Chem4Word.ACME.Models
 
                 return temp;
             }
-        }
-
-        public bool HasIsotopes
-        {
-            get { return IsotopeMasses.Count > 1; }
-        }
-
-        public class IsotopeValue
-        {
-            public string Label { get; set; }
-            public int? Mass { get; set; }
-        }
-
-        public class ChargeValue
-        {
-            public string Label { get; set; }
-            public int Value { get; set; }
         }
     }
 }

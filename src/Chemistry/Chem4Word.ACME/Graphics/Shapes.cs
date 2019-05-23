@@ -7,7 +7,7 @@
 
 namespace Chem4Word.ACME.Graphics
 {
-    public class Shapes
+    internal class Shapes
     {
     }
 }

@@ -590,15 +590,26 @@
                     </Canvas>
                 </RadioButton>
             </StackPanel>
-            <Button
+            <StackPanel
                 Grid.Row="5"
                 Grid.Column="1"
-                Width="50"
-                Margin="0,5,0,0"
                 HorizontalAlignment="Right"
-                Click="Save_OnClick">
-                Save
-            </Button>
+                Orientation="Horizontal">
+                <Button
+                    Width="50"
+                    Margin="0,5,5,0"
+                    HorizontalAlignment="Right"
+                    Click="Cancel_OnClick">
+                    Cancel
+                </Button>
+                <Button
+                    Width="50"
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Right"
+                    Click="Save_OnClick">
+                    Save
+                </Button>
+            </StackPanel>
         </Grid>
     </Border>
 </Window>

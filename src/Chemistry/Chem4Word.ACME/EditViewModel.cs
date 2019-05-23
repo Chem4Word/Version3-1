@@ -2094,13 +2094,16 @@ namespace Chem4Word.ACME
             int? chargeAfter = null;
             int? isotopeAfter = null;
             bool? showSymbolAfter = null;
-            AtomHelpers.TryParse(model.Element.Symbol, out elementBaseAfter);
 
-            chargeAfter = model.Charge;
-            showSymbolAfter = model.ShowSymbol;
-            if (!string.IsNullOrEmpty(model.Isotope))
+            AtomHelpers.TryParse(model.Element.Symbol, out elementBaseAfter);
+            if (elementBaseAfter is Element)
             {
-                isotopeAfter = int.Parse(model.Isotope);
+                chargeAfter = model.Charge;
+                showSymbolAfter = model.ShowSymbol;
+                if (!string.IsNullOrEmpty(model.Isotope))
+                {
+                    isotopeAfter = int.Parse(model.Isotope);
+                }
             }
 
             Action redo = () =>

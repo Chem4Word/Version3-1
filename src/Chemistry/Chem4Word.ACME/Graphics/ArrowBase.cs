@@ -10,23 +10,15 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.ACME.Enums;
 
 namespace Chem4Word.ACME.Graphics
 {
-    //comment to force a check-in
-    public enum ArrowEnds
-    {
-        None = 0,
-        Start = 1,
-        End = 2,
-        Both = 3
-    }
-
     /// <summary>
     /// Draws an arrow.  Override ArrowLineFigure if you want to draw a curvy arrow
     /// </summary>
 
-    public class ArrowBase : Shape
+    internal class ArrowBase : Shape
     {
         #region "Fields"
 

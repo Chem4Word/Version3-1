@@ -353,7 +353,7 @@
                     MinHeight="25"
                     MinWidth="48"
                     FontFamily="Arial"
-                    FontSize="16"
+                    FontSize="18"
                     FontWeight="DemiBold"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
                     ItemsSource="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AtomOptions}"

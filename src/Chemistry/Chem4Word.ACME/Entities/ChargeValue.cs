@@ -5,22 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-
-namespace Chem4Word.Model2
+namespace Chem4Word.ACME.Entities
 {
-    public class Formula
+    public class ChargeValue
     {
-        public string Id { get; set; }
-
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
-        {
-        }
+        public string Label { get; set; }
+        public int Value { get; set; }
     }
 }

@@ -41,27 +41,15 @@ namespace Chem4Word.Model2
 
         public void Store(Molecule parent)
         {
-            XmlSerializer namesSerializer= new XmlSerializer(typeof(ObservableCollection<ChemicalName>));
-            XmlSerializer formulasSerializer = new XmlSerializer(typeof(ObservableCollection<Formula>));
-            StringWriter sw1 = new StringWriter();
-            StringWriter sw2 = new StringWriter();
-            namesSerializer.Serialize(sw1, parent.Names);
-            formulasSerializer.Serialize(sw2, parent.Formulas);
-            Names = sw1.ToString();
-            Formulas = sw2.ToString();
+            Names = JsonConvert.SerializeObject(parent.Names, Formatting.None);
+            Formulas = JsonConvert.SerializeObject(parent.Formulas, Formatting.None);
         }
 
         public void Restore(Molecule parent)
         {
-            XmlSerializer namesSerializer = new XmlSerializer(typeof(ObservableCollection<ChemicalName>));
-            XmlSerializer formulasSerializer = new XmlSerializer(typeof(ObservableCollection<Formula>));
-            StringReader sr1 = new StringReader(Names);
-            StringReader sr2 = new StringReader(Formulas);
-
             parent.Names.Clear();
-            parent.Names = ((ObservableCollection<ChemicalName>) namesSerializer.Deserialize(sr1));
-            parent.Formulas = ((ObservableCollection<Formula>)formulasSerializer.Deserialize(sr2));
-
+            parent.Names = JsonConvert.DeserializeObject<ObservableCollection<ChemicalName>>(Names);
+            parent.Formulas = JsonConvert.DeserializeObject<ObservableCollection<Formula>>(Formulas);
         }
     }
 }

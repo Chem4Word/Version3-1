@@ -5,22 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-
-namespace Chem4Word.Model2
+namespace Chem4Word.ACME.Enums
 {
-    public class Formula
+    public enum ArrowEnds
     {
-        public string Id { get; set; }
-
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
-        {
-        }
+        None = 0,
+        Start = 1,
+        End = 2,
+        Both = 3
     }
 }

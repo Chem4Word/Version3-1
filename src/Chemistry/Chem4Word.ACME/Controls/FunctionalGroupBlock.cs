@@ -15,6 +15,8 @@ namespace Chem4Word.ACME.Controls
 {
     public class FunctionalGroupBlock : TextBlock
     {
+        private const double SuperSubSriptSize = 0.8;
+
         // Using a DependencyProperty as the backing store for ParentGroup.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ParentGroupProperty =
             DependencyProperty.Register("ParentGroup", typeof(FunctionalGroup), typeof(FunctionalGroupBlock),
@@ -50,8 +52,6 @@ namespace Chem4Word.ACME.Controls
                     var textbefore = "";
                     var supertext = "";
                     var textafter = "";
-                    var i = 0;
-                    var before = true;
 
                     textbefore = fg.Symbol.Substring(0, superstart);
                     supertext = fg.Symbol.Substring(superstart + 1, superend - superstart - 1);
@@ -68,7 +68,7 @@ namespace Chem4Word.ACME.Controls
                                     {
                                         Typography = {Variants = FontVariants.Subscript},
                                         BaselineAlignment = BaselineAlignment.Superscript,
-                                        FontSize = FontSize * 0.6
+                                        FontSize = FontSize * SuperSubSriptSize
                                     });
                     }
 
@@ -102,8 +102,8 @@ namespace Chem4Word.ACME.Controls
                                     {
                                         Typography = {Variants = FontVariants.Subscript},
                                         BaselineAlignment = BaselineAlignment.Subscript,
-                                        FontSize = FontSize * 0.6
-                                    });
+                                        FontSize = FontSize * SuperSubSriptSize
+                        });
                     }
                 }
 
@@ -129,8 +129,8 @@ namespace Chem4Word.ACME.Controls
                                     {
                                         Typography = {Variants = FontVariants.Subscript},
                                         BaselineAlignment = BaselineAlignment.Subscript,
-                                        FontSize = FontSize * 0.6
-                                    });
+                                        FontSize = FontSize * SuperSubSriptSize
+                        });
                     }
                 }
             }

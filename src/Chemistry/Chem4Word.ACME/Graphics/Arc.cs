@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 
 namespace Chem4Word.ACME.Graphics
 {
-    public sealed class Arc : Shape
+    internal sealed class Arc : Shape
     {
         public Point Center
         {

@@ -39,6 +39,11 @@ namespace Chem4Word.ACME.Controls
             Top = _model.Centre.Y - ActualHeight / 2;
         }
 
+        private void Cancel_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
             if (ValidateModel())

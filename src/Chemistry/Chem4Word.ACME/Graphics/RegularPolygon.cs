@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 
 namespace Chem4Word.ACME.Graphics
 {
-    public class RegularPolygon : Shape
+    internal class RegularPolygon : Shape
     {
         public int PointCount
         {

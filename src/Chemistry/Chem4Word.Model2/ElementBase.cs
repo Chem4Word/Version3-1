@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.ComponentModel;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {

@@ -110,6 +110,20 @@ namespace Chem4Word.ACME
 
         #endregion ChemistryHeight (DependencyProperty)
 
+
+
+        public bool HighlightActive
+        {
+            get { return (bool)GetValue(HighlightActiveProperty); }
+            set { SetValue(HighlightActiveProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for HighlightActive.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty HighlightActiveProperty =
+            DependencyProperty.Register("HighlightActive", typeof(bool), typeof(Display), new PropertyMetadata(true));
+
+
+
         #endregion Public Properties
 
         #region Private Methods

@@ -10,11 +10,12 @@ using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
-using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -23,14 +24,14 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class AtomPropertyEditor : Window, INotifyPropertyChanged
     {
-        private AtomPropertiesModel _model;
+        private AtomPropertiesModel _apeModel;
 
-        public AtomPropertiesModel Model
+        public AtomPropertiesModel ApeModel
         {
-            get { return _model; }
+            get { return _apeModel; }
             set
             {
-                _model = value;
+                _apeModel = value;
                 OnPropertyChanged();
             }
         }
@@ -44,46 +45,10 @@ namespace Chem4Word.ACME.Controls
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                Model = model;
-                DataContext = Model;
-                AtomPath.Text = Model.Path;
-                LoadAtomItems();
-                ContentRendered += AtomPropertyEditor_ContentRendered;
+                ApeModel = model;
+                DataContext = ApeModel;
+                AtomPath.Text = ApeModel.Path;
             }
-        }
-
-        private void LoadAtomItems()
-        {
-            foreach (var item in Constants.StandardAtoms)
-            {
-                AtomPicker.Items.Add(new AtomOption(Globals.PeriodicTable.Elements[item]));
-            }
-
-            foreach (var item in Constants.StandardFunctionalGroups)
-            {
-                AtomPicker.Items.Add(new AtomOption(Globals.FunctionalGroupsDictionary[item]));
-            }
-
-            if (Model.Element is Element el)
-            {
-                if (!Constants.StandardAtoms.Contains(el.Symbol))
-                {
-                    AtomPicker.Items.Add(new AtomOption(Globals.PeriodicTable.Elements[el.Symbol]));
-                }
-            }
-
-            if (Model.Element is FunctionalGroup fg)
-            {
-                if (!Constants.StandardFunctionalGroups.Contains(fg.Symbol))
-                {
-                    AtomPicker.Items.Add(new AtomOption(Globals.FunctionalGroupsDictionary[fg.Symbol]));
-                }
-            }
-        }
-
-        private void AtomPropertyEditor_ContentRendered(object sender, EventArgs e)
-        {
-            Activate();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -94,42 +59,35 @@ namespace Chem4Word.ACME.Controls
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private void Close_OnClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
             if (ValidateModel())
             {
-                Model.Save = true;
+                ApeModel.Save = true;
                 Close();
             }
         }
 
-        private bool ValidateModel()
-        {
-            ElementBase eb;
-            bool b1 = AtomHelpers.TryParse(Model.Element.Symbol, out eb);
-
-            int n;
-
-            bool b3 = string.IsNullOrEmpty(Model.Isotope);
-            if (!b3)
-            {
-                b3 = int.TryParse(Model.Isotope, out n);
-            }
-
-            return b1 && b3;
-        }
-
         private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
         {
-            Left = Model.Centre.X - ActualWidth / 2;
-            Top = Model.Centre.Y - ActualHeight / 2;
+            Left = ApeModel.Centre.X - ActualWidth / 2;
+            Top = ApeModel.Centre.Y - ActualHeight / 2;
+
+            LoadAtomItems();
+            LoadFunctionalGroups();
+            ShowPreview();
         }
 
         private void AtomTable_OnElementSelected(object sender, VisualPeriodicTable.ElementEventArgs e)
         {
             AtomOption newOption = null;
             var selElement = e.SelectedElement as Element;
-            Model.Element = selElement;
+            ApeModel.Element = selElement;
             PeriodicTableExpander.IsExpanded = false;
             bool found = false;
 
@@ -141,23 +99,126 @@ namespace Chem4Word.ACME.Controls
                     if (el == selElement)
                     {
                         found = true;
+                        newOption = option;
                         break;
                     }
                 }
 
                 if (option.Element is FunctionalGroup fg)
                 {
-                    // Ignore any Functional Groups in the picker
+                    // Ignore any Functional Groups in the picker (if present)
                 }
             }
+
             if (!found)
             {
                 newOption = new AtomOption(selElement);
                 AtomPicker.Items.Add(newOption);
-                Model.AddedElement = selElement;
+                ApeModel.AddedElement = selElement;
             }
+
             var atomPickerSelectedItem = newOption;
             AtomPicker.SelectedItem = atomPickerSelectedItem;
+            ShowPreview();
+        }
+
+        private void AtomPicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AtomOption option = AtomPicker.SelectedItem as AtomOption;
+            ApeModel.AddedElement = option?.Element;
+            ShowPreview();
+        }
+
+        private void FunctionalGroupPicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AtomOption option = FunctionalGroupPicker.SelectedItem as AtomOption;
+            ApeModel.AddedElement = option?.Element;
+            ShowPreview();
+        }
+
+        private void ChargeCombo_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ShowPreview();
+        }
+
+        private void IsotopePicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ShowPreview();
+        }
+
+        private void ExplicitCheckBox_OnClick(object sender, RoutedEventArgs e)
+        {
+            ShowPreview();
+        }
+
+        private void LoadAtomItems()
+        {
+            AtomPicker.Items.Clear();
+            foreach (var item in Constants.StandardAtoms)
+            {
+                AtomPicker.Items.Add(new AtomOption(Globals.PeriodicTable.Elements[item]));
+            }
+
+            if (ApeModel.Element is Element el)
+            {
+                if (!Constants.StandardAtoms.Contains(el.Symbol))
+                {
+                    AtomPicker.Items.Add(new AtomOption(Globals.PeriodicTable.Elements[el.Symbol]));
+                }
+
+                AtomPicker.SelectedItem = new AtomOption(ApeModel.Element as Element);
+            }
+        }
+
+        private void LoadFunctionalGroups()
+        {
+            FunctionalGroupPicker.Items.Clear();
+            foreach (var item in Globals.FunctionalGroupsDictionary)
+            {
+                FunctionalGroupPicker.Items.Add(new AtomOption(item.Value));
+            }
+
+            if (ApeModel.IsFunctionalGroup)
+            {
+                FunctionalGroupPicker.SelectedItem = new AtomOption(ApeModel.Element as FunctionalGroup);
+            }
+        }
+
+        private bool ValidateModel()
+        {
+            // There are no properties from user typed entries, so all are good
+            return true;
+        }
+
+        private void ShowPreview()
+        {
+            var atoms = ApeModel.MicroModel.GetAllAtoms();
+            var atom = atoms[0];
+
+            if (ApeModel.IsElement)
+            {
+                atom.Element = ApeModel.Element;
+                atom.FormalCharge = ApeModel.Charge;
+                atom.ShowSymbol = ApeModel.ShowSymbol;
+                if (string.IsNullOrEmpty(ApeModel.Isotope))
+                {
+                    atom.IsotopeNumber = null;
+                }
+                else
+                {
+                    atom.IsotopeNumber = int.Parse(ApeModel.Isotope);
+                }
+            }
+
+            if (ApeModel.IsFunctionalGroup)
+            {
+                atom.Element = ApeModel.Element;
+                atom.FormalCharge = null;
+                atom.ShowSymbol = null;
+                atom.IsotopeNumber = null;
+            }
+
+            Preview.Chemistry = ApeModel.MicroModel.Copy();
         }
     }
 }

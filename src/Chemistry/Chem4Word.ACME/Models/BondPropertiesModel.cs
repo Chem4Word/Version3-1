@@ -12,10 +12,9 @@ namespace Chem4Word.ACME.Models
 {
     public class BondPropertiesModel : BaseDialogModel, INotifyPropertyChanged
     {
-        //public string Stereo { get; set; }
         public DoubleBondType DoubleBondChoice { get; set; }
-
         public SingleBondType SingleBondChoice { get; set; }
+
         public double Angle { get; set; }
         public bool IsSingle { get; set; }
         public bool IsDouble { get; set; }

@@ -17,7 +17,7 @@ namespace Chem4Word.ACME.Graphics
     /// centered on a point, that has a start and end angle
     /// Designed to be used directly from XAML
     /// </summary>
-    public class ArcArrow : ArrowBase
+    internal class ArcArrow : ArrowBase
     {
         public Point Center
         {
