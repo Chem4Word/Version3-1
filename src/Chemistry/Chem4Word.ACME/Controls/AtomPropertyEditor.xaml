@@ -277,6 +277,8 @@
         <StackPanel
             Grid.Row="1"
             Grid.Column="1"
+            MaxWidth="208"
+            MaxHeight="208"
             Margin="5">
             <Border
                 BorderBrush="Orange"
@@ -300,15 +302,14 @@
                 Width="50"
                 Height="25"
                 Margin="5"
-                Click="Close_OnClick"
-                Content="Cancel" />
+                Click="Save_OnClick"
+                Content="Save" />
             <Button
                 Width="50"
                 Height="25"
                 Margin="5"
-                Click="Save_OnClick"
-                Content="Save" />
-
+                Click="Close_OnClick"
+                Content="Cancel" />
         </StackPanel>
     </Grid>
 </Window>

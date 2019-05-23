@@ -3,38 +3,41 @@
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
-// ---------------------
+// ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
 {
     public class FunctionalGroupBlock : TextBlock
     {
-        private const double SuperSubSriptSize = 0.8;
+        private const double SuperSubScriptSize = 0.8;
 
         // Using a DependencyProperty as the backing store for ParentGroup.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ParentGroupProperty =
             DependencyProperty.Register("ParentGroup", typeof(FunctionalGroup), typeof(FunctionalGroupBlock),
                                         new FrameworkPropertyMetadata(FunctionalGroupChanged));
 
+        public FunctionalGroupBlock()
+        {
+            Width = double.NaN;
+        }
 
         public FunctionalGroup ParentGroup
         {
-            get => (FunctionalGroup) GetValue(ParentGroupProperty);
+            get => (FunctionalGroup)GetValue(ParentGroupProperty);
             set => SetValue(ParentGroupProperty, value);
         }
 
         private static void FunctionalGroupChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var tb = (FunctionalGroupBlock) d;
-            tb.BuildTextBlock((FunctionalGroup) e.NewValue);
+            var tb = (FunctionalGroupBlock)d;
+            tb.BuildTextBlock((FunctionalGroup)e.NewValue);
         }
-
 
         public void BuildTextBlock(FunctionalGroup fg)
         {
@@ -65,11 +68,11 @@ namespace Chem4Word.ACME.Controls
                     if (supertext != "")
                     {
                         Inlines.Add(new Run(supertext)
-                                    {
-                                        Typography = {Variants = FontVariants.Subscript},
-                                        BaselineAlignment = BaselineAlignment.Superscript,
-                                        FontSize = FontSize * SuperSubSriptSize
-                                    });
+                        {
+                            Typography = { Variants = FontVariants.Subscript },
+                            BaselineAlignment = BaselineAlignment.Superscript,
+                            FontSize = FontSize * SuperSubScriptSize
+                        });
                     }
 
                     if (textafter != "")
@@ -99,17 +102,21 @@ namespace Chem4Word.ACME.Controls
                     if (group.Count != 1)
                     {
                         Inlines.Add(new Run(group.Count.ToString())
-                                    {
-                                        Typography = {Variants = FontVariants.Subscript},
-                                        BaselineAlignment = BaselineAlignment.Subscript,
-                                        FontSize = FontSize * SuperSubSriptSize
+                        {
+                            Typography = { Variants = FontVariants.Subscript },
+                            BaselineAlignment = BaselineAlignment.Subscript,
+                            FontSize = FontSize * SuperSubScriptSize
                         });
                     }
                 }
 
                 if (elem is FunctionalGroup fg)
                 {
-                    Inlines.Add(new Run("("));
+                    if (group.Count != 1)
+                    {
+                        Inlines.Add(new Run("("));
+                    }
+
                     if (fg.ShowAsSymbol)
                     {
                         Inlines.Add(fg.Symbol);
@@ -126,10 +133,10 @@ namespace Chem4Word.ACME.Controls
                     {
                         Inlines.Add(")");
                         Inlines.Add(new Run(group.Count.ToString())
-                                    {
-                                        Typography = {Variants = FontVariants.Subscript},
-                                        BaselineAlignment = BaselineAlignment.Subscript,
-                                        FontSize = FontSize * SuperSubSriptSize
+                        {
+                            Typography = { Variants = FontVariants.Subscript },
+                            BaselineAlignment = BaselineAlignment.Subscript,
+                            FontSize = FontSize * SuperSubScriptSize
                         });
                     }
                 }
