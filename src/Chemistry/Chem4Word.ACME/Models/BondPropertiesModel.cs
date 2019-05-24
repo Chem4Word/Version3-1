@@ -10,7 +10,7 @@ using System.ComponentModel;
 
 namespace Chem4Word.ACME.Models
 {
-    public class BondPropertiesModel : BaseDialogModel, INotifyPropertyChanged
+    public class BondPropertiesModel : BaseDialogModel
     {
         public DoubleBondType DoubleBondChoice { get; set; }
         public SingleBondType SingleBondChoice { get; set; }
@@ -18,9 +18,9 @@ namespace Chem4Word.ACME.Models
         public double Angle { get; set; }
         public bool IsSingle { get; set; }
         public bool IsDouble { get; set; }
+        public bool ShowPlacementSettings { get; set; }
 
         private double _bondOrderValue;
-
         public double BondOrderValue
         {
             get { return _bondOrderValue; }
@@ -33,9 +33,11 @@ namespace Chem4Word.ACME.Models
 
                     IsSingle = value == 1;
                     IsDouble = value == 2;
+                    ShowPlacementSettings = value == 1.5 || value == 2 || value == 2.5;
 
                     OnPropertyChanged(nameof(IsSingle));
                     OnPropertyChanged(nameof(IsDouble));
+                    OnPropertyChanged(nameof(ShowPlacementSettings));
 
                     if (IsSingle)
                     {

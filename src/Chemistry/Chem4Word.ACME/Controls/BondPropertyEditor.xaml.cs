@@ -5,18 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Models;
 using System.ComponentModel;
 using System.Windows;
+using Chem4Word.ACME.Models;
 
 namespace Chem4Word.ACME.Controls
 {
     /// <summary>
-    /// Interaction logic for BondPropertyEditor.xaml
+    ///     Interaction logic for BondPropertyEditor.xaml
     /// </summary>
     public partial class BondPropertyEditor : Window
     {
-        private BondPropertiesModel _model;
+        private readonly BondPropertiesModel _model;
 
         public BondPropertyEditor()
         {
@@ -53,9 +53,6 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-        private bool ValidateModel()
-        {
-            return true;
-        }
+        private bool ValidateModel() => true;
     }
 }

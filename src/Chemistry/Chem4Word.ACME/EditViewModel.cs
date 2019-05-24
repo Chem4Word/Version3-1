@@ -2183,7 +2183,7 @@ namespace Chem4Word.ACME
                 }
             }
 
-            if (model.IsDouble)
+            if (model.ShowPlacementSettings)
             {
                 if (model.DoubleBondChoice == DoubleBondType.Indeterminate)
                 {

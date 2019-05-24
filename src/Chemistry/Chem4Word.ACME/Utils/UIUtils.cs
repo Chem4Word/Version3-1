@@ -139,20 +139,25 @@ namespace Chem4Word.ACME.Utils
                     Angle = bond.Angle,
                     BondOrderValue = bond.OrderValue.Value,
                     IsSingle = bond.Order.Equals(Globals.OrderSingle),
-                    IsDouble = bond.Order.Equals(Globals.OrderDouble)
+                    IsDouble = bond.Order.Equals(Globals.OrderDouble),
+                    ShowPlacementSettings = bond.Order.Equals(Globals.OrderPartial12) || bond.Order.Equals(Globals.OrderDouble) || bond.Order.Equals(Globals.OrderPartial23)
                 };
 
-                if (model.IsDouble)
-                {
-                    model.DoubleBondChoice = DoubleBondType.Auto;
+                model.DoubleBondChoice = DoubleBondType.Auto;
 
-                    if (bond.Stereo == Globals.BondStereo.Indeterminate)
-                    {
-                        model.DoubleBondChoice = DoubleBondType.Indeterminate;
-                    }
-                    else if (bond.ExplicitPlacement != null)
+                if (model.ShowPlacementSettings)
+                {
+                    if (bond.ExplicitPlacement != null)
                     {
                         model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
+
+                        if (model.IsDouble)
+                        {
+                            if (bond.Stereo == Globals.BondStereo.Indeterminate)
+                            {
+                                model.DoubleBondChoice = DoubleBondType.Indeterminate;
+                            }
+                        }
                     }
                 }
 

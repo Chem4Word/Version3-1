@@ -414,7 +414,7 @@
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 VerticalAlignment="Center"
-                Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                Visibility="{Binding Path=ShowPlacementSettings, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
             <StackPanel
@@ -422,7 +422,7 @@
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
-                Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                Visibility="{Binding Path=ShowPlacementSettings, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Auto}}" ToolTip="Automatic">
                     <TextBlock
                         Margin="0,0,0,5"
@@ -550,7 +550,10 @@
                             Y2="38" />
                     </Canvas>
                 </RadioButton>
-                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Indeterminate}}" ToolTip="Indeterminate">
+                <RadioButton
+                    IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Indeterminate}}"
+                    ToolTip="Indeterminate"
+                    Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
                     <Canvas>
                         <Canvas.RenderTransform>
                             <RotateTransform Angle="{Binding Path=Angle}" CenterX="24" CenterY="24" />
