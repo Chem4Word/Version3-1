@@ -225,7 +225,7 @@ namespace Chem4Word.ACME.Behaviors
                     Atom lastAtom = landedAtomVisual.ParentAtom;
                     if (sameAtom) //both are the same atom
                     {
-                        if (lastAtom.Element != EditViewModel.SelectedElement)
+                        if (lastAtom.Element.Symbol != EditViewModel.SelectedElement.Symbol)
                         {
                             EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() { lastAtom });
                         }
