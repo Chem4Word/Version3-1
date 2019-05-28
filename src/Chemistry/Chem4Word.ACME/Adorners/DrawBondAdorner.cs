@@ -71,12 +71,12 @@ namespace Chem4Word.ACME.Adorners
             }
             else
             {
-                outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder, ExistingBond.PrimaryRing);
+                outline = GetBondGeometry(StartPoint, EndPoint, length, Stereo, BondOrder, ExistingBond.PrimaryRing, ExistingBond.SubsidiaryRing);
             }
             drawingContext.DrawGeometry(_solidColorBrush, _dashPen, outline);
         }
 
-        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order, Ring existingRing = null)
+        public static Geometry GetBondGeometry(Point startPoint, Point endPoint, double bondLength, Globals.BondStereo stereo, string order, Ring existingRing = null, Ring subsidiaryRing=null)
         {
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
@@ -114,9 +114,9 @@ namespace Chem4Word.ACME.Adorners
                 }
 
                 Point? centroid = existingRing?.Centroid;
-
+                Point? otherCentroid = subsidiaryRing?.Centroid;
                 return BondGeometry.DoubleBondGeometry(startPoint, endPoint, bondLength, Globals.BondDirection.None,
-                    ref dummy, centroid);
+                    ref dummy, ringCentroid:  centroid, otherCentroid: otherCentroid);
             }
             //tripe bond
             if (ordervalue == 3)

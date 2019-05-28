@@ -283,6 +283,31 @@ namespace Chem4Word.Model2
             }
         }
 
+        public Ring SubsidiaryRing
+        {
+            get
+            {
+                if (!Rings.Any()) //no rings
+                {
+                    return null;
+                }
+                else if (Rings.Count == 2)
+                {
+                    return Rings[1];
+                }
+                else
+                {
+                    List<Ring> ringList = Parent.SortedRings;
+                    var firstRing = (
+                        from Ring r in ringList
+                        where r.Atoms.Contains(StartAtom) && r.Atoms.Contains(EndAtom)
+                        select r
+                    ).Take(1).FirstOrDefault();
+                    return firstRing;
+                }
+            }
+        }
+
         public bool IsCyclic()
         {
             return Rings.Any();

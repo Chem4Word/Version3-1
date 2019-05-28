@@ -143,14 +143,14 @@ namespace Chem4Word.ACME.Drawing
                     {
                         singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
                           parentBond.Placement,
-                          ref enclosingPoly, centroid, startAtomGeometry, endAtomGeometry);
+                          ref enclosingPoly, centroid,  parentBond.SubsidiaryRing?.Centroid, startAtomGeometry, endAtomGeometry);
                         return true;
                     }
                     else
                     {
                         singleBondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
                                                                              parentBond.Placement,
-                                                                             ref enclosingPoly, null, startAtomGeometry, endAtomGeometry);
+                                                                             ref enclosingPoly, null, null,  startAtomGeometry, endAtomGeometry);
                         return true;
                     }
                 }

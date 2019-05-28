@@ -60,7 +60,7 @@ namespace Chem4Word.ACME.Adorners
                                                            newAtomPlacement.Position,
                                                            Math.Abs((newAtomPlacement.Position -
                                                                      oldAtomPlacement.Position).Length),
-                                                           Globals.BondDirection.Clockwise,
+                                                           Globals.BondDirection.Anticlockwise,
                                                            ref dummy, centroid));
                             visited.Add(oldAtomPlacement);
                             visited.Add(newAtomPlacement);
