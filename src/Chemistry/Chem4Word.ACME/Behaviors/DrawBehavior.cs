@@ -118,7 +118,7 @@ namespace Chem4Word.ACME.Behaviors
 
                         var angleBetween =
                             Vector.AngleBetween(
-                                (_lastAtomVisual?.ParentAtom?.BalancingVector) ?? BasicGeometry.ScreenNorth,
+                                (_lastAtomVisual?.ParentAtom?.BalancingVector()) ?? BasicGeometry.ScreenNorth,
                                 BasicGeometry.ScreenNorth);
                         //snap a bond into position
                         lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
@@ -361,7 +361,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             else if (lastAtom.Degree == 2)
             {
-                var balancingVector = lastAtom.BalancingVector;
+                var balancingVector = lastAtom.BalancingVector();
                 balancingVector.Normalize();
                 newDirection = balancingVector * EditViewModel.Model.XamlBondLength;
                 newTag = GetGeneralDir(balancingVector);

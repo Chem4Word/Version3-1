@@ -229,7 +229,7 @@ namespace Chem4Word.ACME.Behaviors
             Vector direction;
             if (hitAtom.Degree != 0)
             {
-                direction = hitAtom.BalancingVector;
+                direction = hitAtom.BalancingVector();
             }
             else
             {

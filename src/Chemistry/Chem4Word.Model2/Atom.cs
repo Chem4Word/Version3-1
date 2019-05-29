@@ -240,7 +240,7 @@ namespace Chem4Word.Model2
                     {
                         if (Element.Symbol.Equals("C"))
                         {
-                            if (ShowSymbol!=null)
+                            if (ShowSymbol != null)
                             {
                                 if (ShowSymbol.Value)
                                 {
@@ -352,7 +352,7 @@ namespace Chem4Word.Model2
                 {
                     int bondCount = (int)Math.Truncate(this.BondOrders);
                     int charge = FormalCharge ?? 0;
-                    foreach (int valency in e.Valencies??new []{0})
+                    foreach (int valency in e.Valencies ?? new[] { 0 })
                     {
                         if (valency - bondCount + charge > 0)
                         {
@@ -460,63 +460,63 @@ namespace Chem4Word.Model2
         public bool IsUnsaturated => Bonds.Any(b => b.OrderValue >= 2);
 
         //drawing related properties
-        public Vector BalancingVector
+        public Vector BalancingVector(bool forLabelPlacement = false)
         {
-            get
+            Vector vsumVector = BasicGeometry.ScreenNorth;
+
+            if (Bonds.Any())
             {
-                Vector vsumVector = BasicGeometry.ScreenNorth;
-
-                if (Bonds.Any())
+                double sumOfLengths = 0;
+                foreach (var bond in Bonds)
                 {
-                    double sumOfLengths = 0;
-                    foreach (var bond in Bonds)
-                    {
-                        Vector v = bond.OtherAtom(this).Position - this.Position;
+                    Vector v = bond.OtherAtom(this).Position - this.Position;
 
+                    if (forLabelPlacement)
+                    {
                         // Multiply by bond order to bias away from double or triple bonds
                         double order = bond.OrderValue.Value;
                         if (order > 0.1)
                         {
                             v = v * bond.OrderValue.Value;
                         }
-
-                        sumOfLengths += v.Length;
-                        vsumVector += v;
                     }
 
-                    // Set tiny amount as 10% of average bond length
-                    double tinyAmount = sumOfLengths / Bonds.Count() * 0.1;
-                    double xy = vsumVector.Length;
+                    sumOfLengths += v.Length;
+                    vsumVector += v;
+                }
 
-                    // Is resultant vector is big enough for us to use?
-                    if (xy >= tinyAmount)
+                // Set tiny amount as 10% of average bond length
+                double tinyAmount = sumOfLengths / Bonds.Count() * 0.1;
+                double xy = vsumVector.Length;
+
+                // Is resultant vector is big enough for us to use?
+                if (xy >= tinyAmount)
+                {
+                    // Get vector in opposite direction
+                    vsumVector = -vsumVector;
+                    vsumVector.Normalize();
+                }
+                else
+                {
+                    // Get vector of first bond
+                    Vector vector = Bonds.First().OtherAtom(this).Position - Position;
+                    if (Bonds.Count() == 2)
                     {
-                        // Get vector in opposite direction
+                        // Get vector at right angles
+                        vsumVector = vector.Perpendicular();
                         vsumVector = -vsumVector;
-                        vsumVector.Normalize();
                     }
                     else
                     {
-                        // Get vector of first bond
-                        Vector vector = Bonds.First().OtherAtom(this).Position - Position;
-                        if (Bonds.Count() == 2)
-                        {
-                            // Get vector at right angles
-                            vsumVector = vector.Perpendicular();
-                            vsumVector = -vsumVector;
-                        }
-                        else
-                        {
-                            // Get vector in opposite direction
-                            vsumVector = -vector;
-                        }
-                        vsumVector.Normalize();
+                        // Get vector in opposite direction
+                        vsumVector = -vector;
                     }
+                    vsumVector.Normalize();
                 }
-
-                //Debug.WriteLine($"Atom {Id} Resultant Balancing Vector Angle is {Vector.AngleBetween(BasicGeometry.ScreenNorth, vsumVector)}");
-                return vsumVector;
             }
+
+            //Debug.WriteLine($"Atom {Id} Resultant Balancing Vector Angle is {Vector.AngleBetween(BasicGeometry.ScreenNorth, vsumVector)}");
+            return vsumVector;
         }
 
         public List<Atom> UnprocessedNeighbours(Predicate<Atom> unprocessedTest)
@@ -613,7 +613,7 @@ namespace Chem4Word.Model2
                 else
                 {
                     double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
-                        BalancingVector);
+                        BalancingVector(true));
 
                     return BasicGeometry.SnapTo4NESW(baFromNorth);
                 }

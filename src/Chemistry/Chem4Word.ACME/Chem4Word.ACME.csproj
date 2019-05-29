@@ -72,6 +72,7 @@
     <Compile Include="Adorners\AtomHoverAdorner.cs" />
     <Compile Include="Adorners\AtomSelectionAdorner.cs" />
     <Compile Include="Adorners\BondSelectionAdorner.cs" />
+    <Compile Include="Adorners\ChainAdorner.cs" />
     <Compile Include="Adorners\DrawBondAdorner.cs" />
     <Compile Include="Adorners\NRingAdorner.cs" />
     <Compile Include="Adorners\FixedRingAdorner.cs" />
@@ -81,7 +82,8 @@
     <Compile Include="Adorners\RingDrawer.cs" />
     <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />
     <Compile Include="AtomOption.cs" />
-    <Compile Include="Behaviors\NRingBehavior .cs" />
+    <Compile Include="Behaviors\ChainBehavior.cs" />
+    <Compile Include="Behaviors\NRingBehavior.cs" />
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
     <Compile Include="Behaviors\BaseEditBehavior.cs" />
     <Compile Include="Behaviors\DeleteBehavior.cs" />

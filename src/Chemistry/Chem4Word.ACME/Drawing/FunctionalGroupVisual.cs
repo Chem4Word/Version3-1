@@ -19,7 +19,7 @@ namespace Chem4Word.ACME.Drawing
     {
         private List<LabelTextSourceRun> ComponentRuns { get; }
         public FunctionalGroup ParentGroup { get; }
-        public bool Flipped => ParentAtom.BalancingVector.X < 0d;
+        public bool Flipped => ParentAtom.BalancingVector().X < 0d;
 
         public FunctionalGroupVisual(Atom parent) : this((FunctionalGroup)parent.Element)
         {

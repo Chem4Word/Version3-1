@@ -27,6 +27,17 @@ namespace Chem4Word.Telemetry
         private Queue<ServiceBusMessage> _buffer1 = new Queue<ServiceBusMessage>();
         private bool _running = false;
 
+        public AzureServiceBusWriter()
+        {
+            ServiceBusEnvironment.SystemConnectivity.Mode = ConnectivityMode.Https;
+
+            ServicePointManager.DefaultConnectionLimit = 100;
+            ServicePointManager.UseNagleAlgorithm = false;
+            ServicePointManager.Expect100Continue = false;
+
+            _client = QueueClient.CreateFromConnectionString(ServiceBus, QueueName);
+        }
+
         public void QueueMessage(ServiceBusMessage message)
         {
             lock (_queueLock)
@@ -66,14 +77,6 @@ namespace Chem4Word.Telemetry
                     Monitor.PulseAll(_queueLock);
                 }
 
-                ServiceBusEnvironment.SystemConnectivity.Mode = ConnectivityMode.Https;
-
-                ServicePointManager.DefaultConnectionLimit = 100;
-                ServicePointManager.UseNagleAlgorithm = false;
-                ServicePointManager.Expect100Continue = false;
-
-                _client = QueueClient.CreateFromConnectionString(ServiceBus, QueueName);
-
                 while (buffer2.Count > 0)
                 {
                     WriteMessage(buffer2.Dequeue());
@@ -94,7 +97,7 @@ namespace Chem4Word.Telemetry
             }
         }
 
-        private void WriteMessage(ServiceBusMessage message)
+        public void WriteMessage(ServiceBusMessage message)
         {
             try
             {

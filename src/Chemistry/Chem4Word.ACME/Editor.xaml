@@ -586,12 +586,15 @@
                         </UniformGrid>
                     </Border>
                 </Popup>
-                <RadioButton x:Name="ChainButton" GroupName="Actions">
+                <RadioButton x:Name="ChainButton" GroupName="Actions" Click="ModeButton_OnChecked" ToolTip="Draw Chain">
                     <Path Style="{StaticResource ChainStyle}">
                         <Path.LayoutTransform>
                             <RotateTransform Angle="180" />
                         </Path.LayoutTransform>
                     </Path>
+                    <RadioButton.Tag>
+                        <behaviors:ChainBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"/>
+                    </RadioButton.Tag>
                 </RadioButton>
                 <!--  ReactionButton Hidden (Collapsed)  -->
                 <RadioButton

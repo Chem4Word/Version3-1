@@ -110,7 +110,7 @@ namespace Chem4Word.ACME.Behaviors
                             if (_preferredPlacements != null)
                             {
                                 Vector parallelToBV =
-                                    GetProjection(av.ParentAtom.BalancingVector, av.Position, CurrentPoint);
+                                    GetProjection(av.ParentAtom.BalancingVector(), av.Position, CurrentPoint);
                                 Point endPoint = av.Position + parallelToBV;
                                 CurrentAdorner = new NRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
                                                                   _preferredPlacements, av.Position, endPoint);
@@ -233,7 +233,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             //take the dot product of the distance we moved the mouse with the balancing vector
 
-            double displacement = Vector.Multiply((end - start.Position), start.ParentAtom.BalancingVector);
+            double displacement = Vector.Multiply((end - start.Position), start.ParentAtom.BalancingVector());
             return GetRingSize(bondSize, displacement);
         }
 
@@ -368,7 +368,7 @@ namespace Chem4Word.ACME.Behaviors
             Vector direction;
             if (hitAtom.Degree != 0)
             {
-                direction = hitAtom.BalancingVector;
+                direction = hitAtom.BalancingVector();
             }
             else
             {

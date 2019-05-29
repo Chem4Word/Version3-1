@@ -205,7 +205,9 @@ namespace Chem4Word.Telemetry
             sbm.Level = level;
             sbm.Message = message;
             sbm.AssemblyVersionNumber = _helper.AssemblyVersionNumber;
-            _azureServiceBusWriter.QueueMessage(sbm);
+
+            //_azureServiceBusWriter.QueueMessage(sbm);
+            _azureServiceBusWriter.WriteMessage(sbm);
         }
     }
 }

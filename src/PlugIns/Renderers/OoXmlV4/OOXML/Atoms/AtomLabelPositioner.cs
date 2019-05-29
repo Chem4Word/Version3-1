@@ -197,7 +197,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                 #region Determine NESW
 
-                double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector);
+                double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
                 CompassPoints nesw = CompassPoints.East;
 
                 if (bondCount == 1)
@@ -493,7 +493,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         public void CreateFunctionalGroupCharacters(Atom atom, Options options)
         {
             FunctionalGroup fg = atom.Element as FunctionalGroup;
-            double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector);
+            double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
 
             CompassPoints nesw = BasicGeometry.SnapTo2EW(baFromNorth);
             bool reverse = nesw == CompassPoints.West;

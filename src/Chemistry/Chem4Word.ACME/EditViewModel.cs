@@ -1167,6 +1167,34 @@ namespace Chem4Word.ACME
            
         }
 
+        public void DrawChain(List<Point> placements, Atom startAtom = null)
+        {
+            UndoManager.BeginUndoBlock();
+            Atom lastAtom = startAtom;
+            if (startAtom == null) //we're drawing an isolated chain
+            {
+                lastAtom = AddAtomChain(null, placements[0], ClockDirections.Nothing);
+            }
+            
+            foreach (Point placement in placements.Skip(1))
+            {
+                lastAtom= AddAtomChain(lastAtom, placement,ClockDirections.Nothing);
+                if (placement != placements.Last())
+                {
+                    lastAtom.ShowSymbol = null;
+                }
+            }
+            
+            if (startAtom != null)
+            {
+                startAtom.UpdateVisual();
+                foreach (var bond in startAtom.Bonds)
+                {
+                    bond.UpdateVisual();
+                }
+            }
+            UndoManager.EndUndoBlock();
+        }
         public void DeleteMolecules(IEnumerable<Molecule> mols)
         {
             UndoManager.BeginUndoBlock();
@@ -1250,7 +1278,7 @@ namespace Chem4Word.ACME
                     }
 
                     int hydrogenCount = atom.ImplicitHydrogenCount;
-                    var vector = atom.BalancingVector;
+                    var vector = atom.BalancingVector();
                     switch (hydrogenCount)
                     {
                         case 1:
