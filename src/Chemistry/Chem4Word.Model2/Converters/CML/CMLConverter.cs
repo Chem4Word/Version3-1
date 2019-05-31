@@ -338,6 +338,11 @@ namespace Chem4Word.Model2.Converters.CML
             {
                 result.Add(new XAttribute(CMLConstants.TagIsotopeNumber, atom.IsotopeNumber));
             }
+
+            if (atom.ShowSymbol != null)
+            {
+                result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.TagExplicit, atom.ShowSymbol));
+            }
             return result;
         }
 
@@ -457,6 +462,7 @@ namespace Chem4Word.Model2.Converters.CML
                 atom.Element = e;
                 atom.FormalCharge = CMLHelper.GetFormalCharge(cmlElement);
                 atom.IsotopeNumber = CMLHelper.GetIsotopeNumber(cmlElement);
+                atom.ShowSymbol = CMLHelper.GetExplicit(cmlElement);
             }
 
             return atom;

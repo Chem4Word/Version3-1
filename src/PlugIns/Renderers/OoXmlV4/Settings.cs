@@ -199,7 +199,6 @@ namespace Chem4Word.Renderer.OoXmlV4
         {
             chkColouredAtoms.Checked = RendererOptions.ColouredAtoms;
             chkShowHydrogens.Checked = RendererOptions.ShowHydrogens;
-            chkShowCarbons.Checked = RendererOptions.ShowCarbons;
 
             chkClipLines.Checked = RendererOptions.ClipLines;
             chkShowCharacterBox.Checked = RendererOptions.ShowCharacterBoundingBoxes;
@@ -252,21 +251,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             try
             {
                 RendererOptions.ShowAtomPositions = chkShowAtomPositions.Checked;
-                _dirty = true;
-            }
-            catch (Exception ex)
-            {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
-            }
-        }
-
-        private void chkShowCarbonLabels_CheckedChanged(object sender, EventArgs e)
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
-            try
-            {
-                RendererOptions.ShowCarbons = chkShowCarbons.Checked;
                 _dirty = true;
             }
             catch (Exception ex)

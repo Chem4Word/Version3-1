@@ -151,7 +151,7 @@ namespace Chem4Word.Model2
                         return true;
 
                     default:
-                        return false;
+                        return null;
                 }
             }
             set

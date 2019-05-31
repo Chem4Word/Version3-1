@@ -74,7 +74,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             bool showLabel = true;
             if (atomLabel == "C")
             {
-                if (!options.ShowCarbons)
+                if (atom.ShowSymbol.HasValue)
+                {
+                    showLabel = atom.ShowSymbol.Value;
+                }
+                else
                 {
                     if (ringCount > 0 || bondCount > 1)
                     {
@@ -94,17 +98,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         }
                     }
 
-                    // Force on if atom has charge
-                    if (iAbsCharge > 0)
-                    {
-                        showLabel = true;
-                    }
-                    // Force on if atom has isotope value
-                    if (isoValue > 0)
-                    {
-                        showLabel = true;
-                    }
                 }
+
+                // Force on if atom has charge
+                if (iAbsCharge > 0)
+                {
+                    showLabel = true;
+                }
+                // Force on if atom has isotope value
+                if (isoValue > 0)
+                {
+                    showLabel = true;
+                }
+
             }
 
             #endregion Decide if atom label is to be displayed

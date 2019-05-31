@@ -44,5 +44,6 @@ namespace Chem4Word.Model2.Converters.CML
         public const string TagChem4WordFormula = "chem4word:Formula";
         public const string TagChem4WordSynonym = "chem4word:Synonym";
         public const string TagNameDictUnknown = "nameDict:unknown";
+        public static string TagExplicit = "explicit";
     }
 }

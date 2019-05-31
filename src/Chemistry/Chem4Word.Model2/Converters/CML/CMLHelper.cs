@@ -206,5 +206,19 @@ namespace Chem4Word.Model2.Converters.CML
             }
             return result;
         }
+
+        public static bool? GetExplicit(XElement cmlElement)
+        {
+            bool expl;
+
+            if (bool.TryParse(cmlElement.Attribute(CMLNamespaces.c4w + CMLConstants.TagExplicit)?.Value, out expl))
+            {
+                return expl;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
