@@ -209,7 +209,7 @@
   <Fragment>
     <ComponentGroup Id="Manual" Directory="MANUAL">
       <Component Id="Chem4Word.Version3.User.Manual">
-        <File Id="Chem4Word.Version3.User.Manual.docx" Source="$(var.Chem4Word.V3.TargetDir)..\..\..\..\doc\Chem4Word-Version3-1-User-Manual.docx"/>
+        <File Id="Chem4Word.Version3.User.Manual.docx" Source="$(var.Chem4Word.V3.TargetDir)..\..\..\..\doc\Chem4Word-Version3-1-User-Manual.docx" />
       </Component>
     </ComponentGroup>
   </Fragment>

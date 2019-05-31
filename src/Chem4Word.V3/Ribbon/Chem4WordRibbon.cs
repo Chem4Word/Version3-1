@@ -1983,5 +1983,27 @@ namespace Chem4Word
 
             AfterButtonChecks(sender as RibbonButton);
         }
+
+        private void ShowSystemInfo_Click(object sender, RibbonControlEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            BeforeButtonChecks(sender as RibbonButton);
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+
+            try
+            {
+                SystemInfo fa = new SystemInfo();
+                fa.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+
+                fa.ShowDialog();
+
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+            }
+
+            AfterButtonChecks(sender as RibbonButton);
+        }
     }
 }

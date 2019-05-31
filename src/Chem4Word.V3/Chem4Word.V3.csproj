@@ -369,6 +369,12 @@
       <DependentUpon>ImportErrors.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\PlugInComboItem.cs" />
+    <Compile Include="UI\SystemInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\SystemInfo.Designer.cs">
+      <DependentUpon>SystemInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\UpdateFailure.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -496,6 +502,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\ImportErrors.resx">
       <DependentUpon>ImportErrors.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SystemInfo.resx">
+      <DependentUpon>SystemInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\UpdateFailure.resx">
       <DependentUpon>UpdateFailure.cs</DependentUpon>

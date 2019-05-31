@@ -61,6 +61,7 @@ namespace Chem4Word
             this.YouTube = this.Factory.CreateRibbonButton();
             this.ButtonsDisabled = this.Factory.CreateRibbonButton();
             this.Update = this.Factory.CreateRibbonButton();
+            this.ShowSystemInfo = this.Factory.CreateRibbonButton();
             this.Chem4WordV3.SuspendLayout();
             this.GroupInputOutput.SuspendLayout();
             this.GroupLibrary.SuspendLayout();
@@ -246,6 +247,7 @@ namespace Chem4Word
             this.HelpMenu.Image = global::Chem4Word.Properties.Resources.Help;
             this.HelpMenu.Items.Add(this.ShowAbout);
             this.HelpMenu.Items.Add(this.ShowHome);
+            this.HelpMenu.Items.Add(this.ShowSystemInfo);
             this.HelpMenu.Items.Add(this.CheckNow);
             this.HelpMenu.Items.Add(this.ReadManual);
             this.HelpMenu.Items.Add(this.YouTube);
@@ -314,6 +316,14 @@ namespace Chem4Word
             this.Update.ShowImage = true;
             this.Update.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnUpdateClick);
             // 
+            // ShowSystemInfo
+            // 
+            this.ShowSystemInfo.Image = global::Chem4Word.Properties.Resources.About;
+            this.ShowSystemInfo.Label = "System Info";
+            this.ShowSystemInfo.Name = "ShowSystemInfo";
+            this.ShowSystemInfo.ShowImage = true;
+            this.ShowSystemInfo.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ShowSystemInfo_Click);
+            // 
             // CustomRibbon
             // 
             this.Name = "CustomRibbon";
@@ -361,6 +371,7 @@ namespace Chem4Word
         internal Microsoft.Office.Tools.Ribbon.RibbonButton ReadManual;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton YouTube;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton ButtonsDisabled;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton ShowSystemInfo;
     }
 
     partial class ThisRibbonCollection

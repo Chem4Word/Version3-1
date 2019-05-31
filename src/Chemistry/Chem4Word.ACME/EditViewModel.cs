@@ -1173,12 +1173,12 @@ namespace Chem4Word.ACME
             Atom lastAtom = startAtom;
             if (startAtom == null) //we're drawing an isolated chain
             {
-                lastAtom = AddAtomChain(null, placements[0], ClockDirections.Nothing);
+                lastAtom = AddAtomChain(null, placements[0], ClockDirections.Nothing,bondOrder:OrderSingle);
             }
             
             foreach (Point placement in placements.Skip(1))
             {
-                lastAtom= AddAtomChain(lastAtom, placement,ClockDirections.Nothing);
+                lastAtom= AddAtomChain(lastAtom, placement,ClockDirections.Nothing, bondOrder:OrderSingle);
                 if (placement != placements.Last())
                 {
                     lastAtom.ShowSymbol = null;

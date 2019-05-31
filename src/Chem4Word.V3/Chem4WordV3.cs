@@ -63,6 +63,7 @@ namespace Chem4Word
         public bool LibraryState = false;
 
         public C4wAddInInfo AddInInfo = new C4wAddInInfo();
+        public SystemHelper Helper = new SystemHelper();
         public Options SystemOptions = null;
         public TelemetryWriter Telemetry = new TelemetryWriter(true);
 
@@ -306,7 +307,7 @@ namespace Chem4Word
             try
             {
                 // Initiallize Telemetry with send permission
-                Telemetry = new TelemetryWriter(true);
+                Telemetry = new TelemetryWriter(true, Helper);
 
                 // Read in options file
                 string padPath = AddInInfo.ProductAppDataPath;
@@ -350,7 +351,7 @@ namespace Chem4Word
                 bool isBeta = betaValue != null && bool.Parse(betaValue);
 
                 // Re-Initialize Telemetry with granted permissions
-                Telemetry = new TelemetryWriter(isBeta || SystemOptions.TelemetryEnabled);
+                Telemetry = new TelemetryWriter(isBeta || SystemOptions.TelemetryEnabled, Helper);
 
                 try
                 {

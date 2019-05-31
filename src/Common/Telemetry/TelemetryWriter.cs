@@ -26,12 +26,19 @@ namespace Chem4Word.Telemetry
 
         private readonly bool _permissionGranted;
 
-        public TelemetryWriter(bool permissionGranted)
+        public TelemetryWriter(bool permissionGranted, SystemHelper helper = null)
         {
             _permissionGranted = permissionGranted;
-            if (_helper == null)
+            if (helper != null)
             {
-                _helper = new SystemHelper();
+                _helper = helper;
+            }
+            else
+            {
+                if (_helper == null)
+                {
+                    _helper = new SystemHelper();
+                }
             }
 
             if (_wmiHelper == null)

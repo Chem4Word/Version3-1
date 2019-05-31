@@ -295,6 +295,18 @@ namespace Chem4Word.Telemetry
                 {
                     int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
 
+                    // .Net 4.8
+                    if (releaseKey >= 528049)
+                    {
+                        DotNetVersion = $".NET 4.8 [{releaseKey}]";
+                        return;
+                    }
+                    if (releaseKey >= 528040)
+                    {
+                        DotNetVersion = $".NET 4.8 (W10 1903) [{releaseKey}]";
+                        return;
+                    }
+
                     // .Net 4.7.2
                     if (releaseKey >= 461814)
                     {
@@ -395,7 +407,7 @@ namespace Chem4Word.Telemetry
 
                     if (releaseKey < 378389)
                     {
-                        DotNetVersion = ".Net Version Unknown [{releaseKey}]";
+                        DotNetVersion = $".Net Version Unknown [{releaseKey}]";
                     }
                 }
             }
