@@ -90,6 +90,10 @@ namespace Chem4Word.ACME.Behaviors
             CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
         }
 
+        public override void Abort()
+        {
+        }
+
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
         {
             List<Point> altPlacements;

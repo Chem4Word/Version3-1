@@ -69,8 +69,13 @@ namespace Chem4Word.ACME.Adorners
 
             AttachHandlers();
 
-            //no need to add the adroner in at this point as the base has already done it
+          
+            Focusable = true;
+            Focus();
+
+            //no need to add the adorner in at this point as the base has already done it
         }
+
 
         protected void AttachHandlers()
         {
@@ -101,13 +106,6 @@ namespace Chem4Word.ACME.Adorners
             BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
-        }
-
-        protected override void AbortDragging()
-        {
-            Dragging = false;
-            Resizing = false;
-            base.AbortDragging();
         }
 
         private void BuildRotateThumb(ref Thumb rotateThumb, Cursor hand)

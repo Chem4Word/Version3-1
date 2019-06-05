@@ -43,7 +43,7 @@ namespace Chem4Word.ACME.Adorners
         //where the dragging starts
         protected Point StartPos;
 
-        private readonly EditorCanvas _editorCanvas;
+        public EditorCanvas CurrentEditor { get; }
         protected bool IsWorking => Dragging;
 
         // Override the VisualChildrenCount and GetVisualChild properties to interface with
@@ -82,20 +82,33 @@ namespace Chem4Word.ACME.Adorners
             Focusable = false;
             IsHitTestVisible = true;
 
-            _editorCanvas = (EditorCanvas)adornedElement;
-            PreviewMouseRightButtonUp += SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
+            CurrentEditor = (EditorCanvas)adornedElement;
+          
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
+            //PreviewKeyDown += SingleAtomSelectionAdorner_PreviewKeyDown;
+            //BigThumb.PreviewKeyDown += SingleAtomSelectionAdorner_PreviewKeyDown;
+            Focusable = true;
+            Keyboard.Focus(this);
         }
+
+        //private void SingleAtomSelectionAdorner_PreviewKeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (e.Key == Key.Escape)
+        //    {
+        //        BigThumb.CancelDrag();
+        //    }
+        //}
 
         private void SingleAtomSelectionAdorner_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            _editorCanvas?.RaiseEvent(e);
+            CurrentEditor?.RaiseEvent(e);
         }
 
         ~SingleAtomSelectionAdorner()
         {
             PreviewMouseRightButtonUp -= SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
+           
         }
 
         protected void AttachHandler()
@@ -103,6 +116,7 @@ namespace Chem4Word.ACME.Adorners
             //wire up the event handling
             MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
             KeyDown += ThisAdorner_KeyDown;
+            PreviewMouseRightButtonUp += SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
         }
 
         private void BigThumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -115,23 +129,7 @@ namespace Chem4Word.ACME.Adorners
 
         protected void ThisAdorner_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Delete))
-            {
-                //bubble it up
-                e.Handled = false;
-            }
-            else if ((Keyboard.IsKeyDown(Key.Z) | (Keyboard.IsKeyDown(Key.Y)) && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control))
-            {
-                e.Handled = false;
-            }
-            else if (Keyboard.IsKeyDown(Key.Escape))
-            {
-                e.Handled = true;
-                if (IsWorking)
-                {
-                    AbortDragging();
-                }
-            }
+            CurrentEditor.RaiseEvent(e);
         }
 
         protected virtual void AbortDragging()
@@ -171,6 +169,8 @@ namespace Chem4Word.ACME.Adorners
             BigThumb.DragCompleted += BigThumb_DragCompleted;
             BigThumb.DragDelta += BigThumb_DragDelta;
             BigThumb.MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
+            BigThumb.Focusable = true;
+            Keyboard.Focus(BigThumb);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Chem4Word.ACME.Adorners
 
                 //take a snapshot of the molecule
 
-                var ghost = _editorCanvas.GhostMolecule(AdornedMolecules);
+                var ghost = CurrentEditor.GhostMolecule(AdornedMolecules);
                 //Debug.WriteLine(LastOperation.ToString());
                 ghost.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
@@ -266,29 +266,39 @@ namespace Chem4Word.ACME.Adorners
         /// <param name="e"></param>
         private void BigThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            //wire up the event handling
-            var lastTranslation = (TranslateTransform)LastOperation;
-            lastTranslation.X = DragXTravel;
-            lastTranslation.Y = DragYTravel;
-
-            SetBoundingBox();
-            InvalidateVisual();
-            _editorCanvas.SuppressRedraw = true;
-            //move the molecule
-            var atoms = from mol in AdornedMolecules
-                        from atom in mol.Atoms.Values
-                        select atom;
-
-            CurrentModel.DoTransform(LastOperation, atoms.ToList());
-
-            RaiseDRCompleted(sender, e);
-            Dragging = false;
-            _editorCanvas.SuppressRedraw = false;
-
-            foreach (Molecule adornedMolecule in AdornedMolecules)
+            if (!e.Canceled)
             {
-                adornedMolecule.ForceUpdates();
+
+
+                var lastTranslation = (TranslateTransform) LastOperation;
+                lastTranslation.X = DragXTravel;
+                lastTranslation.Y = DragYTravel;
+
+                SetBoundingBox();
+                InvalidateVisual();
+                CurrentEditor.SuppressRedraw = true;
+                //move the molecule
+                var atoms = from mol in AdornedMolecules
+                            from atom in mol.Atoms.Values
+                            select atom;
+
+                CurrentModel.DoTransform(LastOperation, atoms.ToList());
+
+                RaiseDRCompleted(sender, e);
+            
+                CurrentEditor.SuppressRedraw = false;
+
+                foreach (Molecule adornedMolecule in AdornedMolecules)
+                {
+                    adornedMolecule.ForceUpdates();
+                }
             }
+            else
+            {
+                CurrentModel.SelectedItems.Remove(AdornedMolecules);
+            }
+            Dragging = false;
+
         }
 
         #endregion MouseIsDown

@@ -591,7 +591,7 @@ namespace Chem4Word.ACME.Controls
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            //if (this is EditorCanvas ec)
+            //if (this is CurrentEditor ec)
             //{
             //    Debug.WriteLine($"EC: @ {e.GetPosition(this)}");
             //}

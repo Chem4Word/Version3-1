@@ -34,7 +34,13 @@ namespace Chem4Word.ACME.Adorners
             PreviewMouseLeftButtonUp += AtomSelectionAdorner_PreviewMouseLeftButtonUp;
             PreviewMouseRightButtonUp += AtomSelectionAdorner_PreviewMouseRightButtonUp;
             MouseLeftButtonUp += AtomSelectionAdorner_MouseLeftButtonUp;
+            PreviewKeyDown += AtomSelectionAdorner_PreviewKeyDown;
             IsHitTestVisible = true;
+        }
+
+        private void AtomSelectionAdorner_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
         }
 
         private void AtomSelectionAdorner_PreviewMouseRightButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -106,9 +112,10 @@ namespace Chem4Word.ACME.Adorners
         ~AtomSelectionAdorner()
         {
             MouseLeftButtonDown -= AtomSelectionAdorner_MouseLeftButtonDown;
-            MouseMove += AtomSelectionAdorner_MouseMove;
-            MouseLeftButtonUp += AtomSelectionAdorner_MouseLeftButtonUp;
+            MouseMove -= AtomSelectionAdorner_MouseMove;
+            MouseLeftButtonUp -= AtomSelectionAdorner_MouseLeftButtonUp;
             PreviewMouseRightButtonUp -= AtomSelectionAdorner_PreviewMouseRightButtonUp;
+            PreviewKeyDown -= AtomSelectionAdorner_PreviewKeyDown;
         }
     }
 }

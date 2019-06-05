@@ -5,17 +5,19 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2.Annotations;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interactivity;
 
 namespace Chem4Word.ACME.Behaviors
 {
-    public class BaseEditBehavior : Behavior<Canvas>, INotifyPropertyChanged
+    public abstract class BaseEditBehavior : Behavior<Canvas>, INotifyPropertyChanged
     {
         public EditViewModel EditViewModel
         {
@@ -29,8 +31,38 @@ namespace Chem4Word.ACME.Behaviors
 
         private string _currentStatus;
 
-        public EditorCanvas CurrentEditor { get; set; }
 
+        private EditorCanvas _currentEditor;
+
+        public EditorCanvas CurrentEditor
+        {
+            get { return _currentEditor; }
+            set
+            {
+                if (_currentEditor!=null)
+                {
+                    _currentEditor.PreviewKeyDown-= CurrentEditor_PreviewKeyDown;
+                }
+                _currentEditor = value;
+                if (_currentEditor != null)
+                {
+                    _currentEditor.PreviewKeyDown += CurrentEditor_PreviewKeyDown;
+                    _currentEditor.Focusable = true;
+                    _currentEditor.Focus();
+                }
+            }
+            
+        }
+
+        private void CurrentEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Abort();
+            }
+        }
+
+      
         public virtual string CurrentStatus
         {
             get
@@ -44,6 +76,9 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
+        public abstract void Abort();
+       
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -51,5 +86,15 @@ namespace Chem4Word.ACME.Behaviors
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            if (_currentEditor != null)
+            {
+                _currentEditor.PreviewKeyDown -= CurrentEditor_PreviewKeyDown;
+            }
+        }
+
     }
 }

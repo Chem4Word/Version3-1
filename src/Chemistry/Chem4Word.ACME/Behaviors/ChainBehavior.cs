@@ -36,6 +36,7 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     _currentAdorner.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
                     _currentAdorner.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
+                    _currentAdorner.PreviewKeyDown += CurrentEditor_PreviewKeyDown;
                 }
 
                 //local function
@@ -47,9 +48,18 @@ namespace Chem4Word.ACME.Behaviors
                         layer.Remove(_currentAdorner);
                         _currentAdorner.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
                         _currentAdorner.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
+                        _currentAdorner.PreviewKeyDown -= CurrentEditor_PreviewKeyDown;
                         _currentAdorner = null;
                     }
                 }
+            }
+        }
+
+        private void CurrentEditor_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Abort();
             }
         }
 
@@ -65,6 +75,8 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseMove += CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
+            CurrentEditor.PreviewKeyDown += CurrentEditor_PreviewKeyDown;
+            
             AssociatedObject.IsHitTestVisible = true;
 
             if (_parent != null)
@@ -74,6 +86,8 @@ namespace Chem4Word.ACME.Behaviors
 
             CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
         }
+
+      
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -139,6 +153,16 @@ namespace Chem4Word.ACME.Behaviors
         public Atom Target { get; set; }
 
         public Point FirstPoint { get; set; }
+
+
+        public override void Abort()
+        {
+            MouseIsDown = false;
+            IsDrawing = false;
+            CurrentEditor.ReleaseMouseCapture();
+            CurrentAdorner = null;
+            Placements = null;
+        }
 
         public void MarkOutAtoms(Point endPoint, MouseEventArgs e)
         {
@@ -297,6 +321,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseMove -= CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
+            CurrentEditor.PreviewKeyDown -= CurrentEditor_PreviewKeyDown;
             //CurrentEditor = null;
             if (_parent != null)
             {

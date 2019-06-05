@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -23,6 +24,7 @@ namespace Chem4Word.ACME.Adorners
 
         private Pen _dashPen;
 
+        private EditorCanvas CurrentEditor { get; }
         public Globals.BondStereo Stereo { get; set; }
 
         public string BondOrder { get; set; }
@@ -53,11 +55,22 @@ namespace Chem4Word.ACME.Adorners
         {
             _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
             _solidColorBrush.Opacity = 0.5;
-
             _dashPen = new Pen(SystemColors.HighlightBrush, bondThickness);
 
+            CurrentEditor = (EditorCanvas) adornedElement;
+        
+            PreviewKeyDown += DrawBondAdorner_PreviewKeyDown;
+    
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
+
+            Focusable = true;
+            Focus();
+        }
+
+        private void DrawBondAdorner_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

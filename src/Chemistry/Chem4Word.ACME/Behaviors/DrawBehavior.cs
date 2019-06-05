@@ -29,7 +29,7 @@ namespace Chem4Word.ACME.Behaviors
         private readonly TranslateTransform _transform = new TranslateTransform();
 
         private AtomVisual _currentAtomVisual;
-        private bool _flag;
+        public bool IsDrawing { get; private set; }
 
         private Snapper _angleSnapper;
         //private Window _parent;
@@ -53,6 +53,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.PreviewMouseMove += CurrentEditor_PreviewMouseMove;
             CurrentEditor.PreviewMouseRightButtonUp += CurrentEditor_PreviewMouseRightButtonUp;
             CurrentEditor.IsHitTestVisible = true;
+
             CurrentStatus = DefaultText;
         }
 
@@ -164,112 +165,116 @@ namespace Chem4Word.ACME.Behaviors
         {
             CurrentEditor.ReleaseMouseCapture();
             CurrentStatus = "";
-            //first get the current active visuals
-            var landedAtomVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as AtomVisual;
+            if (IsDrawing)
+            {
+                //first get the current active visuals
+                var landedAtomVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as AtomVisual;
 
-            var landedBondVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as BondVisual;
-            //check to see whether or not we've clicked and released on the same atom
-            bool sameAtom = landedAtomVisual == _currentAtomVisual;
-            //check to see whether the target is in the same molecule
-            bool sameMolecule = landedAtomVisual?.ParentAtom.Parent == _currentAtomVisual?.ParentAtom.Parent;
-            //check bonds first - we can't connect to a bond so we need to simply do some stuff with it
-            if (landedBondVisual != null)
-            {
-                //clicking on a stereo bond should just invert it
-                if (landedBondVisual.ParentBond.Stereo == BondStereo.Hatch &
-                    EditViewModel.CurrentStereo == BondStereo.Hatch |
-                    landedBondVisual.ParentBond.Stereo == BondStereo.Wedge &
-                    EditViewModel.CurrentStereo == BondStereo.Wedge)
+                var landedBondVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as BondVisual;
+                //check to see whether or not we've clicked and released on the same atom
+                bool sameAtom = landedAtomVisual == _currentAtomVisual;
+                //check to see whether the target is in the same molecule
+                bool sameMolecule = landedAtomVisual?.ParentAtom.Parent == _currentAtomVisual?.ParentAtom.Parent;
+                //check bonds first - we can't connect to a bond so we need to simply do some stuff with it
+                if (landedBondVisual != null)
                 {
-                    EditViewModel.SwapBondDirection(landedBondVisual.ParentBond);
-                }
-                else
-                {
-                    //modify the bond attribute (order, stereo, whatever's selected really)
-                    EditViewModel.SetBondAttributes(landedBondVisual.ParentBond);
-                }
-            }
-            else //we clicked on empty space or an atom
-            {
-                Atom parentAtom = _currentAtomVisual?.ParentAtom;
-                if (landedAtomVisual == null) //no atom hit
-                {
-                    if (parentAtom != null)
+                    //clicking on a stereo bond should just invert it
+                    if (landedBondVisual.ParentBond.Stereo == BondStereo.Hatch &
+                        EditViewModel.CurrentStereo == BondStereo.Hatch |
+                        landedBondVisual.ParentBond.Stereo == BondStereo.Wedge &
+                        EditViewModel.CurrentStereo == BondStereo.Wedge)
                     {
-                        if (!parentAtom.CanAddAtoms)
+                        EditViewModel.SwapBondDirection(landedBondVisual.ParentBond);
+                    }
+                    else
+                    {
+                        //modify the bond attribute (order, stereo, whatever's selected really)
+                        EditViewModel.SetBondAttributes(landedBondVisual.ParentBond);
+                    }
+                }
+                else //we clicked on empty space or an atom
+                {
+                    Atom parentAtom = _currentAtomVisual?.ParentAtom;
+                    if (landedAtomVisual == null) //no atom hit
+                    {
+                        if (parentAtom != null)
                         {
-                            Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
-                        }
-                        //but we went mouse-down on an atom
-                        else if (_currentAtomVisual != null)
-                        {
-                            //so just sprout a chain off it at two-o-clock
-                            EditViewModel.AddAtomChain(parentAtom, _angleSnapper.SnapBond(e.GetPosition(CurrentEditor), e),
-                                                   ClockDirections.II);
+                            if (!parentAtom.CanAddAtoms)
+                            {
+                                Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
+                            }
+                            //but we went mouse-down on an atom
+                            else if (_currentAtomVisual != null)
+                            {
+                                //so just sprout a chain off it at two-o-clock
+                                EditViewModel.AddAtomChain(
+                                    parentAtom, _angleSnapper.SnapBond(e.GetPosition(CurrentEditor), e),
+                                    ClockDirections.II);
+                            }
+                            else
+                            {
+                                //otherwise create a singleton
+                                EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
+                            }
                         }
                         else
                         {
+                            //create a singleton
                             //otherwise create a singleton
                             EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
                         }
                     }
-                    else
+                    else //we went mouse-up on an atom
                     {
-                        //create a singleton
-                        //otherwise create a singleton
-                        EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
-                    }
-                }
-                else //we went mouse-up on an atom
-                {
-                    Atom lastAtom = landedAtomVisual.ParentAtom;
-                    if (sameAtom) //both are the same atom
-                    {
-                        if (lastAtom.Element.Symbol != EditViewModel.SelectedElement.Symbol)
+                        Atom lastAtom = landedAtomVisual.ParentAtom;
+                        if (sameAtom) //both are the same atom
                         {
-                            EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() { lastAtom });
-                        }
-                        else
-                        {
-                            if (!lastAtom.CanAddAtoms)
+                            if (lastAtom.Element.Symbol != EditViewModel.SelectedElement.Symbol)
                             {
-                                Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
+                                EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() {lastAtom});
                             }
                             else
                             {
-                                var atomMetrics = GetNewChainEndPos(landedAtomVisual);
-                                EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
+                                if (!lastAtom.CanAddAtoms)
+                                {
+                                    Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
+                                }
+                                else
+                                {
+                                    var atomMetrics = GetNewChainEndPos(landedAtomVisual);
+                                    EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
+                                }
                             }
                         }
-                    }
-                    else //we must have hit a different atom altogether
-                    {
-                        //already has a bond to the target atom
-                        var existingBond = parentAtom.BondBetween(lastAtom);
-                        if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
+                        else //we must have hit a different atom altogether
                         {
-                            Core.UserInteractions.AlertUser(
-                                "Unable to increase bond order:  either atom is saturated.");
-                        }
-                        else if (existingBond != null) //it must be in the same molecule
-                        {
-                            EditViewModel.IncreaseBondOrder(existingBond);
-                        }
-                        else //doesn't have a bond to the target atom
-                        {
+                            //already has a bond to the target atom
+                            var existingBond = parentAtom.BondBetween(lastAtom);
                             if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
                             {
-                                Core.UserInteractions.AlertUser("Unable to add bond:  either atom is saturated.");
+                                Core.UserInteractions.AlertUser(
+                                    "Unable to increase bond order:  either atom is saturated.");
                             }
-                            else if (sameMolecule)
+                            else if (existingBond != null) //it must be in the same molecule
                             {
-                                EditViewModel.AddNewBond(parentAtom, lastAtom,
-                                                     parentAtom.Parent);
+                                EditViewModel.IncreaseBondOrder(existingBond);
                             }
-                            else
+                            else //doesn't have a bond to the target atom
                             {
-                                EditViewModel.JoinMolecules(parentAtom, lastAtom, EditViewModel.CurrentBondOrder,
-                                                        EditViewModel.CurrentStereo);
+                                if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
+                                {
+                                    Core.UserInteractions.AlertUser("Unable to add bond:  either atom is saturated.");
+                                }
+                                else if (sameMolecule)
+                                {
+                                    EditViewModel.AddNewBond(parentAtom, lastAtom,
+                                                             parentAtom.Parent);
+                                }
+                                else
+                                {
+                                    EditViewModel.JoinMolecules(parentAtom, lastAtom, EditViewModel.CurrentBondOrder,
+                                                                EditViewModel.CurrentStereo);
+                                }
                             }
                         }
                     }
@@ -282,7 +287,22 @@ namespace Chem4Word.ACME.Behaviors
             }
 
             _currentAtomVisual = null;
-            _flag = false;
+            IsDrawing = false;
+            //clear this to prevent a weird bug in drawing
+            CurrentEditor.ActiveChemistry = null;
+        }
+
+        public override void Abort()
+        {
+            CurrentEditor.ReleaseMouseCapture();
+            CurrentStatus = "";
+            if (_adorner != null)
+            {
+                RemoveAdorner(ref _adorner);
+            }
+
+            _currentAtomVisual = null;
+            IsDrawing = false;
             //clear this to prevent a weird bug in drawing
             CurrentEditor.ActiveChemistry = null;
         }
@@ -522,12 +542,12 @@ namespace Chem4Word.ACME.Behaviors
                 _angleSnapper = new Snapper(_currentAtomVisual.ParentAtom.Position, EditViewModel);
                 _lastAtomVisual = _currentAtomVisual;
             }
-            _flag = true;
+            IsDrawing = true;
         }
 
         private bool Dragging(MouseEventArgs e)
         {
-            return e.LeftButton == MouseButtonState.Pressed & _flag;
+            return e.LeftButton == MouseButtonState.Pressed & IsDrawing;
         }
 
         //private AtomVisual GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)

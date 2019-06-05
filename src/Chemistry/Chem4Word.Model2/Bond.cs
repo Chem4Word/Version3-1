@@ -199,7 +199,7 @@ namespace Chem4Word.Model2
         public object Tag { get; set; }
         public List<string> Messages { get; private set; }
 
-        private BondDirection? _implicitPlacement; //caching variable, can be trashed
+
         private string _internalId;
 
         public BondDirection Placement
@@ -628,19 +628,7 @@ namespace Chem4Word.Model2
             return dir;
         }
 
-        public BondDirection? ImplicitPlacement
-        {
-            get
-            {
-                if (_implicitPlacement == null) //we haven't even touched this yet
-                {
-                    _implicitPlacement = GetPlacement(); //so guess what it should be
-                }
-
-                return _implicitPlacement;
-            }
-            internal set { _implicitPlacement = value; }
-        }
+        public BondDirection? ImplicitPlacement => GetPlacement();
 
         public Vector BondVector
         {

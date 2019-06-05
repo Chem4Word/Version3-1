@@ -1158,6 +1158,7 @@ namespace Chem4Word.ACME
                         Bond bondBetween = thisAtom.BondBetween(otherAtom);
                         SetBondAttributes(bondBetween,
                                           OrderDouble, Globals.BondStereo.None);
+                        bondBetween.ExplicitPlacement = null;
                         //bondBetween.Placement = BondDirection.Anticlockwise;
                         bondBetween.UpdateVisual();
                         thisAtom.UpdateVisual();
@@ -1578,6 +1579,7 @@ namespace Chem4Word.ACME
                 {
                     atomToFlip.Position = flipTransform.Transform(atomToFlip.Position);
                 }
+                InvertPlacements(selMolecule);
                 selMolecule.ForceUpdates();
             };
 
@@ -1587,6 +1589,7 @@ namespace Chem4Word.ACME
                 {
                     atomToFlip.Position = flipTransform.Transform(atomToFlip.Position);
                 }
+                InvertPlacements(selMolecule);
                 selMolecule.ForceUpdates();
             };
 
@@ -1594,6 +1597,22 @@ namespace Chem4Word.ACME
             redo();
 
             UndoManager.EndUndoBlock();
+
+            //local function
+            void InvertPlacements(Molecule m)
+            {
+                var ringBonds = from b in m.Bonds
+                                where b.Rings.Any()
+                                && b.OrderValue <=2.5 & b.OrderValue >=1.5
+                                select b;
+                foreach (Bond ringBond in ringBonds)
+                {
+                    if (ringBond.ExplicitPlacement != null )
+                    {
+                        ringBond.ExplicitPlacement = (BondDirection) (-(int) ringBond.ExplicitPlacement);
+                    }
+                }
+            }
         }
 
         public void AddToSelection(object thingToAdd)

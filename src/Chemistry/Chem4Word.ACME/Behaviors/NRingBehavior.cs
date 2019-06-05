@@ -64,6 +64,18 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor_MouseLeftButtonUp(sender, e);
         }
 
+        public override void Abort()
+        {
+            _preferredPlacements = null;
+            CurrentEditor.ReleaseMouseCapture();
+
+            CurrentAdorner = null;
+            Target = null;
+            MouseIsDown = false;
+            IsDrawing = false;
+            CurrentStatus = DefaultStatusText;
+        }
+
         private void _currentAdorner_MouseMove(object sender, MouseEventArgs e)
         {
             CurrentEditor_MouseMove(sender, e);

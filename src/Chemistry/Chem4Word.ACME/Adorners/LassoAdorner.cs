@@ -28,9 +28,17 @@ namespace Chem4Word.ACME.Adorners
             _dashPen = new Pen(SystemColors.HighlightBrush, 1);
             _dashPen.DashStyle = DashStyles.Dash;
             CurrentEditor = (EditorCanvas)adornedElement;
-            PreviewMouseLeftButtonUp += LassoAdorner_PreviewMouseLeftButtonUp;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
+
+
+            Focusable = true;
+            Focus();
+        }
+
+        private void LassoAdorner_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
         }
 
         private void LassoAdorner_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)

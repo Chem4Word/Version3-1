@@ -26,6 +26,10 @@ namespace Chem4Word.ACME.Behaviors
         //private LassoAdorner _lassoAdorner;
         //private MoleculeSelectionAdorner _molAdorner;
 
+        public override void Abort()
+        {
+        }
+
         protected override void OnAttached()
         {
             base.OnAttached();

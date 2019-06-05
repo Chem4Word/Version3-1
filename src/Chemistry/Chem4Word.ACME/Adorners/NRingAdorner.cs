@@ -20,11 +20,19 @@ namespace Chem4Word.ACME.Adorners
 
         public NRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, Point startPoint, Point endPoint) : base(adornedElement, bondThickness, placements)
         {
-            MouseLeftButtonDown += FixedRingAdorner_MouseLeftButtonDown;
             PreviewMouseUp += NRingAdorner_PreviewMouseUp;
+            PreviewKeyDown += NRingAdorner_PreviewKeyDown;
             MouseUp += NRingAdorner_MouseUp;
             StartPoint = startPoint;
             EndPoint = endPoint;
+            Focusable = true;
+            Focus();
+
+        }
+
+        private void NRingAdorner_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
         }
 
         private void NRingAdorner_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -37,11 +45,7 @@ namespace Chem4Word.ACME.Adorners
             CurrentEditor.RaiseEvent(e);
         }
 
-        private void FixedRingAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            //_currentEditor.RaiseEvent(e);
-            //e.Handled = true;
-        }
+        
 
         protected override void OnRender(DrawingContext drawingContext)
         {
@@ -88,6 +92,13 @@ namespace Chem4Word.ACME.Adorners
 
             var fatArrow = FatArrowGeometry.GetArrowGeometry(StartPoint, EndPoint);
             dc.DrawGeometry(fillBrush, null, fatArrow);
+        }
+
+        ~NRingAdorner()
+        {
+            PreviewMouseUp -= NRingAdorner_PreviewMouseUp;
+            PreviewKeyDown -= NRingAdorner_PreviewKeyDown;
+            MouseUp -= NRingAdorner_MouseUp;
         }
     }
 }
