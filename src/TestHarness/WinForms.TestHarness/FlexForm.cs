@@ -118,7 +118,6 @@ namespace WinForms.TestHarness
             if (dr == DialogResult.OK)
             {
                 DisplayHost.BackColor = colorDialog1.Color;
-                //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
             }
         }
 
@@ -191,7 +190,6 @@ namespace WinForms.TestHarness
                     Information.Text =
                         $"Formula: {model.ConciseFormula} BondLength: {model.MeanBondLength.ToString("#,##0.0##")}";
 
-                    //Display.BackgroundColor = ColorToBrush(DisplayHost.BackColor);
                     model.Refresh();
 
                     Display.Chemistry = model;
@@ -307,10 +305,7 @@ namespace WinForms.TestHarness
                         modelMolecule.RemoveAtom(atom);
                     }
 
-                    //foreach (var mol in model.Molecules)
-                    //{
-                    //    mol.ConciseFormula = "";
-                    //}
+               
 
                     model.Refresh();
                     Information.Text =
@@ -363,10 +358,7 @@ namespace WinForms.TestHarness
                             b.UpdateVisual();
                         }
 
-                        //foreach (var mol in model.Molecules)
-                        //{
-                        //    mol.ConciseFormula = "";
-                        //}
+                      
 
                         model.Refresh();
                         Information.Text =

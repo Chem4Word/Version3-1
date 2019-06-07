@@ -140,12 +140,14 @@ namespace Chem4Word.ACME.Utils
                     BondOrderValue = bond.OrderValue.Value,
                     IsSingle = bond.Order.Equals(Globals.OrderSingle),
                     IsDouble = bond.Order.Equals(Globals.OrderDouble),
-                    ShowPlacementSettings = bond.Order.Equals(Globals.OrderPartial12) || bond.Order.Equals(Globals.OrderDouble) || bond.Order.Equals(Globals.OrderPartial23)
+                    Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
+                    Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
+
                 };
 
                 model.DoubleBondChoice = DoubleBondType.Auto;
 
-                if (model.ShowPlacementSettings)
+                if (model.IsDouble | model.Is1Point5 | model.Is2Point5)
                 {
                     if (bond.ExplicitPlacement != null)
                     {

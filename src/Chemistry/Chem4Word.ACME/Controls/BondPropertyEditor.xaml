@@ -24,6 +24,93 @@
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
             <converters:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
+            <x:Array x:Key="BondItems2" Type="{x:Type ComboBoxItem}">
+                <ComboBoxItem Tag="0" Height="Auto">
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">None</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black"  StrokeThickness="2" StrokeDashArray="1,1" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="0.5" >
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">Half</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black"  StrokeThickness="2" StrokeDashArray="2,1" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="1">
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">Single</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black"  StrokeThickness="2" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="1.5">
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">1.5</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black" StrokeThickness="2" StrokeEndLineCap="Round"/>
+                            <Line X1="0" Y1="12" X2="50" Y2="12" Stroke="Black" StrokeDashArray="2,1" StrokeEndLineCap="Round" StrokeThickness="2"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="2">
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">Double</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="5" X2="50" Y2="5" Stroke="Black" StrokeThickness="2"/>
+                            <Line X1="0" Y1="10" X2="50" Y2="10" Stroke="Black" StrokeThickness="2"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="2.5">
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">2.5</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="3" X2="50" Y2="3" Stroke="Black" StrokeThickness="2"/>
+                            <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black" StrokeThickness="2"/>
+                            <Line X1="0" Y1="13" X2="50" Y2="13" Stroke="Black" StrokeThickness="2"  StrokeDashArray="2,1" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="3">
+                    <StackPanel Orientation="Horizontal" Height="Auto">
+                        <TextBlock  Width="50">Triple</TextBlock>
+                        <Canvas Width="60" Height="Auto">
+                            <Line X1="0" Y1="3" X2="50" Y2="3" Stroke="Black" StrokeThickness="2"/>
+                            <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black" StrokeThickness="2"/>
+                            <Line X1="0" Y1="13" X2="50" Y2="13" Stroke="Black" StrokeThickness="2"/>
+                        </Canvas>
+                    </StackPanel>
+                </ComboBoxItem>
+            </x:Array>
+            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}">
+                <ComboBoxItem Tag="0" Height="Auto">
+                        <TextBlock  Width="50">None</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="0.5" >
+                        <TextBlock  Width="50">Half</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="1">
+                        <TextBlock  Width="50">Single</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="1.5">
+                        <TextBlock  Width="50">1.5</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="2">
+                        <TextBlock  Width="50">Double</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="2.5">
+                        <TextBlock  Width="50">2.5</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem Tag="3">
+                        <TextBlock  Width="50">Triple</TextBlock>
+                </ComboBoxItem>
+            </x:Array>
 
             <Style TargetType="{x:Type RadioButton}">
                 <Setter Property="Template">
@@ -71,6 +158,9 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock
@@ -93,6 +183,8 @@
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 SelectedValue="{Binding Path=BondOrderValue, Mode=TwoWay}"
+                FontSize="12"
+                Foreground="{StaticResource Chem4WordBrush}"
                 SelectedValuePath="Tag">
                 <ComboBoxItem Content="None" Tag="0" />
                 <ComboBoxItem Content="Half" Tag="0.5" />
@@ -414,7 +506,7 @@
                 Grid.Column="0"
                 Margin="0,5,5,0"
                 VerticalAlignment="Center"
-                Visibility="{Binding Path=ShowPlacementSettings, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
             <StackPanel
@@ -422,7 +514,7 @@
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
-                Visibility="{Binding Path=ShowPlacementSettings, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Auto}}" ToolTip="Automatic">
                     <TextBlock
                         Margin="0,0,0,5"
@@ -593,8 +685,236 @@
                     </Canvas>
                 </RadioButton>
             </StackPanel>
+            <TextBlock
+                Grid.Row="5"
+                Grid.Column="0"
+                Margin="0,5,5,0"
+                VerticalAlignment="Center"
+                Visibility="{Binding Path=Is1Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                Placement
+            </TextBlock>
             <StackPanel
                 Grid.Row="5"
+                Grid.Column="1"
+                Margin="0,5,0,0"
+                Orientation="Horizontal"
+                Visibility="{Binding Path=Is1Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Auto}}" ToolTip="Automatic">
+                    <TextBlock
+                        Margin="0,0,0,5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="25"
+                        Foreground="Black">
+                        A
+                    </TextBlock>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Clockwise}}" ToolTip="Clockwise">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform Angle="{Binding Path=Angle}" CenterX="24" CenterY="24" />
+                        </Canvas.RenderTransform>
+                        <Line
+                            Stroke="Red"
+                            StrokeDashArray="1,1"
+                            StrokeThickness="1"
+                            X1="24"
+                            X2="24"
+                            Y1="6"
+                            Y2="42" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,1,0,0"
+                            Fill="Red" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,43,0,0"
+                            Fill="Red" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            X1="24"
+                            X2="24"
+                            Y1="10"
+                            Y2="38" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            StrokeDashArray="2,1"
+                            X1="17"
+                            X2="17"
+                            Y1="10"
+                            Y2="38" />
+                    </Canvas>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Anticlockwise}}" ToolTip="Anticlockwise">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform Angle="{Binding Path=Angle}" CenterX="24" CenterY="24" />
+                        </Canvas.RenderTransform>
+                        <Line
+                            Stroke="Red"
+                            StrokeDashArray="1,1"
+                            StrokeThickness="1"
+                            X1="24"
+                            X2="24"
+                            Y1="6"
+                            Y2="42" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,1,0,0"
+                            Fill="Red" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,43,0,0"
+                            Fill="Red" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            X1="24"
+                            X2="24"
+                            Y1="10"
+                            Y2="38" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            StrokeDashArray="2,1"
+                            X1="31"
+                            X2="31"
+                            Y1="10"
+                            Y2="38" />
+                    </Canvas>
+                </RadioButton>
+                
+                
+            </StackPanel>
+            <TextBlock
+                Grid.Row="6"
+                Grid.Column="0"
+                Margin="0,5,5,0"
+                VerticalAlignment="Center"
+                Visibility="{Binding Path=Is2Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                Placement
+            </TextBlock>
+            <StackPanel
+                Grid.Row="6"
+                Grid.Column="1"
+                Margin="0,5,0,0"
+                Orientation="Horizontal"
+                Visibility="{Binding Path=Is2Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
+                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Auto}}" ToolTip="Automatic">
+                    <TextBlock
+                        Margin="0,0,0,5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="25"
+                        Foreground="Black">
+                        A
+                    </TextBlock>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Clockwise}}" ToolTip="Clockwise">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform Angle="{Binding Path=Angle}" CenterX="24" CenterY="24" />
+                        </Canvas.RenderTransform>
+                        <Line
+                            Stroke="Red"
+                            StrokeDashArray="1,1"
+                            StrokeThickness="1"
+                            X1="24"
+                            X2="24"
+                            Y1="6"
+                            Y2="42" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,1,0,0"
+                            Fill="Red" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,43,0,0"
+                            Fill="Red" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            X1="24"
+                            X2="24"
+                            Y1="10"
+                            Y2="38" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            StrokeDashArray="2,1"
+                            X1="17"
+                            X2="17"
+                            Y1="10"
+                            Y2="38" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            X1="31"
+                            X2="31"
+                            Y1="10"
+                            Y2="38" />
+                    </Canvas>
+                </RadioButton>
+                <RadioButton IsChecked="{Binding Path=DoubleBondChoice, Converter={StaticResource enumToBooleanConverter}, ConverterParameter={x:Static local:DoubleBondType.Anticlockwise}}" ToolTip="Anticlockwise">
+                    <Canvas>
+                        <Canvas.RenderTransform>
+                            <RotateTransform Angle="{Binding Path=Angle}" CenterX="24" CenterY="24" />
+                        </Canvas.RenderTransform>
+                        <Line
+                            Stroke="Red"
+                            StrokeDashArray="1,1"
+                            StrokeThickness="1"
+                            X1="24"
+                            X2="24"
+                            Y1="6"
+                            Y2="42" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,1,0,0"
+                            Fill="Red" />
+                        <Ellipse
+                            Width="4"
+                            Height="4"
+                            Margin="22,43,0,0"
+                            Fill="Red" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            X1="24"
+                            X2="24"
+                            Y1="10"
+                            Y2="38" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            StrokeDashArray="2,1"
+                            X1="31"
+                            X2="31"
+                            Y1="10"
+                            Y2="38" />
+                        <Line
+                            Stroke="Black"
+                            StrokeThickness="2"
+                            X1="17"
+                            X2="17"
+                            Y1="10"
+                            Y2="38" />
+                    </Canvas>
+                </RadioButton>
+
+
+            </StackPanel>
+            <StackPanel
+                Grid.Row="7"
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">

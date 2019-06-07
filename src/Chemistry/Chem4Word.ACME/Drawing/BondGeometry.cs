@@ -121,33 +121,7 @@ namespace Chem4Word.ACME.Drawing
                                                   double bondLength, ref List<Point> enclosingPoly,
                                                   Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
-            Vector v = endPoint - startPoint;
-            Vector normal = v.Perpendicular();
-            normal.Normalize();
-
-            double distance = bondLength * BondOffsetPercentage;
-            Point point1 = startPoint + normal * distance;
-            Point point2 = point1 + v;
-
-            Point point3 = startPoint - normal * distance;
-            Point point4 = point3 + v;
-
-            if (startAtomGeometry != null)
-            {
-                AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
-                AdjustTerminus(ref point1, point2, startAtomGeometry);
-                AdjustTerminus(ref point3, point4, startAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point4, point3};
-            }
-
-            if (endAtomGeometry != null)
-            {
-                AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
-                AdjustTerminus(ref point2, point1, endAtomGeometry);
-                AdjustTerminus(ref point4, point3, endAtomGeometry);
-                enclosingPoly = new List<Point>() {point1, point2, point4, point3};
-            }
-
+            enclosingPoly = GetTripleBondPoints(ref startPoint, ref endPoint, bondLength, startAtomGeometry, endAtomGeometry, out var point1, out var point2, out var point3, out var point4);
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
@@ -159,10 +133,44 @@ namespace Chem4Word.ACME.Drawing
                 sgc.LineTo(point4, true, false);
                 sgc.Close();
             }
-
             sg.Freeze();
 
             return sg;
+        }
+
+        public static List<Point> GetTripleBondPoints(ref Point startPoint, ref Point endPoint, double bondLength,
+                                                Geometry startAtomGeometry, Geometry endAtomGeometry, out Point point1,
+                                                out Point point2, out Point point3, out Point point4)
+        {
+            Vector v = endPoint - startPoint;
+            Vector normal = v.Perpendicular();
+            normal.Normalize();
+
+            double distance = bondLength * BondOffsetPercentage;
+            point1 = startPoint + normal * distance;
+            point2 = point1 + v;
+
+            point3 = startPoint - normal * distance;
+            point4 = point3 + v;
+
+            if (startAtomGeometry != null)
+            {
+                AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
+                AdjustTerminus(ref point1, point2, startAtomGeometry);
+                AdjustTerminus(ref point3, point4, startAtomGeometry);
+                
+            }
+
+            if (endAtomGeometry != null)
+            {
+                AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
+                AdjustTerminus(ref point2, point1, endAtomGeometry);
+                AdjustTerminus(ref point4, point3, endAtomGeometry);
+              
+            }
+
+            var enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+            return enclosingPoly;
         }
 
         /// <summary>

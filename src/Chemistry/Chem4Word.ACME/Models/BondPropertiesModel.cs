@@ -18,8 +18,10 @@ namespace Chem4Word.ACME.Models
         public double Angle { get; set; }
         public bool IsSingle { get; set; }
         public bool IsDouble { get; set; }
-        public bool ShowPlacementSettings { get; set; }
 
+        public bool Is1Point5 { get; set; }
+        public bool Is2Point5 { get; set; }
+       
         private double _bondOrderValue;
         public double BondOrderValue
         {
@@ -33,11 +35,14 @@ namespace Chem4Word.ACME.Models
 
                     IsSingle = value == 1;
                     IsDouble = value == 2;
-                    ShowPlacementSettings = value == 1.5 || value == 2 || value == 2.5;
+                    Is1Point5 = value == 1.5;
+                    Is2Point5 = value == 2.5;
+                    
 
                     OnPropertyChanged(nameof(IsSingle));
                     OnPropertyChanged(nameof(IsDouble));
-                    OnPropertyChanged(nameof(ShowPlacementSettings));
+                    OnPropertyChanged(nameof(Is1Point5));
+                    OnPropertyChanged(nameof(Is2Point5));
 
                     if (IsSingle)
                     {
@@ -45,11 +50,14 @@ namespace Chem4Word.ACME.Models
                         OnPropertyChanged(nameof(SingleBondChoice));
                     }
 
-                    if (IsDouble)
+                    if (IsDouble | Is1Point5 | Is2Point5)
                     {
                         DoubleBondChoice = DoubleBondType.Auto;
                         OnPropertyChanged(nameof(DoubleBondChoice));
                     }
+
+                   
+
                 }
             }
         }

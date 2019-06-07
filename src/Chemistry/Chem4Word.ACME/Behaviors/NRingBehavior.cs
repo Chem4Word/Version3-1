@@ -107,7 +107,7 @@ namespace Chem4Word.ACME.Behaviors
             //check to see whether we've dragged off the target first
             if (MouseIsDown & IsDrawing)
             {
-                CurrentStatus = "Drag along arrow to size ring.";
+                CurrentStatus = "Drag along arrow to size ring: [Esc] to cancel";
                 double xamlBondSize = EditViewModel.Model.XamlBondLength;
                 if (Target != null & GetTargetedVisual(e) != Target) //dragging off a bond or atom
                 {

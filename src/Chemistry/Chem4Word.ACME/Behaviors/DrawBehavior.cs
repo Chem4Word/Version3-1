@@ -85,7 +85,7 @@ namespace Chem4Word.ACME.Behaviors
 
                 if (Dragging(e))
                 {
-                    CurrentStatus = "[Shift] to unlock length; [Ctrl] to unlock angle; [Shift][Ctrl] to unlock both.";
+                    CurrentStatus = "[Shift] = unlock length; [Ctrl] = unlock angle; [Esc] = cancel.";
                     //are we already on top of an atom?
 
                     if (targetedVisual is AtomVisual atomUnderCursor)

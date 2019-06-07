@@ -250,7 +250,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 if (_initialTarget is Bond b)
                 {
-                    CurrentStatus = "Drag bond to reposition";
+                    CurrentStatus = "Drag bond to reposition.";
                     _atomList = new List<Atom> {b.StartAtom, b.EndAtom};
                 }
                 else //we're dragging an atom
@@ -268,7 +268,7 @@ namespace Chem4Word.ACME.Behaviors
                     //if we are then we can invoke the bond snapper to limit the movement
                     if (immediateNeighbours.Count == 1) //we are moving an atom attached by a single bond
                     {
-                        CurrentStatus = "[Shift] = unlock length; [Ctrl] = unlock angle; [Alt]=rotate drag.";
+                        CurrentStatus = "[Shift] = unlock length; [Ctrl] = unlock angle; [Alt] = pivot.";
                         //so invoke the snapper!
                         //grab the atom in the static fragment
                         var staticAtom = immediateNeighbours[0];

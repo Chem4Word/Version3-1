@@ -112,7 +112,7 @@ namespace Chem4Word.ACME.Behaviors
 
             if (IsDrawing)
             {
-                CurrentStatus = "Drag to start sizing chain.";
+                CurrentStatus = "Drag to start sizing chain: [Esc] to cancel.";
                 var endPoint = e.GetPosition(EditViewModel.CurrentEditor);
 
                 MarkOutAtoms(endPoint, e);

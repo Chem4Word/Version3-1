@@ -251,7 +251,7 @@
 
                 <!--  Properties of a Functional Group  -->
                 <StackPanel Visibility="{Binding IsChecked, Converter={StaticResource VisConverter}, ElementName=FunctionalGroup}">
-                    <TextBlock Margin="5"><Run Text="Chose a group" /></TextBlock>
+                    <TextBlock Margin="5"><Run Text="Choose a group" /></TextBlock>
                     <ComboBox
                         x:Name="FunctionalGroupPicker"
                         Width="Auto"

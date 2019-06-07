@@ -64,36 +64,30 @@ namespace WinForms.TestHarness
         {
             if (Result != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
             {
-                Editor ec = elementHost1.Child as Editor;
-                if (ec != null)
+                if (elementHost1.Child is Editor ec && ec.Dirty)
                 {
-                    if (ec.Dirty)
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Do you wish to save your changes?");
+                    sb.AppendLine("  Click 'Yes' to save your changes and exit.");
+                    sb.AppendLine("  Click 'No' to discard your changes and exit.");
+                    sb.AppendLine("  Click 'Cancel' to return to the form.");
+                    DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                    switch (dr)
                     {
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendLine("Do you wish to save your changes?");
-                        sb.AppendLine("  Click 'Yes' to save your changes and exit.");
-                        sb.AppendLine("  Click 'No' to discard your changes and exit.");
-                        sb.AppendLine("  Click 'Cancel' to return to the form.");
-                        DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
-                        switch (dr)
-                        {
-                            case DialogResult.Cancel:
-                                e.Cancel = true;
-                                break;
+                        case DialogResult.Cancel:
+                            e.Cancel = true;
+                            break;
 
-                            case DialogResult.Yes:
-                                Result = DialogResult.OK;
-                                CMLConverter cc = new CMLConverter();
-                                OutputValue = cc.Export(ec.Data);
-                                Hide();
-                                ec.OnOkButtonClick -= OnWpfButtonClick;
-                                ec = null;
-                                break;
+                        case DialogResult.Yes:
+                            Result = DialogResult.OK;
+                            CMLConverter cc = new CMLConverter();
+                            OutputValue = cc.Export(ec.Data);
+                            Hide();
+                            ec.OnOkButtonClick -= OnWpfButtonClick;
+                            break;
 
-                            case DialogResult.No:
-                                ec = null;
-                                break;
-                        }
+                        case DialogResult.No:
+                            break;
                     }
                 }
 
