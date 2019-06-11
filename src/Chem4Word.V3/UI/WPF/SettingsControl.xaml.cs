@@ -165,7 +165,7 @@ namespace Chem4Word.UI.WPF
 
         #endregion Bottom Buttons
 
-        #region Tab 1 Events
+        #region Plug-Ins Tab Events
 
         private void SelectedEditorSettings_OnClick(object sender, RoutedEventArgs e)
         {
@@ -246,24 +246,75 @@ namespace Chem4Word.UI.WPF
             }
         }
 
-        #endregion Tab 1 Events
+        #endregion Plug-Ins Tab Events
 
-        #region Tab 2 Events
+        #region General Tab Events
 
-        private void Chem4WordWebServiceUri_OnTextChanged(object sender, TextChangedEventArgs e)
+        private void BondLength_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (!_loading)
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
-                SystemOptions.Chem4WordWebServiceUri = Chem4WordWebServiceUri.Text;
+
+                var cbi = DefaultBondLength.SelectedItem as ComboBoxItem;
+                SystemOptions.BondLength = int.Parse((string)cbi.Tag);
+
                 Dirty = true;
             }
         }
 
-        #endregion Tab 2 Events
+        private void RemoveExplicitOnImportFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+            SystemOptions.RemoveExplicitHydrogensOnImportFromFile = RemoveExplicitOnImportFile.IsChecked.Value;
+            Dirty = true;
+        }
 
-        #region Tab 3 Events
+        private void RemoveExplicitOnImportSearch_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+            SystemOptions.RemoveExplicitHydrogensOnImportFromSearch = RemoveExplicitOnImportSearch.IsChecked.Value;
+            Dirty = true;
+        }
+
+        private void RemoveExplicitOnImportLibrary_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+            SystemOptions.RemoveExplicitHydrogensOnImportFromLibrary = RemoveExplicitOnImportLibrary.IsChecked.Value;
+            Dirty = true;
+        }
+
+        private void ApplyDefaultOnImportFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+            SystemOptions.SetBondLengthOnImportFromFile = ApplyDefaultOnImportFile.IsChecked.Value;
+            Dirty = true;
+        }
+
+        private void ApplyDefaultOnImportSearch_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+            SystemOptions.SetBondLengthOnImportFromSearch = ApplyDefaultOnImportSearch.IsChecked.Value;
+            Dirty = true;
+        }
+
+        private void ApplyDefaultOnImportLibrary_OnClick(object sender, RoutedEventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
+            SystemOptions.SetBondLengthOnImportFromLibrary = ApplyDefaultOnImportLibrary.IsChecked.Value;
+            Dirty = true;
+        }
+
+        #endregion
+
+        #region Privacy Tab Events
 
         private void TelemetryEnabled_OnClick(object sender, RoutedEventArgs e)
         {
@@ -276,9 +327,9 @@ namespace Chem4Word.UI.WPF
             }
         }
 
-        #endregion Tab 3 Events
+        #endregion Privacy Tab Events
 
-        #region Tab 4 Events
+        #region Library Tab Events
 
         private void ImportIntoLibrary_OnClick(object sender, RoutedEventArgs e)
         {
@@ -483,10 +534,10 @@ namespace Chem4Word.UI.WPF
                     lib.DeleteAllChemistry();
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
 
-                    // Close the existing Library Pane
 #if DEBUG
                     Debugger.Break();
 #endif
+                    // Close the existing Library Pane
                     //var app = Globals.Chem4WordV3.Application;
                     //foreach (CustomTaskPane taskPane in Globals.Chem4WordV3.CustomTaskPanes)
                     //{
@@ -504,9 +555,9 @@ namespace Chem4Word.UI.WPF
             }
         }
 
-        #endregion Tab 4 Events
+        #endregion Library Tab Events
 
-        #region Tab 5 Events
+        #region Maintenance Tab Events
 
         private void SettingsFolder_OnClick(object sender, RoutedEventArgs e)
         {
@@ -553,7 +604,7 @@ namespace Chem4Word.UI.WPF
             }
         }
 
-        #endregion Tab 5 Events
+        #endregion Maintenance Tab Events
 
         #region Private methods
 
@@ -561,7 +612,7 @@ namespace Chem4Word.UI.WPF
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            #region Tab 1
+            #region Editor Plug-Ins Tab
 
             SelectEditorPlugIn.Items.Clear();
             SelectRendererPlugIn.Items.Clear();
@@ -646,23 +697,9 @@ namespace Chem4Word.UI.WPF
                 }
             }
 
-            #endregion Tab 1
+            #endregion Editor Plug-Ins Tab
 
-            #region Tab 2
-
-            string uri = SystemOptions.Chem4WordWebServiceUri;
-            if (!Uri.IsWellFormedUriString(uri, UriKind.Absolute))
-            {
-                uri = Constants.DefaultChem4WordWebServiceUri;
-                SystemOptions.Chem4WordWebServiceUri = uri;
-                Dirty = true;
-            }
-
-            Chem4WordWebServiceUri.Text = uri;
-
-            #endregion Tab 2
-
-            #region Tab 3
+            #region Telemetry Tab
 
             string betaValue = Globals.Chem4WordV3.ThisVersion.Root?.Element("IsBeta")?.Value;
             bool isBeta = betaValue != null && bool.Parse(betaValue);
@@ -674,7 +711,29 @@ namespace Chem4Word.UI.WPF
                 BetaInformation.Visibility = Visibility.Hidden;
             }
 
-            #endregion Tab 3
+            #endregion Telemetry Tab
+
+            #region General Tab
+
+            ApplyDefaultOnImportFile.IsChecked = SystemOptions.SetBondLengthOnImportFromFile;
+            ApplyDefaultOnImportSearch.IsChecked = SystemOptions.SetBondLengthOnImportFromSearch;
+            ApplyDefaultOnImportLibrary.IsChecked = SystemOptions.SetBondLengthOnImportFromLibrary;
+
+            RemoveExplicitOnImportFile.IsChecked = SystemOptions.RemoveExplicitHydrogensOnImportFromFile;
+            RemoveExplicitOnImportSearch.IsChecked = SystemOptions.RemoveExplicitHydrogensOnImportFromSearch;
+            RemoveExplicitOnImportLibrary.IsChecked = SystemOptions.RemoveExplicitHydrogensOnImportFromLibrary;
+
+            foreach (var item in DefaultBondLength.Items)
+            {
+                var cbi = item as ComboBoxItem;
+                if (int.Parse(cbi.Tag as string) == SystemOptions.BondLength)
+                {
+                    DefaultBondLength.SelectedItem = item;
+                    break;
+                }
+            }
+
+            #endregion
         }
 
         private BitmapImage CreateImageFromStream(Stream stream)
@@ -693,5 +752,6 @@ namespace Chem4Word.UI.WPF
         }
 
         #endregion Private methods
+
     }
 }

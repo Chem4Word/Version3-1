@@ -18,6 +18,9 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Utils;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.ACME
 {
@@ -37,6 +40,10 @@ namespace Chem4Word.ACME
                 OnPropertyChanged();
             }
         }
+
+        public Point TopLeft { get; set; }
+        public string SettingsFile { get; set; }
+        public IChem4WordTelemetry Telemetry { get; set; }
 
         public static readonly DependencyProperty SliderVisibilityProperty =
             DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor),
@@ -190,13 +197,13 @@ namespace Chem4Word.ACME
                 Model tempModel = cc.Import(_cml);
 
                 tempModel.RescaleForXaml(false);
-                var vm = new EditViewModel(tempModel);
+                var vm = new EditViewModel(tempModel, ChemCanvas);
                 ActiveViewModel = vm;
 
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
 
                 ChemCanvas.Chemistry = vm;
-
+                
                 vm.Loading = true;
                 var mean = ActiveViewModel.Model.MeanBondLength / Globals.ScaleFactorForXaml;
                 var average = Math.Round(mean / 5.0) * 5;
@@ -209,7 +216,8 @@ namespace Chem4Word.ACME
 
             //refresh the ring button
             SetCurrentRing(BenzeneButton);
-            //kludge:  need to do this to put the editor into the right mode after refreshing the ring button
+
+            //HACK: Need to do this to put the editor into the right mode after refreshing the ring button
             ModeButton_OnChecked(DrawButton, new RoutedEventArgs());
         }
 
@@ -269,13 +277,18 @@ namespace Chem4Word.ACME
         {
             //Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {ActiveViewModel.BoundingBox.Width}");
             //Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {ActiveViewModel.BoundingBox.Height}");
-            Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
-            Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
-            Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
-            Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportHeight: {DrawingArea.ViewportHeight}");
+            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
+            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
+            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
+            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportHeight: {DrawingArea.ViewportHeight}");
 
             DrawingArea.ScrollToHorizontalOffset((DrawingArea.ExtentWidth - DrawingArea.ViewportWidth) / 2);
             DrawingArea.ScrollToVerticalOffset((DrawingArea.ExtentHeight - DrawingArea.ViewportHeight) / 2);
+        }
+
+        private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            UIUtils.ShowAcmeSettings(ChemCanvas, SettingsFile, Telemetry, TopLeft);
         }
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)
@@ -316,12 +329,6 @@ namespace Chem4Word.ACME
             }
         }
 
-        private void RingButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            Debugger.Break();
-            throw new NotImplementedException();
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -329,6 +336,5 @@ namespace Chem4Word.ACME
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
     }
 }

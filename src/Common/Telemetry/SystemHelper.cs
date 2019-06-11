@@ -270,7 +270,7 @@ namespace Chem4Word.Telemetry
 
             foreach (var screen in Screen.AllScreens)
             {
-                screens.Add($"{screen.Bounds.Width} x {screen.Bounds.Height}");
+                screens.Add($"X={screen.Bounds.X}, Y={screen.Bounds.Y}, W={screen.Bounds.Width}, H={screen.Bounds.Height}");
             }
 
             Screens = string.Join("; ", screens);

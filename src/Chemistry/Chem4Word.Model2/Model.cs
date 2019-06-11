@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using Chem4Word.Core.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -619,7 +620,7 @@ namespace Chem4Word.Model2
         {
             if (ScaledForXaml)
             {
-                double newLength = Globals.SingleAtomPseudoBondLength / Globals.ScaleFactorForXaml;
+                double newLength = Constants.StandardBondLength / Globals.ScaleFactorForXaml;
 
                 if (MeanBondLength > 0)
                 {
@@ -636,7 +637,7 @@ namespace Chem4Word.Model2
         {
             if (!ScaledForXaml)
             {
-                double newLength = Globals.SingleAtomPseudoBondLength * Globals.ScaleFactorForXaml;
+                double newLength = Constants.StandardBondLength * Globals.ScaleFactorForXaml;
 
                 if (MeanBondLength > 0)
                 {

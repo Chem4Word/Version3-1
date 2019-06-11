@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.ACME.Annotations;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
@@ -73,14 +74,22 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-        private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
+        private void AtomPropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // This gets it close to the final position
             Left = ApeModel.Centre.X - ActualWidth / 2;
             Top = ApeModel.Centre.Y - ActualHeight / 2;
 
             LoadAtomItems();
             LoadFunctionalGroups();
             ShowPreview();
+        }
+
+        private void AtomPropertyEditor_OnContentRendered(object sender, EventArgs e)
+        {
+            // This moves it to the correct position
+            Left = ApeModel.Centre.X - ActualWidth / 2;
+            Top = ApeModel.Centre.Y - ActualHeight / 2;
         }
 
         private void AtomTable_OnElementSelected(object sender, VisualPeriodicTable.ElementEventArgs e)

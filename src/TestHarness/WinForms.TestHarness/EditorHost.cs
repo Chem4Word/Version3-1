@@ -6,13 +6,16 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Drawing;
+using System.IO;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Telemetry;
+using Size = System.Drawing.Size;
 
 namespace WinForms.TestHarness
 {
@@ -33,6 +36,12 @@ namespace WinForms.TestHarness
                 ec.InitializeComponent();
                 elementHost1.Child = ec;
                 ec.ShowSave = true;
+
+                ec.Telemetry = new TelemetryWriter(true);
+                var appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var settingsPath = Path.Combine(appdata, "Chem4Word.V3");
+                ec.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
+
                 ec.OnOkButtonClick += OnWpfButtonClick;
             }
             else
@@ -46,7 +55,11 @@ namespace WinForms.TestHarness
 
         private void EditorHost_Load(object sender, EventArgs e)
         {
-
+            Editor ec = elementHost1.Child as Editor;
+            if (ec != null)
+            {
+                ec.TopLeft = new Point(Location.X + Chem4Word.Core.Helpers.Constants.TopLeftOffset, Location.Y + Chem4Word.Core.Helpers.Constants.TopLeftOffset);
+            }
         }
 
         private void OnWpfButtonClick(object sender, EventArgs e)

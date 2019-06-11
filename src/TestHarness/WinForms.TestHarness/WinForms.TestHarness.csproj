@@ -176,6 +176,10 @@
       <Project>{c89bc92a-4183-48a6-b039-ad76aa1df48f}</Project>
       <Name>Chem4Word.Telemetry</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Contracts\Chem4Word.Contracts.csproj">
+      <Project>{BDFEE6C1-3F34-4200-9100-C543BF4C3783}</Project>
+      <Name>Chem4Word.Contracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="StackViewer.xaml">

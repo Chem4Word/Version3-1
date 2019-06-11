@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using System.ComponentModel;
 using System.Windows;
 using Chem4Word.ACME.Models;
@@ -33,8 +34,16 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-        private void Dialog_OnLoaded(object sender, RoutedEventArgs e)
+        private void BondPropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
+            // This gets it close to the final position
+            Left = _model.Centre.X - ActualWidth / 2;
+            Top = _model.Centre.Y - ActualHeight / 2;
+        }
+
+        private void BondPropertyEditor_OnContentRendered(object sender, EventArgs e)
+        {
+            // This moves it to the correct position
             Left = _model.Centre.X - ActualWidth / 2;
             Top = _model.Centre.Y - ActualHeight / 2;
         }
@@ -54,7 +63,5 @@ namespace Chem4Word.ACME.Controls
         }
 
         private bool ValidateModel() => true;
-
-       
     }
 }

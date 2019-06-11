@@ -16,16 +16,6 @@ namespace Chem4Word
     [JsonObject(MemberSerialization.OptIn)]
     public class Options
     {
-        #region Web Services
-
-        //[JsonProperty]
-        public bool UseWebServices { get; set; }
-
-        [JsonProperty]
-        public string Chem4WordWebServiceUri { get; set; }
-
-        #endregion Web Services
-
         #region Telemetry
 
         [JsonProperty]
@@ -53,6 +43,27 @@ namespace Chem4Word
 
         #endregion Selected Plug Ins
 
+        #region General
+
+        [JsonProperty]
+        public int BondLength { get; set; }
+
+        [JsonProperty]
+        public bool RemoveExplicitHydrogensOnImportFromFile { get; set; }
+        [JsonProperty]
+        public bool RemoveExplicitHydrogensOnImportFromSearch { get; set; }
+        [JsonProperty]
+        public bool RemoveExplicitHydrogensOnImportFromLibrary { get; set; }
+
+        [JsonProperty]
+        public bool SetBondLengthOnImportFromFile { get; set; }
+        [JsonProperty]
+        public bool SetBondLengthOnImportFromSearch { get; set; }
+        [JsonProperty]
+        public bool SetBondLengthOnImportFromLibrary { get; set; }
+
+        #endregion
+
         // Not Saved
         public Point WordTopLeft { get; set; }
 
@@ -65,9 +76,6 @@ namespace Chem4Word
         {
             Options clone = new Options();
 
-            clone.UseWebServices = UseWebServices;
-            clone.Chem4WordWebServiceUri = Chem4WordWebServiceUri;
-
             clone.TelemetryEnabled = TelemetryEnabled;
 
             clone.SelectedEditorPlugIn = SelectedEditorPlugIn;
@@ -75,6 +83,16 @@ namespace Chem4Word
 
             clone.AutoUpdateEnabled = AutoUpdateEnabled;
             clone.AutoUpdateFrequency = AutoUpdateFrequency;
+
+            clone.BondLength = BondLength;
+
+            clone.SetBondLengthOnImportFromFile = SetBondLengthOnImportFromFile;
+            clone.SetBondLengthOnImportFromSearch = SetBondLengthOnImportFromSearch;
+            clone.SetBondLengthOnImportFromLibrary = SetBondLengthOnImportFromLibrary;
+
+            clone.RemoveExplicitHydrogensOnImportFromFile = RemoveExplicitHydrogensOnImportFromFile;
+            clone.RemoveExplicitHydrogensOnImportFromSearch = RemoveExplicitHydrogensOnImportFromSearch;
+            clone.RemoveExplicitHydrogensOnImportFromLibrary = RemoveExplicitHydrogensOnImportFromLibrary;
 
             return clone;
         }
@@ -84,32 +102,21 @@ namespace Chem4Word
             // User Options
             TelemetryEnabled = true;
 
-            Version browser = null;
-            try
-            {
-                browser = new WebBrowser().Version;
-            }
-            catch
-            {
-                browser = null;
-            }
-
-            // Force CDW 702 if IE < 11
-            if (browser?.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion)
-            {
-                SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
-            }
-            else
-            {
-                SelectedEditorPlugIn = Constants.DefaultEditorPlugIn800;
-            }
+            SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
             SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
-
-            UseWebServices = true;
-            Chem4WordWebServiceUri = Constants.DefaultChem4WordWebServiceUri;
 
             AutoUpdateEnabled = true;
             AutoUpdateFrequency = 7;
+
+            BondLength = (int)Constants.StandardBondLength;
+
+            SetBondLengthOnImportFromFile = true;
+            SetBondLengthOnImportFromSearch = true;
+            SetBondLengthOnImportFromLibrary = true;
+
+            RemoveExplicitHydrogensOnImportFromFile = false;
+            RemoveExplicitHydrogensOnImportFromSearch = false;
+            RemoveExplicitHydrogensOnImportFromLibrary = false;
         }
     }
 }

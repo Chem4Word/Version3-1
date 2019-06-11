@@ -9,7 +9,8 @@
     Title="Bond Properties"
     MinWidth="200"
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
-    Loaded="Dialog_OnLoaded"
+    Loaded="BondPropertyEditor_OnLoaded"
+    ContentRendered="BondPropertyEditor_OnContentRendered"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
@@ -123,7 +124,7 @@
                                         <Ellipse
                                             x:Name="CheckMark"
                                             Margin="1"
-                                            Fill="Orange" />
+                                            Fill="DarkOrange" />
                                         <Ellipse Margin="5" Fill="White" />
                                         <ContentPresenter />
                                     </Grid>

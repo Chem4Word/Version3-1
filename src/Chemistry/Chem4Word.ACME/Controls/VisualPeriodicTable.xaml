@@ -53,7 +53,7 @@
                         <Setter Property="Background" Value="Yellow" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="pseudo">
-                        <Setter Property="Background" Value="Orange" />
+                        <Setter Property="Background" Value="DarkOrange" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="other">
                         <Setter Property="Background" Value="Gray" />

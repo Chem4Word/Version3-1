@@ -9,12 +9,14 @@
     xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:Chem4Word.ACME.Models"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     x:Name="PropertyEditor"
     Title="Atom Properties"
     MinWidth="200"
     d:DataContext="{d:DesignInstance {x:Type models:AtomPropertiesModel}}"
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
-    Loaded="Dialog_OnLoaded"
+    Loaded="AtomPropertyEditor_OnLoaded"
+    ContentRendered="AtomPropertyEditor_OnContentRendered"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
@@ -281,7 +283,7 @@
             MaxHeight="208"
             Margin="5">
             <Border
-                BorderBrush="Orange"
+                BorderBrush="DarkOrange"
                 BorderThickness="3"
                 CornerRadius="5">
                 <ACME:Display

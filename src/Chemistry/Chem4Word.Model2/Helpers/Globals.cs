@@ -221,9 +221,6 @@ namespace Chem4Word.Model2.Helpers
         // Font Size to use if all else fails
         public const double DefaultFontSize = 20.0d;
 
-        // Imaginary Bond Size for Single Atom
-        public const double SingleAtomPseudoBondLength = 20.0d;
-
         // Calculate Font size as bond length * FontSizePercentageBond
         public const double FontSizePercentageBond = 0.5d;
 

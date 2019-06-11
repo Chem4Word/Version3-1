@@ -33,11 +33,11 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
             this.tabControlEx = new Chem4Word.Core.UI.Controls.TabControlEx();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.chkShowCarbons = new System.Windows.Forms.CheckBox();
             this.chkShowImplicitHydrogens = new System.Windows.Forms.CheckBox();
             this.chkColouredAtoms = new System.Windows.Forms.CheckBox();
             this.btnSetDefaults = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
-            this.chkShowCarbons = new System.Windows.Forms.CheckBox();
             this.tabControlEx.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.SuspendLayout();
@@ -51,7 +51,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             this.tabControlEx.Location = new System.Drawing.Point(17, 16);
             this.tabControlEx.Name = "tabControlEx";
             this.tabControlEx.SelectedIndex = 0;
-            this.tabControlEx.Size = new System.Drawing.Size(399, 178);
+            this.tabControlEx.Size = new System.Drawing.Size(400, 185);
             this.tabControlEx.TabIndex = 0;
             // 
             // tabPage1
@@ -64,9 +64,23 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             this.tabPage1.Location = new System.Drawing.Point(0, 23);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(399, 155);
+            this.tabPage1.Size = new System.Drawing.Size(400, 162);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Display";
+            // 
+            // chkShowCarbons
+            // 
+            this.chkShowCarbons.AutoSize = true;
+            this.chkShowCarbons.Checked = true;
+            this.chkShowCarbons.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowCarbons.Location = new System.Drawing.Point(16, 108);
+            this.chkShowCarbons.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.chkShowCarbons.Name = "chkShowCarbons";
+            this.chkShowCarbons.Size = new System.Drawing.Size(132, 20);
+            this.chkShowCarbons.TabIndex = 9;
+            this.chkShowCarbons.Text = "Show All Carbons";
+            this.chkShowCarbons.UseVisualStyleBackColor = true;
+            this.chkShowCarbons.CheckedChanged += new System.EventHandler(this.chkShowCarbons_CheckedChanged);
             // 
             // chkShowImplicitHydrogens
             // 
@@ -99,7 +113,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             // btnSetDefaults
             // 
             this.btnSetDefaults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSetDefaults.Location = new System.Drawing.Point(174, 203);
+            this.btnSetDefaults.Location = new System.Drawing.Point(175, 210);
             this.btnSetDefaults.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.btnSetDefaults.Name = "btnSetDefaults";
             this.btnSetDefaults.Size = new System.Drawing.Size(118, 34);
@@ -111,7 +125,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(298, 203);
+            this.btnOk.Location = new System.Drawing.Point(299, 210);
             this.btnOk.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(118, 34);
@@ -120,25 +134,11 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
-            // chkShowCarbons
-            // 
-            this.chkShowCarbons.AutoSize = true;
-            this.chkShowCarbons.Checked = true;
-            this.chkShowCarbons.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowCarbons.Location = new System.Drawing.Point(16, 108);
-            this.chkShowCarbons.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.chkShowCarbons.Name = "chkShowCarbons";
-            this.chkShowCarbons.Size = new System.Drawing.Size(132, 20);
-            this.chkShowCarbons.TabIndex = 9;
-            this.chkShowCarbons.Text = "Show All Carbons";
-            this.chkShowCarbons.UseVisualStyleBackColor = true;
-            this.chkShowCarbons.CheckedChanged += new System.EventHandler(this.chkShowCarbons_CheckedChanged);
-            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(433, 254);
+            this.ClientSize = new System.Drawing.Size(434, 261);
             this.Controls.Add(this.btnSetDefaults);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabControlEx);

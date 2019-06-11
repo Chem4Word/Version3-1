@@ -60,7 +60,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabControlEx.Location = new System.Drawing.Point(13, 13);
             this.tabControlEx.Name = "tabControlEx";
             this.tabControlEx.SelectedIndex = 0;
-            this.tabControlEx.Size = new System.Drawing.Size(428, 183);
+            this.tabControlEx.Size = new System.Drawing.Size(409, 200);
             this.tabControlEx.TabIndex = 0;
             // 
             // tabRendering
@@ -72,7 +72,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabRendering.Location = new System.Drawing.Point(0, 20);
             this.tabRendering.Name = "tabRendering";
             this.tabRendering.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRendering.Size = new System.Drawing.Size(428, 163);
+            this.tabRendering.Size = new System.Drawing.Size(409, 180);
             this.tabRendering.TabIndex = 0;
             this.tabRendering.Text = "Rendering";
             // 
@@ -118,7 +118,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabDebug.Location = new System.Drawing.Point(0, 20);
             this.tabDebug.Name = "tabDebug";
             this.tabDebug.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDebug.Size = new System.Drawing.Size(428, 163);
+            this.tabDebug.Size = new System.Drawing.Size(409, 180);
             this.tabDebug.TabIndex = 1;
             this.tabDebug.Text = "Debug";
             // 
@@ -223,7 +223,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             // btnSetDefaults
             // 
             this.btnSetDefaults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSetDefaults.Location = new System.Drawing.Point(260, 203);
+            this.btnSetDefaults.Location = new System.Drawing.Point(241, 220);
             this.btnSetDefaults.Margin = new System.Windows.Forms.Padding(4);
             this.btnSetDefaults.Name = "btnSetDefaults";
             this.btnSetDefaults.Size = new System.Drawing.Size(88, 28);
@@ -235,7 +235,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(354, 203);
+            this.btnOk.Location = new System.Drawing.Point(335, 220);
             this.btnOk.Margin = new System.Windows.Forms.Padding(4);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(88, 28);
@@ -248,7 +248,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(453, 244);
+            this.ClientSize = new System.Drawing.Size(434, 261);
             this.Controls.Add(this.btnSetDefaults);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabControlEx);

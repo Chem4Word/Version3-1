@@ -16,7 +16,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-
+using Chem4Word.Core.Helpers;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.Model2
@@ -637,7 +637,7 @@ namespace Chem4Word.Model2
 
         public double Angle => Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector);
 
-        public double HatchScaling => BondVector.Length / (SingleAtomPseudoBondLength * 2);
+        public double HatchScaling => BondVector.Length / (Constants.StandardBondLength * 4);
         public double BondLength => BondVector.Length;
 
         #endregion Properties

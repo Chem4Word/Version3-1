@@ -10,6 +10,7 @@ using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Models;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using IChem4Word.Contracts;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -29,12 +30,32 @@ namespace Chem4Word.ACME.Utils
             return dialog.ShowDialog();
         }
 
+        public static void ShowAcmeSettings(EditorCanvas currentEditor, string settingsFile, IChem4WordTelemetry telemetry, Point topLeft)
+        {
+            var mode = Application.Current.ShutdownMode;
+            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            var options = FileUtils.LoadAcmeSettings(settingsFile, telemetry, topLeft);
+            options.SettingsFile = settingsFile;
+            var pe = new SettingsHost(options, telemetry, topLeft);
+            ShowDialog(pe, currentEditor);
+            Application.Current.ShutdownMode = mode;
+        }
+
         public static void DoPropertyEdit(MouseButtonEventArgs e, EditorCanvas currentEditor)
         {
             var pp = currentEditor.PointToScreen(e.GetPosition(currentEditor));
 
             EditViewModel evm;
             var activeVisual = currentEditor.GetTargetedVisual(e.GetPosition(currentEditor));
+
+            PresentationSource source = PresentationSource.FromVisual(activeVisual);
+            if (source != null && source.CompositionTarget != null)
+            {
+                double dpiX = 96.0 * source.CompositionTarget.TransformToDevice.M11;
+                double dpiY = 96.0 * source.CompositionTarget.TransformToDevice.M22;
+
+                pp = new Point(pp.X * 96.0 / dpiX, pp.Y * 96.0 / dpiY);
+            }
 
             if (activeVisual is AtomVisual av)
             {
@@ -98,7 +119,7 @@ namespace Chem4Word.ACME.Utils
                 model.MicroModel.ScaleToAverageBondLength(20);
 
                 var pe = new AtomPropertyEditor(model);
-                UIUtils.ShowDialog(pe, currentEditor);
+                ShowDialog(pe, currentEditor);
                 Application.Current.ShutdownMode = mode;
 
                 if (model.Save)
@@ -188,7 +209,7 @@ namespace Chem4Word.ACME.Utils
                 }
 
                 var pe = new BondPropertyEditor(model);
-                UIUtils.ShowDialog(pe, currentEditor);
+                ShowDialog(pe, currentEditor);
                 Application.Current.ShutdownMode = mode;
 
                 if (model.Save)

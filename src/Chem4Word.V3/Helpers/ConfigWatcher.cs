@@ -24,7 +24,9 @@ namespace Chem4Word.Helpers
         private Config[] _watchedConfigs = {
             new Config { Name = "ShowHydrogens", Type = "bool" },
             new Config { Name = "ShowCarbons", Type = "bool" },
-            new Config { Name = "ColouredAtoms", Type = "bool" }};
+            new Config { Name = "ColouredAtoms", Type = "bool" },
+            new Config {Name = "BondLength", Type = "int"}
+        };
 
         private FileSystemWatcher _watcher;
         private string _watchedPath;
@@ -116,6 +118,10 @@ namespace Chem4Word.Helpers
                                                 {
                                                     case "bool":
                                                         jObject[kvp.Key] = bool.Parse(kvp.Value.Value);
+                                                        write = true;
+                                                        break;
+                                                    case "int":
+                                                        jObject[kvp.Key] = int.Parse(kvp.Value.Value);
                                                         write = true;
                                                         break;
                                                 }

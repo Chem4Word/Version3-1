@@ -39,6 +39,7 @@
             Height="150"
             Margin="8"
             HorizontalAlignment="Stretch"
+            HighlightActive="False"
             Background="{Binding ElementName=NavItemControl, Path=Background}"
             Chemistry="{Binding Path=ChemicalStructure}" />
         <StackPanel

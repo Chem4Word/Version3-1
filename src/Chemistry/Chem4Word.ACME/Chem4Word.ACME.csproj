@@ -66,6 +66,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="Xceed.Wpf.Toolkit, Version=3.8.19076.18510, Culture=neutral, PublicKeyToken=ba83ff368b7563c6, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xceed.Wpf.Toolkit.3.8.19076.18510\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\2Point5BondType.cs" />
@@ -94,6 +97,12 @@
     <Compile Include="BondOption.cs" />
     <Compile Include="Controls\FunctionalGroupBlock.cs" />
     <Compile Include="Controls\GridAwareItemsControl.cs" />
+    <Compile Include="Controls\SettingsHost.xaml.cs">
+      <DependentUpon>SettingsHost.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UserSettings.xaml.cs">
+      <DependentUpon>UserSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\VisualPeriodicTable.xaml.cs">
       <DependentUpon>VisualPeriodicTable.xaml</DependentUpon>
     </Compile>
@@ -144,7 +153,9 @@
     <Compile Include="Drawing\SuperscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\LabelTextRunTypographyProperties.cs" />
+    <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="NewAtomPlacement.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -153,6 +164,7 @@
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="UndoHandler.cs" />
     <Compile Include="Utils\CursorUtils.cs" />
+    <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="Utils\UIUtils.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="Drawing\AtomVisual.cs" />
@@ -203,6 +215,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\SettingsHost.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\UserSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\VisualPeriodicTable.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -236,6 +256,10 @@
     <ProjectReference Include="..\..\Common\Chem4Word.Core\Chem4Word.Core.csproj">
       <Project>{2e7b1308-8149-4b03-9cb9-48e0b7151560}</Project>
       <Name>Chem4Word.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Contracts\Chem4Word.Contracts.csproj">
+      <Project>{BDFEE6C1-3F34-4200-9100-C543BF4C3783}</Project>
+      <Name>Chem4Word.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Chem4Word.Model2\Chem4Word.Model2.csproj">
       <Project>{c69bab8f-4881-4d5f-9929-fc8470df1e48}</Project>

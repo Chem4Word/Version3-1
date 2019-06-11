@@ -50,7 +50,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             this.tabControlEx.Location = new System.Drawing.Point(13, 13);
             this.tabControlEx.Name = "tabControlEx";
             this.tabControlEx.SelectedIndex = 0;
-            this.tabControlEx.Size = new System.Drawing.Size(299, 145);
+            this.tabControlEx.Size = new System.Drawing.Size(408, 200);
             this.tabControlEx.TabIndex = 0;
             // 
             // tabPage1
@@ -62,7 +62,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             this.tabPage1.Location = new System.Drawing.Point(0, 20);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(299, 125);
+            this.tabPage1.Size = new System.Drawing.Size(408, 180);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Display";
             // 
@@ -97,7 +97,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             // btnSetDefaults
             // 
             this.btnSetDefaults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSetDefaults.Location = new System.Drawing.Point(130, 165);
+            this.btnSetDefaults.Location = new System.Drawing.Point(239, 220);
             this.btnSetDefaults.Margin = new System.Windows.Forms.Padding(4);
             this.btnSetDefaults.Name = "btnSetDefaults";
             this.btnSetDefaults.Size = new System.Drawing.Size(88, 28);
@@ -109,7 +109,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(224, 165);
+            this.btnOk.Location = new System.Drawing.Point(333, 220);
             this.btnOk.Margin = new System.Windows.Forms.Padding(4);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(88, 28);
@@ -122,7 +122,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(325, 206);
+            this.ClientSize = new System.Drawing.Size(434, 261);
             this.Controls.Add(this.btnSetDefaults);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.tabControlEx);

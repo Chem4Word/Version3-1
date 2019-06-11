@@ -100,6 +100,7 @@
             Margin="8"
             HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Stretch"
+            HighlightActive="False"
             Background="{Binding RelativeSource={RelativeSource AncestorType=local:LibraryItemControl}, Path=Background}"
             Chemistry="{Binding Path=XML}" />
         <Grid

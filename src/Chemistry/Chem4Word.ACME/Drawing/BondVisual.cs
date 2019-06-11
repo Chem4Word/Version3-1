@@ -171,7 +171,7 @@ namespace Chem4Word.ACME.Drawing
                             MappingMode = BrushMappingMode.Absolute,
                             SpreadMethod = GradientSpreadMethod.Repeat,
                             StartPoint = new Point(50, 0),
-                            EndPoint = new Point(50, 5),
+                            EndPoint = new Point(50, 3),
                             GradientStops = new GradientStopCollection()
                                             {
                                                 new GradientStop {Offset = 0d, Color = Colors.Black},
@@ -179,11 +179,7 @@ namespace Chem4Word.ACME.Drawing
                                                 new GradientStop {Offset = 0.25d, Color = Colors.Transparent},
                                                 new GradientStop {Offset = 0.30, Color = Colors.Transparent}
                                             },
-                            RelativeTransform = new ScaleTransform
-                                                {
-                                                    ScaleX = ParentBond.HatchScaling,
-                                                    ScaleY = ParentBond.HatchScaling
-                                                },
+                        
                             Transform = new RotateTransform
                                         {
                                             Angle = ParentBond.Angle

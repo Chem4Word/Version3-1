@@ -110,28 +110,140 @@
                             </DockPanel>
                             <TextBlock x:Name="SelectedSearcherDescription"
                                 Margin="5"
-                                Text="Description of the renderer ..."
+                                Text="Description of the searcher ..."
                                 TextWrapping="Wrap" />
                         </DockPanel>
                     </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="Web Services">
+            <TabItem Header="General">
                 <Grid Margin="5">
-                    <StackPanel>
-                        <DockPanel Margin="0,10,5,0">
-                            <Label
-                                Width="200"
-                                Margin="0,0,5,0"
-                                HorizontalContentAlignment="Right"
-                                Content="Chem4Word Web Service:"
-                                DockPanel.Dock="Left" />
-                            <TextBox x:Name="Chem4WordWebServiceUri"
-                                Margin="5,0,0,0"
-                                Text="https://chemicalservices.azurewebsites.net/api/Resolve"
-                                TextChanged="Chem4WordWebServiceUri_OnTextChanged" />
-                        </DockPanel>
-                    </StackPanel>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Separator
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
+                    <TextBlock
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Margin="5"
+                        Text="Default bond length" />
+                    <ComboBox x:Name="DefaultBondLength"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Width="50"
+                        Margin="5"
+                        HorizontalAlignment="Left"
+                        SelectedIndex="3"
+                        SelectionChanged="BondLength_OnSelectionChanged"
+                        ToolTip="Set Default Bond Length">
+                        <ComboBoxItem Tag="5">5</ComboBoxItem>
+                        <ComboBoxItem Tag="10">10</ComboBoxItem>
+                        <ComboBoxItem Tag="15">15</ComboBoxItem>
+                        <ComboBoxItem Tag="20">20</ComboBoxItem>
+                        <ComboBoxItem Tag="25">25</ComboBoxItem>
+                        <ComboBoxItem Tag="30">30</ComboBoxItem>
+                        <ComboBoxItem Tag="35">35</ComboBoxItem>
+                        <ComboBoxItem Tag="40">40</ComboBoxItem>
+                        <ComboBoxItem Tag="45">45</ComboBoxItem>
+                        <ComboBoxItem Tag="50">50</ComboBoxItem>
+                        <ComboBoxItem Tag="55">55</ComboBoxItem>
+                        <ComboBoxItem Tag="60">60</ComboBoxItem>
+                        <ComboBoxItem Tag="65">65</ComboBoxItem>
+                        <ComboBoxItem Tag="70">70</ComboBoxItem>
+                        <ComboBoxItem Tag="75">75</ComboBoxItem>
+                        <ComboBoxItem Tag="80">80</ComboBoxItem>
+                        <ComboBoxItem Tag="85">85</ComboBoxItem>
+                        <ComboBoxItem Tag="90">90</ComboBoxItem>
+                        <ComboBoxItem Tag="95">95</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Margin="5"
+                        Text="Remove explicit Hydrogen atoms during import"
+                        TextWrapping="Wrap" />
+                    <Grid
+                        Grid.Row="0"
+                        Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <CheckBox x:Name="RemoveExplicitOnImportFile"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Click="RemoveExplicitOnImportFile_OnClick"
+                            Margin="5">
+                            from file
+                        </CheckBox>
+                        <CheckBox x:Name="RemoveExplicitOnImportSearch"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Click="RemoveExplicitOnImportSearch_OnClick"
+                            Margin="5">
+                            from search
+                        </CheckBox>
+                        <CheckBox x:Name="RemoveExplicitOnImportLibrary"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Click="RemoveExplicitOnImportLibrary_OnClick"
+                            Margin="5">
+                            from library
+                        </CheckBox>
+                    </Grid>
+                    <TextBlock
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Margin="5"
+                        Text="Apply default bond length during import"
+                        TextWrapping="Wrap" />
+                    <Grid
+                        Grid.Row="3"
+                        Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <CheckBox x:Name="ApplyDefaultOnImportFile"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Click="ApplyDefaultOnImportFile_OnClick"
+                            Margin="5">
+                            from file
+                        </CheckBox>
+                        <CheckBox x:Name="ApplyDefaultOnImportSearch"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Click="ApplyDefaultOnImportSearch_OnClick"
+                            Margin="5">
+                            from search
+                        </CheckBox>
+                        <CheckBox x:Name="ApplyDefaultOnImportLibrary"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Click="ApplyDefaultOnImportLibrary_OnClick"
+                            Margin="5">
+                            from library
+                        </CheckBox>
+                    </Grid>
+                    <Separator
+                        Grid.Row="4"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
                 </Grid>
             </TabItem>
             <TabItem Header="Privacy">
@@ -158,7 +270,9 @@
             <TabItem Header="Library">
                 <Grid Margin="5">
                     <StackPanel>
-                        <GroupBox BorderThickness="2" Header="Import">
+                        <GroupBox
+                            BorderThickness="2"
+                            Header="Import">
                             <DockPanel>
                                 <Button x:Name="ImportIntoLibrary"
                                     Width="120"
@@ -173,7 +287,9 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/Gallery-Toggle.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Import" />
+                                        <Label
+                                            VerticalContentAlignment="Center"
+                                            Content="Import" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock
@@ -183,7 +299,9 @@
                                     TextWrapping="Wrap" />
                             </DockPanel>
                         </GroupBox>
-                        <GroupBox BorderThickness="2" Header="Export">
+                        <GroupBox
+                            BorderThickness="2"
+                            Header="Export">
                             <DockPanel>
                                 <Button x:Name="ExportFromLibrary"
                                     Width="120"
@@ -198,7 +316,9 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/Gallery-Save.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Export" />
+                                        <Label
+                                            VerticalContentAlignment="Center"
+                                            Content="Export" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock
@@ -208,7 +328,9 @@
                                     TextWrapping="Wrap" />
                             </DockPanel>
                         </GroupBox>
-                        <GroupBox BorderThickness="2" Header="Clear">
+                        <GroupBox
+                            BorderThickness="2"
+                            Header="Clear">
                             <DockPanel>
                                 <Button x:Name="EraseLibrary"
                                     Width="120"
@@ -223,7 +345,9 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/Gallery-Delete.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Clear" />
+                                        <Label
+                                            VerticalContentAlignment="Center"
+                                            Content="Clear" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock
@@ -240,7 +364,9 @@
                 <Grid Margin="5">
                     <StackPanel>
                         <Label Content="You should back up the contents of these folders regularily." />
-                        <GroupBox BorderThickness="2" Header="Settings">
+                        <GroupBox
+                            BorderThickness="2"
+                            Header="Settings">
                             <DockPanel>
                                 <Button x:Name="SettingsFolder"
                                     Width="120"
@@ -255,7 +381,9 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/File-Open.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Open" />
+                                        <Label
+                                            VerticalContentAlignment="Center"
+                                            Content="Open" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock
@@ -265,7 +393,9 @@
                                     TextWrapping="Wrap" />
                             </DockPanel>
                         </GroupBox>
-                        <GroupBox BorderThickness="2" Header="Library">
+                        <GroupBox
+                            BorderThickness="2"
+                            Header="Library">
                             <DockPanel>
                                 <Button x:Name="LibraryFolder"
                                     Width="120"
@@ -280,7 +410,9 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/File-Open.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Open" />
+                                        <Label
+                                            VerticalContentAlignment="Center"
+                                            Content="Open" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock
@@ -290,7 +422,9 @@
                                     TextWrapping="Wrap" />
                             </DockPanel>
                         </GroupBox>
-                        <GroupBox BorderThickness="2" Header="Plug-Ins">
+                        <GroupBox
+                            BorderThickness="2"
+                            Header="Plug-Ins">
                             <DockPanel>
                                 <Button x:Name="PlugInsFolder"
                                     Width="120"
@@ -305,7 +439,9 @@
                                             Height="32"
                                             Margin="5"
                                             Source="/Resources/Button Images/Office-2016/File-Open.png" />
-                                        <Label VerticalContentAlignment="Center" Content="Open" />
+                                        <Label
+                                            VerticalContentAlignment="Center"
+                                            Content="Open" />
                                     </StackPanel>
                                 </Button>
                                 <TextBlock

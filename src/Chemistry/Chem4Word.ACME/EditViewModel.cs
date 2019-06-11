@@ -338,7 +338,7 @@ namespace Chem4Word.ACME
 
         #region Constructors
 
-        public EditViewModel(Model model) : base(model)
+        public EditViewModel(Model model, EditorCanvas currentEditor) : base(model)
         {
             _atomOptions = new ObservableCollection<AtomOption>();
             LoadAtomOptions();
@@ -363,7 +363,7 @@ namespace Chem4Word.ACME
             GroupCommand = new GroupCommand(this);
             UnGroupCommand = new UnGroupCommand(this);
             SettingsCommand = new SettingsCommand(this);
-
+            CurrentEditor = currentEditor;
             _selectedElement = Globals.PeriodicTable.C;
 
             _selectedBondOptionId = 1;
@@ -454,12 +454,12 @@ namespace Chem4Word.ACME
         /// </summary>
         private void LoadBondOptions()
         {
-            //if you add more bond options then you *MUST* update ACMEResources.XAML to correspond
-            _bondOptions[1] = new BondOption { Id = 1, Order = "S", Stereo = BondStereo.None };
-            _bondOptions[2] = new BondOption { Id = 2, Order = "D", Stereo = BondStereo.None };
-            _bondOptions[3] = new BondOption { Id = 3, Order = "T", Stereo = BondStereo.None };
-            _bondOptions[4] = new BondOption { Id = 4, Order = "S", Stereo = BondStereo.Wedge };
-            _bondOptions[5] = new BondOption { Id = 5, Order = "S", Stereo = BondStereo.Hatch };
+          
+            var storedOptions = (BondOption[])CurrentEditor.FindResource("BondOptions");
+            for (int i = 1; i <= storedOptions.Length; i++)
+            {
+                _bondOptions[i] = storedOptions[i - 1];
+            }
         }
 
         #endregion Constructors
@@ -468,7 +468,7 @@ namespace Chem4Word.ACME
 
         private bool AllAtomsSelected(Molecule atomParent)
         {
-            Debug.WriteLine($"Atom count = {atomParent.Atoms.Count()}, Adornder Count = {MolAtomAdorners(atomParent).Count()}");
+            Debug.WriteLine($"Atom count = {atomParent.Atoms.Count()}, Adorner Count = {MolAtomAdorners(atomParent).Count()}");
             return atomParent.Atoms.Count() == MolAtomAdorners(atomParent).Count();
         }
 

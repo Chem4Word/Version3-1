@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class SettingsCommand : ACME.Commands.BaseCommand
+    public class SettingsCommand : BaseCommand
     {
         public SettingsCommand(EditViewModel vm) : base(vm)
         {
@@ -17,7 +17,7 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return false;
+            return true;
         }
 
         public override void Execute(object parameter)

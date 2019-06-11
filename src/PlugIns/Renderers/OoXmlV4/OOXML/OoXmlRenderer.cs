@@ -1455,7 +1455,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             outline1.Append(solidFill1);
 
-            A.TailEnd tailEnd1 = new A.TailEnd() { Type = A.LineEndValues.Triangle };
+            A.TailEnd tailEnd1 = new A.TailEnd() { Type = A.LineEndValues.Arrow };
             outline1.Append(tailEnd1);
 
             shapeProperties1.Append(transform2D1);
