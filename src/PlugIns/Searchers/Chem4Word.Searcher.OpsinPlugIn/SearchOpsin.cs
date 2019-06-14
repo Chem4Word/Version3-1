@@ -104,15 +104,10 @@ namespace Chem4Word.Searcher.OpsinPlugIn
 
                     CMLConverter cmlConverter = new CMLConverter();
                     Model2.Model model = cmlConverter.Import(temp);
-                    if (model.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
-                        || model.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
-                    {
-                        model.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
-                    }
-
                     Cml = cmlConverter.Export(model);
 
-                    display1.Chemistry = Cml;
+                    model.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
+                    display1.Chemistry = model;
                     ImportButton.Enabled = true;
                 }
             }

@@ -45,7 +45,7 @@ namespace Chem4Word.Navigator
                     {
                         if (ActiveDocument?.ActiveWindow?.Selection != null)
                         {
-                            TaskPaneHelper.InsertChemistry(false, ActiveDocument.Application, Display);
+                            TaskPaneHelper.InsertChemistry(false, ActiveDocument.Application, Display, false);
                         }
                     }
                     Globals.Chem4WordV3.EventsEnabled = true;
@@ -72,7 +72,7 @@ namespace Chem4Word.Navigator
                     {
                         if (ActiveDocument?.ActiveWindow?.Selection != null)
                         {
-                            TaskPaneHelper.InsertChemistry(true, ActiveDocument.Application, Display);
+                            TaskPaneHelper.InsertChemistry(true, ActiveDocument.Application, Display, false);
                         }
                     }
                     Globals.Chem4WordV3.EventsEnabled = true;

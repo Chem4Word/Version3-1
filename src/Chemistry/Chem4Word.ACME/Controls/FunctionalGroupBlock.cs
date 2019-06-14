@@ -5,11 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Drawing.Text;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -25,6 +27,9 @@ namespace Chem4Word.ACME.Controls
         public FunctionalGroupBlock()
         {
             Width = double.NaN;
+            FontSize = 18;
+            FontWeight = FontWeights.DemiBold;
+            FontFamily = new FontFamily("Arial");
         }
 
         public FunctionalGroup ParentGroup

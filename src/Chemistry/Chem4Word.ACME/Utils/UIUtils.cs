@@ -132,13 +132,19 @@ namespace Chem4Word.ACME.Utils
                         if (model.IsElement)
                         {
                             var newOption = new AtomOption(model.AddedElement as Element);
-                            evm.AtomOptions.Add(newOption);
+                            if (!evm.AtomOptions.Contains(newOption))
+                            {
+                                evm.AtomOptions.Add(newOption);
+                            }
                         }
 
                         if (model.IsFunctionalGroup)
                         {
                             var newOption = new AtomOption(model.AddedElement as FunctionalGroup);
-                            evm.AtomOptions.Add(newOption);
+                            if (!evm.AtomOptions.Contains(newOption))
+                            {
+                                evm.AtomOptions.Add(newOption);
+                            }
                         }
                     }
                     evm.SelectedElement = model.Element;
@@ -163,7 +169,6 @@ namespace Chem4Word.ACME.Utils
                     IsDouble = bond.Order.Equals(Globals.OrderDouble),
                     Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
                     Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
-
                 };
 
                 model.DoubleBondChoice = DoubleBondType.Auto;
@@ -173,7 +178,9 @@ namespace Chem4Word.ACME.Utils
                     if (bond.ExplicitPlacement != null)
                     {
                         model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
-
+                    }
+                    else
+                    {
                         if (model.IsDouble)
                         {
                             if (bond.Stereo == Globals.BondStereo.Indeterminate)

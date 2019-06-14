@@ -415,7 +415,7 @@ namespace Chem4Word.UI.WPF
 
                                     var cml = File.ReadAllText(cmlFile);
                                     var lib = new Database.Library();
-                                    if (lib.ImportCml(cml))
+                                    if (lib.ImportCml(cml, true))
                                     {
                                         fileCount++;
                                     }

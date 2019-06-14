@@ -5,18 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Windows.Forms;
+using System.Collections.Generic;
 
-namespace WinForms.TestHarness
+namespace Chem4Word.Model2
 {
-    public partial class Dumper : Form
+    public class HydrogenTargets
     {
-        public Dumper(string data)
+        public List<Atom> Atoms { get; set; }
+        public List<Bond> Bonds { get; set; }
+        public Dictionary<string, Molecule> Molecules { get; set; }
+
+        public HydrogenTargets()
         {
-            InitializeComponent();
-            Dump.Text = data;
-            Dump.SelectionStart = 0;
-            Dump.SelectionLength = 0;
+            Atoms = new List<Atom>();
+            Bonds = new List<Bond>();
+            Molecules = new Dictionary<string, Molecule>();
         }
     }
 }

@@ -296,7 +296,6 @@ namespace Chem4Word.ACME
         #endregion Properties
 
         private BaseEditBehavior _activeMode;
-        private readonly ObservableCollection<AtomOption> _atomOptions;
 
         public BaseEditBehavior ActiveMode
         {
@@ -314,7 +313,11 @@ namespace Chem4Word.ACME
             }
         }
 
-        public ObservableCollection<AtomOption> AtomOptions => _atomOptions;
+        private ObservableCollection<AtomOption> _atomOptions;
+        public ObservableCollection<AtomOption> AtomOptions {
+            get { return _atomOptions; }
+            set { _atomOptions = value; }
+        }
 
         #region Commands
 
@@ -340,7 +343,8 @@ namespace Chem4Word.ACME
 
         public EditViewModel(Model model, EditorCanvas currentEditor) : base(model)
         {
-            _atomOptions = new ObservableCollection<AtomOption>();
+            AtomOptions = new ObservableCollection<AtomOption>();
+            AtomOptions.CollectionChanged += AtomOptions_CollectionChanged;
             LoadAtomOptions();
             RedoCommand = new RedoCommand(this);
             UndoCommand = new UndoCommand(this);
@@ -369,6 +373,11 @@ namespace Chem4Word.ACME
             _selectedBondOptionId = 1;
 
             LoadBondOptions();
+        }
+
+        private void AtomOptions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            
         }
 
         public void LoadAtomOptions()
@@ -1414,94 +1423,40 @@ namespace Chem4Word.ACME
 
         public void RemoveHydrogens()
         {
-            List<Atom> targetAtoms = new List<Atom>();
-            List<Bond> targetBonds = new List<Bond>();
-            Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
-
-            var mols = SelectedItems.OfType<Molecule>().ToList();
-            if (mols.Any())
+            HydrogenTargets targets;
+            var molecules = SelectedItems.OfType<Molecule>().ToList();
+            if (molecules.Any())
             {
-                foreach (var mol in mols)
-                {
-                    var allHydrogens = mol.Atoms.Values.Where(a => a.Element.Symbol.Equals("H")).ToList();
-                    if (allHydrogens.Any())
-                    {
-                        foreach (var hydrogen in allHydrogens)
-                        {
-                            // Terminal Atom?
-                            if (hydrogen.Degree == 1)
-                            {
-                                // Not Stereo
-                                if (hydrogen.Bonds.First().Stereo == BondStereo.None)
-                                {
-                                    if (!parents.ContainsKey(hydrogen.InternalId))
-                                    {
-                                        parents.Add(hydrogen.InternalId, hydrogen.Parent);
-                                    }
-                                    targetAtoms.Add(hydrogen);
-                                    if (!parents.ContainsKey(hydrogen.Bonds.First().InternalId))
-                                    {
-                                        parents.Add(hydrogen.Bonds.First().InternalId, hydrogen.Parent);
-                                    }
-                                    targetBonds.Add(hydrogen.Bonds.First());
-                                }
-                            }
-                        }
-                    }
-                }
+                targets = Model.GetHydrogenTargets(molecules);
             }
             else
             {
-                var allHydrogens = Model.GetAllAtoms().Where(a => a.Element.Symbol.Equals("H")).ToList();
-                if (allHydrogens.Any())
-                {
-                    foreach (var hydrogen in allHydrogens)
-                    {
-                        // Terminal Atom?
-                        if (hydrogen.Degree == 1)
-                        {
-                            // Not Stereo
-                            if (hydrogen.Bonds.First().Stereo == BondStereo.None)
-                            {
-                                if (!parents.ContainsKey(hydrogen.InternalId))
-                                {
-                                    parents.Add(hydrogen.InternalId, hydrogen.Parent);
-                                }
-                                targetAtoms.Add(hydrogen);
-                                if (!parents.ContainsKey(hydrogen.Bonds.First().InternalId))
-                                {
-                                    parents.Add(hydrogen.Bonds.First().InternalId, hydrogen.Parent);
-                                }
-                                targetBonds.Add(hydrogen.Bonds.First());
-                            }
-                        }
-                    }
-                }
+                targets = Model.GetHydrogenTargets();
             }
 
-            if (targetAtoms.Any())
+            if (targets.Atoms.Any())
             {
                 UndoManager.BeginUndoBlock();
                 Action undoAction = () =>
                 {
                     Model.InhibitEvents = true;
 
-                    foreach (var atom in targetAtoms)
+                    foreach (var atom in targets.Atoms)
                     {
-                        parents[atom.InternalId].AddAtom(atom);
-                        atom.Parent = parents[atom.InternalId];
+                        targets.Molecules[atom.InternalId].AddAtom(atom);
+                        atom.Parent = targets.Molecules[atom.InternalId];
                     }
-                    foreach (var bond in targetBonds)
+                    foreach (var bond in targets.Bonds)
                     {
-                        parents[bond.InternalId].AddBond(bond);
-                        bond.Parent = parents[bond.InternalId];
+                        targets.Molecules[bond.InternalId].AddBond(bond);
+                        bond.Parent = targets.Molecules[bond.InternalId];
                     }
 
                     Model.InhibitEvents = false;
 
-                    if (mols.Any())
+                    if (molecules.Any())
                     {
-                        RefreshMolecules(mols);
+                        RefreshMolecules(molecules);
                     }
                     else
                     {
@@ -1513,22 +1468,18 @@ namespace Chem4Word.ACME
 
                 Action redoAction = () =>
                 {
-                    //Model.InhibitEvents = true;
-
-                    foreach (var bond in targetBonds)
+                    foreach (var bond in targets.Bonds)
                     {
                         bond.Parent.RemoveBond(bond);
                     }
-                    foreach (var atom in targetAtoms)
+                    foreach (var atom in targets.Atoms)
                     {
                         atom.Parent.RemoveAtom(atom);
                     }
 
-                    //Model.InhibitEvents = false;
-
-                    if (mols.Any())
+                    if (molecules.Any())
                     {
-                        RefreshMolecules(mols);
+                        RefreshMolecules(molecules);
                     }
                     else
                     {

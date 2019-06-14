@@ -11,7 +11,10 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Microsoft.Office.Interop.Word;
 using System;
+using System.Linq;
 using System.Reflection;
+using Chem4Word.Model2.Converters.CML;
+using DocumentFormat.OpenXml.EMMA;
 
 namespace Chem4Word.Helpers
 {
@@ -20,7 +23,7 @@ namespace Chem4Word.Helpers
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        public static void InsertChemistry(bool isCopy, Application app, Display display)
+        public static void InsertChemistry(bool isCopy, Application app, Display display, bool fromLibrary)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -58,7 +61,37 @@ namespace Chem4Word.Helpers
             {
                 try
                 {
-                    cc = ChemistryHelper.Insert2DChemistry(doc, display.Chemistry.ToString(), isCopy);
+                    CMLConverter cmlConverter = new CMLConverter();
+                    var model = cmlConverter.Import(display.Chemistry.ToString());
+
+                    if (fromLibrary)
+                    {
+                        if (Globals.Chem4WordV3.SystemOptions.RemoveExplicitHydrogensOnImportFromLibrary)
+                        {
+                            var targets = model.GetHydrogenTargets();
+
+                            if (targets.Atoms.Any())
+                            {
+                                foreach (var bond in targets.Bonds)
+                                {
+                                    bond.Parent.RemoveBond(bond);
+                                }
+                                foreach (var atom in targets.Atoms)
+                                {
+                                    atom.Parent.RemoveAtom(atom);
+                                }
+                            }
+                        }
+
+                        var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength,
+                                               Globals.Chem4WordV3.SystemOptions.SetBondLengthOnImportFromLibrary);
+                        if (!string.IsNullOrEmpty(outcome))
+                        {
+                            Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                        }
+                    }
+
+                    cc = ChemistryHelper.Insert2DChemistry(doc, cmlConverter.Export(model), isCopy);
                 }
                 catch (Exception ex)
                 {

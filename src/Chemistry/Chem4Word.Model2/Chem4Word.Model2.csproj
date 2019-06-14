@@ -94,6 +94,7 @@
     <Compile Include="Helpers\AtomHelpers.cs" />
     <Compile Include="Helpers\Globals.cs" />
     <Compile Include="Helpers\Utils.cs" />
+    <Compile Include="HydrogenTargets.cs" />
     <Compile Include="Interfaces\IChemistryContainer.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Molecule.cs" />

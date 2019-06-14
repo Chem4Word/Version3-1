@@ -63,7 +63,7 @@ namespace Chem4Word.Library
                         ActiveDocument = Globals.Chem4WordV3.Application.ActiveDocument;
                         if (ActiveDocument?.ActiveWindow?.Selection != null)
                         {
-                            TaskPaneHelper.InsertChemistry(true, ActiveDocument.Application, Display);
+                            TaskPaneHelper.InsertChemistry(true, ActiveDocument.Application, Display, true);
                         }
                     }
                     Globals.Chem4WordV3.EventsEnabled = true;

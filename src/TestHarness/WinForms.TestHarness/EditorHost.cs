@@ -5,16 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.IO;
-using System.Text;
-using System.Windows;
-using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Telemetry;
+using System;
+using System.IO;
+using System.Text;
+using System.Windows;
+using System.Windows.Forms;
 using Size = System.Drawing.Size;
 
 namespace WinForms.TestHarness

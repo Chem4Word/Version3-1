@@ -484,6 +484,32 @@ namespace Chem4Word
                                 if (dr == DialogResult.OK)
                                 {
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
+
+                                    // Remove Explicit Hydrogens if required
+                                    if (Globals.Chem4WordV3.SystemOptions.RemoveExplicitHydrogensOnImportFromFile)
+                                    {
+                                        var targets = model.GetHydrogenTargets();
+
+                                        if (targets.Atoms.Any())
+                                        {
+                                            foreach (var bond in targets.Bonds)
+                                            {
+                                                bond.Parent.RemoveBond(bond);
+                                            }
+                                            foreach (var atom in targets.Atoms)
+                                            {
+                                                atom.Parent.RemoveAtom(atom);
+                                            }
+                                        }
+                                    }
+
+                                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength,
+                                                           Globals.Chem4WordV3.SystemOptions.SetBondLengthOnImportFromFile);
+                                    if (!string.IsNullOrEmpty(outcome))
+                                    {
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                                    }
+
                                     CMLConverter cmlConverter = new CMLConverter();
                                     cml = cmlConverter.Export(model);
                                     if (model.TotalAtomsCount > 0)
@@ -1321,7 +1347,37 @@ namespace Chem4Word
                             if (dr == DialogResult.OK)
                             {
                                 Word.Document doc = Globals.Chem4WordV3.Application.ActiveDocument;
-                                Word.ContentControl cc = ChemistryHelper.Insert2DChemistry(doc, searcher.Cml, true);
+
+                                CMLConverter cmlConverter = new CMLConverter();
+                                Model model = cmlConverter.Import(searcher.Cml);
+                                model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
+
+                                // Remove Explicit Hydrogens if required
+                                if (Globals.Chem4WordV3.SystemOptions.RemoveExplicitHydrogensOnImportFromSearch)
+                                {
+                                    var targets = model.GetHydrogenTargets();
+
+                                    if (targets.Atoms.Any())
+                                    {
+                                        foreach (var bond in targets.Bonds)
+                                        {
+                                            bond.Parent.RemoveBond(bond);
+                                        }
+                                        foreach (var atom in targets.Atoms)
+                                        {
+                                            atom.Parent.RemoveAtom(atom);
+                                        }
+                                    }
+                                }
+
+                                var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength,
+                                                       Globals.Chem4WordV3.SystemOptions.SetBondLengthOnImportFromSearch);
+                                if (!string.IsNullOrEmpty(outcome))
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                                }
+
+                                Word.ContentControl cc = ChemistryHelper.Insert2DChemistry(doc, cmlConverter.Export(model), true);
                                 if (cc != null)
                                 {
                                     // Move selection point into the Content Control which was just inserted
@@ -1383,7 +1439,7 @@ namespace Chem4Word
                                     }
 
                                     var lib = new Database.Library();
-                                    lib.ImportCml(cml);
+                                    lib.ImportCml(cml, false);
 
                                     // Re- Read the Library Names
                                     Globals.Chem4WordV3.LoadNamesFromLibrary();
@@ -1393,7 +1449,7 @@ namespace Chem4Word
                                 }
                                 else
                                 {
-                                    UserInteractions.InformUser("Only chemistry with Atoms can be saved into the library.");
+                                    UserInteractions.InformUser("Only chemistry with at least one Atom can be saved into the library.");
                                 }
                             }
 

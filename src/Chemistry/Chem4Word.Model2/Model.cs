@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Chem4Word.Core.Helpers;
@@ -550,18 +551,110 @@ namespace Chem4Word.Model2
             _molecules.Clear();
         }
 
+        public HydrogenTargets GetHydrogenTargets(List<Molecule> molecules = null)
+        {
+            var targets = new HydrogenTargets();
+
+            if (molecules == null)
+            {
+                var allHydrogens = GetAllAtoms().Where(a => a.Element.Symbol.Equals("H")).ToList();
+                ProcessHydrogens(allHydrogens);
+            }
+            else
+            {
+                foreach (var mol in molecules)
+                {
+                    var allHydrogens = mol.Atoms.Values.Where(a => a.Element.Symbol.Equals("H")).ToList();
+                    ProcessHydrogens(allHydrogens);
+                }
+            }
+
+            return targets;
+
+            // Local function
+            void ProcessHydrogens(List<Atom> hydrogens)
+            {
+                if (hydrogens.Any())
+                {
+                    foreach (var hydrogen in hydrogens)
+                    {
+                        // Terminal Atom?
+                        if (hydrogen.Degree == 1)
+                        {
+                            // Not Stereo
+                            if (hydrogen.Bonds.First().Stereo == Globals.BondStereo.None)
+                            {
+                                if (!targets.Molecules.ContainsKey(hydrogen.InternalId))
+                                {
+                                    targets.Molecules.Add(hydrogen.InternalId, hydrogen.Parent);
+                                }
+                                targets.Atoms.Add(hydrogen);
+                                if (!targets.Molecules.ContainsKey(hydrogen.Bonds.First().InternalId))
+                                {
+                                    targets.Molecules.Add(hydrogen.Bonds.First().InternalId, hydrogen.Parent);
+                                }
+                                targets.Bonds.Add(hydrogen.Bonds.First());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Ensure that bond length is between 5 and 95, and force to default if required
+        /// </summary>
+        /// <param name="target">Target bond length (if force true)</param>
+        /// <param name="force">true to force setting of bond length to target bond length</param>
+        public string EnsureBondLength(double target, bool force)
+        {
+            string result = string.Empty;
+
+            if (TotalBondsCount > 0 && MeanBondLength > 0)
+            {
+                if (Math.Abs(MeanBondLength - target) < 0.1)
+                {
+                    result = $"BondLength of {Stringify(MeanBondLength)} is correct";
+                }
+                else
+                {
+                    if (force)
+                    {
+                        result = $"Forced BondLength to {Stringify(target)} from {Stringify(MeanBondLength)}";
+                        ScaleToAverageBondLength(target);
+                    }
+                    else
+                    {
+                        if (MeanBondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
+                            || MeanBondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
+                        {
+                            result = $"Adjusted BondLength from {Stringify(MeanBondLength)} to {Stringify(target)}";
+                            ScaleToAverageBondLength(target);
+                        }
+                        else
+                        {
+                            result = $"BondLength of {Stringify(MeanBondLength)} is within tolerance";
+                        }
+                    }
+                }
+            }
+
+            Debug.WriteLine(result);
+            return result;
+
+            // Local Function
+            string Stringify(double value)
+            {
+                return value.ToString("#,##0.00");
+            }
+        }
+
         public void ScaleToAverageBondLength(double newLength, Point centre)
         {
-            if (MeanBondLength > 0)
+            if (TotalBondsCount > 0 && MeanBondLength > 0)
             {
-                double scale = newLength / MeanBondLength;
-                var allAtoms = GetAllAtoms();
-                foreach (var atom in allAtoms)
-                {
-                    atom.Position = new Point(atom.Position.X * scale, atom.Position.Y * scale);
-                }
+                ScaleToAverageBondLength(newLength);
 
-                _boundingBox = Rect.Empty;
                 var bb = BoundingBox;
                 var c = new Point(bb.Left + bb.Width / 2, bb.Top + bb.Height / 2);
                 RepositionAll(c.X - centre.X, c.Y - centre.Y);
@@ -571,7 +664,7 @@ namespace Chem4Word.Model2
 
         public void ScaleToAverageBondLength(double newLength)
         {
-            if (MeanBondLength > 0)
+            if (TotalBondsCount > 0 && MeanBondLength > 0)
             {
                 double scale = newLength / MeanBondLength;
                 var allAtoms = GetAllAtoms();
@@ -622,7 +715,7 @@ namespace Chem4Word.Model2
             {
                 double newLength = Constants.StandardBondLength / Globals.ScaleFactorForXaml;
 
-                if (MeanBondLength > 0)
+                if (TotalBondsCount > 0 && MeanBondLength > 0)
                 {
                     newLength = MeanBondLength / Globals.ScaleFactorForXaml;
                 }
@@ -639,28 +732,22 @@ namespace Chem4Word.Model2
             {
                 double newLength = Constants.StandardBondLength * Globals.ScaleFactorForXaml;
 
-                if (MeanBondLength > 0)
+                if (TotalBondsCount > 0 && MeanBondLength > 0)
                 {
                     newLength = MeanBondLength * Globals.ScaleFactorForXaml;
                 }
-
-                //var before = OverallAtomBoundingBox;
-                //Debug.WriteLine($"ABB1 = {before}");
 
                 ScaleToAverageBondLength(newLength);
                 XamlBondLength = newLength;
                 ScaledForXaml = true;
 
                 var middle = OverallAtomBoundingBox;
-                //Debug.WriteLine($"ABB2 = {middle}");
+
                 if (forDisplay)
                 {
                     // Move to (0,0)
                     RepositionAll(middle.Left, middle.Top);
                 }
-
-                //var after = OverallAtomBoundingBox;
-                //Debug.WriteLine($"ABB3 = {after}");
 
                 OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
                 OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));

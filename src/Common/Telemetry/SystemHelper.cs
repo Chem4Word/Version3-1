@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -268,9 +269,12 @@ namespace Chem4Word.Telemetry
         {
             List<string> screens = new List<string>();
 
+            int idx = 0;
             foreach (var screen in Screen.AllScreens)
             {
-                screens.Add($"X={screen.Bounds.X}, Y={screen.Bounds.Y}, W={screen.Bounds.Width}, H={screen.Bounds.Height}");
+                idx++;
+                var primary = screen.Primary ? "[P]" : "";
+                screens.Add($"#{idx}{primary}: X={screen.Bounds.X},Y={screen.Bounds.Y},W={screen.Bounds.Width},H={screen.Bounds.Height}");
             }
 
             Screens = string.Join("; ", screens);

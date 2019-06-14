@@ -46,6 +46,8 @@ namespace Chem4Word.ACME.Controls
             // This moves it to the correct position
             Left = _model.Centre.X - ActualWidth / 2;
             Top = _model.Centre.Y - ActualHeight / 2;
+
+            InvalidateArrange();
         }
 
         private void Cancel_OnClick(object sender, RoutedEventArgs e)

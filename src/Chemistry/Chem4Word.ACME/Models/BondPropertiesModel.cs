@@ -31,13 +31,11 @@ namespace Chem4Word.ACME.Models
                 if (value != _bondOrderValue)
                 {
                     _bondOrderValue = value;
-                    OnPropertyChanged();
 
                     IsSingle = value == 1;
                     IsDouble = value == 2;
                     Is1Point5 = value == 1.5;
                     Is2Point5 = value == 2.5;
-                    
 
                     OnPropertyChanged(nameof(IsSingle));
                     OnPropertyChanged(nameof(IsDouble));
@@ -56,8 +54,7 @@ namespace Chem4Word.ACME.Models
                         OnPropertyChanged(nameof(DoubleBondChoice));
                     }
 
-                   
-
+                    OnPropertyChanged();
                 }
             }
         }

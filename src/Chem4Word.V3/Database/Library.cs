@@ -91,7 +91,7 @@ namespace Chem4Word.Database
             }
         }
 
-        public bool ImportCml(string cmlFile)
+        public bool ImportCml(string cmlFile, bool fixUp)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -102,18 +102,18 @@ namespace Chem4Word.Database
                 var converter = new CMLConverter();
                 Model model = converter.Import(cmlFile);
 
+                if (fixUp)
+                {
+                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                    if (!string.IsNullOrEmpty(outcome))
+                    {
+                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                    }
+                }
+
                 if (model.TotalAtomsCount > 0)
                 {
-                    double before = model.MeanBondLength;
-                    if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
-                        || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
-                    {
-                        model.ScaleToAverageBondLength(Constants.StandardBondLength);
-                        double after = model.MeanBondLength;
-                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
-                    }
-
-                    // Ensure each molecule has a Consise Formula set
+                    // Ensure each molecule has a Concise Formula set
                     foreach (var molecule in model.Molecules.Values)
                     {
                         if (string.IsNullOrEmpty(molecule.ConciseFormula))
@@ -249,7 +249,7 @@ namespace Chem4Word.Database
                 while (chemistry.Read())
                 {
                     var byteArray = (Byte[])chemistry["Chemistry"];
-                    result = CmlFromBytes(byteArray, id);
+                    result = CmlFromBytes(byteArray);
                     break;
                 }
 
@@ -439,7 +439,7 @@ namespace Chem4Word.Database
 
                     dto.Id = (long)chemistry["ID"];
                     var byteArray = (Byte[])chemistry["Chemistry"];
-                    dto.Cml = CmlFromBytes(byteArray, dto.Id);
+                    dto.Cml = CmlFromBytes(byteArray);
                     dto.Name = chemistry["name"] as string;
                     dto.Formula = chemistry["formula"] as string;
 
@@ -453,21 +453,9 @@ namespace Chem4Word.Database
             return results;
         }
 
-        private string CmlFromBytes(byte[] byteArray, long id)
+        private string CmlFromBytes(byte[] byteArray)
         {
-            string cml = Encoding.UTF8.GetString(byteArray);
-            CMLConverter cc = new CMLConverter();
-            Model m = cc.Import(cml);
-            double before = m.MeanBondLength;
-            if (before < Constants.MinimumBondLength - Constants.BondLengthTolerance
-                || before > Constants.MaximumBondLength + Constants.BondLengthTolerance)
-            {
-                m.ScaleToAverageBondLength(Constants.StandardBondLength);
-                double after = m.MeanBondLength;
-                Debug.WriteLine($"Structure Id: {id} rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
-            }
-
-            return cc.Export(m);
+            return Encoding.UTF8.GetString(byteArray);
         }
 
         public List<ChemistryTagDTO> GetChemistryByTags()

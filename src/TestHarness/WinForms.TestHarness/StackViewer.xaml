@@ -47,6 +47,7 @@
                             HorizontalAlignment="Stretch"
                             Background="White"
                             BackgroundColor="White"
+                            HighlightActive="False"
                             Chemistry="{Binding Path=Model}" />
                     </Border>
                 </DataTemplate>

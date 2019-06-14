@@ -25,7 +25,7 @@
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
             <converters:EnumToBooleanConverter x:Key="enumToBooleanConverter" />
-            <x:Array x:Key="BondItems2" Type="{x:Type ComboBoxItem}">
+            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}">
                 <ComboBoxItem Tag="0" Height="Auto">
                     <StackPanel Orientation="Horizontal" Height="Auto">
                         <TextBlock  Width="50">None</TextBlock>
@@ -87,29 +87,6 @@
                             <Line X1="0" Y1="13" X2="50" Y2="13" Stroke="Black" StrokeThickness="2"/>
                         </Canvas>
                     </StackPanel>
-                </ComboBoxItem>
-            </x:Array>
-            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}">
-                <ComboBoxItem Tag="0" Height="Auto">
-                        <TextBlock  Width="50">None</TextBlock>
-                </ComboBoxItem>
-                <ComboBoxItem Tag="0.5" >
-                        <TextBlock  Width="50">Half</TextBlock>
-                </ComboBoxItem>
-                <ComboBoxItem Tag="1">
-                        <TextBlock  Width="50">Single</TextBlock>
-                </ComboBoxItem>
-                <ComboBoxItem Tag="1.5">
-                        <TextBlock  Width="50">1.5</TextBlock>
-                </ComboBoxItem>
-                <ComboBoxItem Tag="2">
-                        <TextBlock  Width="50">Double</TextBlock>
-                </ComboBoxItem>
-                <ComboBoxItem Tag="2.5">
-                        <TextBlock  Width="50">2.5</TextBlock>
-                </ComboBoxItem>
-                <ComboBoxItem Tag="3">
-                        <TextBlock  Width="50">Triple</TextBlock>
                 </ComboBoxItem>
             </x:Array>
 
@@ -185,15 +162,9 @@
                 Margin="0,5,0,0"
                 SelectedValue="{Binding Path=BondOrderValue, Mode=TwoWay}"
                 FontSize="12"
+                ItemsSource="{Binding Source={StaticResource BondItems}}"
                 Foreground="{StaticResource Chem4WordBrush}"
                 SelectedValuePath="Tag">
-                <ComboBoxItem Content="None" Tag="0" />
-                <ComboBoxItem Content="Half" Tag="0.5" />
-                <ComboBoxItem Content="Single" Tag="1" />
-                <ComboBoxItem Content="1.5" Tag="1.5" />
-                <ComboBoxItem Content="Double" Tag="2" />
-                <ComboBoxItem Content="2.5" Tag="2.5" />
-                <ComboBoxItem Content="Triple" Tag="3" />
             </ComboBox>
             <TextBlock
                 Grid.Row="2"

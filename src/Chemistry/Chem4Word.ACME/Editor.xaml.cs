@@ -336,5 +336,7 @@ namespace Chem4Word.ACME
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+     
     }
 }

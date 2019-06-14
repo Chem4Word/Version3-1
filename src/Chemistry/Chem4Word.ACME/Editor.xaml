@@ -301,7 +301,7 @@
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
     </UserControl.InputBindings>
 
-    <Grid>
+    <Grid Name="SelectorGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="{Binding ElementName=MainTray, Path=Height}" />
             <RowDefinition Height="*" />
@@ -352,12 +352,12 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ToolBarTray.Resources>
-            <ToolBar
+            <ToolBar x:Name="SelectorToolbar"
                 Height="40">
                 <ComboBox x:Name="AtomCombo"
                     Width="Auto"
+                    MinWidth="60"
                     Height="Auto"
-                    MinWidth="48"
                     MinHeight="25"
                     FontFamily="Arial"
                     FontSize="18"
@@ -366,7 +366,22 @@
                     ItemsSource="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AtomOptions}"
                     SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, PresentationTraceSources.TraceLevel=High, Mode=TwoWay, Converter={StaticResource DoNothing}}"
                     SelectedValuePath="Element"
-                    ToolTip="Current Atom Type" />
+                    ToolTip="Current Atom Type">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Viewbox ToolTip="{Binding Path=Element, Mode=OneTime}">
+                               <ContentPresenter Content="{Binding Content}"/>
+                            </Viewbox>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.ItemContainerStyle>
+                        <Style TargetType="ComboBoxItem">
+                            <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="FontWeight" Value="DemiBold"/>
+                            <Setter Property="FontFamily" Value="Arial"/>
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
                 <ComboBox
                     x:Name="BondCombo"
                     Width="60"

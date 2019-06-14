@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.ACME.Controls
@@ -29,7 +30,10 @@ namespace Chem4Word.ACME.Controls
 
         public AtomPropertiesModel ApeModel
         {
-            get { return _apeModel; }
+            get
+            {
+                return _apeModel;
+            }
             set
             {
                 _apeModel = value;
@@ -90,6 +94,8 @@ namespace Chem4Word.ACME.Controls
             // This moves it to the correct position
             Left = ApeModel.Centre.X - ActualWidth / 2;
             Top = ApeModel.Centre.Y - ActualHeight / 2;
+
+            InvalidateArrange();
         }
 
         private void AtomTable_OnElementSelected(object sender, VisualPeriodicTable.ElementEventArgs e)

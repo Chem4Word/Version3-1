@@ -392,12 +392,12 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                                 lastMolfile = new StreamReader(resStream).ReadToEnd();
                                 SdFileConverter sdFileConverter = new SdFileConverter();
                                 Model2.Model model = sdFileConverter.Import(lastMolfile);
-                                if (model.MeanBondLength < Core.Helpers.Constants.MinimumBondLength - Core.Helpers.Constants.BondLengthTolerance
-                                    || model.MeanBondLength > Core.Helpers.Constants.MaximumBondLength + Core.Helpers.Constants.BondLengthTolerance)
-                                {
-                                    model.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
-                                }
+                                CMLConverter cmlConverter = new CMLConverter();
+                                Cml = cmlConverter.Export(model);
+
+                                model.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
                                 this.display1.Chemistry = model;
+
                                 if (model.AllWarnings.Count > 0 || model.AllErrors.Count > 0)
                                 {
                                     Telemetry.Write(module, "Exception(Data)", lastMolfile);
@@ -418,8 +418,6 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                                 }
                                 else
                                 {
-                                    CMLConverter cmlConverter = new CMLConverter();
-                                    Cml = cmlConverter.Export(model);
                                     ImportButton.Enabled = true;
                                 }
                             }
