@@ -140,18 +140,22 @@ namespace Chem4Word.ACME.Drawing
                     if (!ignoreCentroid)
                     {
                         bondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                          parentBond.Placement,
-                          ref enclosingPoly, centroid,  parentBond.SubsidiaryRing?.Centroid, startAtomGeometry, endAtomGeometry);
+                                                                       parentBond.Placement,
+                                                                       ref enclosingPoly, centroid,
+                                                                       parentBond.SubsidiaryRing?.Centroid,
+                                                                       startAtomGeometry, endAtomGeometry);
                         return true;
                     }
                     else
                     {
                         bondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                             parentBond.Placement,
-                                                                             ref enclosingPoly, null, null,  startAtomGeometry, endAtomGeometry);
+                                                                       parentBond.Placement,
+                                                                       ref enclosingPoly, null, null, startAtomGeometry,
+                                                                       endAtomGeometry);
                         return true;
                     }
                 }
+
                 case 3:
                     bondGeometry = BondGeometry.TripleBondGeometry(startPoint, endPoint, modelXamlBondLength,
                                                                    ref enclosingPoly, startAtomGeometry,
@@ -179,7 +183,7 @@ namespace Chem4Word.ACME.Drawing
                                                 new GradientStop {Offset = 0.25d, Color = Colors.Transparent},
                                                 new GradientStop {Offset = 0.30, Color = Colors.Transparent}
                                             },
-                        
+
                             Transform = new RotateTransform
                                         {
                                             Angle = ParentBond.Angle
@@ -191,7 +195,7 @@ namespace Chem4Word.ACME.Drawing
         /// <summary>
         /// Renders a bond to the display
         /// </summary>
-       public override void Render()
+        public override void Render()
         {
             //set up the shared variables first
             Point startPoint, endPoint;
@@ -262,17 +266,17 @@ namespace Chem4Word.ACME.Drawing
                     }
 
                     _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                      ParentBond.Placement, null, out _,
-                                                                      out _, out _, out _);
+                                                                      ParentBond.Placement, null).EnclosingPoly();
                     break;
 
                 case Globals.OrderPartial01:
                     _mainBondPen.DashStyle = DashStyles.Dash;
-                    
+
                     if (startAtomGeometry != null)
                     {
                         BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
                     }
+
                     if (endAtomGeometry != null)
                     {
                         BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
@@ -289,8 +293,7 @@ namespace Chem4Word.ACME.Drawing
 
                     //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
                     _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                      ParentBond.Placement, null, out _,
-                                                                      out _, out _, out _);
+                                                                      ParentBond.Placement, null).EnclosingPoly();
 
                     break;
 
@@ -345,6 +348,7 @@ namespace Chem4Word.ACME.Drawing
                             {
                                 BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
                             }
+
                             if (endAtomGeometry != null)
                             {
                                 BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
@@ -361,9 +365,9 @@ namespace Chem4Word.ACME.Drawing
 
                             //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
                             _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                              ParentBond.Placement, null, out _,
-                                                                              out _, out _, out _);
-                         break;
+                                                                              ParentBond.Placement, null)
+                                                         .EnclosingPoly();
+                            break;
                     }
 
                     break;
@@ -371,30 +375,35 @@ namespace Chem4Word.ACME.Drawing
                 case Globals.OrderPartial12:
                 case Globals.OrderAromatic:
                     // Handle 1.5 bond 
-                    Point? centroid = ParentBond.PrimaryRing?.Centroid;
+                    Point? centroid = ParentBond.Centroid;
+                 
+
+
                     _subsidiaryBondPen.DashStyle = DashStyles.Dash;
-                    _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,ParentBond.Placement, centroid,
-                                                                      out point1, out point2, out point3, out point4);
+                    var desc = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength, ParentBond.Placement,
+                                                                centroid, centroid);
+                    _enclosingPoly = desc.EnclosingPoly();
                     _subsidiaryBondPen.DashStyle = DashStyles.Dash;
                     if (startAtomGeometry != null)
                     {
-                        BondGeometry.AdjustTerminus(ref point1, point2, startAtomGeometry);
-                        BondGeometry.AdjustTerminus(ref point3, point4, startAtomGeometry);
-                        _enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+                        BondGeometry.AdjustTerminus(ref desc.PrimaryStart, desc.PrimaryEnd, startAtomGeometry);
+                        BondGeometry.AdjustTerminus(ref desc.SecondaryStart, desc.SecondaryEnd, startAtomGeometry);
                     }
 
                     if (endAtomGeometry != null)
                     {
-                        BondGeometry.AdjustTerminus(ref point4, point3, endAtomGeometry);
-                        BondGeometry.AdjustTerminus(ref point2, point1, endAtomGeometry);
-                        _enclosingPoly = new List<Point> { point1, point2, point4, point3 };
+                        BondGeometry.AdjustTerminus(ref desc.SecondaryEnd, desc.SecondaryStart, endAtomGeometry);
+                        BondGeometry.AdjustTerminus(ref desc.PrimaryEnd, desc.PrimaryStart, endAtomGeometry);
                     }
+
                     using (DrawingContext dc = RenderOpen())
                     {
-                        dc.DrawLine(_mainBondPen, point1, point2);
-                        dc.DrawLine(_subsidiaryBondPen, point3, point4);
+                        dc.DrawLine(_mainBondPen, desc.PrimaryStart, desc.PrimaryEnd);
+                        dc.DrawLine(_subsidiaryBondPen, desc.SecondaryStart, desc.SecondaryEnd);
+
                         dc.Close();
                     }
+
                     break;
 
                 case "2":
@@ -412,32 +421,31 @@ namespace Chem4Word.ACME.Drawing
                     }
                     else
                     {
-                        // Handle Half bond 
-                        centroid = ParentBond.PrimaryRing?.Centroid;
+                        centroid = ParentBond.Centroid;
                         //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                        _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                          ParentBond.Placement, centroid, out point1,
-                                                                          out point2, out point3, out point4);
-
+                        var descriptor = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
+                                                                          ParentBond.Placement, centroid);
+                        _enclosingPoly = descriptor.EnclosingPoly();
                         if (startAtomGeometry != null)
                         {
-                            BondGeometry.AdjustTerminus(ref point1, point2, startAtomGeometry);
-                            BondGeometry.AdjustTerminus(ref point3, point4, startAtomGeometry);
-                            _enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                            BondGeometry.AdjustTerminus(ref descriptor.PrimaryStart, descriptor.PrimaryEnd,
+                                                        startAtomGeometry);
+                            BondGeometry.AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd,
+                                                        startAtomGeometry);
                         }
 
                         if (endAtomGeometry != null)
                         {
-                            BondGeometry.AdjustTerminus(ref point4, point3, endAtomGeometry);
-                            BondGeometry.AdjustTerminus(ref point2, point1, endAtomGeometry);
-                            _enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                            BondGeometry.AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart,
+                                                        endAtomGeometry);
+                            BondGeometry.AdjustTerminus(ref descriptor.PrimaryEnd, descriptor.PrimaryStart,
+                                                        endAtomGeometry);
                         }
 
                         using (DrawingContext dc = RenderOpen())
                         {
-                            dc.DrawLine(_mainBondPen, point1, point2);
-                            dc.DrawLine(_subsidiaryBondPen, point3, point4);
-
+                            dc.DrawLine(_mainBondPen, descriptor.PrimaryStart, descriptor.PrimaryEnd);
+                            dc.DrawLine(_subsidiaryBondPen, descriptor.SecondaryStart, descriptor.SecondaryEnd);
                             dc.Close();
                         }
                     }
@@ -445,7 +453,7 @@ namespace Chem4Word.ACME.Drawing
                     break;
 
                 case Globals.OrderPartial23:
-                   
+
 
                 case "3":
                 case Globals.OrderTriple:
@@ -454,23 +462,23 @@ namespace Chem4Word.ACME.Drawing
                     {
                         _subsidiaryBondPen.DashStyle = DashStyles.Dash;
                     }
-                    _enclosingPoly = BondGeometry.GetTripleBondPoints(ref startPoint, ref endPoint, bondLength,
-                                                                      startAtomGeometry, endAtomGeometry, out point1,
-                                                                      out point2, out point3, out point4);
-                
+
+                    var tbd = BondGeometry.GetTripleBondPoints(startPoint, endPoint, bondLength,
+                                                               startAtomGeometry, endAtomGeometry);
+
                     using (DrawingContext dc = RenderOpen())
                     {
                         if (ParentBond.Placement == Globals.BondDirection.Clockwise)
                         {
-                            dc.DrawLine(_mainBondPen, point1, point2);
-                            dc.DrawLine(_mainBondPen, startPoint, endPoint);
-                            dc.DrawLine(_subsidiaryBondPen, point3, point4);
+                            dc.DrawLine(_mainBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
+                            dc.DrawLine(_mainBondPen, tbd.PrimaryStart, tbd.PrimaryEnd);
+                            dc.DrawLine(_subsidiaryBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                         }
                         else
                         {
-                            dc.DrawLine(_subsidiaryBondPen, point1, point2);
-                            dc.DrawLine(_mainBondPen, startPoint, endPoint);
-                            dc.DrawLine(_mainBondPen, point3, point4);
+                            dc.DrawLine(_subsidiaryBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
+                            dc.DrawLine(_mainBondPen, tbd.PrimaryStart, tbd.PrimaryEnd);
+                            dc.DrawLine(_mainBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                         }
 
                         dc.Close();
@@ -483,6 +491,7 @@ namespace Chem4Word.ACME.Drawing
                     {
                         BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
                     }
+
                     if (endAtomGeometry != null)
                     {
                         BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
@@ -499,8 +508,7 @@ namespace Chem4Word.ACME.Drawing
 
                     //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
                     _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                      ParentBond.Placement, null, out _,
-                                                                      out _, out _, out _);
+                                                                      ParentBond.Placement, null).EnclosingPoly();
                     break;
             }
         }

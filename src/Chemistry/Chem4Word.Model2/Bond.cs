@@ -561,9 +561,9 @@ namespace Chem4Word.Model2
             }
             else
             {
-                if (BondCentroid != null)
+                if (PseudoCentroid != null)
                 {
-                    return BondCentroid - MidPoint;
+                    return PseudoCentroid - MidPoint;
                 }
                 else
                 {
@@ -590,25 +590,103 @@ namespace Chem4Word.Model2
             }
         }
 
-        public Point? BondCentroid
+        public Point? Centroid
         {
             get
             {
-                if (StartAtom.Neighbours.Count() == 2 & EndAtom.Neighbours.Count() == 2)
+                if (PrimaryRing != null)
                 {
-                    var firstLigand = StartAtom.NeighboursExcept(EndAtom)[0];
-                    var secondLigand = EndAtom.NeighboursExcept(StartAtom)[0];
-                    BasicGeometry.IntersectLines(
-                        out double t, out double u, StartAtom.Position, secondLigand.Position, EndAtom.Position,
-                        firstLigand.Position);
-                    if ((t >= 0d) & (t <= 1d) & (u >= 0d) & (u <= 1d))
-                    {
-                        return StartAtom.Position + (secondLigand.Position - StartAtom.Position) * t;
-                    }
+                    return PrimaryRing.Centroid;
                 }
+                else
+                {
+                    return PseudoCentroid;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns a 'centroid' for a non-cyclic bond
+        /// </summary>
+        public Point? PseudoCentroid
+        {
+            get
+            {
+                var endLigands = EndAtom.NeighboursExcept(StartAtom);
+                var startLigands = StartAtom.NeighboursExcept(EndAtom);
+                Atom preferredStartLigand = null, preferredEndLigand = null;
+               //first, narrow down to atoms on the same side of the bond
+
+               int sign = - (int) Placement;
+               double bondangle = 180d;
+
+               foreach (Atom startLigand in startLigands)
+               {
+                   double angle = sign * Vector.AngleBetween(BondVector, startLigand.Position - StartAtom.Position);
+                   if (angle > 0)
+                   {
+                       var abs = Math.Abs(angle);
+                       if (abs < bondangle)
+                       {
+                           bondangle = abs;
+                           preferredStartLigand = startLigand;
+                       }
+                   }
+               }
+
+               bondangle = 180d;
+               foreach (Atom endLigand in endLigands)
+               {
+                   double angle = sign * Vector.AngleBetween(-BondVector, endLigand.Position - EndAtom.Position);
+                   if (angle < 0)
+                   {
+                       var abs = Math.Abs(angle);
+                        if (abs < bondangle)
+                       {
+                           bondangle = abs;
+                           preferredEndLigand = endLigand;
+                       }
+                   }
+
+               }
+                //if we have two atoms on the same side as the bond...
+                if (preferredStartLigand != null & preferredEndLigand != null)
+               {
+                   return preferredStartLigand.Position +
+                          (preferredEndLigand.Position - preferredStartLigand.Position) / 2;
+               }
+               //if we have only one atom on the same side of the bond
+               else if (preferredStartLigand != null) //preferredEndLigand == null
+               {
+                   return  StartAtom.Position + (preferredStartLigand.Position - StartAtom.Position) + BondVector;
+               }
+               else if (preferredEndLigand != null) //preferredEndLigand == null
+               {
+                   return EndAtom.Position + (preferredEndLigand.Position - EndAtom.Position) - BondVector;
+               }
                 return null;
             }
         }
+
+        private Atom GetCisLigand(Atom startLigand, List<Atom> endLigands, Atom startAtom, Atom endAtom)
+        {
+            //assume there are two endLigands
+
+            if (BasicGeometry.LineSegmentsIntersect(startLigand.Position, endAtom.Position, endLigands[0].Position,
+                                                    startAtom.Position)!=null)
+            {
+                return endLigands[0];
+            }
+            else if (BasicGeometry.LineSegmentsIntersect(startLigand.Position, endAtom.Position, endLigands[1].Position, startAtom.Position) != null)
+
+            {
+                return endLigands[1];
+
+            }
+            return null;
+        }
+
+     
 
         private BondDirection? GetPlacement()
         {

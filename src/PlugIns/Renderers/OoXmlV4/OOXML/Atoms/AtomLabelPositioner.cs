@@ -294,15 +294,21 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             case CompassPoints.North:
                                 if (atom.Bonds.ToList().Count > 1)
                                 {
-                                    cursorPosition.X = labelBounds.X + (labelBounds.Width / 2) - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
-                                    cursorPosition.Y = cursorPosition.Y +
-                                                       OoXmlHelper.ScaleCsTtfToCml(-hydrogenCharacter.Height) -
-                                                       OoXmlHelper.CHARACTER_CLIPPING_MARGIN;
+                                    cursorPosition.X = labelBounds.X
+                                                       + (labelBounds.Width / 2)
+                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
+                                    cursorPosition.Y = cursorPosition.Y
+                                                       + OoXmlHelper.ScaleCsTtfToCml(-hydrogenCharacter.Height)
+                                                       - OoXmlHelper.CHARACTER_VERTICAL_SPACING;
                                     if (iCharge > 0)
                                     {
                                         if (implicitHCount > 1)
                                         {
-                                            cursorPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(-implicitValueCharacter.Height * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2) - OoXmlHelper.CHARACTER_CLIPPING_MARGIN);
+                                            cursorPosition.Offset(0,
+                                                                  OoXmlHelper.ScaleCsTtfToCml(
+                                                                      -implicitValueCharacter.Height *
+                                                                      OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2)
+                                                                - OoXmlHelper.CHARACTER_VERTICAL_SPACING);
                                         }
                                     }
                                 }
@@ -315,10 +321,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             case CompassPoints.South:
                                 if (atom.Bonds.ToList().Count > 1)
                                 {
-                                    cursorPosition.X = labelBounds.X + (labelBounds.Width / 2) - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
-                                    cursorPosition.Y = cursorPosition.Y +
-                                                       OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height) +
-                                                       OoXmlHelper.CHARACTER_CLIPPING_MARGIN;
+                                    cursorPosition.X = labelBounds.X + (labelBounds.Width / 2)
+                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
+                                    cursorPosition.Y = cursorPosition.Y 
+                                                       + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height)
+                                                       + OoXmlHelper.CHARACTER_VERTICAL_SPACING;
                                 }
                                 break;
 

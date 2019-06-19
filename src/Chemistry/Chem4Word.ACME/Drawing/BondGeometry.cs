@@ -21,6 +21,37 @@ namespace Chem4Word.ACME.Drawing
     /// now uses StreamGeometry in preference to PathGeometry
     /// Old code is commented out
     /// </summary>
+    ///
+
+    public struct DoubleBondDescriptor
+    {
+        public Point PrimaryStart;
+        public Point PrimaryEnd;
+        public Point SecondaryStart;
+        public Point SecondaryEnd;
+
+        public List<Point> EnclosingPoly()
+        {
+            return new List<Point>{PrimaryStart, PrimaryEnd, SecondaryEnd, SecondaryStart};
+        }
+
+    }
+
+    public struct TripleBondDescriptor
+    {
+        public Point PrimaryStart;
+        public Point PrimaryEnd;
+        public Point SecondaryStart;
+        public Point SecondaryEnd;
+        public Point TertiaryStart;
+        public Point TertiaryEnd;
+
+        public List<Point> EnclosingPoly()
+        {
+            return new List<Point> { SecondaryStart, SecondaryEnd, TertiaryEnd, TertiaryStart};
+        }
+
+    }
     public static class BondGeometry
     {
         /// <summary>
@@ -121,16 +152,16 @@ namespace Chem4Word.ACME.Drawing
                                                   double bondLength, ref List<Point> enclosingPoly,
                                                   Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
         {
-            enclosingPoly = GetTripleBondPoints(ref startPoint, ref endPoint, bondLength, startAtomGeometry, endAtomGeometry, out var point1, out var point2, out var point3, out var point4);
+            var tbd = GetTripleBondPoints(startPoint, endPoint, bondLength, startAtomGeometry, endAtomGeometry);
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
                 sgc.BeginFigure(startPoint, false, false);
                 sgc.LineTo(endPoint, true, false);
-                sgc.BeginFigure(point1, false, false);
-                sgc.LineTo(point2, true, false);
-                sgc.BeginFigure(point3, false, false);
-                sgc.LineTo(point4, true, false);
+                sgc.BeginFigure(tbd.SecondaryStart, false, false);
+                sgc.LineTo(tbd.SecondaryEnd, true, false);
+                sgc.BeginFigure(tbd.TertiaryStart, false, false);
+                sgc.LineTo(tbd.TertiaryEnd, true, false);
                 sgc.Close();
             }
             sg.Freeze();
@@ -138,39 +169,40 @@ namespace Chem4Word.ACME.Drawing
             return sg;
         }
 
-        public static List<Point> GetTripleBondPoints(ref Point startPoint, ref Point endPoint, double bondLength,
-                                                Geometry startAtomGeometry, Geometry endAtomGeometry, out Point point1,
-                                                out Point point2, out Point point3, out Point point4)
+        public static TripleBondDescriptor GetTripleBondPoints(Point startPoint, Point endPoint, double bondLength,
+                                                Geometry startAtomGeometry, Geometry endAtomGeometry)
         {
+            TripleBondDescriptor tbd;
+
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
             normal.Normalize();
-
+            tbd.PrimaryStart = startPoint;
+            tbd.PrimaryEnd = endPoint;
             double distance = bondLength * BondOffsetPercentage;
-            point1 = startPoint + normal * distance;
-            point2 = point1 + v;
+            tbd.SecondaryStart = startPoint + normal * distance;
+            tbd.SecondaryEnd = tbd.SecondaryStart+ v;
 
-            point3 = startPoint - normal * distance;
-            point4 = point3 + v;
+            tbd.TertiaryStart = startPoint - normal * distance;
+            tbd.TertiaryEnd = tbd.TertiaryStart+ v;
 
             if (startAtomGeometry != null)
             {
-                AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
-                AdjustTerminus(ref point1, point2, startAtomGeometry);
-                AdjustTerminus(ref point3, point4, startAtomGeometry);
+                AdjustTerminus(ref tbd.PrimaryStart, tbd.PrimaryEnd, startAtomGeometry);
+                AdjustTerminus(ref tbd.SecondaryStart, tbd.SecondaryEnd, startAtomGeometry);
+                AdjustTerminus(ref tbd.TertiaryStart, tbd.TertiaryEnd, startAtomGeometry);
                 
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
-                AdjustTerminus(ref point2, point1, endAtomGeometry);
-                AdjustTerminus(ref point4, point3, endAtomGeometry);
+                AdjustTerminus(ref tbd.PrimaryEnd, tbd.PrimaryStart, endAtomGeometry);
+                AdjustTerminus(ref tbd.SecondaryEnd, tbd.SecondaryStart, endAtomGeometry);
+                AdjustTerminus(ref tbd.TertiaryEnd, tbd.TertiaryStart, endAtomGeometry);
               
             }
 
-            var enclosingPoly = new List<Point> { point1, point2, point4, point3 };
-            return enclosingPoly;
+            return tbd;
         }
 
         /// <summary>
@@ -194,33 +226,32 @@ namespace Chem4Word.ACME.Drawing
                                                                        Geometry endAtomGeometry = null)
 
         {
-            Point point1;
-            Point point2;
-            Point point3;
-            Point point4;
-            enclosingPoly = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid,
-                                                out point1, out point2, out point3, out point4, otherCentroid);
+            
+            var descriptor = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid,
+                                                otherCentroid);
             if (startAtomGeometry != null)
             {
-                AdjustTerminus(ref point1, point2, startAtomGeometry);
-                AdjustTerminus(ref point3, point4, startAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                AdjustTerminus(ref descriptor.PrimaryStart, descriptor.PrimaryEnd, startAtomGeometry);
+                AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd, startAtomGeometry);
+                
             }
 
             if (endAtomGeometry != null)
             {
-                AdjustTerminus(ref point4, point3, endAtomGeometry);
-                AdjustTerminus(ref point2, point1, endAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart, endAtomGeometry);
+                AdjustTerminus(ref descriptor.PrimaryEnd, descriptor.PrimaryStart, endAtomGeometry);   
             }
+
+            enclosingPoly = descriptor.EnclosingPoly();
+
 
             StreamGeometry sg = new StreamGeometry();
             using (StreamGeometryContext sgc = sg.Open())
             {
-                sgc.BeginFigure(point1, false, false);
-                sgc.LineTo(point2, true, false);
-                sgc.BeginFigure(point3, false, false);
-                sgc.LineTo(point4, true, false);
+                sgc.BeginFigure(descriptor.PrimaryStart, false, false);
+                sgc.LineTo(descriptor.PrimaryEnd, true, false);
+                sgc.BeginFigure(descriptor.SecondaryStart, false, false);
+                sgc.LineTo(descriptor.SecondaryEnd, true, false);
                 sgc.Close();
             }
 
@@ -241,20 +272,18 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="point3"></param>
         /// <param name="point4"></param>
         /// <returns></returns>
-        public static List<Point> GetDoubleBondPoints(Point startPoint, Point endPoint, double bondLength,
+        public static DoubleBondDescriptor GetDoubleBondPoints(Point startPoint, Point endPoint, double bondLength,
                                                       BondDirection doubleBondPlacement,
-                                                      Point? ringCentroid, out Point point1, out Point point2,
-                                                      out Point point3, out Point point4, Point? otherCentroid = null)
+                                                      Point? ringCentroid, Point? otherCentroid = null)
         {
-            List<Point> enclosingPoly;
+
             Point? point3a;
             Point? point4a;
-            Vector v;
-            Vector normal;
-            double distance;
-            //use a tuple here to return the values
-            (point1, point2, point3, point4, v, normal, distance) =
-                GetDefaultDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement);
+
+
+            DoubleBondDescriptor dbd;
+            //use a struct here to return the values
+            dbd= GetDefaultDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement);
 
             if (ringCentroid != null)
                 //now, if there is a centroid defined, the bond is part of a ring
@@ -279,34 +308,30 @@ namespace Chem4Word.ACME.Drawing
                 }
                 if (workingCentroid != null)
                 {
-                    point3a = BasicGeometry.LineSegmentsIntersect(startPoint, workingCentroid.Value, point3, point4);
-                    point4a = BasicGeometry.LineSegmentsIntersect(endPoint, workingCentroid.Value, point3, point4);
-                    var tempPoint3 = point3a ?? point3;
-                    var tempPoint4 = point4 = point4a ?? point4;
+                    point3a = BasicGeometry.LineSegmentsIntersect(startPoint, workingCentroid.Value, dbd.SecondaryStart, dbd.SecondaryEnd);
+                    point4a = BasicGeometry.LineSegmentsIntersect(endPoint, workingCentroid.Value, dbd.SecondaryStart, dbd.SecondaryEnd);
+                    var tempPoint3 = point3a ?? dbd.SecondaryStart;
+                    var tempPoint4 = dbd.SecondaryEnd = point4a ?? dbd.SecondaryEnd;
 
-                    point3 = tempPoint3;
-                    point4 = tempPoint4;
+                    dbd.SecondaryStart= tempPoint3;
+                    dbd.SecondaryEnd = tempPoint4;
                 }
 
 
                 //capture  the enclosing polygon for hit testing later
             }
 
-            enclosingPoly = new List<Point>() {point1, point2, point4, point3};
+            
 
-
-            return enclosingPoly;
+            return dbd;
         }
 
-        private static (Point point1, Point point2, Point point3, Point point4, Vector v, Vector normal, double distance
-            )
+        private static DoubleBondDescriptor
             GetDefaultDoubleBondPoints(Point startPoint, Point endPoint, double bondLength,
                                        BondDirection doubleBondPlacement)
         {
-            Point point1;
-            Point point2;
-            Point point3;
-            Point point4;
+
+            DoubleBondDescriptor dbd;
             Vector v = endPoint - startPoint;
             Vector normal = v.Perpendicular();
             normal.Normalize();
@@ -318,43 +343,43 @@ namespace Chem4Word.ACME.Drawing
             {
                 case BondDirection.None:
 
-                    point1 = startPoint + normal * distance;
-                    point2 = point1 + v;
+                    dbd.PrimaryStart = startPoint + normal * distance;
+                    dbd.PrimaryEnd = dbd.PrimaryStart + v;
 
-                    point3 = startPoint - normal * distance;
-                    point4 = point3 + v;
+                    dbd.SecondaryStart = startPoint - normal * distance;
+                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
 
                     break;
 
                 case BondDirection.Clockwise:
                 {
-                    point1 = startPoint;
+                    dbd.PrimaryStart = startPoint;
 
-                    point2 = endPoint;
-                    point3 = startPoint - normal * 2 * distance;
-                    point4 = point3 + v;
+                    dbd.PrimaryEnd = endPoint;
+                    dbd.SecondaryStart = startPoint - normal * 2 * distance;
+                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
 
                     break;
                 }
 
                 case BondDirection.Anticlockwise:
-                    point1 = startPoint;
-                    point2 = endPoint;
-                    point3 = startPoint + normal * 2 * distance;
-                    point4 = point3 + v;
+                    dbd.PrimaryStart = startPoint;
+                    dbd.PrimaryEnd = endPoint;
+                    dbd.SecondaryStart = startPoint + normal * 2 * distance;
+                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
                     break;
 
                 default:
 
-                    point1 = startPoint + normal * distance;
-                    point2 = point1 + v;
+                    dbd.PrimaryStart = startPoint + normal * distance;
+                    dbd.PrimaryEnd = dbd.PrimaryStart + v;
 
-                    point3 = startPoint - normal * distance;
-                    point4 = point3 + v;
+                    dbd.SecondaryStart = startPoint - normal * distance;
+                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
                     break;
             }
 
-            return (point1, point2, point3, point4, v, normal, distance);
+            return dbd;
         }
 
         /// <summary>

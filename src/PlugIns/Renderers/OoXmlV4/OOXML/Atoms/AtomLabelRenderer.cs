@@ -296,7 +296,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            Int32Value emus = (Int32Value)(points * 12700);
+            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
             A.Outline outline1 = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();

@@ -229,7 +229,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            A.Outline outline1 = new A.Outline() { Width = 9525, CapType = A.LineCapValues.Round };
+            A.Outline outline1 = new A.Outline() { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();
 
@@ -488,7 +488,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            A.Outline outline1 = new A.Outline() { Width = 9525, CapType = A.LineCapValues.Round };
+            A.Outline outline1 = new A.Outline() { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();
 
@@ -572,7 +572,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            A.Outline outline1 = new A.Outline() { Width = 9525, CapType = A.LineCapValues.Round };
+            A.Outline outline1 = new A.Outline() { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();
             A.PresetDash presetDash1 = new A.PresetDash() { Val = A.PresetLineDashValues.Dash };
@@ -658,7 +658,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry1.Append(rectangle1);
             customGeometry1.Append(pathList1);
 
-            A.Outline outline1 = new A.Outline() { Width = 9525, CapType = A.LineCapValues.Round };
+            A.Outline outline1 = new A.Outline() { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill1 = new A.SolidFill();
             A.PresetDash presetDash1 = new A.PresetDash() { Val = A.PresetLineDashValues.LargeDash };

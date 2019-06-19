@@ -59,7 +59,10 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            UIUtils.DoPropertyEdit(e, CurrentEditor);
+            if (CurrentEditor.ActiveVisual != null)
+            {
+                UIUtils.DoPropertyEdit(e, CurrentEditor);
+            }
         }
 
         ///
