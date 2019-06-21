@@ -1862,6 +1862,7 @@ namespace Chem4Word
 
         private void OnShowAboutClick(object sender, RibbonControlEventArgs e)
         {
+            
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             BeforeButtonChecks(sender as RibbonButton);
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
@@ -1872,9 +1873,9 @@ namespace Chem4Word
 
                 try
                 {
-                    About fa = new About();
-                    fa.TopLeft = Globals.Chem4WordV3.WordTopLeft;
-
+                    AboutHost ah = new AboutHost();
+                    ah.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+                    
                     Assembly assembly = Assembly.GetExecutingAssembly();
                     FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
                     UpdateHelper.ReadThisVersion(assembly);
@@ -1883,14 +1884,15 @@ namespace Chem4Word
                         string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                         string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                         int idx = temp.IndexOf(" ");
-                        fa.VersionString = $"Chem4Word V{Constants.Chem4WordVersion} {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+                        ah.VersionString = $"Chem4Word V{Constants.Chem4WordVersion} {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+
                     }
                     else
                     {
-                        fa.VersionString = $"Chem4Word Version {fvi.FileVersion}";
+                        ah.VersionString = $"Chem4Word Version {fvi.FileVersion}";
                     }
-
-                    fa.ShowDialog();
+                    ah.ShowDialog();
+                    
                 }
                 catch (Exception ex)
                 {

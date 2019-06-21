@@ -401,6 +401,15 @@
       <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\WaitCursor.cs" />
+    <Compile Include="UI\WPF\AboutControl.xaml.cs">
+      <DependentUpon>AboutControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WPF\AboutHost.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\WPF\AboutHost.Designer.cs">
+      <DependentUpon>AboutHost.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\WPF\SettingsControl.xaml.cs">
       <DependentUpon>SettingsControl.xaml</DependentUpon>
     </Compile>
@@ -413,12 +422,6 @@
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="UI\About.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\About.Designer.cs">
-      <DependentUpon>About.cs</DependentUpon>
     </Compile>
     <Compile Include="UI\XmlViewer.cs">
       <SubType>Form</SubType>
@@ -441,7 +444,9 @@
     <None Include="Data\index.html" />
     <EmbeddedResource Include="Data\This-Version.xml" />
     <Content Include="Library\14-tag.png" />
-    <Content Include="Resources\About Images\C4W Background 512.png" />
+    <Resource Include="Resources\About Images\C4W Background 512.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\Button Images\ArrowLeft.png" />
     <Content Include="Resources\Button Images\ArrowRight.png" />
     <Content Include="Resources\Button Images\Code.png" />
@@ -492,9 +497,6 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\About.resx">
-      <DependentUpon>About.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\AutomaticUpdate.resx">
       <DependentUpon>AutomaticUpdate.cs</DependentUpon>
     </EmbeddedResource>
@@ -518,6 +520,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\UserControls\UcMoleculeLabelEditor.resx">
       <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\WPF\AboutHost.resx">
+      <DependentUpon>AboutHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\WPF\SettingsHost.resx">
       <DependentUpon>SettingsHost.cs</DependentUpon>
@@ -578,7 +583,9 @@
     <Content Include="Resources\Button Images\TrashRed.png" />
     <Content Include="Resources\Button Images\TrashVista.png" />
     <Content Include="Resources\Button Images\Xml.png" />
-    <Content Include="Resources\About Images\ChemDoodleWebBadge.png" />
+    <Resource Include="Resources\About Images\ChemDoodleWebBadge.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\Button Images\YouTube.png" />
     <Content Include="Resources\SingleCarbon.xml">
       <SubType>Designer</SubType>
@@ -654,6 +661,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Navigator\NavigatorViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\WPF\AboutControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

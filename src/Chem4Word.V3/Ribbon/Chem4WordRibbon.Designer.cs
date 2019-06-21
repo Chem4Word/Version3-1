@@ -56,12 +56,12 @@ namespace Chem4Word
             this.HelpMenu = this.Factory.CreateRibbonMenu();
             this.ShowAbout = this.Factory.CreateRibbonButton();
             this.ShowHome = this.Factory.CreateRibbonButton();
+            this.ShowSystemInfo = this.Factory.CreateRibbonButton();
             this.CheckNow = this.Factory.CreateRibbonButton();
             this.ReadManual = this.Factory.CreateRibbonButton();
             this.YouTube = this.Factory.CreateRibbonButton();
             this.ButtonsDisabled = this.Factory.CreateRibbonButton();
             this.Update = this.Factory.CreateRibbonButton();
-            this.ShowSystemInfo = this.Factory.CreateRibbonButton();
             this.Chem4WordV3.SuspendLayout();
             this.GroupInputOutput.SuspendLayout();
             this.GroupLibrary.SuspendLayout();
@@ -273,6 +273,14 @@ namespace Chem4Word
             this.ShowHome.ShowImage = true;
             this.ShowHome.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnShowHomeClick);
             // 
+            // ShowSystemInfo
+            // 
+            this.ShowSystemInfo.Image = global::Chem4Word.Properties.Resources.About;
+            this.ShowSystemInfo.Label = "System Info";
+            this.ShowSystemInfo.Name = "ShowSystemInfo";
+            this.ShowSystemInfo.ShowImage = true;
+            this.ShowSystemInfo.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ShowSystemInfo_Click);
+            // 
             // CheckNow
             // 
             this.CheckNow.Image = global::Chem4Word.Properties.Resources.SmallTick;
@@ -315,14 +323,6 @@ namespace Chem4Word
             this.Update.ScreenTip = "About Chem4Word";
             this.Update.ShowImage = true;
             this.Update.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnUpdateClick);
-            // 
-            // ShowSystemInfo
-            // 
-            this.ShowSystemInfo.Image = global::Chem4Word.Properties.Resources.About;
-            this.ShowSystemInfo.Label = "System Info";
-            this.ShowSystemInfo.Name = "ShowSystemInfo";
-            this.ShowSystemInfo.ShowImage = true;
-            this.ShowSystemInfo.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ShowSystemInfo_Click);
             // 
             // CustomRibbon
             // 
