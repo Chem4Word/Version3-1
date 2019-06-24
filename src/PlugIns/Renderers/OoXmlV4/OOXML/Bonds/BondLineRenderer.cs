@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Renderer.OoXmlV4.Enums;
 using DocumentFormat.OpenXml;
 using A = DocumentFormat.OpenXml.Drawing;
 using Point = System.Windows.Point;
@@ -44,10 +45,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             switch (bl.Style)
             {
                 case BondLineStyle.Wedge:
+                    Debug.WriteLine($"Draw Wedge from {bl.Bond.StartAtom.Position} to {bl.Bond.EndAtom.Position}");
                     DrawFilledTriangle(wordprocessingGroup1, points);
                     break;
 
                 case BondLineStyle.Hatch:
+                    Debug.WriteLine($"Draw Hatch from {bl.Bond.StartAtom.Position} to {bl.Bond.EndAtom.Position}");
                     DrawHatchBondLines(wordprocessingGroup1, points);
                     break;
 
@@ -397,7 +400,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point p2 = new Point(points[2].X, points[2].Y);
 
             // Draw Tail Line
-            BondLine blTail = new BondLine(points[1], points[2], BondLineStyle.Solid, null, null, null, null);
+            BondLine blTail = new BondLine(BondLineStyle.Solid, points[1], points[2]);
             DrawBondLine(wordprocessingGroup1, blTail);
 
             // Prep for intermediate lines
@@ -426,7 +429,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                     out linesIntersect, out segmentsIntersect, out outIntersectP1);
                 CoordinateTool.FindIntersection(rightTailEnd, p0, p1, p2,
                     out linesIntersect, out segmentsIntersect, out outIntersectP2);
-                blNext = new BondLine(outIntersectP1, outIntersectP2, BondLineStyle.Solid, null, null, null, null);
+                blNext = new BondLine(BondLineStyle.Solid, outIntersectP1, outIntersectP2);
                 DrawBondLine(wordprocessingGroup1, blNext);
             }
 
@@ -434,7 +437,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point n1 = new Point(points[0].X - 0.025, points[0].Y - 0.025);
             Point n2 = new Point(points[0].X + 0.025, points[0].Y + 0.025);
 
-            BondLine blNose = new BondLine(n1, n2, BondLineStyle.Solid, null, null, null, null);
+            BondLine blNose = new BondLine(BondLineStyle.Solid, n1, n2);
             DrawBondLine(wordprocessingGroup1, blNose);
         }
 

@@ -9,7 +9,7 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
@@ -33,7 +33,7 @@ namespace Chem4Word.ACME.Drawing
         #endregion Fields
 
         private Geometry _hullGeometry;
-        private Geometry _bondGeometry;
+        public BondDescriptor BondDescriptor { get; private set; }
 
         public Geometry HullGeometry
         {
@@ -61,109 +61,161 @@ namespace Chem4Word.ACME.Drawing
             ParentBond = bond;
         }
 
-        public Geometry GetBondGeometry(Point startPoint, Point endPoint,
-                                        Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
+        /// <summary>
+        /// Returns a BondDescriptor object describing the visual layout of the visual
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="startAtomVisual"></param>
+        /// <param name="endAtomVisual"></param>
+        /// <param name="modelXamlBondLength"></param>
+        /// <param name="ignoreCentroid"></param>
+        /// <returns></returns>
+        public static BondDescriptor GetBondDescriptor(Bond parent, AtomVisual startAtomVisual, AtomVisual endAtomVisual, double modelXamlBondLength, bool ignoreCentroid = false)
         {
-            //Vector startOffset = new Vector();
-            //Vector endOffset = new Vector();
-            var modelXamlBondLength = this.ParentBond.Model.XamlBondLength;
+            //check to see if it's a wedge or a hatch yet
+            var startAtomPosition = parent.StartAtom.Position;
+            var endAtomPosition = parent.EndAtom.Position;
 
-            if (GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry, modelXamlBondLength,
-                                out var singleBondGeometry, ParentBond, out _enclosingPoly))
+            Point? centroid = null;
+            Point? secondaryCentroid = null;
+            if (parent.IsCyclic() & !ignoreCentroid)
             {
-                return singleBondGeometry;
+                centroid = parent.PrimaryRing?.Centroid;
+                secondaryCentroid = parent.SubsidiaryRing?.Centroid;
             }
 
-            return null;
+            //do the straightforward cases first -discriminate by stereo
+            var parentStereo = parent.Stereo;
+            var parentOrderValue = parent.OrderValue;
+            var parentPlacement = parent.Placement;
+
+            return GetBondDescriptor(startAtomVisual, endAtomVisual, modelXamlBondLength, parentStereo, startAtomPosition, endAtomPosition, parentOrderValue, parentPlacement, centroid, secondaryCentroid);
         }
 
-        public static bool GetBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry,
-                                           Geometry endAtomGeometry,
-                                           double modelXamlBondLength, out Geometry bondGeometry, Bond parentBond,
-                                           out List<Point> enclosingPoly, bool ignoreCentroid = false)
+        public static BondDescriptor GetBondDescriptor(AtomVisual startAtomVisual, AtomVisual endAtomVisual,
+                                                        double modelXamlBondLength, Globals.BondStereo parentStereo,
+                                                        Point startAtomPosition, Point endAtomPosition,
+                                                        double? parentOrderValue, Globals.BondDirection parentPlacement,
+                                                        Point? centroid, Point? secondaryCentroid)
         {
-            enclosingPoly = null;
-            //check to see if it's a wedge or a hatch yet
-            if (parentBond.Stereo == Globals.BondStereo.Wedge | parentBond.Stereo == Globals.BondStereo.Hatch)
+            if (parentStereo == Globals.BondStereo.Wedge | parentStereo == Globals.BondStereo.Hatch)
             {
+                WedgeBondDescriptor wbd = new WedgeBondDescriptor()
                 {
-                    bondGeometry = BondGeometry.WedgeBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                  startAtomGeometry, endAtomGeometry);
-                    return true;
+                    Start = startAtomPosition,
+                    End = endAtomPosition,
+                    StartAtomVisual = startAtomVisual,
+                    EndAtomVisual = endAtomVisual
+                };
+
+                var endAtom = endAtomVisual.ParentAtom;
+                var otherBonds = endAtom.Bonds.Except(new[] { startAtomVisual.ParentAtom.BondBetween(endAtom) });
+                Bond bond = null;
+                if (otherBonds.Any())
+                {
+                    bond = otherBonds.ToArray()[0];
                 }
+
+                bool chamferBond = (otherBonds.Any() &&
+                                    (endAtom.Element as Element) == Globals.PeriodicTable.C
+                                    && endAtom.SymbolText == ""
+                                    && bond.Order == Globals.OrderSingle);
+                if (!chamferBond)
+                {
+                    wbd.CappedOff = false;
+                    BondGeometry.GetWedgeBondGeometry(wbd, modelXamlBondLength);
+                }
+                else
+                {
+                    var nonHPs = from b in otherBonds
+                                 where (b.OtherAtom(endAtom)).Element as Element != Globals.PeriodicTable.H
+                                 select b.OtherAtom(endAtom).Position;
+
+                    wbd.CappedOff = true;
+                    BondGeometry.GetChamferedWedgeGeometry(wbd, modelXamlBondLength, nonHPs.ToList());
+                }
+
+                return wbd;
             }
 
-            if (parentBond.Stereo == Globals.BondStereo.Indeterminate && parentBond.OrderValue == 1.0)
+            //wavy bond
+            if (parentStereo == Globals.BondStereo.Indeterminate && parentOrderValue == 1.0)
             {
+                BondDescriptor sbd = new BondDescriptor
                 {
-                    bondGeometry = BondGeometry.WavyBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                 startAtomGeometry, endAtomGeometry);
-                    return true;
-                }
+                    Start = startAtomPosition,
+                    End = endAtomPosition,
+                    StartAtomVisual = startAtomVisual,
+                    EndAtomVisual = endAtomVisual
+                };
+                BondGeometry.GetWavyBondGeometry(sbd, modelXamlBondLength);
+                return sbd;
             }
 
-            //single or dotted bond
-            if (parentBond.OrderValue <= 1)
+            switch (parentOrderValue)
             {
-                {
-                    bondGeometry =
-                        BondGeometry.SingleBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
-                    return true;
-                }
-            }
+                //indeterminate double
+                case 2 when parentStereo == Globals.BondStereo.Indeterminate:
+                    DoubleBondDescriptor dbd = new DoubleBondDescriptor()
+                    {
+                        StartAtomVisual = startAtomVisual,
+                        EndAtomVisual = endAtomVisual,
+                        Start = startAtomPosition,
+                        End = endAtomPosition
+                    };
+                    BondGeometry.GetCrossedDoubleGeometry(dbd, modelXamlBondLength);
+                    return dbd;
 
-            switch (parentBond.OrderValue)
-            {
-                //double bond
+                //partial or undefined bonds
+                case 0:
+                case 0.5:
+                case 1.0:
+                    BondDescriptor sbd = new BondDescriptor
+                    {
+                        Start = startAtomPosition,
+                        End = endAtomPosition,
+                        StartAtomVisual = startAtomVisual,
+                        EndAtomVisual = endAtomVisual
+                    };
+
+                    BondGeometry.GetSingleBondGeometry(sbd);
+                    return sbd;
+
+                //double bond & 1.5 bond
                 case 1.5:
-                case 2.5:
-                    //it's a resonance bond, so we deal with this in Render
-                    //as we can't return a single geometry that can be
-                    //stroked with two different brushes
-                    //return BondGeometry.SingleBondGeometry(startPoint.Value, endPoint.Value);
-                    bondGeometry = new StreamGeometry();
-                    return true;
-                case 2 when parentBond.Stereo == Globals.BondStereo.Indeterminate:
-                    bondGeometry = BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                      ref enclosingPoly, startAtomGeometry,
-                                                                      endAtomGeometry);
-                    return true;
-                //tripe bond
                 case 2:
-                    Point? centroid = null;
-                    if (parentBond.IsCyclic())
+                    DoubleBondDescriptor dbd2 = new DoubleBondDescriptor()
                     {
-                        centroid = parentBond.PrimaryRing?.Centroid;
-                    }
+                        StartAtomVisual = startAtomVisual,
+                        EndAtomVisual = endAtomVisual,
+                        Start = startAtomPosition,
+                        End = endAtomPosition,
+                        Placement = parentPlacement,
+                        PrimaryCentroid = centroid,
+                        SecondaryCentroid = secondaryCentroid
+                    };
 
-                {
-                    if (!ignoreCentroid)
-                    {
-                        bondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                       parentBond.Placement,
-                                                                       ref enclosingPoly, centroid,
-                                                                       parentBond.SubsidiaryRing?.Centroid,
-                                                                       startAtomGeometry, endAtomGeometry);
-                        return true;
-                    }
-                    else
-                    {
-                        bondGeometry = BondGeometry.DoubleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                       parentBond.Placement,
-                                                                       ref enclosingPoly, null, null, startAtomGeometry,
-                                                                       endAtomGeometry);
-                        return true;
-                    }
-                }
+                    BondGeometry.GetDoubleBondGeometry(dbd2, modelXamlBondLength);
+                    return dbd2;
 
+                //triple and 2.5 bond
+                case 2.5:
                 case 3:
-                    bondGeometry = BondGeometry.TripleBondGeometry(startPoint, endPoint, modelXamlBondLength,
-                                                                   ref enclosingPoly, startAtomGeometry,
-                                                                   endAtomGeometry);
-                    return true;
+                    TripleBondDescriptor tbd = new TripleBondDescriptor()
+                    {
+                        StartAtomVisual = startAtomVisual,
+                        EndAtomVisual = endAtomVisual,
+                        Start = startAtomPosition,
+                        End = endAtomPosition,
+                        Placement = parentPlacement,
+                        PrimaryCentroid = centroid,
+                        SecondaryCentroid = secondaryCentroid
+                    };
+                    BondGeometry.GetTripleBondGeometry(tbd, modelXamlBondLength);
+                    return tbd;
+
                 default:
-                    bondGeometry = null;
-                    return false;
+                    return null;
             }
         }
 
@@ -171,12 +223,12 @@ namespace Chem4Word.ACME.Drawing
         {
             Brush bondBrush;
             bondBrush = new LinearGradientBrush
-                        {
-                            MappingMode = BrushMappingMode.Absolute,
-                            SpreadMethod = GradientSpreadMethod.Repeat,
-                            StartPoint = new Point(50, 0),
-                            EndPoint = new Point(50, 3),
-                            GradientStops = new GradientStopCollection()
+            {
+                MappingMode = BrushMappingMode.Absolute,
+                SpreadMethod = GradientSpreadMethod.Repeat,
+                StartPoint = new Point(50, 0),
+                EndPoint = new Point(50, 3),
+                GradientStops = new GradientStopCollection()
                                             {
                                                 new GradientStop {Offset = 0d, Color = Colors.Black},
                                                 new GradientStop {Offset = 0.25d, Color = Colors.Black},
@@ -184,11 +236,11 @@ namespace Chem4Word.ACME.Drawing
                                                 new GradientStop {Offset = 0.30, Color = Colors.Transparent}
                                             },
 
-                            Transform = new RotateTransform
-                                        {
-                                            Angle = ParentBond.Angle
-                                        }
-                        };
+                Transform = new RotateTransform
+                {
+                    Angle = ParentBond.Angle
+                }
+            };
             return bondBrush;
         }
 
@@ -202,313 +254,173 @@ namespace Chem4Word.ACME.Drawing
             //Point? idealStartPoint = null, idealEndPoint=null;
             startPoint = ParentBond.StartAtom.Position;
             endPoint = ParentBond.EndAtom.Position;
-            Geometry bondGeometry = null;
-            Vector bondVector = endPoint - startPoint;
+
             var bondLength = ParentBond.Model.XamlBondLength;
             var cv1 = ChemicalVisuals.ContainsKey(ParentBond.StartAtom);
             var cv2 = ChemicalVisuals.ContainsKey(ParentBond.EndAtom);
 
-            Geometry startAtomGeometry;
-            Geometry endAtomGeometry;
-            Point point1 = new Point(0, 0),
-                  point2 = new Point(0, 0),
-                  point3 = new Point(0, 0),
-                  point4 = new Point(0, 0);
-
             //bale out in case we have a null start or end
             if (!cv1 || !cv2)
             {
-                // Hack: Abort if either ChemicalVisual is missing !
+                // HACK: Abort if either ChemicalVisual is missing !
                 return;
             }
 
             //now get the geometry of start and end atoms
-            startAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.StartAtom]).WidenedHullGeometry;
-            endAtomGeometry = ((AtomVisual) ChemicalVisuals[ParentBond.EndAtom]).WidenedHullGeometry;
-            _bondGeometry = bondGeometry = GetBondGeometry(startPoint, endPoint, startAtomGeometry, endAtomGeometry);
+            var startVisual = (AtomVisual)ChemicalVisuals[ParentBond.StartAtom];
 
+            var endVisual = (AtomVisual)ChemicalVisuals[ParentBond.EndAtom];
+
+            //first grab the main descriptor
+            BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength);
+            _enclosingPoly = BondDescriptor.Boundary;
             //set up the default pens for rendering
             _mainBondPen = new Pen(Brushes.Black, BondThickness)
-                           {
-                               StartLineCap = PenLineCap.Round,
-                               EndLineCap = PenLineCap.Round
-                           };
+            {
+                StartLineCap = PenLineCap.Round,
+                EndLineCap = PenLineCap.Round,
+                LineJoin = PenLineJoin.Miter
+            };
 
             _subsidiaryBondPen = _mainBondPen.Clone();
-
 
             switch (ParentBond.Order)
             {
                 case Globals.OrderZero:
+                case Globals.OrderOther:
                 case "unknown":
-                    // Handle Zero Bond 
+                    // Handle Zero Bond
                     _mainBondPen.DashStyle = DashStyles.Dot;
-                    //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-
-
-                    if (startAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
-                    }
-
-                    if (endAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
-                    }
 
                     using (DrawingContext dc = RenderOpen())
                     {
-                        dc.DrawLine(_mainBondPen, startPoint, endPoint);
+                        dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
                         //we need to draw another transparent thicker line on top of the existing one
                         dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4),
-                                        _bondGeometry);
+                                        BondDescriptor.DefiningGeometry);
                         dc.Close();
                     }
+                    DoubleBondDescriptor dbd = new DoubleBondDescriptor
+                    {
+                        Start = startPoint,
+                        End = endPoint,
+                        Placement = ParentBond.Placement
+                    };
 
-                    _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                      ParentBond.Placement, null).EnclosingPoly();
+                    BondGeometry.GetDoubleBondPoints(dbd, bondLength);
+                    _enclosingPoly = dbd.Boundary;
                     break;
 
                 case Globals.OrderPartial01:
                     _mainBondPen.DashStyle = DashStyles.Dash;
 
-                    if (startAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
-                    }
-
-                    if (endAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
-                    }
-
                     using (DrawingContext dc = RenderOpen())
                     {
-                        dc.DrawLine(_mainBondPen, startPoint, endPoint);
+                        dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
                         //we need to draw another transparent thicker line on top of the existing one
                         dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4),
-                                        _bondGeometry);
+                                        BondDescriptor.DefiningGeometry);
                         dc.Close();
                     }
 
                     //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                    _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                      ParentBond.Placement, null).EnclosingPoly();
+                    DoubleBondDescriptor dbd2 = new DoubleBondDescriptor
+                    {
+                        Start = startPoint,
+                        End = endPoint,
+                        Placement = ParentBond.Placement
+                    };
+
+                    BondGeometry.GetDoubleBondPoints(dbd2, bondLength);
+                    _enclosingPoly = dbd2.Boundary;
 
                     break;
 
                 case "1":
                 case Globals.OrderSingle:
-                    // Handle Single bond 
+                    // Handle Single bond
                     switch (ParentBond.Stereo)
                     {
                         case Globals.BondStereo.Indeterminate:
-                            //draw a wavy bond
-
-                            bondGeometry =
-                                BondGeometry.WavyBondGeometry(startPoint, endPoint, bondLength, startAtomGeometry,
-                                                              endAtomGeometry);
-                            using (DrawingContext dc = RenderOpen())
-                            {
-                                dc.DrawGeometry(null, _mainBondPen, bondGeometry);
-
-                                dc.Close();
-                            }
-
-                            break;
-                        case Globals.BondStereo.Hatch:
-                            bondGeometry =
-                                BondGeometry.WedgeBondGeometry(startPoint, endPoint, bondLength, startAtomGeometry,
-                                                               endAtomGeometry);
-                            _mainBondPen.Thickness = 0d;
-                            using (DrawingContext dc = RenderOpen())
-                            {
-                                dc.DrawGeometry(GetHatchBrush(), _mainBondPen, bondGeometry);
-
-                                dc.Close();
-                            }
-
-                            break;
+                        case Globals.BondStereo.None:
                         case Globals.BondStereo.Wedge:
-                            bondGeometry =
-                                bondGeometry =
-                                    BondGeometry.WedgeBondGeometry(startPoint, endPoint, bondLength, startAtomGeometry,
-                                                                   endAtomGeometry);
-                            _mainBondPen.Thickness = 0d;
                             using (DrawingContext dc = RenderOpen())
                             {
-                                dc.DrawGeometry(Brushes.Black, _mainBondPen, bondGeometry);
+                                dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
 
                                 dc.Close();
                             }
-
                             break;
-                        default:
-                            if (startAtomGeometry != null)
-                            {
-                                BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
-                            }
 
-                            if (endAtomGeometry != null)
-                            {
-                                BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
-                            }
-
+                        case Globals.BondStereo.Hatch:
+                            //_mainBondPen.Thickness = 0d;
                             using (DrawingContext dc = RenderOpen())
                             {
-                                dc.DrawLine(_mainBondPen, startPoint, endPoint);
-                                //we need to draw another transparent thicker line on top of the existing one
-                                dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4),
-                                                _bondGeometry);
+                                dc.DrawGeometry(GetHatchBrush(), _mainBondPen, BondDescriptor.DefiningGeometry);
+
                                 dc.Close();
                             }
-
-                            //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                            _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                              ParentBond.Placement, null)
-                                                         .EnclosingPoly();
                             break;
                     }
-
                     break;
 
                 case Globals.OrderPartial12:
                 case Globals.OrderAromatic:
-                    // Handle 1.5 bond 
+                    // Handle 1.5 bond
                     Point? centroid = ParentBond.Centroid;
-                 
-
 
                     _subsidiaryBondPen.DashStyle = DashStyles.Dash;
-                    var desc = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength, ParentBond.Placement,
-                                                                centroid, centroid);
-                    _enclosingPoly = desc.EnclosingPoly();
-                    _subsidiaryBondPen.DashStyle = DashStyles.Dash;
-                    if (startAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref desc.PrimaryStart, desc.PrimaryEnd, startAtomGeometry);
-                        BondGeometry.AdjustTerminus(ref desc.SecondaryStart, desc.SecondaryEnd, startAtomGeometry);
-                    }
 
-                    if (endAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref desc.SecondaryEnd, desc.SecondaryStart, endAtomGeometry);
-                        BondGeometry.AdjustTerminus(ref desc.PrimaryEnd, desc.PrimaryStart, endAtomGeometry);
-                    }
+                    _enclosingPoly = BondDescriptor.Boundary;
+                    _subsidiaryBondPen.DashStyle = DashStyles.Dash;
 
                     using (DrawingContext dc = RenderOpen())
                     {
-                        dc.DrawLine(_mainBondPen, desc.PrimaryStart, desc.PrimaryEnd);
-                        dc.DrawLine(_subsidiaryBondPen, desc.SecondaryStart, desc.SecondaryEnd);
-
+                        dc.DrawLine(_mainBondPen, BondDescriptor.Start, BondDescriptor.End);
+                        dc.DrawLine(_subsidiaryBondPen,
+                                    (BondDescriptor as DoubleBondDescriptor).SecondaryStart,
+                                    (BondDescriptor as DoubleBondDescriptor).SecondaryEnd);
                         dc.Close();
                     }
-
                     break;
 
                 case "2":
                 case Globals.OrderDouble:
-                    // Handle Double bond 
-                    if (ParentBond.Stereo == Globals.BondStereo.Indeterminate)
+                    // Handle Double bond
+                    using (DrawingContext dc = RenderOpen())
                     {
-                        bondGeometry = BondGeometry.CrossedDoubleGeometry(
-                            startPoint, endPoint, bondLength, ref _enclosingPoly, startAtomGeometry, endAtomGeometry);
-                        using (DrawingContext dc = RenderOpen())
-                        {
-                            dc.DrawGeometry(null, _mainBondPen, bondGeometry);
-                            dc.Close();
-                        }
+                        dc.DrawGeometry(null, _mainBondPen, BondDescriptor.DefiningGeometry);
+                        dc.Close();
                     }
-                    else
-                    {
-                        centroid = ParentBond.Centroid;
-                        //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                        var descriptor = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                          ParentBond.Placement, centroid);
-                        _enclosingPoly = descriptor.EnclosingPoly();
-                        if (startAtomGeometry != null)
-                        {
-                            BondGeometry.AdjustTerminus(ref descriptor.PrimaryStart, descriptor.PrimaryEnd,
-                                                        startAtomGeometry);
-                            BondGeometry.AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd,
-                                                        startAtomGeometry);
-                        }
-
-                        if (endAtomGeometry != null)
-                        {
-                            BondGeometry.AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart,
-                                                        endAtomGeometry);
-                            BondGeometry.AdjustTerminus(ref descriptor.PrimaryEnd, descriptor.PrimaryStart,
-                                                        endAtomGeometry);
-                        }
-
-                        using (DrawingContext dc = RenderOpen())
-                        {
-                            dc.DrawLine(_mainBondPen, descriptor.PrimaryStart, descriptor.PrimaryEnd);
-                            dc.DrawLine(_subsidiaryBondPen, descriptor.SecondaryStart, descriptor.SecondaryEnd);
-                            dc.Close();
-                        }
-                    }
-
                     break;
 
                 case Globals.OrderPartial23:
-
-
                 case "3":
                 case Globals.OrderTriple:
-                    // Handle 2.5 bond 
+                    // Handle 2.5 bond
                     if (ParentBond.Order == Globals.OrderPartial23)
                     {
                         _subsidiaryBondPen.DashStyle = DashStyles.Dash;
                     }
 
-                    var tbd = BondGeometry.GetTripleBondPoints(startPoint, endPoint, bondLength,
-                                                               startAtomGeometry, endAtomGeometry);
-
+                    var tbd = (BondDescriptor as TripleBondDescriptor);
                     using (DrawingContext dc = RenderOpen())
                     {
                         if (ParentBond.Placement == Globals.BondDirection.Clockwise)
                         {
                             dc.DrawLine(_mainBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
-                            dc.DrawLine(_mainBondPen, tbd.PrimaryStart, tbd.PrimaryEnd);
+                            dc.DrawLine(_mainBondPen, tbd.Start, tbd.End);
                             dc.DrawLine(_subsidiaryBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                         }
                         else
                         {
                             dc.DrawLine(_subsidiaryBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
-                            dc.DrawLine(_mainBondPen, tbd.PrimaryStart, tbd.PrimaryEnd);
+                            dc.DrawLine(_mainBondPen, tbd.Start, tbd.End);
                             dc.DrawLine(_mainBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                         }
 
                         dc.Close();
                     }
-
-                    break;
-
-                default:
-                    if (startAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref startPoint, endPoint, startAtomGeometry);
-                    }
-
-                    if (endAtomGeometry != null)
-                    {
-                        BondGeometry.AdjustTerminus(ref endPoint, startPoint, endAtomGeometry);
-                    }
-
-                    using (DrawingContext dc = RenderOpen())
-                    {
-                        dc.DrawLine(_mainBondPen, startPoint, endPoint);
-                        //we need to draw another transparent thicker line on top of the existing one
-                        dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4),
-                                        _bondGeometry);
-                        dc.Close();
-                    }
-
-                    //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                    _enclosingPoly = BondGeometry.GetDoubleBondPoints(startPoint, endPoint, bondLength,
-                                                                      ParentBond.Placement, null).EnclosingPoly();
                     break;
             }
         }
@@ -525,7 +437,7 @@ namespace Chem4Word.ACME.Drawing
             else
             {
                 var widepen = new Pen(Brushes.Black, BondThickness * 8.0);
-                if (_bondGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
+                if (BondDescriptor.DefiningGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);
                 }

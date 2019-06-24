@@ -55,21 +55,28 @@ namespace Chem4Word.ACME.Adorners
                               false) && !(newAtomPlacement.ExistingAtom?.IsUnsaturated ?? false))
                         {
                             List<Point> dummy = new List<Point>();
-                            BasicGeometry.DrawGeometry(sgc, Drawing.BondGeometry.DoubleBondGeometry(
-                                                           oldAtomPlacement.Position,
-                                                           newAtomPlacement.Position,
-                                                           Math.Abs((newAtomPlacement.Position -
-                                                                     oldAtomPlacement.Position).Length),
-                                                           Globals.BondDirection.Anticlockwise,
-                                                           ref dummy, centroid));
+
+                            DoubleBondDescriptor dbd = new DoubleBondDescriptor
+                                                       {
+                                                           Start =oldAtomPlacement.Position,
+                                                           End = newAtomPlacement.Position,
+                                                           Placement = Globals.BondDirection.Anticlockwise,
+                                                           PrimaryCentroid = centroid
+                                                       };
+                            BondGeometry.GetDoubleBondGeometry(dbd, dbd.PrincipleVector.Length);
+                            BasicGeometry.DrawGeometry(sgc, dbd.DefiningGeometry);
                             visited.Add(oldAtomPlacement);
                             visited.Add(newAtomPlacement);
                         }
                         else
                         {
-                            BasicGeometry.DrawGeometry(
-                                sgc,
-                                BondGeometry.SingleBondGeometry(oldAtomPlacement.Position, newAtomPlacement.Position));
+                            BondDescriptor sbd = new BondDescriptor
+                                                       {
+                                                           Start = oldAtomPlacement.Position,
+                                                           End = newAtomPlacement.Position
+                                                       };
+                            BondGeometry.GetSingleBondGeometry(sbd);
+                            BasicGeometry.DrawGeometry(sgc,sbd.DefiningGeometry);
                         }
 
                         oldAtomPlacement = newAtomPlacement;

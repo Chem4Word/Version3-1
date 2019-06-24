@@ -94,50 +94,61 @@ namespace Chem4Word.ACME.Adorners
             //Vector startOffset = new Vector();
             //Vector endOffset = new Vector();
 
+            BondDescriptor sbd=null;
             //check to see if it's a wedge or a hatch yet
             if (stereo == Globals.BondStereo.Wedge | stereo == Globals.BondStereo.Hatch)
             {
-                return BondGeometry.WedgeBondGeometry(startPoint, endPoint, bondLength);
+                var wbd = new WedgeBondDescriptor {Start = startPoint, End = endPoint};
+                BondGeometry.GetWedgeBondGeometry(wbd, bondLength);
+                sbd = wbd;
             }
 
             if (stereo == Globals.BondStereo.Indeterminate && (order == Globals.OrderSingle))
             {
-                return BondGeometry.WavyBondGeometry(startPoint, endPoint, bondLength);
+                sbd = new BondDescriptor {Start = startPoint, End = endPoint};
+                BondGeometry.GetWavyBondGeometry(sbd, bondLength);
             }
 
             var ordervalue = Bond.OrderToOrderValue(order);
             //single or dotted bond
             if (ordervalue <= 1)
             {
-                return BondGeometry.SingleBondGeometry(startPoint, endPoint);
+                sbd = new BondDescriptor { Start = startPoint, End = endPoint };
+                BondGeometry.GetSingleBondGeometry(sbd);
             }
             if (ordervalue == 1.5)
             {
                 //it's a resonance bond, so we deal with this in OnRender
-                //return BondGeometry.SingleBondGeometry(startPoint.Value, endPoint.Value);
+                //return BondGeometry.GetSingleBondGeometry(startPoint.Value, endPoint.Value);
                 return new StreamGeometry();
             }
             List<Point> dummy = new List<Point>();
             //double bond
             if (ordervalue == 2)
             {
+                DoubleBondDescriptor dbd = new DoubleBondDescriptor() {Start = startPoint, End = endPoint};
                 if (stereo == Globals.BondStereo.Indeterminate)
                 {
-                    return BondGeometry.CrossedDoubleGeometry(startPoint, endPoint, bondLength, ref dummy);
+                    
+                    BondGeometry.GetCrossedDoubleGeometry(dbd, bondLength);
+                }
+                else
+                {
+                    dbd.PrimaryCentroid = existingRing?.Centroid;
+                    dbd.SecondaryCentroid = subsidiaryRing?.Centroid;
+                    BondGeometry.GetDoubleBondGeometry(dbd, bondLength);
                 }
 
-                Point? centroid = existingRing?.Centroid;
-                Point? otherCentroid = subsidiaryRing?.Centroid;
-                return BondGeometry.DoubleBondGeometry(startPoint, endPoint, bondLength, Globals.BondDirection.None,
-                    ref dummy, ringCentroid:  centroid, otherCentroid: otherCentroid);
+                sbd = dbd;
             }
             //tripe bond
             if (ordervalue == 3)
             {
-                return BondGeometry.TripleBondGeometry(startPoint, endPoint, bondLength, ref dummy);
+                var tbd= new TripleBondDescriptor() {Start = startPoint, End=endPoint};
+                BondGeometry.GetTripleBondGeometry( tbd, bondLength);
             }
 
-            return null;
+            return sbd?.DefiningGeometry;
         }
     }
 }

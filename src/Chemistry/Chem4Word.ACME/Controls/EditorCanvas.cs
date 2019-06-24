@@ -137,14 +137,19 @@ namespace Chem4Word.ACME.Controls
                 }
                 foreach (Bond bond in bondSet)
                 {
+
                     List<Point> throwaway = new List<Point>();
                     var startAtomPosition = transformedPositions[bond.StartAtom];
                     var endAtomPosition = transformedPositions[bond.EndAtom];
-
-                    bool ok = GetBondGeometry(startAtomPosition, endAtomPosition,
-                                              atomGeometries[bond.StartAtom], atomGeometries[bond.EndAtom], this.Chemistry.Model.XamlBondLength,
-                                              out Geometry bondGeom, bond, out _, true);
-                    DrawGeometry(ghostContext, bondGeom);
+                    var startAtomVisual = (AtomVisual)(chemicalVisuals[bond.StartAtom]) ;
+                    var endAtomVisual = (AtomVisual)(chemicalVisuals[bond.EndAtom]);
+                    var descriptor = GetBondDescriptor(startAtomVisual, endAtomVisual, Chemistry.Model.XamlBondLength,
+                                                       bond.Stereo, startAtomPosition, endAtomPosition, bond.OrderValue,
+                                                       bond.Placement, bond.Centroid, bond.SubsidiaryRing?.Centroid);
+                    descriptor.Start = startAtomPosition;
+                    descriptor.End = endAtomPosition;
+                    var bondgeom =  descriptor.DefiningGeometry;
+                    DrawGeometry(ghostContext, bondgeom);
                 }
                 ghostContext.Close();
             }

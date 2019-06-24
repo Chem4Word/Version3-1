@@ -6,23 +6,75 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics.PerformanceData;
 using System.Windows;
+using Chem4Word.Model2;
+using Chem4Word.Renderer.OoXmlV4.Enums;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 {
     public class BondLine
     {
-        public string ParentMolecule { get; set; }
-        public string ParentBond { get; set; }
+        private Bond _bond;
+        public Bond Bond
+        {
+            get { return _bond;}
+        }
+
+        public string ParentMolecule
+        {
+            get
+            {
+                if (_bond != null)
+                {
+                    return _bond.Parent.Path;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public string ParentBond
+        {
+            get
+            {
+                if (_bond != null)
+                {
+                    return _bond.Path;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public string StartAtomPath
+        {
+            get
+            {
+                if (_bond != null)
+                {
+                    return _bond.StartAtom.Path;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public string EndAtomPath
+        {
+            get
+            {
+                if (_bond != null)
+                {
+                    return _bond.EndAtom.Path;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public BondLineStyle Style { get; private set; }
 
         private Point _start;
-        private Point _end;
-        public string StartAtomPath;
-        public string EndAtomPath;
-
-        public BondLineStyle Style { get; set; }
-
         public Point Start
         {
             get { return _start; }
@@ -33,6 +85,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             }
         }
 
+        private Point _end;
         public Point End
         {
             get { return _end; }
@@ -43,18 +96,33 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             }
         }
 
-        public Rect BoundingBox { get; set; }
+        public Rect BoundingBox { get; private set; }
 
-        public BondLine(Point startPoint, Point endPoint, BondLineStyle style, string parentBond, string parentMolecule, string startAtomPath, string endAtomPath)
+        public BondLine(BondLineStyle style, Bond bond)
         {
+            Style = style;
+            _bond = bond;
+
+            if (bond != null)
+            {
+                _start = bond.StartAtom.Position;
+                _end = bond.EndAtom.Position;
+            }
+        }
+
+        public BondLine(BondLineStyle style, Point startPoint, Point endPoint)
+        {
+            Style = style;
             _start = startPoint;
             _end = endPoint;
-            BoundingBox = new Rect(startPoint, endPoint);
+        }
+
+        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, Bond bond)
+        {
             Style = style;
-            ParentBond = parentBond;
-            ParentMolecule = parentMolecule;
-            StartAtomPath = startAtomPath;
-            EndAtomPath = endAtomPath;
+            _start = startPoint;
+            _end = endPoint;
+            _bond = bond;
         }
 
         public BondLine GetParallel(double offset)
@@ -68,22 +136,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point newEndPoint = new Point((float)(_end.X - offset * yDifference / length),
                                           (float)(_end.Y + offset * xDifference / length));
 
-            return new BondLine(newStartPoint, newEndPoint, Style, ParentBond, ParentMolecule, StartAtomPath, EndAtomPath);
+            return new BondLine(Style, newStartPoint, newEndPoint);
         }
 
         public void SetLineStyle(BondLineStyle style)
         {
             Style = style;
         }
-    }
-
-    public enum BondLineStyle
-    {
-        Solid,
-        Dotted,
-        Dashed,
-        Wavy,
-        Wedge,
-        Hatch
     }
 }

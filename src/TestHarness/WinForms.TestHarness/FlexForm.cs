@@ -509,5 +509,53 @@ namespace WinForms.TestHarness
                 MessageBox.Show(exception.StackTrace, exception.Message);
             }
         }
+
+        private void SaveStructure_Click(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                CMLConverter cmlConverter = new CMLConverter();
+                Model m = cmlConverter.Import(_lastCml);
+                m.CustomXmlPartGuid = "";
+
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "CML molecule files (*.cml)|*.cml|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf";
+                DialogResult dr = sfd.ShowDialog();
+                if (dr == DialogResult.OK)
+                {
+                    FileInfo fi = new FileInfo(sfd.FileName);
+                    _telemetry.Write(module, "Information", $"Exporting to '{fi.Name}'");
+                    string fileType = Path.GetExtension(sfd.FileName).ToLower();
+                    switch (fileType)
+                    {
+                        case ".cml":
+                            string temp = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                + Environment.NewLine
+                                + cmlConverter.Export(m);
+                            File.WriteAllText(sfd.FileName, temp);
+                            break;
+
+                        case ".mol":
+                        case ".sdf":
+                            // https://www.chemaxon.com/marvin-archive/6.0.2/marvin/help/formats/mol-csmol-doc.html
+                            double before = m.MeanBondLength;
+                            // Set bond length to 1.54 angstroms (Å)
+                            m.ScaleToAverageBondLength(1.54);
+                            double after = m.MeanBondLength;
+                            _telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
+                            SdFileConverter converter = new SdFileConverter();
+                            File.WriteAllText(sfd.FileName, converter.Export(m));
+                            break;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
+            }
+        }
     }
 }

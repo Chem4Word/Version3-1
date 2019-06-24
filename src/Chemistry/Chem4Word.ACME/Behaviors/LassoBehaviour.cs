@@ -339,7 +339,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
 
                 RemoveGhost();
-                _ghostAdorner = new PartialGhostAdorner(CurrentEditor, _atomList, _shift);
+                _ghostAdorner = new PartialGhostAdorner(EditViewModel, _atomList, _shift);
             }
         }
 

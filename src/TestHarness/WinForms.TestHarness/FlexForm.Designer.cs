@@ -53,6 +53,7 @@ namespace WinForms.TestHarness
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ShowCml = new System.Windows.Forms.Button();
+            this.SaveStructure = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -87,12 +88,13 @@ namespace WinForms.TestHarness
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(93, 504);
+            this.ChangeBackground.Location = new System.Drawing.Point(209, 533);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
             this.ChangeBackground.Text = "Background";
             this.ChangeBackground.UseVisualStyleBackColor = true;
+            this.ChangeBackground.Visible = false;
             this.ChangeBackground.Click += new System.EventHandler(this.ChangeBackground_Click);
             // 
             // ShowCarbons
@@ -135,7 +137,7 @@ namespace WinForms.TestHarness
             // 
             this.Undo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Undo.Enabled = false;
-            this.Undo.Location = new System.Drawing.Point(12, 537);
+            this.Undo.Location = new System.Drawing.Point(12, 533);
             this.Undo.Name = "Undo";
             this.Undo.Size = new System.Drawing.Size(75, 23);
             this.Undo.TabIndex = 11;
@@ -147,7 +149,7 @@ namespace WinForms.TestHarness
             // 
             this.Redo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Redo.Enabled = false;
-            this.Redo.Location = new System.Drawing.Point(93, 537);
+            this.Redo.Location = new System.Drawing.Point(93, 533);
             this.Redo.Name = "Redo";
             this.Redo.Size = new System.Drawing.Size(75, 23);
             this.Redo.TabIndex = 12;
@@ -264,11 +266,23 @@ namespace WinForms.TestHarness
             this.ShowCml.UseVisualStyleBackColor = true;
             this.ShowCml.Click += new System.EventHandler(this.ShowCml_Click);
             // 
+            // SaveStructure
+            // 
+            this.SaveStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SaveStructure.Location = new System.Drawing.Point(93, 504);
+            this.SaveStructure.Name = "SaveStructure";
+            this.SaveStructure.Size = new System.Drawing.Size(75, 23);
+            this.SaveStructure.TabIndex = 19;
+            this.SaveStructure.Text = "Save ...";
+            this.SaveStructure.UseVisualStyleBackColor = true;
+            this.SaveStructure.Click += new System.EventHandler(this.SaveStructure_Click);
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1137, 562);
+            this.Controls.Add(this.SaveStructure);
             this.Controls.Add(this.ShowCml);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -316,6 +330,7 @@ namespace WinForms.TestHarness
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button ShowCml;
+        private System.Windows.Forms.Button SaveStructure;
     }
 }
 

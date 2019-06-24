@@ -5,266 +5,176 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME.Drawing
 {
     /// <summary>
-    /// Static class to define bond geometries
-    /// now uses StreamGeometry in preference to PathGeometry
-    /// Old code is commented out
+    ///     Static class to define bond geometries
+    ///     now uses StreamGeometry in preference to PathGeometry
+    ///     Old code is commented out
     /// </summary>
-    ///
-
-    public struct DoubleBondDescriptor
-    {
-        public Point PrimaryStart;
-        public Point PrimaryEnd;
-        public Point SecondaryStart;
-        public Point SecondaryEnd;
-
-        public List<Point> EnclosingPoly()
-        {
-            return new List<Point>{PrimaryStart, PrimaryEnd, SecondaryEnd, SecondaryStart};
-        }
-
-    }
-
-    public struct TripleBondDescriptor
-    {
-        public Point PrimaryStart;
-        public Point PrimaryEnd;
-        public Point SecondaryStart;
-        public Point SecondaryEnd;
-        public Point TertiaryStart;
-        public Point TertiaryEnd;
-
-        public List<Point> EnclosingPoly()
-        {
-            return new List<Point> { SecondaryStart, SecondaryEnd, TertiaryEnd, TertiaryStart};
-        }
-
-    }
+ 
+  
     public static class BondGeometry
     {
         /// <summary>
-        /// Returns the geometry of a wedge bond.  Hatch bonds use the same geometry
-        /// but a different brush.
+        ///  Returns the geometry of a wedge bond.  Hatch bonds use the same geometry
+        ///     but a different brush.
         /// </summary>
-        /// <param name="startPoint">Position of starting atom</param>
-        /// <param name="endPoint">Position of ending atom </param>
-        /// <param name="bondLength"></param>
-        /// <param name="startAtomGeometry"></param>
-        /// <param name="endAtomGeometry"></param>
-        /// <returns></returns>
-        public static Geometry WedgeBondGeometry(Point startPoint, Point endPoint, double bondLength,
-                                                 Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
+        /// <param name="desc">Descriptor defining the bond shape</param>
+        /// <param name="perp">perpendicular vector to the bond</param>
+        public static void GetWedgePoints(WedgeBondDescriptor desc, Vector perp)
         {
-            void ComputeWedge(StreamGeometry streamGeometry, Point start, Point end, Vector vector)
-            {
-                Point pointA;
-                Point pointB;
-                using (StreamGeometryContext sgc = streamGeometry.Open())
-                {
-                    sgc.BeginFigure(start, true, true);
-                    pointA = end + vector;
-                    pointB = end - vector;
-                    sgc.LineTo(pointA, true, true);
-                    sgc.LineTo(pointB, true, true);
-                    sgc.Close();
-                }
-            }
+            desc.FirstCorner = desc.End + perp;
 
-            Vector bondVector = endPoint - startPoint;
-            Vector perpVector = bondVector.Perpendicular();
+            desc.SecondCorner = desc.End - perp;
+
+            desc.Boundary.AddRange(new[] {desc.Start, desc.FirstCorner, desc.SecondCorner});
+        }
+
+        public static void GetWedgeBondGeometry(WedgeBondDescriptor desc, double standardBondLength)
+
+        {
+            var bondVector = desc.PrincipleVector;
+            var perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
-            perpVector *= bondLength * BondOffsetPercentage;
+            perpVector *= standardBondLength * BondOffsetPercentage;
 
-            StreamGeometry sg = new StreamGeometry();
+            StreamGeometry sg;
 
-            ComputeWedge(sg, startPoint, endPoint, perpVector);
 
+           AdjustTerminus(ref desc.Start, desc.End, desc.StartAtomVisual);
+           AdjustTerminus(ref desc.End, desc.Start, desc.EndAtomVisual);
+
+
+            GetWedgePoints(desc, perpVector);
+            sg = desc.GetOutline();
             sg.Freeze();
-
-            if (startAtomGeometry == null & endAtomGeometry == null)
-            {
-                return sg;
-            }
-            else //adjust the start and end points of the bond
-            {
-                var start = startPoint;
-                var end = endPoint;
-                Vector offset = bondVector * (1d / 100d);
-
-                if (startAtomGeometry != null)
-                {
-                    var overlap = startAtomGeometry.FillContainsWithDetail(sg);
-
-                    while (overlap == IntersectionDetail.Intersects)
-                    {
-                        start += offset;
-                        sg = new StreamGeometry();
-
-                        ComputeWedge(sg, start, end, perpVector);
-
-                        overlap = startAtomGeometry.FillContainsWithDetail(sg);
-                    }
-                }
-
-                if (endAtomGeometry != null)
-                {
-                    var overlap = endAtomGeometry.FillContainsWithDetail(sg);
-                    while (overlap == IntersectionDetail.Intersects)
-                    {
-                        end -= offset;
-                        sg = new StreamGeometry();
-
-                        ComputeWedge(sg, start, end, perpVector);
-
-                        overlap = endAtomGeometry.FillContainsWithDetail(sg);
-                    }
-                }
-
-                sg.Freeze();
-
-                return sg;
-            }
+            desc.DefiningGeometry = sg;
         }
 
         /// <summary>
-        /// Defines the three parallel lines of a Triple bond.
+        ///     Defines the three parallel lines of a Triple bond.
         /// </summary>
         /// <param name="startPoint">Where the bond starts</param>
         /// <param name="endPoint">Where it ends</param>
-        /// <param name="bondLength"></param>
+        /// <param name="standardBondLength"></param>
         /// <param name="enclosingPoly"></param>
-        /// <param name="startAtomGeometry"></param>
-        /// <param name="endAtomGeometry"></param>
+        /// <param name="descriptor.StartAtomVisual"></param>
+        /// <param name="descriptor.EndAtomVisual"></param>
         /// <returns></returns>
-        public static Geometry TripleBondGeometry(Point startPoint, Point endPoint,
-                                                  double bondLength, ref List<Point> enclosingPoly,
-                                                  Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
+        public static void GetTripleBondGeometry(TripleBondDescriptor descriptor, double standardBondLength)
         {
-            var tbd = GetTripleBondPoints(startPoint, endPoint, bondLength, startAtomGeometry, endAtomGeometry);
-            StreamGeometry sg = new StreamGeometry();
-            using (StreamGeometryContext sgc = sg.Open())
+            GetTripleBondPoints(descriptor, standardBondLength);
+            var sg = new StreamGeometry();
+            using (var sgc = sg.Open())
             {
-                sgc.BeginFigure(startPoint, false, false);
-                sgc.LineTo(endPoint, true, false);
-                sgc.BeginFigure(tbd.SecondaryStart, false, false);
-                sgc.LineTo(tbd.SecondaryEnd, true, false);
-                sgc.BeginFigure(tbd.TertiaryStart, false, false);
-                sgc.LineTo(tbd.TertiaryEnd, true, false);
+                sgc.BeginFigure(descriptor.Start, false, false);
+                sgc.LineTo(descriptor.Start, true, false);
+                sgc.BeginFigure(descriptor.SecondaryStart, false, false);
+                sgc.LineTo(descriptor.SecondaryEnd, true, false);
+                sgc.BeginFigure(descriptor.TertiaryStart, false, false);
+                sgc.LineTo(descriptor.TertiaryEnd, true, false);
                 sgc.Close();
             }
-            sg.Freeze();
 
-            return sg;
+            sg.Freeze();
+            descriptor.DefiningGeometry = sg;
         }
 
-        public static TripleBondDescriptor GetTripleBondPoints(Point startPoint, Point endPoint, double bondLength,
-                                                Geometry startAtomGeometry, Geometry endAtomGeometry)
+        public static void GetTripleBondPoints(TripleBondDescriptor descriptor, double standardBondLength)
         {
-            TripleBondDescriptor tbd;
-
-            Vector v = endPoint - startPoint;
-            Vector normal = v.Perpendicular();
+            var v = descriptor.PrincipleVector;
+            var normal = v.Perpendicular();
             normal.Normalize();
-            tbd.PrimaryStart = startPoint;
-            tbd.PrimaryEnd = endPoint;
-            double distance = bondLength * BondOffsetPercentage;
-            tbd.SecondaryStart = startPoint + normal * distance;
-            tbd.SecondaryEnd = tbd.SecondaryStart+ v;
 
-            tbd.TertiaryStart = startPoint - normal * distance;
-            tbd.TertiaryEnd = tbd.TertiaryStart+ v;
+            var distance = standardBondLength * BondOffsetPercentage;
+            descriptor.SecondaryStart = descriptor.Start + normal * distance;
+            descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
 
-            if (startAtomGeometry != null)
+            descriptor.TertiaryStart = descriptor.Start - normal * distance;
+            descriptor.TertiaryEnd = descriptor.TertiaryStart + v;
+
+            if (descriptor.StartAtomVisual != null)
             {
-                AdjustTerminus(ref tbd.PrimaryStart, tbd.PrimaryEnd, startAtomGeometry);
-                AdjustTerminus(ref tbd.SecondaryStart, tbd.SecondaryEnd, startAtomGeometry);
-                AdjustTerminus(ref tbd.TertiaryStart, tbd.TertiaryEnd, startAtomGeometry);
-                
+                AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
+                AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd, descriptor.StartAtomVisual);
+                AdjustTerminus(ref descriptor.TertiaryStart, descriptor.TertiaryEnd, descriptor.StartAtomVisual);
             }
 
-            if (endAtomGeometry != null)
+            if (descriptor.EndAtomVisual != null)
             {
-                AdjustTerminus(ref tbd.PrimaryEnd, tbd.PrimaryStart, endAtomGeometry);
-                AdjustTerminus(ref tbd.SecondaryEnd, tbd.SecondaryStart, endAtomGeometry);
-                AdjustTerminus(ref tbd.TertiaryEnd, tbd.TertiaryStart, endAtomGeometry);
-              
+                AdjustTerminus(ref descriptor.End, descriptor.Start, descriptor.EndAtomVisual);
+                AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart, descriptor.EndAtomVisual);
+                AdjustTerminus(ref descriptor.TertiaryEnd, descriptor.TertiaryStart, descriptor.EndAtomVisual);
             }
 
-            return tbd;
+            descriptor.Boundary.Clear();
+            descriptor.Boundary.AddRange(new[]
+                                              {
+                                                  descriptor.SecondaryStart, descriptor.SecondaryEnd,
+                                                  descriptor.TertiaryEnd, descriptor.TertiaryStart
+                                              });
         }
 
         /// <summary>
-        /// draws the two parallel lines of a double bond
-        /// These bonds can either straddle the atom-atom line or fall to one or other side of it
+        ///     draws the two parallel lines of a double bond
+        ///     These bonds can either straddle the atom-atom line or fall to one or other side of it
         /// </summary>
         /// <param name="startPoint"></param>
         /// <param name="endPoint"></param>
-        /// <param name="bondLength"></param>
+        /// <param name="standardBondLength"></param>
         /// <param name="doubleBondPlacement"></param>
         /// <param name="ringCentroid"></param>
         /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static System.Windows.Media.Geometry DoubleBondGeometry(Point startPoint, Point endPoint,
-                                                                       double bondLength,
-                                                                       BondDirection doubleBondPlacement,
-                                                                       ref List<Point> enclosingPoly,
-                                                                       Point? ringCentroid = null,
-                                                                       Point? otherCentroid=null,
-                                                                       Geometry startAtomGeometry = null,
-                                                                       Geometry endAtomGeometry = null)
+        public static void GetDoubleBondGeometry(DoubleBondDescriptor descriptor, double standardBondLength)
 
         {
-            
-            var descriptor = GetDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement, ringCentroid,
-                                                otherCentroid);
-            if (startAtomGeometry != null)
+            GetDoubleBondPoints(descriptor, standardBondLength);
+
+            if (descriptor.StartAtomVisual != null)
             {
-                AdjustTerminus(ref descriptor.PrimaryStart, descriptor.PrimaryEnd, startAtomGeometry);
-                AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd, startAtomGeometry);
-                
+                AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
+                AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd, descriptor.StartAtomVisual);
             }
 
-            if (endAtomGeometry != null)
+
+            if (descriptor.EndAtomVisual != null)
             {
-                AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart, endAtomGeometry);
-                AdjustTerminus(ref descriptor.PrimaryEnd, descriptor.PrimaryStart, endAtomGeometry);   
+                AdjustTerminus(ref descriptor.End, descriptor.Start, descriptor.EndAtomVisual);
+                AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart, descriptor.EndAtomVisual);
             }
 
-            enclosingPoly = descriptor.EnclosingPoly();
-
-
-            StreamGeometry sg = new StreamGeometry();
-            using (StreamGeometryContext sgc = sg.Open())
+            var sg = new StreamGeometry();
+            using (var sgc = sg.Open())
             {
-                sgc.BeginFigure(descriptor.PrimaryStart, false, false);
-                sgc.LineTo(descriptor.PrimaryEnd, true, false);
+                sgc.BeginFigure(descriptor.Start, false, false);
+                sgc.LineTo(descriptor.End, true, false);
                 sgc.BeginFigure(descriptor.SecondaryStart, false, false);
                 sgc.LineTo(descriptor.SecondaryEnd, true, false);
                 sgc.Close();
             }
 
             sg.Freeze();
-            return sg;
+            descriptor.DefiningGeometry = sg;
         }
 
         /// <summary>
-        /// Defines the 4 points that characterise a double bond and returns a list of them in polygon order
+        ///     Defines the 4 points that characterise a double bond and returns a list of them in polygon order
         /// </summary>
         /// <param name="startPoint"></param>
         /// <param name="endPoint"></param>
-        /// <param name="bondLength"></param>
+        /// <param name="standardBondLength"></param>
         /// <param name="doubleBondPlacement"></param>
         /// <param name="ringCentroid"></param>
         /// <param name="point1"></param>
@@ -272,159 +182,148 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="point3"></param>
         /// <param name="point4"></param>
         /// <returns></returns>
-        public static DoubleBondDescriptor GetDoubleBondPoints(Point startPoint, Point endPoint, double bondLength,
-                                                      BondDirection doubleBondPlacement,
-                                                      Point? ringCentroid, Point? otherCentroid = null)
+        public static void GetDoubleBondPoints(DoubleBondDescriptor descriptor, double standardBondLength)
         {
-
             Point? point3a;
             Point? point4a;
 
 
-            DoubleBondDescriptor dbd;
             //use a struct here to return the values
-            dbd= GetDefaultDoubleBondPoints(startPoint, endPoint, bondLength, doubleBondPlacement);
+            GetDefaultDoubleBondPoints(descriptor, standardBondLength);
 
-            if (ringCentroid != null)
+            if (descriptor.PrimaryCentroid != null)
                 //now, if there is a centroid defined, the bond is part of a ring
             {
                 Point? workingCentroid = null;
 
-                var bondvector = endPoint - startPoint;
-                var centreVector = ringCentroid - startPoint;
-                
+                var bondvector = descriptor.PrincipleVector;
+                var centreVector = descriptor.PrimaryCentroid - descriptor.Start;
+
                 var computedPlacement = (BondDirection) Math.Sign(Vector.CrossProduct(centreVector.Value, bondvector));
 
-                if(doubleBondPlacement!= BondDirection.None)
+                if (descriptor.Placement != BondDirection.None)
                 {
-                    if (computedPlacement == doubleBondPlacement) //then we have nothing to worry about
+                    if (computedPlacement == descriptor.Placement) //then we have nothing to worry about
                     {
-                        workingCentroid = ringCentroid;
+                        workingCentroid = descriptor.PrimaryCentroid;
                     }
                     else //we need to adjust the points according to the other centroid
                     {
-                        workingCentroid = otherCentroid;
+                        workingCentroid = descriptor.SecondaryCentroid;
                     }
                 }
+
                 if (workingCentroid != null)
                 {
-                    point3a = BasicGeometry.LineSegmentsIntersect(startPoint, workingCentroid.Value, dbd.SecondaryStart, dbd.SecondaryEnd);
-                    point4a = BasicGeometry.LineSegmentsIntersect(endPoint, workingCentroid.Value, dbd.SecondaryStart, dbd.SecondaryEnd);
-                    var tempPoint3 = point3a ?? dbd.SecondaryStart;
-                    var tempPoint4 = dbd.SecondaryEnd = point4a ?? dbd.SecondaryEnd;
+                    point3a = BasicGeometry.LineSegmentsIntersect(descriptor.Start, workingCentroid.Value,
+                                                                  descriptor.SecondaryStart,
+                                                                  descriptor.SecondaryEnd);
+                    point4a = BasicGeometry.LineSegmentsIntersect(descriptor.End, workingCentroid.Value,
+                                                                  descriptor.SecondaryStart,
+                                                                  descriptor.SecondaryEnd);
+                    var tempPoint3 = point3a ?? descriptor.SecondaryStart;
+                    var tempPoint4 = descriptor.SecondaryEnd = point4a ?? descriptor.SecondaryEnd;
 
-                    dbd.SecondaryStart= tempPoint3;
-                    dbd.SecondaryEnd = tempPoint4;
+                    descriptor.SecondaryStart = tempPoint3;
+                    descriptor.SecondaryEnd = tempPoint4;
                 }
 
-
+                descriptor.Boundary.Clear();
+                descriptor.Boundary.AddRange(new[]
+                                                  {
+                                                      descriptor.Start, descriptor.End, descriptor.SecondaryEnd,
+                                                      descriptor.SecondaryStart
+                                                  });
                 //capture  the enclosing polygon for hit testing later
             }
-
-            
-
-            return dbd;
         }
 
-        private static DoubleBondDescriptor
-            GetDefaultDoubleBondPoints(Point startPoint, Point endPoint, double bondLength,
-                                       BondDirection doubleBondPlacement)
+        private static void GetDefaultDoubleBondPoints(DoubleBondDescriptor descriptor, double standardBondLength)
         {
-
-            DoubleBondDescriptor dbd;
-            Vector v = endPoint - startPoint;
-            Vector normal = v.Perpendicular();
+            var v = descriptor.PrincipleVector;
+            var normal = v.Perpendicular();
             normal.Normalize();
 
 
-            double distance = bondLength * BondOffsetPercentage;
+            var distance = standardBondLength * BondOffsetPercentage;
             //first, calculate the default bond points as if there were no rings involved
-            switch (doubleBondPlacement)
+            var tempStart = descriptor.Start;
+            var tempEnd = descriptor.End;
+            switch (descriptor.Placement)
             {
                 case BondDirection.None:
 
-                    dbd.PrimaryStart = startPoint + normal * distance;
-                    dbd.PrimaryEnd = dbd.PrimaryStart + v;
+                    
+                    descriptor.Start = tempStart + normal * distance;
+                    descriptor.End = descriptor.Start + v;
 
-                    dbd.SecondaryStart = startPoint - normal * distance;
-                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
+                    descriptor.SecondaryStart = tempStart - normal * distance;
+                    descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
 
                     break;
 
                 case BondDirection.Clockwise:
                 {
-                    dbd.PrimaryStart = startPoint;
-
-                    dbd.PrimaryEnd = endPoint;
-                    dbd.SecondaryStart = startPoint - normal * 2 * distance;
-                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
+                   
+                    descriptor.SecondaryStart = tempStart - normal * 2 * distance;
+                    descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
 
                     break;
                 }
 
                 case BondDirection.Anticlockwise:
-                    dbd.PrimaryStart = startPoint;
-                    dbd.PrimaryEnd = endPoint;
-                    dbd.SecondaryStart = startPoint + normal * 2 * distance;
-                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
+
+                    descriptor.SecondaryStart =tempStart + normal * 2 * distance;
+                    descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
                     break;
 
                 default:
 
-                    dbd.PrimaryStart = startPoint + normal * distance;
-                    dbd.PrimaryEnd = dbd.PrimaryStart + v;
+                    descriptor.Start = tempStart+ normal * distance;
+                    descriptor.End = descriptor.Start + v;
 
-                    dbd.SecondaryStart = startPoint - normal * distance;
-                    dbd.SecondaryEnd = dbd.SecondaryStart + v;
+                    descriptor.SecondaryStart = tempStart - normal * distance;
+                    descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
                     break;
             }
-
-            return dbd;
         }
 
         /// <summary>
-        /// Draws the crossed double bond to indicate indeterminate geometry
+        ///     Draws the crossed double bond to indicate indeterminate geometry
         /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="enclosingPoly"></param>
         /// <returns></returns>
-        public static Geometry CrossedDoubleGeometry(Point startPoint, Point endPoint, double bondLength,
-                                                     ref List<Point> enclosingPoly, Geometry startAtomGeometry = null,
-                                                     Geometry endAtomGeometry = null)
+        public static void GetCrossedDoubleGeometry(DoubleBondDescriptor descriptor, double standardBondLength)
         {
-            Vector v = endPoint - startPoint;
-            Vector normal = v.Perpendicular();
+            var v = descriptor.PrincipleVector;
+            var normal = v.Perpendicular();
             normal.Normalize();
 
             Point point1, point2, point3, point4;
 
-            double distance = bondLength * BondOffsetPercentage;
+            var distance = standardBondLength * BondOffsetPercentage;
 
-            point1 = startPoint + normal * distance;
+            point1 = descriptor.Start + normal * distance;
             point2 = point1 + v;
 
-            point3 = startPoint - normal * distance;
+            point3 = descriptor.Start - normal * distance;
             point4 = point3 + v;
 
-            enclosingPoly = new List<Point> {point1, point2, point4, point3};
 
-            if (startAtomGeometry != null)
+            if (descriptor.StartAtomVisual != null)
             {
-                AdjustTerminus(ref point1, point2, startAtomGeometry);
-                AdjustTerminus(ref point3, point4, startAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                AdjustTerminus(ref point1, point2, descriptor.StartAtomVisual);
+                AdjustTerminus(ref point3, point4, descriptor.StartAtomVisual);
             }
 
-            if (endAtomGeometry != null)
+
+            if (descriptor.EndAtomVisual != null)
             {
-                AdjustTerminus(ref point2, point1, endAtomGeometry);
-                AdjustTerminus(ref point4, point3, endAtomGeometry);
-                enclosingPoly = new List<Point> {point1, point2, point4, point3};
+                AdjustTerminus(ref point2, point1, descriptor.EndAtomVisual);
+                AdjustTerminus(ref point4, point3, descriptor.EndAtomVisual);
             }
 
-            StreamGeometry sg = new StreamGeometry();
-            using (StreamGeometryContext sgc = sg.Open())
+            var sg = new StreamGeometry();
+            using (var sgc = sg.Open())
             {
                 sgc.BeginFigure(point1, false, false);
                 sgc.LineTo(point4, true, false);
@@ -434,27 +333,30 @@ namespace Chem4Word.ACME.Drawing
             }
 
             sg.Freeze();
-            return sg;
+            descriptor.DefiningGeometry = sg;
+            descriptor.Boundary.Clear();
+            descriptor.Boundary.AddRange(new[] {point1, point2, point4, point3});
         }
 
-        public static Geometry SingleBondGeometry(Point startPoint, Point endPoint, Geometry startAtomGeometry = null,
-                                                  Geometry endAtomGeometry = null)
+        public static void GetSingleBondGeometry(BondDescriptor descriptor)
         {
-            var start = startPoint;
-            var end = endPoint;
+            var start = descriptor.Start;
+            var end = descriptor.End;
 
-            StreamGeometry sg = new StreamGeometry();
-            if (startAtomGeometry != null)
+            var sg = new StreamGeometry();
+            
+            if (descriptor.StartAtomVisual!= null)
             {
-                AdjustTerminus(ref start, end, startAtomGeometry);
+                AdjustTerminus(ref start, end, descriptor.StartAtomVisual);
             }
 
-            if (endAtomGeometry != null)
+
+            if (descriptor.EndAtomVisual != null)
             {
-                AdjustTerminus(ref end, start, endAtomGeometry);
+                AdjustTerminus(ref end, start, descriptor.EndAtomVisual);
             }
 
-            using (StreamGeometryContext sgc = sg.Open())
+            using (var sgc = sg.Open())
             {
                 sgc.BeginFigure(start, false, false);
                 sgc.LineTo(end, true, false);
@@ -462,106 +364,195 @@ namespace Chem4Word.ACME.Drawing
             }
 
             sg.Freeze();
-            return sg;
+            descriptor.DefiningGeometry = sg;
         }
 
-        public static void AdjustTerminus(ref Point startPoint, Point endPoint, Geometry startAtomGeometry)
+        /// <summary>
+        /// Adjusts the StartPoint of a bond to avoid the atom visual
+        /// </summary>
+        /// <param name="startPoint">Moveable start point</param>
+        /// <param name="endPoint">Fixed end point</param>
+        /// <param name="av">AtomVisual to avoid</param>
+        public static void AdjustTerminus(ref Point startPoint, Point endPoint, AtomVisual av)
         {
-            if (startPoint != endPoint)
+            if (av!=null && av.AtomSymbol != "")
             {
-                Vector bondVector = endPoint - startPoint;
-
-                Point tempStartPoint = startPoint;
-                Vector offset = bondVector * (1d / 100d);
-
-                while (startAtomGeometry.FillContains(tempStartPoint))
+                if (startPoint != endPoint)
                 {
-                    tempStartPoint += offset;
-                }
+                    var displacement = endPoint - startPoint;
 
-                startPoint = tempStartPoint;
+                    var intersection = av.GetIntersection(startPoint, endPoint);
+                    if (intersection != null)
+                    {
+                        displacement.Normalize();
+                        displacement = displacement * AtomVisual.Standoff;
+                        var tempPoint = new Point(intersection.Value.X, intersection.Value.Y) + displacement;
+                        startPoint = new Point(tempPoint.X, tempPoint.Y);
+                    }
+                }
             }
         }
 
-        private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
+       private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
         {
-            List<PathSegment> segments = new List<PathSegment> {new LineSegment(endPoint, false)};
+            var segments = new List<PathSegment> {new LineSegment(endPoint, false)};
 
-            List<PathFigure> figures = new List<PathFigure>();
-            PathFigure pf = new PathFigure(startPoint, segments, true);
+            var figures = new List<PathFigure>();
+            var pf = new PathFigure(startPoint, segments, true);
             figures.Add(pf);
             return figures;
         }
 
-        public static Geometry WavyBondGeometry(Point startPoint, Point endPoint, double standardBondLength,
-                                                Geometry startAtomGeometry = null, Geometry endAtomGeometry = null)
+        public static void GetWavyBondGeometry(BondDescriptor descriptor, double standardBondLength)
         {
-            Point newStart = startPoint;
-            Point newEnd = endPoint;
-            StreamGeometry sg = new StreamGeometry();
+            var sg = new StreamGeometry();
 
-            if (startAtomGeometry != null)
+            if (descriptor.StartAtomVisual != null)
             {
-                AdjustTerminus(ref newStart, newEnd, startAtomGeometry);
+                AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
             }
 
-            if (endAtomGeometry != null)
+
+            if (descriptor.EndAtomVisual != null)
             {
-                AdjustTerminus(ref newEnd, newStart, endAtomGeometry);
+                AdjustTerminus(ref descriptor.End, descriptor.Start, descriptor.EndAtomVisual);
             }
 
-            using (StreamGeometryContext sgc = sg.Open())
+            Vector halfAWiggle;
+            using (var sgc = sg.Open())
             {
-                Vector bondVector = newEnd - newStart;
-                int noOfWiggles = (int) Math.Ceiling(bondVector.Length / standardBondLength * BondOffsetPercentage);
+                var bondVector = descriptor.PrincipleVector;
+                var noOfWiggles = (int) Math.Ceiling(bondVector.Length / standardBondLength * BondOffsetPercentage);
                 if (noOfWiggles < 3)
                 {
                     noOfWiggles = 3;
                 }
 
-                double wiggleLength = bondVector.Length / noOfWiggles;
+                var wiggleLength = bondVector.Length / noOfWiggles;
                 Debug.WriteLine($"standardBondLength: {standardBondLength} noOfWiggles: {noOfWiggles}");
 
-                Vector halfAWiggle = bondVector;
+                halfAWiggle = bondVector;
                 halfAWiggle.Normalize();
                 halfAWiggle *= wiggleLength / 2;
 
-                Matrix toLeft = new Matrix();
+                var toLeft = new Matrix();
                 toLeft.Rotate(-60);
-                Matrix toRight = new Matrix();
+                var toRight = new Matrix();
                 toRight.Rotate(60);
-                Vector leftVector = halfAWiggle * toLeft;
-                Vector rightVector = halfAWiggle * toRight;
+                var leftVector = halfAWiggle * toLeft;
+                var rightVector = halfAWiggle * toRight;
 
-                List<Point> allpoints = new List<Point>();
+                var allpoints = new List<Point>();
 
-                allpoints.Add(newStart);
+                allpoints.Add(descriptor.Start);
 
-                Point lastPoint = newStart;
-                for (int i = 0; i < noOfWiggles; i++)
+                var lastPoint = descriptor.Start;
+                for (var i = 0; i < noOfWiggles; i++)
                 {
-                    Point leftPoint = lastPoint + leftVector;
+                    var leftPoint = lastPoint + leftVector;
                     allpoints.Add(leftPoint);
                     allpoints.Add(lastPoint + halfAWiggle);
-                    Point rightPoint = lastPoint + halfAWiggle + rightVector;
+                    var rightPoint = lastPoint + halfAWiggle + rightVector;
                     allpoints.Add(rightPoint);
                     lastPoint += halfAWiggle * 2;
                     allpoints.Add(lastPoint);
                 }
 
-                allpoints.Add(newEnd);
+                allpoints.Add(descriptor.End);
                 MakePathFromPoints(sgc, allpoints);
                 sgc.Close();
             }
 
+            descriptor.Boundary.Clear();
+            descriptor.Boundary.AddRange(new[]
+                                              {
+                                                  descriptor.Start - halfAWiggle.Perpendicular(),
+                                                  descriptor.End - halfAWiggle.Perpendicular(),
+                                                  descriptor.End + halfAWiggle.Perpendicular(),
+                                                  descriptor.Start + halfAWiggle.Perpendicular()
+                                              });
+
             sg.Freeze();
-            return sg;
+            descriptor.DefiningGeometry = sg;
         }
 
         private static void MakePathFromPoints(StreamGeometryContext sgc, List<Point> allpoints)
         {
             sgc.BeginFigure(allpoints[0], false, false);
             sgc.PolyQuadraticBezierTo(allpoints.Skip(1).ToArray(), true, true);
+        }
+
+        public static void GetChamferedWedgeGeometry(WedgeBondDescriptor descriptor,
+                                                         double standardBondLength, List<Point> otherAtomPoints)
+        {
+            var bondVector = descriptor.PrincipleVector;
+
+            var perpVector = bondVector.Perpendicular();
+            perpVector.Normalize();
+            perpVector *= standardBondLength * BondOffsetPercentage;
+            GetWedgeBondGeometry(descriptor, standardBondLength);
+
+            var firstEdgeVector = descriptor.FirstCorner - descriptor.Start;
+            var secondEdgeVector = descriptor.SecondCorner - descriptor.Start;
+
+            //get the two bonds with widest splay
+
+            var widestPoints = (from Point p in otherAtomPoints
+                                orderby Math.Abs(Vector.AngleBetween(bondVector, p - descriptor.End)) descending
+                                select p);
+
+
+            double firstScalingFactor = 0d, secondScalingFactor = 0d;
+
+            foreach (var point in widestPoints)
+            {
+                BasicGeometry.IntersectLines(out var firstEdgeCut, out var otherBond1Cut, descriptor.Start,
+                                             descriptor.FirstCorner,
+                                             descriptor.End,
+                                             point);
+                BasicGeometry.IntersectLines(out var secondEdgeCut, out var otherBond2Cut, descriptor.Start,
+                                             descriptor.SecondCorner,
+                                             descriptor.End,
+                                             point);
+                if (otherAtomPoints.Count() == 1)
+                {
+                    if (firstEdgeCut > firstScalingFactor)
+                    {
+                        firstScalingFactor = firstEdgeCut;
+                    }
+
+
+                    if (secondEdgeCut > secondScalingFactor)
+                    {
+                        secondScalingFactor = secondEdgeCut;
+                    }
+                }
+                else
+                {
+                    if (firstEdgeCut > firstScalingFactor & otherBond1Cut < 1d & otherBond1Cut > 0d)
+                    {
+                        firstScalingFactor = firstEdgeCut;
+                    }
+
+
+                    if (secondEdgeCut > secondScalingFactor & otherBond2Cut < 1d & otherBond2Cut > 0d)
+                    {
+                        secondScalingFactor = secondEdgeCut;
+                    }
+                }
+            }
+
+
+            descriptor.FirstCorner = firstEdgeVector * firstScalingFactor + descriptor.Start;
+            descriptor.SecondCorner = secondEdgeVector * secondScalingFactor + descriptor.Start;
+
+            //AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
+
+            descriptor.CappedOff = true;
+
+            var sg = descriptor.GetOutline();
+            sg.Freeze();
+            descriptor.DefiningGeometry = sg;
         }
     }
 }

@@ -218,7 +218,7 @@ namespace Chem4Word.ACME.Drawing
         /// <summary>
         /// Distance between an atom visual and any bond ends
         /// </summary>
-        protected double Standoff => GlyphText.SymbolSize / 4;
+        public static double Standoff => GlyphText.SymbolSize / 6;
 
         #endregion Visual Properties
 
@@ -644,27 +644,24 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
-
         /// <summary>
-        /// Returns a point indicating where the bond line intersects the atom label;
+        /// Returns the intersection point of a line with the Convex Hull
         /// </summary>
-        /// <param name="pointA"></param>
-        /// <param name="pointB"></param>
-        /// <returns></returns>
-        public Point? GetIntersection(Point pointA, Point pointB)
+        /// <param name="start">Start point of line</param>
+        /// <param name="end">End point of line</param>
+        /// <returns>Point? defining the crossing point</returns>
+        public Point? GetIntersection(Point start, Point end)
         {
-            Pen _widepen = new Pen(Brushes.Black, BondThickness);
-            Geometry lg = new LineGeometry(pointA, pointB).GetWidenedPathGeometry(_widepen);
-
-            CombinedGeometry combinedGeometry = new CombinedGeometry(GeometryCombineMode.Intersect, WidenedHullGeometry, lg);
-
-            Rect bounds = combinedGeometry.Bounds;
-            if (!bounds.IsEmpty)
+            for (int i = 0; i < Hull.Count; i++)
             {
-                return new Point((bounds.Left + bounds.Right) / 2, (bounds.Bottom + bounds.Top) / 2);
+                Point? p;
+                if ((p = BasicGeometry.LineSegmentsIntersect(start, end, Hull[i], Hull[(i+1)%Hull.Count])) != null)
+                {
+                    return p;
+                } 
             }
-
             return null;
         }
+      
     }
 }

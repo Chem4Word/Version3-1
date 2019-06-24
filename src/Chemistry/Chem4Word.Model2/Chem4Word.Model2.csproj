@@ -84,7 +84,7 @@
     <Compile Include="Formula.cs" />
     <Compile Include="FunctionalGroup.cs" />
     <Compile Include="FunctionalGroups.cs" />
-    <Compile Include="Geometry\BaseGeometry.cs" />
+    <Compile Include="Geometry\BasicGeometry.cs" />
     <Compile Include="Geometry\Geometry.cs" />
     <Compile Include="Geometry\Packer.cs" />
     <Compile Include="Geometry\Seperator.cs" />

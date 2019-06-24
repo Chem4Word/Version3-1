@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoordinateTool.cs" />
+    <Compile Include="Enums\BondLineStyle.cs" />
     <Compile Include="GeometryTool.cs" />
     <Compile Include="OOXML\Atoms\AtomLabelCharacter.cs" />
     <Compile Include="OOXML\Atoms\AtomLabelPositioner.cs" />

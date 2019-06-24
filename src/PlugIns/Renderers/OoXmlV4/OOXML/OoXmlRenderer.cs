@@ -16,6 +16,7 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.OOXML.Atoms;
 using Chem4Word.Renderer.OoXmlV4.OOXML.Bonds;
 using Chem4Word.Renderer.OoXmlV4.TTF;
@@ -181,7 +182,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wpg.WordprocessingGroup wordprocessingGroup1 = new Wpg.WordprocessingGroup();
 
             // Create Inline Drawing using canvas extents
-            Wp.Inline inline1 = CreateInline(graphicData1, wordprocessingGroup1);
+            Wp.Inline inline1 = CreateInline(wordprocessingGroup1);
 
             #endregion Step 5 - Create main OoXml drawing objects
 
@@ -639,7 +640,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         {
                             // Line was clipped at both ends;
                             // 1. Generate new line
-                            BondLine extraLine = new BondLine(new Point(end.X, end.Y), new Point(bl.End.X, bl.End.Y), bl.Style, bl.ParentBond, bl.ParentMolecule, bl.StartAtomPath, bl.EndAtomPath);
+                            BondLine extraLine = new BondLine(bl.Style, new Point(end.X, end.Y), new Point(bl.End.X, bl.End.Y), bl.Bond);
                             extraBondLines.Add(extraLine);
                             // 2. Trim existing line
                             bl.End = new Point(start.X, start.Y);
@@ -866,7 +867,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return new A.GraphicData() { Uri = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" };
         }
 
-        private Wp.Inline CreateInline(A.GraphicData graphicData, Wpg.WordprocessingGroup wordprocessingGroup1)
+        private Wp.Inline CreateInline(Wpg.WordprocessingGroup wordprocessingGroup1)
         {
             UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
 
@@ -880,12 +881,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wp.DocProperties docProperties1 = new Wp.DocProperties() { Id = inlineId, Name = "moleculeGroup" };
 
             Wpg.NonVisualGroupDrawingShapeProperties nonVisualGroupDrawingShapeProperties1 = new Wpg.NonVisualGroupDrawingShapeProperties();
-            Wpg.NonVisualGraphicFrameProperties nonVisualGraphicFrameProperties = new Wpg.NonVisualGraphicFrameProperties();
-            A.GraphicFrameLocks gfl = new A.GraphicFrameLocks()
-            {
-                NoMove = true,
-                NoSelection = true
-            };
+            //Wpg.NonVisualGraphicFrameProperties nonVisualGraphicFrameProperties = new Wpg.NonVisualGraphicFrameProperties();
+            //A.GraphicFrameLocks gfl = new A.GraphicFrameLocks()
+            //{
+            //    NoMove = true,
+            //    NoSelection = true
+            //};
 
             Wpg.GroupShapeProperties groupShapeProperties1 = new Wpg.GroupShapeProperties();
 
@@ -907,7 +908,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             inline1.Append(extent1);
             inline1.Append(effectExtent1);
             inline1.Append(docProperties1);
-            inline1.Append(gfl);
+            //inline1.Append(gfl);
 
             return inline1;
         }
