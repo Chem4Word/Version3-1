@@ -159,7 +159,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                         }
                         else
                         {
-                            Debug.WriteLine($"bond.Placement {bond.Placement}");
+                            //Debug.WriteLine($"bond.Placement {bond.Placement}");
                             Point outIntersectP1;
                             Point outIntersectP2;
                             bool linesIntersect;

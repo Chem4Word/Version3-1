@@ -141,11 +141,13 @@ namespace Chem4Word.ACME
                     {
                         var conv = new Model2.Converters.CML.CMLConverter();
                         chemistryModel = conv.Import(data);
+                        chemistryModel.EnsureBondLength(20, false);
                     }
                     //else if (data.Contains("M  END"))
                     //{
                     //    var conv = new SdFileConverter();
                     //    chemistryModel = conv.Import(data);
+                    //    chemistryModel.EnsureBondLength(20, false);
                     //}
                 }
             }
@@ -156,7 +158,11 @@ namespace Chem4Word.ACME
                     Debugger.Break();
                     throw new ArgumentException($"Object must be of type {nameof(Model2.Model)}.");
                 }
-                chemistryModel = Chemistry as Chem4Word.Model2.Model;
+                chemistryModel = Chemistry as ChemistryModel;
+                if (chemistryModel != null)
+                {
+                    chemistryModel.EnsureBondLength(20, false);
+                }
             }
 
             //assuming we've got this far, we should have something we can draw

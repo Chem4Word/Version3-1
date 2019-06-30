@@ -87,7 +87,7 @@
     <Compile Include="Geometry\BasicGeometry.cs" />
     <Compile Include="Geometry\Geometry.cs" />
     <Compile Include="Geometry\Packer.cs" />
-    <Compile Include="Geometry\Seperator.cs" />
+    <Compile Include="Geometry\Separator.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="Converters\CML\CMLHelper.cs" />
     <Compile Include="Converters\CML\CMLConverter.cs" />

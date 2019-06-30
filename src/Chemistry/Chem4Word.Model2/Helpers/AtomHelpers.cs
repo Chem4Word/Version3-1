@@ -6,6 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Chem4Word.Model2.Helpers
 {
@@ -26,7 +28,7 @@ namespace Chem4Word.Model2.Helpers
         /// <summary>
         /// gets the charge annotation string for an atom symbol
         /// </summary>
-        /// <param name="charge">Int contaioning the charge value</param>
+        /// <param name="charge">Int containing the charge value</param>
         /// <returns></returns>
         public static string GetChargeString(int? charge)
         {

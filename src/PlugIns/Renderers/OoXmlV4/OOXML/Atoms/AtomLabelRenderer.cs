@@ -20,28 +20,30 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         private Rect _canvasExtents;
         private long _ooxmlId;
         private Options _options;
+        private double _meanBondLength;
 
-        public AtomLabelRenderer(Rect canvasExtents, ref long ooxmlId, Options opts)
+        public AtomLabelRenderer(Rect canvasExtents, ref long ooxmlId, Options opts, double meanBondLength)
         {
             _canvasExtents = canvasExtents;
             _ooxmlId = ooxmlId;
             _options = opts;
+            _meanBondLength = meanBondLength;
         }
 
-        public void DrawCharacter(Wpg.WordprocessingGroup wordprocessingGroup1, AtomLabelCharacter alc)
+        public void DrawCharacter(Wpg.WordprocessingGroup wordprocessingGroup, AtomLabelCharacter alc)
         {
             Point characterPosition = new Point(alc.Position.X, alc.Position.Y);
             characterPosition.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
 
-            UInt32Value atomLabelId = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string atomLabelName = "Atom " + alc.ParentAtom;
 
-            Int64Value width = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Width);
-            Int64Value height = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height);
+            Int64Value width = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Width, _meanBondLength);
+            Int64Value height = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height, _meanBondLength);
             if (alc.IsSmaller)
             {
-                width = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Width);
-                height = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height);
+                width = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Width, _meanBondLength);
+                height = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height, _meanBondLength);
             }
             Int64Value top = OoXmlHelper.ScaleCmlToEmu(characterPosition.Y);
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(characterPosition.X);
@@ -50,33 +52,34 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             if (_options.ShowCharacterBoundingBoxes)
             {
                 Rect boundingBox = new Rect(new Point(left, top), new Size(width, height));
-                DrawCharacterBox(wordprocessingGroup1, boundingBox, "00ff00", 0.25);
+                DrawCharacterBox(wordprocessingGroup, boundingBox, "00ff00", 0.25);
             }
 
-            Wps.WordprocessingShape wordprocessingShape10 = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties10 = new Wps.NonVisualDrawingProperties() { Id = atomLabelId, Name = atomLabelName };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties10 = new Wps.NonVisualDrawingShapeProperties();
+            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = atomLabelName };
+            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
-            Wps.ShapeProperties shapeProperties10 = new Wps.ShapeProperties();
+            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
-            A.Transform2D transform2D10 = new A.Transform2D();
-            A.Offset offset11 = new A.Offset() { X = left, Y = top };
-            A.Extents extents11 = new A.Extents() { Cx = width, Cy = height };
+            A.Transform2D transform2D = new A.Transform2D();
+            A.Offset offset = new A.Offset() { X = left, Y = top };
+            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
 
-            transform2D10.Append(offset11);
-            transform2D10.Append(extents11);
+            transform2D.Append(offset);
+            transform2D.Append(extents);
 
-            A.CustomGeometry customGeometry10 = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList10 = new A.AdjustValueList();
-            A.Rectangle rectangle10 = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.CustomGeometry geometry = new A.CustomGeometry();
+            A.AdjustValueList adjustValueList = new A.AdjustValueList();
+            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
-            A.PathList pathList10 = new A.PathList();
+            A.PathList pathList = new A.PathList();
 
-            A.Path path10 = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path() { Width = width, Height = height };
 
             foreach (TtfContour contour in alc.Character.Contours)
             {
                 int i = 0;
+
                 while (i < contour.Points.Count)
                 {
                     TtfPoint thisPoint = contour.Points[i];
@@ -89,88 +92,56 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     switch (thisPoint.Type)
                     {
                         case TtfPoint.PointType.Start:
-                            A.MoveTo moveTo1 = new A.MoveTo();
+                            A.MoveTo moveTo = new A.MoveTo();
                             if (alc.IsSmaller)
                             {
-                                A.Point point1 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfSubScriptToEmu(thisPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + thisPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                moveTo1.Append(point1);
-                                path10.Append(moveTo1);
+                                A.Point point = MakeSubscriptPoint(thisPoint);
+                                moveTo.Append(point);
+                                path.Append(moveTo);
                             }
                             else
                             {
-                                A.Point point1 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfToEmu(thisPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + thisPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                moveTo1.Append(point1);
-                                path10.Append(moveTo1);
+                                A.Point point = MakeNormalPoint(thisPoint);
+                                moveTo.Append(point);
+                                path.Append(moveTo);
                             }
                             i++;
                             break;
 
                         case TtfPoint.PointType.Line:
-                            A.LineTo lineTo1 = new A.LineTo();
+                            A.LineTo lineTo = new A.LineTo();
                             if (alc.IsSmaller)
                             {
-                                A.Point point2 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfSubScriptToEmu(thisPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + thisPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                lineTo1.Append(point2);
-                                path10.Append(lineTo1);
+                                A.Point point = MakeSubscriptPoint(thisPoint);
+                                lineTo.Append(point);
+                                path.Append(lineTo);
                             }
                             else
                             {
-                                A.Point point2 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfToEmu(thisPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + thisPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                lineTo1.Append(point2);
-                                path10.Append(lineTo1);
+                                A.Point point = MakeNormalPoint(thisPoint);
+                                lineTo.Append(point);
+                                path.Append(lineTo);
                             }
                             i++;
                             break;
 
                         case TtfPoint.PointType.CurveOff:
-                            A.QuadraticBezierCurveTo quadraticBezierCurveTo13 = new A.QuadraticBezierCurveTo();
+                            A.QuadraticBezierCurveTo quadraticBezierCurveTo = new A.QuadraticBezierCurveTo();
                             if (alc.IsSmaller)
                             {
-                                A.Point point3 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfSubScriptToEmu(thisPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + thisPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                A.Point point4 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfSubScriptToEmu(nextPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + nextPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                quadraticBezierCurveTo13.Append(point3);
-                                quadraticBezierCurveTo13.Append(point4);
-                                path10.Append(quadraticBezierCurveTo13);
+                                A.Point pointA = MakeSubscriptPoint(thisPoint);
+                                A.Point pointB = MakeSubscriptPoint(nextPoint);
+                                quadraticBezierCurveTo.Append(pointA);
+                                quadraticBezierCurveTo.Append(pointB);
+                                path.Append(quadraticBezierCurveTo);
                             }
                             else
                             {
-                                A.Point point3 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfToEmu(thisPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + thisPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                A.Point point4 = new A.Point()
-                                {
-                                    X = OoXmlHelper.ScaleCsTtfToEmu(nextPoint.X - alc.Character.OriginX).ToString(),
-                                    Y = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + nextPoint.Y - (alc.Character.Height + alc.Character.OriginY)).ToString()
-                                };
-                                quadraticBezierCurveTo13.Append(point3);
-                                quadraticBezierCurveTo13.Append(point4);
-                                path10.Append(quadraticBezierCurveTo13);
+                                A.Point pointA = MakeNormalPoint(thisPoint);
+                                A.Point pointB = MakeNormalPoint(nextPoint);
+                                quadraticBezierCurveTo.Append(pointA);
+                                quadraticBezierCurveTo.Append(pointB);
+                                path.Append(quadraticBezierCurveTo);
                             }
                             i++;
                             i++;
@@ -183,100 +154,104 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     }
                 }
 
-                A.CloseShapePath closeShapePath1 = new A.CloseShapePath();
-                path10.Append(closeShapePath1);
+                A.CloseShapePath closeShapePath = new A.CloseShapePath();
+                path.Append(closeShapePath);
             }
 
-            pathList10.Append(path10);
+            pathList.Append(path);
 
-            customGeometry10.Append(adjustValueList10);
-            customGeometry10.Append(rectangle10);
-            customGeometry10.Append(pathList10);
+            geometry.Append(adjustValueList);
+            geometry.Append(rectangle);
+            geometry.Append(pathList);
 
-            A.SolidFill solidFill10 = new A.SolidFill();
+            A.SolidFill solidFill = new A.SolidFill();
 
             // Set Colour
-            A.RgbColorModelHex rgbColorModelHex10 = new A.RgbColorModelHex() { Val = alc.Colour };
-            solidFill10.Append(rgbColorModelHex10);
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = alc.Colour };
+            solidFill.Append(rgbColorModelHex);
 
-            shapeProperties10.Append(transform2D10);
-            shapeProperties10.Append(customGeometry10);
-            shapeProperties10.Append(solidFill10);
+            shapeProperties.Append(transform2D);
+            shapeProperties.Append(geometry);
+            shapeProperties.Append(solidFill);
 
-            Wps.ShapeStyle shapeStyle10 = new Wps.ShapeStyle();
-            A.LineReference lineReference10 = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference10 = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference10 = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference10 = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            OoXmlHelper.AppendShapeStyle(shape, nonVisualDrawingProperties, nonVisualDrawingShapeProperties, shapeProperties);
+            wordprocessingGroup.Append(shape);
 
-            shapeStyle10.Append(lineReference10);
-            shapeStyle10.Append(fillReference10);
-            shapeStyle10.Append(effectReference10);
-            shapeStyle10.Append(fontReference10);
-            Wps.TextBodyProperties textBodyProperties10 = new Wps.TextBodyProperties();
+            // Local Functions
+            A.Point MakeSubscriptPoint(TtfPoint ttfPoint)
+            {
+                A.Point pp = new A.Point
+                             {
+                                 X = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(ttfPoint.X - alc.Character.OriginX, _meanBondLength)}",
+                                 Y = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _meanBondLength)}"
+                             };
+                return pp;
+            }
 
-            wordprocessingShape10.Append(nonVisualDrawingProperties10);
-            wordprocessingShape10.Append(nonVisualDrawingShapeProperties10);
-            wordprocessingShape10.Append(shapeProperties10);
-            wordprocessingShape10.Append(shapeStyle10);
-            wordprocessingShape10.Append(textBodyProperties10);
-
-            wordprocessingGroup1.Append(wordprocessingShape10);
+            A.Point MakeNormalPoint(TtfPoint ttfPoint)
+            {
+                A.Point pp = new A.Point
+                             {
+                                 X = $"{OoXmlHelper.ScaleCsTtfToEmu(ttfPoint.X - alc.Character.OriginX, _meanBondLength)}",
+                                 Y = $"{OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _meanBondLength)}"
+                             };
+                return pp;
+            }
         }
 
-        private void DrawCharacterBox(Wpg.WordprocessingGroup wordprocessingGroup1, Rect extents, string colour, double points)
+        private void DrawCharacterBox(Wpg.WordprocessingGroup wordprocessingGroup, Rect boxExtents, string colour, double points)
         {
-            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "char-diag-box-" + bondLineId;
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string bondLineName = "char-diag-box-" + id;
 
-            Int64Value width = (Int64Value)extents.Width;
-            Int64Value height = (Int64Value)extents.Height;
-            Int64Value top = (Int64Value)extents.Top;
-            Int64Value left = (Int64Value)extents.Left;
+            Int64Value width = (Int64Value)boxExtents.Width;
+            Int64Value height = (Int64Value)boxExtents.Height;
+            Int64Value top = (Int64Value)boxExtents.Top;
+            Int64Value left = (Int64Value)boxExtents.Left;
 
-            Wps.WordprocessingShape wordprocessingShape1 = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties1 = new Wps.NonVisualDrawingProperties()
+            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties()
             {
-                Id = bondLineId,
+                Id = id,
                 Name = bondLineName
             };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties1 = new Wps.NonVisualDrawingShapeProperties();
+            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
-            Wps.ShapeProperties shapeProperties1 = new Wps.ShapeProperties();
+            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
-            A.Transform2D transform2D1 = new A.Transform2D();
-            A.Offset offset2 = new A.Offset() { X = left, Y = top };
-            A.Extents extents2 = new A.Extents() { Cx = width, Cy = height };
+            A.Transform2D transform2D = new A.Transform2D();
+            A.Offset offset = new A.Offset() { X = left, Y = top };
+            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
 
-            transform2D1.Append(offset2);
-            transform2D1.Append(extents2);
+            transform2D.Append(offset);
+            transform2D.Append(extents);
 
-            A.CustomGeometry customGeometry1 = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList1 = new A.AdjustValueList();
-            A.Rectangle rectangle1 = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.CustomGeometry customGeometry = new A.CustomGeometry();
+            A.AdjustValueList adjustValueList = new A.AdjustValueList();
+            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
-            A.PathList pathList1 = new A.PathList();
+            A.PathList pathList = new A.PathList();
 
-            A.Path path1 = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path() { Width = width, Height = height };
 
             // Starting Point
-            A.MoveTo moveTo1 = new A.MoveTo();
+            A.MoveTo moveTo = new A.MoveTo();
             A.Point point1 = new A.Point() { X = "0", Y = "0" };
-            moveTo1.Append(point1);
+            moveTo.Append(point1);
 
             // Mid Point
             A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point() { X = extents.Width.ToString("0"), Y = "0" };
+            A.Point point2 = new A.Point() { X = boxExtents.Width.ToString("0"), Y = "0" };
             lineTo1.Append(point2);
 
             // Mid Point
             A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point() { X = extents.Width.ToString("0"), Y = extents.Height.ToString("0") };
+            A.Point point3 = new A.Point() { X = boxExtents.Width.ToString("0"), Y = boxExtents.Height.ToString("0") };
             lineTo2.Append(point3);
 
             // Last Point
             A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point() { X = "0", Y = extents.Height.ToString("0") };
+            A.Point point4 = new A.Point() { X = "0", Y = boxExtents.Height.ToString("0") };
             lineTo3.Append(point4);
 
             // Back to Start Point
@@ -284,51 +259,34 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             A.Point point5 = new A.Point() { X = "0", Y = "0" };
             lineTo4.Append(point5);
 
-            path1.Append(moveTo1);
-            path1.Append(lineTo1);
-            path1.Append(lineTo2);
-            path1.Append(lineTo3);
-            path1.Append(lineTo4);
+            path.Append(moveTo);
+            path.Append(lineTo1);
+            path.Append(lineTo2);
+            path.Append(lineTo3);
+            path.Append(lineTo4);
 
-            pathList1.Append(path1);
+            pathList.Append(path);
 
-            customGeometry1.Append(adjustValueList1);
-            customGeometry1.Append(rectangle1);
-            customGeometry1.Append(pathList1);
+            customGeometry.Append(adjustValueList);
+            customGeometry.Append(rectangle);
+            customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline1 = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
 
-            A.SolidFill solidFill1 = new A.SolidFill();
+            A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex1 = new A.RgbColorModelHex() { Val = colour };
-            solidFill1.Append(rgbColorModelHex1);
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            solidFill.Append(rgbColorModelHex);
 
-            outline1.Append(solidFill1);
+            outline.Append(solidFill);
 
-            shapeProperties1.Append(transform2D1);
-            shapeProperties1.Append(customGeometry1);
-            shapeProperties1.Append(outline1);
+            shapeProperties.Append(transform2D);
+            shapeProperties.Append(customGeometry);
+            shapeProperties.Append(outline);
 
-            Wps.ShapeStyle shapeStyle1 = new Wps.ShapeStyle();
-            A.LineReference lineReference1 = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference1 = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference1 = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference1 = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
-
-            shapeStyle1.Append(lineReference1);
-            shapeStyle1.Append(fillReference1);
-            shapeStyle1.Append(effectReference1);
-            shapeStyle1.Append(fontReference1);
-            Wps.TextBodyProperties textBodyProperties1 = new Wps.TextBodyProperties();
-
-            wordprocessingShape1.Append(nonVisualDrawingProperties1);
-            wordprocessingShape1.Append(nonVisualDrawingShapeProperties1);
-            wordprocessingShape1.Append(shapeProperties1);
-            wordprocessingShape1.Append(shapeStyle1);
-            wordprocessingShape1.Append(textBodyProperties1);
-
-            wordprocessingGroup1.Append(wordprocessingShape1);
+            OoXmlHelper.AppendShapeStyle(shape, nonVisualDrawingProperties, nonVisualDrawingShapeProperties, shapeProperties);
+            wordprocessingGroup.Append(shape);
         }
     }
 }

@@ -30,13 +30,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         private List<AtomLabelCharacter> _AtomLabelCharacters;
         private Dictionary<string, List<Point>> _convexhHulls;
         private IChem4WordTelemetry _telemetry;
+        private double _meanBondLength;
 
-        public AtomLabelPositioner(List<AtomLabelCharacter> atomLabelCharacters, Dictionary<string, List<Point>> convexHulls, Dictionary<char, TtfCharacter> characterset, IChem4WordTelemetry telemetry)
+        public AtomLabelPositioner(double meanBondLength, List<AtomLabelCharacter> atomLabelCharacters, Dictionary<string, List<Point>> convexHulls, Dictionary<char, TtfCharacter> characterset, IChem4WordTelemetry telemetry)
         {
             _AtomLabelCharacters = atomLabelCharacters;
             _TtfCharacterSet = characterset;
             _convexhHulls = convexHulls;
             _telemetry = telemetry;
+            _meanBondLength = meanBondLength;
         }
 
         public void CreateElementCharacters(Atom atom, Options options)
@@ -150,8 +152,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                         xMin = Math.Min(xMin, thisCharacterPosition.X);
                         yMin = Math.Min(yMin, thisCharacterPosition.Y);
-                        xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width));
-                        yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height));
+                        xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width, _meanBondLength));
+                        yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height, _meanBondLength));
 
                         // Uncomment the following to disable offsetting for terminal atoms
                         //if (bonds.Count == 1)
@@ -162,7 +164,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         if (idx < atomLabel.Length - 1)
                         {
                             // Move to next Character position
-                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX), 0);
+                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
                         }
                     }
                 }
@@ -193,8 +195,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         _AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
-                        lastOffset = OoXmlHelper.ScaleCsTtfToCml(c.IncrementX);
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX), 0);
+                        lastOffset = OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength);
+                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
                         chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
                     }
                 }
@@ -246,7 +248,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             thisCharacterPosition = GetCharacterPosition(chargeCursorPosition, chargeValueCharacter);
 
                             // Raise the superscript Character
-                            thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
+                            thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, _meanBondLength));
 
                             AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, chargeValueCharacter, atomColour, chr, atom.Path, atom.Parent.Path);
                             alcc.IsSmaller = true;
@@ -254,15 +256,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             _AtomLabelCharacters.Add(alcc);
 
                             // Move to next Character position
-                            chargeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
-                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                            chargeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                         }
                     }
 
                     // Insert sign at raised position
                     thisCharacterPosition = GetCharacterPosition(chargeCursorPosition, chargeSignCharacter);
-                    thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
-                    thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.Height / 2 * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
+                    thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, _meanBondLength));
+                    thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.Height / 2 * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, _meanBondLength));
 
                     AtomLabelCharacter alcs = new AtomLabelCharacter(thisCharacterPosition, chargeSignCharacter, atomColour, sign, atom.Path, atom.Parent.Path);
                     alcs.IsSmaller = true;
@@ -271,7 +273,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                     if (iAbsCharge != 0)
                     {
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                     }
                 }
 
@@ -296,9 +298,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                                 {
                                     cursorPosition.X = labelBounds.X
                                                        + (labelBounds.Width / 2)
-                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
+                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width, _meanBondLength) / 2);
                                     cursorPosition.Y = cursorPosition.Y
-                                                       + OoXmlHelper.ScaleCsTtfToCml(-hydrogenCharacter.Height)
+                                                       + OoXmlHelper.ScaleCsTtfToCml(-hydrogenCharacter.Height, _meanBondLength)
                                                        - OoXmlHelper.CHARACTER_VERTICAL_SPACING;
                                     if (iCharge > 0)
                                     {
@@ -307,7 +309,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                                             cursorPosition.Offset(0,
                                                                   OoXmlHelper.ScaleCsTtfToCml(
                                                                       -implicitValueCharacter.Height *
-                                                                      OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2)
+                                                                      OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2, _meanBondLength)
                                                                 - OoXmlHelper.CHARACTER_VERTICAL_SPACING);
                                         }
                                     }
@@ -322,9 +324,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                                 if (atom.Bonds.ToList().Count > 1)
                                 {
                                     cursorPosition.X = labelBounds.X + (labelBounds.Width / 2)
-                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width) / 2);
+                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width, _meanBondLength) / 2);
                                     cursorPosition.Y = cursorPosition.Y 
-                                                       + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height)
+                                                       + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _meanBondLength)
                                                        + OoXmlHelper.CHARACTER_VERTICAL_SPACING;
                                 }
                                 break;
@@ -332,17 +334,17 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             case CompassPoints.West:
                                 if (implicitHCount == 1)
                                 {
-                                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2)), 0);
+                                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2), _meanBondLength), 0);
                                 }
                                 else
                                 {
                                     if (iAbsCharge == 0)
                                     {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2.5)), 0);
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2.5), _meanBondLength), 0);
                                     }
                                     else
                                     {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.5))), 0);
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.5)), _meanBondLength), 0);
                                     }
                                 }
                                 break;
@@ -354,7 +356,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         _AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.IncrementX), 0);
+                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.IncrementX, _meanBondLength), 0);
 
                         if (nesw == CompassPoints.East)
                         {
@@ -377,7 +379,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             thisCharacterPosition = GetCharacterPosition(cursorPosition, implicitValueCharacter);
 
                             // Drop the subscript Character
-                            thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR));
+                            thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, _meanBondLength));
 
                             AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, numbers[implicitHCount], atom.Path, atom.Parent.Path);
                             alc.IsSmaller = true;
@@ -385,7 +387,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             _AtomLabelCharacters.Add(alc);
 
                             // Move to next Character position
-                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(implicitValueCharacter.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(implicitValueCharacter.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                         }
                     }
 
@@ -414,15 +416,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         thisCharacterPosition = GetCharacterPosition(isotopeCursorPosition, c);
 
                         // Raise the superscript Character
-                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
+                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, _meanBondLength));
 
                         xMin = Math.Min(xMin, thisCharacterPosition.X);
                         yMin = Math.Min(yMin, thisCharacterPosition.Y);
-                        xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width));
-                        yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height));
+                        xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width, _meanBondLength));
+                        yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height, _meanBondLength));
 
                         // Move to next Character position
-                        isotopeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                        isotopeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                     }
 
                     // Re-position Isotope Cursor
@@ -436,7 +438,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         thisCharacterPosition = GetCharacterPosition(isotopeCursorPosition, c);
 
                         // Raise the superscript Character
-                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR));
+                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, _meanBondLength));
 
                         AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Path, atom.Parent.Path);
                         alcc.IsSmaller = true;
@@ -444,7 +446,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         _AtomLabelCharacters.Add(alcc);
 
                         // Move to next Character position
-                        isotopeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                        isotopeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                     }
                 }
 
@@ -471,26 +473,26 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 if (c.IsSmaller)
                 {
                     // Top Right +-
-                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
                                         c.Position.Y - margin));
                     // Bottom Right ++
-                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
-                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
+                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
                     // Bottom Left -+
                     points.Add(new Point(c.Position.X - margin,
-                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
+                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
                 }
                 else
                 {
                     // Top Right +-
-                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) + margin,
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _meanBondLength) + margin,
                                         c.Position.Y - margin));
                     // Bottom Right ++
-                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width) + margin,
-                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) + margin));
+                    points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _meanBondLength) + margin,
+                                        c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _meanBondLength) + margin));
                     // Bottom Left -+
                     points.Add(new Point(c.Position.X - margin,
-                                          c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height) + margin));
+                                          c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _meanBondLength) + margin));
                 }
             }
 
@@ -500,7 +502,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         private Point GetCharacterPosition(Point cursorPosition, TtfCharacter character)
         {
             // Add the (negative) OriginY to raise the character by it
-            return new Point(cursorPosition.X, cursorPosition.Y + OoXmlHelper.ScaleCsTtfToCml(character.OriginY));
+            return new Point(cursorPosition.X, cursorPosition.Y + OoXmlHelper.ScaleCsTtfToCml(character.OriginY, _meanBondLength));
         }
 
         public void CreateFunctionalGroupCharacters(Atom atom, Options options)
@@ -583,29 +585,29 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     {
                         var thisCharacterPosition = cursorPosition;
                         // Start by assuming it's SubScript
-                        thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.SUBSCRIPT_DROP_FACTOR));
+                        thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, _meanBondLength));
                         if (alc.IsSuperScript)
                         {
                             // Shift up by height of H to make it SuperScript
-                            thisCharacterPosition.Offset(0, - OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height));
+                            thisCharacterPosition.Offset(0, - OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _meanBondLength));
                         }
                         alc.Position = thisCharacterPosition;
 
                         thisBoundingBox = new Rect(alc.Position,
-                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
 
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                     }
                     else
                     {
                         alc.Position = cursorPosition;
 
                         thisBoundingBox = new Rect(alc.Position,
-                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width),
-                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height)));
+                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _meanBondLength),
+                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _meanBondLength)));
 
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX), 0);
+                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, _meanBondLength), 0);
                     }
 
                     fgCharacters.Add(alc);

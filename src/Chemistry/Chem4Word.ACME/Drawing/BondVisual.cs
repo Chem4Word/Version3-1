@@ -262,7 +262,7 @@ namespace Chem4Word.ACME.Drawing
             //bale out in case we have a null start or end
             if (!cv1 || !cv2)
             {
-                // HACK: Abort if either ChemicalVisual is missing !
+                // Abort if either ChemicalVisual is missing !
                 return;
             }
 

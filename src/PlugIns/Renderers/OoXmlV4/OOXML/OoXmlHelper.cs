@@ -5,6 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using A = DocumentFormat.OpenXml.Drawing;
+using Drawing = DocumentFormat.OpenXml.Wordprocessing.Drawing;
+using Point = System.Windows.Point;
+using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
+using Wp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using Wpg = DocumentFormat.OpenXml.Office2010.Word.DrawingGroup;
+using Wps = DocumentFormat.OpenXml.Office2010.Word.DrawingShape;
 using DocumentFormat.OpenXml;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
@@ -17,8 +24,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         // Margins are in CML Points
         public const double DRAWING_MARGIN = 5; // 5 is a good value to use (Use 0 to compare with AMC diagrams)
 
-        public const double CHARACTER_CLIPPING_MARGIN = 1.25; // cml pixels
-        public const double CHARACTER_VERTICAL_SPACING = 1.25; // cml pixels
+        public const double CHARACTER_CLIPPING_MARGIN = 1.25;   // cml pixels
+        public const double CHARACTER_VERTICAL_SPACING = 1.25;  // cml pixels
 
         // Percentage of average (median) bond length
         public const double MULTIPLE_BOND_OFFSET_PERCENTAGE = 0.18;
@@ -29,12 +36,37 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         public const int EMUS_PER_WORD_POINT = 12700;
         public const int ACS_LINE_WIDTH_EMUS = 7620;    // This makes bond line width equal to ACS Guide of 0.6pt
-
         private const int EMUS_PER_CML_POINT = 9144;    // This makes cml bond length of 20 equal ACS guide 0.2" (0.508cm)
 
-        private const double EMUS_PER_CS_TTF_POINT = 9.852;
-        private const double EMUS_PER_CS_TTF_POINT_SUBSCRIPT = EMUS_PER_CS_TTF_POINT * SUBSCRIPT_SCALE_FACTOR;
-        private const double CS_TTF_TO_CML = EMUS_PER_CML_POINT / EMUS_PER_CS_TTF_POINT;
+        // These calculations yield a font which has a point size of 9 at a bond length of 20
+        private static double EmusPerCsTtfPoint(double bondLength)
+        {
+            return bondLength / 2.5 + 1;
+        }
+
+        private static double EmusPerCsTtfPointSubscript(double bondLength)
+        {
+            if (bondLength > 0.1)
+            {
+                return EmusPerCsTtfPoint(bondLength) * SUBSCRIPT_SCALE_FACTOR;
+            }
+            else
+            {
+                return EmusPerCsTtfPoint(20) * SUBSCRIPT_SCALE_FACTOR;
+            }
+        }
+
+        private static double CsTtfToCml(double bondLength)
+        {
+            if (bondLength > 0.1)
+            {
+                return EMUS_PER_CML_POINT / EmusPerCsTtfPoint(bondLength);
+            }
+            else
+            {
+                return EMUS_PER_CML_POINT / EmusPerCsTtfPoint(20);
+            }
+        }
 
         /// <summary>
         /// Scales a CML X or Y co-ordinate to DrawingML Units (EMU)
@@ -47,26 +79,68 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return Int64Value.FromInt64((long)scaled);
         }
 
+        public static void AppendShapeStyle(Wps.WordprocessingShape shape,
+                                            Wps.NonVisualDrawingProperties nonVisualDrawingProperties,
+                                            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties,
+                                            Wps.ShapeProperties shapeProperties)
+        {
+            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
+            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+
+            shapeStyle.Append(lineReference);
+            shapeStyle.Append(fillReference);
+            shapeStyle.Append(effectReference);
+            shapeStyle.Append(fontReference);
+
+            shape.Append(nonVisualDrawingProperties);
+            shape.Append(nonVisualDrawingShapeProperties);
+            shape.Append(shapeProperties);
+            shape.Append(shapeStyle);
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            shape.Append(textBodyProperties);
+        }
+
         #region C# TTF
 
         /// <summary>
         /// Scales a C# TTF X or Y co-ordinate to DrawingML Units (EMU)
         /// </summary>
         /// <param name="XorY"></param>
+        /// <param name="bondLength"></param>
         /// <returns></returns>
-        public static Int64Value ScaleCsTtfToEmu(double XorY)
+        public static Int64Value ScaleCsTtfToEmu(double XorY, double bondLength)
         {
-            double scaled = XorY * EMUS_PER_CS_TTF_POINT;
-            return Int64Value.FromInt64((long)scaled);
+            if (bondLength > 0.1)
+            {
+                double scaled = XorY * EmusPerCsTtfPoint(bondLength);
+                return Int64Value.FromInt64((long)scaled);
+            }
+            else
+            {
+                double scaled = XorY * EmusPerCsTtfPoint(20);
+                return Int64Value.FromInt64((long)scaled);
+            }
         }
 
         /// <summary>
         /// Scales a CS TTF SubScript X or Y co-ordinate to DrawingML Units (EMU)
         /// </summary>
-        public static Int64Value ScaleCsTtfSubScriptToEmu(double XorY)
+        public static Int64Value ScaleCsTtfSubScriptToEmu(double XorY, double bondLength)
         {
-            double scaled = XorY * EMUS_PER_CS_TTF_POINT_SUBSCRIPT;
-            return Int64Value.FromInt64((long)scaled);
+            if (bondLength > 0.1)
+            {
+                double scaled = XorY * EmusPerCsTtfPointSubscript(bondLength);
+                return Int64Value.FromInt64((long)scaled);
+            }
+            else
+            {
+                double scaled = XorY * EmusPerCsTtfPointSubscript(20);
+                return Int64Value.FromInt64((long)scaled);
+            }
         }
 
         /// <summary>
@@ -74,9 +148,16 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         /// </summary>
         /// <param name="XorY"></param>
         /// <returns></returns>
-        public static double ScaleCsTtfToCml(double XorY)
+        public static double ScaleCsTtfToCml(double XorY, double bondLength)
         {
-            return XorY / CS_TTF_TO_CML;
+            if (bondLength > 0.1)
+            {
+                return XorY / CsTtfToCml(bondLength);
+            }
+            else
+            {
+                return XorY / CsTtfToCml(20);
+            }
         }
 
         #endregion C# TTF

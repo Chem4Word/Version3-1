@@ -14,19 +14,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 {
     public class BondLine
     {
-        private Bond _bond;
-        public Bond Bond
-        {
-            get { return _bond;}
-        }
+        public Bond Bond { get; }
 
         public string ParentMolecule
         {
             get
             {
-                if (_bond != null)
+                if (Bond != null)
                 {
-                    return _bond.Parent.Path;
+                    return Bond.Parent.Path;
                 }
 
                 return string.Empty;
@@ -37,9 +33,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
         {
             get
             {
-                if (_bond != null)
+                if (Bond != null)
                 {
-                    return _bond.Path;
+                    return Bond.Path;
                 }
 
                 return string.Empty;
@@ -50,9 +46,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
         {
             get
             {
-                if (_bond != null)
+                if (Bond != null)
                 {
-                    return _bond.StartAtom.Path;
+                    return Bond.StartAtom.Path;
                 }
 
                 return string.Empty;
@@ -63,9 +59,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
         {
             get
             {
-                if (_bond != null)
+                if (Bond != null)
                 {
-                    return _bond.EndAtom.Path;
+                    return Bond.EndAtom.Path;
                 }
 
                 return string.Empty;
@@ -81,7 +77,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             set
             {
                 _start = value;
-                BoundingBox = new Rect(_start, _end);
             }
         }
 
@@ -92,16 +87,28 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             set
             {
                 _end = value;
-                BoundingBox = new Rect(_start, _end);
             }
         }
 
-        public Rect BoundingBox { get; private set; }
+        private Rect _boundingBox = Rect.Empty;
+
+        public Rect BoundingBox
+        {
+            get
+            {
+                if (_boundingBox.IsEmpty)
+                {
+                    _boundingBox = new Rect(_start, _end);
+                }
+
+                return _boundingBox;
+            }
+        }
 
         public BondLine(BondLineStyle style, Bond bond)
         {
             Style = style;
-            _bond = bond;
+            Bond = bond;
 
             if (bond != null)
             {
@@ -122,7 +129,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Style = style;
             _start = startPoint;
             _end = endPoint;
-            _bond = bond;
+            Bond = bond;
         }
 
         public BondLine GetParallel(double offset)
@@ -136,12 +143,28 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point newEndPoint = new Point((float)(_end.X - offset * yDifference / length),
                                           (float)(_end.Y + offset * xDifference / length));
 
-            return new BondLine(Style, newStartPoint, newEndPoint);
+            return new BondLine(Style, newStartPoint, newEndPoint, Bond);
         }
 
         public void SetLineStyle(BondLineStyle style)
         {
             Style = style;
+        }
+
+        private string PointAsString(Point p)
+        {
+            return $"{p.X.ToString("#,##0.000")},{p.Y.ToString("#,##0.000")}";
+        }
+
+        public override string ToString()
+        {
+            string result = $"{Style} from {PointAsString(_start)} to {PointAsString(_end)}";
+            if (Bond != null)
+            {
+                result+= $" [{Bond}]";
+            }
+
+            return result;
         }
     }
 }

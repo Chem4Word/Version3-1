@@ -1756,8 +1756,12 @@ namespace Chem4Word
 
                                     Packer packer = new Packer();
                                     packer.Model = model;
-
                                     packer.Pack(model.MeanBondLength * 2);
+
+                                    //Separator separator = new Separator(model);
+                                    //int loops = 0;
+                                    //separator.Separate(model.MeanBondLength, 99, out loops);
+                                    //Debug.WriteLine($"Separate took {loops} loops");
 
                                     string afterCml = cmlConverter.Export(model);
 

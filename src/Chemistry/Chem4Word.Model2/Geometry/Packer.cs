@@ -28,8 +28,6 @@ namespace Chem4Word.Model2.Geometry
 
         public bool Pack(double padding)
         {
-            // ToDo: Test this is may be called from the Separate Button on the Ribbon
-            Debugger.Break();
             if (Model != null)
             {
                 var watch = Stopwatch.StartNew();
