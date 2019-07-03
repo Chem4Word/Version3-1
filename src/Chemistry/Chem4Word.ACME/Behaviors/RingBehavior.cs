@@ -291,9 +291,8 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else
                 {
-                        preferredPlacements = null;
-                        altPlacements = null;
-                   
+                    preferredPlacements = null;
+                    altPlacements = null;
                 }
             }
             else

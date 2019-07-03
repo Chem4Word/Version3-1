@@ -29,6 +29,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Resources;
+using Chem4Word.Model2.Geometry;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME
@@ -1289,6 +1290,7 @@ namespace Chem4Word.ACME
 
                     int hydrogenCount = atom.ImplicitHydrogenCount;
                     var vector = atom.BalancingVector();
+
                     switch (hydrogenCount)
                     {
                         case 1:

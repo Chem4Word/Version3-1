@@ -9,6 +9,7 @@ using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Xml.Linq;
@@ -326,8 +327,8 @@ namespace Chem4Word.Model2.Converters.CML
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,
                 new XAttribute(CMLConstants.TagId, atom.Id),
                 new XAttribute(CMLConstants.TagElementType, elementType),
-                new XAttribute(CMLConstants.TagX2, atom.Position.X),
-                new XAttribute(CMLConstants.TagY2, atom.Position.Y)
+                new XAttribute(CMLConstants.TagX2, atom.Position.X.ToString("0.####", CultureInfo.InvariantCulture)),
+                new XAttribute(CMLConstants.TagY2, atom.Position.Y.ToString("0.####", CultureInfo.InvariantCulture))
             );
 
             if (atom.FormalCharge != null)

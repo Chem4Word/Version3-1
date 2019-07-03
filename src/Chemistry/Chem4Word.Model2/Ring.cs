@@ -253,30 +253,6 @@ namespace Chem4Word.Model2
             Atoms = new HashSet<Atom>(ringAtoms);
         }
 
-        private void Atoms_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (Atom atom in e.NewItems)
-                    {
-                        if (!atom.Rings.Contains(this))
-                            atom.Rings.Add(this);
-                    }
-
-                    break;
-
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (Atom atom in e.NewItems)
-                    {
-                        if (atom.Rings.Contains(this))
-                            atom.Rings.Remove(this);
-                    }
-
-                    break;
-            }
-        }
-
         #endregion Constructors
 
         #region Operators

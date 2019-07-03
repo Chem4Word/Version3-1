@@ -747,7 +747,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 if (atom.Bonds.ToList().Count == 3)
                 {
-                    bool isInRing = atom.Rings.Count != 0;
+                    bool isInRing = atom.IsInRing;
                     List<BondLine> lines = _bondLines.Where(bl => bl.ParentBond.Equals(bondPath)).ToList();
                     if (lines.Any())
                     {

@@ -17,7 +17,6 @@ namespace Chem4Word.Model2.Geometry
 {
     /// See https://www.topcoder.com/community/data-science/data-science-tutorials/geometry-concepts-line-intersection-and-its-applications/
     /// for implementing some good basic operations in geometry
-    /// </summary>
 
     public static class BasicGeometry
     {
@@ -29,14 +28,13 @@ namespace Chem4Word.Model2.Geometry
         /// GetAngle(new Point2(-1,0), new Point2(0,0), new Point2(0,1)) => -Math.PI/2
         /// GetAngle(new Point2(0,1), new Point2(0,0), new Point2(1,0)) => -Math.PI/2
         ///
-        /// </summary>
         /// <param name="point0">first point</param>
         /// <param name="point1">centre point</param>
         /// <param name="point2">final point</param>
-        /// <param name="epsilon"></param>
+        /// <param name="epsilon">tolerance</param>
         /// <exception cref="ArgumentException">if any atoms are coincident</exception>
         /// <returns>null if any points are null</returns>
-        /// <summary>
+        /// </summary>
         public static double? GetAngle(Point? point0, Point? point1, Point? point2, double epsilon)
         {
             double? angle = null;
@@ -176,6 +174,19 @@ namespace Chem4Word.Model2.Geometry
             int tolerance = 15;
             var sector = SnapAngleToTolerance(angleFromNorth, tolerance);
             return sector;
+        }
+
+        public static Vector SnapVectorToClock(Vector vector)
+        {
+            double angle = AngleBetween(vector, ScreenNorth);
+            angle = Math.Round(angle / 30.0) * 30;
+
+            int clock = Convert.ToInt32(angle);
+
+            Matrix rotator = new Matrix();
+            rotator.Rotate(-clock);
+
+            return ScreenNorth *= rotator;
         }
 
         private static int SnapAngleToTolerance(double angleFromNorth, int tolerance)

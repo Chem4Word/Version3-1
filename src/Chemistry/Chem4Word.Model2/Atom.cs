@@ -11,6 +11,7 @@ using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -58,9 +59,70 @@ namespace Chem4Word.Model2
         public HashSet<Atom> NeighbourSet => new HashSet<Atom>(Neighbours);
 
         /// <summary>
-        /// The rings this atom belongs to
+        /// Count of rings that this atom is a member of
         /// </summary>
-        public List<Ring> Rings { get; private set; }
+        public int RingCount
+        {
+            get
+            {
+                int result = 0;
+
+                var allRings = ((Molecule)Parent).Rings;
+                foreach (Ring ring in allRings)
+                {
+                    if (ring.Atoms.Contains(this))
+                    {
+                        result++;
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// List of rings that this atom belongs to
+        /// </summary>
+        public IEnumerable<Ring> Rings {
+            get
+            {
+                var result = new List<Ring>();
+
+                var allRings = ((Molecule)Parent).Rings;
+                foreach (Ring ring in allRings)
+                {
+                    if (ring.Atoms.Contains(this))
+                    {
+                        result.Add(ring);
+                    }
+                }
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// Detect if this atom is a member of any rings
+        /// </summary>
+        public bool IsInRing
+        {
+            get
+            {
+                var result = false;
+
+                var allRings = ((Molecule)Parent).Rings;
+                foreach (Ring ring in allRings)
+                {
+                    if (ring.Atoms.Contains(this))
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+
+                return result;
+            }
+        }
 
         public Molecule Parent { get; set; }
 
@@ -80,11 +142,6 @@ namespace Chem4Word.Model2
         }
 
         public int Degree => Bonds.Count();
-
-        //public List<Atom> UnprocessedNeighbours(Predicate<Atom> unprocessedTest)
-        //{
-        //    return Neighbours.Where(a => unprocessedTest(a)).ToList();
-        //}
 
         private string _id;
 
@@ -165,7 +222,7 @@ namespace Chem4Word.Model2
                         break;
 
                     default:
-                        //just ignor3e it for now
+                        //just ignore it for now
                         //Debugger.Break();
                         //throw new ArgumentOutOfRangeException("ShowSymbol", "Cannot set explicit display on a non-carbon atom.");
                         break;
@@ -537,7 +594,6 @@ namespace Chem4Word.Model2
         {
             Id = Guid.NewGuid().ToString("D");
             InternalId = Id;
-            Rings = new List<Ring>();
         }
 
         /// <summary>

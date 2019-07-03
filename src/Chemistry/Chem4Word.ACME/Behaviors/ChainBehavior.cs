@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -76,7 +77,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseMove += CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
             CurrentEditor.PreviewKeyDown += CurrentEditor_PreviewKeyDown;
-            
+
             AssociatedObject.IsHitTestVisible = true;
 
             if (_parent != null)
@@ -86,8 +87,6 @@ namespace Chem4Word.ACME.Behaviors
 
             CurrentStatus = "Draw a ring by clicking on a bond, atom or free space.";
         }
-
-      
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -140,7 +139,6 @@ namespace Chem4Word.ACME.Behaviors
                 Placements.Add(Target.Position);
             }
 
-
             Mouse.Capture(CurrentEditor);
             Keyboard.Focus(CurrentEditor);
             MouseIsDown = true;
@@ -153,7 +151,6 @@ namespace Chem4Word.ACME.Behaviors
         public Atom Target { get; set; }
 
         public Point FirstPoint { get; set; }
-
 
         public override void Abort()
         {
@@ -181,6 +178,7 @@ namespace Chem4Word.ACME.Behaviors
                 Matrix rotator = new Matrix();
                 rotator.Rotate(angle);
                 Vector newvector = lastBondvector;
+                newvector = BasicGeometry.SnapVectorToClock(newvector);
                 newvector.Normalize();
                 newvector *= EditViewModel.Model.XamlBondLength;
                 newvector *= rotator;
@@ -221,8 +219,6 @@ namespace Chem4Word.ACME.Behaviors
                             balancing *= EditViewModel.Model.XamlBondLength;
                             Placements.Add(Placements.Last() + balancing);
                         }
-
-                        ;
                     }
                 }
             }

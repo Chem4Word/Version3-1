@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Chem4WordTests
 {
-    public class FunctionalGroups
+    public class FunctionalGroupLoading
     {
         [Fact]
         public void ShortcutListIsPopulated()

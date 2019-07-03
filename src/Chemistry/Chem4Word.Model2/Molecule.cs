@@ -1038,18 +1038,6 @@ namespace Chem4Word.Model2
 
         public Point Centroid { get; set; }
 
-        private void WipeMoleculeRings()
-        {
-            Rings.Clear();
-
-            //first set all atoms to side chains
-            foreach (Atom a in Atoms.Values)
-            {
-                a.Rings.Clear();
-                _sortedRings = null;
-            }
-        }
-
         /// <summary>
         /// Sorts a series of small rings ready for determining double bond placement
         /// see DOI: 10.1002/minf.201200171
@@ -1060,7 +1048,6 @@ namespace Chem4Word.Model2
         // ReSharper disable once InconsistentNaming
         public List<Ring> SortRingsForDBPlacement()
         {
-            //
             //Debug.Assert(HasRings); //no bloody point in running this unless it has rings
             //Debug.Assert(RingsCalculated); //make sure that if the molecule contains rings that we have calculated them
             //1) All rings of sizes 6, 5, 7, 4 and 3 are discovered, in that order, and added to a list R.
@@ -1071,7 +1058,7 @@ namespace Chem4Word.Model2
             Dictionary<Atom, int> atomFrequency = new Dictionary<Atom, int>();
             foreach (Atom atom in Atoms.Values)
             {
-                atomFrequency[atom] = atom.Rings.Count;
+                atomFrequency[atom] = atom.RingCount;
             }
 
             //Define Q as an array of size equal to length of R, where each value is equal
@@ -1261,7 +1248,7 @@ namespace Chem4Word.Model2
             }
             else
             {
-                var chainAtoms = Atoms.Values.Where(a => !a.Rings.Any()).ToList();
+                var chainAtoms = Atoms.Values.Where(a => !a.IsInRing).ToList();
                 if (excludeAtoms != null)
                 {
                     foreach (Atom excludeAtom in excludeAtoms)

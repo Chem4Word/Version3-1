@@ -65,7 +65,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             //Debug.WriteLine("  X: " + atom.X2 + " Y: " + atom.Y2 + " Implicit H Count: " + implicitHCount);
 
-            int ringCount = atom.Rings.Count;
+            //int ringCount = atom.Rings.Count;
             int bondCount = atom.Bonds.ToList().Count;
 
             //var bv = atom.BalancingVector;
@@ -82,7 +82,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 }
                 else
                 {
-                    if (ringCount > 0 || bondCount > 1)
+                    if (atom.IsInRing || bondCount > 1)
                     {
                         showLabel = false;
                     }

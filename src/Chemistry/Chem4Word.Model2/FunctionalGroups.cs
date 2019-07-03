@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace Chem4Word.Model2
 {
@@ -58,7 +59,6 @@ namespace Chem4Word.Model2
                 }
                 return _shortcutList;
             }
-            //private set { _shortcutList = value; }
         }
 
         private static void LoadFromResource()
@@ -68,7 +68,12 @@ namespace Chem4Word.Model2
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
             if (!string.IsNullOrEmpty(json))
             {
-                _shortcutList = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
+                // Copy the values one by one to prevent recursive issue found during unit tests
+                var temp = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
+                foreach (var kvp in temp)
+                {
+                    _shortcutList.Add(kvp.Key, kvp.Value);
+                }
             }
         }
 
