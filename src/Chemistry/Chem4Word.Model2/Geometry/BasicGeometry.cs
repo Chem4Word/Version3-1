@@ -78,13 +78,13 @@ namespace Chem4Word.Model2.Geometry
             return new Vector(-v.Y, v.X);
         }
 
-        public static Vector ScreenSouth = new Vector(0, 1);
+        public static Vector ScreenSouth => new Vector(0, 1);
 
-        public static Vector ScreenEast = new Vector(1, 0);
+        public static Vector ScreenEast => new Vector(1, 0);
 
-        public static Vector ScreenNorth = -ScreenSouth;
+        public static Vector ScreenNorth => -ScreenSouth;
 
-        public static Vector ScreenWest = -ScreenEast;
+        public static Vector ScreenWest => -ScreenEast;
 
         #endregion extension methods
 
@@ -186,7 +186,10 @@ namespace Chem4Word.Model2.Geometry
             Matrix rotator = new Matrix();
             rotator.Rotate(-clock);
 
-            return ScreenNorth *= rotator;
+            Vector result = ScreenNorth;
+            result *= rotator;
+
+            return result;
         }
 
         private static int SnapAngleToTolerance(double angleFromNorth, int tolerance)
@@ -201,10 +204,11 @@ namespace Chem4Word.Model2.Geometry
         }
 
         /// <summary>
-        /// Takes a list of poinst and builds a  Path object from it.
+        /// Takes a list of points and builds a  Path object from it.
         /// Generally used for constructing masks
         /// </summary>
         /// <param name="hull">List of points making up the path </param>
+        /// <param name="isClosed"></param>
         /// <returns></returns>
         public static Path BuildPath(List<Point> hull, bool isClosed = true)
         {
@@ -242,6 +246,13 @@ namespace Chem4Word.Model2.Geometry
             return path;
         }
 
+        /// <summary>
+        /// Takes a list of points and builds a  StreamGeometry object from it.
+        /// Generally used for constructing masks
+        /// </summary>
+        /// <param name="hull"></param>
+        /// <param name="isClosed"></param>
+        /// <returns></returns>
         public static StreamGeometry BuildPolyPath(List<Point> hull, bool isClosed = true)
         {
             var points = hull.ToArray();
@@ -280,23 +291,23 @@ namespace Chem4Word.Model2.Geometry
             return geometry;
         }
 
-        public static void CombineGeometries(DrawingGroup p_DrawingGroup, GeometryCombineMode p_CombineMode, ref CombinedGeometry p_CombinedGeometry)
+        public static void CombineGeometries(DrawingGroup drawingGroup, GeometryCombineMode combineMode, ref CombinedGeometry combinedGeometry)
         {
-            if (p_CombinedGeometry == null)
-                p_CombinedGeometry = new CombinedGeometry();
+            if (combinedGeometry == null)
+                combinedGeometry = new CombinedGeometry();
 
-            DrawingCollection drawingCollection = p_DrawingGroup.Children;
+            DrawingCollection drawingCollection = drawingGroup.Children;
 
             foreach (System.Windows.Media.Drawing drawing in drawingCollection)
             {
                 if (drawing is DrawingGroup)
                 {
-                    CombineGeometries((DrawingGroup)drawing, p_CombineMode, ref p_CombinedGeometry);
+                    CombineGeometries((DrawingGroup)drawing, combineMode, ref combinedGeometry);
                 }
                 else if (drawing is GeometryDrawing)
                 {
                     GeometryDrawing geoDrawing = drawing as GeometryDrawing;
-                    p_CombinedGeometry = new CombinedGeometry(p_CombineMode, p_CombinedGeometry, geoDrawing.Geometry);
+                    combinedGeometry = new CombinedGeometry(combineMode, combinedGeometry, geoDrawing.Geometry);
                 }
             }
         }

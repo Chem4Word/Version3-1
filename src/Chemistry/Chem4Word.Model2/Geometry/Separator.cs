@@ -6,11 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media.Animation;
-using System.Windows.Navigation;
 
 namespace Chem4Word.Model2.Geometry
 {

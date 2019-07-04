@@ -15,8 +15,6 @@ using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2.Geometry
 {
-  
-
     public static class AngleMethods
     {
         public static Vector ToVector(this Globals.ClockDirections dir)

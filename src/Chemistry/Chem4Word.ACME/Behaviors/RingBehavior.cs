@@ -234,6 +234,10 @@ namespace Chem4Word.ACME.Behaviors
             if (hitAtom.Degree != 0)
             {
                 direction = hitAtom.BalancingVector();
+                if (ringSize == 3 || ringSize == 4 || ringSize == 6)
+                {
+                    direction = BasicGeometry.SnapVectorToClock(direction);
+                }
             }
             else
             {
@@ -262,6 +266,11 @@ namespace Chem4Word.ACME.Behaviors
             parentMolecule = hitBond.Parent;
             var bondDirection = hitBond.BondVector;
             var mouseDirection = position - hitBond.StartAtom.Position;
+            if (ringSize == 3 || ringSize == 4 || ringSize == 6)
+            {
+                bondDirection = BasicGeometry.SnapVectorToClock(bondDirection);
+                mouseDirection = BasicGeometry.SnapVectorToClock(mouseDirection);
+            }
             bool followsBond = Vector.AngleBetween(bondDirection, mouseDirection) > 0;
 
             placements = MarkOutAtoms(hitBond, followsBond, ringSize);
@@ -272,15 +281,9 @@ namespace Chem4Word.ACME.Behaviors
             secondOverlap = parentMolecule.OverlapArea(altPlacements);
             secondOverlapArea = secondOverlap.GetArea();
 
-            //get a point on the less crowded side of the bond
-            var perpvector = hitBond.GetUncrowdedSideVector();
-            if (perpvector != null)
+            // Get points on the less crowded side of the bond
+            if (hitBond.GetUncrowdedSideVector() != null)
             {
-                var vec = perpvector.Value;
-                vec.Normalize();
-                vec *= hitBond.BondVector.Length / 2;
-                var placementPoint = hitBond.MidPoint + vec;
-
                 if (firstOverlapArea < 0.001)
                 {
                     preferredPlacements = placements;

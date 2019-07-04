@@ -38,16 +38,6 @@ namespace Chem4Word.Model2.Helpers
             return atomList.Count() - atomList.GetHCount();
         }
 
-        ////collection utils
-
-        //public static void RemoveAll(this IList list)
-        //{
-        //    while (list.Count > 0)
-        //    {
-        //        list.RemoveAt(list.Count - 1);
-        //    }
-        //}
-
         public static string GetRelativePath(string ancestor, string descendant)
         {
             Uri urifrom = new Uri(ancestor);
