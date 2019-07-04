@@ -65,6 +65,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +165,7 @@
     </Compile>
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="UndoHandler.cs" />
+    <Compile Include="Utils\ClipboardMonitor.cs" />
     <Compile Include="Utils\CursorUtils.cs" />
     <Compile Include="Utils\FileUtils.cs" />
     <Compile Include="Utils\UIUtils.cs" />
@@ -204,6 +206,10 @@
     <Compile Include="VisualTreeHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Resources\BondOptions.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CmlEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

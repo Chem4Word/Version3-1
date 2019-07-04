@@ -78,11 +78,20 @@ namespace Chem4Word.ACME.Drawing
 
             Point? centroid = null;
             Point? secondaryCentroid = null;
-            if (parent.IsCyclic() & !ignoreCentroid)
+            if(!ignoreCentroid)
             {
-                centroid = parent.PrimaryRing?.Centroid;
-                secondaryCentroid = parent.SubsidiaryRing?.Centroid;
+                if (parent.IsCyclic())
+                {
+                    centroid = parent.PrimaryRing?.Centroid;
+                    secondaryCentroid = parent.SubsidiaryRing?.Centroid;
+                }
+                else
+                {
+                    centroid = parent.Centroid;
+                    secondaryCentroid = null;
+                }
             }
+          
 
             //do the straightforward cases first -discriminate by stereo
             var parentStereo = parent.Stereo;
@@ -273,6 +282,8 @@ namespace Chem4Word.ACME.Drawing
 
             //first grab the main descriptor
             BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength);
+            
+
             _enclosingPoly = BondDescriptor.Boundary;
             //set up the default pens for rendering
             _mainBondPen = new Pen(Brushes.Black, BondThickness)
@@ -366,33 +377,32 @@ namespace Chem4Word.ACME.Drawing
 
                 case Globals.OrderPartial12:
                 case Globals.OrderAromatic:
+                case "2":
+                case Globals.OrderDouble:
                     // Handle 1.5 bond
+                    DoubleBondDescriptor dbd3 = (DoubleBondDescriptor) BondDescriptor;
                     Point? centroid = ParentBond.Centroid;
+                    dbd3.PrimaryCentroid = centroid;
 
-                    _subsidiaryBondPen.DashStyle = DashStyles.Dash;
+                    if (ParentBond.Order == Globals.OrderPartial12 | ParentBond.Order == Globals.OrderAromatic)
+                    {
+                        _subsidiaryBondPen.DashStyle = DashStyles.Dash;
+                    }
 
-                    _enclosingPoly = BondDescriptor.Boundary;
-                    _subsidiaryBondPen.DashStyle = DashStyles.Dash;
+                    _enclosingPoly = dbd3.Boundary;
+
 
                     using (DrawingContext dc = RenderOpen())
                     {
                         dc.DrawLine(_mainBondPen, BondDescriptor.Start, BondDescriptor.End);
                         dc.DrawLine(_subsidiaryBondPen,
-                                    (BondDescriptor as DoubleBondDescriptor).SecondaryStart,
-                                    (BondDescriptor as DoubleBondDescriptor).SecondaryEnd);
+                                    dbd3.SecondaryStart,
+                                    dbd3.SecondaryEnd);
                         dc.Close();
                     }
                     break;
 
-                case "2":
-                case Globals.OrderDouble:
-                    // Handle Double bond
-                    using (DrawingContext dc = RenderOpen())
-                    {
-                        dc.DrawGeometry(null, _mainBondPen, BondDescriptor.DefiningGeometry);
-                        dc.Close();
-                    }
-                    break;
+                
 
                 case Globals.OrderPartial23:
                 case "3":

@@ -239,7 +239,7 @@ namespace Chem4Word.Model2.Converters.CML
             return result;
         }
 
-        private XElement GetMoleculeElement(Molecule mol)
+        public XElement GetMoleculeElement(Molecule mol)
         {
             XElement molElement = new XElement(CMLNamespaces.cml + CMLConstants.TagMolecule, new XAttribute(CMLConstants.TagId, mol.Id));
 

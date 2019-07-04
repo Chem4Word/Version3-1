@@ -384,7 +384,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             var currentObject = CurrentObject(e);
 
-            if (currentObject == null)
+            if (!(currentObject != null | Utils.KeyboardUtils.HoldingDownShift()))
             {
                 EditViewModel.SelectedItems.Clear();
             }

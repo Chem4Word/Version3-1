@@ -40,7 +40,6 @@ namespace Chem4Word.Model2
         public List<string> Warnings { get; set; }
         public List<string> Errors { get; set; }
 
-        private List<Ring> _sortedRings = null;
 
         #endregion Collections
 
@@ -1027,16 +1026,12 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (_sortedRings == null)
-                {
-                    _sortedRings = SortRingsForDBPlacement();
-                }
-
-                return _sortedRings;
+              return SortRingsForDBPlacement();
             }
         }
 
         public Point Centroid { get; set; }
+
 
         /// <summary>
         /// Sorts a series of small rings ready for determining double bond placement
@@ -1089,7 +1084,8 @@ namespace Chem4Word.Model2
 
             IOrderedEnumerable<Ring> highestDBperRing = lowestCumulFreq.OrderByDescending(r => doubleBondsperRing[r]);
 
-            return highestDBperRing.ToList();
+            var sortRingsForDbPlacement = highestDBperRing.ToList();
+            return sortRingsForDbPlacement;
         }
 
         /// <summary>
@@ -1246,26 +1242,24 @@ namespace Chem4Word.Model2
             {
                 return true;
             }
-            else
+
+            var chainAtoms = Atoms.Values.Where(a => !a.Rings.Any()).ToList();
+            if (excludeAtoms != null)
             {
-                var chainAtoms = Atoms.Values.Where(a => !a.IsInRing).ToList();
-                if (excludeAtoms != null)
+                foreach (Atom excludeAtom in excludeAtoms)
                 {
-                    foreach (Atom excludeAtom in excludeAtoms)
+                    if (chainAtoms.Contains(excludeAtom))
                     {
-                        if (chainAtoms.Contains(excludeAtom))
-                        {
-                            chainAtoms.Remove(excludeAtom);
-                        }
+                        chainAtoms.Remove(excludeAtom);
                     }
                 }
-                var placementsArea = BasicGeometry.BuildPath(placements).Data;
-                foreach (var chainAtom in chainAtoms)
+            }
+            var placementsArea = BasicGeometry.BuildPath(placements).Data;
+            foreach (var chainAtom in chainAtoms)
+            {
+                if (placementsArea.FillContains(chainAtom.Position, 0.01, ToleranceType.Relative))
                 {
-                    if (placementsArea.FillContains(chainAtom.Position, 0.01, ToleranceType.Relative))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 

@@ -159,6 +159,32 @@ namespace Chem4Word.ACME
             set { SetValue(SliderVisibilityProperty, value); }
         }
 
+
+
+        public double HorizontalOffset
+        {
+            get => DrawingArea.HorizontalOffset;
+        }
+
+        public double VerticalOffset
+        {
+            get => DrawingArea.VerticalOffset;
+        }
+
+        public double ViewportWidth
+        {
+            get => DrawingArea.ViewportWidth;
+        }
+
+        public double ViewportHeight
+        {
+            get => DrawingArea.ViewportHeight;
+        }
+
+        public Point TranslateToScreen(Point p)
+        {
+            return DrawingArea.TranslatePoint(p, ChemCanvas);
+        }
         private void Popup_Click(object sender, RoutedEventArgs e)
         {
             RingButton.IsChecked = true;
@@ -199,7 +225,7 @@ namespace Chem4Word.ACME
                 tempModel.RescaleForXaml(false);
                 var vm = new EditViewModel(tempModel, ChemCanvas);
                 ActiveViewModel = vm;
-
+                ActiveViewModel.EditorControl = this;
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
 
                 ChemCanvas.Chemistry = vm;

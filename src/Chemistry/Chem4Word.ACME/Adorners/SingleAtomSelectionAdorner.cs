@@ -52,6 +52,7 @@ namespace Chem4Word.ACME.Adorners
 
         //public Molecule AdornedMolecule { get; set; }
         public readonly List<Molecule> AdornedMolecules;
+        private Geometry _ghostMolecule;
 
         protected override Visual GetVisualChild(int index)
         {
@@ -185,12 +186,14 @@ namespace Chem4Word.ACME.Adorners
                 //identify which Molecule the atom belongs to
 
                 //take a snapshot of the molecule
-
-                var ghost = CurrentEditor.GhostMolecule(AdornedMolecules);
+                if (_ghostMolecule == null)
+                {
+                    _ghostMolecule = CurrentEditor.GhostMolecule(AdornedMolecules);
+                }
                 //Debug.WriteLine(LastOperation.ToString());
-                ghost.Transform = LastOperation;
+                _ghostMolecule.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, _ghostMolecule);
 
                 base.OnRender(drawingContext);
             }

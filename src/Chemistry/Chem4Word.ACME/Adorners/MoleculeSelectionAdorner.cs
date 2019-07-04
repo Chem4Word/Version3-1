@@ -44,6 +44,7 @@ namespace Chem4Word.ACME.Adorners
         private double _rotateAngle;
         private Point _centroid;
         private EditorCanvas _editorCanvas;
+        private Geometry _ghostMolecule;
 
         //private SnapGeometry _rotateSnapper;
         //private readonly Brush _renderBrush;
@@ -217,12 +218,14 @@ namespace Chem4Word.ACME.Adorners
                 //identify which Molecule the atom belongs to
 
                 //take a snapshot of the molecule
-
-                var ghost = _editorCanvas.GhostMolecule(AdornedMolecules);
+                if (_ghostMolecule == null)
+                {
+                    _ghostMolecule = _editorCanvas.GhostMolecule(AdornedMolecules);
+                }
                 //Debug.WriteLine(LastOperation.ToString());
-                ghost.Transform = LastOperation;
+                _ghostMolecule.Transform = LastOperation;
                 //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
+                drawingContext.DrawGeometry(RenderBrush, BorderPen, _ghostMolecule);
             }
         }
 

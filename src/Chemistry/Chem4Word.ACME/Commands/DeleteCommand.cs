@@ -22,23 +22,7 @@ namespace Chem4Word.ACME.Commands
 
         public override void Execute(object parameter)
         {
-            var atoms = EditViewModel.SelectedItems.OfType<Atom>().ToList();
-            var bonds = EditViewModel.SelectedItems.OfType<Bond>().ToList();
-            var mols = EditViewModel.SelectedItems.OfType<Molecule>().ToList();
-
-            if (mols.Any())
-            {
-                EditViewModel.DeleteMolecules(mols);
-            }
-            else if (atoms.Any() | bonds.Any())
-            {
-                EditViewModel.UndoManager.BeginUndoBlock();
-
-                EditViewModel.DeleteAtomsAndBonds(atoms, bonds);
-
-                EditViewModel.UndoManager.EndUndoBlock();
-                EditViewModel.SelectedItems.Clear();
-            }
+            EditViewModel.DeleteSelection();
         }
 
         public override event EventHandler CanExecuteChanged;

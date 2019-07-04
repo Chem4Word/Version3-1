@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core;
-
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -31,29 +30,31 @@ namespace Chem4Word.ACME
 
         public Brush BackgroundColor
         {
-            get { return (Brush)GetValue(BackgroundColorProperty); }
+            get { return (Brush) GetValue(BackgroundColorProperty); }
             set { SetValue(BackgroundColorProperty, value); }
         }
 
         public static readonly DependencyProperty BackgroundColorProperty =
             DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display),
-                new FrameworkPropertyMetadata(SystemColors.WindowBrush,
-                    FrameworkPropertyMetadataOptions.AffectsRender));
+                                        new FrameworkPropertyMetadata(SystemColors.WindowBrush,
+                                                                      FrameworkPropertyMetadataOptions.AffectsRender));
 
         #region Chemistry (DependencyProperty)
 
         public object Chemistry
         {
-            get { return (object)GetValue(ChemistryProperty); }
+            get { return (object) GetValue(ChemistryProperty); }
             set { SetValue(ChemistryProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Chemistry.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ChemistryProperty =
             DependencyProperty.Register("Chemistry", typeof(object), typeof(Display),
-                new FrameworkPropertyMetadata(null,
-                    FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                    FrameworkPropertyMetadataOptions.AffectsMeasure, ChemistryChanged));
+                                        new FrameworkPropertyMetadata(null,
+                                                                      FrameworkPropertyMetadataOptions.AffectsRender |
+                                                                      FrameworkPropertyMetadataOptions.AffectsArrange |
+                                                                      FrameworkPropertyMetadataOptions.AffectsMeasure,
+                                                                      ChemistryChanged));
 
         private static void ChemistryChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
         {
@@ -72,20 +73,18 @@ namespace Chem4Word.ACME
 
         public double ChemistryWidth
         {
-            get
-            {
-                return (double)GetValue(ChemistryWidthProperty);
-            }
-            set
-            {
-                SetValue(ChemistryWidthProperty, value);
-            }
+            get { return (double) GetValue(ChemistryWidthProperty); }
+            set { SetValue(ChemistryWidthProperty, value); }
         }
 
         public static readonly DependencyProperty ChemistryWidthProperty = DependencyProperty.Register(
             "ChemistryWidth", typeof(double), typeof(Display), new FrameworkPropertyMetadata(default(double),
-                FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                FrameworkPropertyMetadataOptions.AffectsMeasure));
+                                                                                             FrameworkPropertyMetadataOptions
+                                                                                                 .AffectsRender |
+                                                                                             FrameworkPropertyMetadataOptions
+                                                                                                 .AffectsArrange |
+                                                                                             FrameworkPropertyMetadataOptions
+                                                                                                 .AffectsMeasure));
 
         #endregion ChemistryWidth (DependencyProperty)
 
@@ -93,36 +92,31 @@ namespace Chem4Word.ACME
 
         public double ChemistryHeight
         {
-            get
-            {
-                return (double)GetValue(ChemistryHeightProperty);
-            }
-            set
-            {
-                SetValue(ChemistryHeightProperty, value);
-            }
+            get { return (double) GetValue(ChemistryHeightProperty); }
+            set { SetValue(ChemistryHeightProperty, value); }
         }
 
         public static readonly DependencyProperty ChemistryHeightProperty = DependencyProperty.Register(
             "ChemistryHeight", typeof(double), typeof(Display), new FrameworkPropertyMetadata(default(double),
-                FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsArrange |
-                FrameworkPropertyMetadataOptions.AffectsMeasure));
+                                                                                              FrameworkPropertyMetadataOptions
+                                                                                                  .AffectsRender |
+                                                                                              FrameworkPropertyMetadataOptions
+                                                                                                  .AffectsArrange |
+                                                                                              FrameworkPropertyMetadataOptions
+                                                                                                  .AffectsMeasure));
 
         #endregion ChemistryHeight (DependencyProperty)
 
 
-
         public bool HighlightActive
         {
-            get { return (bool)GetValue(HighlightActiveProperty); }
+            get { return (bool) GetValue(HighlightActiveProperty); }
             set { SetValue(HighlightActiveProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for HighlightActive.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HighlightActiveProperty =
             DependencyProperty.Register("HighlightActive", typeof(bool), typeof(Display), new PropertyMetadata(true));
-
-
 
         #endregion Public Properties
 
@@ -143,12 +137,6 @@ namespace Chem4Word.ACME
                         chemistryModel = conv.Import(data);
                         chemistryModel.EnsureBondLength(20, false);
                     }
-                    //else if (data.Contains("M  END"))
-                    //{
-                    //    var conv = new SdFileConverter();
-                    //    chemistryModel = conv.Import(data);
-                    //    chemistryModel.EnsureBondLength(20, false);
-                    //}
                 }
             }
             else
@@ -175,14 +163,6 @@ namespace Chem4Word.ACME
                     CurrentViewModel = new ViewModel(chemistryModel);
                     DrawChemistry(CurrentViewModel);
                 }
-                else
-                {
-                    //Placeholder.DataContext = null;
-                }
-            }
-            else
-            {
-                //Placeholder.DataContext = null;
             }
         }
 

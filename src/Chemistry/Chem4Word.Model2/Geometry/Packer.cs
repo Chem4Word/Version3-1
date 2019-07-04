@@ -34,9 +34,9 @@ namespace Chem4Word.Model2.Geometry
 
                 List<Node> nodes = new List<Node>();
 
-                foreach (var moleclue in Model.Molecules.Values)
+                foreach (var molecule in Model.Molecules.Values)
                 {
-                    nodes.Add(new Node(moleclue.Id, 0, 0, moleclue.BoundingBox.Width, moleclue.BoundingBox.Height));
+                    nodes.Add(new Node(molecule.Id, 0, 0, molecule.BoundingBox.Width, molecule.BoundingBox.Height));
                 }
 
                 //nodes.Sort((a, b) => b.Area.CompareTo(a.Area));
@@ -60,15 +60,15 @@ namespace Chem4Word.Model2.Geometry
                 Debug.WriteLine($"Packing took {packTime}ms");
                 Debug.WriteLine($"Width: {Width} Height {Height}");
 
-                foreach (var moleclue in Model.Molecules.Values)
+                foreach (var molecule in Model.Molecules.Values)
                 {
                     foreach (var node in nodes)
                     {
-                        if (node.Id.Equals(moleclue.Id))
+                        if (node.Id.Equals(molecule.Id))
                         {
-                            double dx = node.X - moleclue.BoundingBox.X;
-                            double dy = node.Y - moleclue.BoundingBox.Y;
-                            moleclue.MoveAllAtoms(dx, dy);
+                            double dx = node.X - molecule.BoundingBox.X;
+                            double dy = node.Y - molecule.BoundingBox.Y;
+                            molecule.MoveAllAtoms(dx, dy);
                         }
                     }
                 }

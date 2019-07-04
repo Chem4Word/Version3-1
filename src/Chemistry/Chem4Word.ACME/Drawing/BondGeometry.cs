@@ -18,9 +18,7 @@ using static Chem4Word.Model2.Helpers.Globals;
 namespace Chem4Word.ACME.Drawing
 {
     /// <summary>
-    ///     Static class to define bond geometries
-    ///     now uses StreamGeometry in preference to PathGeometry
-    ///     Old code is commented out
+    ///     Static class to handle bond geometries 
     /// </summary>
  
   
@@ -40,23 +38,28 @@ namespace Chem4Word.ACME.Drawing
 
             desc.Boundary.AddRange(new[] {desc.Start, desc.FirstCorner, desc.SecondCorner});
         }
-
+        /// <summary>
+        /// Gets the geometry of a wedge bond.  
+        /// </summary>
+        /// <param name="desc">WedgeBondDescriptor which is populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         public static void GetWedgeBondGeometry(WedgeBondDescriptor desc, double standardBondLength)
 
         {
+            //get the width of the wedge bond's thick end
             var bondVector = desc.PrincipleVector;
             var perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
             perpVector *= standardBondLength * BondOffsetPercentage;
+            
+            // shrink the bond so it doesn't overlap any AtomVisuals
+            AdjustTerminus(ref desc.Start, desc.End, desc.StartAtomVisual);
+            AdjustTerminus(ref desc.End, desc.Start, desc.EndAtomVisual);
 
-            StreamGeometry sg;
-
-
-           AdjustTerminus(ref desc.Start, desc.End, desc.StartAtomVisual);
-           AdjustTerminus(ref desc.End, desc.Start, desc.EndAtomVisual);
-
-
+            //then draw it
             GetWedgePoints(desc, perpVector);
+            //and pass it back as a Geometry
+            StreamGeometry sg;
             sg = desc.GetOutline();
             sg.Freeze();
             desc.DefiningGeometry = sg;
@@ -65,16 +68,15 @@ namespace Chem4Word.ACME.Drawing
         /// <summary>
         ///     Defines the three parallel lines of a Triple bond.
         /// </summary>
-        /// <param name="startPoint">Where the bond starts</param>
-        /// <param name="endPoint">Where it ends</param>
-        /// <param name="standardBondLength"></param>
-        /// <param name="enclosingPoly"></param>
-        /// <param name="descriptor.StartAtomVisual"></param>
-        /// <param name="descriptor.EndAtomVisual"></param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
+        /// <param name="descriptor.StartAtomVisual">AtomVisual defining the starting atom</param>
+        /// <param name="descriptor.EndAtomVisual">AtomVisual defining the end atom</param>
         /// <returns></returns>
         public static void GetTripleBondGeometry(TripleBondDescriptor descriptor, double standardBondLength)
         {
+            //start by getting the six points that define a standard triple bond
             GetTripleBondPoints(descriptor, standardBondLength);
+            //and draw it
             var sg = new StreamGeometry();
             using (var sgc = sg.Open())
             {
@@ -91,19 +93,26 @@ namespace Chem4Word.ACME.Drawing
             descriptor.DefiningGeometry = sg;
         }
 
+        /// <summary>
+        /// 'Draws' the triple bond
+        /// </summary>
+        /// <param name="descriptor">TripleBondDescriptor which is populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         public static void GetTripleBondPoints(TripleBondDescriptor descriptor, double standardBondLength)
         {
+            //get a standard perpendicular vector
             var v = descriptor.PrincipleVector;
             var normal = v.Perpendicular();
             normal.Normalize();
 
+            //offset the secondaries
             var distance = standardBondLength * BondOffsetPercentage;
             descriptor.SecondaryStart = descriptor.Start + normal * distance;
             descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
 
             descriptor.TertiaryStart = descriptor.Start - normal * distance;
             descriptor.TertiaryEnd = descriptor.TertiaryStart + v;
-
+            //adjust the line ends
             if (descriptor.StartAtomVisual != null)
             {
                 AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
@@ -118,6 +127,7 @@ namespace Chem4Word.ACME.Drawing
                 AdjustTerminus(ref descriptor.TertiaryEnd, descriptor.TertiaryStart, descriptor.EndAtomVisual);
             }
 
+            //and define the boundary for hit testing
             descriptor.Boundary.Clear();
             descriptor.Boundary.AddRange(new[]
                                               {
@@ -130,18 +140,16 @@ namespace Chem4Word.ACME.Drawing
         ///     draws the two parallel lines of a double bond
         ///     These bonds can either straddle the atom-atom line or fall to one or other side of it
         /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="standardBondLength"></param>
-        /// <param name="doubleBondPlacement"></param>
-        /// <param name="ringCentroid"></param>
-        /// <param name="enclosingPoly"></param>
+        /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         /// <returns></returns>
         public static void GetDoubleBondGeometry(DoubleBondDescriptor descriptor, double standardBondLength)
 
         {
-            GetDoubleBondPoints(descriptor, standardBondLength);
 
+            //get the standard points for a double bond
+            GetDoubleBondPoints(descriptor, standardBondLength);
+            //adjust the line ends
             if (descriptor.StartAtomVisual != null)
             {
                 AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
@@ -154,7 +162,7 @@ namespace Chem4Word.ACME.Drawing
                 AdjustTerminus(ref descriptor.End, descriptor.Start, descriptor.EndAtomVisual);
                 AdjustTerminus(ref descriptor.SecondaryEnd, descriptor.SecondaryStart, descriptor.EndAtomVisual);
             }
-
+            //and draw it
             var sg = new StreamGeometry();
             using (var sgc = sg.Open())
             {
@@ -170,17 +178,10 @@ namespace Chem4Word.ACME.Drawing
         }
 
         /// <summary>
-        ///     Defines the 4 points that characterise a double bond and returns a list of them in polygon order
+        ///     Defines a double bond 
         /// </summary>
-        /// <param name="startPoint"></param>
-        /// <param name="endPoint"></param>
-        /// <param name="standardBondLength"></param>
-        /// <param name="doubleBondPlacement"></param>
-        /// <param name="ringCentroid"></param>
-        /// <param name="point1"></param>
-        /// <param name="point2"></param>
-        /// <param name="point3"></param>
-        /// <param name="point4"></param>
+        /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         /// <returns></returns>
         public static void GetDoubleBondPoints(DoubleBondDescriptor descriptor, double standardBondLength)
         {
@@ -195,7 +196,7 @@ namespace Chem4Word.ACME.Drawing
                 //now, if there is a centroid defined, the bond is part of a ring
             {
                 Point? workingCentroid = null;
-
+                //work out whether the bond is place inside or outside the ring
                 var bondvector = descriptor.PrincipleVector;
                 var centreVector = descriptor.PrimaryCentroid - descriptor.Start;
 
@@ -214,7 +215,9 @@ namespace Chem4Word.ACME.Drawing
                 }
 
                 if (workingCentroid != null)
+
                 {
+                    //shorten the secondto fit neatly within the ring 
                     point3a = BasicGeometry.LineSegmentsIntersect(descriptor.Start, workingCentroid.Value,
                                                                   descriptor.SecondaryStart,
                                                                   descriptor.SecondaryEnd);
@@ -227,17 +230,21 @@ namespace Chem4Word.ACME.Drawing
                     descriptor.SecondaryStart = tempPoint3;
                     descriptor.SecondaryEnd = tempPoint4;
                 }
-
+                //get the boundary for hit testing purposes
                 descriptor.Boundary.Clear();
                 descriptor.Boundary.AddRange(new[]
                                                   {
                                                       descriptor.Start, descriptor.End, descriptor.SecondaryEnd,
                                                       descriptor.SecondaryStart
                                                   });
-                //capture  the enclosing polygon for hit testing later
+                
             }
         }
-
+        /// <summary>
+        /// Gets an unadjusted set of points for a double bond
+        /// </summary>
+        /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         private static void GetDefaultDoubleBondPoints(DoubleBondDescriptor descriptor, double standardBondLength)
         {
             var v = descriptor.PrincipleVector;
@@ -248,7 +255,7 @@ namespace Chem4Word.ACME.Drawing
             var distance = standardBondLength * BondOffsetPercentage;
             //first, calculate the default bond points as if there were no rings involved
             var tempStart = descriptor.Start;
-            var tempEnd = descriptor.End;
+            //offset according to placement
             switch (descriptor.Placement)
             {
                 case BondDirection.None:
@@ -402,11 +409,16 @@ namespace Chem4Word.ACME.Drawing
             figures.Add(pf);
             return figures;
         }
-
+        /// <summary>
+        /// Quite ghastly routine to draw a wiggly bond
+        /// </summary>
+        /// <param name="descriptor">BondDescriptor which is populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         public static void GetWavyBondGeometry(BondDescriptor descriptor, double standardBondLength)
         {
             var sg = new StreamGeometry();
 
+            //first do the adjustment for any atom visuals
             if (descriptor.StartAtomVisual != null)
             {
                 AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
@@ -418,35 +430,40 @@ namespace Chem4Word.ACME.Drawing
                 AdjustTerminus(ref descriptor.End, descriptor.Start, descriptor.EndAtomVisual);
             }
 
+            //Work out the control points for a quadratic Bezier by sprouting alternately along the bond line
             Vector halfAWiggle;
             using (var sgc = sg.Open())
             {
                 var bondVector = descriptor.PrincipleVector;
-                var noOfWiggles = (int) Math.Ceiling(bondVector.Length / standardBondLength * BondOffsetPercentage);
+                //come up with a number of wiggles that looks aesthetically sensible
+                var noOfWiggles = (int) Math.Ceiling(bondVector.Length / (standardBondLength * BondOffsetPercentage *2));
                 if (noOfWiggles < 3)
                 {
                     noOfWiggles = 3;
                 }
-
+                //now calculate a wiggle vector that is 60 degrees from the bond angle
                 var wiggleLength = bondVector.Length / noOfWiggles;
                 Debug.WriteLine($"standardBondLength: {standardBondLength} noOfWiggles: {noOfWiggles}");
 
                 halfAWiggle = bondVector;
                 halfAWiggle.Normalize();
                 halfAWiggle *= wiggleLength / 2;
-
+                
+                //work out left and right sprouting vectors
                 var toLeft = new Matrix();
                 toLeft.Rotate(-60);
                 var toRight = new Matrix();
                 toRight.Rotate(60);
+
                 var leftVector = halfAWiggle * toLeft;
                 var rightVector = halfAWiggle * toRight;
 
                 var allpoints = new List<Point>();
-
+                //allpoints holds the control points for the bezier
                 allpoints.Add(descriptor.Start);
 
                 var lastPoint = descriptor.Start;
+                //move along the bond vector, sprouting control points alternately
                 for (var i = 0; i < noOfWiggles; i++)
                 {
                     var leftPoint = lastPoint + leftVector;
@@ -459,10 +476,10 @@ namespace Chem4Word.ACME.Drawing
                 }
 
                 allpoints.Add(descriptor.End);
-                MakePathFromPoints(sgc, allpoints);
+                BezierFromPoints(sgc, allpoints);
                 sgc.Close();
             }
-
+            //define the boundary
             descriptor.Boundary.Clear();
             descriptor.Boundary.AddRange(new[]
                                               {
@@ -474,22 +491,28 @@ namespace Chem4Word.ACME.Drawing
 
             sg.Freeze();
             descriptor.DefiningGeometry = sg;
+
+            //local function
+            void BezierFromPoints(StreamGeometryContext sgc, List<Point> allpoints)
+            {
+                sgc.BeginFigure(allpoints[0], false, false);
+                sgc.PolyQuadraticBezierTo(allpoints.Skip(1).ToArray(), true, true);
+            }
         }
 
-        private static void MakePathFromPoints(StreamGeometryContext sgc, List<Point> allpoints)
-        {
-            sgc.BeginFigure(allpoints[0], false, false);
-            sgc.PolyQuadraticBezierTo(allpoints.Skip(1).ToArray(), true, true);
-        }
-
+        /// <summary>
+        /// Chamfers or forks the end of a wedge bond under special circumstances
+        /// (one or more incoming single bonds)
+        /// </summary>
+        /// <param name="descriptor"> WedgeBondDescriptor to be populated</param>
+        /// <param name="standardBondLength">Standard bond length as defined by the model</param>
+        /// <param name="otherAtomPoints">List of positions of atoms splaying from the end atom</param>
         public static void GetChamferedWedgeGeometry(WedgeBondDescriptor descriptor,
                                                          double standardBondLength, List<Point> otherAtomPoints)
         {
             var bondVector = descriptor.PrincipleVector;
 
-            var perpVector = bondVector.Perpendicular();
-            perpVector.Normalize();
-            perpVector *= standardBondLength * BondOffsetPercentage;
+            //first get an unaltered bond
             GetWedgeBondGeometry(descriptor, standardBondLength);
 
             var firstEdgeVector = descriptor.FirstCorner - descriptor.Start;
@@ -501,9 +524,11 @@ namespace Chem4Word.ACME.Drawing
                                 orderby Math.Abs(Vector.AngleBetween(bondVector, p - descriptor.End)) descending
                                 select p);
 
-
+            //the scaling factors are what we multiply the bond edge vectors by
             double firstScalingFactor = 0d, secondScalingFactor = 0d;
 
+
+            //work out the biggest scaling factor for either long edge
             foreach (var point in widestPoints)
             {
                 BasicGeometry.IntersectLines(out var firstEdgeCut, out var otherBond1Cut, descriptor.Start,
@@ -520,8 +545,6 @@ namespace Chem4Word.ACME.Drawing
                     {
                         firstScalingFactor = firstEdgeCut;
                     }
-
-
                     if (secondEdgeCut > secondScalingFactor)
                     {
                         secondScalingFactor = secondEdgeCut;
@@ -533,8 +556,6 @@ namespace Chem4Word.ACME.Drawing
                     {
                         firstScalingFactor = firstEdgeCut;
                     }
-
-
                     if (secondEdgeCut > secondScalingFactor & otherBond2Cut < 1d & otherBond2Cut > 0d)
                     {
                         secondScalingFactor = secondEdgeCut;
@@ -542,11 +563,11 @@ namespace Chem4Word.ACME.Drawing
                 }
             }
 
-
+            //and multiply the edges by the scaling factors
             descriptor.FirstCorner = firstEdgeVector * firstScalingFactor + descriptor.Start;
             descriptor.SecondCorner = secondEdgeVector * secondScalingFactor + descriptor.Start;
 
-            //AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
+           
 
             descriptor.CappedOff = true;
 

@@ -299,6 +299,18 @@
         <KeyBinding
             Key="Delete"
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
+        <KeyBinding
+            Key="C"
+            Modifiers="Control"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand}" />
+        <KeyBinding
+            Key="X"
+            Modifiers="Control"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand}" />
+        <KeyBinding
+            Key="V"
+            Modifiers="Control"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand}" />
     </UserControl.InputBindings>
 
     <Grid Name="SelectorGrid">
@@ -701,6 +713,7 @@
 
                 <Button x:Name="CutButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand}"
+                    ToolTip="Cut"
                     Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
@@ -714,6 +727,7 @@
                 </Button>
                 <Button x:Name="CopyButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand}"
+                    ToolTip="Copy"
                     Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
@@ -727,6 +741,7 @@
                 </Button>
                 <Button x:Name="PasteButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand}"
+                    ToolTip="Paste"
                     Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
@@ -740,6 +755,7 @@
                 </Button>
                 <Button x:Name="UndoButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UndoCommand}"
+                    ToolTip="Undo"
                     Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"
@@ -755,6 +771,7 @@
                 </Button>
                 <Button x:Name="RedoButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand}"
+                    ToolTip="Redo"
                     Style="{StaticResource CommandButtonStyle}">
                     <Viewbox
                         Width="24"

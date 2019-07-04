@@ -157,6 +157,7 @@ namespace Chem4Word.ACME.Controls
             return ghostGeometry;
         }
 
+
         #endregion Methods
 
         #region Overrides

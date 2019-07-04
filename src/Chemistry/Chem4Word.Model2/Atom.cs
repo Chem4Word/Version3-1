@@ -388,7 +388,7 @@ namespace Chem4Word.Model2
             set
             {
                 _formalCharge = value;
-                //Attributed call knows who we are, no need to pass "FormalCharge" as an argument
+               
                 OnPropertyChanged();
             }
         }

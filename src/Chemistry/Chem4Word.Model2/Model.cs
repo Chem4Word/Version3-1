@@ -450,6 +450,16 @@ namespace Chem4Word.Model2
             _boundingBox = Rect.Empty;
         }
 
+
+        public void CenterOn(Point point)
+        {
+            Rect boundingBox = BoundingBox;
+            Point midPoint = new Point( BoundingBox.Left +  boundingBox.Width/2, BoundingBox.Top + BoundingBox.Height/2);
+            Vector displacement = midPoint - point;
+            RepositionAll(displacement.X, displacement.Y);
+
+        }
+
         public ChemistryBase GetFromPath(string path)
         {
             try
@@ -777,6 +787,7 @@ namespace Chem4Word.Model2
 
             RepositionAll(offsetLeft, offsetTop);
         }
+
     }
 
     #endregion Methods
