@@ -50,7 +50,6 @@ namespace Chem4Word.ACME.Adorners
         // the adorner's visual collection.
         protected override int VisualChildrenCount => VisualChildren.Count;
 
-        //public Molecule AdornedMolecule { get; set; }
         public readonly List<Molecule> AdornedMolecules;
         private Geometry _ghostMolecule;
 
@@ -84,22 +83,13 @@ namespace Chem4Word.ACME.Adorners
             IsHitTestVisible = true;
 
             CurrentEditor = (EditorCanvas)adornedElement;
-          
+
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
-            //PreviewKeyDown += SingleAtomSelectionAdorner_PreviewKeyDown;
-            //BigThumb.PreviewKeyDown += SingleAtomSelectionAdorner_PreviewKeyDown;
+
             Focusable = true;
             Keyboard.Focus(this);
         }
-
-        //private void SingleAtomSelectionAdorner_PreviewKeyDown(object sender, KeyEventArgs e)
-        //{
-        //    if (e.Key == Key.Escape)
-        //    {
-        //        BigThumb.CancelDrag();
-        //    }
-        //}
 
         private void SingleAtomSelectionAdorner_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -109,7 +99,6 @@ namespace Chem4Word.ACME.Adorners
         ~SingleAtomSelectionAdorner()
         {
             PreviewMouseRightButtonUp -= SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
-           
         }
 
         protected void AttachHandler()
@@ -139,20 +128,6 @@ namespace Chem4Word.ACME.Adorners
 
             LastOperation = null;
             InvalidateVisual();
-        }
-
-        protected virtual void DragStarted(object sender, DragStartedEventArgs e)
-        {
-            Dragging = true;
-            Keyboard.Focus(this);
-            DragXTravel = 0.0d;
-            DragYTravel = 0.0d;
-        }
-
-        private void SetBoundingBox()
-        {
-            //and work out the aspect ratio for later resizing
-            //AdornedMolecule.ResetBoundingBox();
         }
 
         /// <summary>
@@ -190,9 +165,9 @@ namespace Chem4Word.ACME.Adorners
                 {
                     _ghostMolecule = CurrentEditor.GhostMolecule(AdornedMolecules);
                 }
-                //Debug.WriteLine(LastOperation.ToString());
+
                 _ghostMolecule.Transform = LastOperation;
-                //drawingContext.DrawRectangle(_renderBrush, _renderPen, ghostImage.Bounds);
+
                 drawingContext.DrawGeometry(RenderBrush, BorderPen, _ghostMolecule);
 
                 base.OnRender(drawingContext);
@@ -240,7 +215,7 @@ namespace Chem4Word.ACME.Adorners
 
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
-
+            Keyboard.Focus(this);
             StartPos = new Point(Canvas.GetLeft(BigThumb), Canvas.GetTop(BigThumb));
             LastOperation = new TranslateTransform();
         }
@@ -271,13 +246,10 @@ namespace Chem4Word.ACME.Adorners
         {
             if (!e.Canceled)
             {
-
-
-                var lastTranslation = (TranslateTransform) LastOperation;
+                var lastTranslation = (TranslateTransform)LastOperation;
                 lastTranslation.X = DragXTravel;
                 lastTranslation.Y = DragYTravel;
 
-                SetBoundingBox();
                 InvalidateVisual();
                 CurrentEditor.SuppressRedraw = true;
                 //move the molecule
@@ -288,7 +260,7 @@ namespace Chem4Word.ACME.Adorners
                 CurrentModel.DoTransform(LastOperation, atoms.ToList());
 
                 RaiseDRCompleted(sender, e);
-            
+
                 CurrentEditor.SuppressRedraw = false;
 
                 foreach (Molecule adornedMolecule in AdornedMolecules)
@@ -301,7 +273,6 @@ namespace Chem4Word.ACME.Adorners
                 CurrentModel.SelectedItems.Remove(AdornedMolecules);
             }
             Dragging = false;
-
         }
 
         #endregion MouseIsDown

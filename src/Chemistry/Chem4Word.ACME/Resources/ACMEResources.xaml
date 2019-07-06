@@ -276,7 +276,7 @@
         TargetType="Thumb">
         <Setter Property="Opacity" Value="0.15" />
     </Style>
-
+ 
     <Style x:Key="RotateThumb" TargetType="Thumb">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
@@ -290,32 +290,42 @@
                         Width="{TemplateBinding Width}"
                         Height="{TemplateBinding Height}"
                         Stretch="Uniform">
+
                         <Canvas
-                            Width="200"
-                            Height="200"
+                            Background="{x:Static SystemColors.WindowBrush}"
+                            Width="38"
+                            Height="38"
                             Margin="0">
-                            <graphics:ArcArrow
-                                ArrowHeadLength="50"
-                                Center="50,50"
-                                EndAngle="0"
-                                Fill="Transparent"
-                                HeadAngle="45"
-                                IsArrowClosed="True"
-                                Radius="100"
-                                SmallAngle="False"
-                                StartAngle="270"
-                                Stroke="{StaticResource GrabHandleBorderBrush}"
-                                StrokeStartLineCap="Round"
-                                StrokeThickness="35" />
-                            <Ellipse
-                                Canvas.Left="25"
-                                Canvas.Top="25"
-                                Width="50"
-                                Height="50"
-                                Fill="{StaticResource GrabHandleFillBrush}"
-                                Stroke="{StaticResource GrabHandleBorderBrush}" />
+                            <Path Width="38" Height="38"  Stretch="Fill" Fill="{StaticResource GrabHandleBorderBrush}"
+                                  Data="F1 M 57,57L 42,57L 42,42L 47.1924,47.1924C 49.5449,44.8399 51,41.5899 51,38C 
+                                  51,30.8203 45.1797,25 38,25C 30.8203,25 25,30.8203 25,38C 25,42.6137 27.4035,46.6661 
+                                  31.0266,48.9734L 26.7138,53.2862C 22.0342,49.8254 19,44.2671 19,38C 19,27.5066 27.5066,19 38,19C
+                                  48.4934,19 57,27.5066 57,38C 57,43.2467 54.8734,47.9967 51.435,51.435L 57,57 Z ">
+                               
+                            </Path>
+                           
                         </Canvas>
                     </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PivotStyle" TargetType="Thumb">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource GrabHandleBorderBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Ellipse  Stroke="{StaticResource GrabHandleBorderBrush}" Width="15" Height="15" >
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="{x:Static SystemColors.WindowColor}" Opacity="0.25"></SolidColorBrush>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

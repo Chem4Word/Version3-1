@@ -37,6 +37,7 @@ namespace Chem4Word.ACME.Behaviors
         private DrawBondAdorner _adorner;
 
         private AtomVisual _lastAtomVisual;
+        private Cursor _lastCursor;
 
         private const string DefaultText = "Click existing atom to sprout a chain or modify element.";
 
@@ -45,7 +46,8 @@ namespace Chem4Word.ACME.Behaviors
             base.OnAttached();
 
             CurrentEditor = (EditorCanvas)AssociatedObject;
-
+            _lastCursor = CurrentEditor.Cursor;
+            CurrentEditor.Cursor = Cursors.Pen;
             EditViewModel.SelectedItems?.Clear();
 
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
@@ -121,8 +123,7 @@ namespace Chem4Word.ACME.Behaviors
                         lastPos = e.GetPosition(CurrentEditor);
 
                         var angleBetween =
-                            Vector.AngleBetween(
-                                (_lastAtomVisual?.ParentAtom?.BalancingVector()) ?? BasicGeometry.ScreenNorth,
+                            Vector.AngleBetween(_lastAtomVisual?.ParentAtom?.BalancingVector() ?? BasicGeometry.ScreenNorth,
                                 BasicGeometry.ScreenNorth);
                         //snap a bond into position
                         lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
@@ -578,6 +579,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.PreviewMouseMove -= CurrentEditor_PreviewMouseMove;
             CurrentEditor.PreviewMouseRightButtonUp -= CurrentEditor_PreviewMouseRightButtonUp;
             CurrentStatus = "";
+            CurrentEditor.Cursor = _lastCursor;
         }
     }
 }

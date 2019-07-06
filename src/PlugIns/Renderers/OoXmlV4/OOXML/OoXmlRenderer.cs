@@ -751,19 +751,20 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     List<BondLine> lines = _bondLines.Where(bl => bl.ParentBond.Equals(bondPath)).ToList();
                     if (lines.Any())
                     {
-                        List<Bond> otherBonds;
+                        List<Bond> otherLines;
                         if (isInRing)
                         {
-                            otherBonds = atom.Bonds.Where(b => !b.Id.Equals(bondPath)).ToList();
+                            otherLines = atom.Bonds.Where(b => !b.Id.Equals(bondPath)).ToList();
                         }
                         else
                         {
-                            otherBonds = atom.Bonds.Where(b => !b.Id.Equals(bondPath) && b.Order.Equals(Globals.OrderSingle)).ToList();
+                            otherLines = atom.Bonds.Where(b => !b.Id.Equals(bondPath) && b.Order.Equals(Globals.OrderSingle)).ToList();
                         }
-                        if (otherBonds.Count == 2)
+
+                        if (lines.Count == 2 && otherLines.Count == 2)
                         {
-                            BondLine line1 = _bondLines.First(bl => bl.ParentBond.Equals(otherBonds[0].Path));
-                            BondLine line2 = _bondLines.First(bl => bl.ParentBond.Equals(otherBonds[1].Path));
+                            BondLine line1 = _bondLines.First(bl => bl.ParentBond.Equals(otherLines[0].Path));
+                            BondLine line2 = _bondLines.First(bl => bl.ParentBond.Equals(otherLines[1].Path));
                             TrimLines(lines, line1, line2, isInRing);
                         }
                     }
@@ -778,6 +779,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 TrimLine(mainPair[0], line2, isInRing);
             }
+            // Only two of these calls are expected to do anything
             if (!TrimLine(mainPair[1], line1, isInRing))
             {
                 TrimLine(mainPair[1], line2, isInRing);

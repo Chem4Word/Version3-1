@@ -294,11 +294,13 @@ namespace Chem4Word.Model2.Geometry
         public static void CombineGeometries(DrawingGroup drawingGroup, GeometryCombineMode combineMode, ref CombinedGeometry combinedGeometry)
         {
             if (combinedGeometry == null)
+            {
                 combinedGeometry = new CombinedGeometry();
+            }
 
             DrawingCollection drawingCollection = drawingGroup.Children;
 
-            foreach (System.Windows.Media.Drawing drawing in drawingCollection)
+            foreach (Drawing drawing in drawingCollection)
             {
                 if (drawing is DrawingGroup)
                 {
@@ -316,7 +318,9 @@ namespace Chem4Word.Model2.Geometry
         {
             var pathGeometry = geo as PathGeometry ?? PathGeometry.CreateFromGeometry(geo);
             foreach (var figure in pathGeometry.Figures)
+            {
                 DrawFigure(ctx, figure);
+            }
         }
 
         public static void DrawFigure(StreamGeometryContext ctx, PathFigure figure)
