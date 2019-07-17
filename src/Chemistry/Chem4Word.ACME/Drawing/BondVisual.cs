@@ -228,7 +228,7 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
-        private Brush GetHatchBrush()
+        public static Brush GetHatchBrush(double angle)
         {
             Brush bondBrush;
             bondBrush = new LinearGradientBrush
@@ -247,7 +247,7 @@ namespace Chem4Word.ACME.Drawing
 
                 Transform = new RotateTransform
                 {
-                    Angle = ParentBond.Angle
+                    Angle = angle
                 }
             };
             return bondBrush;
@@ -367,7 +367,7 @@ namespace Chem4Word.ACME.Drawing
                             //_mainBondPen.Thickness = 0d;
                             using (DrawingContext dc = RenderOpen())
                             {
-                                dc.DrawGeometry(GetHatchBrush(), _mainBondPen, BondDescriptor.DefiningGeometry);
+                                dc.DrawGeometry(GetHatchBrush(ParentBond.Angle), _mainBondPen, BondDescriptor.DefiningGeometry);
 
                                 dc.Close();
                             }
@@ -391,14 +391,25 @@ namespace Chem4Word.ACME.Drawing
 
                     _enclosingPoly = dbd3.Boundary;
 
-
-                    using (DrawingContext dc = RenderOpen())
+                    if(ParentBond.Stereo!=Globals.BondStereo.Indeterminate)
                     {
-                        dc.DrawLine(_mainBondPen, BondDescriptor.Start, BondDescriptor.End);
-                        dc.DrawLine(_subsidiaryBondPen,
-                                    dbd3.SecondaryStart,
-                                    dbd3.SecondaryEnd);
-                        dc.Close();
+                        using (DrawingContext dc = RenderOpen())
+                        {
+                            dc.DrawLine(_mainBondPen, BondDescriptor.Start, BondDescriptor.End);
+                            dc.DrawLine(_subsidiaryBondPen,
+                                        dbd3.SecondaryStart,
+                                        dbd3.SecondaryEnd);
+                            dc.Close();
+                        }
+                    }
+                    else
+                    {
+                        using (DrawingContext dc = RenderOpen())
+                        {
+                            dc.DrawGeometry(_mainBondPen.Brush, _mainBondPen, BondDescriptor.DefiningGeometry);
+                          
+                            dc.Close();
+                        }
                     }
                     break;
 

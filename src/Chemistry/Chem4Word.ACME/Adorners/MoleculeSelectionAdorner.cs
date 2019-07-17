@@ -154,6 +154,7 @@ namespace Chem4Word.ACME.Adorners
 
                 double snapAngle = Vector.AngleBetween(BasicGeometry.ScreenNorth,
                                                        _rotateSnapper.SnapVector(0, originalDisplacement));
+                _rotateAngle = snapAngle;
                 LastOperation = new RotateTransform(snapAngle, _centroid.X, _centroid.Y);
 
                 InvalidateVisual();
@@ -332,7 +333,6 @@ namespace Chem4Word.ACME.Adorners
 
         #region Events
 
-        public new event DragCompletedEventHandler DragCompleted;
 
         #endregion Events
 

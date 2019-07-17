@@ -321,21 +321,21 @@ namespace Chem4Word.ACME
 
         #region Commands
 
-        public DeleteCommand DeleteCommand { get; }
-        public AddAtomCommand AddAtomCommand { get; }
-        public UndoCommand UndoCommand { get; }
-        public RedoCommand RedoCommand { get; }
-        public CopyCommand CopyCommand { get; }
-        public CutCommand CutCommand { get; }
-        public PasteCommand PasteCommand { get; }
-        public FlipVerticalCommand FlipVerticalCommand { get; }
-        public FlipHorizontalCommand FlipHorizontalCommand { get; }
-        public AddHydrogensCommand AddHydrogensCommand { get; }
-        public RemoveHydrogensCommand RemoveHydrogensCommand { get; }
-        public FuseCommand FuseCommand { get; }
-        public GroupCommand GroupCommand { get; }
-        public UnGroupCommand UnGroupCommand { get; }
-        public SettingsCommand SettingsCommand { get; }
+        public DeleteCommand DeleteCommand { get; set; }
+        public AddAtomCommand AddAtomCommand { get; set; }
+        public UndoCommand UndoCommand { get; set; }
+        public RedoCommand RedoCommand { get; set; }
+        public CopyCommand CopyCommand { get; set; }
+        public CutCommand CutCommand { get; set; }
+        public PasteCommand PasteCommand { get; set; }
+        public FlipVerticalCommand FlipVerticalCommand { get; set; }
+        public FlipHorizontalCommand FlipHorizontalCommand { get; set; }
+        public AddHydrogensCommand AddHydrogensCommand { get; set; }
+        public RemoveHydrogensCommand RemoveHydrogensCommand { get; set; }
+        public FuseCommand FuseCommand { get; set; }
+        public GroupCommand GroupCommand { get; set; }
+        public UnGroupCommand UnGroupCommand { get; set; }
+        public SettingsCommand SettingsCommand { get; set; }
 
         #endregion Commands
 
@@ -346,14 +346,28 @@ namespace Chem4Word.ACME
             AtomOptions = new ObservableCollection<AtomOption>();
             
             LoadAtomOptions();
-            RedoCommand = new RedoCommand(this);
-            UndoCommand = new UndoCommand(this);
+          
 
             SelectedItems = new ObservableCollection<object>();
             SelectedItems.CollectionChanged += SelectedItemsOnCollectionChanged;
 
             UndoManager = new UndoHandler(this);
 
+            SetupCommands();
+            CurrentEditor = currentEditor;
+            ClipboardMonitor = new ClipboardMonitor();
+            ClipboardMonitor.OnClipboardContentChanged += ClipboardMonitor_OnClipboardContentChanged;
+            _selectedElement = Globals.PeriodicTable.C;
+
+            _selectedBondOptionId = 1;
+
+            LoadBondOptions();
+        }
+
+        private void SetupCommands()
+        {
+            RedoCommand = new RedoCommand(this);
+            UndoCommand = new UndoCommand(this);
             DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
             CopyCommand = new CopyCommand(this);
@@ -367,14 +381,6 @@ namespace Chem4Word.ACME
             GroupCommand = new GroupCommand(this);
             UnGroupCommand = new UnGroupCommand(this);
             SettingsCommand = new SettingsCommand(this);
-            CurrentEditor = currentEditor;
-            ClipboardMonitor = new ClipboardMonitor();
-            ClipboardMonitor.OnClipboardContentChanged += ClipboardMonitor_OnClipboardContentChanged;
-            _selectedElement = Globals.PeriodicTable.C;
-
-            _selectedBondOptionId = 1;
-
-            LoadBondOptions();
         }
 
         private void ClipboardMonitor_OnClipboardContentChanged(object sender, EventArgs e)
