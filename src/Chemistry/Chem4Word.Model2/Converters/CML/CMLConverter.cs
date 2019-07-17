@@ -429,6 +429,14 @@ namespace Chem4Word.Model2.Converters.CML
             {
                 molecule.Names.Add(GetName(nameElement));
             }
+            //do a quick check to see if the molecule contains any disconnected fragments
+            //take a copy
+            Molecule copy = molecule.Copy();
+            copy.SplitIntoChildren();
+            if(copy.Molecules.Count>1)
+            {
+                molecule = copy;
+            }
 
             molecule.RebuildRings();
 

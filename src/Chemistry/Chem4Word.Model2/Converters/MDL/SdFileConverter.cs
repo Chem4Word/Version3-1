@@ -39,7 +39,7 @@ namespace Chem4Word.Model2.Converters.MDL
 
             if (data != null)
             {
-                string dataAsString = (string)data;
+                string dataAsString = (string) data;
                 if (!dataAsString.Contains("v3000") && !dataAsString.Contains("V3000"))
                 {
                     model = new Model();
@@ -72,6 +72,15 @@ namespace Chem4Word.Model2.Converters.MDL
                                 {
                                     model.GeneralErrors.Add(message);
                                 }
+
+                                //split the molecule if it's disconnected
+                                Molecule copy = molecule.Copy();
+                                copy.SplitIntoChildren();
+                                if (copy.Molecules.Count > 1)
+                                {
+                                    molecule = copy;
+                                }
+
                                 //Ensure we add the molecule after it's populated
                                 model.AddMolecule(molecule);
                                 molecule.Parent = model;
@@ -80,6 +89,7 @@ namespace Chem4Word.Model2.Converters.MDL
                                     model.GeneralErrors.Add("This file has greater than 16 structures!");
                                     sr.ReadToEnd();
                                 }
+
                                 break;
 
                             case SdfState.EndOfCtab:
@@ -151,7 +161,8 @@ namespace Chem4Word.Model2.Converters.MDL
             return result;
 
             // Local Function
-            void GatherChildren(Molecule molecule, List<Atom> atoms, List<Bond> bonds, List<ChemicalName> names, List<Formula> formulas)
+            void GatherChildren(Molecule molecule, List<Atom> atoms, List<Bond> bonds, List<ChemicalName> names,
+                                List<Formula> formulas)
             {
                 atoms.AddRange(molecule.Atoms.Values.ToList());
                 bonds.AddRange(molecule.Bonds.ToList());

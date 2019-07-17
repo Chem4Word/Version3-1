@@ -40,7 +40,6 @@ namespace Chem4Word.Model2
         public List<string> Warnings { get; set; }
         public List<string> Errors { get; set; }
 
-
         #endregion Collections
 
         #endregion Fields
@@ -385,7 +384,7 @@ namespace Chem4Word.Model2
         {
             _bonds.Add(newBond);
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Bond> { newBond });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Bond> {newBond});
             OnBondsChanged(this, e);
 
             UpdateBondsPropertyHandlers(e);
@@ -403,7 +402,7 @@ namespace Chem4Word.Model2
         {
             bool result = _bonds.Remove(toRemove);
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Bond> { toRemove });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Bond> {toRemove});
             OnBondsChanged(this, e);
             UpdateBondsPropertyHandlers(e);
             return result;
@@ -413,7 +412,7 @@ namespace Chem4Word.Model2
         {
             _atoms[newAtom.InternalId] = newAtom;
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Atom> { newAtom });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Atom> {newAtom});
             OnAtomsChanged(this, e);
             UpdateAtomPropertyHandlers(e);
             return newAtom;
@@ -423,8 +422,8 @@ namespace Chem4Word.Model2
         {
             bool bondsExist =
                 Bonds.Any(b =>
-                    b.StartAtomInternalId.Equals(toRemove.InternalId) |
-                    b.EndAtomInternalId.Equals(toRemove.InternalId));
+                              b.StartAtomInternalId.Equals(toRemove.InternalId) |
+                              b.EndAtomInternalId.Equals(toRemove.InternalId));
             if (bondsExist)
             {
                 throw new InvalidOperationException("Cannot remove an Atom without first removing the attached Bonds.");
@@ -435,7 +434,7 @@ namespace Chem4Word.Model2
             {
                 NotifyCollectionChangedEventArgs e =
                     new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
-                        new List<Atom> { toRemove });
+                                                         new List<Atom> {toRemove});
                 OnAtomsChanged(this, e);
                 UpdateAtomPropertyHandlers(e);
             }
@@ -449,7 +448,7 @@ namespace Chem4Word.Model2
             {
                 foreach (object oldItem in e.OldItems)
                 {
-                    ((Atom)oldItem).PropertyChanged -= ChemObject_PropertyChanged;
+                    ((Atom) oldItem).PropertyChanged -= ChemObject_PropertyChanged;
                 }
             }
 
@@ -457,7 +456,7 @@ namespace Chem4Word.Model2
             {
                 foreach (object newItem in e.NewItems)
                 {
-                    ((Atom)newItem).PropertyChanged += ChemObject_PropertyChanged;
+                    ((Atom) newItem).PropertyChanged += ChemObject_PropertyChanged;
                 }
             }
         }
@@ -469,7 +468,7 @@ namespace Chem4Word.Model2
             {
                 NotifyCollectionChangedEventArgs e =
                     new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
-                        new List<Molecule> { mol });
+                                                         new List<Molecule> {mol});
                 OnMoleculesChanged(this, e);
                 UpdateMoleculeHandlers(e);
             }
@@ -481,7 +480,7 @@ namespace Chem4Word.Model2
         {
             _molecules[newMol.InternalId] = newMol;
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Molecule> { newMol });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Molecule> {newMol});
             OnMoleculesChanged(this, e);
             UpdateMoleculeHandlers(e);
             return newMol;
@@ -518,7 +517,7 @@ namespace Chem4Word.Model2
             {
                 foreach (object oldItem in e.OldItems)
                 {
-                    Molecule mol = (Molecule)oldItem;
+                    Molecule mol = (Molecule) oldItem;
                     mol.AtomsChanged -= Atoms_CollectionChanged;
                     mol.BondsChanged -= Bonds_CollectionChanged;
                     mol.PropertyChanged -= ChemObject_PropertyChanged;
@@ -529,7 +528,7 @@ namespace Chem4Word.Model2
             {
                 foreach (object newItem in e.NewItems)
                 {
-                    Molecule mol = (Molecule)newItem;
+                    Molecule mol = (Molecule) newItem;
                     mol.AtomsChanged += Atoms_CollectionChanged;
                     mol.BondsChanged += Bonds_CollectionChanged;
                     mol.PropertyChanged += ChemObject_PropertyChanged;
@@ -557,7 +556,7 @@ namespace Chem4Word.Model2
             {
                 foreach (object oldItem in e.OldItems)
                 {
-                    ((Bond)oldItem).PropertyChanged -= ChemObject_PropertyChanged;
+                    ((Bond) oldItem).PropertyChanged -= ChemObject_PropertyChanged;
                 }
             }
 
@@ -565,7 +564,7 @@ namespace Chem4Word.Model2
             {
                 foreach (object newItem in e.NewItems)
                 {
-                    ((Bond)newItem).PropertyChanged += ChemObject_PropertyChanged;
+                    ((Bond) newItem).PropertyChanged += ChemObject_PropertyChanged;
                 }
             }
         }
@@ -983,8 +982,8 @@ namespace Chem4Word.Model2
                     {
                         Atom startAtom =
                             workingSet.Keys.OrderByDescending(a => a.Degree).First(); // go for the highest degree atom
-                        Ring nextRing = GetRing(startAtom); //identify a ring
-                        if (nextRing != null) //bingo
+                        Ring nextRing = GetRing(startAtom);                           //identify a ring
+                        if (nextRing != null)                                         //bingo
                         {
                             //and add the ring to the atoms
                             Rings.Add(nextRing); //add the ring to the set
@@ -1024,13 +1023,64 @@ namespace Chem4Word.Model2
         /// </summary>
         public List<Ring> SortedRings
         {
-            get
-            {
-              return SortRingsForDBPlacement();
-            }
+            get { return SortRingsForDBPlacement(); }
         }
 
         public Point Centroid { get; set; }
+
+        /// <summary>
+        /// Splits a molecule into child molecules and
+        /// adds them in as immediate children
+        /// Note this routine is destructive and should only
+        /// be used on copies of molecules unless
+        /// you are certain there are disconnected fragments
+        /// </summary>
+        public void SplitIntoChildren()
+        {
+            //take a count of the atoms in the molecule
+            int atomCount = Atoms.Count;
+            
+            //keep a running total of processed atoms
+            int processed = 0;
+
+            while (processed < atomCount)
+            {
+                //choose the first atom
+                Atom start = Atoms.Values.First();
+                HashSet<Atom> childAtoms = new HashSet<Atom>();
+                TraverseBFS(start, a => childAtoms.Add(a), a => !childAtoms.Contains(a));
+                processed += childAtoms.Count;
+
+                HashSet<Bond> childBonds = new HashSet<Bond>();
+                foreach (Atom childAtom in childAtoms)
+                {
+                    foreach (Bond childAtomBond in childAtom.Bonds)
+                    {
+                        childBonds.Add(childAtomBond);
+                    }
+                }
+
+                //create a new child
+                Molecule newChild = new Molecule();
+                //add it to this molecule
+                newChild.Parent = this;
+                AddMolecule(newChild);
+
+                foreach (Bond childBond in childBonds)
+                {
+                    RemoveBond(childBond);
+                    childBond.Parent = newChild;
+                    newChild.AddBond(childBond);
+                }
+
+                foreach (Atom childAtom in childAtoms)
+                {
+                    RemoveAtom(childAtom);
+                    childAtom.Parent = newChild;
+                    newChild.AddAtom(childAtom);
+                }
+            }
+        }
 
 
         /// <summary>
@@ -1125,8 +1175,8 @@ namespace Chem4Word.Model2
             //shove the neigbours onto the queue to prime it
             foreach (Atom initialAtom in startAtom.Neighbours)
             {
-                AtomData node = new AtomData() { Source = startAtom, CurrentAtom = initialAtom };
-                path[initialAtom] = new HashSet<Atom>() { startAtom, initialAtom };
+                AtomData node = new AtomData() {Source = startAtom, CurrentAtom = initialAtom};
+                path[initialAtom] = new HashSet<Atom>() {startAtom, initialAtom};
                 atomsSoFar.Enqueue(node);
             }
 
@@ -1144,7 +1194,7 @@ namespace Chem4Word.Model2
                             temp.Add(m);
                             temp.UnionWith(path[frontNode.CurrentAtom]);
                             path[m] = temp; //add on the path built up so far
-                            AtomData newItem = new AtomData { Source = frontNode.CurrentAtom, CurrentAtom = m };
+                            AtomData newItem = new AtomData {Source = frontNode.CurrentAtom, CurrentAtom = m};
                             atomsSoFar.Enqueue(newItem);
                         }
                         else //we've got a collision - is it a ring closure
@@ -1254,6 +1304,7 @@ namespace Chem4Word.Model2
                     }
                 }
             }
+
             var placementsArea = BasicGeometry.BuildPath(placements).Data;
             foreach (var chainAtom in chainAtoms)
             {
@@ -1280,9 +1331,11 @@ namespace Chem4Word.Model2
                 {
                     var hull = ringHull.Data;
                     var hullGeo = hull.GetOutlinedPathGeometry();
-                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo, hullGeo).GetOutlinedPathGeometry();
+                    ringsGeo = new CombinedGeometry(GeometryCombineMode.Union, ringsGeo, hullGeo)
+                        .GetOutlinedPathGeometry();
                 }
             }
+
             Path otherGeo = BasicGeometry.BuildPath(placements);
 
             var val1 = ringsGeo;
@@ -1290,6 +1343,7 @@ namespace Chem4Word.Model2
             {
                 val1.FillRule = FillRule.EvenOdd;
             }
+
             var val2 = otherGeo.Data.GetOutlinedPathGeometry();
             if (val2 != null)
             {
@@ -1336,6 +1390,7 @@ namespace Chem4Word.Model2
 
             copy.CheckIntegrity();
             return copy;
+
             //local function
             void Transfer(Molecule source, Molecule dest)
             {
@@ -1359,7 +1414,6 @@ namespace Chem4Word.Model2
         /// </summary>
         /// <param name="bond">Bond at which to split the molecule</param>
         /// <returns></returns>
-
         public (Molecule startMol, Molecule endMol) Split(Bond bond)
         {
             var startAtom = bond.StartAtom;
@@ -1384,7 +1438,7 @@ namespace Chem4Word.Model2
                 Molecule molecule = new Molecule();
                 foreach (Atom atom in hashSet)
                 {
-                    foreach (Atom atom1 in hashSet.Except(new[] { atom }))
+                    foreach (Atom atom1 in hashSet.Except(new[] {atom}))
                     {
                         Bond b;
                         if ((b = atom1.BondBetween(atom)) != null)
@@ -1456,7 +1510,8 @@ namespace Chem4Word.Model2
         /// <param name="operation">delegate pointing to operation to perform</param>
         /// <param name="isntProcessed"> Predicate test to tell us whether or not to process an atom</param>
         /// <param name="excludeBonds">List of bonds to exclude from traversion</param>
-        public void Traverse(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed, HashSet<Bond> excludeBonds)
+        public void Traverse(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed,
+                             HashSet<Bond> excludeBonds)
         {
             operation(startAtom);
 
@@ -1470,6 +1525,7 @@ namespace Chem4Word.Model2
                     {
                         operation(nextAtom);
                     }
+
                     Traverse(nextAtom, operation, isntProcessed, excludeBonds);
                 }
                 else
@@ -1498,7 +1554,7 @@ namespace Chem4Word.Model2
         public void TraverseBFS(Atom startAtom, Action<Atom> operation, Predicate<Atom> isntProcessed,
                                 HashSet<Bond> excludeBonds = null)
         {
-            if (excludeBonds == null)//then create an empty exclusion set
+            if (excludeBonds == null) //then create an empty exclusion set
             {
                 excludeBonds = new HashSet<Bond>();
             }
