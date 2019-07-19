@@ -166,6 +166,20 @@ namespace Chem4Word.Model2
                 return this;
             }
         }
+        public Molecule RootMolecule
+        {
+            get
+            {
+                if(!(Parent is Molecule))
+                {
+                    return this;
+                }
+                else
+                {
+                    return ((Molecule)Parent).RootMolecule;
+                }
+            }
+        }
 
         /// <summary>
         /// Returns a unique path to the molecule
@@ -725,6 +739,10 @@ namespace Chem4Word.Model2
             {
                 bond.SendDummyNotif();
             }
+            foreach(Molecule mol in Molecules.Values)
+            {
+                mol.ForceUpdates();
+            }
         }
 
         public Molecule Copy()
@@ -1027,6 +1045,14 @@ namespace Chem4Word.Model2
         }
 
         public Point Centroid { get; set; }
+        public bool IsGrouped
+        {
+            get
+            {
+                return Molecules.Count > 0;
+            }
+
+        }
 
         /// <summary>
         /// Splits a molecule into child molecules and
@@ -1362,6 +1388,10 @@ namespace Chem4Word.Model2
             foreach (Atom atom in Atoms.Values)
             {
                 atom.Position = lastOperation.Transform(atom.Position);
+            }
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.Transform(lastOperation);
             }
         }
 

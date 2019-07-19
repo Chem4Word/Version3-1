@@ -364,7 +364,6 @@ namespace Chem4Word.ACME.Drawing
                             break;
 
                         case Globals.BondStereo.Hatch:
-                            //_mainBondPen.Thickness = 0d;
                             using (DrawingContext dc = RenderOpen())
                             {
                                 dc.DrawGeometry(GetHatchBrush(ParentBond.Angle), _mainBondPen, BondDescriptor.DefiningGeometry);

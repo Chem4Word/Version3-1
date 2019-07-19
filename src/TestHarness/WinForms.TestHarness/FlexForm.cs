@@ -207,6 +207,7 @@ namespace WinForms.TestHarness
             RandomElement.Enabled = true;
             EditCml.Enabled = true;
             ShowCml.Enabled = true;
+            SaveStructure.Enabled = true;
 
             ListStacks();
         }

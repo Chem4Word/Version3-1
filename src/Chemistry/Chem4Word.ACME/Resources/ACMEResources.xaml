@@ -270,6 +270,16 @@
         </Setter>
     </Style>
 
+    <Style x:Key="GroupHandleStyle" BasedOn="{StaticResource GrabHandleStyle}" TargetType="Thumb">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Rectangle Fill="{x:Static SystemColors.WindowBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" StrokeThickness="2" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style
         x:Key="MolAdornerStyle"
         BasedOn="{StaticResource GrabHandleStyle}"
@@ -321,7 +331,7 @@
                 <ControlTemplate TargetType="Thumb">
                     <Ellipse  Stroke="{StaticResource GrabHandleBorderBrush}" Width="15" Height="15" >
                         <Ellipse.Fill>
-                            <SolidColorBrush Color="{x:Static SystemColors.WindowColor}" Opacity="0.25"></SolidColorBrush>
+                            <SolidColorBrush Color="{x:Static SystemColors.WindowColor}" Opacity="0.25"/>
                         </Ellipse.Fill>
                     </Ellipse>
 

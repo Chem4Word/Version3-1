@@ -127,7 +127,6 @@ namespace Chem4Word.ACME.Adorners
             rotateThumb.DragStarted += RotateStarted;
             rotateThumb.DragDelta += RotateThumb_DragDelta;
             rotateThumb.DragCompleted += HandleResizeCompleted;
-            //rotateThumb.DragDelta += RotateThumb_DragDelta;
 
             VisualChildren.Add(rotateThumb);
         }
@@ -181,16 +180,8 @@ namespace Chem4Word.ACME.Adorners
 
             if (LastOperation != null)
             {
-                var atomList = (
-                    from mol in AdornedMolecules
-                    from a in mol.Atoms.Values
-                    select a).ToList();
-
-                CurrentModel.DoTransform(LastOperation, atomList);
-                foreach (Molecule molecule in AdornedMolecules)
-                {
-                    molecule.ForceUpdates();
-                }
+                CurrentModel.DoTransform(LastOperation, AdornedMolecules);
+               
                 SetBoundingBox();
                 ResizeCompleted?.Invoke(this, dragCompletedEventArgs);
                 SetCentroid();
@@ -228,18 +219,14 @@ namespace Chem4Word.ACME.Adorners
             if (IsWorking)
             {
                 //identify which Molecule the atom belongs to
-
                 //take a snapshot of the molecule
-
                 var ghost = _editorCanvas.GhostMolecule(AdornedMolecules);
-
                 ghost.Transform = LastOperation;
-
                 drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
             }
         }
 
-        private new bool IsWorking => Dragging | Resizing | Rotating;
+        private new bool IsWorking => Dragging || Resizing || Rotating;
 
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {
@@ -252,9 +239,14 @@ namespace Chem4Word.ACME.Adorners
 
             // Set some arbitrary visual characteristics.
             cornerThumb.Cursor = customizedCursor;
-            cornerThumb.Style = (Style)FindResource("GrabHandleStyle");
+            SetThumbStyle(cornerThumb);
             cornerThumb.KeyDown += ThisAdorner_KeyDown;
             VisualChildren.Add(cornerThumb);
+        }
+
+        protected virtual void SetThumbStyle(Thumb cornerThumb)
+        {
+            cornerThumb.Style = (Style)FindResource("GrabHandleStyle");
         }
 
         // Override the VisualChildrenCount and GetVisualChild properties to interface with
@@ -325,8 +317,7 @@ namespace Chem4Word.ACME.Adorners
             }
             RotateHandle.Arrange(new Rect(newLoc.X, newLoc.Y, RotateHandle.Width, RotateHandle.Height));
 
-            // Return the final size.
-            //BoundingBox = bbb;
+         
             base.ArrangeOverride(finalSize);
             return finalSize;
         }

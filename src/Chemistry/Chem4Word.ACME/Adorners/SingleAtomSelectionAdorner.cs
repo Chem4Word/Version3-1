@@ -253,11 +253,9 @@ namespace Chem4Word.ACME.Adorners
                 InvalidateVisual();
                 CurrentEditor.SuppressRedraw = true;
                 //move the molecule
-                var atoms = from mol in AdornedMolecules
-                            from atom in mol.Atoms.Values
-                            select atom;
+               
 
-                CurrentModel.DoTransform(LastOperation, atoms.ToList());
+                CurrentModel.DoTransform(LastOperation,AdornedMolecules);
 
                 RaiseDRCompleted(sender, e);
 

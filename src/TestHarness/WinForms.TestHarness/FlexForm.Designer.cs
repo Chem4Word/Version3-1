@@ -44,16 +44,16 @@ namespace WinForms.TestHarness
             this.LayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.DisplayHost = new System.Windows.Forms.Integration.ElementHost();
             this.Display = new Chem4Word.ACME.Display();
-            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.RedoStack = new WinFormsTestHarness.StackViewer();
-            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.UndoStack = new WinFormsTestHarness.StackViewer();
             this.Information = new System.Windows.Forms.Label();
             this.EditCml = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
+            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.RedoStack = new WinFormsTestHarness.StackViewer();
+            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.UndoStack = new WinFormsTestHarness.StackViewer();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -88,7 +88,7 @@ namespace WinForms.TestHarness
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(209, 533);
+            this.ChangeBackground.Location = new System.Drawing.Point(523, 524);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -174,7 +174,7 @@ namespace WinForms.TestHarness
             this.LayoutPanel.Name = "LayoutPanel";
             this.LayoutPanel.RowCount = 1;
             this.LayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.LayoutPanel.Size = new System.Drawing.Size(1113, 453);
+            this.LayoutPanel.Size = new System.Drawing.Size(1101, 453);
             this.LayoutPanel.TabIndex = 13;
             // 
             // DisplayHost
@@ -183,30 +183,10 @@ namespace WinForms.TestHarness
             this.DisplayHost.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DisplayHost.Location = new System.Drawing.Point(278, 3);
             this.DisplayHost.Name = "DisplayHost";
-            this.DisplayHost.Size = new System.Drawing.Size(557, 447);
+            this.DisplayHost.Size = new System.Drawing.Size(545, 447);
             this.DisplayHost.TabIndex = 1;
             this.DisplayHost.Text = "centreHost";
             this.DisplayHost.Child = this.Display;
-            // 
-            // RedoHost
-            // 
-            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(841, 3);
-            this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(269, 447);
-            this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "rightHost";
-            this.RedoHost.Child = this.RedoStack;
-            // 
-            // UndoHost
-            // 
-            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UndoHost.Location = new System.Drawing.Point(3, 3);
-            this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(269, 447);
-            this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "leftHost";
-            this.UndoHost.Child = this.UndoStack;
             // 
             // Information
             // 
@@ -234,7 +214,7 @@ namespace WinForms.TestHarness
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.EditWithAcme);
             this.groupBox1.Controls.Add(this.EditCml);
-            this.groupBox1.Location = new System.Drawing.Point(1036, 478);
+            this.groupBox1.Location = new System.Drawing.Point(1024, 478);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(89, 80);
             this.groupBox1.TabIndex = 16;
@@ -246,7 +226,7 @@ namespace WinForms.TestHarness
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.RemoveAtom);
             this.groupBox2.Controls.Add(this.RandomElement);
-            this.groupBox2.Location = new System.Drawing.Point(911, 478);
+            this.groupBox2.Location = new System.Drawing.Point(899, 478);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(119, 82);
             this.groupBox2.TabIndex = 17;
@@ -255,10 +235,9 @@ namespace WinForms.TestHarness
             // 
             // ShowCml
             // 
-            this.ShowCml.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShowCml.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCml.Enabled = false;
-            this.ShowCml.Location = new System.Drawing.Point(532, 528);
+            this.ShowCml.Location = new System.Drawing.Point(174, 504);
             this.ShowCml.Name = "ShowCml";
             this.ShowCml.Size = new System.Drawing.Size(75, 23);
             this.ShowCml.TabIndex = 18;
@@ -269,6 +248,7 @@ namespace WinForms.TestHarness
             // SaveStructure
             // 
             this.SaveStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.SaveStructure.Enabled = false;
             this.SaveStructure.Location = new System.Drawing.Point(93, 504);
             this.SaveStructure.Name = "SaveStructure";
             this.SaveStructure.Size = new System.Drawing.Size(75, 23);
@@ -277,11 +257,31 @@ namespace WinForms.TestHarness
             this.SaveStructure.UseVisualStyleBackColor = true;
             this.SaveStructure.Click += new System.EventHandler(this.SaveStructure_Click);
             // 
+            // RedoHost
+            // 
+            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RedoHost.Location = new System.Drawing.Point(829, 3);
+            this.RedoHost.Name = "RedoHost";
+            this.RedoHost.Size = new System.Drawing.Size(269, 447);
+            this.RedoHost.TabIndex = 2;
+            this.RedoHost.Text = "rightHost";
+            this.RedoHost.Child = this.RedoStack;
+            // 
+            // UndoHost
+            // 
+            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UndoHost.Location = new System.Drawing.Point(3, 3);
+            this.UndoHost.Name = "UndoHost";
+            this.UndoHost.Size = new System.Drawing.Size(269, 447);
+            this.UndoHost.TabIndex = 3;
+            this.UndoHost.Text = "leftHost";
+            this.UndoHost.Child = this.UndoStack;
+            // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1137, 562);
+            this.ClientSize = new System.Drawing.Size(1125, 562);
             this.Controls.Add(this.SaveStructure);
             this.Controls.Add(this.ShowCml);
             this.Controls.Add(this.groupBox2);
