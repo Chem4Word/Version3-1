@@ -1142,7 +1142,7 @@ namespace Chem4Word
                         {
                             foreach (var name in mol.Names)
                             {
-                                if (tw.ChemicalName.ToLower().Equals(name.Name.ToLower()))
+                                if (tw.ChemicalName.ToLower().Equals(name.Value.ToLower()))
                                 {
                                     tagPrefix = name.Id;
                                     break;

@@ -98,7 +98,7 @@ namespace Chem4Word.UI.UserControls
 
         private void SetIcon()
         {
-            if (string.IsNullOrEmpty(txtFormula.Text) || txtFormula.Text.Contains("<") || txtFormula.Text.Contains(">"))
+            if (string.IsNullOrEmpty(txtFormula.Text))
             {
                 pbFormulaCheck.Image = Resources.LabelError;
             }

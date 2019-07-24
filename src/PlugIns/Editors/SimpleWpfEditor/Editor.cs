@@ -70,21 +70,15 @@ namespace Chem4Word.Editor.SimpleWpfEditor
                     LoadSettings();
                 }
 
-                // Strip off Formulae and ChemicalNames as we don't edit them here
-                CMLConverter cmlConverter = new CMLConverter();
-                Model2.Model model = cmlConverter.Import(Cml);
-                foreach (Molecule molecule in model.Molecules.Values)
+                EditorHost host = new EditorHost(Cml);
+                host.TopLeft = TopLeft;
+                DialogResult dr = host.ShowDialog();
+                if (dr == DialogResult.OK)
                 {
-                    molecule.Names.Clear();
-                    molecule.Formulas.Clear();
-                    molecule.ConciseFormula = "";
+                    result = host.Result;
+                    Cml = host.OutputValue;
                 }
 
-                EditorHost host = new EditorHost(cmlConverter.Export(model));
-                host.TopLeft = TopLeft;
-                host.ShowDialog();
-                result = host.Result;
-                Cml = host.OutputValue;
                 host.Close();
                 host.Dispose();
             }

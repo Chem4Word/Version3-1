@@ -206,7 +206,7 @@ namespace Chem4Word.Helpers
                                     doc.Application.Selection.SetRange(start - 1, start - 1);
                                     var model = new Model();
                                     var molecule = new Molecule();
-                                    molecule.Names.Add(new ChemicalName { Id = "m1.n1", Name = cci.Text, DictRef = Constants.Chem4WordUserSynonym });
+                                    molecule.Names.Add(new TextualProperty { Id = "m1.n1", Value = cci.Text, Type = Constants.Chem4WordUserSynonym });
                                     model.AddMolecule(molecule);
                                     molecule.Parent = model;
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
@@ -415,7 +415,7 @@ namespace Chem4Word.Helpers
                                         }
                                         foreach (var formula in molecule.Formulas)
                                         {
-                                            if (formula.Inline.Equals(dv))
+                                            if (formula.Value.Equals(dv))
                                             {
                                                 cci.Type = formula.Id;
                                                 break;
@@ -423,7 +423,7 @@ namespace Chem4Word.Helpers
                                         }
                                         foreach (var name in molecule.Names)
                                         {
-                                            if (name.Name.Equals(dv))
+                                            if (name.Value.Equals(dv))
                                             {
                                                 cci.Type = name.Id;
                                                 break;

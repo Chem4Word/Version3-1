@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
 using System;
@@ -15,7 +16,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using Chem4Word.Core.Helpers;
 
 namespace Chem4Word.Model2
 {
@@ -129,6 +129,9 @@ namespace Chem4Word.Model2
 
         public bool InhibitEvents { get; set; }
 
+        /// <summary>
+        /// True is this model has functional groups
+        /// </summary>
         public bool HasFunctionalGroups
         {
             get
@@ -150,6 +153,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// True if this model has nested molecules
+        /// </summary>
         public bool HasNestedMolecules
         {
             get
@@ -169,6 +175,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Count of atoms in all molecules
+        /// </summary>
         public int TotalAtomsCount
         {
             get
@@ -184,6 +193,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Lowest atomic number of any atom (if element) in all molecules
+        /// </summary>
         public int MinAtomicNumber
         {
             get
@@ -204,6 +216,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Highest atomic number of any atom (if element) in all molecules
+        /// </summary>
         public int MaxAtomicNumber
         {
             get
@@ -224,6 +239,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Count of bonds in all molecules
+        /// </summary>
         public int TotalBondsCount
         {
             get
@@ -239,6 +257,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Average bond length of all molecules
+        /// </summary>
         public double MeanBondLength
         {
             get
@@ -267,8 +288,15 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// Bond length used in Xaml
+        /// </summary>
         public double XamlBondLength { get; set; }
 
+        /// <summary>
+        /// Overall bounding box for all atoms
+        /// </summary>
+        // ToDo: Check if this is the same as BoundingBox ???
         public Rect OverallAtomBoundingBox
         {
             get
@@ -296,6 +324,10 @@ namespace Chem4Word.Model2
         public double MinY => BoundingBox.Top;
         public double MaxY => BoundingBox.Bottom;
 
+        /// <summary>
+        /// Overall bounding box for all atoms
+        /// </summary>
+        // ToDo: Check if this is the same as OverallAtomBoundingBox ???
         public Rect BoundingBox
         {
             get
@@ -323,7 +355,9 @@ namespace Chem4Word.Model2
             }
         }
 
-        //used to calculate the bounds of the atom
+        /// <summary>
+        /// Font size used for Xaml
+        /// </summary>
         public double FontSize
         {
             get
@@ -340,7 +374,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        private Dictionary<string, Molecule> _molecules { get; }
+        private readonly Dictionary<string, Molecule> _molecules;
 
         //wraps up the above Molecules collection
         public ReadOnlyDictionary<string, Molecule> Molecules;
@@ -349,6 +383,9 @@ namespace Chem4Word.Model2
 
         public List<string> GeneralErrors { get; set; }
 
+        /// <summary>
+        /// List of all warnings encountered during the import from external file format
+        /// </summary>
         public List<string> AllWarnings
         {
             get
@@ -363,6 +400,9 @@ namespace Chem4Word.Model2
             }
         }
 
+        /// <summary>
+        /// List of all errors encountered during the import from external file format
+        /// </summary>
         public List<string> AllErrors
         {
             get
@@ -377,49 +417,78 @@ namespace Chem4Word.Model2
             }
         }
 
-        public string ConciseFormula
+        public void CalculateFormula()
         {
-            get
+            // Phase #1 calculate and set each molecule's formula
+            var calculateFormulas = CalculateAllFormulas();
+
+            // Phase #2 - Collate the values
+            string result = "";
+            Dictionary<string, int> dictionary = new Dictionary<string, int>();
+            foreach (var formula in calculateFormulas)
             {
-                string result = "";
-                Dictionary<string, int> f = new Dictionary<string, int>();
-                foreach (var mol in Molecules.Values)
+                if (dictionary.ContainsKey(formula))
                 {
-                    if (string.IsNullOrEmpty(mol.ConciseFormula))
-                    {
-                        mol.ConciseFormula = mol.CalculatedFormula();
-                    }
+                    dictionary[formula]++;
+                }
+                else
+                {
+                    dictionary.Add(formula, 1);
+                }
+            }
 
-                    if (f.ContainsKey(mol.ConciseFormula))
+            foreach (KeyValuePair<string, int> kvp in dictionary)
+            {
+                if (kvp.Value == 1)
+                {
+                    result += $"{kvp.Key} . ";
+                }
+                else
+                {
+                    result += $"{kvp.Value} {kvp.Key} . ";
+                }
+            }
+
+            if (result.EndsWith(" . "))
+            {
+                result = result.Substring(0, result.Length - 3);
+            }
+
+            ConciseFormula = result;
+        }
+
+        private List<string> CalculateAllFormulas()
+        {
+            List<string> result = new List<string>();
+            SetFormulas(Molecules.Values.ToList(), result);
+            return result;
+
+            // Local function to support recursion
+            void SetFormulas(List<Molecule> molecules, List<string> data)
+            {
+                foreach (var molecule in molecules)
+                {
+                    if (molecule.Atoms.Count > 0)
                     {
-                        f[mol.ConciseFormula]++;
+                        var calculatedFormula = molecule.CalculatedFormula();
+                        if (!string.IsNullOrEmpty(calculatedFormula))
+                        {
+                            molecule.ConciseFormula = calculatedFormula;
+                            data.Add(calculatedFormula);
+                        }
                     }
                     else
                     {
-                        f.Add(mol.ConciseFormula, 1);
+                        SetFormulas(molecule.Molecules.Values.ToList(), data);
                     }
                 }
-
-                foreach (KeyValuePair<string, int> kvp in f)
-                {
-                    if (kvp.Value == 1)
-                    {
-                        result += $"{kvp.Key} . ";
-                    }
-                    else
-                    {
-                        result += $"{kvp.Value} {kvp.Key} . ";
-                    }
-                }
-
-                if (result.EndsWith(" . "))
-                {
-                    result = result.Substring(0, result.Length - 3);
-                }
-
-                return result;
             }
         }
+
+        /// <summary>
+        /// Concise formula for the model
+        /// </summary>
+        public string ConciseFormula { get; private set; }
 
         #endregion Properties
 
@@ -450,14 +519,12 @@ namespace Chem4Word.Model2
             _boundingBox = Rect.Empty;
         }
 
-
         public void CenterOn(Point point)
         {
             Rect boundingBox = BoundingBox;
-            Point midPoint = new Point( BoundingBox.Left +  boundingBox.Width/2, BoundingBox.Top + BoundingBox.Height/2);
+            Point midPoint = new Point(BoundingBox.Left + boundingBox.Width / 2, BoundingBox.Top + BoundingBox.Height / 2);
             Vector displacement = midPoint - point;
             RepositionAll(displacement.X, displacement.Y);
-
         }
 
         public ChemistryBase GetFromPath(string path)
@@ -624,7 +691,7 @@ namespace Chem4Word.Model2
             {
                 if (Math.Abs(MeanBondLength - target) < 0.1)
                 {
-                    result = $"BondLength of {Stringify(MeanBondLength)} is correct";
+                    result = string.Empty;
                 }
                 else
                 {
@@ -649,7 +716,7 @@ namespace Chem4Word.Model2
                 }
             }
 
-            Debug.WriteLine(result);
+            //Debug.WriteLine(result);
             return result;
 
             // Local Function
@@ -787,7 +854,6 @@ namespace Chem4Word.Model2
 
             RepositionAll(offsetLeft, offsetTop);
         }
-
     }
 
     #endregion Methods

@@ -133,9 +133,9 @@ namespace Chem4Word.Database
                         foreach (var name in mol.Names)
                         {
                             long temp;
-                            if (!long.TryParse(name.Name, out temp))
+                            if (!long.TryParse(name.Value, out temp))
                             {
-                                chemicalName = name.Name;
+                                chemicalName = name.Value;
                                 break;
                             }
                         }
@@ -146,7 +146,7 @@ namespace Chem4Word.Database
                         var id = AddChemistry(conn, cml, chemicalName, model.ConciseFormula);
                         foreach (var name in mol.Names)
                         {
-                            AddChemicalName(conn, id, name.Name, name.DictRef);
+                            AddChemicalName(conn, id, name.Value, name.Type);
                         }
                     }
 

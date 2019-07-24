@@ -14,7 +14,6 @@ namespace Chem4Word.Model2.Helpers
     {
         public static PeriodicTable PeriodicTable = new PeriodicTable();
         public static Dictionary<string, FunctionalGroup> FunctionalGroupsDictionary = FunctionalGroups.ShortcutList;
-       
 
         #region Geometry Stuff
 
@@ -242,8 +241,9 @@ namespace Chem4Word.Model2.Helpers
 
         #region Clipboard Formats
 
-        public const string FormatCML="CML";
+        public const string FormatCML = "CML";
         public const string FormatSDFile = "SDFile";
-        #endregion
+
+        #endregion Clipboard Formats
     }
 }

@@ -187,9 +187,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     {
                         foreach (var di in _allResults.IupacNames)
                         {
-                            var cn = new ChemicalName();
-                            cn.Name = di.data;
-                            cn.DictRef = "chebi:Iupac";
+                            var cn = new TextualProperty();
+                            cn.Value = di.data;
+                            cn.Type = "chebi:Iupac";
                             expModel.Molecules.Values.First().Names.Add(cn);
                         }
                     }
@@ -197,9 +197,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     {
                         foreach (var di in _allResults.Synonyms)
                         {
-                            var cn = new ChemicalName();
-                            cn.Name = di.data;
-                            cn.DictRef = "chebi:Synonym";
+                            var cn = new TextualProperty();
+                            cn.Value = di.data;
+                            cn.Type = "chebi:Synonym";
                             expModel.Molecules.Values.First().Names.Add(cn);
                         }
                     }

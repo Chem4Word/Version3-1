@@ -62,16 +62,6 @@ namespace Chem4Word.Helpers
                         modified = true;
                     }
 
-                    // Ensure each molecule has a Concise Formula set
-                    foreach (var molecule in model.Molecules.Values)
-                    {
-                        if (string.IsNullOrEmpty(molecule.ConciseFormula))
-                        {
-                            molecule.ConciseFormula = molecule.CalculatedFormula();
-                            modified = true;
-                        }
-                    }
-
                     if (modified)
                     {
                         // Re-export as the CustomXmlPartGuid or Bond Length has been changed
@@ -355,16 +345,16 @@ namespace Chem4Word.Helpers
                 // Only check formulae if necessary
                 if (string.IsNullOrEmpty(text))
                 {
-                    foreach (Formula f in m.Formulas)
+                    foreach (var f in m.Formulas)
                     {
                         if (f.Id.Equals(prefix))
                         {
-                            text = f.Inline;
-                            if (!string.IsNullOrEmpty(f.Convention))
+                            text = f.Value;
+                            if (!string.IsNullOrEmpty(f.Type))
                             {
-                                if (f.Convention.ToLower().Contains("formula"))
+                                if (f.Type.ToLower().Contains("formula"))
                                 {
-                                    source = f.Convention;
+                                    source = f.Type;
                                     isFormula = true;
                                 }
                             }
@@ -376,12 +366,12 @@ namespace Chem4Word.Helpers
                 // Only check names if necessary
                 if (string.IsNullOrEmpty(text))
                 {
-                    foreach (ChemicalName n in m.Names)
+                    foreach (var n in m.Names)
                     {
                         if (n.Id.Equals(prefix))
                         {
-                            text = n.Name;
-                            source = n.DictRef;
+                            text = n.Value;
+                            source = n.Type;
                             break;
                         }
                     }

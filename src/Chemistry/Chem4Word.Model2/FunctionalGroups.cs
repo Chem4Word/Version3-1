@@ -8,12 +8,10 @@
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 
 namespace Chem4Word.Model2
 {

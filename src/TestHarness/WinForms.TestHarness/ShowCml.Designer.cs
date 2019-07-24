@@ -39,7 +39,7 @@
             this.scintilla.Dock = System.Windows.Forms.DockStyle.Fill;
             this.scintilla.Location = new System.Drawing.Point(0, 0);
             this.scintilla.Name = "scintilla";
-            this.scintilla.Size = new System.Drawing.Size(800, 450);
+            this.scintilla.Size = new System.Drawing.Size(1018, 450);
             this.scintilla.TabIndex = 0;
             this.scintilla.Text = "...";
             // 
@@ -52,7 +52,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1018, 450);
             this.Controls.Add(this.scintilla);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ShowCml";

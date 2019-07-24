@@ -88,13 +88,57 @@ namespace Chem4WordTests
             Assert.True(molecule.Rings.Count == 2, $"Expected 2 Rings; Got {molecule.Rings.Count}");
 
             // Get atom to test
-            var atoms = molecule.Atoms.Values.Where(a => a.SymbolText == element);
-            Assert.True(atoms.Count() == 1,"Expected only one atom");
+            var atoms = molecule.Atoms.Values.Where(a => a.SymbolText == element).ToList();
+            Assert.True(atoms.Count == 1,"Expected only one atom");
             Atom atom = atoms.FirstOrDefault();
             Assert.NotNull(atom);
 
             Assert.True(atom.RingCount == ringCount, $"Expected RingCount: {ringCount}; Got {atom.RingCount}");
             Assert.True(atom.IsInRing == isInRing, $"Expected IsInRing: {isInRing}; Got {atom.IsInRing}");
+        }
+
+        [Fact]
+        public void CheckFormulasCanBeAltered()
+        {
+            Model model = new Model();
+
+            Molecule molecule = new Molecule();
+            molecule.Id = "m1";
+            model.AddMolecule(molecule);
+            molecule.Parent = model;
+
+            var formula = new TextualProperty();
+            formula.Type = "";
+            formula.Value = "";
+            molecule.Formulas.Add(formula);
+
+            Assert.True(molecule.Formulas.Count == 1, "Expected count to be 1");
+            Assert.Equal("", molecule.Formulas[0].Type);
+
+            molecule.Formulas[0].Type = "convention";
+            Assert.Equal("convention", molecule.Formulas[0].Type);
+        }
+
+        [Fact]
+        public void CheckNamesCanBeAltered()
+        {
+            Model model = new Model();
+
+            Molecule molecule = new Molecule();
+            molecule.Id = "m1";
+            model.AddMolecule(molecule);
+            molecule.Parent = model;
+
+            var name = new TextualProperty();
+            name.Type = "";
+            name.Value = "";
+            molecule.Names.Add(name);
+
+            Assert.True(molecule.Names.Count == 1, "Expected count to be 1");
+            Assert.Equal("", molecule.Names[0].Type);
+
+            molecule.Names[0].Type = "dictref";
+            Assert.Equal("dictref", molecule.Names[0].Type);
         }
     }
 }

@@ -35,6 +35,9 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 using Word = Microsoft.Office.Interop.Word;
 
+// ++++++++++++++++++++++++++++
+// Do NOT Change this Namespace
+// ++++++++++++++++++++++++++++
 namespace Chem4Word
 {
     public partial class CustomRibbon
@@ -314,7 +317,7 @@ namespace Chem4Word
                                 }
 
                                 // Other Formulae
-                                foreach (Formula f in mol.Formulas)
+                                foreach (var f in mol.Formulas)
                                 {
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
                                     ribbonButton.Tag = f.Id;
@@ -322,14 +325,14 @@ namespace Chem4Word
                                     {
                                         ribbonButton.Image = Properties.Resources.SmallTick;
                                     }
-                                    ribbonButton.Label = f.Inline;
+                                    ribbonButton.Label = f.Value;
                                     ribbonButton.SuperTip = "Render as formula";
                                     ribbonButton.Click += OnRenderAsButtonClick;
                                     ShowAsMenu.Items.Add(ribbonButton);
                                 }
 
                                 // Chemical Names
-                                foreach (ChemicalName n in mol.Names)
+                                foreach (var n in mol.Names)
                                 {
                                     RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
                                     ribbonButton.Tag = n.Id;
@@ -337,7 +340,7 @@ namespace Chem4Word
                                     {
                                         ribbonButton.Image = Properties.Resources.SmallTick;
                                     }
-                                    ribbonButton.Label = n.Name;
+                                    ribbonButton.Label = n.Value;
                                     ribbonButton.SuperTip = "Render as name";
                                     ribbonButton.Click += OnRenderAsButtonClick;
                                     ShowAsMenu.Items.Add(ribbonButton);
@@ -387,6 +390,7 @@ namespace Chem4Word
                     f.SystemOptions = Globals.Chem4WordV3.SystemOptions.Clone();
                     f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
                     f.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
+
                     DialogResult dr = f.ShowDialog();
                     if (dr == DialogResult.OK)
                     {
@@ -526,7 +530,7 @@ namespace Chem4Word
                                         if (model.Molecules.Any() && model.Molecules.Values.First().Names.Any())
                                         {
                                             Word.ContentControl cc = ChemistryHelper.Insert1DChemistry(doc,
-                                                model.Molecules.Values.First().Names[0].Name, false,
+                                                model.Molecules.Values.First().Names[0].Value, false,
                                                 $"{model.Molecules.Values.First().Names[0].Id}:{model.CustomXmlPartGuid}");
                                             doc.CustomXMLParts.Add(cml);
                                             if (cc != null)
@@ -724,18 +728,18 @@ namespace Chem4Word
                                     {
                                         foreach (var formula in beforeMolecule.Formulas)
                                         {
-                                            Formula f = new Formula();
+                                            var f = new TextualProperty();
                                             f.Id = formula.Id;
-                                            f.Convention = formula.Convention;
-                                            f.Inline = formula.Inline;
+                                            f.Type = formula.Type;
+                                            f.Value = formula.Value;
                                             afterMolecule.Formulas.Add(f);
                                         }
                                         foreach (var name in beforeMolecule.Names)
                                         {
-                                            ChemicalName n = new ChemicalName();
+                                            var n = new TextualProperty();
                                             n.Id = name.Id;
-                                            n.DictRef = name.DictRef;
-                                            n.Name = name.Name;
+                                            n.Type = name.Type;
+                                            n.Value = name.Value;
                                             afterMolecule.Names.Add(n);
                                         }
                                         matchedMolecules++;
@@ -832,18 +836,18 @@ namespace Chem4Word
                                             updated = false;
                                             foreach (var formula in mol.Formulas)
                                             {
-                                                if (formula.Convention.Equals(kvp.Key))
+                                                if (formula.Type.Equals(kvp.Key))
                                                 {
-                                                    formula.Inline = kvp.Value;
+                                                    formula.Value = kvp.Value;
                                                     updated = true;
                                                     break;
                                                 }
                                             }
                                             if (!updated)
                                             {
-                                                Formula f = new Formula();
-                                                f.Convention = kvp.Key;
-                                                f.Inline = kvp.Value;
+                                                var f = new TextualProperty();
+                                                f.Type = kvp.Key;
+                                                f.Value = kvp.Value;
                                                 mol.Formulas.Add(f);
                                             }
                                             break;
@@ -856,18 +860,18 @@ namespace Chem4Word
                                             updated = false;
                                             foreach (var name in mol.Names)
                                             {
-                                                if (name.DictRef.Equals(kvp.Key))
+                                                if (name.Type.Equals(kvp.Key))
                                                 {
-                                                    name.Name = kvp.Value;
+                                                    name.Value = kvp.Value;
                                                     updated = true;
                                                     break;
                                                 }
                                             }
                                             if (!updated)
                                             {
-                                                ChemicalName n = new ChemicalName();
-                                                n.DictRef = kvp.Key;
-                                                n.Name = kvp.Value;
+                                                var n = new TextualProperty();
+                                                n.Type = kvp.Key;
+                                                n.Value = kvp.Value;
                                                 mol.Names.Add(n);
                                             }
                                             break;
@@ -1234,6 +1238,31 @@ namespace Chem4Word
                             {
                                 string cml = customXmlPart.XML;
 
+                                #region New Code
+
+                                //var host = new EditLabelsHost();
+                                //host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+                                //host.Cml = cml;
+                                //host.Used1D = ChemistryHelper.GetUsed1D(doc, guid);
+                                //host.Message = "";
+
+                                //var result = host.ShowDialog();
+                                //if (result == DialogResult.OK)
+                                //{
+                                //    customXmlPart.Delete();
+                                //    doc.CustomXMLParts.Add(host.Cml);
+
+                                //    CMLConverter conv = new CMLConverter();
+                                //    Model model = conv.Import(host.Cml);
+                                //    ChemistryHelper.UpdateThisStructure(doc, model, guid, "");
+
+                                //    app.Selection.SetRange(cc.Range.Start, cc.Range.End);
+                                //}
+
+                                #endregion
+
+                                #region Old Code
+
                                 EditLabels f = new EditLabels();
                                 f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
                                 f.Cml = cml;
@@ -1252,6 +1281,8 @@ namespace Chem4Word
 
                                     app.Selection.SetRange(cc.Range.Start, cc.Range.End);
                                 }
+
+                                #endregion
                             }
                         }
                     }

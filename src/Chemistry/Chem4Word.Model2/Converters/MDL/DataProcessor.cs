@@ -69,16 +69,16 @@ namespace Chem4Word.Model2.Converters.MDL
                             {
                                 if (isFormula)
                                 {
-                                    var formula = new Formula();
-                                    formula.Convention = internalName;
-                                    formula.Inline = line;
+                                    var formula = new TextualProperty();
+                                    formula.Type = internalName;
+                                    formula.Value = line;
                                     _molecule.Formulas.Add(formula);
                                 }
                                 else
                                 {
-                                    var name = new ChemicalName();
-                                    name.DictRef = internalName;
-                                    name.Name = line;
+                                    var name = new TextualProperty();
+                                    name.Type = internalName;
+                                    name.Value = line;
                                     _molecule.Names.Add(name);
                                 }
                             }
@@ -99,35 +99,35 @@ namespace Chem4Word.Model2.Converters.MDL
             return result;
         }
 
-        public void ExportToStream(List<ChemicalName> names, List<Formula> formulas, StreamWriter writer)
+        public void ExportToStream(List<TextualProperty> names, List<TextualProperty> formulas, StreamWriter writer)
         {
             Dictionary<string, List<string>> properties = new Dictionary<string, List<string>>();
 
             foreach (var name in names)
             {
-                if (properties.ContainsKey(name.DictRef))
+                if (properties.ContainsKey(name.Type))
                 {
-                    properties[name.DictRef].Add(name.Name);
+                    properties[name.Type].Add(name.Value);
                 }
                 else
                 {
                     List<string> dataNames = new List<string>();
-                    dataNames.Add(name.Name);
-                    properties.Add(name.DictRef, dataNames);
+                    dataNames.Add(name.Value);
+                    properties.Add(name.Type, dataNames);
                 }
             }
 
             foreach (var formula in formulas)
             {
-                if (properties.ContainsKey(formula.Convention))
+                if (properties.ContainsKey(formula.Type))
                 {
-                    properties[formula.Convention].Add(formula.Inline);
+                    properties[formula.Type].Add(formula.Value);
                 }
                 else
                 {
                     List<string> dataNames = new List<string>();
-                    dataNames.Add(formula.Inline);
-                    properties.Add(formula.Convention, dataNames);
+                    dataNames.Add(formula.Value);
+                    properties.Add(formula.Type, dataNames);
                 }
             }
 

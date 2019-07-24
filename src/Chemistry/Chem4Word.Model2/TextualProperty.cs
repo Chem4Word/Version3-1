@@ -5,22 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-
 namespace Chem4Word.Model2
 {
-    public class Formula
+    public class TextualProperty
     {
         public string Id { get; set; }
+        public string Type { get; set; }
+        public string Value { get; set; }
 
-        public string Convention { get; set; }
-
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
+        public TextualProperty()
         {
+        }
+
+        public override string ToString()
+        {
+            return $"{Id} {Type} {Value}";
         }
     }
 }

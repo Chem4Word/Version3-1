@@ -5,51 +5,38 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+
 namespace Chem4Word.Model2
 {
-
     /// <summary>
     /// Stashes the molecule properties as XML and restores them
     /// Used in editing operations
     /// </summary>
     public class MoleculePropertyBag
     {
-        private string _names;
+        private string Names { get; set; }
 
-        public string Names
-        {
-            get { return _names; }
-            set { _names = value; }
-        }
+        private string Formulas { get; set; }
 
-        private string _formulas;
-
-        public string Formulas
-        {
-            get { return _formulas; }
-            set { _formulas = value; }
-        }
+        private string Labels { get; set; }
 
         public void Store(Molecule parent)
         {
             Names = JsonConvert.SerializeObject(parent.Names, Formatting.None);
             Formulas = JsonConvert.SerializeObject(parent.Formulas, Formatting.None);
+            Labels = JsonConvert.SerializeObject(parent.Labels, Formatting.None);
         }
 
         public void Restore(Molecule parent)
         {
             parent.Names.Clear();
-            parent.Names = JsonConvert.DeserializeObject<ObservableCollection<ChemicalName>>(Names);
-            parent.Formulas = JsonConvert.DeserializeObject<ObservableCollection<Formula>>(Formulas);
+            parent.Names = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Names);
+            parent.Formulas.Clear();
+            parent.Formulas = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Formulas);
+            parent.Labels.Clear();
+            parent.Labels = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Labels);
         }
     }
 }

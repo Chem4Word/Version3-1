@@ -479,21 +479,21 @@
             Margin="10,0,10,0"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
-            <Button x:Name="DefaultsButton"
+            <Button
                 Width="80"
                 Height="32"
                 Margin="5,5,30,5"
                 VerticalAlignment="Center"
                 Click="DefaultsButton_OnClick"
                 Content="Defaults" />
-            <Button x:Name="CancelButton"
+            <Button
                 Width="80"
                 Height="32"
                 Margin="5"
                 VerticalAlignment="Center"
                 Click="CancelButton_OnClick"
                 Content="Cancel" />
-            <Button x:Name="OkButton"
+            <Button
                 Width="80"
                 Height="32"
                 Margin="5"

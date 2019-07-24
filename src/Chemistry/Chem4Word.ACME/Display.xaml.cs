@@ -120,6 +120,17 @@ namespace Chem4Word.ACME
 
         #endregion Public Properties
 
+        #region Public Methods
+
+        public void Clear()
+        {
+            var model = new ChemistryModel();
+            CurrentViewModel = new ViewModel(model);
+            DrawChemistry(CurrentViewModel);
+        }
+
+        #endregion Public Methods
+
         #region Private Methods
 
         private void HandleDataContextChanged()

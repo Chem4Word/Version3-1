@@ -5,16 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace Chem4Word.Model2
 {
@@ -45,6 +40,7 @@ namespace Chem4Word.Model2
             element = null;
             return false;
         }
+
         public static bool TryParse(string desc, out FunctionalGroup fg)
         {
             try
@@ -117,6 +113,7 @@ namespace Chem4Word.Model2
                 return parts;
             }
         }
+
         /// <summary>
         /// Determines whether the functional group can be flipped about the pivot
         /// </summary>

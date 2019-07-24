@@ -11,7 +11,6 @@ using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -83,7 +82,8 @@ namespace Chem4Word.Model2
         /// <summary>
         /// List of rings that this atom belongs to
         /// </summary>
-        public IEnumerable<Ring> Rings {
+        public IEnumerable<Ring> Rings
+        {
             get
             {
                 var result = new List<Ring>();
@@ -388,7 +388,7 @@ namespace Chem4Word.Model2
             set
             {
                 _formalCharge = value;
-               
+
                 OnPropertyChanged();
             }
         }

@@ -39,7 +39,7 @@ namespace Chem4Word.Model2.Converters.MDL
 
             if (data != null)
             {
-                string dataAsString = (string) data;
+                string dataAsString = (string)data;
                 if (!dataAsString.Contains("v3000") && !dataAsString.Contains("V3000"))
                 {
                     model = new Model();
@@ -73,9 +73,10 @@ namespace Chem4Word.Model2.Converters.MDL
                                     model.GeneralErrors.Add(message);
                                 }
 
-                                //split the molecule if it's disconnected
                                 Molecule copy = molecule.Copy();
                                 copy.SplitIntoChildren();
+
+                                // If copy now contains (child) molecules, replace original
                                 if (copy.Molecules.Count > 1)
                                 {
                                     molecule = copy;
@@ -136,8 +137,8 @@ namespace Chem4Word.Model2.Converters.MDL
                 {
                     List<Atom> atoms = mol.Atoms.Values.ToList();
                     List<Bond> bonds = mol.Bonds.ToList();
-                    List<ChemicalName> names = mol.Names.ToList();
-                    List<Formula> formulas = mol.Formulas.ToList();
+                    List<TextualProperty> names = mol.Names.ToList();
+                    List<TextualProperty> formulas = mol.Formulas.ToList();
 
                     if (mol.Molecules.Any())
                     {
@@ -161,8 +162,9 @@ namespace Chem4Word.Model2.Converters.MDL
             return result;
 
             // Local Function
-            void GatherChildren(Molecule molecule, List<Atom> atoms, List<Bond> bonds, List<ChemicalName> names,
-                                List<Formula> formulas)
+            void GatherChildren(Molecule molecule, List<Atom> atoms, List<Bond> bonds,
+                                List<TextualProperty> names,
+                                List<TextualProperty> formulas)
             {
                 atoms.AddRange(molecule.Atoms.Values.ToList());
                 bonds.AddRange(molecule.Bonds.ToList());

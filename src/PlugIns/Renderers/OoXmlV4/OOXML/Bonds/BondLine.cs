@@ -153,7 +153,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private string PointAsString(Point p)
         {
-            return $"{p.X.ToString("#,##0.000")},{p.Y.ToString("#,##0.000")}";
+            return $"{p.X.ToString("#,##0.0000")},{p.Y.ToString("#,##0.0000")}";
         }
 
         public override string ToString()

@@ -70,10 +70,10 @@ namespace Chem4Word.UI.UserControls
                 elc.Parent = panelFormulae;
                 elc.Location = new Point(5, 5 + i * elc.ClientRectangle.Height);
                 elc.Width = panelFormulae.Width - 10;
-                elc.FormulaText = f.Inline;
+                elc.FormulaText = f.Value;
                 elc.CanDelete = !Used1D.Any(s => s.StartsWith(f.Id));
-                elc.CanEdit = f.Convention.Equals(Constants.Chem4WordUserFormula);
-                elc.Convention = f.Convention;
+                elc.CanEdit = f.Type.Equals(Constants.Chem4WordUserFormula);
+                elc.Convention = f.Type;
                 elc.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
                 elc.IsLoading = false;
                 i++;
@@ -96,10 +96,10 @@ namespace Chem4Word.UI.UserControls
                 elc.Parent = panelNames;
                 elc.Location = new Point(5, 5 + i * elc.ClientRectangle.Height);
                 elc.Width = panelNames.Width - 10;
-                elc.DictRef = n.DictRef;
-                elc.NameText = n.Name;
+                elc.DictRef = n.Type;
+                elc.NameText = n.Value;
                 elc.CanDelete = !Used1D.Any(s => s.StartsWith(n.Id));
-                elc.CanEdit = n.DictRef.Equals(Constants.Chem4WordUserSynonym);
+                elc.CanEdit = n.Type.Equals(Constants.Chem4WordUserSynonym);
                 elc.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
                 i++;
             }
@@ -124,17 +124,16 @@ namespace Chem4Word.UI.UserControls
 
         private bool StringIsValid(string input)
         {
-            return string.IsNullOrEmpty(input) || input.Contains("<") || input.Contains(">");
+            return string.IsNullOrEmpty(input);
         }
 
         public void ChangeFormulaValueAt(string id, string value)
         {
-            foreach (Formula f in Molecule.Formulas)
+            foreach (var f in Molecule.Formulas)
             {
                 if (f.Id.Equals(id))
                 {
-                    f.Inline = value;
-                    f.IsValid = !StringIsValid(value);
+                    f.Value = value;
                     break;
                 }
             }
@@ -142,7 +141,7 @@ namespace Chem4Word.UI.UserControls
 
         public void DeleteFourmulaAt(string id)
         {
-            foreach (Formula f in Molecule.Formulas.ToList())
+            foreach (var f in Molecule.Formulas.ToList())
             {
                 if (f.Id.Equals(id))
                 {
@@ -155,12 +154,11 @@ namespace Chem4Word.UI.UserControls
 
         public void ChangeNameValueAt(string id, string name)
         {
-            foreach (ChemicalName n in Molecule.Names)
+            foreach (var n in Molecule.Names)
             {
                 if (n.Id.Equals(id))
                 {
-                    n.Name = name;
-                    n.IsValid = !StringIsValid(name);
+                    n.Value = name;
                     break;
                 }
             }
@@ -168,7 +166,7 @@ namespace Chem4Word.UI.UserControls
 
         public void DeleteChemicalNameAt(string id)
         {
-            foreach (ChemicalName n in Molecule.Names.ToList())
+            foreach (var n in Molecule.Names.ToList())
             {
                 if (n.Id.Equals(id))
                 {
@@ -192,9 +190,9 @@ namespace Chem4Word.UI.UserControls
 
             try
             {
-                ChemicalName n = new ChemicalName();
-                n.DictRef = Constants.Chem4WordUserSynonym;
-                n.Name = "";
+                var n = new TextualProperty();
+                n.Type = Constants.Chem4WordUserSynonym;
+                n.Value = "";
                 n.Id = $"{Molecule.Id}.n{++_maxNameId}";
                 Molecule.Names.Add(n);
                 RefreshNamesPanel();
@@ -212,9 +210,9 @@ namespace Chem4Word.UI.UserControls
 
             try
             {
-                Formula f = new Formula();
-                f.Convention = Constants.Chem4WordUserFormula;
-                f.Inline = "";
+                var f = new TextualProperty();
+                f.Type = Constants.Chem4WordUserFormula;
+                f.Value = "";
                 f.Id = $"{Molecule.Id}.f{++_maxFormulaId}";
                 Molecule.Formulas.Add(f);
                 RefreshFormulaePanel();

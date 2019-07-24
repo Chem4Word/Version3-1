@@ -44,16 +44,17 @@ namespace WinForms.TestHarness
             this.LayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.DisplayHost = new System.Windows.Forms.Integration.ElementHost();
             this.Display = new Chem4Word.ACME.Display();
+            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.RedoStack = new WinFormsTestHarness.StackViewer();
+            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.UndoStack = new WinFormsTestHarness.StackViewer();
             this.Information = new System.Windows.Forms.Label();
             this.EditCml = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
-            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.RedoStack = new WinFormsTestHarness.StackViewer();
-            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.UndoStack = new WinFormsTestHarness.StackViewer();
+            this.ClearChemistry = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -67,6 +68,7 @@ namespace WinForms.TestHarness
             this.LoadStructure.Size = new System.Drawing.Size(75, 23);
             this.LoadStructure.TabIndex = 0;
             this.LoadStructure.Text = "Load";
+            this.LoadStructure.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.LoadStructure.UseVisualStyleBackColor = true;
             this.LoadStructure.Click += new System.EventHandler(this.LoadStructure_Click);
             // 
@@ -82,6 +84,7 @@ namespace WinForms.TestHarness
             this.EditWithAcme.Size = new System.Drawing.Size(75, 23);
             this.EditWithAcme.TabIndex = 2;
             this.EditWithAcme.Text = "ACME";
+            this.EditWithAcme.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.EditWithAcme.UseVisualStyleBackColor = true;
             this.EditWithAcme.Click += new System.EventHandler(this.EditWithAcme_Click);
             // 
@@ -119,6 +122,7 @@ namespace WinForms.TestHarness
             this.RemoveAtom.Size = new System.Drawing.Size(97, 23);
             this.RemoveAtom.TabIndex = 5;
             this.RemoveAtom.Text = "Remove Atom";
+            this.RemoveAtom.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.RemoveAtom.UseVisualStyleBackColor = true;
             this.RemoveAtom.Click += new System.EventHandler(this.RemoveAtom_Click);
             // 
@@ -130,6 +134,7 @@ namespace WinForms.TestHarness
             this.RandomElement.Size = new System.Drawing.Size(97, 23);
             this.RandomElement.TabIndex = 6;
             this.RandomElement.Text = "Random Element";
+            this.RandomElement.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.RandomElement.UseVisualStyleBackColor = true;
             this.RandomElement.Click += new System.EventHandler(this.RandomElement_Click);
             // 
@@ -142,6 +147,7 @@ namespace WinForms.TestHarness
             this.Undo.Size = new System.Drawing.Size(75, 23);
             this.Undo.TabIndex = 11;
             this.Undo.Text = "Undo";
+            this.Undo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Undo.UseVisualStyleBackColor = true;
             this.Undo.Click += new System.EventHandler(this.Undo_Click);
             // 
@@ -154,6 +160,7 @@ namespace WinForms.TestHarness
             this.Redo.Size = new System.Drawing.Size(75, 23);
             this.Redo.TabIndex = 12;
             this.Redo.Text = "Redo";
+            this.Redo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.Redo.UseVisualStyleBackColor = true;
             this.Redo.Click += new System.EventHandler(this.Redo_Click);
             // 
@@ -188,6 +195,26 @@ namespace WinForms.TestHarness
             this.DisplayHost.Text = "centreHost";
             this.DisplayHost.Child = this.Display;
             // 
+            // RedoHost
+            // 
+            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RedoHost.Location = new System.Drawing.Point(829, 3);
+            this.RedoHost.Name = "RedoHost";
+            this.RedoHost.Size = new System.Drawing.Size(269, 447);
+            this.RedoHost.TabIndex = 2;
+            this.RedoHost.Text = "rightHost";
+            this.RedoHost.Child = this.RedoStack;
+            // 
+            // UndoHost
+            // 
+            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UndoHost.Location = new System.Drawing.Point(3, 3);
+            this.UndoHost.Name = "UndoHost";
+            this.UndoHost.Size = new System.Drawing.Size(269, 447);
+            this.UndoHost.TabIndex = 3;
+            this.UndoHost.Text = "leftHost";
+            this.UndoHost.Child = this.UndoStack;
+            // 
             // Information
             // 
             this.Information.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -206,6 +233,7 @@ namespace WinForms.TestHarness
             this.EditCml.Size = new System.Drawing.Size(75, 23);
             this.EditCml.TabIndex = 15;
             this.EditCml.Text = "CML";
+            this.EditCml.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.EditCml.UseVisualStyleBackColor = true;
             this.EditCml.Click += new System.EventHandler(this.EditCml_Click);
             // 
@@ -242,6 +270,7 @@ namespace WinForms.TestHarness
             this.ShowCml.Size = new System.Drawing.Size(75, 23);
             this.ShowCml.TabIndex = 18;
             this.ShowCml.Text = "Show CML";
+            this.ShowCml.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ShowCml.UseVisualStyleBackColor = true;
             this.ShowCml.Click += new System.EventHandler(this.ShowCml_Click);
             // 
@@ -254,34 +283,26 @@ namespace WinForms.TestHarness
             this.SaveStructure.Size = new System.Drawing.Size(75, 23);
             this.SaveStructure.TabIndex = 19;
             this.SaveStructure.Text = "Save ...";
+            this.SaveStructure.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.SaveStructure.UseVisualStyleBackColor = true;
             this.SaveStructure.Click += new System.EventHandler(this.SaveStructure_Click);
             // 
-            // RedoHost
+            // ClearChemistry
             // 
-            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(829, 3);
-            this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(269, 447);
-            this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "rightHost";
-            this.RedoHost.Child = this.RedoStack;
-            // 
-            // UndoHost
-            // 
-            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UndoHost.Location = new System.Drawing.Point(3, 3);
-            this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(269, 447);
-            this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "leftHost";
-            this.UndoHost.Child = this.UndoStack;
+            this.ClearChemistry.Location = new System.Drawing.Point(174, 535);
+            this.ClearChemistry.Name = "ClearChemistry";
+            this.ClearChemistry.Size = new System.Drawing.Size(75, 23);
+            this.ClearChemistry.TabIndex = 0;
+            this.ClearChemistry.Text = "Clear";
+            this.ClearChemistry.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ClearChemistry.Click += new System.EventHandler(this.ClearChemistry_Click);
             // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1125, 562);
+            this.ClientSize = new System.Drawing.Size(1137, 562);
+            this.Controls.Add(this.ClearChemistry);
             this.Controls.Add(this.SaveStructure);
             this.Controls.Add(this.ShowCml);
             this.Controls.Add(this.groupBox2);
@@ -296,8 +317,7 @@ namespace WinForms.TestHarness
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FlexForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Flexible Display";
-            this.Load += new System.EventHandler(this.FlexForm_Load);
+            this.Text = "ACME Test Bed";
             this.LayoutPanel.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -331,6 +351,7 @@ namespace WinForms.TestHarness
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Button ShowCml;
         private System.Windows.Forms.Button SaveStructure;
+        private System.Windows.Forms.Button ClearChemistry;
     }
 }
 

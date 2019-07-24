@@ -138,42 +138,6 @@ namespace Chem4Word.UI
             this.ResumeLayout();
         }
 
-        private bool CanSave()
-        {
-            bool isValid = true;
-
-            foreach (var molecule in _model.Molecules.Values)
-            {
-                foreach (Formula formula in molecule.Formulas)
-                {
-                    if (formula.Convention.Equals(Constants.Chem4WordUserFormula))
-                    {
-                        if (!formula.IsValid)
-                        {
-                            isValid = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (isValid)
-                {
-                    foreach (ChemicalName chemicalName in molecule.Names)
-                    {
-                        if (chemicalName.DictRef.Equals(Constants.Chem4WordUserSynonym))
-                        {
-                            if (!chemicalName.IsValid)
-                            {
-                                isValid = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return isValid;
-        }
 
         private void OnSaveClick(object sender, EventArgs e)
         {
@@ -182,16 +146,9 @@ namespace Chem4Word.UI
 
             try
             {
-                if (CanSave())
-                {
-                    Cml = _cmlConvertor.Export(_model);
+                Cml = _cmlConvertor.Export(_model);
 
-                    DialogResult = DialogResult.OK;
-                }
-                else
-                {
-                    UserInteractions.InformUser("Can't save because at least one user defined label contains an error");
-                }
+                DialogResult = DialogResult.OK;
             }
             catch (Exception ex)
             {

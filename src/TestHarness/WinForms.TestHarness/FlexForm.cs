@@ -123,7 +123,6 @@ namespace WinForms.TestHarness
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 #if !DEBUG
             try
-
 #endif
             {
                 if (!string.IsNullOrEmpty(_lastCml))
@@ -207,6 +206,7 @@ namespace WinForms.TestHarness
             RandomElement.Enabled = true;
             EditCml.Enabled = true;
             ShowCml.Enabled = true;
+            ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
 
             ListStacks();
@@ -366,11 +366,6 @@ namespace WinForms.TestHarness
                 _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
                 MessageBox.Show(exception.StackTrace, exception.Message);
             }
-        }
-
-        private void FlexForm_Load(object sender, EventArgs e)
-        {
-            //
         }
 
         private void Undo_Click(object sender, EventArgs e)
@@ -557,6 +552,12 @@ namespace WinForms.TestHarness
                 _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
                 MessageBox.Show(exception.StackTrace, exception.Message);
             }
+        }
+
+        private void ClearChemistry_Click(object sender, EventArgs e)
+        {
+            Display.Clear();
+            //_lastCml = "<cml></cml>";
         }
     }
 }

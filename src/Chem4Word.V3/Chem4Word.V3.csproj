@@ -410,6 +410,15 @@
     <Compile Include="UI\WPF\AboutHost.Designer.cs">
       <DependentUpon>AboutHost.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\WPF\EditLabelsControl.xaml.cs">
+      <DependentUpon>EditLabelsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WPF\EditLabelsHost.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\WPF\EditLabelsHost.Designer.cs">
+      <DependentUpon>EditLabelsHost.cs</DependentUpon>
+    </Compile>
     <Compile Include="UI\WPF\SettingsControl.xaml.cs">
       <DependentUpon>SettingsControl.xaml</DependentUpon>
     </Compile>
@@ -523,6 +532,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\WPF\AboutHost.resx">
       <DependentUpon>AboutHost.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\WPF\EditLabelsHost.resx">
+      <DependentUpon>EditLabelsHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\WPF\SettingsHost.resx">
       <DependentUpon>SettingsHost.cs</DependentUpon>
@@ -665,6 +677,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\WPF\AboutControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\WPF\EditLabelsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

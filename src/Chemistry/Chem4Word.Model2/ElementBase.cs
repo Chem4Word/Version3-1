@@ -24,6 +24,5 @@ namespace Chem4Word.Model2
         {
             throw new System.NotImplementedException();
         }
-
     }
 }

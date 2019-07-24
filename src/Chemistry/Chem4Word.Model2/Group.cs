@@ -5,10 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
 using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Chem4Word.Model2
 {

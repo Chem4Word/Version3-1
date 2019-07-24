@@ -5,19 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Chem4Word.Core;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Core.UI.Wpf;
+using System;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace Chem4Word.UI.WPF
 {
@@ -28,6 +19,7 @@ namespace Chem4Word.UI.WPF
 
         public string VersionString { get; set; }
         public System.Windows.Point TopLeft { get; set; }
+
         public AboutHost()
         {
             InitializeComponent();
@@ -41,7 +33,7 @@ namespace Chem4Word.UI.WPF
                 aboutControl1.VersionString = VersionString;
                 aboutControl1.TopLeft = TopLeft;
                 Left = (int)TopLeft.X;
-                Top = (int)TopLeft.Y;  
+                Top = (int)TopLeft.Y;
             }
             catch (Exception ex)
             {

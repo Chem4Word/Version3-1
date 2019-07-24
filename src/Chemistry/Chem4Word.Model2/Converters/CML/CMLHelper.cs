@@ -28,7 +28,7 @@ namespace Chem4Word.Model2.Converters.CML
         {
             int isotopeNumber;
 
-            if (int.TryParse(cmlElement.Attribute(CMLConstants.TagIsotopeNumber)?.Value, out isotopeNumber))
+            if (int.TryParse(cmlElement.Attribute(CMLConstants.AttributeIsotopeNumber)?.Value, out isotopeNumber))
             {
                 return isotopeNumber;
             }
@@ -41,7 +41,7 @@ namespace Chem4Word.Model2.Converters.CML
         internal static ElementBase GetChemicalElement(XElement cmlElement, out string message)
         {
             message = "";
-            XAttribute xa = cmlElement.Attribute(CMLConstants.TagElementType);
+            XAttribute xa = cmlElement.Attribute(CMLConstants.AttributeElementType);
             if (xa != null)
             {
                 string symbol = xa.Value;
@@ -71,8 +71,8 @@ namespace Chem4Word.Model2.Converters.CML
 
         internal static XElement GetCustomXmlPartGuid(XElement doc)
         {
-            var id1 = from XElement xe in doc.Elements(CMLConstants.TagXMLPartGuid) select xe;
-            var id2 = from XElement xe in doc.Elements(CMLNamespaces.c4w + CMLConstants.TagXMLPartGuid) select xe;
+            var id1 = from XElement xe in doc.Elements(CMLConstants.TagXmlPartGuid) select xe;
+            var id2 = from XElement xe in doc.Elements(CMLNamespaces.c4w + CMLConstants.TagXmlPartGuid) select xe;
             return id1.Union(id2).FirstOrDefault();
         }
 
@@ -151,11 +151,18 @@ namespace Chem4Word.Model2.Converters.CML
             return formulae1.Union(formulae2).ToList();
         }
 
+        internal static List<XElement> GetLabels(XElement mol)
+        {
+            var labels1 = from f1 in mol.Elements(CMLConstants.TagLabel) select f1;
+            var labels2 = from f2 in mol.Elements(CMLNamespaces.cml + CMLConstants.TagLabel) select f2;
+            return labels1.Union(labels2).ToList();
+        }
+
         internal static int? GetFormalCharge(XElement cmlElement)
         {
             int formalCharge;
 
-            if (int.TryParse(cmlElement.Attribute(CMLConstants.TagFormalCharge)?.Value, out formalCharge))
+            if (int.TryParse(cmlElement.Attribute(CMLConstants.AttributeFormalCharge)?.Value, out formalCharge))
             {
                 return formalCharge;
             }
@@ -173,29 +180,29 @@ namespace Chem4Word.Model2.Converters.CML
         internal static Point GetPosn(XElement cmlElement, out string message)
         {
             message = "";
-            string symbol = cmlElement.Attribute(CMLConstants.TagElementType)?.Value;
-            string id = cmlElement.Attribute(CMLConstants.TagId)?.Value;
+            string symbol = cmlElement.Attribute(CMLConstants.AttributeElementType)?.Value;
+            string id = cmlElement.Attribute(CMLConstants.AttributeId)?.Value;
 
             Point result = new Point();
             bool found = false;
 
             // Try first with 2D Co-ordinate scheme
-            if (cmlElement.Attribute(CMLConstants.TagX2) != null && cmlElement.Attribute(CMLConstants.TagY2) != null)
+            if (cmlElement.Attribute(CMLConstants.AttributeX2) != null && cmlElement.Attribute(CMLConstants.AttributeY2) != null)
             {
                 result = new Point(
-                    Double.Parse(cmlElement.Attribute(CMLConstants.TagX2).Value, CultureInfo.InvariantCulture),
-                    Double.Parse(cmlElement.Attribute(CMLConstants.TagY2).Value, CultureInfo.InvariantCulture));
+                    Double.Parse(cmlElement.Attribute(CMLConstants.AttributeX2).Value, CultureInfo.InvariantCulture),
+                    Double.Parse(cmlElement.Attribute(CMLConstants.AttributeY2).Value, CultureInfo.InvariantCulture));
                 found = true;
             }
 
             if (!found)
             {
                 // Try again with 3D Co-ordinate scheme
-                if (cmlElement.Attribute(CMLConstants.TagX3) != null && cmlElement.Attribute(CMLConstants.TagY3) != null)
+                if (cmlElement.Attribute(CMLConstants.AttributeX3) != null && cmlElement.Attribute(CMLConstants.AttributeY3) != null)
                 {
                     result = new Point(
-                        Double.Parse(cmlElement.Attribute(CMLConstants.TagX3).Value, CultureInfo.InvariantCulture),
-                        Double.Parse(cmlElement.Attribute(CMLConstants.TagY3).Value, CultureInfo.InvariantCulture));
+                        Double.Parse(cmlElement.Attribute(CMLConstants.AttributeX3).Value, CultureInfo.InvariantCulture),
+                        Double.Parse(cmlElement.Attribute(CMLConstants.AttributeY3).Value, CultureInfo.InvariantCulture));
                     found = true;
                 }
             }
@@ -211,7 +218,7 @@ namespace Chem4Word.Model2.Converters.CML
         {
             bool expl;
 
-            if (bool.TryParse(cmlElement.Attribute(CMLNamespaces.c4w + CMLConstants.TagExplicit)?.Value, out expl))
+            if (bool.TryParse(cmlElement.Attribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit)?.Value, out expl))
             {
                 return expl;
             }

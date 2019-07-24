@@ -12,12 +12,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Chem4Word.Core.Helpers;
-using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.Model2
 {
@@ -186,7 +183,7 @@ namespace Chem4Word.Model2
         private string _endAtomInternalId;
         private string _startAtomInternalId;
 
-        public BondStereo Stereo
+        public Globals.BondStereo Stereo
         {
             get { return _stereo; }
             set
@@ -199,10 +196,9 @@ namespace Chem4Word.Model2
         public object Tag { get; set; }
         public List<string> Messages { get; private set; }
 
-
         private string _internalId;
 
-        public BondDirection Placement
+        public Globals.BondDirection Placement
         {
             get
             {
@@ -213,10 +209,10 @@ namespace Chem4Word.Model2
                     {
                         Parent.RebuildRings();
                     }
-                    return ExplicitPlacement ?? ImplicitPlacement ?? BondDirection.None;
+                    return ExplicitPlacement ?? ImplicitPlacement ?? Globals.BondDirection.None;
                 }
 
-                return BondDirection.None;
+                return Globals.BondDirection.None;
             }
             set
             {
@@ -225,7 +221,7 @@ namespace Chem4Word.Model2
             }
         }
 
-        public BondDirection? ExplicitPlacement { get; set; }
+        public Globals.BondDirection? ExplicitPlacement { get; set; }
 
         private Vector? VectorOnSideOfNonHAtomFromStartLigands(Atom startAtom, Atom endAtom, IEnumerable<Atom> startLigands)
         {
@@ -570,7 +566,7 @@ namespace Chem4Word.Model2
                     if (StartAtom.Neighbours.Count() == 1 & EndAtom.Neighbours.Count() == 2)
                     {
                         var tempvector = EndAtom.NeighboursExcept(StartAtom)[0].Position - StartAtom.Position;
-                        var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector)*BondVector.Perpendicular();
+                        var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector) * BondVector.Perpendicular();
                         return perp;
                     }
                     else if (StartAtom.Neighbours.Count() == 2 & EndAtom.Neighbours.Count() == 1)
@@ -579,14 +575,11 @@ namespace Chem4Word.Model2
                         var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector) * BondVector.Perpendicular();
                         return perp;
                     }
-
                     else
                     {
                         return BondVector.Perpendicular();
                     }
-                    
                 }
-
             }
         }
 
@@ -615,55 +608,54 @@ namespace Chem4Word.Model2
                 var endLigands = EndAtom.NeighboursExcept(StartAtom);
                 var startLigands = StartAtom.NeighboursExcept(EndAtom);
                 Atom preferredStartLigand = null, preferredEndLigand = null;
-               //first, narrow down to atoms on the same side of the bond
+                //first, narrow down to atoms on the same side of the bond
 
-               int sign = - (int) Placement;
-               double bondangle = 180d;
+                int sign = -(int)Placement;
+                double bondangle = 180d;
 
-               foreach (Atom startLigand in startLigands)
-               {
-                   double angle = sign * Vector.AngleBetween(BondVector, startLigand.Position - StartAtom.Position);
-                   if (angle > 0)
-                   {
-                       var abs = Math.Abs(angle);
-                       if (abs < bondangle)
-                       {
-                           bondangle = abs;
-                           preferredStartLigand = startLigand;
-                       }
-                   }
-               }
-
-               bondangle = 180d;
-               foreach (Atom endLigand in endLigands)
-               {
-                   double angle = sign * Vector.AngleBetween(-BondVector, endLigand.Position - EndAtom.Position);
-                   if (angle < 0)
-                   {
-                       var abs = Math.Abs(angle);
+                foreach (Atom startLigand in startLigands)
+                {
+                    double angle = sign * Vector.AngleBetween(BondVector, startLigand.Position - StartAtom.Position);
+                    if (angle > 0)
+                    {
+                        var abs = Math.Abs(angle);
                         if (abs < bondangle)
-                       {
-                           bondangle = abs;
-                           preferredEndLigand = endLigand;
-                       }
-                   }
+                        {
+                            bondangle = abs;
+                            preferredStartLigand = startLigand;
+                        }
+                    }
+                }
 
-               }
+                bondangle = 180d;
+                foreach (Atom endLigand in endLigands)
+                {
+                    double angle = sign * Vector.AngleBetween(-BondVector, endLigand.Position - EndAtom.Position);
+                    if (angle < 0)
+                    {
+                        var abs = Math.Abs(angle);
+                        if (abs < bondangle)
+                        {
+                            bondangle = abs;
+                            preferredEndLigand = endLigand;
+                        }
+                    }
+                }
                 //if we have two atoms on the same side as the bond...
                 if (preferredStartLigand != null & preferredEndLigand != null)
-               {
-                   return preferredStartLigand.Position +
-                          (preferredEndLigand.Position - preferredStartLigand.Position) / 2;
-               }
-               //if we have only one atom on the same side of the bond
-               else if (preferredStartLigand != null) //preferredEndLigand == null
-               {
-                   return  StartAtom.Position + (preferredStartLigand.Position - StartAtom.Position) + BondVector;
-               }
-               else if (preferredEndLigand != null) //preferredEndLigand == null
-               {
-                   return EndAtom.Position + (preferredEndLigand.Position - EndAtom.Position) - BondVector;
-               }
+                {
+                    return preferredStartLigand.Position +
+                           (preferredEndLigand.Position - preferredStartLigand.Position) / 2;
+                }
+                //if we have only one atom on the same side of the bond
+                else if (preferredStartLigand != null) //preferredEndLigand == null
+                {
+                    return StartAtom.Position + (preferredStartLigand.Position - StartAtom.Position) + BondVector;
+                }
+                else if (preferredEndLigand != null) //preferredEndLigand == null
+                {
+                    return EndAtom.Position + (preferredEndLigand.Position - EndAtom.Position) - BondVector;
+                }
                 return null;
             }
         }
@@ -673,7 +665,7 @@ namespace Chem4Word.Model2
             //assume there are two endLigands
 
             if (BasicGeometry.LineSegmentsIntersect(startLigand.Position, endAtom.Position, endLigands[0].Position,
-                                                    startAtom.Position)!=null)
+                                                    startAtom.Position) != null)
             {
                 return endLigands[0];
             }
@@ -681,41 +673,33 @@ namespace Chem4Word.Model2
 
             {
                 return endLigands[1];
-
             }
             return null;
         }
 
-     
-
-        private BondDirection? GetPlacement()
+        private Globals.BondDirection? GetPlacement()
         {
-            BondDirection dir = BondDirection.None;
+            Globals.BondDirection dir = Globals.BondDirection.None;
 
             var vec = GetPrettyDoubleBondVector();
 
             if (vec == null)
             {
-                dir = BondDirection.None;
+                dir = Globals.BondDirection.None;
             }
             else
             {
-                dir = (BondDirection)Math.Sign(Vector.CrossProduct(vec.Value, BondVector));
+                dir = (Globals.BondDirection)Math.Sign(Vector.CrossProduct(vec.Value, BondVector));
             }
 
             return dir;
         }
 
-        public BondDirection? ImplicitPlacement => GetPlacement();
+        public Globals.BondDirection? ImplicitPlacement => GetPlacement();
 
-        public Vector BondVector
-        {
-            get { return EndAtom.Position - StartAtom.Position; }
-        }
+        public Vector BondVector => EndAtom.Position - StartAtom.Position;
 
         public double Angle => Vector.AngleBetween(BasicGeometry.ScreenNorth, BondVector);
-
-        public double HatchScaling => BondVector.Length / (Constants.StandardBondLength * 4);
         public double BondLength => BondVector.Length;
 
         #endregion Properties
