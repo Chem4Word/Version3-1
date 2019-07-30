@@ -15,7 +15,7 @@ namespace Chem4Word.ACME.Controls
     {
         public GridAwareItemsControl()
         {
-            VirtualizingStackPanel.SetIsVirtualizing(this, false);
+            VirtualizingPanel.SetIsVirtualizing(this, false);
         }
 
         protected override DependencyObject GetContainerForItemOverride()

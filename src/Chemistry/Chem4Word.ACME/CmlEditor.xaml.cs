@@ -27,15 +27,22 @@ namespace Chem4Word.ACME
         public CmlEditor(string cml)
         {
             InitializeComponent();
-            cmlText.Text = cml;
+            CmlText.Text = cml;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void OnSaveClick(object sender, RoutedEventArgs e)
         {
             WpfEventArgs args = new WpfEventArgs();
-            args.OutputValue = cmlText.Text;
+            args.OutputValue = CmlText.Text;
             args.Button = "OK";
+            OnButtonClick?.Invoke(this, args);
+        }
 
+        private void OnCancelClick(object sender, RoutedEventArgs e)
+        {
+            WpfEventArgs args = new WpfEventArgs();
+            args.OutputValue = "";
+            args.Button = "CANCEL";
             OnButtonClick?.Invoke(this, args);
         }
     }

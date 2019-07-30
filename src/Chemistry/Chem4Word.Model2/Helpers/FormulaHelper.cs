@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace Chem4Word.Helpers
+namespace Chem4Word.Model2.Helpers
 {
     public class FormulaPart
     {

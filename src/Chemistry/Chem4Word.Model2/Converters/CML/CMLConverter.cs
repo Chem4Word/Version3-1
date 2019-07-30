@@ -21,7 +21,7 @@ namespace Chem4Word.Model2.Converters.CML
     {
         public bool Compressed { get; set; }
 
-        public Model Import(object data)
+        public Model Import(object data, List<string> protectedLabels = null)
         {
             Model newModel = new Model();
 
@@ -50,7 +50,14 @@ namespace Chem4Word.Model2.Converters.CML
                 // Force all ConciseFormulas to be (re) calculated
                 newModel.CalculateFormula();
 
-                newModel.Relabel(true);
+                if (protectedLabels == null)
+                {
+                    newModel.Relabel(true);
+                }
+                else
+                {
+                    newModel.Relabel(false, protectedLabels);
+                }
                 newModel.Refresh();
             }
 
@@ -175,16 +182,28 @@ namespace Chem4Word.Model2.Converters.CML
             return result;
         }
 
-        // <cml:label dictRef="chem4word:Synonym">r6</cml:label>
-        private XElement GetXElement(string label)
+        // <cml:label id="m1.l1" dictRef="chem4word:Label "value="C19"/>
+        private XElement GetLabelXElement(TextualProperty label)
         {
-            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagLabel, label);
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagLabel);
+
+            if (label.Id != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeId, label.Id));
+            }
+
             result.Add(new XAttribute(CMLConstants.AttributeDictRef, CMLConstants.AttributeValueChem4WordLabel));
+
+            if (label.Value != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeValue, label.Value));
+            }
+
             return result;
         }
 
         // <cml:name id="m1.n1" dictRef="chem4word:Synonym">m1.n1</cml:name>
-        private XElement GetXElement(TextualProperty name)
+        private XElement GetNameXElement(TextualProperty name)
         {
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagName, name.Value);
 
@@ -255,7 +274,7 @@ namespace Chem4Word.Model2.Converters.CML
             {
                 foreach (var label in mol.Labels)
                 {
-                    molElement.Add(GetXElement(label));
+                    molElement.Add(GetLabelXElement(label));
                 }
 
                 foreach (var childMolecule in mol.Molecules.Values)
@@ -277,12 +296,12 @@ namespace Chem4Word.Model2.Converters.CML
 
                 foreach (var chemicalName in mol.Names)
                 {
-                    molElement.Add(GetXElement(chemicalName));
+                    molElement.Add(GetNameXElement(chemicalName));
                 }
 
                 foreach (var label in mol.Labels)
                 {
-                    molElement.Add(GetXElement(label));
+                    molElement.Add(GetLabelXElement(label));
                 }
 
                 if (mol.Atoms.Count > 0)
@@ -577,12 +596,18 @@ namespace Chem4Word.Model2.Converters.CML
             return formula;
         }
 
-        // <cml:label dictRef="chem4word:Synonym">r6</cml:label>
+        // <cml:label dictRef="chem4word:Label" value="C19 />
         private static TextualProperty GetLabel(XElement cmlElement)
         {
             var result = new TextualProperty();
 
-            result.Value = cmlElement.Value;
+            result.Type = CMLConstants.AttributeValueChem4WordLabel;
+
+            if (cmlElement.Attribute(CMLConstants.AttributeValue) != null)
+            {
+                result.Value = cmlElement.Attribute(CMLConstants.AttributeValue)?.Value;
+            }
+            result.CanBeDeleted = true;
 
             return result;
         }

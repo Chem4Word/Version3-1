@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.UI
 {

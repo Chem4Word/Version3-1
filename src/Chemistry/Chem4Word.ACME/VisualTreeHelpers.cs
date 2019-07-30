@@ -17,7 +17,7 @@ namespace Chem4Word.ACME
     public class VisualTreeHelpers
     {
         /// <summary>
-        /// Returns the first ancester of specified type
+        /// Returns the first ancestor of specified type
         /// </summary>
         public static T FindAncestor<T>(DependencyObject current)
         where T : DependencyObject
@@ -36,7 +36,7 @@ namespace Chem4Word.ACME
         }
 
         /// <summary>
-        /// Returns a specific ancester of an object
+        /// Returns a specific ancestor of an object
         /// </summary>
         public static T FindAncestor<T>(DependencyObject current, T lookupItem)
         where T : DependencyObject

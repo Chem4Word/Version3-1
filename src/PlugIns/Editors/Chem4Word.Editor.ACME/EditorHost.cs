@@ -5,14 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2.Converters.CML;
 using System;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.ACME;
-using Chem4Word.Core;
-using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Editor.ACME
 {
@@ -41,7 +40,9 @@ namespace Chem4Word.Editor.ACME
         private void OnWpfOkButtonClick(object sender, EventArgs e)
         {
             WpfEventArgs args = (WpfEventArgs)e;
-            if (args.Button.Equals("SAVE"))
+            var button = args.Button.ToLower();
+
+            if (button.Equals("save") || button.Equals("ok"))
             {
                 Result = DialogResult.OK;
                 OutputValue = args.OutputValue;
@@ -67,10 +68,9 @@ namespace Chem4Word.Editor.ACME
         {
             if (Result != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
             {
-                Chem4Word.ACME.Editor ec = elementHost1.Child as Chem4Word.ACME.Editor;
-                if (ec != null)
+                if (elementHost1.Child is Chem4Word.ACME.Editor editor)
                 {
-                    if (ec.Dirty)
+                    if (editor.IsDirty)
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine("Do you wish to save your changes?");
@@ -87,14 +87,14 @@ namespace Chem4Word.Editor.ACME
                             case DialogResult.Yes:
                                 Result = DialogResult.OK;
                                 CMLConverter cc = new CMLConverter();
-                                OutputValue = cc.Export(ec.Data);
+                                OutputValue = cc.Export(editor.Data);
                                 Hide();
-                                ec.OnOkButtonClick -= OnWpfOkButtonClick;
-                                ec = null;
+                                editor.OnOkButtonClick -= OnWpfOkButtonClick;
+                                editor = null;
                                 break;
 
                             case DialogResult.No:
-                                ec = null;
+                                editor = null;
                                 break;
                         }
                     }

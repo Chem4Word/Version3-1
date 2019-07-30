@@ -13,6 +13,7 @@
     Width="1013"
     Height="774"
     d:DataContext="{d:DesignInstance acme:EditViewModel}"
+    PreviewKeyDown="Editor_OnPreviewKeyDown"
     Loaded="ACMEControl_Loaded"
     mc:Ignorable="d">
     <UserControl.Resources>
@@ -26,8 +27,7 @@
             <converters:DoNothingConverter x:Key="DoNothing" />
             <!--  styles  -->
 
-            <Style x:Key="CommandButtonStyle"
-                TargetType="{x:Type Button}">
+            <Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}">
                 <Setter Property="HorizontalAlignment" Value="Stretch" />
                 <Setter Property="BorderBrush" Value="Transparent" />
                 <Setter Property="Background" Value="Transparent" />
@@ -42,7 +42,8 @@
 
                 <Style.Resources>
 
-                    <VisualBrush x:Key="AlphaBrush"
+                    <VisualBrush
+                        x:Key="AlphaBrush"
                         Stretch="None"
                         TileMode="Tile"
                         Viewport="0,0,8,8"
@@ -77,21 +78,18 @@
                         </VisualBrush.Visual>
                     </VisualBrush>
 
-                    <Style x:Key="ToggleButtonStyle"
-                        TargetType="ToggleButton">
+                    <Style x:Key="ToggleButtonStyle" TargetType="ToggleButton">
                         <Setter Property="SnapsToDevicePixels" Value="true" />
                         <Setter Property="OverridesDefaultStyle" Value="true" />
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ToggleButton">
-                                    <Border x:Name="Border"
-                                            Background="{Binding RelativeSource={RelativeSource AncestorType=control:ChemistryCanvas}, Path=Background}">
+                                    <Border x:Name="Border" Background="{Binding RelativeSource={RelativeSource AncestorType=control:ChemistryCanvas}, Path=Background}">
                                         <ContentPresenter />
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter TargetName="Border" Property="Background"
-                                                    Value="{Binding RelativeSource={RelativeSource AncestorType=control:ChemistryCanvas}, Path=Background}" />
+                                            <Setter TargetName="Border" Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=control:ChemistryCanvas}, Path=Background}" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -118,7 +116,8 @@
                                                         <ColumnDefinition Width="20" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    <Path Name="Arrow"
+                                                    <Path
+                                                        Name="Arrow"
                                                         Grid.Column="0"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"
@@ -132,7 +131,8 @@
                                                             <RotateTransform Angle="0" />
                                                         </Path.RenderTransform>
                                                     </Path>
-                                                    <ContentPresenter Name="HeaderContent"
+                                                    <ContentPresenter
+                                                        Name="HeaderContent"
                                                         Grid.Column="1"
                                                         ContentSource="Header" />
                                                 </Grid>
@@ -207,23 +207,18 @@
                                 BorderBrush="DimGray"
                                 BorderThickness="1"
                                 CornerRadius="1">
-                                <Expander
-                                    Background="Transparent"
-                                    IsExpanded="True">
+                                <Expander Background="Transparent" IsExpanded="True">
                                     <Border
                                         Height="180"
                                         Padding="0"
                                         BorderBrush="DimGray"
                                         BorderThickness="0,1,0,0">
                                         <Grid>
-                                            <Canvas Name="PART_ZoomCanvas"
-                                                Margin="5">
+                                            <Canvas Name="PART_ZoomCanvas" Margin="5">
                                                 <Canvas.Background>
-                                                    <VisualBrush Stretch="Uniform"
-                                                                 Visual="{Binding ElementName=DrawingArea, Path=Content}" />
+                                                    <VisualBrush Stretch="Uniform" Visual="{Binding ElementName=DrawingArea, Path=Content}" />
                                                 </Canvas.Background>
-                                                <Thumb Name="PART_ZoomThumb"
-                                                    Cursor="SizeAll">
+                                                <Thumb Name="PART_ZoomThumb" Cursor="SizeAll">
                                                     <Thumb.Style>
                                                         <Style TargetType="Thumb">
                                                             <Setter Property="Template">
@@ -248,7 +243,8 @@
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Slider Name="PART_ZoomSlider"
+                                            <Slider
+                                                Name="PART_ZoomSlider"
                                                 MinWidth="104"
                                                 MinHeight="21"
                                                 Margin="0"
@@ -296,21 +292,19 @@
             Key="Y"
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand}"
             Modifiers="Control" />
-        <KeyBinding
-            Key="Delete"
-            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
+        <KeyBinding Key="Delete" Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
         <KeyBinding
             Key="C"
-            Modifiers="Control"
-            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand}" />
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand}"
+            Modifiers="Control" />
         <KeyBinding
             Key="X"
-            Modifiers="Control"
-            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand}" />
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand}"
+            Modifiers="Control" />
         <KeyBinding
             Key="V"
-            Modifiers="Control"
-            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand}" />
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand}"
+            Modifiers="Control" />
     </UserControl.InputBindings>
 
     <Grid Name="SelectorGrid">
@@ -320,27 +314,26 @@
             <RowDefinition Height="25" />
         </Grid.RowDefinitions>
         <Grid.Resources>
-            <converters:BoolToVisibilityConverter x:Key="VisConverter"
+            <converters:BoolToVisibilityConverter
+                x:Key="VisConverter"
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
         </Grid.Resources>
-        <ToolBarTray Name="MainTray"
+        <ToolBarTray
+            Name="MainTray"
             DockPanel.Dock="Top"
             IsLocked="True">
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
-                    <EventSetter
-                        Event="Button.Click"
-                        Handler="Popup_Click" />
+                    <EventSetter Event="Button.Click" Handler="Popup_Click" />
                 </Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBrushKey}}" />
                     <Setter Property="BorderThickness" Value="1" />
                     <Setter Property="Padding" Value="2" />
                 </Style>
-                <Style x:Key="ToolbarButtonStyle"
-                    TargetType="{x:Type RadioButton}">
+                <Style x:Key="ToolbarButtonStyle" TargetType="{x:Type RadioButton}">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="Transparent" />
                     <Setter Property="Background" Value="Transparent" />
@@ -351,8 +344,7 @@
                     <Setter Property="Margin" Value="0" />
                     <Setter Property="Padding" Value="0" />
                 </Style>
-                <Style x:Key="CommandButtonStyle"
-                    TargetType="{x:Type Button}">
+                <Style x:Key="CommandButtonStyle" TargetType="{x:Type Button}">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="BorderBrush" Value="Transparent" />
                     <Setter Property="Background" Value="Transparent" />
@@ -364,12 +356,12 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ToolBarTray.Resources>
-            <ToolBar x:Name="SelectorToolbar"
-                Height="40">
-                <ComboBox x:Name="AtomCombo"
+            <ToolBar x:Name="SelectorToolbar" Height="40">
+                <ComboBox
+                    x:Name="AtomCombo"
                     Width="Auto"
-                    MinWidth="60"
                     Height="Auto"
+                    MinWidth="60"
                     MinHeight="25"
                     FontFamily="Arial"
                     FontSize="18"
@@ -382,15 +374,15 @@
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Viewbox ToolTip="{Binding Path=Element, Mode=OneTime}">
-                               <ContentPresenter Content="{Binding Content}"/>
+                                <ContentPresenter Content="{Binding Content}" />
                             </Viewbox>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                     <ComboBox.ItemContainerStyle>
                         <Style TargetType="ComboBoxItem">
-                            <Setter Property="FontSize" Value="18"/>
-                            <Setter Property="FontWeight" Value="DemiBold"/>
-                            <Setter Property="FontFamily" Value="Arial"/>
+                            <Setter Property="FontSize" Value="18" />
+                            <Setter Property="FontWeight" Value="DemiBold" />
+                            <Setter Property="FontFamily" Value="Arial" />
                         </Style>
                     </ComboBox.ItemContainerStyle>
                 </ComboBox>
@@ -398,15 +390,19 @@
                     x:Name="BondCombo"
                     Width="60"
                     Height="25"
+                    IsHitTestVisible="True"
                     ItemsSource="{StaticResource BondOptions}"
                     SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedBondOptionId, Mode=TwoWay}"
                     SelectedValuePath="Id"
-                    IsHitTestVisible="True"
                     ToolTip="Current Bond Type">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Viewbox ToolTip="{Binding Path=Description, Mode=OneTime}">
-                                <Image Stretch="None" HorizontalAlignment="Left" Width="40" Height="14">
+                                <Image
+                                    Width="40"
+                                    Height="14"
+                                    HorizontalAlignment="Left"
+                                    Stretch="None">
                                     <Image.Source>
                                         <DrawingImage Drawing="{Binding Path=BondGraphic}" />
                                     </Image.Source>
@@ -416,13 +412,14 @@
                     </ComboBox.ItemTemplate>
                     <ComboBox.ItemContainerStyle>
                         <Style TargetType="ComboBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         </Style>
                     </ComboBox.ItemContainerStyle>
                 </ComboBox>
                 <Separator Margin="5" />
 
-                <RadioButton x:Name="DrawButton"
+                <RadioButton
+                    x:Name="DrawButton"
                     Click="ModeButton_OnChecked"
                     GroupName="Actions"
                     IsChecked="True"
@@ -443,7 +440,8 @@
                         <behaviors:DrawBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
-                <RadioButton x:Name="SelectionButton"
+                <RadioButton
+                    x:Name="SelectionButton"
                     Checked="ModeButton_OnChecked"
                     GroupName="Actions"
                     Style="{StaticResource ToolbarButtonStyle}"
@@ -460,11 +458,11 @@
                             Stretch="Fill" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:LassoBehaviour
-                            EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                        <behaviors:LassoBehaviour EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
-                <RadioButton Name="RingButton"
+                <RadioButton
+                    Name="RingButton"
                     Width="30"
                     Height="30"
                     Checked="ModeButton_OnChecked"
@@ -474,23 +472,24 @@
                         Width="24"
                         Height="24"
                         Stretch="Uniform">
-                        <StackPanel Name="RingPanel"
+                        <StackPanel
+                            Name="RingPanel"
                             Width="24"
                             Height="24" />
                     </Viewbox>
                 </RadioButton>
-                <Button Name="RingDropdownButton"
+                <Button
+                    Name="RingDropdownButton"
                     Width="10"
                     Click="RingDropdown_OnClick"
                     ToolTip="Select Ring">
                     <Viewbox Stretch="Uniform">
-                        <Path
-                            Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z"
-                            Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
+                        <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                 </Button>
                 <!--  Print Toggle Button Popup  -->
-                <Popup x:Name="RingPopup"
+                <Popup
+                    x:Name="RingPopup"
                     PlacementTarget="{Binding ElementName=RingButton}"
                     StaysOpen="False">
                     <Border>
@@ -502,14 +501,11 @@
 
                                         <Setter Property="BorderBrush" Value="Transparent" />
                                         <Setter Property="Height" Value="Auto" />
-                                        <EventSetter
-                                            Event="Click"
-                                            Handler="RingSelButton_OnClick" />
+                                        <EventSetter Event="Click" Handler="RingSelButton_OnClick" />
                                     </Style.Setters>
                                 </Style>
                             </UniformGrid.Resources>
-                            <Button Name="BenzeneButton"
-                                ToolTip="Benzene">
+                            <Button Name="BenzeneButton" ToolTip="Benzene">
                                 <Viewbox>
                                     <Path Style="{StaticResource BenzeneStyle}" />
                                 </Viewbox>
@@ -575,9 +571,7 @@
                             </Button>
                             <Button ToolTip="Cyclopropane">
                                 <Viewbox Stretch="UniformToFill">
-                                    <Path
-                                        Data="M0,15 L20,15 L10,-2.32 Z"
-                                        Stroke="{StaticResource Chem4WordBrush}" />
+                                    <Path Data="M0,15 L20,15 L10,-2.32 Z" Stroke="{StaticResource Chem4WordBrush}" />
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
@@ -622,14 +616,14 @@
                                     </Grid>
                                 </Viewbox>
                                 <Button.Tag>
-                                    <behaviors:NRingBehavior
-                                        EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                    <behaviors:NRingBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                                 </Button.Tag>
                             </Button>
                         </UniformGrid>
                     </Border>
                 </Popup>
-                <RadioButton x:Name="ChainButton"
+                <RadioButton
+                    x:Name="ChainButton"
                     Click="ModeButton_OnChecked"
                     GroupName="Actions"
                     ToolTip="Draw Chain">
@@ -639,12 +633,12 @@
                         </Path.LayoutTransform>
                     </Path>
                     <RadioButton.Tag>
-                        <behaviors:ChainBehavior
-                            EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                        <behaviors:ChainBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
                 <!--  ReactionButton Hidden (Collapsed)  -->
-                <RadioButton x:Name="ReactionButton"
+                <RadioButton
+                    x:Name="ReactionButton"
                     GroupName="Actions"
                     Style="{StaticResource ToolbarButtonStyle}"
                     Visibility="Collapsed">
@@ -657,8 +651,7 @@
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>
-                                NH
-                                <Run BaselineAlignment="Subscript" FontSize="12">
+                                NH<Run BaselineAlignment="Subscript" FontSize="12">
                                     3
                                 </Run>
                             </TextBlock>
@@ -681,16 +674,15 @@
                                 <TextBlock.Effect>
                                     <DropShadowEffect Color="LightGray" />
                                 </TextBlock.Effect>
-                                H
-                                <Run BaselineAlignment="Subscript" FontSize="12">
+                                H<Run BaselineAlignment="Subscript" FontSize="12">
                                     2
                                 </Run>
-                                O
-                            </TextBlock>
+                                O</TextBlock>
                         </StackPanel>
                     </Viewbox>
                 </RadioButton>
-                <RadioButton x:Name="DeleteButton"
+                <RadioButton
+                    x:Name="DeleteButton"
                     Click="ModeButton_OnChecked"
                     FontSize="18"
                     GroupName="Actions"
@@ -700,21 +692,19 @@
                         Width="24"
                         Height="24"
                         Stretch="Uniform">
-                        <Path
-                            Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"
-                            Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
+                        <Path Data="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
                     </Viewbox>
                     <RadioButton.Tag>
-                        <behaviors:DeleteBehavior
-                            EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                        <behaviors:DeleteBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>
                 </RadioButton>
                 <Separator Margin="5" />
 
-                <Button x:Name="CutButton"
+                <Button
+                    x:Name="CutButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CutCommand}"
-                    ToolTip="Cut"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Cut">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -725,10 +715,11 @@
                             Stretch="UniformToFill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="CopyButton"
+                <Button
+                    x:Name="CopyButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand}"
-                    ToolTip="Copy"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Copy">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -739,10 +730,11 @@
                             Stretch="UniformToFill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="PasteButton"
+                <Button
+                    x:Name="PasteButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand}"
-                    ToolTip="Paste"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Paste">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -753,10 +745,11 @@
                             Stretch="UniformToFill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="UndoButton"
+                <Button
+                    x:Name="UndoButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UndoCommand}"
-                    ToolTip="Undo"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Undo">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -769,10 +762,11 @@
                             Stretch="Fill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="RedoButton"
+                <Button
+                    x:Name="RedoButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand}"
-                    ToolTip="Redo"
-                    Style="{StaticResource CommandButtonStyle}">
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Redo">
                     <Viewbox
                         Width="24"
                         Height="24"
@@ -787,13 +781,12 @@
                 </Button>
                 <Separator Margin="5" />
 
-                <Button x:Name="FlipHorizontalButton"
+                <Button
+                    x:Name="FlipHorizontalButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipHorizontalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Vertical">
-                    <Viewbox
-                        Width="24"
-                        Height="24">
+                    <Viewbox Width="24" Height="24">
                         <Path
                             Width="24"
                             Height="24"
@@ -803,13 +796,12 @@
                             Stretch="Uniform" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="FlipVerticalButton"
+                <Button
+                    x:Name="FlipVerticalButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipVerticalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Flip Horizontal">
-                    <Viewbox
-                        Width="24"
-                        Height="24">
+                    <Viewbox Width="24" Height="24">
                         <Path
                             Width="24"
                             Height="24"
@@ -819,7 +811,8 @@
                             Stretch="Uniform" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="AddHydrogensButton"
+                <Button
+                    x:Name="AddHydrogensButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AddHydrogensCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Add Explicit Hydrogens">
@@ -836,7 +829,8 @@
                         </TextBlock>
                     </Viewbox>
                 </Button>
-                <Button x:Name="RemoveHydrogensButton"
+                <Button
+                    x:Name="RemoveHydrogensButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RemoveHydrogensCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Remove Explicit Hydrogens">
@@ -853,13 +847,12 @@
                         </TextBlock>
                     </Viewbox>
                 </Button>
-                <Button x:Name="FuseButton"
+                <Button
+                    x:Name="FuseButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FuseCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Fuse">
-                    <Viewbox
-                        Width="24"
-                        Height="24">
+                    <Viewbox Width="24" Height="24">
                         <Path
                             Width="24"
                             Height="24"
@@ -869,7 +862,8 @@
                             Stretch="Uniform" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="GroupButton"
+                <Button
+                    x:Name="GroupButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.GroupCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Group fragments">
@@ -883,7 +877,8 @@
                             Stretch="Uniform" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="UngroupButton"
+                <Button
+                    x:Name="UngroupButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UnGroupCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Ungroup fragments">
@@ -899,7 +894,8 @@
                 </Button>
                 <Separator Margin="5" />
 
-                <ComboBox x:Name="BondLengthSelector"
+                <ComboBox
+                    x:Name="BondLengthSelector"
                     Width="50"
                     FontFamily="Arial"
                     FontSize="16"
@@ -909,7 +905,8 @@
                     ToolTip="Change Bond Length" />
                 <Separator Margin="5" />
 
-                <Button x:Name="SaveButton"
+                <Button
+                    x:Name="SaveButton"
                     Click="SaveButton_OnClick"
                     Style="{StaticResource CommandButtonStyle}"
                     Visibility="{Binding ElementName=AcmeControl, Path=ShowSave, Converter={StaticResource VisConverter}}">
@@ -925,7 +922,8 @@
                             Stretch="Fill" />
                     </Viewbox>
                 </Button>
-                <Button x:Name="SettingsButton"
+                <Button
+                    x:Name="SettingsButton"
                     Click="SettingsButton_OnClick"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Settings">
@@ -941,25 +939,26 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        <Grid
-            Grid.Row="1"
-            Height="Auto">
+        <Grid Grid.Row="1" Height="Auto">
             <Grid.Resources>
                 <converters:DoNothingConverter x:Key="SnoopConverter" />
             </Grid.Resources>
             <!--  actual drawing area  -->
-            <ScrollViewer Name="DrawingArea"
+            <ScrollViewer
+                Name="DrawingArea"
                 Width="Auto"
                 Height="Auto"
                 Background="White"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto">
-                <control:EditorCanvas x:Name="ChemCanvas"
+                <control:EditorCanvas
+                    x:Name="ChemCanvas"
                     MinWidth="2000"
                     MinHeight="1500"
                     Background="White" />
             </ScrollViewer>
-            <control:ZoomBox x:Name="ZoomBox"
+            <control:ZoomBox
+                x:Name="ZoomBox"
                 Width="180"
                 Margin="0,5,25,0"
                 HorizontalAlignment="Right"
@@ -967,7 +966,8 @@
                 ChemistryCanvas="{Binding ElementName=ChemCanvas}"
                 ScrollViewer="{Binding ElementName=DrawingArea}" />
         </Grid>
-        <StatusBar Name="FeedbackBar"
+        <StatusBar
+            Name="FeedbackBar"
             Grid.Row="2"
             Height="25"
             Background="{x:Static SystemColors.WindowBrush}">

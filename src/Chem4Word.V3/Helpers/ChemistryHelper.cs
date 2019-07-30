@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Helpers

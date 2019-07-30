@@ -1,11 +1,12 @@
 These files should reside in *ALL* of the following
 
 C:\Users\{UserName}\AppData\Local\Temp
-C:\Users\{UserName}\AppData\Local\1\Temp
-C:\Users\{UserName}\AppData\Local\2\Temp
-C:\Users\{UserName}\AppData\Local\3\Temp
+C:\Users\{UserName}\AppData\Local\Temp\1
+C:\Users\{UserName}\AppData\Local\Temp\2
+C:\Users\{UserName}\AppData\Local\Temp\3
 
 .NETFramework,Version=v4.5.2.AssemblyAttributes.cs
+.NETFramework,Version=v4.6.1.AssemblyAttributes.cs
 .NETFramework,Version=v4.6.2.AssemblyAttributes.cs
 
 They sometimes get cleaned out of the %temp% folder !
@@ -15,6 +16,7 @@ When this happens it's Post Build Event clears the PlugIns folder.
 
 Thus all hell breaks loose in the Word Add-In as there are no plug Ins
 
-The \1\ \2\ \3\ folders are created by RDP Sessions and the nunmber varies
+The \1 \2 \3 folders are created by RDP Sessions and the nunmber varies
 
+%LOCALAPPDATA%
 copy C:\Dev\vsts\chem4word\Version3-1\src\Snippets\*.cs %temp%

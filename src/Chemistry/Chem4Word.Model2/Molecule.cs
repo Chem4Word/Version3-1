@@ -503,6 +503,69 @@ namespace Chem4Word.Model2
 
         public string ConciseFormula { get; set; }
 
+        public string CalculatedFormulaOfChildren()
+        {
+            // Phase #1 Collect data
+            List<string> calculateFormulas = new List<string>();
+
+            calculateFormulas.AddRange(GetChildFormulas(this));
+
+            // Local Function
+            List<string> GetChildFormulas(Molecule molecule)
+            {
+                var childFormulae = new List<string>();
+
+                foreach (var child in molecule.Molecules.Values)
+                {
+                    if (child.Molecules.Count == 0)
+                    {
+                        childFormulae.Add(child.ConciseFormula);
+                    }
+                    else
+                    {
+                        childFormulae.AddRange(GetChildFormulas(child));
+                    }
+                }
+
+                return childFormulae;
+            }
+
+
+            // Phase #2 - Collate the values
+            string result = "";
+            Dictionary<string, int> dictionary = new Dictionary<string, int>();
+            foreach (var formula in calculateFormulas)
+            {
+                if (dictionary.ContainsKey(formula))
+                {
+                    dictionary[formula]++;
+                }
+                else
+                {
+                    dictionary.Add(formula, 1);
+                }
+            }
+
+            foreach (KeyValuePair<string, int> kvp in dictionary)
+            {
+                if (kvp.Value == 1)
+                {
+                    result += $"{kvp.Key} . ";
+                }
+                else
+                {
+                    result += $"{kvp.Value} {kvp.Key} . ";
+                }
+            }
+
+            if (result.EndsWith(" . "))
+            {
+                result = result.Substring(0, result.Length - 3);
+            }
+
+            return result;
+        }
+
         #endregion Constructors
 
         #region Events
@@ -607,6 +670,30 @@ namespace Chem4Word.Model2
 
         #region Methods
 
+        public string GetNextId(ObservableCollection<TextualProperty> properties, string seedSuffix)
+        {
+            string prefix = Id;
+            string suffix = seedSuffix;
+            int max = 0;
+
+            foreach (var property in properties)
+            {
+                if (!string.IsNullOrEmpty(property.Id))
+                {
+                    if (property.Id.Contains("."))
+                    {
+                        var parts = property.Id.Split('.');
+                        prefix = parts[0];
+                        suffix = parts[1].Substring(0, 1);
+                        int n = int.Parse(parts[1].Substring(1));
+                        max = Math.Max(max, n);
+                    }
+                }
+            }
+
+            return $"{prefix}.{suffix}{max + 1}";
+        }
+
         public List<Atom> GetAtomNeighbours(Atom atom)
         {
             List<Atom> temps = new List<Atom>();
@@ -654,9 +741,10 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void ReLabel(bool includeNames, ref int iMolcount, ref int iAtomCount, ref int iBondcount)
+        public void ReLabel(ref int iMolcount, ref int iAtomCount, ref int iBondcount, bool includeNames, List<string> protectedLabels)
         {
             Id = $"m{++iMolcount}";
+
             foreach (Atom a in Atoms.Values)
             {
                 a.Id = $"a{++iAtomCount}";
@@ -673,18 +761,75 @@ namespace Chem4Word.Model2
                 foreach (var formula in Formulas)
                 {
                     formula.Id = $"{Id}.f{count++}";
+                    formula.CanBeDeleted = true;
                 }
 
                 count = 1;
                 foreach (var name in Names)
                 {
                     name.Id = $"{Id}.n{count++}";
+                    name.CanBeDeleted = true;
+                }
+
+                count = 1;
+                foreach (var label in Labels)
+                {
+                    label.Id = $"{Id}.l{count++}";
+                    label.CanBeDeleted = true;
+                }
+            }
+            else
+            {
+                // Fix any missing Ids
+                foreach (var formula in Formulas)
+                {
+                    if (string.IsNullOrEmpty(formula.Id))
+                    {
+                        formula.Id = GetNextId(Formulas, "f");
+                        formula.CanBeDeleted = true;
+                    }
+                }
+
+                foreach (var name in Names)
+                {
+                    if (string.IsNullOrEmpty(name.Id))
+                    {
+                        name.Id = GetNextId(Names, "n");
+                        name.CanBeDeleted = true;
+                    }
+                }
+
+                foreach (var label in Labels)
+                {
+                    if (string.IsNullOrEmpty(label.Id))
+                    {
+                        label.Id = GetNextId(Labels, "l");
+                        label.CanBeDeleted = true;
+                    }
+                }
+            }
+
+            if (protectedLabels != null)
+            {
+                foreach (var formula in Formulas)
+                {
+                    formula.CanBeDeleted = !protectedLabels.Any(s => s.StartsWith(formula.Id));
+                }
+
+                foreach (var name in Names)
+                {
+                    name.CanBeDeleted = !protectedLabels.Any(s => s.StartsWith(name.Id));
+                }
+
+                foreach (var label in Labels)
+                {
+                    label.CanBeDeleted = !protectedLabels.Any(s => s.StartsWith(label.Id));
                 }
             }
 
             foreach (Molecule mol in Molecules.Values)
             {
-                mol.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
+                mol.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames, protectedLabels);
             }
         }
 

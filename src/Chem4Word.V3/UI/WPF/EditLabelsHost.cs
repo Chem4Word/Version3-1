@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.UI.WPF
 {
@@ -38,10 +40,10 @@ namespace Chem4Word.UI.WPF
             WpfEventArgs args = (WpfEventArgs)e;
             switch (args.Button.ToLower())
             {
+                case "ok":
                 case "save":
                     DialogResult = DialogResult.OK;
-                    var ec = elementHost1.Child as EditLabelsControl;
-                    if (ec != null)
+                    if (elementHost1.Child is LabelsEditor labelsEditor)
                     {
                         Cml = args.OutputValue;
                         Hide();
@@ -64,14 +66,13 @@ namespace Chem4Word.UI.WPF
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;
 
-                var ec = elementHost1.Child as EditLabelsControl;
-                if (ec != null)
+                if (elementHost1.Child is LabelsEditor labelsEditor)
                 {
-                    ec.TopLeft = TopLeft;
-                    ec.Cml = Cml;
-                    ec.Used1D = Used1D;
-                    ec.Message = Message;
-                    ec.OnButtonClick += OnWpfButtonClick;
+                    labelsEditor.TopLeft = TopLeft;
+                    labelsEditor.Used1D = Used1D;
+                    labelsEditor.PopulateTreeView(Cml);
+                    labelsEditor.Message = Message;
+                    labelsEditor.OnButtonClick += OnWpfButtonClick;
                 }
             }
             catch (Exception ex)
@@ -84,10 +85,9 @@ namespace Chem4Word.UI.WPF
         {
             if (!_closedInCode)
             {
-                var ec = elementHost1.Child as EditLabelsControl;
-                if (ec != null)
+                if (elementHost1.Child is LabelsEditor labelsEditor)
                 {
-                    if (ec.Dirty)
+                    if (labelsEditor.IsDirty)
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine("Do you wish to save your changes?");
@@ -103,7 +103,8 @@ namespace Chem4Word.UI.WPF
                                 break;
 
                             case DialogResult.Yes:
-                                Cml = "???";
+                                var cmlConvertor = new CMLConverter();
+                                Cml = cmlConvertor.Export(labelsEditor.Data);
                                 DialogResult = DialogResult.OK;
                                 break;
 

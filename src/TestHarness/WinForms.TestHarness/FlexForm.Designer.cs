@@ -51,6 +51,7 @@ namespace WinForms.TestHarness
             this.Information = new System.Windows.Forms.Label();
             this.EditCml = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.EditLabels = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
@@ -91,7 +92,7 @@ namespace WinForms.TestHarness
             // ChangeBackground
             // 
             this.ChangeBackground.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeBackground.Location = new System.Drawing.Point(523, 524);
+            this.ChangeBackground.Location = new System.Drawing.Point(109, 19);
             this.ChangeBackground.Name = "ChangeBackground";
             this.ChangeBackground.Size = new System.Drawing.Size(75, 23);
             this.ChangeBackground.TabIndex = 3;
@@ -105,7 +106,7 @@ namespace WinForms.TestHarness
             this.ShowCarbons.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCarbons.AutoSize = true;
             this.ShowCarbons.Enabled = false;
-            this.ShowCarbons.Location = new System.Drawing.Point(523, 501);
+            this.ShowCarbons.Location = new System.Drawing.Point(109, 54);
             this.ShowCarbons.Name = "ShowCarbons";
             this.ShowCarbons.Size = new System.Drawing.Size(95, 17);
             this.ShowCarbons.TabIndex = 4;
@@ -228,7 +229,7 @@ namespace WinForms.TestHarness
             // EditCml
             // 
             this.EditCml.Enabled = false;
-            this.EditCml.Location = new System.Drawing.Point(6, 50);
+            this.EditCml.Location = new System.Drawing.Point(87, 50);
             this.EditCml.Name = "EditCml";
             this.EditCml.Size = new System.Drawing.Size(75, 23);
             this.EditCml.TabIndex = 15;
@@ -240,26 +241,42 @@ namespace WinForms.TestHarness
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.EditLabels);
             this.groupBox1.Controls.Add(this.EditWithAcme);
             this.groupBox1.Controls.Add(this.EditCml);
-            this.groupBox1.Location = new System.Drawing.Point(1024, 478);
+            this.groupBox1.Location = new System.Drawing.Point(941, 478);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(89, 80);
+            this.groupBox1.Size = new System.Drawing.Size(169, 80);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Edit with";
+            // 
+            // EditLabels
+            // 
+            this.EditLabels.Enabled = false;
+            this.EditLabels.Location = new System.Drawing.Point(87, 19);
+            this.EditLabels.Name = "EditLabels";
+            this.EditLabels.Size = new System.Drawing.Size(75, 23);
+            this.EditLabels.TabIndex = 16;
+            this.EditLabels.Text = "Labels";
+            this.EditLabels.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EditLabels.UseVisualStyleBackColor = true;
+            this.EditLabels.Click += new System.EventHandler(this.EditLabels_Click);
             // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.RemoveAtom);
             this.groupBox2.Controls.Add(this.RandomElement);
-            this.groupBox2.Location = new System.Drawing.Point(899, 478);
+            this.groupBox2.Controls.Add(this.ChangeBackground);
+            this.groupBox2.Controls.Add(this.ShowCarbons);
+            this.groupBox2.Location = new System.Drawing.Point(434, 478);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(119, 82);
+            this.groupBox2.Size = new System.Drawing.Size(238, 82);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Experiments";
+            this.groupBox2.Text = "Experiments (Hidden)";
+            this.groupBox2.Visible = false;
             // 
             // ShowCml
             // 
@@ -311,8 +328,6 @@ namespace WinForms.TestHarness
             this.Controls.Add(this.LayoutPanel);
             this.Controls.Add(this.Redo);
             this.Controls.Add(this.Undo);
-            this.Controls.Add(this.ShowCarbons);
-            this.Controls.Add(this.ChangeBackground);
             this.Controls.Add(this.LoadStructure);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FlexForm";
@@ -321,6 +336,7 @@ namespace WinForms.TestHarness
             this.LayoutPanel.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -352,6 +368,7 @@ namespace WinForms.TestHarness
         private System.Windows.Forms.Button ShowCml;
         private System.Windows.Forms.Button SaveStructure;
         private System.Windows.Forms.Button ClearChemistry;
+        private System.Windows.Forms.Button EditLabels;
     }
 }
 

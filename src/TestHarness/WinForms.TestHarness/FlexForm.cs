@@ -118,6 +118,43 @@ namespace WinForms.TestHarness
             }
         }
 
+        private void EditLabels_Click(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+#if !DEBUG
+            try
+#endif
+            {
+                if (!string.IsNullOrEmpty(_lastCml))
+                {
+                    EditorHost editorHost = new EditorHost(_lastCml, "LABELS");
+                    editorHost.ShowDialog(this);
+                    if (editorHost.Result == DialogResult.OK)
+                    {
+                        CMLConverter cc = new CMLConverter();
+                        var clone = cc.Import(_lastCml);
+                        Debug.WriteLine(
+                            $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                        _undoStack.Push(clone);
+
+                        Model m = cc.Import(editorHost.OutputValue);
+                        m.Relabel(true);
+                        _lastCml = cc.Export(m);
+
+                        ShowChemistry($"Edited {m.ConciseFormula}", m);
+                    }
+                }
+            }
+#if !DEBUG
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
+            }
+#endif
+        }
+
         private void EditWithAcme_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -201,11 +238,13 @@ namespace WinForms.TestHarness
         {
             ShowCarbons.Checked = false;
             EditWithAcme.Enabled = true;
-            ShowCarbons.Enabled = true;
-            RemoveAtom.Enabled = true;
-            RandomElement.Enabled = true;
+            EditLabels.Enabled = true;
             EditCml.Enabled = true;
+
             ShowCml.Enabled = true;
+            //ShowCarbons.Enabled = true;
+            //RemoveAtom.Enabled = true;
+            //RandomElement.Enabled = true;
             ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
 

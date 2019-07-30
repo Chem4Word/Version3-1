@@ -122,11 +122,6 @@ namespace Chem4Word.UI.UserControls
             }
         }
 
-        private bool StringIsValid(string input)
-        {
-            return string.IsNullOrEmpty(input);
-        }
-
         public void ChangeFormulaValueAt(string id, string value)
         {
             foreach (var f in Molecule.Formulas)

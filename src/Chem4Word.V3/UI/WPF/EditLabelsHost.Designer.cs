@@ -1,4 +1,6 @@
-﻿namespace Chem4Word.UI.WPF
+﻿using Chem4Word.ACME.Controls;
+
+namespace Chem4Word.UI.WPF
 {
     partial class EditLabelsHost
     {
@@ -30,7 +32,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditLabelsHost));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.editLabelsControl1 = new Chem4Word.UI.WPF.EditLabelsControl();
+            this.editLabelsControl1 = new LabelsEditor();
             this.SuspendLayout();
             // 
             // elementHost1
@@ -61,6 +63,6 @@
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private EditLabelsControl editLabelsControl1;
+        private LabelsEditor editLabelsControl1;
     }
 }

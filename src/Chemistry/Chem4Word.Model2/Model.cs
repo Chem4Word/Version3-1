@@ -590,13 +590,13 @@ namespace Chem4Word.Model2
             return newMol;
         }
 
-        public void Relabel(bool includeNames)
+        public void Relabel(bool includeNames, List<string> protectedLabels = null)
         {
             int iBondcount = 0, iAtomCount = 0, iMolcount = 0;
 
             foreach (Molecule m in Molecules.Values)
             {
-                m.ReLabel(includeNames, ref iMolcount, ref iAtomCount, ref iBondcount);
+                m.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames, protectedLabels);
             }
         }
 

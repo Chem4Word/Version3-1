@@ -173,10 +173,6 @@ namespace Chem4Word.Model2
             return atomList;
         }
 
-        // ToDo: This does not look right ???
-        public List<Bond> DoubleBonds =>
-            Bonds.Where(b => (b.Order.Equals(OrderSingle) | b.Order.Equals(OrderAromatic))).ToList();
-
         //generates a unique ID for each ring based on the atom hash codes()
         public string UniqueID
         {

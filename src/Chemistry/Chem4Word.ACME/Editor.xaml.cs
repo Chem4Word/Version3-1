@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Utils;
@@ -68,7 +69,7 @@ namespace Chem4Word.ACME
             InitializeComponent();
         }
 
-        public bool Dirty
+        public bool IsDirty
         {
             get
             {
@@ -78,7 +79,7 @@ namespace Chem4Word.ACME
                 }
                 else
                 {
-                    return ActiveViewModel.Dirty;
+                    return ActiveViewModel.IsDirty;
                 }
             }
         }
@@ -159,8 +160,6 @@ namespace Chem4Word.ACME
             set { SetValue(SliderVisibilityProperty, value); }
         }
 
-
-
         public double HorizontalOffset
         {
             get => DrawingArea.HorizontalOffset;
@@ -185,6 +184,7 @@ namespace Chem4Word.ACME
         {
             return DrawingArea.TranslatePoint(p, ChemCanvas);
         }
+
         private void Popup_Click(object sender, RoutedEventArgs e)
         {
             RingButton.IsChecked = true;
@@ -363,6 +363,13 @@ namespace Chem4Word.ACME
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-     
+
+        private void Editor_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                ActiveViewModel.DeleteSelection();
+            }
+        }
     }
 }

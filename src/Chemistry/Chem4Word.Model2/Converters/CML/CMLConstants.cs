@@ -43,7 +43,7 @@ namespace Chem4Word.Model2.Converters.CML
         public const string TagBondStereo = "bondStereo";
         public const string AttributePlacement = "placement";
         // Formula
-        // <cml:formula id="m1.f1" convention="chemspider:Smiles" inline="m1.f1" concise="C 6 H 14 Li 1 N 1" />
+        // <cml:formula id="m1.f1" convention="chem4word:Formula" inline="m1.f1" concise="C 6 H 14 Li 1 N 1" />
         public const string TagFormula = "formula";
         public const string AttributeConvention = "convention";
         public const string AttributeInline = "inline";
@@ -56,8 +56,9 @@ namespace Chem4Word.Model2.Converters.CML
         public const string AttributeValueChem4WordSynonym = "chem4word:Synonym";
         public const string AttributeValueNameDictUnknown = "nameDict:unknown";
         // Labels
-        // <cml:label dictRef="chem4word:Label">m1</cml:label>
+        // <cml:label id="m1.l1" dictRef="chem4word:Label" value="m1.l1" />
         public const string TagLabel = "label";
+        public const string AttributeValue = "value";
         public const string AttributeValueChem4WordLabel = "chem4word:Label";
     }
 }

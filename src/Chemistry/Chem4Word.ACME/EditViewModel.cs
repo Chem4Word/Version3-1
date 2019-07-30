@@ -319,7 +319,6 @@ namespace Chem4Word.ACME
 
         #region Commands
 
-        public DeleteCommand DeleteCommand { get; set; }
         public AddAtomCommand AddAtomCommand { get; set; }
         public UndoCommand UndoCommand { get; set; }
         public RedoCommand RedoCommand { get; set; }
@@ -365,7 +364,6 @@ namespace Chem4Word.ACME
         {
             RedoCommand = new RedoCommand(this);
             UndoCommand = new UndoCommand(this);
-            DeleteCommand = new DeleteCommand(this);
             AddAtomCommand = new AddAtomCommand(this);
             CopyCommand = new CopyCommand(this);
             CutCommand = new CutCommand(this);
@@ -1077,7 +1075,6 @@ namespace Chem4Word.ACME
         {
             CopyCommand.RaiseCanExecChanged();
             CutCommand.RaiseCanExecChanged();
-            DeleteCommand.RaiseCanExecChanged();
             FlipHorizontalCommand.RaiseCanExecChanged();
             FlipVerticalCommand.RaiseCanExecChanged();
             AddHydrogensCommand.RaiseCanExecChanged();
@@ -1244,7 +1241,7 @@ namespace Chem4Word.ACME
 
         #endregion Event Handlers
 
-        public bool Dirty => UndoManager.CanUndo;
+        public bool IsDirty => UndoManager.CanUndo;
 
         /// <summary>
         /// Draws a ring as specfied by the new atom placements

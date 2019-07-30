@@ -325,7 +325,6 @@
     </Compile>
     <Compile Include="Helpers\CustomXMLPartHelper.cs" />
     <Compile Include="Helpers\C4wAddInInfo.cs" />
-    <Compile Include="Helpers\FormulaHelper.cs" />
     <Compile Include="Helpers\Upgrader.cs" />
     <Compile Include="Navigator\FormulaBlock.cs" />
     <Compile Include="Navigator\DoNothingConverter.cs" />
@@ -409,9 +408,6 @@
     </Compile>
     <Compile Include="UI\WPF\AboutHost.Designer.cs">
       <DependentUpon>AboutHost.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\WPF\EditLabelsControl.xaml.cs">
-      <DependentUpon>EditLabelsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\WPF\EditLabelsHost.cs">
       <SubType>Form</SubType>
@@ -677,10 +673,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\WPF\AboutControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\WPF\EditLabelsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

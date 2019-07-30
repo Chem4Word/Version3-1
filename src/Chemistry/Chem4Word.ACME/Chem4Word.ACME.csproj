@@ -70,6 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adorners\GroupSelectionAdorner.cs" />
+    <Compile Include="LabelsEditor.xaml.cs">
+      <DependentUpon>LabelsEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NamesEditor.xaml.cs">
+      <DependentUpon>NamesEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Drawing\BondDescriptor.cs" />
     <Compile Include="Drawing\DoubleBondDescriptor.cs" />
     <Compile Include="Drawing\TripleBondDescriptor.cs" />
@@ -88,7 +94,7 @@
     <Compile Include="Adorners\PartialGhostAdorner.cs" />
     <Compile Include="Adorners\RingDrawer.cs" />
     <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />
-    <Compile Include="AtomOption.cs" />
+    <Compile Include="Controls\AtomOption.cs" />
     <Compile Include="Behaviors\ChainBehavior.cs" />
     <Compile Include="Behaviors\NRingBehavior.cs" />
     <Compile Include="Behaviors\AdjustScaleToFitContentBehavior.cs" />
@@ -97,7 +103,7 @@
     <Compile Include="Behaviors\DrawBehavior.cs" />
     <Compile Include="Behaviors\LassoBehaviour.cs" />
     <Compile Include="Behaviors\RingBehavior.cs" />
-    <Compile Include="BondOption.cs" />
+    <Compile Include="Controls\BondOption.cs" />
     <Compile Include="Controls\FunctionalGroupBlock.cs" />
     <Compile Include="Controls\GridAwareItemsControl.cs" />
     <Compile Include="Controls\SettingsHost.xaml.cs">
@@ -122,7 +128,6 @@
     <Compile Include="Commands\BaseCommand.cs" />
     <Compile Include="Commands\CopyCommand.cs" />
     <Compile Include="Commands\CutCommand.cs" />
-    <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\FlipCommand.cs" />
     <Compile Include="Commands\FlipHorizontalCommand.cs" />
     <Compile Include="Commands\FlipVerticalCommand.cs" />
@@ -156,8 +161,9 @@
     <Compile Include="Drawing\SuperscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\LabelTextRunTypographyProperties.cs" />
+    <Compile Include="Models\NamesModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
-    <Compile Include="NewAtomPlacement.cs" />
+    <Compile Include="Models\NewAtomPlacement.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -207,6 +213,14 @@
     <Compile Include="VisualTreeHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="LabelsEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\NamesEditor.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\BondOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -178,6 +178,7 @@ namespace Chem4Word.ACME.Behaviors
             _mouseTrack = null;
 
             CurrentEditor.ReleaseMouseCapture();
+            CurrentEditor.Focus();
             CurrentStatus = DefaultText;
         }
 

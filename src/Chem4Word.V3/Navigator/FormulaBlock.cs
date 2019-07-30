@@ -6,12 +6,12 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Helpers;
 using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Navigator
 {
@@ -39,7 +39,7 @@ namespace Chem4Word.Navigator
 
                 string newFormula = (string)args.NewValue;
 
-                var parts = Chem4Word.Helpers.FormulaHelper.Parts(newFormula);
+                var parts = FormulaHelper.Parts(newFormula);
 
                 foreach (FormulaPart formulaPart in parts)
                 {
