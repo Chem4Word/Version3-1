@@ -50,11 +50,13 @@
                                 <TextBox
                                     Grid.Column="0"
                                     Margin="5"
+                                    VerticalContentAlignment="Center"
                                     IsReadOnly="True"
                                     Text="{Binding Path=Type}" />
                                 <TextBox
                                     Grid.Column="1"
                                     Margin="5"
+                                    VerticalContentAlignment="Center"
                                     IsReadOnly="{Binding CanBeEdited}"
                                     Text="{Binding Path=Value, Mode=TwoWay}" />
                                 <Button

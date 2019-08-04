@@ -98,6 +98,8 @@ namespace WinForms.TestHarness
 
                         _telemetry.Write(module, "Information", $"File: {filename}");
                         ShowChemistry(filename, model);
+
+                        var listofProperties = model.AllTextualProperties;
                     }
                 }
             }

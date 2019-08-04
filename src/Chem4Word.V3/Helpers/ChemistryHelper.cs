@@ -332,60 +332,24 @@ namespace Chem4Word.Helpers
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
             source = null;
-            string text = "";
+            string text;
 
-            foreach (Molecule m in model.Molecules.Values)
+            var tp = model.GetTextPropertyById(prefix);
+            if (tp != null)
             {
-                if (prefix.Equals($"{m.Id}.f0"))
+                text = tp.Value;
+                if (tp.Id.EndsWith("f0"))
                 {
-                    text = m.ConciseFormula;
                     source = "ConciseFormula";
                     isFormula = true;
                 }
-
-                // Only check formulae if necessary
-                if (string.IsNullOrEmpty(text))
+                else
                 {
-                    foreach (var f in m.Formulas)
-                    {
-                        if (f.Id.Equals(prefix))
-                        {
-                            text = f.Value;
-                            if (!string.IsNullOrEmpty(f.Type))
-                            {
-                                if (f.Type.ToLower().Contains("formula"))
-                                {
-                                    source = f.Type;
-                                    isFormula = true;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
-
-                // Only check names if necessary
-                if (string.IsNullOrEmpty(text))
-                {
-                    foreach (var n in m.Names)
-                    {
-                        if (n.Id.Equals(prefix))
-                        {
-                            text = n.Value;
-                            source = n.Type;
-                            break;
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(text))
-                {
-                    break; // Out of molecules loop
+                    source = tp.Type;
+                    isFormula = tp.Type.ToLower().Contains("formula");
                 }
             }
-
-            // Handle not found gracefully
-            if (string.IsNullOrEmpty(text))
+            else
             {
                 text = $"Unable to find formula or name with id of '{prefix}'";
             }

@@ -53,7 +53,7 @@ namespace Chem4Word.ACME.Controls
 
                     var model = new SettingsModel();
                     model.CurrentBondLength = (double) _options.BondLength;
-
+                    model.ShowMoleculeGroups = _options.ShowMoleculeGroups;
                     SettingsModel = model;
                     DataContext = SettingsModel;
                 }
@@ -92,6 +92,7 @@ namespace Chem4Word.ACME.Controls
         {
             _options.RestoreDefaults();
             SettingsModel.CurrentBondLength = Options.BondLength;
+            SettingsModel.ShowMoleculeGroups = Options.ShowMoleculeGroups;
             OnPropertyChanged(nameof(SettingsModel));
         }
 
@@ -108,6 +109,7 @@ namespace Chem4Word.ACME.Controls
         {
             // Copy current model values to options before saving
             Options.BondLength = (int) SettingsModel.CurrentBondLength;
+            Options.ShowMoleculeGroups = SettingsModel.ShowMoleculeGroups;
             FileUtils.SaveAcmeSettings(Options, Telemetry, TopLeft);
 
             WpfEventArgs args = new WpfEventArgs();

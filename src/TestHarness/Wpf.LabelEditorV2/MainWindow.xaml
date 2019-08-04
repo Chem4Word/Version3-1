@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:Chem4Word.ACME.Controls;assembly=Chem4Word.ACME"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:acme="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
     Title="Label Editor V2"
     Width="800"
     Height="600"
@@ -14,6 +15,6 @@
     ContentRendered="OnContentRendered"
     mc:Ignorable="d">
     <Grid>
-        <controls:LabelsEditor x:Name="EditLabelsControl" />
+        <acme:LabelsEditor x:Name="EditLabelsControl" />
     </Grid>
 </Window>

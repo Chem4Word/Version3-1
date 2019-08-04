@@ -26,6 +26,9 @@ namespace Chem4Word.ACME
             }
         }
 
+        [JsonProperty]
+        public bool ShowMoleculeGroups { get; set; }
+
         public string SettingsFile { get; set; }
         public bool Dirty { get; set; }
 
@@ -39,6 +42,7 @@ namespace Chem4Word.ACME
             Options clone = new Options();
 
             clone.BondLength = BondLength;
+            clone.ShowMoleculeGroups = ShowMoleculeGroups;
 
             clone.SettingsFile = SettingsFile;
 
@@ -48,6 +52,7 @@ namespace Chem4Word.ACME
         public void RestoreDefaults()
         {
             BondLength = (int) Constants.StandardBondLength;
+            ShowMoleculeGroups = true;
             Dirty = false;
         }
     }

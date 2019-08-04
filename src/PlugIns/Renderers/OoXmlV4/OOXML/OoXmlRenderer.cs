@@ -47,7 +47,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private IChem4WordTelemetry _telemetry;
         private Point _topLeft;
 
-        private Model2.Model _chemistryModel;
+        private Model _chemistryModel;
         private Dictionary<char, TtfCharacter> _TtfCharacterSet;
 
         private long _ooxmlId = 1;
@@ -63,11 +63,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private List<Rect> _boundingBoxesOfMoleculeAtoms = new List<Rect>();
         private List<Rect> _boundingBoxesOfMoleculesIncludingCharacters = new List<Rect>();
-        private List<Rect> _boundingBoxesOfMoleculesWithAtLeastTwoChildren = new List<Rect>();
+        private List<MoleculeGroup> _listOfGroups = new List<MoleculeGroup>();
         private List<Point> _ringCentres = new List<Point>();
         private Dictionary<string, List<Point>> _convexHulls = new Dictionary<string, List<Point>>();
 
-        public OoXmlRenderer(Model2.Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        public OoXmlRenderer(Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -92,7 +92,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             double xMax = mol.BoundingBox.Right;
             double yMin = mol.BoundingBox.Top;
             double yMax = mol.BoundingBox.Bottom;
-
             foreach (var c in chars)
             {
                 xMin = Math.Min(xMin, c.Position.X);
@@ -191,18 +190,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             sw.Reset();
             sw.Start();
 
-            #region Step 5a - Diagnostics
+            #region Step 5.1 - Show Molecule Groups
 
             if (_options.ShowMoleculeGroups)
             {
-                foreach (var box in _boundingBoxesOfMoleculesWithAtLeastTwoChildren)
+                foreach (var group in _listOfGroups)
                 {
-                    double offset = OoXmlHelper.DRAWING_MARGIN / 2;
-                    Rect bb = new Rect(new Point(box.TopLeft.X - offset, box.TopLeft.Y - offset),
-                                       new Point(box.BottomRight.X + offset, box.BottomRight.Y + offset));
-                    DrawBrackets(wordprocessingGroup1, bb, "909090", .75);
+                    DrawGroupBrackets(wordprocessingGroup1, group.BoundingBox, _chemistryModel.MeanBondLength / 2, OoXmlHelper.ACS_LINE_WIDTH * 2, "2A579A");
                 }
             }
+
+            #endregion
+
+            #region Step 5a - Diagnostics
 
             if (_options.ShowMoleculeBoundingBoxes)
             {
@@ -368,9 +368,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 r2.Union(r1);
                 _boundingBoxesOfMoleculeAtoms.Add(r1);
                 _boundingBoxesOfMoleculesIncludingCharacters.Add(r2);
-                if (mol.Molecules.Count > 1)
+
+                if (mol.IsGrouped)
                 {
-                    _boundingBoxesOfMoleculesWithAtLeastTwoChildren.Add(r2);
+                    var childGroups = _listOfGroups.Where(g => g.Path.StartsWith(mol.Path));
+                    foreach (var child in childGroups)
+                    {
+                        r2.Union(child.BoundingBox);
+                    }
+
+                    double offset = OoXmlHelper.DRAWING_MARGIN;
+                    Rect bb = new Rect(new Point( r2.TopLeft.X - offset, r2.TopLeft.Y - offset),
+                                       new Point(r2.BottomRight.X + offset, r2.BottomRight.Y + offset));
+                    _listOfGroups.Add(new MoleculeGroup(mol.Path, bb));
                 }
             }
         }
@@ -380,7 +390,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             foreach (var hull in _convexHulls)
             {
                 var points = hull.Value.ToList();
-                DrawPolygon(wordprocessingGroup1, points, "ff0000", 0.25);
+                DrawPolygon(wordprocessingGroup1, points, 0.25, "ff0000");
             }
         }
 
@@ -695,11 +705,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
 
             // Create new canvas extents
-            _boundingBoxOfAllCharacters = new Rect(xMin - OoXmlHelper.DRAWING_MARGIN,
-                yMin - OoXmlHelper.DRAWING_MARGIN,
-                xMax - xMin + (2 * OoXmlHelper.DRAWING_MARGIN),
-                yMax - yMin + (2 * OoXmlHelper.DRAWING_MARGIN));
+            _boundingBoxOfAllCharacters = new Rect(xMin, yMin,
+                xMax - xMin, yMax - yMin);
 
+            foreach (var group in _listOfGroups)
+            {
+                _boundingBoxOfAllCharacters.Union(group.BoundingBox);
+            }
+
+            _boundingBoxOfAllCharacters.Inflate(OoXmlHelper.DRAWING_MARGIN, OoXmlHelper.DRAWING_MARGIN);
             //Debug.WriteLine(m_canvasExtents);
         }
 
@@ -897,8 +911,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wpg.GroupShapeProperties groupShapeProperties = new Wpg.GroupShapeProperties();
 
             A.TransformGroup transformGroup = new A.TransformGroup();
-            A.Offset offset = new A.Offset() { X = 0L, Y = 0L };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = 0L, Y = 0L };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
             A.ChildOffset childOffset = new A.ChildOffset() { X = 0L, Y = 0L };
             A.ChildExtents childExtents = new A.ChildExtents() { Cx = width, Cy = height };
 
@@ -949,43 +963,43 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path { Width = width, Height = height };
 
             // Starting Point
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point() { X = "0", Y = "0" };
+            A.Point point1 = new A.Point { X = "0", Y = "0" };
             moveTo.Append(point1);
 
             // Mid Point
             A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point() { X = boundingBox.Width.ToString("0"), Y = "0" };
+            A.Point point2 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
             lineTo1.Append(point2);
 
             // Mid Point
             A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point() { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            A.Point point3 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
             lineTo2.Append(point3);
 
             // Last Point
             A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point() { X = "0", Y = boundingBox.Height.ToString("0") };
+            A.Point point4 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
             lineTo3.Append(point4);
 
             // Back to Start Point
             A.LineTo lineTo4 = new A.LineTo();
-            A.Point point5 = new A.Point() { X = "0", Y = "0" };
+            A.Point point5 = new A.Point { X = "0", Y = "0" };
             lineTo4.Append(point5);
 
             path.Append(moveTo);
@@ -1001,11 +1015,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value) (points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
 
             outline.Append(solidFill);
@@ -1015,10 +1029,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             shapeProperties.Append(outline);
 
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
 
             shapeStyle.Append(lineReference);
             shapeStyle.Append(fillReference);
@@ -1036,10 +1050,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             wordprocessingGroup.Append(shape);
         }
 
-        private void DrawBrackets(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, string colour, double points)
+        private void DrawGroupBrackets(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, double armLength, double points, string colour)
         {
             UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "box" + id;
+            string bondLineName = "bracket" + id;
 
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
             Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
@@ -1050,6 +1064,192 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Size size = new Size(width, height);
             location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
             Rect boundingBox = new Rect(location, size);
+            Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
+
+            width = (Int64Value)boundingBox.Width;
+            height = (Int64Value)boundingBox.Height;
+            top = (Int64Value)boundingBox.Top;
+            left = (Int64Value)boundingBox.Left;
+
+            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties
+            {
+                Id = id,
+                Name = bondLineName
+            };
+            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+
+            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+
+            A.Transform2D transform2D = new A.Transform2D();
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
+
+            transform2D.Append(offset);
+            transform2D.Append(extents);
+
+            A.CustomGeometry customGeometry = new A.CustomGeometry();
+            A.AdjustValueList adjustValueList = new A.AdjustValueList();
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+
+            A.PathList pathList = new A.PathList();
+
+            pathList.Append(MakeCorner(boundingBox, "TopLeft", armLengthEmu));
+            pathList.Append(MakeCorner(boundingBox, "TopRight", armLengthEmu));
+            pathList.Append(MakeCorner(boundingBox, "BottomLeft", armLengthEmu));
+            pathList.Append(MakeCorner(boundingBox, "BottomRight", armLengthEmu));
+
+            customGeometry.Append(adjustValueList);
+            customGeometry.Append(rectangle);
+            customGeometry.Append(pathList);
+
+            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
+
+            A.SolidFill solidFill = new A.SolidFill();
+
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
+            solidFill.Append(rgbColorModelHex);
+
+            outline.Append(solidFill);
+
+            shapeProperties.Append(transform2D);
+            shapeProperties.Append(customGeometry);
+            shapeProperties.Append(outline);
+
+            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
+
+            shapeStyle.Append(lineReference);
+            shapeStyle.Append(fillReference);
+            shapeStyle.Append(effectReference);
+            shapeStyle.Append(fontReference);
+
+            shape.Append(nonVisualDrawingProperties);
+            shape.Append(nonVisualDrawingShapeProperties);
+            shape.Append(shapeProperties);
+            shape.Append(shapeStyle);
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            shape.Append(textBodyProperties);
+
+            wordprocessingGroup.Append(shape);
+
+            // Local function
+            A.Path MakeCorner(Rect bbRect, string corner, double armsSize)
+            {
+                var path = new A.Path { Width = (Int64Value)bbRect.Width, Height = (Int64Value)bbRect.Height };
+
+                A.Point p0 = new A.Point();
+                A.Point p1 = new A.Point();
+                A.Point p2 = new A.Point();
+
+                switch (corner)
+                {
+                    case "TopLeft":
+                        p0 = new A.Point
+                        {
+                            X = armsSize.ToString("0"),
+                            Y = "0"
+                        };
+                        p1 = new A.Point
+                        {
+                            X = "0",
+                            Y = "0"
+                        };
+                        p2 = new A.Point
+                        {
+                            X = "0",
+                            Y = armsSize.ToString("0")
+                        };
+                        break;
+                    case "TopRight":
+                        p0 = new A.Point
+                        {
+                            X = (bbRect.Width - armsSize).ToString("0"),
+                            Y = "0"
+                        };
+                        p1 = new A.Point
+                        {
+                            X = bbRect.Width.ToString("0"),
+                            Y = "0"
+                        };
+                        p2 = new A.Point
+                        {
+                            X = bbRect.Width.ToString("0"),
+                            Y = armsSize.ToString("0")
+                        };
+                        break;
+                    case "BottomLeft":
+                        p0 = new A.Point
+                        {
+                            X = "0",
+                            Y = (bbRect.Height - armsSize).ToString("0")
+                        };
+                        p1 = new A.Point
+                        {
+                            X = "0",
+                            Y = bbRect.Height.ToString("0")
+                        };
+                        p2 = new A.Point
+                        {
+                            X = armsSize.ToString("0"),
+                            Y = bbRect.Height.ToString("0")
+                        };
+                        break;
+                    case "BottomRight":
+                        p0 = new A.Point
+                        {
+                            X = bbRect.Width.ToString("0"),
+                            Y = (bbRect.Height - armsSize).ToString("0")
+                        };
+                        p1 = new A.Point
+                        {
+                            X = bbRect.Width.ToString("0"),
+                            Y = bbRect.Height.ToString("0")
+                        };
+                        p2 = new A.Point
+                        {
+                            X = (bbRect.Width - armsSize).ToString("0"),
+                            Y = bbRect.Height.ToString("0")
+                        };
+                        break;
+                }
+
+                var moveTo = new A.MoveTo();
+                moveTo.Append(p0);
+                path.Append(moveTo);
+
+                var lineTo1 = new A.LineTo();
+                lineTo1.Append(p1);
+                path.Append(lineTo1);
+
+                var lineTo2 = new A.LineTo();
+                lineTo2.Append(p2);
+                path.Append(lineTo2);
+
+                return path;
+            }
+        }
+
+        private void DrawMoleculeBrackets(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, double armLength, double points, string colour)
+        {
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string bondLineName = "bracket" + id;
+
+            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+
+            Point location = new Point(left, top);
+            Size size = new Size(width, height);
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
+            Rect boundingBox = new Rect(location, size);
+            Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
 
             width = (Int64Value)boundingBox.Width;
             height = (Int64Value)boundingBox.Height;
@@ -1067,15 +1267,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
@@ -1084,26 +1284,25 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             double rightSide = width - leftSide;
 
             // Left Path
-
-            A.Path path1 = new A.Path() { Width = width, Height = height };
+            A.Path path1 = new A.Path { Width = width, Height = height };
 
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point() { X = leftSide.ToString("0"), Y = "0" };
+            A.Point point1 = new A.Point { X = leftSide.ToString("0"), Y = "0" };
             moveTo.Append(point1);
 
             // Mid Point
             A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point() { X = "0", Y = "0" };
+            A.Point point2 = new A.Point { X = "0", Y = "0" };
             lineTo1.Append(point2);
 
             // Last Point
             A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point() { X = "0", Y = boundingBox.Height.ToString("0") };
+            A.Point point3 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
             lineTo2.Append(point3);
 
             // Mid Point
             A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point() { X = leftSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            A.Point point4 = new A.Point { X = leftSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
             lineTo3.Append(point4);
 
             path1.Append(moveTo);
@@ -1114,26 +1313,25 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             pathList.Append(path1);
 
             // Right Path
-
-            A.Path path2 = new A.Path() { Width = width, Height = height };
+            A.Path path2 = new A.Path { Width = width, Height = height };
 
             A.MoveTo moveTo2 = new A.MoveTo();
-            A.Point point5 = new A.Point() { X = rightSide.ToString("0"), Y = "0" };
+            A.Point point5 = new A.Point { X = rightSide.ToString("0"), Y = "0" };
             moveTo2.Append(point5);
 
             // Mid Point
             A.LineTo lineTo4 = new A.LineTo();
-            A.Point point6 = new A.Point() { X = boundingBox.Width.ToString("0"), Y = "0" };
+            A.Point point6 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
             lineTo4.Append(point6);
 
             // Last Point
             A.LineTo lineTo5 = new A.LineTo();
-            A.Point point7 = new A.Point() { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            A.Point point7 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
             lineTo5.Append(point7);
 
             // Mid Point
             A.LineTo lineTo6 = new A.LineTo();
-            A.Point point8 = new A.Point() { X = rightSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            A.Point point8 = new A.Point { X = rightSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
             lineTo6.Append(point8);
 
             path2.Append(moveTo2);
@@ -1148,11 +1346,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
 
             outline.Append(solidFill);
@@ -1162,10 +1360,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             shapeProperties.Append(outline);
 
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
 
             shapeStyle.Append(lineReference);
             shapeStyle.Append(fillReference);
@@ -1183,7 +1381,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             wordprocessingGroup.Append(shape);
         }
 
-        private void DrawPolygon(Wpg.WordprocessingGroup wordprocessingGroup, List<Point> vertices, string colour, double points)
+        private void DrawPolygon(Wpg.WordprocessingGroup wordprocessingGroup, List<Point> vertices, double points, string colour)
         {
             UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "diag-polygon-" + bondLineId;
@@ -1210,19 +1408,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path { Width = width, Height = height };
 
             // Local Function
             A.Point MakePoint(Point point)
@@ -1230,7 +1428,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 Point startPoint = point;
                 startPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
                 startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
-                return new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
+                return new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
             }
 
             // First point
@@ -1257,11 +1455,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
 
             rgbColorModelHex.Append(alpha);
@@ -1306,26 +1504,26 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path { Width = width, Height = height };
 
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
+            A.Point point1 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
             moveTo.Append(point1);
 
             A.LineTo lineTo = new A.LineTo();
-            A.Point point2 = new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(endPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(endPoint.Y).ToString() };
+            A.Point point2 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(endPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(endPoint.Y).ToString() };
             lineTo.Append(point2);
 
             path.Append(moveTo);
@@ -1338,11 +1536,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
 
             rgbColorModelHex.Append(alpha);
@@ -1356,10 +1554,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             shapeProperties.Append(outline);
 
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
 
             shapeStyle.Append(lineReference);
             shapeStyle.Append(fillReference);
@@ -1405,26 +1603,26 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path { Width = width, Height = height };
 
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
+            A.Point point1 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
             moveTo.Append(point1);
 
             A.LineTo lineTo = new A.LineTo();
-            A.Point point2 = new A.Point() { X = OoXmlHelper.ScaleCmlToEmu(endPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(endPoint.Y).ToString() };
+            A.Point point2 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(endPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(endPoint.Y).ToString() };
             lineTo.Append(point2);
 
             path.Append(moveTo);
@@ -1437,11 +1635,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
 
             rgbColorModelHex.Append(alpha);
@@ -1458,10 +1656,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             shapeProperties.Append(outline);
 
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
 
             shapeStyle.Append(lineReference);
             shapeStyle.Append(fillReference);
@@ -1500,7 +1698,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             left = (Int64Value)boundingBox.Left;
 
             A.PresetGeometry presetGeometry = null;
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
             presetGeometry = new A.PresetGeometry() { Preset = shape };
 
             Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
@@ -1515,7 +1713,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
+            A.Offset offset = new A.Offset { X = left, Y = top };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
@@ -1525,7 +1723,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             presetGeometry.Append(adjustValueList);
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
 
             shapeProperties.Append(transform2D);
@@ -1533,10 +1731,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             shapeProperties.Append(solidFill);
 
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
 
             shapeStyle.Append(lineReference);
             shapeStyle.Append(fillReference);

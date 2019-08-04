@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adorners\GroupSelectionAdorner.cs" />
+    <Compile Include="Converters\TreeViewLineConverter.cs" />
     <Compile Include="LabelsEditor.xaml.cs">
       <DependentUpon>LabelsEditor.xaml</DependentUpon>
     </Compile>

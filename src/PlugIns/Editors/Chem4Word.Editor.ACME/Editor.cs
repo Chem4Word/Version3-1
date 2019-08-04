@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using IChem4Word.Contracts;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -15,9 +14,7 @@ using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters.CML;
-
+using IChem4Word.Contracts;
 
 namespace Chem4Word.Editor.ACME
 {
@@ -35,6 +32,7 @@ namespace Chem4Word.Editor.ACME
         public bool CanEditNestedMolecules => true;
         public bool CanEditFunctionalGroups => true;
         public bool RequiresSeedAtom => false;
+        public List<string> Used1DProperties { get; set; }
 
         public Point TopLeft { get; set; }
 
@@ -107,17 +105,7 @@ namespace Chem4Word.Editor.ACME
                     LoadSettings();
                 }
 
-                // Strip off Formulae and ChemicalNames as we don't edit them here
-                CMLConverter cmlConverter = new CMLConverter();
-                Model model = cmlConverter.Import(Cml);
-                foreach (Molecule molecule in model.Molecules.Values)
-                {
-                    molecule.Names.Clear();
-                    molecule.Formulas.Clear();
-                    molecule.ConciseFormula = "";
-                }
-
-                EditorHost host = new EditorHost(cmlConverter.Export(model));
+                EditorHost host = new EditorHost(Cml);
                 host.TopLeft = TopLeft;
                 host.ShowDialog();
                 result = host.Result;
@@ -132,6 +120,5 @@ namespace Chem4Word.Editor.ACME
 
             return result;
         }
-
     }
 }

@@ -5,15 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.UI.Forms;
-using IChem4Word.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Core.UI.Forms;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.Editor.SimpleWpfEditor
 {
@@ -32,6 +30,8 @@ namespace Chem4Word.Editor.SimpleWpfEditor
         public bool CanEditNestedMolecules => true;
         public bool CanEditFunctionalGroups => true;
         public bool RequiresSeedAtom => false;
+        public List<string> Used1DProperties { get; set; }
+
 
         public string Cml { get; set; }
 

@@ -32,7 +32,7 @@ namespace Chem4Word.UI.WPF
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditLabelsHost));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.editLabelsControl1 = new LabelsEditor();
+            this.labelsEditor1 = new Chem4Word.ACME.LabelsEditor();
             this.SuspendLayout();
             // 
             // elementHost1
@@ -43,7 +43,7 @@ namespace Chem4Word.UI.WPF
             this.elementHost1.Size = new System.Drawing.Size(1165, 601);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.editLabelsControl1;
+            this.elementHost1.Child = this.labelsEditor1;
             // 
             // EditLabelsHost
             // 
@@ -63,6 +63,6 @@ namespace Chem4Word.UI.WPF
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private LabelsEditor editLabelsControl1;
+        private ACME.LabelsEditor labelsEditor1;
     }
 }

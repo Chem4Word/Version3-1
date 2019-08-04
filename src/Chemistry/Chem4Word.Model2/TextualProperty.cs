@@ -41,7 +41,6 @@ namespace Chem4Word.Model2
             set
             {
                 _value = value;
-                SetEditFlag();
                 IsValid = !string.IsNullOrEmpty(_value);
                 OnPropertyChanged(nameof(Value));
             }
@@ -49,9 +48,12 @@ namespace Chem4Word.Model2
 
         private void SetEditFlag()
         {
-            CanBeEdited = !(Type.Equals(CMLConstants.AttributeValueChem4WordLabel)
-                          || Type.Equals(CMLConstants.AttributeValueChem4WordFormula)
-                          || Type.Equals(CMLConstants.AttributeValueChem4WordSynonym));
+            if (!string.IsNullOrEmpty(Type))
+            {
+                CanBeEdited = !(Type.Equals(CMLConstants.AttributeValueChem4WordLabel)
+                                || Type.Equals(CMLConstants.AttributeValueChem4WordFormula)
+                                || Type.Equals(CMLConstants.AttributeValueChem4WordSynonym));
+            }
         }
 
         public override string ToString()

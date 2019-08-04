@@ -33,10 +33,10 @@ namespace Chem4Word.Renderer.OoXmlV4
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Settings));
             this.tabControlEx = new Chem4Word.Core.UI.Controls.TabControlEx();
             this.tabRendering = new System.Windows.Forms.TabPage();
+            this.chkShowGroups = new System.Windows.Forms.CheckBox();
             this.chkShowHydrogens = new System.Windows.Forms.CheckBox();
             this.chkColouredAtoms = new System.Windows.Forms.CheckBox();
             this.tabDebug = new System.Windows.Forms.TabPage();
-            this.chkShowGroups = new System.Windows.Forms.CheckBox();
             this.chkShowConvexHulls = new System.Windows.Forms.CheckBox();
             this.chkShowAtomPositions = new System.Windows.Forms.CheckBox();
             this.chkShowRingCentres = new System.Windows.Forms.CheckBox();
@@ -45,6 +45,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.chkClipLines = new System.Windows.Forms.CheckBox();
             this.btnSetDefaults = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
+            this.ShowMoleculeLabels = new System.Windows.Forms.CheckBox();
             this.tabControlEx.SuspendLayout();
             this.tabRendering.SuspendLayout();
             this.tabDebug.SuspendLayout();
@@ -67,6 +68,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             // 
             this.tabRendering.BackColor = System.Drawing.SystemColors.Control;
             this.tabRendering.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabRendering.Controls.Add(this.chkShowGroups);
             this.tabRendering.Controls.Add(this.chkShowHydrogens);
             this.tabRendering.Controls.Add(this.chkColouredAtoms);
             this.tabRendering.Location = new System.Drawing.Point(0, 20);
@@ -75,6 +77,20 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabRendering.Size = new System.Drawing.Size(409, 180);
             this.tabRendering.TabIndex = 0;
             this.tabRendering.Text = "Rendering";
+            // 
+            // chkShowGroups
+            // 
+            this.chkShowGroups.AutoSize = true;
+            this.chkShowGroups.Checked = true;
+            this.chkShowGroups.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkShowGroups.Location = new System.Drawing.Point(12, 83);
+            this.chkShowGroups.Margin = new System.Windows.Forms.Padding(4);
+            this.chkShowGroups.Name = "chkShowGroups";
+            this.chkShowGroups.Size = new System.Drawing.Size(136, 17);
+            this.chkShowGroups.TabIndex = 24;
+            this.chkShowGroups.Text = "Show Molecule Groups";
+            this.chkShowGroups.UseVisualStyleBackColor = true;
+            this.chkShowGroups.CheckedChanged += new System.EventHandler(this.chkShowGroups_CheckedChanged);
             // 
             // chkShowHydrogens
             // 
@@ -108,7 +124,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             // 
             this.tabDebug.BackColor = System.Drawing.SystemColors.Control;
             this.tabDebug.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabDebug.Controls.Add(this.chkShowGroups);
+            this.tabDebug.Controls.Add(this.ShowMoleculeLabels);
             this.tabDebug.Controls.Add(this.chkShowConvexHulls);
             this.tabDebug.Controls.Add(this.chkShowAtomPositions);
             this.tabDebug.Controls.Add(this.chkShowRingCentres);
@@ -121,20 +137,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabDebug.Size = new System.Drawing.Size(409, 180);
             this.tabDebug.TabIndex = 1;
             this.tabDebug.Text = "Debug";
-            // 
-            // chkShowGroups
-            // 
-            this.chkShowGroups.AutoSize = true;
-            this.chkShowGroups.Checked = true;
-            this.chkShowGroups.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowGroups.Location = new System.Drawing.Point(203, 87);
-            this.chkShowGroups.Margin = new System.Windows.Forms.Padding(4);
-            this.chkShowGroups.Name = "chkShowGroups";
-            this.chkShowGroups.Size = new System.Drawing.Size(136, 17);
-            this.chkShowGroups.TabIndex = 23;
-            this.chkShowGroups.Text = "Show Molecule Groups";
-            this.chkShowGroups.UseVisualStyleBackColor = true;
-            this.chkShowGroups.CheckedChanged += new System.EventHandler(this.chkShowGroups_CheckedChanged);
             // 
             // chkShowConvexHulls
             // 
@@ -244,6 +246,20 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
             // 
+            // ShowMoleculeLabels
+            // 
+            this.ShowMoleculeLabels.AutoSize = true;
+            this.ShowMoleculeLabels.Checked = true;
+            this.ShowMoleculeLabels.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowMoleculeLabels.Location = new System.Drawing.Point(203, 87);
+            this.ShowMoleculeLabels.Margin = new System.Windows.Forms.Padding(4);
+            this.ShowMoleculeLabels.Name = "ShowMoleculeLabels";
+            this.ShowMoleculeLabels.Size = new System.Drawing.Size(133, 17);
+            this.ShowMoleculeLabels.TabIndex = 23;
+            this.ShowMoleculeLabels.Text = "Show Molecule Labels";
+            this.ShowMoleculeLabels.UseVisualStyleBackColor = true;
+            this.ShowMoleculeLabels.CheckedChanged += new System.EventHandler(this.ShowMoleculeLabels_CheckedChanged);
+            // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -286,5 +302,6 @@ namespace Chem4Word.Renderer.OoXmlV4
         private System.Windows.Forms.CheckBox chkShowAtomPositions;
         private System.Windows.Forms.CheckBox chkShowConvexHulls;
         private System.Windows.Forms.CheckBox chkShowGroups;
+        private System.Windows.Forms.CheckBox ShowMoleculeLabels;
     }
 }

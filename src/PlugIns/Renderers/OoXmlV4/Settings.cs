@@ -288,5 +288,20 @@ namespace Chem4Word.Renderer.OoXmlV4
                 new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
             }
         }
+
+        private void ShowMoleculeLabels_CheckedChanged(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            Telemetry.Write(module, "Action", "Triggered");
+            try
+            {
+                RendererOptions.ShowMoleculeLabels = ShowMoleculeLabels.Checked;
+                _dirty = true;
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
     }
 }

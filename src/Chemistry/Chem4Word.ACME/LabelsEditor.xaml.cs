@@ -1,19 +1,18 @@
-﻿using Chem4Word.ACME.Models;
-using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Model2.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 
-namespace Chem4Word.ACME.Controls
+namespace Chem4Word.ACME
 {
     /// <summary>
     /// Interaction logic for LabelsEditor.xaml
@@ -55,6 +54,8 @@ namespace Chem4Word.ACME.Controls
                 if (!string.IsNullOrEmpty(_cml))
                 {
                     PopulateTreeView(_cml);
+                    WarningMessage.Text = Message;
+                    TreeView_OnSelectedItemChanged(null, null);
                 }
             }
         }
@@ -69,31 +70,28 @@ namespace Chem4Word.ACME.Controls
 
             var model = new Model();
 
-            if (sender is TreeView treeView)
+            if (TreeView.SelectedItem is TreeViewItem item)
             {
-                if (treeView.SelectedItem is TreeViewItem item)
+                if (item.Tag is Model m)
                 {
-                    if (item.Tag is Model m)
+                    Display.Chemistry = m.Copy();
+                }
+
+                if (item.Tag is Molecule thisMolecule)
+                {
+                    //Debug.WriteLine($"Molecule {thisMolecule.Path} [{thisMolecule.ConciseFormula}] selected");
+
+                    model = new Model();
+                    var copy = thisMolecule.Copy();
+                    model.AddMolecule(copy);
+                    copy.Parent = model;
+
+                    if (thisMolecule.Molecules.Count == 0)
                     {
-                        Display.Chemistry = m.Copy();
+                        LoadNamesEditor(NamesGrid, thisMolecule.Names);
+                        LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
                     }
-
-                    if (item.Tag is Molecule thisMolecule)
-                    {
-                        //Debug.WriteLine($"Molecule {thisMolecule.Path} [{thisMolecule.ConciseFormula}] selected");
-
-                        model = new Model();
-                        var copy = thisMolecule.Copy();
-                        model.AddMolecule(copy);
-                        copy.Parent = model;
-
-                        if (thisMolecule.Molecules.Count == 0)
-                        {
-                            LoadNamesEditor(NamesGrid, thisMolecule.Names);
-                            LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
-                        }
-                        LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
-                    }
+                    LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
                 }
             }
 
@@ -106,6 +104,7 @@ namespace Chem4Word.ACME.Controls
             var cc = new CMLConverter();
             _model = cc.Import(_cml, Used1D);
             TreeView.Items.Clear();
+            bool initialSelectionMade = false;
 
             if (_model != null)
             {
@@ -114,11 +113,15 @@ namespace Chem4Word.ACME.Controls
                 var root = new TreeViewItem
                 {
                     Header = "Structure",
-                    Tag = _model,
-                    IsSelected = true
+                    Tag = _model
                 };
                 TreeView.Items.Add(root);
                 root.IsExpanded = true;
+                if (_model.GetAllMolecules().Count > 1)
+                {
+                    root.IsSelected = true;
+                    initialSelectionMade = true;
+                }
 
                 AddNodes(root, _model.Molecules.Values);
             }
@@ -140,11 +143,8 @@ namespace Chem4Word.ACME.Controls
                         {
                             Orientation = Orientation.Horizontal
                         };
-                        stackPanel.Children.Add(TextBlockFromFormula(molecule.CalculatedFormulaOfChildren(), "Group"));
+                        stackPanel.Children.Add(TextBlockFromFormula(molecule.CalculatedFormulaOfChildren, "Group:"));
                         tvi.Header = stackPanel;
-                        //tvi.Header = "Group " + molecule.CalculatedFormulaOfChildren();
-                        //tvi.Header = molecule.ConciseFormula;
-                        //tvi.Tag = molecule.Labels;
                         tvi.Tag = molecule;
                     }
                     else
@@ -162,8 +162,12 @@ namespace Chem4Word.ACME.Controls
                     tvi.ToolTip = molecule.Path;
 #endif
 
-                    tvi.IsExpanded = true;
                     parent.Items.Add(tvi);
+                    tvi.IsExpanded = true;
+                    if (!initialSelectionMade)
+                    {
+                        tvi.IsSelected = true;
+                    }
 
                     molecule.Labels.CollectionChanged += OnCollectionChanged;
                     foreach (var property in molecule.Labels)
@@ -302,7 +306,6 @@ namespace Chem4Word.ACME.Controls
         // Copied from $\src\Chem4Word.V3\Navigator\FormulaBlock.cs
         // Ought to be made into common routine
         // ToDo: Refactor into common code ...
-
         private TextBlock TextBlockFromFormula(string formula, string prefix = null)
         {
             var textBlock = new TextBlock();

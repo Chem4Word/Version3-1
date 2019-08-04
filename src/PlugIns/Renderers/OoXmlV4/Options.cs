@@ -18,6 +18,9 @@ namespace Chem4Word.Renderer.OoXmlV4
         [JsonProperty]
         public bool ColouredAtoms { get; set; }
 
+        [JsonProperty]
+        public bool ShowMoleculeGroups { get; set; }
+
         // Debugging
         [JsonProperty]
         public bool ClipLines { get; set; }
@@ -28,11 +31,11 @@ namespace Chem4Word.Renderer.OoXmlV4
 
         // Debugging
         [JsonProperty]
-        public bool ShowMoleculeGroups { get; set; }
+        public bool ShowMoleculeBoundingBoxes { get; set; }
 
         // Debugging
         [JsonProperty]
-        public bool ShowMoleculeBoundingBoxes { get; set; }
+        public bool ShowMoleculeLabels { get; set; }
 
         // Debugging
         [JsonProperty]
@@ -57,6 +60,7 @@ namespace Chem4Word.Renderer.OoXmlV4
 
             clone.ColouredAtoms = ColouredAtoms;
             clone.ShowHydrogens = ShowHydrogens;
+            clone.ShowMoleculeGroups = ShowMoleculeGroups;
 
             // Debugging Options
             clone.ClipLines = ClipLines;
@@ -65,7 +69,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             clone.ShowRingCentres = ShowRingCentres;
             clone.ShowAtomPositions = ShowAtomPositions;
             clone.ShowHulls = ShowHulls;
-            clone.ShowMoleculeGroups = ShowMoleculeGroups;
+            clone.ShowMoleculeLabels = ShowMoleculeLabels;
 
             return clone;
         }
@@ -74,6 +78,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         {
             ShowHydrogens = true;
             ColouredAtoms = true;
+            ShowMoleculeGroups = true;
 
             // Debugging Options
             ClipLines = true;
@@ -82,7 +87,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             ShowRingCentres = false;
             ShowAtomPositions = false;
             ShowHulls = false;
-            ShowMoleculeGroups = false;
+            ShowMoleculeLabels = false;
         }
     }
 }

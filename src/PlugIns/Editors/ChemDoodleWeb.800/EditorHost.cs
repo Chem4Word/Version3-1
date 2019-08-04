@@ -5,13 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.UI.Wpf;
-using IChem4Word.Contracts;
 using System;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.JSON;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
 {
@@ -55,7 +56,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
             CMLConverter cc = new CMLConverter();
             JSONConverter jc = new JSONConverter();
-            Model2.Model model = cc.Import(_cml);
+            Model model = cc.Import(_cml);
 
             WpfChemDoodle editor = new WpfChemDoodle();
             editor.Telemetry = Telemetry;
@@ -85,7 +86,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                 DialogResult = DialogResult.OK;
                 CMLConverter cc = new CMLConverter();
                 JSONConverter jc = new JSONConverter();
-                Model2.Model model = jc.Import(args.OutputValue);
+                Model model = jc.Import(args.OutputValue);
                 OutputValue = cc.Export(model);
             }
 

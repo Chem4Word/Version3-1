@@ -40,7 +40,7 @@ namespace WinForms.TestHarness
             switch (_editorType)
             {
                 case "ACME":
-                    Editor acmeEditor = new Editor(cml);
+                    Editor acmeEditor = new Editor(cml, null);
                     acmeEditor.InitializeComponent();
                     elementHost1.Child = acmeEditor;
 

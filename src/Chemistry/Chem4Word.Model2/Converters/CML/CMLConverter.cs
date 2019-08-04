@@ -455,7 +455,7 @@ namespace Chem4Word.Model2.Converters.CML
                 }
 
                 var formula = GetFormula(formulaElement);
-                if (!string.IsNullOrEmpty(formula.Value))
+                if (formula.IsValid)
                 {
                     molecule.Formulas.Add(formula);
                 }
@@ -463,7 +463,11 @@ namespace Chem4Word.Model2.Converters.CML
 
             foreach (XElement nameElement in nameElements)
             {
-                molecule.Names.Add(GetName(nameElement));
+                var name = GetName(nameElement);
+                if (name.IsValid)
+                {
+                    molecule.Names.Add(name);
+                }
             }
 
             Molecule copy = molecule.Copy();
@@ -477,7 +481,11 @@ namespace Chem4Word.Model2.Converters.CML
 
             foreach (var labelElement in labelElements)
             {
-                molecule.Labels.Add(GetLabel(labelElement));
+                var label = GetLabel(labelElement);
+                if (label.IsValid)
+                {
+                    molecule.Labels.Add(label);
+                }
             }
 
             molecule.RebuildRings();

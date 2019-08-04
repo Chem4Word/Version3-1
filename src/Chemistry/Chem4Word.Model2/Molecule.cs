@@ -163,11 +163,12 @@ namespace Chem4Word.Model2
                 return this;
             }
         }
+
         public Molecule RootMolecule
         {
             get
             {
-                if(!(Parent is Molecule))
+                if (!(Parent is Molecule))
                 {
                     return this;
                 }
@@ -503,67 +504,133 @@ namespace Chem4Word.Model2
 
         public string ConciseFormula { get; set; }
 
-        public string CalculatedFormulaOfChildren()
+        public List<TextualProperty> AllTextualProperties
         {
-            // Phase #1 Collect data
-            List<string> calculateFormulas = new List<string>();
-
-            calculateFormulas.AddRange(GetChildFormulas(this));
-
-            // Local Function
-            List<string> GetChildFormulas(Molecule molecule)
+            get
             {
-                var childFormulae = new List<string>();
+                var list = new List<TextualProperty>();
 
-                foreach (var child in molecule.Molecules.Values)
+                list.AddRange(GetChildProperties(this));
+
+                return list;
+
+                List<TextualProperty> GetChildProperties(Molecule molecule)
                 {
-                    if (child.Molecules.Count == 0)
+                    var properties = new List<TextualProperty>();
+
+                    if (molecule.Atoms.Any())
                     {
-                        childFormulae.Add(child.ConciseFormula);
+                        properties.Add(new TextualProperty
+                                        {
+                                            Id = $"{molecule.Id}.f0",
+                                            Type = "F",
+                                            Value = molecule.ConciseFormula
+                                        });
+
+                        foreach (var name in molecule.Names)
+                        {
+                            properties.Add(new TextualProperty
+                                           {
+                                               Id = name.Id,
+                                               Type = "N",
+                                               Value = name.Value
+                                           });
+                        }
+
+                        foreach (var formula in molecule.Formulas)
+                        {
+                            properties.Add(new TextualProperty
+                                           {
+                                               Id = formula.Id,
+                                               Type = "F",
+                                               Value = formula.Value
+                                           });
+                        }
+
+                        properties.Add(new TextualProperty
+                                       {
+                                           Id = "S",
+                                           Type = "S",
+                                           Value = "S"
+                                       });
                     }
                     else
                     {
-                        childFormulae.AddRange(GetChildFormulas(child));
+                        foreach (var child in molecule.Molecules.Values)
+                        {
+                            properties.AddRange(GetChildProperties(child));
+                        }
+                    }
+
+                    return properties;
+                }
+            }
+        }
+
+        public string CalculatedFormulaOfChildren
+        {
+            get
+            {
+                // Phase #1 Collect data
+                List<string> calculateFormulas = new List<string>();
+
+                calculateFormulas.AddRange(GetChildFormulas(this));
+
+                // Phase #2 - Collate the values
+                string result = "";
+                Dictionary<string, int> dictionary = new Dictionary<string, int>();
+                foreach (var formula in calculateFormulas)
+                {
+                    if (dictionary.ContainsKey(formula))
+                    {
+                        dictionary[formula]++;
+                    }
+                    else
+                    {
+                        dictionary.Add(formula, 1);
                     }
                 }
 
-                return childFormulae;
-            }
-
-
-            // Phase #2 - Collate the values
-            string result = "";
-            Dictionary<string, int> dictionary = new Dictionary<string, int>();
-            foreach (var formula in calculateFormulas)
-            {
-                if (dictionary.ContainsKey(formula))
+                foreach (KeyValuePair<string, int> kvp in dictionary)
                 {
-                    dictionary[formula]++;
+                    if (kvp.Value == 1)
+                    {
+                        result += $"{kvp.Key} . ";
+                    }
+                    else
+                    {
+                        result += $"{kvp.Value} {kvp.Key} . ";
+                    }
                 }
-                else
-                {
-                    dictionary.Add(formula, 1);
-                }
-            }
 
-            foreach (KeyValuePair<string, int> kvp in dictionary)
-            {
-                if (kvp.Value == 1)
+                if (result.EndsWith(" . "))
                 {
-                    result += $"{kvp.Key} . ";
+                    result = result.Substring(0, result.Length - 3);
                 }
-                else
+
+                return result;
+
+                // Local Function
+                List<string> GetChildFormulas(Molecule molecule)
                 {
-                    result += $"{kvp.Value} {kvp.Key} . ";
+                    var childFormulae = new List<string>();
+
+                    foreach (var child in molecule.Molecules.Values)
+                    {
+                        if (child.Molecules.Count == 0)
+                        {
+                            childFormulae.Add(child.ConciseFormula);
+                        }
+                        else
+                        {
+                            childFormulae.AddRange(GetChildFormulas(child));
+                        }
+                    }
+
+                    return childFormulae;
                 }
-            }
 
-            if (result.EndsWith(" . "))
-            {
-                result = result.Substring(0, result.Length - 3);
             }
-
-            return result;
         }
 
         #endregion Constructors
@@ -885,7 +952,7 @@ namespace Chem4Word.Model2
             {
                 bond.SendDummyNotif();
             }
-            foreach(Molecule mol in Molecules.Values)
+            foreach (Molecule mol in Molecules.Values)
             {
                 mol.ForceUpdates();
             }
@@ -1196,13 +1263,13 @@ namespace Chem4Word.Model2
         }
 
         public Point Centroid { get; set; }
+
         public bool IsGrouped
         {
             get
             {
                 return Molecules.Count > 0;
             }
-
         }
 
         /// <summary>

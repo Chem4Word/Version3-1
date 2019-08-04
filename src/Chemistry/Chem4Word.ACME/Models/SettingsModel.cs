@@ -14,6 +14,8 @@ namespace Chem4Word.ACME.Models
     public class SettingsModel : INotifyPropertyChanged
     {
         private double _currentBondLength;
+        private bool _showMoleculeGroups;
+
         public double CurrentBondLength
         {
             get
@@ -23,6 +25,16 @@ namespace Chem4Word.ACME.Models
             set
             {
                 _currentBondLength = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ShowMoleculeGroups
+        {
+            get => _showMoleculeGroups;
+            set
+            {
+                _showMoleculeGroups = value;
                 OnPropertyChanged();
             }
         }

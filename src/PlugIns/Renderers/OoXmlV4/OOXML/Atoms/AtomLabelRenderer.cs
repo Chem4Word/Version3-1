@@ -62,19 +62,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry geometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path { Width = width, Height = height };
 
             foreach (TtfContour contour in alc.Character.Contours)
             {
@@ -167,7 +167,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             A.SolidFill solidFill = new A.SolidFill();
 
             // Set Colour
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = alc.Colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = alc.Colour };
             solidFill.Append(rgbColorModelHex);
 
             shapeProperties.Append(transform2D);
@@ -220,43 +220,43 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset() { X = left, Y = top };
-            A.Extents extents = new A.Extents() { Cx = width, Cy = height };
+            A.Offset offset = new A.Offset { X = left, Y = top };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
 
             transform2D.Append(offset);
             transform2D.Append(extents);
 
             A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle() { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path() { Width = width, Height = height };
+            A.Path path = new A.Path { Width = width, Height = height };
 
             // Starting Point
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point() { X = "0", Y = "0" };
+            A.Point point1 = new A.Point { X = "0", Y = "0" };
             moveTo.Append(point1);
 
             // Mid Point
             A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point() { X = boxExtents.Width.ToString("0"), Y = "0" };
+            A.Point point2 = new A.Point { X = boxExtents.Width.ToString("0"), Y = "0" };
             lineTo1.Append(point2);
 
             // Mid Point
             A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point() { X = boxExtents.Width.ToString("0"), Y = boxExtents.Height.ToString("0") };
+            A.Point point3 = new A.Point { X = boxExtents.Width.ToString("0"), Y = boxExtents.Height.ToString("0") };
             lineTo2.Append(point3);
 
             // Last Point
             A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point() { X = "0", Y = boxExtents.Height.ToString("0") };
+            A.Point point4 = new A.Point { X = "0", Y = boxExtents.Height.ToString("0") };
             lineTo3.Append(point4);
 
             // Back to Start Point
             A.LineTo lineTo4 = new A.LineTo();
-            A.Point point5 = new A.Point() { X = "0", Y = "0" };
+            A.Point point5 = new A.Point { X = "0", Y = "0" };
             lineTo4.Append(point5);
 
             path.Append(moveTo);
@@ -272,11 +272,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             customGeometry.Append(pathList);
 
             Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline() { Width = emus, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex() { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
 
             outline.Append(solidFill);

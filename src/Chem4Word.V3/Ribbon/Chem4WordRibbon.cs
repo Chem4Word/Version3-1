@@ -5,6 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Windows.Forms;
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
@@ -22,14 +30,6 @@ using Chem4Word.WebServices;
 using IChem4Word.Contracts;
 using Microsoft.Office.Core;
 using Microsoft.Office.Tools.Ribbon;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows.Forms;
 using CustomTaskPane = Microsoft.Office.Tools.CustomTaskPane;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
@@ -38,6 +38,7 @@ using Word = Microsoft.Office.Interop.Word;
 // ++++++++++++++++++++++++++++
 // Do NOT Change this Namespace
 // ++++++++++++++++++++++++++++
+// ReSharper disable once CheckNamespace
 namespace Chem4Word
 {
     public partial class CustomRibbon
@@ -168,8 +169,9 @@ namespace Chem4Word
                                             }
                                             else
                                             {
+                                                var used1D = ChemistryHelper.GetUsed1D(doc, CustomXmlPartHelper.GuidFromTag(cc?.Tag));
                                                 CMLConverter conv = new CMLConverter();
-                                                Model model = conv.Import(customXmlPart.XML);
+                                                Model model = conv.Import(customXmlPart.XML, used1D);
 
                                                 bool isFormula = false;
                                                 string text;
@@ -185,7 +187,6 @@ namespace Chem4Word
                                                     text = ChemistryHelper.GetInlineText(model, chosenState, ref isFormula, out source);
                                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Render structure as {source}");
                                                 }
-
                                                 ChemistryHelper.Insert1D(cc, text, isFormula, chosenState + ":" + guid);
                                             }
                                         }
@@ -252,98 +253,60 @@ namespace Chem4Word
                         customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
                         if (customXmlPart != null)
                         {
+                            var used1D = ChemistryHelper.GetUsed1D(doc, CustomXmlPartHelper.GuidFromTag(cc?.Tag));
                             string cml = customXmlPart.XML;
                             CMLConverter conv = new CMLConverter();
-                            Model model = conv.Import(cml);
+                            Model model = conv.Import(cml, used1D);
 
-                            if (model.Molecules.Count > 0)
+                            var list = model.AllTextualProperties;
+                            foreach (var item in list)
                             {
-                                int allAtomsCount = 0;
-                                foreach (var mol in model.Molecules.Values)
+                                if (item.IsValid)
                                 {
-                                    allAtomsCount = mol.Atoms.Count;
-                                }
-
-                                if (allAtomsCount > 0)
-                                {
-                                    // Add 2D menu Item
-                                    RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
-                                    ribbonButton.Tag = "2D";
+                                    RibbonButton ribbonButton = Factory.CreateRibbonButton();
+                                    ribbonButton.Tag = item.Id;
                                     if (prefix.Equals(ribbonButton.Tag))
                                     {
                                         ribbonButton.Image = Properties.Resources.SmallTick;
                                     }
-                                    ribbonButton.Label = "2D";
-                                    ribbonButton.SuperTip = "Render as 2D image";
+                                    ribbonButton.Label = item.Value;
                                     ribbonButton.Click += OnRenderAsButtonClick;
-                                    ShowAsMenu.Items.Add(ribbonButton);
 
-                                    if (model.Molecules.Count > 1)
+                                    switch (item.Type)
                                     {
-                                        // Overall Concise Formula
-                                        ribbonButton = Factory.CreateRibbonButton();
-                                        ribbonButton.Tag = "c0";
-                                        if (prefix.Equals(ribbonButton.Tag))
-                                        {
-                                            ribbonButton.Image = Properties.Resources.SmallTick;
-                                        }
-                                        ribbonButton.Label = model.ConciseFormula;
-                                        ribbonButton.SuperTip = "Render as overall concise formula";
-                                        ribbonButton.Click += OnRenderAsButtonClick;
-                                        ShowAsMenu.Items.Add(ribbonButton);
-                                    }
-                                }
-                            }
+                                        case "S":
+                                            ShowAsMenu.Items.Add(Factory.CreateRibbonSeparator());
+                                            break;
 
-                            foreach (Molecule mol in model.Molecules.Values)
-                            {
-                                RibbonSeparator separator = this.Factory.CreateRibbonSeparator();
-                                ShowAsMenu.Items.Add(separator);
+                                        case "2D":
+                                            ribbonButton.SuperTip = "Render as 2D image";
+                                            ShowAsMenu.Items.Add(ribbonButton);
+                                            break;
 
-                                if (mol.Atoms.Count > 0)
-                                {
-                                    // Concise Formula
-                                    RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
-                                    ribbonButton = Factory.CreateRibbonButton();
-                                    ribbonButton.Tag = $"{mol.Id}.f0";
-                                    if (prefix.Equals(ribbonButton.Tag))
-                                    {
-                                        ribbonButton.Image = Properties.Resources.SmallTick;
-                                    }
-                                    ribbonButton.Label = mol.ConciseFormula;
-                                    ribbonButton.SuperTip = "Render as concise formula";
-                                    ribbonButton.Click += OnRenderAsButtonClick;
-                                    ShowAsMenu.Items.Add(ribbonButton);
-                                }
+                                        case "N":
+                                            ribbonButton.SuperTip = "Render as name";
+                                            ShowAsMenu.Items.Add(ribbonButton);
+                                            break;
 
-                                // Other Formulae
-                                foreach (var f in mol.Formulas)
-                                {
-                                    RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
-                                    ribbonButton.Tag = f.Id;
-                                    if (prefix.Equals(ribbonButton.Tag))
-                                    {
-                                        ribbonButton.Image = Properties.Resources.SmallTick;
+                                        case "F":
+                                            if (item.Id.Equals("c0"))
+                                            {
+                                                ribbonButton.SuperTip = "Render as overall concise formula";
+                                            }
+                                            else
+                                            {
+                                                if (item.Id.EndsWith(".f0"))
+                                                {
+                                                    ribbonButton.SuperTip = "Render as concise formula";
+                                                }
+                                                else
+                                                {
+                                                    ribbonButton.SuperTip = "Render as formula";
+                                                }
+                                            }
+                                            ShowAsMenu.Items.Add(ribbonButton);
+                                            break;
                                     }
-                                    ribbonButton.Label = f.Value;
-                                    ribbonButton.SuperTip = "Render as formula";
-                                    ribbonButton.Click += OnRenderAsButtonClick;
-                                    ShowAsMenu.Items.Add(ribbonButton);
-                                }
-
-                                // Chemical Names
-                                foreach (var n in mol.Names)
-                                {
-                                    RibbonButton ribbonButton = this.Factory.CreateRibbonButton();
-                                    ribbonButton.Tag = n.Id;
-                                    if (prefix.Equals(ribbonButton.Tag))
-                                    {
-                                        ribbonButton.Image = Properties.Resources.SmallTick;
-                                    }
-                                    ribbonButton.Label = n.Value;
-                                    ribbonButton.SuperTip = "Render as name";
-                                    ribbonButton.Click += OnRenderAsButtonClick;
-                                    ShowAsMenu.Items.Add(ribbonButton);
                                 }
                             }
                         }
@@ -383,6 +346,7 @@ namespace Chem4Word
             if (Globals.Chem4WordV3.EventsEnabled && Globals.Chem4WordV3.ChemistryAllowed)
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
+                Word.Application app = Globals.Chem4WordV3.Application;
 
                 try
                 {
@@ -403,6 +367,9 @@ namespace Chem4Word
                     new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
                 }
                 Globals.Chem4WordV3.EventsEnabled = true;
+
+                app.ActiveWindow.SetFocus();
+                app.Activate();
             }
 
             AfterButtonChecks(sender as RibbonButton);
@@ -619,10 +586,11 @@ namespace Chem4Word
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             Word.Application app = Globals.Chem4WordV3.Application;
+
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Started");
             Word.Document doc = app.ActiveDocument;
             Word.ContentControl cc = null;
 
-            Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Started");
             try
             {
                 if (Globals.Chem4WordV3.SystemOptions == null)
@@ -697,8 +665,28 @@ namespace Chem4Word
                                 return;
                             }
                         }
+                        string guidString;
+                        string fullTag;
+
+                        if (isNewDrawing)
+                        {
+                            guidString = Guid.NewGuid().ToString("N"); // No dashes
+                            fullTag = guidString;
+                        }
+                        else
+                        {
+                            fullTag = cc?.Tag;
+                            guidString = CustomXmlPartHelper.GuidFromTag(cc?.Tag);
+                            if (string.IsNullOrEmpty(guidString))
+                            {
+                                guidString = Guid.NewGuid().ToString("N"); // No dashes
+                            }
+                        }
+
+                        var used1D = ChemistryHelper.GetUsed1D(doc, guidString);
 
                         editor.Cml = beforeCml;
+                        editor.Used1DProperties = used1D;
                         DialogResult chemEditorResult = editor.Edit();
 
                         if (chemEditorResult == DialogResult.OK)
@@ -710,84 +698,78 @@ namespace Chem4Word
                             CMLConverter cmlConverter = new CMLConverter();
                             SdFileConverter molConverter = new SdFileConverter();
 
-                            Model beforeModel = cmlConverter.Import(beforeCml);
-                            Model afterModel = cmlConverter.Import(editor.Cml);
+                            Model beforeModel = cmlConverter.Import(beforeCml, used1D);
+                            Model afterModel = cmlConverter.Import(editor.Cml, used1D);
 
-                            int matchedMolecules = 0;
+                            var oldMolecules = beforeModel.GetAllMolecules();
+                            var newMolecules = afterModel.GetAllMolecules();
 
-                            #region Copy old formulae and labels to new model and count matched molecues
-
-                            foreach (Molecule beforeMolecule in beforeModel.Molecules.Values)
+                            if (!editor.CanEditNestedMolecules)
                             {
-                                string concise = beforeMolecule.ConciseFormula;
-                                string molId = beforeMolecule.Id;
-
-                                foreach (Molecule afterMolecule in afterModel.Molecules.Values)
+                                foreach (var molecule in newMolecules)
                                 {
-                                    if (afterMolecule.ConciseFormula.Equals(concise) && afterMolecule.Id.Equals(molId))
+                                    var mol = oldMolecules.FirstOrDefault(m => m.Path.Equals(molecule.Path));
+                                    if (mol != null)
                                     {
-                                        foreach (var formula in beforeMolecule.Formulas)
+                                        // Copy over existing Formulae and Names if Paths match
+                                        foreach (var formula in mol.Formulas)
                                         {
-                                            var f = new TextualProperty();
-                                            f.Id = formula.Id;
-                                            f.Type = formula.Type;
-                                            f.Value = formula.Value;
-                                            afterMolecule.Formulas.Add(f);
+                                            molecule.Formulas.Add(formula);
                                         }
-                                        foreach (var name in beforeMolecule.Names)
+                                        foreach (var name in mol.Names)
                                         {
-                                            var n = new TextualProperty();
-                                            n.Id = name.Id;
-                                            n.Type = name.Type;
-                                            n.Value = name.Value;
-                                            afterMolecule.Names.Add(n);
+                                            molecule.Names.Add(name);
                                         }
-                                        matchedMolecules++;
-                                        break;
                                     }
                                 }
                             }
 
-                            #endregion Copy old formulae and labels to new model and count matched molecues
+                            int changedProperties = 0;
+                            int newProperties = 0;
 
-                            bool showLabelEditor = afterModel.Molecules.Count != matchedMolecules;
+                            #region Web Service Calls
 
-                            #region WebService API Calls
-
-                            int webServiceCalls = afterModel.Molecules.Count + 1;
+                            int webServiceCalls = newMolecules.Count + 1;
 
                             Progress pb = new Progress();
                             pb.TopLeft = Globals.Chem4WordV3.WordTopLeft;
                             pb.Value = 0;
                             pb.Maximum = webServiceCalls;
 
-                            double averageBondLength = afterModel.MeanBondLength;
-
-                            int maxAtomicNumber = afterModel.MaxAtomicNumber;
-                            int minAtomicNumber = afterModel.MinAtomicNumber;
-                            foreach (Molecule mol in afterModel.Molecules.Values)
+                            foreach (var molecule in newMolecules)
                             {
-                                Dictionary<string, string> synonyms = new Dictionary<string, string>();
+                                Model temp = new Model();
+                                var mol = molecule.Copy();
+                                temp.AddMolecule(mol);
+                                mol.Parent = temp;
 
-                                // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 0 or > 4 or Elements < 1 or > 118
-                                List<Bond> invalidBonds = mol.Bonds.Where(b => b.OrderValue != null && (CtabProcessor.MdlBondType(b.Order) < 1 || CtabProcessor.MdlBondType(b.Order) > 4)).ToList();
+                                int maxAtomicNumber = temp.MaxAtomicNumber;
+                                int minAtomicNumber = temp.MinAtomicNumber;
+
+                                var invalidBonds = new List<Bond>();
+                                if (mol.Bonds.Any())
+                                {
+                                    invalidBonds = mol.Bonds.Where(b => b.OrderValue != null && (CtabProcessor.MdlBondType(b.Order) < 1 || CtabProcessor.MdlBondType(b.Order) > 4)).ToList();
+                                }
+
+                                var calculatedNames = new List<TextualProperty>();
+                                var calculatedFormulae = new List<TextualProperty>();
+
                                 if (invalidBonds.Any() || minAtomicNumber < 1 || maxAtomicNumber > 118)
                                 {
+                                    // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 0 or > 4 or Elements < 1 or > 118
+
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
-                                    synonyms.Add(Constants.Chem4WordInchiKeyName, "Not Requested");
+                                    calculatedNames.Add(new TextualProperty { Type = Constants.Chem4WordInchiKeyName, Value = "Not Requested" });
                                 }
                                 else
                                 {
                                     pb.Show();
                                     pb.Increment(1);
-                                    pb.Message = $"Calculating InChiKey and Resolving Names using Chem4Word Web Service for molecule {mol.Id}";
+                                    pb.Message = $"Calculating InChiKey and Resolving Names using Chem4Word Web Service for molecule {molecule.Id}";
 
                                     try
                                     {
-                                        Model temp = new Model();
-                                        temp.AddMolecule(mol.Copy());
-                                        mol.Parent = temp;
-
                                         string afterMolFile = molConverter.Export(temp);
                                         mol.ConciseFormula = mol.CalculatedFormula();
 
@@ -799,109 +781,67 @@ namespace Chem4Word
                                             var first = csr.Properties[0];
                                             if (first != null)
                                             {
-                                                if (!string.IsNullOrEmpty(first.InchiKey))
+                                                var value = string.IsNullOrEmpty(first.InchiKey) ? "Not found" : first.InchiKey;
+                                                calculatedNames.Add(new TextualProperty { Type = Constants.Chem4WordInchiKeyName, Value = value });
+
+                                                value = string.IsNullOrEmpty(first.Formula) ? "Not found" : first.Formula;
+                                                calculatedFormulae.Add(new TextualProperty { Type = Constants.Chem4WordResolverFormulaName, Value = value });
+
+                                                value = string.IsNullOrEmpty(first.Name) ? "Not found" : first.Name;
+                                                calculatedNames.Add(new TextualProperty { Type = Constants.Chem4WordResolverIupacName, Value = value });
+
+                                                value = string.IsNullOrEmpty(first.Smiles) ? "Not found" : first.Smiles;
+                                                calculatedFormulae.Add(new TextualProperty { Type = Constants.Chem4WordResolverSmilesName, Value = value });
+                                            }
+
+                                            foreach (var formula in calculatedFormulae)
+                                            {
+                                                var target = molecule.Formulas.FirstOrDefault(f => f.Type.Equals(formula.Type));
+                                                if (target == null)
                                                 {
-                                                    synonyms.Add(Constants.Chem4WordInchiKeyName, first.InchiKey);
+                                                    molecule.Formulas.Add(formula);
+                                                    newProperties++;
                                                 }
-                                                if (!string.IsNullOrEmpty(first.Formula))
+                                                else
                                                 {
-                                                    synonyms.Add(Constants.Chem4WordResolverFormulaName, first.Formula);
+                                                    if (!target.Value.Equals(formula.Value))
+                                                    {
+                                                        target.Value = formula.Value;
+                                                        changedProperties++;
+                                                    }
                                                 }
-                                                if (!string.IsNullOrEmpty(first.Name))
+                                            }
+
+                                            foreach (var name in calculatedNames)
+                                            {
+                                                var target = molecule.Names.FirstOrDefault(f => f.Type.Equals(name.Type));
+                                                if (target == null)
                                                 {
-                                                    synonyms.Add(Constants.Chem4WordResolverIupacName, first.Name);
+                                                    molecule.Names.Add(name);
+                                                    newProperties++;
                                                 }
-                                                if (!string.IsNullOrEmpty(first.Smiles))
+                                                else
                                                 {
-                                                    synonyms.Add(Constants.Chem4WordResolverSmilesName, first.Smiles);
+                                                    if (!target.Value.Equals(name.Value))
+                                                    {
+                                                        target.Value = name.Value;
+                                                        changedProperties++;
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                     catch (Exception e)
                                     {
-                                        Globals.Chem4WordV3.Telemetry.Write(module, "Exception", $"{e.ToString()}");
-                                    }
-                                }
-
-                                foreach (KeyValuePair<string, string> kvp in synonyms)
-                                {
-                                    bool updated;
-                                    switch (kvp.Key)
-                                    {
-                                        case Constants.ChemspiderFormulaName:
-                                        case Constants.ChemSpiderSmilesName:
-                                        case Constants.Chem4WordResolverFormulaName:
-                                        case Constants.Chem4WordResolverSmilesName:
-                                            updated = false;
-                                            foreach (var formula in mol.Formulas)
-                                            {
-                                                if (formula.Type.Equals(kvp.Key))
-                                                {
-                                                    formula.Value = kvp.Value;
-                                                    updated = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!updated)
-                                            {
-                                                var f = new TextualProperty();
-                                                f.Type = kvp.Key;
-                                                f.Value = kvp.Value;
-                                                mol.Formulas.Add(f);
-                                            }
-                                            break;
-
-                                        case Constants.ChemspiderIdName:
-                                        case Constants.Chem4WordInchiKeyName:
-                                        case Constants.ChemSpiderSynonymName:
-                                        case Constants.ChemspiderInchiKeyName:
-                                        case Constants.Chem4WordResolverIupacName:
-                                            updated = false;
-                                            foreach (var name in mol.Names)
-                                            {
-                                                if (name.Type.Equals(kvp.Key))
-                                                {
-                                                    name.Value = kvp.Value;
-                                                    updated = true;
-                                                    break;
-                                                }
-                                            }
-                                            if (!updated)
-                                            {
-                                                var n = new TextualProperty();
-                                                n.Type = kvp.Key;
-                                                n.Value = kvp.Value;
-                                                mol.Names.Add(n);
-                                            }
-                                            break;
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Exception", $"{e}");
                                     }
                                 }
                             }
-
                             pb.Value = 0;
                             pb.Hide();
                             pb.Close();
 
-                            #endregion WebService API Calls
-
-                            string guidString;
-                            string fullTag;
-
-                            if (isNewDrawing)
-                            {
-                                guidString = Guid.NewGuid().ToString("N"); // No dashes
-                                fullTag = guidString;
-                            }
-                            else
-                            {
-                                fullTag = cc?.Tag;
-                                guidString = CustomXmlPartHelper.GuidFromTag(cc?.Tag);
-                                if (string.IsNullOrEmpty(guidString))
-                                {
-                                    guidString = Guid.NewGuid().ToString("N"); // No dashes
-                                }
-                            }
+                            #endregion Web Service Calls
 
                             if (isNewDrawing)
                             {
@@ -913,32 +853,30 @@ namespace Chem4Word
                             }
 
                             afterModel.CustomXmlPartGuid = guidString;
-                            afterModel.Relabel(true);
-                            // Bodge restore bond length
-                            afterModel.ScaleToAverageBondLength(averageBondLength);
 
-                            if (showLabelEditor)
+                            #region Show Label Editor
+
+                            if (changedProperties + newProperties > 0)
                             {
-                                EditLabels el = new EditLabels();
-                                el.TopLeft = Globals.Chem4WordV3.WordTopLeft;
-                                el.Cml = cmlConverter.Export(afterModel);
-                                el.Used1D = ChemistryHelper.GetUsed1D(doc, guidString);
-                                if (afterModel.Molecules.Count > 1)
-                                {
-                                    el.Message = "Warning: At least one Concise formula has changed; Please correct or delete any labels as necessary!";
-                                }
-                                else
-                                {
-                                    el.Message = "Warning: Concise formula has changed; Please correct or delete any labels as necessary!";
-                                }
+                                var host = new EditLabelsHost();
+                                host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+                                host.Cml = cmlConverter.Export(afterModel);
+                                host.Used1D = used1D;
+
+                                host.Message = "Warning: At least one formula or name has changed; Please correct or delete any which are unnecessary or irrelevant !";
 
                                 // Show Label Editor
-                                DialogResult dr = el.ShowDialog();
+                                DialogResult dr = host.ShowDialog();
                                 if (dr == DialogResult.OK)
                                 {
-                                    afterModel = cmlConverter.Import(el.Cml);
+                                    afterModel = cmlConverter.Import(host.Cml, used1D);
                                 }
+
+                                host.Close();
+                                host = null;
                             }
+
+                            #endregion Show Label Editor
 
                             string afterCml = cmlConverter.Export(afterModel);
 
@@ -1054,6 +992,9 @@ namespace Chem4Word
                 {
                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Finished; No ContentControl was inserted");
                 }
+
+                app.ActiveWindow.SetFocus();
+                app.Activate();
             }
         }
 
@@ -1066,10 +1007,10 @@ namespace Chem4Word
             if (Globals.Chem4WordV3.EventsEnabled && Globals.Chem4WordV3.ChemistryAllowed)
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
+                Word.Application app = Globals.Chem4WordV3.Application;
 
                 try
                 {
-                    Word.Application app = Globals.Chem4WordV3.Application;
                     Word.Selection sel = app.Selection;
                     Word.ContentControl cc = null;
                     CustomXMLPart customXmlPart = null;
@@ -1097,6 +1038,9 @@ namespace Chem4Word
                 {
                     new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
                 }
+
+                app.ActiveWindow.SetFocus();
+                app.Activate();
 
                 Globals.Chem4WordV3.EventsEnabled = true;
             }
@@ -1216,9 +1160,10 @@ namespace Chem4Word
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
 
+                Word.Application app = Globals.Chem4WordV3.Application;
+
                 try
                 {
-                    Word.Application app = Globals.Chem4WordV3.Application;
                     Word.Document doc = app.ActiveDocument;
                     Word.Selection sel = app.Selection;
                     Word.ContentControl cc = null;
@@ -1238,58 +1183,41 @@ namespace Chem4Word
                             {
                                 string cml = customXmlPart.XML;
 
-                                #region New Code
+                                var host = new EditLabelsHost();
+                                host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+                                host.Cml = cml;
+                                host.Used1D = ChemistryHelper.GetUsed1D(doc, guid);
+                                host.Message = "";
 
-                                //var host = new EditLabelsHost();
-                                //host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
-                                //host.Cml = cml;
-                                //host.Used1D = ChemistryHelper.GetUsed1D(doc, guid);
-                                //host.Message = "";
-
-                                //var result = host.ShowDialog();
-                                //if (result == DialogResult.OK)
-                                //{
-                                //    customXmlPart.Delete();
-                                //    doc.CustomXMLParts.Add(host.Cml);
-
-                                //    CMLConverter conv = new CMLConverter();
-                                //    Model model = conv.Import(host.Cml);
-                                //    ChemistryHelper.UpdateThisStructure(doc, model, guid, "");
-
-                                //    app.Selection.SetRange(cc.Range.Start, cc.Range.End);
-                                //}
-
-                                #endregion
-
-                                #region Old Code
-
-                                EditLabels f = new EditLabels();
-                                f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
-                                f.Cml = cml;
-                                f.Used1D = ChemistryHelper.GetUsed1D(doc, guid);
-                                f.Message = "";
-
-                                DialogResult dr = f.ShowDialog();
-                                if (dr == DialogResult.OK)
+                                var result = host.ShowDialog();
+                                if (result == DialogResult.OK)
                                 {
                                     customXmlPart.Delete();
-                                    doc.CustomXMLParts.Add(f.Cml);
+                                    doc.CustomXMLParts.Add(host.Cml);
 
                                     CMLConverter conv = new CMLConverter();
-                                    Model model = conv.Import(f.Cml);
+                                    Model model = conv.Import(host.Cml);
                                     ChemistryHelper.UpdateThisStructure(doc, model, guid, "");
 
                                     app.Selection.SetRange(cc.Range.Start, cc.Range.End);
                                 }
 
-                                #endregion
+                                host.Close();
+                                host = null;
                             }
                         }
                     }
+
                 }
                 catch (Exception ex)
                 {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex)
+                        .ShowDialog();
+                }
+                finally
+                {
+                    app.ActiveWindow.SetFocus();
+                    app.Activate();
                 }
 
                 Globals.Chem4WordV3.EventsEnabled = true;
@@ -1365,6 +1293,7 @@ namespace Chem4Word
             if (Globals.Chem4WordV3.EventsEnabled && Globals.Chem4WordV3.ChemistryAllowed)
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
+                Word.Application app = Globals.Chem4WordV3.Application;
 
                 try
                 {
@@ -1424,6 +1353,9 @@ namespace Chem4Word
                 }
 
                 Globals.Chem4WordV3.EventsEnabled = true;
+
+                app.ActiveWindow.SetFocus();
+                app.Activate();
             }
 
             AfterButtonChecks(sender as RibbonButton);
@@ -1897,7 +1829,6 @@ namespace Chem4Word
 
         private void OnShowAboutClick(object sender, RibbonControlEventArgs e)
         {
-            
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             BeforeButtonChecks(sender as RibbonButton);
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
@@ -1906,11 +1837,13 @@ namespace Chem4Word
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
 
+                Word.Application app = Globals.Chem4WordV3.Application;
+
                 try
                 {
                     AboutHost ah = new AboutHost();
                     ah.TopLeft = Globals.Chem4WordV3.WordTopLeft;
-                    
+
                     Assembly assembly = Assembly.GetExecutingAssembly();
                     FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
                     UpdateHelper.ReadThisVersion(assembly);
@@ -1920,14 +1853,12 @@ namespace Chem4Word
                         string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                         int idx = temp.IndexOf(" ");
                         ah.VersionString = $"Chem4Word V{Constants.Chem4WordVersion} {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
-
                     }
                     else
                     {
                         ah.VersionString = $"Chem4Word Version {fvi.FileVersion}";
                     }
                     ah.ShowDialog();
-                    
                 }
                 catch (Exception ex)
                 {
@@ -1935,6 +1866,9 @@ namespace Chem4Word
                 }
 
                 Globals.Chem4WordV3.EventsEnabled = true;
+
+                app.ActiveWindow.SetFocus();
+                app.Activate();
             }
 
             AfterButtonChecks(sender as RibbonButton);
@@ -2089,7 +2023,6 @@ namespace Chem4Word
                 fa.TopLeft = Globals.Chem4WordV3.WordTopLeft;
 
                 fa.ShowDialog();
-
             }
             catch (Exception ex)
             {

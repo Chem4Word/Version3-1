@@ -4,7 +4,7 @@
   <Product Id="*" Name="Chemistry Add-In for Microsoft Word 3.1.0 Alpha 1" Manufacturer="Chem4Word" Version="3.1.0.7030" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of Chem4Word is already installed." />
-    <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+    <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high"/>
     <!-- EULA Must be editied in WordPad NOT Word -->
     <WixVariable Id="WixUILicenseRtf" Value="EULA.rtf" />
     <Property Id="ARPCOMMENTS">This is the WiX installer for Chemistry Add-In for Microsoft Word</Property>

@@ -76,6 +76,7 @@
     <Compile Include="OOXML\Bonds\BondLine.cs" />
     <Compile Include="OOXML\Bonds\BondLinePositioner.cs" />
     <Compile Include="OOXML\Bonds\BondLineRenderer.cs" />
+    <Compile Include="OOXML\MoleculeGroup.cs" />
     <Compile Include="OOXML\OoXmlFile.cs" />
     <Compile Include="OOXML\OoXmlHelper.cs" />
     <Compile Include="OOXML\OoXmlRenderer.cs" />

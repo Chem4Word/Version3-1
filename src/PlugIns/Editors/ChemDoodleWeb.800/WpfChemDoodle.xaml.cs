@@ -5,13 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core;
-using Chem4Word.Core.Helpers;
-using Chem4Word.Core.UI.Forms;
-using Chem4Word.Core.UI.Wpf;
-using IChem4Word.Contracts;
-using Ionic.Zip;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +18,15 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Navigation;
+using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI.Forms;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.JSON;
+using IChem4Word.Contracts;
+using Ionic.Zip;
+using Newtonsoft.Json;
 using Control = System.Windows.Forms.Control;
 using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;
@@ -419,7 +420,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                         if (!string.IsNullOrEmpty(mol))
                         {
                             JSONConverter jc = new JSONConverter();
-                            Model2.Model model = jc.Import(mol);
+                            Model model = jc.Import(mol);
                             StructureJson = jc.Export(model);
                             SwapMode();
                         }
@@ -448,8 +449,8 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                         if (!string.IsNullOrEmpty(mol1) && !string.IsNullOrEmpty(mol2))
                         {
                             JSONConverter jc = new JSONConverter();
-                            Model2.Model model1 = jc.Import(mol1);
-                            Model2.Model model2 = jc.Import(mol2);
+                            Model model1 = jc.Import(mol1);
+                            Model model2 = jc.Import(mol2);
 
                             if (model1.Molecules.Count == 1)
                             {

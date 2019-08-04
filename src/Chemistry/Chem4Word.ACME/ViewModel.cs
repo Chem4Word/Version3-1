@@ -5,18 +5,20 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
+
 namespace Chem4Word.ACME
 {
     public class ViewModel
     {
-        public ViewModel(Model2.Model chemistryModel)
+        public ViewModel(Model chemistryModel)
         {
             Model = chemistryModel;
         }
 
         #region Properties
 
-        public Model2.Model Model { get; }
+        public Model Model { get; }
 
         #endregion Properties
     }

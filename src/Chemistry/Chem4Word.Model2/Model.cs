@@ -175,6 +175,48 @@ namespace Chem4Word.Model2
             }
         }
 
+        public List<TextualProperty> AllTextualProperties
+        {
+            get
+            {
+                var list = new List<TextualProperty>();
+
+                // Add 2D if relevant
+                if (TotalAtomsCount > 0)
+                {
+                    list.Add(new TextualProperty
+                             {
+                                 Id = "2D",
+                                 Type = "2D",
+                                 Value = "2D"
+                             });
+                    list.Add(new TextualProperty
+                             {
+                                 Id = "c0",
+                                 Type = "F",
+                                 Value = ConciseFormula
+                             });
+                    list.Add(new TextualProperty
+                             {
+                                 Id = "S",
+                                 Type = "S",
+                                 Value = "S"
+                            });
+                }
+
+                foreach (var child in Molecules.Values)
+                {
+                    list.AddRange(child.AllTextualProperties);
+                }
+
+                if (list.Count > 0)
+                {
+                    list = list.Take(list.Count - 1).ToList();
+                }
+
+                return list;
+            }
+        }
         /// <summary>
         /// Count of atoms in all molecules
         /// </summary>
@@ -773,6 +815,42 @@ namespace Chem4Word.Model2
             }
 
             return allBonds;
+        }
+
+        public TextualProperty GetTextPropertyById(string id)
+        {
+            TextualProperty tp = null;
+
+            foreach (var molecule in GetAllMolecules())
+            {
+                if (id.StartsWith(molecule.Id))
+                {
+                    if (id.EndsWith("f0"))
+                    {
+                        tp = new TextualProperty()
+                             {
+                                 Id = $"{molecule.Id}.f0",
+                                 Value = molecule.ConciseFormula,
+                                 Type = "ConciseFormula"
+                        };
+                        break;
+                    }
+
+                    tp = molecule.Formulas.SingleOrDefault(f => f.Id.Equals(id));
+                    if (tp != null)
+                    {
+                        break;
+                    }
+
+                    tp = molecule.Names.SingleOrDefault(n => n.Id.Equals(id));
+                    if (tp != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return tp;
         }
 
         public List<Molecule> GetAllMolecules()

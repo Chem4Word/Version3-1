@@ -41,6 +41,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             _meanBondLength = meanBondLength;
         }
 
+        public void CreateMoleculeLabelCharacters(List<TextualProperty> labels, Point bottomCentre)
+        {
+            foreach (var label in labels)
+            {
+                // 1. Measure
+                // 2. Insert
+            }
+        }
+
         public void CreateElementCharacters(Atom atom, Options options)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -49,7 +58,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             string atomLabel = atom.Element.Symbol;
             Rect labelBounds;
 
-            // Get Charge and Isotope valuesfor use later on
+            // Get Charge and Isotope values for use later on
             int iCharge = atom.FormalCharge ?? 0;
             int iAbsCharge = Math.Abs(iCharge);
             int isoValue = atom.IsotopeNumber ?? 0;
@@ -154,12 +163,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         yMin = Math.Min(yMin, thisCharacterPosition.Y);
                         xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width, _meanBondLength));
                         yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height, _meanBondLength));
-
-                        // Uncomment the following to disable offsetting for terminal atoms
-                        //if (bonds.Count == 1)
-                        //{
-                        //    break;
-                        //}
 
                         if (idx < atomLabel.Length - 1)
                         {

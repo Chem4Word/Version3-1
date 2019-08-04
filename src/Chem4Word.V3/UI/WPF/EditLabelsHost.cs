@@ -5,16 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2.Converters.CML;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.UI.WPF
 {
@@ -43,6 +43,7 @@ namespace Chem4Word.UI.WPF
                 case "ok":
                 case "save":
                     DialogResult = DialogResult.OK;
+                    _closedInCode = true;
                     if (elementHost1.Child is LabelsEditor labelsEditor)
                     {
                         Cml = args.OutputValue;

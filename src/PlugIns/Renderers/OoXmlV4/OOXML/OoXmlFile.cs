@@ -10,6 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using Chem4Word.Core.Helpers;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
@@ -39,7 +40,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             CMLConverter cc = new CMLConverter();
-            Model2.Model m = cc.Import(cml);
+            Model m = cc.Import(cml);
             if (m.AllErrors.Count > 0 || m.AllWarnings.Count > 0)
             {
                 if (m.AllErrors.Count > 0)
@@ -91,7 +92,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         /// <param name="options"></param>
         /// <param name="telemetry"></param>
         /// <param name="topLeft"></param>
-        private static void AddPictureFromModel(Body docbody, Model2.Model model, string bookmarkName, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        private static void AddPictureFromModel(Body docbody, Model model, string bookmarkName, Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             Paragraph paragraph1 = new Paragraph();
             if (!string.IsNullOrEmpty(bookmarkName))

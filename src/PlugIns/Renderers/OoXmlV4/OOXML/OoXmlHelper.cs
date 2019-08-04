@@ -35,6 +35,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         public const double CS_SUPERSCRIPT_RAISE_FACTOR = 0.3;
 
         public const int EMUS_PER_WORD_POINT = 12700;
+        public const double ACS_LINE_WIDTH = 0.6;
         public const int ACS_LINE_WIDTH_EMUS = 7620;    // This makes bond line width equal to ACS Guide of 0.6pt
         private const int EMUS_PER_CML_POINT = 9144;    // This makes cml bond length of 20 equal ACS guide 0.2" (0.508cm)
 
@@ -85,10 +86,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                             Wps.ShapeProperties shapeProperties)
         {
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference() { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference() { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference() { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference() { Index = A.FontCollectionIndexValues.Minor };
+            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
+            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
+            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
+            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
 
             shapeStyle.Append(lineReference);
             shapeStyle.Append(fillReference);

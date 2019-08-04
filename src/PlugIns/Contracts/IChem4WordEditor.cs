@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace IChem4Word.Contracts
@@ -16,5 +17,6 @@ namespace IChem4Word.Contracts
         bool CanEditNestedMolecules { get; }
         bool CanEditFunctionalGroups { get; }
         bool RequiresSeedAtom { get; }
+        List<string> Used1DProperties { get; set; }
     }
 }

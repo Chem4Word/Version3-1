@@ -12,6 +12,7 @@ using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -54,13 +55,15 @@ namespace Chem4Word.ACME
 
         // This is used to store the cml until the editor is Loaded
         private string _cml;
+        private List<string> _used1DProperties;
 
         /// <summary>
         /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         /// </summary>
-        public Editor(string cml) : this()
+        public Editor(string cml, List<string> used1DProperties) : this()
         {
             _cml = cml;
+            _used1DProperties = used1DProperties;
         }
 
         public Editor()
@@ -220,7 +223,7 @@ namespace Chem4Word.ACME
             if (!String.IsNullOrEmpty(_cml))
             {
                 CMLConverter cc = new CMLConverter();
-                Model tempModel = cc.Import(_cml);
+                Model tempModel = cc.Import(_cml, _used1DProperties);
 
                 tempModel.RescaleForXaml(false);
                 var vm = new EditViewModel(tempModel, ChemCanvas);
@@ -229,7 +232,7 @@ namespace Chem4Word.ACME
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
 
                 ChemCanvas.Chemistry = vm;
-                
+
                 vm.Loading = true;
                 var mean = ActiveViewModel.Model.MeanBondLength / Globals.ScaleFactorForXaml;
                 var average = Math.Round(mean / 5.0) * 5;

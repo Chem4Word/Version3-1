@@ -21,6 +21,7 @@ using System.Windows.Forms;
 using System.Windows.Media;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 
@@ -391,7 +392,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                             {
                                 lastMolfile = new StreamReader(resStream).ReadToEnd();
                                 SdFileConverter sdFileConverter = new SdFileConverter();
-                                Model2.Model model = sdFileConverter.Import(lastMolfile);
+                                Model model = sdFileConverter.Import(lastMolfile);
                                 CMLConverter cmlConverter = new CMLConverter();
                                 Cml = cmlConverter.Export(model);
 

@@ -1244,46 +1244,56 @@ namespace Chem4Word
                 if (LibraryNames != null && LibraryNames.Any())
                 {
                     // Limit to selections which have less than 5 sentences
-                    if (sel.Sentences.Count <= 5)
+                    if (sel != null && sel.Sentences != null && sel.Sentences.Count <= 5)
                     {
                         Word.Document doc = Application.ActiveDocument;
                         if (doc != null)
                         {
                             int last = doc.Range().End;
+                            int sentenceCount = sel.Sentences.Count;
                             // Handling the selected text sentence by sentence should make us immune to return character sizing.
-                            for (int i = 1; i <= sel.Sentences.Count; i++)
+                            for (int i = 1; i <= sentenceCount; i++)
                             {
-                                var sentence = sel.Sentences[i];
-                                int start = Math.Max(sentence.Start, sel.Start);
-                                start = Math.Max(0, start);
-                                int end = Math.Min(sel.End, sentence.End);
-                                end = Math.Min(end, last);
-                                if (start < end)
+                                try
                                 {
-                                    var range = doc.Range(start, end);
-                                    //Exclude any ranges which contain content controls
-                                    if (range.ContentControls.Count == 0)
+                                    var sentence = sel.Sentences[i];
+                                    int start = Math.Max(sentence.Start, sel.Start);
+                                    start = Math.Max(0, start);
+                                    int end = Math.Min(sel.End, sentence.End);
+                                    end = Math.Min(end, last);
+                                    if (start < end)
                                     {
-                                        string sentenceText = range.Text;
-                                        //Debug.WriteLine($"Sentences[{i}] --> {sentenceText}");
-                                        if (!string.IsNullOrEmpty(sentenceText))
+                                        var range = doc.Range(start, end);
+                                        //Exclude any ranges which contain content controls
+                                        if (range.ContentControls.Count == 0)
                                         {
-                                            foreach (var kvp in LibraryNames)
+                                            string sentenceText = range.Text;
+                                            //Debug.WriteLine($"Sentences[{i}] --> {sentenceText}");
+                                            if (!string.IsNullOrEmpty(sentenceText))
                                             {
-                                                int idx = sentenceText.IndexOf(kvp.Key, StringComparison.InvariantCultureIgnoreCase);
-                                                if (idx > 0)
+                                                foreach (var kvp in LibraryNames)
                                                 {
-                                                    selectedWords.Add(new TargetWord
+                                                    int idx = sentenceText.IndexOf(kvp.Key, StringComparison.InvariantCultureIgnoreCase);
+                                                    if (idx > 0)
                                                     {
-                                                        ChemicalName = kvp.Key,
-                                                        Start = start + idx,
-                                                        ChemistryId = kvp.Value,
-                                                        End = start + idx + kvp.Key.Length
-                                                    });
+                                                        selectedWords.Add(new TargetWord
+                                                        {
+                                                            ChemicalName = kvp.Key,
+                                                            Start = start + idx,
+                                                            ChemistryId = kvp.Value,
+                                                            End = start + idx + kvp.Key.Length
+                                                        });
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                }
+                                catch (Exception e)
+                                {
+                                    Telemetry.Write(module, "Exception", $"Handled; Sentences[{i}] of {sentenceCount} not found");
+                                    Telemetry.Write(module, "Exception", e.Message);
+                                    Telemetry.Write(module, "Exception", e.ToString());
                                 }
                             }
                         }

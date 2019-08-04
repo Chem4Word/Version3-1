@@ -5,14 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core;
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using ChemistryModel = Chem4Word.Model2.Model;
+using Chem4Word.Core;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME
 {
@@ -124,7 +124,7 @@ namespace Chem4Word.ACME
 
         public void Clear()
         {
-            var model = new ChemistryModel();
+            var model = new Model();
             CurrentViewModel = new ViewModel(model);
             DrawChemistry(CurrentViewModel);
         }
@@ -135,7 +135,7 @@ namespace Chem4Word.ACME
 
         private void HandleDataContextChanged()
         {
-            ChemistryModel chemistryModel = null;
+            Model chemistryModel = null;
 
             if (Chemistry is string)
             {
@@ -152,12 +152,12 @@ namespace Chem4Word.ACME
             }
             else
             {
-                if (Chemistry != null && !(Chemistry is ChemistryModel))
+                if (Chemistry != null && !(Chemistry is Model))
                 {
                     Debugger.Break();
-                    throw new ArgumentException($"Object must be of type {nameof(Model2.Model)}.");
+                    throw new ArgumentException($"Object must be of type {nameof(Model)}.");
                 }
-                chemistryModel = Chemistry as ChemistryModel;
+                chemistryModel = Chemistry as Model;
                 if (chemistryModel != null)
                 {
                     chemistryModel.EnsureBondLength(20, false);

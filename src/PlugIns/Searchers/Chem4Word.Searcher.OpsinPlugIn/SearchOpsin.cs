@@ -12,6 +12,7 @@ using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Searcher.OpsinPlugIn
@@ -103,7 +104,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                     string temp = sr.ReadToEnd();
 
                     CMLConverter cmlConverter = new CMLConverter();
-                    Model2.Model model = cmlConverter.Import(temp);
+                    Model model = cmlConverter.Import(temp);
                     Cml = cmlConverter.Export(model);
 
                     model.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
