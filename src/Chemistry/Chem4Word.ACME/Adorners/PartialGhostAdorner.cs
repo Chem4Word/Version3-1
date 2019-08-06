@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Drawing;
 
@@ -38,8 +39,14 @@ namespace Chem4Word.ACME.Adorners
             myAdornerLayer.Add(this);
             PreviewMouseMove += PartialGhostAdorner_PreviewMouseMove;
             PreviewMouseUp += PartialGhostAdorner_PreviewMouseUp;
+            MouseUp += PartialGhostAdorner_MouseUp;
             CurrentViewModel = currentModel;
             CurrentEditor = CurrentViewModel.CurrentEditor;
+        }
+
+        private void PartialGhostAdorner_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            CurrentEditor.RaiseEvent(e);
         }
 
         private void PartialGhostAdorner_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -51,6 +58,8 @@ namespace Chem4Word.ACME.Adorners
         {
             CurrentEditor.RaiseEvent(e);
         }
+
+
 
         public Geometry Ghost
         {

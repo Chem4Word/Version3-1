@@ -56,6 +56,7 @@ namespace WinForms.TestHarness
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
             this.ClearChemistry = new System.Windows.Forms.Button();
+            this.ShowGroupsBox = new System.Windows.Forms.CheckBox();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -266,17 +267,17 @@ namespace WinForms.TestHarness
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.ShowGroupsBox);
             this.groupBox2.Controls.Add(this.RemoveAtom);
             this.groupBox2.Controls.Add(this.RandomElement);
             this.groupBox2.Controls.Add(this.ChangeBackground);
             this.groupBox2.Controls.Add(this.ShowCarbons);
             this.groupBox2.Location = new System.Drawing.Point(434, 478);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(238, 82);
+            this.groupBox2.Size = new System.Drawing.Size(366, 82);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Experiments (Hidden)";
-            this.groupBox2.Visible = false;
             // 
             // ShowCml
             // 
@@ -306,13 +307,25 @@ namespace WinForms.TestHarness
             // 
             // ClearChemistry
             // 
-            this.ClearChemistry.Location = new System.Drawing.Point(174, 535);
+            this.ClearChemistry.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ClearChemistry.Location = new System.Drawing.Point(174, 533);
             this.ClearChemistry.Name = "ClearChemistry";
             this.ClearChemistry.Size = new System.Drawing.Size(75, 23);
             this.ClearChemistry.TabIndex = 0;
             this.ClearChemistry.Text = "Clear";
             this.ClearChemistry.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ClearChemistry.Click += new System.EventHandler(this.ClearChemistry_Click);
+            // 
+            // ShowGroupsBox
+            // 
+            this.ShowGroupsBox.AutoSize = true;
+            this.ShowGroupsBox.Location = new System.Drawing.Point(211, 54);
+            this.ShowGroupsBox.Name = "ShowGroupsBox";
+            this.ShowGroupsBox.Size = new System.Drawing.Size(90, 17);
+            this.ShowGroupsBox.TabIndex = 7;
+            this.ShowGroupsBox.Text = "Show Groups";
+            this.ShowGroupsBox.UseVisualStyleBackColor = true;
+            this.ShowGroupsBox.CheckedChanged += new System.EventHandler(this.ShowGroupsBox_CheckedChanged);
             // 
             // FlexForm
             // 
@@ -333,6 +346,7 @@ namespace WinForms.TestHarness
             this.Name = "FlexForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ACME Test Bed";
+            this.Load += new System.EventHandler(this.FlexForm_Load);
             this.LayoutPanel.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -369,6 +383,7 @@ namespace WinForms.TestHarness
         private System.Windows.Forms.Button SaveStructure;
         private System.Windows.Forms.Button ClearChemistry;
         private System.Windows.Forms.Button EditLabels;
+        private System.Windows.Forms.CheckBox ShowGroupsBox;
     }
 }
 

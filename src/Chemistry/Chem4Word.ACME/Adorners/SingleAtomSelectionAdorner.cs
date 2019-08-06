@@ -194,10 +194,9 @@ namespace Chem4Word.ACME.Adorners
             BigThumb.Height = bbb.Height;
             BigThumb.Width = bbb.Width;
 
-            //add the rotator
 
             // Return the final size.
-            //_boundingBox = bbb;
+
             return finalSize;
         }
 
@@ -251,10 +250,8 @@ namespace Chem4Word.ACME.Adorners
                 lastTranslation.Y = DragYTravel;
 
                 InvalidateVisual();
-                CurrentEditor.SuppressRedraw = true;
-                //move the molecule
-               
 
+                //move the molecule
                 CurrentModel.DoTransform(LastOperation,AdornedMolecules);
 
                 RaiseDRCompleted(sender, e);
@@ -263,7 +260,7 @@ namespace Chem4Word.ACME.Adorners
 
                 foreach (Molecule adornedMolecule in AdornedMolecules)
                 {
-                    adornedMolecule.ForceUpdates();
+                    adornedMolecule.UpdateVisual();
                 }
             }
             else

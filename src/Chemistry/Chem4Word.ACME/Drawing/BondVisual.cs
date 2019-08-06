@@ -260,7 +260,7 @@ namespace Chem4Word.ACME.Drawing
         {
             //set up the shared variables first
             Point startPoint, endPoint;
-            //Point? idealStartPoint = null, idealEndPoint=null;
+
             startPoint = ParentBond.StartAtom.Position;
             endPoint = ParentBond.EndAtom.Position;
 

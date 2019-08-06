@@ -6,9 +6,17 @@
 // ---------------------------------------------------------------------------
 
 using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using Chem4Word.ACME.Enums;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
 {
+
+    /// <summary>
+    /// handles the ungrouping of molecules
+    /// </summary>
     public class UnGroupCommand : ACME.Commands.BaseCommand
     {
         public UnGroupCommand(EditViewModel vm) : base(vm)
@@ -17,12 +25,13 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return false;
+            return EditViewModel.SelectionType == SelectionTypeCode.Molecule &&
+                   EditViewModel.SelectedItems.OfType<Molecule>().All(m => m.IsGrouped);   
         }
 
         public override void Execute(object parameter)
         {
-            Debugger.Break();
+            EditViewModel.UnGroup(EditViewModel.SelectedItems);
         }
     }
 }

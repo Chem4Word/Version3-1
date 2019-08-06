@@ -32,7 +32,6 @@ namespace Chem4Word.ACME.Behaviors
         public bool IsDrawing { get; private set; }
 
         private Snapper _angleSnapper;
-        //private Window _parent;
 
         private DrawBondAdorner _adorner;
 
@@ -79,22 +78,26 @@ namespace Chem4Word.ACME.Behaviors
                 RemoveAdorner(ref _adorner);
             }
 
+            CurrentEditor.Cursor = Cursors.Pen;
             var targetedVisual = CurrentEditor.ActiveVisual;
-            //cherck to see if we have already got an atom remembered
-
             string bondOrder = EditViewModel.CurrentBondOrder;
-
+            //check to see if we have already got an atom remembered
             if (_currentAtomVisual != null)
             {
-                Point lastPos;
+                Point? lastPos;
 
                 if (Dragging(e))
                 {
                     CurrentStatus = "[Shift] = unlock length; [Ctrl] = unlock angle; [Esc] = cancel.";
                     //are we already on top of an atom?
-
-                    if (targetedVisual is AtomVisual atomUnderCursor)
+                    if (targetedVisual is GroupVisual gv)
                     {
+                        CurrentEditor.Cursor = Cursors.No;
+                        lastPos= null;
+                    }
+                    else if (targetedVisual is AtomVisual atomUnderCursor)
+                    {
+                        CurrentEditor.Cursor = Cursors.Pen;
                         //if so. snap to the atom's position
                         lastPos = atomUnderCursor.Position;
                         //if we are stroking over an existing bond
@@ -120,30 +123,39 @@ namespace Chem4Word.ACME.Behaviors
                     }
                     else //or dangling over free space?
                     {
+                        CurrentEditor.Cursor = Cursors.Pen;
                         lastPos = e.GetPosition(CurrentEditor);
 
                         var angleBetween =
                             Vector.AngleBetween(_lastAtomVisual?.ParentAtom?.BalancingVector() ?? BasicGeometry.ScreenNorth,
                                 BasicGeometry.ScreenNorth);
                         //snap a bond into position
-                        lastPos = _angleSnapper.SnapBond(lastPos, e, angleBetween);
+                        lastPos = _angleSnapper.SnapBond(lastPos.Value, e, angleBetween);
                     }
 
-                    _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
+                    if (lastPos != null)
                     {
-                        Stereo = EditViewModel.CurrentStereo,
-                        BondOrder = bondOrder,
-                        ExistingBond = existingBond
-                    };
-
-                    _adorner.StartPoint = _currentAtomVisual.Position;
-                    _adorner.EndPoint = lastPos;
+                        _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
+                                   {
+                                       Stereo = EditViewModel.CurrentStereo,
+                                       BondOrder = bondOrder,
+                                       ExistingBond = existingBond
+                                   };
+                        _adorner.StartPoint = _currentAtomVisual.Position;
+                        _adorner.EndPoint = lastPos.Value;
+                    }
                 }
             }
             else
             {
-                if (targetedVisual is AtomVisual av)
+                if (targetedVisual is GroupVisual gv) //can't draw on a group
                 {
+                    CurrentStatus = "Ungroup before attempting to draw.";
+                    CurrentEditor.Cursor = Cursors.No;
+                }
+                else if (targetedVisual is AtomVisual av)
+                {
+                    CurrentEditor.Cursor = Cursors.Pen;
                     if (EditViewModel.SelectedElement != av.ParentAtom.Element)
                     {
                         CurrentStatus = "Click to set element.";
@@ -155,6 +167,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else if (targetedVisual is BondVisual bv)
                 {
+                    CurrentEditor.Cursor = Cursors.Pen;
                     CurrentStatus = "Click to modify bond";
                 }
             }
@@ -172,13 +185,24 @@ namespace Chem4Word.ACME.Behaviors
             if (IsDrawing)
             {
                 //first get the current active visuals
-                var landedAtomVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as AtomVisual;
 
-                var landedBondVisual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor)) as BondVisual;
+                var newAtomPos = e.GetPosition(CurrentEditor);
+                var landedGroupVisual = CurrentEditor.GetTargetedVisual(newAtomPos) as GroupVisual;
+
+                var landedAtomVisual = CurrentEditor.GetTargetedVisual(newAtomPos) as AtomVisual;
+
+                var landedBondVisual = CurrentEditor.GetTargetedVisual(newAtomPos) as BondVisual;
                 //check to see whether or not we've clicked and released on the same atom
                 bool sameAtom = landedAtomVisual == _currentAtomVisual;
                 //check to see whether the target is in the same molecule
                 bool sameMolecule = landedAtomVisual?.ParentAtom.Parent == _currentAtomVisual?.ParentAtom.Parent;
+
+                if (landedGroupVisual != null)
+                {
+                    ClearTemporaries();
+                    return;
+                }
+
                 //check bonds first - we can't connect to a bond so we need to simply do some stuff with it
                 if (landedBondVisual != null)
                 {
@@ -212,20 +236,20 @@ namespace Chem4Word.ACME.Behaviors
                             {
                                 //so just sprout a chain off it at two-o-clock
                                 EditViewModel.AddAtomChain(
-                                    parentAtom, _angleSnapper.SnapBond(e.GetPosition(CurrentEditor), e),
+                                    parentAtom, _angleSnapper.SnapBond(newAtomPos, e),
                                     ClockDirections.II);
                             }
                             else
                             {
                                 //otherwise create a singleton
-                                EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
+                                EditViewModel.AddAtomChain(null, newAtomPos, ClockDirections.II);
                             }
                         }
                         else
                         {
                             //create a singleton
                             //otherwise create a singleton
-                            EditViewModel.AddAtomChain(null, e.GetPosition(CurrentEditor), ClockDirections.II);
+                            EditViewModel.AddAtomChain(null, newAtomPos, ClockDirections.II);
                         }
                     }
                     else //we went mouse-up on an atom
@@ -285,15 +309,20 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
 
-            if (_adorner != null)
-            {
-                RemoveAdorner(ref _adorner);
-            }
+            ClearTemporaries();
 
-            _currentAtomVisual = null;
-            IsDrawing = false;
-            //clear this to prevent a weird bug in drawing
-            CurrentEditor.ActiveChemistry = null;
+            void ClearTemporaries()
+            {
+                if (_adorner != null)
+                {
+                    RemoveAdorner(ref _adorner);
+                }
+
+                _currentAtomVisual = null;
+                IsDrawing = false;
+                //clear this to prevent a weird bug in drawing
+                CurrentEditor.ActiveChemistry = null;
+            }
         }
 
         public override void Abort()
@@ -410,7 +439,7 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         /// <summary>
-        /// Tries to find the best pace to put a bond
+        /// Tries to find the best place to put a bond
         /// by placing it in uncongested space
         /// </summary>
         /// <param name="rootAtom"></param>
@@ -553,18 +582,6 @@ namespace Chem4Word.ACME.Behaviors
         {
             return e.LeftButton == MouseButtonState.Pressed & IsDrawing;
         }
-
-        //private AtomVisual GetAtomUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
-        //{
-        //    var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-        //    return (result?.VisualHit as AtomVisual);
-        //}
-
-        //private BondVisual GetBondUnderCursor(MouseButtonEventArgs mouseButtonEventArgs)
-        //{
-        //    var result = GetTarget(mouseButtonEventArgs.GetPosition(AssociatedObject));
-        //    return (result?.VisualHit as BondVisual);
-        //}
 
         private HitTestResult GetTarget(Point p)
         {

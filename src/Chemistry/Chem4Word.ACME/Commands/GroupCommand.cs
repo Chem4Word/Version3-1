@@ -6,6 +6,10 @@
 // ---------------------------------------------------------------------------
 
 using System.Diagnostics;
+using System.Linq;
+using System.Windows;
+using Chem4Word.ACME.Enums;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
 {
@@ -17,12 +21,13 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            return false;
+            return EditViewModel.SelectionType == SelectionTypeCode.Molecule 
+                   && EditViewModel.SelectedItems.OfType<Molecule>().Count()>1;
         }
 
         public override void Execute(object parameter)
         {
-            Debugger.Break();
+            MessageBox.Show("Grouping code goes here");
         }
     }
 }

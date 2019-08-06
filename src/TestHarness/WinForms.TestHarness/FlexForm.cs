@@ -600,5 +600,25 @@ namespace WinForms.TestHarness
             Display.Clear();
             //_lastCml = "<cml></cml>";
         }
+
+        private void FlexForm_Load(object sender, EventArgs e)
+        {
+            ShowGroupsBox.Checked = Display.ShowGroups;
+        }
+
+        private void ShowGroupsBox_CheckedChanged(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                Display.ShowGroups = ShowGroupsBox.Checked;
+            }
+            catch (Exception exception)
+            {
+                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
+                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
+                MessageBox.Show(exception.StackTrace, exception.Message);
+            }
+        }
     }
 }

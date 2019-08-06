@@ -118,6 +118,9 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty HighlightActiveProperty =
             DependencyProperty.Register("HighlightActive", typeof(bool), typeof(Display), new PropertyMetadata(true));
 
+        public static readonly DependencyProperty ShowGroupsProperty =
+            DependencyProperty.Register("ShowGroups", typeof(bool), typeof(Display), new PropertyMetadata(true));
+
         #endregion Public Properties
 
         #region Public Methods
@@ -183,6 +186,12 @@ namespace Chem4Word.ACME
         }
 
         public ViewModel CurrentViewModel { get; set; }
+
+        public bool ShowGroups
+        {
+            get { return (bool) GetValue(ShowGroupsProperty); }
+            set { SetValue(ShowGroupsProperty, value); }
+        }
 
         #endregion Private Methods
 

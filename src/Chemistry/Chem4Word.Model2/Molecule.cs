@@ -665,6 +665,7 @@ namespace Chem4Word.Model2
                     Molecule mol = (Molecule)oldItem;
                     mol.AtomsChanged -= Atoms_CollectionChanged;
                     mol.BondsChanged -= Bonds_CollectionChanged;
+                    mol.MoleculesChanged -=Molecules_CollectionChanged;
                     mol.PropertyChanged -= ChemObject_PropertyChanged;
                 }
             }
@@ -676,10 +677,17 @@ namespace Chem4Word.Model2
                     Molecule mol = (Molecule)newItem;
                     mol.AtomsChanged += Atoms_CollectionChanged;
                     mol.BondsChanged += Bonds_CollectionChanged;
+                    mol.MoleculesChanged += Molecules_CollectionChanged;
                     mol.PropertyChanged += ChemObject_PropertyChanged;
                 }
             }
         }
+
+        private void Molecules_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnMoleculesChanged(sender, e);
+        }
+
 
         private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -941,7 +949,7 @@ namespace Chem4Word.Model2
             RebuildRings(true);
         }
 
-        public void ForceUpdates()
+        public void UpdateVisual()
         {
             foreach (var atom in Atoms.Values)
             {
@@ -954,8 +962,16 @@ namespace Chem4Word.Model2
             }
             foreach (Molecule mol in Molecules.Values)
             {
-                mol.ForceUpdates();
+
+                mol.UpdateVisual();
             }
+
+            SendDummyNotif();
+        }
+
+        private void SendDummyNotif()
+        {
+            OnPropertyChanged(nameof(BoundingBox));
         }
 
         public Molecule Copy()
@@ -1599,12 +1615,16 @@ namespace Chem4Word.Model2
             foreach (Atom atom in Atoms.Values)
             {
                 atom.Position = lastOperation.Transform(atom.Position);
+                atom.UpdateVisual();
             }
             foreach (Molecule mol in Molecules.Values)
             {
                 mol.Transform(lastOperation);
+                mol.UpdateVisual();
             }
+            UpdateVisual();
         }
+
 
         public void ClearProperties()
         {

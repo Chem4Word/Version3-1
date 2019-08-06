@@ -201,7 +201,7 @@ namespace Chem4Word.ACME
                         from Atom a1 in m.Atoms.Values
                         select a1);
                 var elements = (from selAtom in allSelAtoms
-                                select (ElementBase)selAtom.Element).Distinct();
+                                select (ElementBase) selAtom.Element).Distinct();
                 return elements.ToList();
             }
         }
@@ -273,12 +273,12 @@ namespace Chem4Word.ACME
                 var selectedBonds = SelectedItems.OfType<Bond>();
 
                 var selbonds = (from Bond selbond in selectedBonds
-                                select new BondOption { Order = selbond.Order, Stereo = selbond.Stereo }).Distinct();
+                                select new BondOption {Order = selbond.Order, Stereo = selbond.Stereo}).Distinct();
 
                 var selOptions = from BondOption bo in _bondOptions.Values
                                  join selbond1 in selbonds
-                                     on new { bo.Order, bo.Stereo } equals new { selbond1.Order, selbond1.Stereo }
-                                 select new BondOption { Id = bo.Id, Order = bo.Order, Stereo = bo.Stereo };
+                                     on new {bo.Order, bo.Stereo} equals new {selbond1.Order, selbond1.Stereo}
+                                 select new BondOption {Id = bo.Id, Order = bo.Order, Stereo = bo.Stereo};
                 return selOptions.ToList();
             }
         }
@@ -466,7 +466,7 @@ namespace Chem4Word.ACME
         /// </summary>
         private void LoadBondOptions()
         {
-            var storedOptions = (BondOption[])CurrentEditor.FindResource("BondOptions");
+            var storedOptions = (BondOption[]) CurrentEditor.FindResource("BondOptions");
             for (int i = 1; i <= storedOptions.Length; i++)
             {
                 _bondOptions[i] = storedOptions[i - 1];
@@ -555,7 +555,7 @@ namespace Chem4Word.ACME
                                   atom.UpdateVisual();
                               }
 
-                              toList[0].Parent.ForceUpdates();
+                              toList[0].Parent.UpdateVisual();
                               foreach (var o in sel)
                               {
                                   AddToSelection(o);
@@ -570,7 +570,7 @@ namespace Chem4Word.ACME
                                   atom.UpdateVisual();
                               }
 
-                              toList[0].Parent.ForceUpdates();
+                              toList[0].Parent.UpdateVisual();
                               foreach (var o in sel)
                               {
                                   AddToSelection(o);
@@ -591,34 +591,44 @@ namespace Chem4Word.ACME
             object[] sel = SelectedItems.ToArray();
 
             Action undo = () =>
-            {
-                SelectedItems.Clear();
-                foreach (Molecule mol in toList)
-                {
-                    mol.Transform((Transform) inverse);
-                    mol.ForceUpdates();
-                }
+                          {
+                              CurrentEditor.SuppressRedraw = true;
+                              SelectedItems.Clear();
+                              foreach (Molecule mol in toList)
+                              {
+                                  mol.Transform((Transform) inverse);
+                              }
 
-                foreach (var o in sel)
-                {
-                    AddToSelection(o);
-                }
-            };
+                              CurrentEditor.SuppressRedraw = false;
+                              foreach (Molecule mol in toList)
+                              {
+                                  mol.UpdateVisual();
+                              }
+
+                              foreach (var o in sel)
+                              {
+                                  AddToSelection(o);
+                              }
+                          };
             Action redo = () =>
-            {
-                SelectedItems.Clear();
-                foreach (var mol in toList)
-                {
-                    mol.Transform((Transform)operation);
-                    mol.ForceUpdates();
-                }
+                          {
+                              SelectedItems.Clear();
+                              foreach (var mol in toList)
+                              {
+                                  mol.Transform((Transform) operation);
+                              }
 
-              
-                foreach (var o in sel)
-                {
-                    AddToSelection(o);
-                }
-            };
+                              CurrentEditor.SuppressRedraw = false;
+                              foreach (Molecule mol in toList)
+                              {
+                                  mol.UpdateVisual();
+                              }
+
+                              foreach (var o in sel)
+                              {
+                                  AddToSelection(o);
+                              }
+                          };
 
             UndoManager.RecordAction(undo, redo);
 
@@ -774,7 +784,7 @@ namespace Chem4Word.ACME
                                  string bondOrder = null, BondStereo? stereo = null)
         {
             //create the new atom based on the current selection
-            Atom newAtom = new Atom { Element = elem ?? _selectedElement, Position = newAtomPos };
+            Atom newAtom = new Atom {Element = elem ?? _selectedElement, Position = newAtomPos};
 
             //the tag stores sprout directions chosen for the chain
             object tag = null;
@@ -949,15 +959,15 @@ namespace Chem4Word.ACME
                     foreach (Atom thisAtom in thisAtomGroup)
                     {
                         Atom a = new Atom
-                        {
-                            Id = thisAtom.Id,
-                            Position = thisAtom.Position,
-                            Element = thisAtom.Element,
-                            FormalCharge = thisAtom.FormalCharge,
-                            IsotopeNumber = thisAtom.IsotopeNumber,
-                            ShowSymbol = thisAtom.ShowSymbol,
-                            Parent = newMol
-                        };
+                                 {
+                                     Id = thisAtom.Id,
+                                     Position = thisAtom.Position,
+                                     Element = thisAtom.Element,
+                                     FormalCharge = thisAtom.FormalCharge,
+                                     IsotopeNumber = thisAtom.IsotopeNumber,
+                                     ShowSymbol = thisAtom.ShowSymbol,
+                                     Parent = newMol
+                                 };
 
                         newMol.AddAtom(a);
                         aa[a.Id] = a;
@@ -975,13 +985,13 @@ namespace Chem4Word.ACME
                                 Atom s = aa[thisBond.StartAtom.Id];
                                 Atom e = aa[thisBond.EndAtom.Id];
                                 Bond b = new Bond(s, e)
-                                {
-                                    Id = thisBond.Id,
-                                    Order = thisBond.Order,
-                                    Stereo = thisBond.Stereo,
-                                    ExplicitPlacement = thisBond.ExplicitPlacement,
-                                    Parent = newMol
-                                };
+                                         {
+                                             Id = thisBond.Id,
+                                             Order = thisBond.Order,
+                                             Stereo = thisBond.Stereo,
+                                             ExplicitPlacement = thisBond.ExplicitPlacement,
+                                             Parent = newMol
+                                         };
 
                                 newMol.AddBond(b);
                             }
@@ -1074,6 +1084,8 @@ namespace Chem4Word.ACME
         private void UpdateCommandStatuses()
         {
             CopyCommand.RaiseCanExecChanged();
+            GroupCommand.RaiseCanExecChanged();
+            UnGroupCommand.RaiseCanExecChanged();
             CutCommand.RaiseCanExecChanged();
             FlipHorizontalCommand.RaiseCanExecChanged();
             FlipVerticalCommand.RaiseCanExecChanged();
@@ -1102,7 +1114,7 @@ namespace Chem4Word.ACME
                     var selectionAdorner = SelectionAdorners[oldObject];
                     if (selectionAdorner is MoleculeSelectionAdorner)
                     {
-                        var msAdorner = (MoleculeSelectionAdorner)selectionAdorner;
+                        var msAdorner = (MoleculeSelectionAdorner) selectionAdorner;
 
                         msAdorner.DragCompleted -= MolAdorner_ResizeCompleted;
                         msAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
@@ -1130,7 +1142,7 @@ namespace Chem4Word.ACME
                     {
                         RemoveAtomBondAdorners(atom.Parent);
                         MoleculeSelectionAdorner molAdorner =
-                            new MoleculeSelectionAdorner(CurrentEditor, new List<Molecule> { atom.Parent }, this);
+                            new MoleculeSelectionAdorner(CurrentEditor, new List<Molecule> {atom.Parent}, this);
                         SelectionAdorners[newObject] = molAdorner;
                     }
                 }
@@ -1155,14 +1167,17 @@ namespace Chem4Word.ACME
                         MoleculeSelectionAdorner molAdorner;
                         if (mol.IsGrouped)
                         {
-                            molAdorner = new GroupSelectionAdorner(CurrentEditor, SelectedItems.OfType<Molecule>().ToList(),
-                                                             this);
+                            molAdorner = new GroupSelectionAdorner(CurrentEditor,
+                                                                   SelectedItems.OfType<Molecule>().ToList(),
+                                                                   this);
                         }
                         else
                         {
-                            molAdorner = new MoleculeSelectionAdorner(CurrentEditor, SelectedItems.OfType<Molecule>().ToList(),
-                                                           this);
+                            molAdorner = new MoleculeSelectionAdorner(CurrentEditor,
+                                                                      SelectedItems.OfType<Molecule>().ToList(),
+                                                                      this);
                         }
+
                         RemoveAllAdorners();
 
                         SelectionAdorners[newObject] = molAdorner;
@@ -1180,7 +1195,7 @@ namespace Chem4Word.ACME
 
         private void MolAdorner_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner)sender);
+            var moleculeSelectionAdorner = ((MoleculeSelectionAdorner) sender);
 
             foreach (Molecule mol in moleculeSelectionAdorner.AdornedMolecules)
             {
@@ -1195,7 +1210,7 @@ namespace Chem4Word.ACME
             //we've completed the drag operation
             //remove the existing molecule adorner
 
-            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner)sender);
+            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
             foreach (Molecule mol in moleculeSelectionAdorner.AdornedMolecules)
             {
                 RemoveFromSelection(mol);
@@ -1208,7 +1223,7 @@ namespace Chem4Word.ACME
         {
             //we've completed the drag operation
             //remove the existing molecule adorner
-            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner)sender);
+            var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
             foreach (Molecule mol in moleculeSelectionAdorner.AdornedMolecules)
             {
                 RemoveFromSelection(mol);
@@ -1296,18 +1311,18 @@ namespace Chem4Word.ACME
                 MakeRingUnsaturated(newAtomPlacements);
             }
 
-            //firstAtom.Parent.ForceUpdates();
+            //firstAtom.ParentMolecule.UpdateVisual();
             firstAtom.Parent.RebuildRings();
             Action undo = () =>
                           {
                               firstAtom.Parent.Refresh();
-                              firstAtom.Parent.ForceUpdates();
+                              firstAtom.Parent.UpdateVisual();
                               SelectedItems.Clear();
                           };
             Action redo = () =>
                           {
                               firstAtom.Parent.Refresh();
-                              firstAtom.Parent.ForceUpdates();
+                              firstAtom.Parent.UpdateVisual();
                           };
 
             UndoManager.RecordAction(undo, redo);
@@ -1496,11 +1511,11 @@ namespace Chem4Word.ACME
                         }
 
                         var aa = new Atom
-                        {
-                            Element = Globals.PeriodicTable.H,
-                            Position = atom.Position +
+                                 {
+                                     Element = Globals.PeriodicTable.H,
+                                     Position = atom.Position +
                                                 vector * (Model.XamlBondLength * ExplicitHydrogenBondPercentage)
-                        };
+                                 };
                         newAtoms.Add(aa);
                         if (!parents.ContainsKey(aa.InternalId))
                         {
@@ -1508,12 +1523,12 @@ namespace Chem4Word.ACME
                         }
 
                         var bb = new Bond
-                        {
-                            StartAtomInternalId = atom.InternalId,
-                            EndAtomInternalId = aa.InternalId,
-                            Stereo = BondStereo.None,
-                            Order = "S"
-                        };
+                                 {
+                                     StartAtomInternalId = atom.InternalId,
+                                     EndAtomInternalId = aa.InternalId,
+                                     Stereo = BondStereo.None,
+                                     Order = "S"
+                                 };
                         newBonds.Add(bb);
                         if (!parents.ContainsKey(bb.InternalId))
                         {
@@ -1594,7 +1609,7 @@ namespace Chem4Word.ACME
         {
             foreach (var mol in mols)
             {
-                mol.ForceUpdates();
+                mol.UpdateVisual();
             }
         }
 
@@ -1708,7 +1723,7 @@ namespace Chem4Word.ACME
                               selMolecule.Transform(flipTransform);
 
                               InvertPlacements(selMolecule);
-                              selMolecule.ForceUpdates();
+                              selMolecule.UpdateVisual();
                           };
 
             Action redo = () =>
@@ -1716,7 +1731,7 @@ namespace Chem4Word.ACME
                               selMolecule.Transform(flipTransform);
 
                               InvertPlacements(selMolecule);
-                              selMolecule.ForceUpdates();
+                              selMolecule.UpdateVisual();
                           };
 
             UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
@@ -1735,7 +1750,7 @@ namespace Chem4Word.ACME
                 {
                     if (ringBond.ExplicitPlacement != null)
                     {
-                        ringBond.ExplicitPlacement = (BondDirection)(-(int)ringBond.ExplicitPlacement);
+                        ringBond.ExplicitPlacement = (BondDirection) (-(int) ringBond.ExplicitPlacement);
                     }
                 }
             }
@@ -1747,13 +1762,13 @@ namespace Chem4Word.ACME
 
             if (!SelectedItems.Contains(parent))
             {
-                AddToSelection(new List<object> { thingToAdd });
+                AddToSelection(new List<object> {thingToAdd});
             }
         }
 
         public void RemoveFromSelection(object thingToRemove)
         {
-            RemoveFromSelection(new List<object> { thingToRemove });
+            RemoveFromSelection(new List<object> {thingToRemove});
         }
 
         public void AddToSelection(List<object> thingsToAdd)
@@ -1783,7 +1798,7 @@ namespace Chem4Word.ACME
                         allObjects.Add(parent.Bonds);
 
                         var selobjects =
-                            new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) { atom };
+                            new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) {atom};
                         selobjects.Add(parent.Bonds);
                         if (allObjects.SetEquals(selobjects))
                         {
@@ -1824,7 +1839,7 @@ namespace Chem4Word.ACME
                         allObjects.Add(parent.Bonds);
 
                         var selobjects =
-                            new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) { bond };
+                            new HashSet<object>(SelectedItems.OfType<Atom>().Where(a => a.Parent == parent)) {bond};
 
                         selobjects.Add(parent.Bonds);
 
@@ -1863,7 +1878,7 @@ namespace Chem4Word.ACME
         {
             //grab all the molecules that contain selected objects
             //var molsInSelection = SelectedItems.Where(o => (o is Atom | o is Bond))
-            //    .Select((dynamic obj) => obj.Parent as Molecule).Distinct();
+            //    .Select((dynamic obj) => obj.ParentMolecule as Molecule).Distinct();
 
             var molsInSelection = (from dynamic selItem in SelectedItems
                                    where ((selItem is Atom) | (selItem is Bond))
@@ -1873,39 +1888,39 @@ namespace Chem4Word.ACME
                 switch (o)
                 {
                     case Atom atom:
+                    {
+                        if (atom.Singleton) //it's a single atom molecule
                         {
-                            if (atom.Singleton) //it's a single atom molecule
-                            {
-                                SelectedItems.Remove(atom.Parent);
-                            }
-
-                            if (SelectedItems.Contains(atom))
-                            {
-                                SelectedItems.Remove(atom);
-                            }
-
-                            break;
+                            SelectedItems.Remove(atom.Parent);
                         }
+
+                        if (SelectedItems.Contains(atom))
+                        {
+                            SelectedItems.Remove(atom);
+                        }
+
+                        break;
+                    }
 
                     case Bond bond:
+                    {
+                        if (SelectedItems.Contains(bond))
                         {
-                            if (SelectedItems.Contains(bond))
-                            {
-                                SelectedItems.Remove(bond);
-                            }
-
-                            break;
+                            SelectedItems.Remove(bond);
                         }
+
+                        break;
+                    }
 
                     case Molecule mol:
+                    {
+                        if (SelectedItems.Contains(mol))
                         {
-                            if (SelectedItems.Contains(mol))
-                            {
-                                SelectedItems.Remove(mol);
-                            }
-
-                            break;
+                            SelectedItems.Remove(mol);
                         }
+
+                        break;
+                    }
                 }
             }
         }
@@ -1939,7 +1954,7 @@ namespace Chem4Word.ACME
                               parent.RemoveMolecule(molB);
                               molB.Parent = null;
                               newMol.Model.Relabel(false);
-                              newMol.ForceUpdates();
+                              newMol.UpdateVisual();
                           };
             redo();
             Action undo = () =>
@@ -1955,8 +1970,8 @@ namespace Chem4Word.ACME
                               parent.RemoveMolecule(newMol);
                               newMol.Parent = null;
                               //Model.InhibitEvents = false;
-                              molA.ForceUpdates();
-                              molB.ForceUpdates();
+                              molA.UpdateVisual();
+                              molB.UpdateVisual();
                           };
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
@@ -2057,7 +2072,7 @@ namespace Chem4Word.ACME
 
                 //TODO: sort out the grouping of atoms
                 var firstAtom = neighbours.First();
-                mol = (Molecule)firstAtom.Parent;
+                mol = (Molecule) firstAtom.Parent;
                 mol.TraverseBFS(firstAtom, a1 => { atomGroup.Add(a1); }, a2 => !atomGroup.Contains(a2), deleteBonds);
                 atomGroups.Add(atomGroup);
                 //remove the list of atoms from the atom group
@@ -2205,7 +2220,7 @@ namespace Chem4Word.ACME
                                       oldMol.Reparent();
                                       oldMol.Parent = parentModel;
                                       parentModel.AddMolecule(oldMol);
-                                      oldMol.ForceUpdates();
+                                      oldMol.UpdateVisual();
                                   }
 
                                   foreach (Molecule newMol in newMolList)
@@ -2225,7 +2240,7 @@ namespace Chem4Word.ACME
                                       newmol.Reparent();
                                       newmol.Parent = parentModel;
                                       parentModel.AddMolecule(newmol);
-                                      newmol.ForceUpdates();
+                                      newmol.UpdateVisual();
                                   }
 
                                   foreach (Molecule oldMol in oldmolList)
@@ -2289,7 +2304,7 @@ namespace Chem4Word.ACME
                               atom.FormalCharge = chargeAfter;
                               atom.IsotopeNumber = isotopeAfter;
                               atom.ShowSymbol = showSymbolAfter;
-                              atom.Parent.ForceUpdates();
+                              atom.Parent.UpdateVisual();
                           };
 
             redo();
@@ -2300,7 +2315,7 @@ namespace Chem4Word.ACME
                               atom.FormalCharge = chargeBefore;
                               atom.IsotopeNumber = isotopeBefore;
                               atom.ShowSymbol = showSymbolBefore;
-                              atom.Parent.ForceUpdates();
+                              atom.Parent.UpdateVisual();
                           };
 
             UndoManager.RecordAction(undo, redo);
@@ -2371,7 +2386,7 @@ namespace Chem4Word.ACME
                     stereoAfter = BondStereo.None;
                     if (model.DoubleBondChoice != DoubleBondType.Auto)
                     {
-                        directionAfter = (BondDirection)model.DoubleBondChoice;
+                        directionAfter = (BondDirection) model.DoubleBondChoice;
                     }
                 }
             }
@@ -2381,7 +2396,7 @@ namespace Chem4Word.ACME
                               bond.Order = OrderValueToOrder(bondOrderAfter);
                               bond.Stereo = stereoAfter;
                               bond.ExplicitPlacement = directionAfter;
-                              bond.Parent.ForceUpdates();
+                              bond.Parent.UpdateVisual();
                               if (swapAtoms)
                               {
                                   bond.EndAtomInternalId = startAtom.InternalId;
@@ -2398,7 +2413,7 @@ namespace Chem4Word.ACME
                               bond.Order = OrderValueToOrder(bondOrderBefore);
                               bond.Stereo = stereoBefore;
                               bond.ExplicitPlacement = directionBefore;
-                              bond.Parent.ForceUpdates();
+                              bond.Parent.UpdateVisual();
                               if (swapAtoms)
                               {
                                   bond.StartAtomInternalId = startAtom.InternalId;
@@ -2494,6 +2509,84 @@ namespace Chem4Word.ACME
                 UndoManager.EndUndoBlock();
                 SelectedItems.Clear();
             }
+        }
+
+
+
+        /// <summary>
+        /// Ungroups selected molecules
+        /// </summary>
+        /// <param name="selection">Active selection within the editor</param>
+        public void UnGroup(ObservableCollection<object> selection)
+        {
+            UndoManager.BeginUndoBlock();
+            
+            //grab just the grouped molecules first
+            var selGroups = from Molecule mol in selection.OfType<Molecule>()
+                            where mol.IsGrouped
+                            select mol;
+            //keep track of parent child relationships for later
+            Dictionary < Molecule, List<Molecule>> parentsAndChildren = new Dictionary<Molecule, List<Molecule>>();
+
+            foreach (Molecule group in selGroups)
+            {
+                parentsAndChildren[group] = new List<Molecule>();
+                foreach (Molecule child in group.Molecules.Values)
+                {
+                    parentsAndChildren[group].Add(child);
+                }
+            }
+
+            Action redo = () =>
+                          {
+                              //selected groups are always top level objects
+                              foreach (Molecule parent in parentsAndChildren.Keys)
+                              {
+                                  RemoveFromSelection(parent);
+                                  Model.RemoveMolecule(parent);
+                                  foreach (var child in parentsAndChildren[parent])
+                                  {
+                                      child.Parent = Model;
+                                      Model.AddMolecule(child);
+                                      child.UpdateVisual();
+                                  }
+                                  
+                              }
+
+                              foreach (List<Molecule> molecules in parentsAndChildren.Values)
+                              {
+                                  foreach (Molecule child in molecules)
+                                  {
+                                      AddToSelection(child);
+                                  }
+                              }
+                              ActiveMode.CurrentStatus = "Ungrouped.";
+                          };
+            Action undo = () =>
+                          {
+                              foreach (var oldParent in parentsAndChildren)
+                              {
+                                  Model.AddMolecule(oldParent.Key);
+                                  foreach (Molecule child in oldParent.Value)
+                                  {
+                                      RemoveFromSelection(child);
+                                      Model.RemoveMolecule(child);
+                                      child.Parent = oldParent.Key;
+                                      oldParent.Key.AddMolecule(child);
+                                      child.UpdateVisual();
+                                  }
+                              
+                                  oldParent.Key.UpdateVisual();
+                              }
+                              foreach (Molecule parent in parentsAndChildren.Keys)
+                              {
+                                  AddToSelection(parent);
+                              }
+                              ActiveMode.CurrentStatus = "Grouped.";
+                          };
+            redo();
+            UndoManager.RecordAction(undo, redo);
+            UndoManager.EndUndoBlock();
         }
     }
 }

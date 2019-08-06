@@ -69,7 +69,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 return _currentStatus;
             }
-            protected set
+            set
             {
                 _currentStatus = value;
                 OnPropertyChanged();

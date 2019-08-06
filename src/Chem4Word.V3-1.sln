@@ -111,7 +111,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Snippets", "Snippets", "{20
 		Snippets\You may need these files.txt = Snippets\You may need these files.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabelEditorV2", "TestHarness\Wpf.LabelEditorV2\Wpf.LabelEditorV2.csproj", "{DD0FF946-7C50-4964-AD45-9FB7DBE2662B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf.LabelEditorV2", "TestHarness\Wpf.LabelEditorV2\Wpf.LabelEditorV2.csproj", "{DD0FF946-7C50-4964-AD45-9FB7DBE2662B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

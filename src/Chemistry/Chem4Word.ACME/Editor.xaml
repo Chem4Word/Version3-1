@@ -852,7 +852,7 @@
                     x:Name="FuseButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FuseCommand}"
                     Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Fuse">
+                    ToolTip="Fuse" Visibility="Collapsed">
                     <Viewbox Width="24" Height="24">
                         <Path
                             Width="24"

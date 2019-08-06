@@ -48,7 +48,16 @@ namespace Chem4Word.ACME.Controls
             Rect union = Rect.Empty;
             foreach (Molecule molecule in adornedMolecules)
             {
-                union.Union(GetMoleculeBoundingBox(molecule));
+                Rect bb;
+                if (molecule.IsGrouped)
+                {
+                    bb = GetDrawnBoundingBox(molecule);
+                }
+                else
+                {
+                    bb= GetMoleculeBoundingBox(molecule);
+                }
+                union.Union(bb);
             }
 
             return union;

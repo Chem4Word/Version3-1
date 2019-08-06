@@ -12,6 +12,7 @@ using Chem4Word.ACME.Enums;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
@@ -79,7 +80,7 @@ namespace Chem4Word.ACME.Behaviors
             Mouse.Capture(CurrentEditor);
             _mouseTrack.Add(_startpoint);
 
-            if ((e.ClickCount == 2) & (EditViewModel.SelectionType == SelectionTypeCode.Molecule))
+            if (e.ClickCount == 2 & EditViewModel.SelectionType == SelectionTypeCode.Molecule)
             {
                 DoMolSelect(e);
                 e.Handled = true;
@@ -138,7 +139,7 @@ namespace Chem4Word.ACME.Behaviors
                 if (_atomList != null && _atomList.Any())
                 {
                     EditViewModel.DoTransform(_shift, _atomList);
-                    _atomList[0].Parent.ForceUpdates();
+                    _atomList[0].Parent.UpdateVisual();
                 }
 
                 IsDragging = false;
@@ -163,6 +164,10 @@ namespace Chem4Word.ACME.Behaviors
                     DoSelectionClick(e);
                 }
 
+                if (_lassoAdorner != null)
+                {
+                    ModifySelection(_lassoAdorner.Outline);
+                }
                 if (EditViewModel.SelectedItems.Any())
                 {
                     CurrentStatus = ActiveSelText;
@@ -194,6 +199,10 @@ namespace Chem4Word.ACME.Behaviors
             else if (visual is BondVisual bv)
             {
                 currentObject = bv.ParentBond;
+            }
+            else if (visual is GroupVisual gv)
+            {
+                currentObject = gv.ParentMolecule;
             }
 
             return currentObject;
@@ -228,7 +237,7 @@ namespace Chem4Word.ACME.Behaviors
 
                     _lassoAdorner.Outline = outline;
 
-                    ModifySelection(outline);
+                    
                 }
                 else
                 {
@@ -433,6 +442,7 @@ namespace Chem4Word.ACME.Behaviors
         private void DoMolSelect(MouseButtonEventArgs e)
         {
             var activeVisual = CurrentEditor.ActiveVisual;
+            CurrentEditor.ActiveVisual = null;
 
             switch (activeVisual)
             {
@@ -466,9 +476,24 @@ namespace Chem4Word.ACME.Behaviors
         private void ToggleSelect(MouseButtonEventArgs e)
         {
             var activeVisual = CurrentEditor.ActiveVisual;
+            CurrentEditor.ActiveVisual = null;
 
             switch (activeVisual)
             {
+                case GroupVisual gv:
+                    var mol = gv.ParentMolecule;
+                    if (!EditViewModel.SelectedItems.Contains(mol))
+                    {
+                        EditViewModel.AddToSelection(mol);
+                    }
+                    else
+                    {
+                        EditViewModel.RemoveFromSelection(mol);
+                    }
+
+                    CurrentStatus = ActiveSelText;
+                    break;
+
                 case AtomVisual av:
                     {
                         var atom = av.ParentAtom;
@@ -479,7 +504,6 @@ namespace Chem4Word.ACME.Behaviors
                         }
                         else
                         {
-                            //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
                             if (!EditViewModel.SelectedItems.Contains(atom))
                             {
                                 EditViewModel.AddToSelection(atom);
@@ -501,7 +525,7 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             EditViewModel.AddToSelection(rootMolecule);
                         }
-                        //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(CurrentEditor).X},{e.GetPosition(CurrentEditor).Y})");
+
                         if (!EditViewModel.SelectedItems.Contains(bond))
                         {
                             EditViewModel.AddToSelection(bond);
@@ -530,7 +554,12 @@ namespace Chem4Word.ACME.Behaviors
             var id = ((GeometryHitTestResult)result).IntersectionDetail;
 
             var myShape = result.VisualHit;
-            if (myShape != null && myShape is AtomVisual | myShape is BondVisual)
+            if (myShape is GroupVisual selGroup)
+            {
+                EditViewModel.AddToSelection(selGroup.ParentMolecule);
+                return HitTestResultBehavior.Stop;
+            }
+            if (myShape != null && myShape is AtomVisual  | myShape is BondVisual )
             {
                 switch (id)
                 {

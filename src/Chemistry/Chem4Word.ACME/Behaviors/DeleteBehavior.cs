@@ -15,16 +15,10 @@ namespace Chem4Word.ACME.Behaviors
 {
     public class DeleteBehavior : BaseEditBehavior
     {
-        //private bool _lassoVisible;
-        //private PointCollection _mouseTrack;
-        //private Point _startpoint;
+      
         private Window _parent;
 
         private Cursor _cursor;
-
-        //private bool _flag;
-        //private LassoAdorner _lassoAdorner;
-        //private MoleculeSelectionAdorner _molAdorner;
 
         public override void Abort()
         {
@@ -55,7 +49,14 @@ namespace Chem4Word.ACME.Behaviors
         private void CurrentEditor_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             var hitTestResult = CurrentEditor.ActiveVisual;
-            if (hitTestResult is AtomVisual atomVisual)
+            if (hitTestResult is GroupVisual gv)
+            {
+                var parent = gv.ParentMolecule;
+                EditViewModel.DeleteMolecule(parent);
+                CurrentStatus="Group deleted";
+
+            }
+            else if (hitTestResult is AtomVisual atomVisual)
             {
                 var atom = atomVisual.ParentAtom;
                 this.EditViewModel.DeleteAtoms(new[] { atom });

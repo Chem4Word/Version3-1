@@ -627,8 +627,8 @@ namespace Chem4Word.Model2
             NotifyCollectionChangedEventArgs e =
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
                     new List<Molecule> { newMol });
-            OnMoleculesChanged(this, e);
             UpdateMoleculeEventHandlers(e);
+            OnMoleculesChanged(this, e);
             return newMol;
         }
 
