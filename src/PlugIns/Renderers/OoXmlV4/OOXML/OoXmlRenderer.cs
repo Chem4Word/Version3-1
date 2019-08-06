@@ -88,27 +88,27 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             var chars = _atomLabelCharacters.Where(m => m.ParentMolecule.StartsWith(mol.Path)).ToList();
 
-            double xMin = mol.BoundingBox.Left;
-            double xMax = mol.BoundingBox.Right;
-            double yMin = mol.BoundingBox.Top;
-            double yMax = mol.BoundingBox.Bottom;
+            Rect result = mol.BoundingBox;
+
             foreach (var c in chars)
             {
-                xMin = Math.Min(xMin, c.Position.X);
-                yMin = Math.Min(yMin, c.Position.Y);
                 if (c.IsSmaller)
                 {
-                    xMax = Math.Max(xMax, c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _chemistryModel.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR);
-                    yMax = Math.Max(yMax, c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _chemistryModel.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR);
+                    Rect r = new Rect(c.Position,
+                                      new Size(OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                               OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                    result.Union(r);
                 }
                 else
                 {
-                    xMax = Math.Max(xMax, c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _chemistryModel.MeanBondLength));
-                    yMax = Math.Max(yMax, c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _chemistryModel.MeanBondLength));
+                    Rect r = new Rect(c.Position,
+                                      new Size(OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _medianBondLength),
+                                               OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _medianBondLength)));
+                    result.Union(r);
                 }
             }
 
-            return new Rect(new Point(xMin, yMin), new Point(xMax, yMax));
+            return result;
         }
 
         public Run GenerateRun()
@@ -135,6 +135,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             //set the median bond length
             _medianBondLength = _chemistryModel.MeanBondLength;
+            if (_chemistryModel.GetAllBonds().Count == 0)
+            {
+                _medianBondLength = _options.BondLength;
+            }
 
             int moleculeNo = 0;
             foreach (Molecule mol in _chemistryModel.Molecules.Values)
@@ -145,7 +149,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             //Debug.WriteLine($"{module} Starting Step 3");
             //_telemetry.Write(module, "Verbose", "Starting Step 3");
 
-            IncreaseCanvasSize();
+            SetCanvasSize();
 
             //Debug.WriteLine("Elapsed time " + sw.ElapsedMilliseconds.ToString("##,##0") + "ms");
             //_telemetry.Write(module, "Timing", "Step 3 took " + sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
@@ -196,7 +200,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 foreach (var group in _listOfGroups)
                 {
-                    DrawGroupBrackets(wordprocessingGroup1, group.BoundingBox, _chemistryModel.MeanBondLength / 2, OoXmlHelper.ACS_LINE_WIDTH * 2, "2A579A");
+                    DrawGroupBrackets(wordprocessingGroup1, group.BoundingBox, _medianBondLength / 2, OoXmlHelper.ACS_LINE_WIDTH * 2, "2A579A");
                 }
             }
 
@@ -236,13 +240,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     foreach (var alc in chars)
                     {
                         Rect thisBoundingBox = thisBoundingBox = new Rect(alc.Position,
-                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _chemistryModel.MeanBondLength),
-                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _chemistryModel.MeanBondLength)));
+                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
+                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
                         if (alc.IsSmaller)
                         {
                             thisBoundingBox = new Rect(alc.Position,
-                                new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _chemistryModel.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _chemistryModel.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                                new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
                         }
 
                         atomCharsRect.Union(thisBoundingBox);
@@ -314,7 +318,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             sw.Reset();
             sw.Start();
 
-            double abl = _chemistryModel.MeanBondLength;
+            double abl = _medianBondLength;
             //Debug.WriteLine("Elapsed time for GenerateRun " + swr.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture) + "ms");
             _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0")} ms; Average Bond Length: {abl.ToString("#0.00")}");
 
@@ -366,8 +370,22 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 Rect r1 = mol.BoundingBox;
                 Rect r2 = CharacterExtents(mol);
                 r2.Union(r1);
+
+                // Handle optional rendering of molecule labels
+                if (_options.ShowMoleculeLabels && mol.Labels.Any())
+                {
+                    var point = new Point(r2.Left + r2.Width / 2, r2.Bottom + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 4);
+                    var alp = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
+                    alp.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
+
+                    // Recalculate r2 as we have just added extra characters
+                    r2 = CharacterExtents(mol);
+                    r2.Union(r1);
+                }
+
                 _boundingBoxesOfMoleculeAtoms.Add(r1);
                 _boundingBoxesOfMoleculesIncludingCharacters.Add(r2);
+
 
                 if (mol.IsGrouped)
                 {
@@ -583,8 +601,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 pb.Increment(1);
 
-                double width = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _chemistryModel.MeanBondLength);
-                double height = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _chemistryModel.MeanBondLength);
+                double width = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength);
+                double height = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength);
 
                 if (alc.IsSubScript)
                 {
@@ -676,37 +694,30 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 }
             }
         }
-
-        private void IncreaseCanvasSize()
+        /// <summary>
+        /// Sets the canvas size to accomodate any extra space required by label characters
+        /// </summary>
+        private void SetCanvasSize()
         {
-            // to accomodate extra space required by label characters
-
-            //Debug.WriteLine(m_canvasExtents);
-
-            double xMin = _boundingBoxOfAllAtoms.Left;
-            double xMax = _boundingBoxOfAllAtoms.Right;
-            double yMin = _boundingBoxOfAllAtoms.Top;
-            double yMax = _boundingBoxOfAllAtoms.Bottom;
+            _boundingBoxOfAllCharacters = _boundingBoxOfAllAtoms;
 
             foreach (AtomLabelCharacter alc in _atomLabelCharacters)
             {
-                xMin = Math.Min(xMin, alc.Position.X);
-                yMin = Math.Min(yMin, alc.Position.Y);
                 if (alc.IsSubScript)
                 {
-                    xMax = Math.Max(xMax, alc.Position.X + OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _chemistryModel.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR);
-                    yMax = Math.Max(yMax, alc.Position.Y + OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _chemistryModel.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR);
+                    Rect r = new Rect(alc.Position,
+                        new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                 OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                    _boundingBoxOfAllCharacters.Union(r);
                 }
                 else
                 {
-                    xMax = Math.Max(xMax, alc.Position.X + OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _chemistryModel.MeanBondLength));
-                    yMax = Math.Max(yMax, alc.Position.Y + OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _chemistryModel.MeanBondLength));
+                    Rect r = new Rect(alc.Position,
+                                      new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
+                                               OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
+                    _boundingBoxOfAllCharacters.Union(r);
                 }
             }
-
-            // Create new canvas extents
-            _boundingBoxOfAllCharacters = new Rect(xMin, yMin,
-                xMax - xMin, yMax - yMin);
 
             foreach (var group in _listOfGroups)
             {
@@ -714,7 +725,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
 
             _boundingBoxOfAllCharacters.Inflate(OoXmlHelper.DRAWING_MARGIN, OoXmlHelper.DRAWING_MARGIN);
-            //Debug.WriteLine(m_canvasExtents);
         }
 
         private void ProcessBonds(Molecule mol, Progress pb, int moleculeNo)

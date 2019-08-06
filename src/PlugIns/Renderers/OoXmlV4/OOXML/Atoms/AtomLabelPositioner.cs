@@ -41,12 +41,78 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             _meanBondLength = meanBondLength;
         }
 
-        public void CreateMoleculeLabelCharacters(List<TextualProperty> labels, Point bottomCentre)
+        public void AddMoleculeLabels(List<TextualProperty> labels, Point centrePoint, string moleculePath)
         {
+            Point measure = new Point(centrePoint.X, centrePoint.Y);
+
             foreach (var label in labels)
             {
-                // 1. Measure
-                // 2. Insert
+                // 1. Measure string
+                var bb = MeasureString(label.Value, measure);
+
+                // 2. Place string
+                if (bb != Rect.Empty)
+                {
+                    Point place = new Point(measure.X - bb.Width / 2, measure.Y + bb.Height);
+                    PlaceString(label.Value, place, moleculePath);
+                }
+
+                // 3. Move to next line
+                measure.Offset(0, bb.Height + _meanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
+            }
+        }
+
+        private Rect MeasureString(string text, Point startPoint)
+        {
+            Rect boundingBox = Rect.Empty;
+            Point cursor = new Point(startPoint.X, startPoint.Y);
+
+            for (int idx = 0; idx < text.Length; idx++)
+            {
+                char chr = text[idx];
+                TtfCharacter c = _TtfCharacterSet[chr];
+                if (c != null)
+                {
+                    Point position = GetCharacterPosition(cursor, c);
+
+                    Rect thisRect = new Rect(new Point(position.X, position.Y),
+                                    new Size(OoXmlHelper.ScaleCsTtfToCml(c.Width, _meanBondLength),
+                                             OoXmlHelper.ScaleCsTtfToCml(c.Height, _meanBondLength)));
+
+                    boundingBox.Union(thisRect);
+
+                    if (idx < text.Length - 1)
+                    {
+                        // Move to next Character position
+                        cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
+                    }
+                }
+            }
+
+            return boundingBox;
+        }
+
+        private void PlaceString(string text, Point startPoint, string path)
+        {
+            Point cursor = new Point(startPoint.X, startPoint.Y);
+
+            for (int idx = 0; idx < text.Length; idx++)
+            {
+                char chr = text[idx];
+                TtfCharacter c = _TtfCharacterSet[chr];
+                if (c != null)
+                {
+                    Point position = GetCharacterPosition(cursor, c);
+
+                    AtomLabelCharacter alc = new AtomLabelCharacter(position, c, "000000", chr, path, path);
+                    _AtomLabelCharacters.Add(alc);
+
+                    if (idx < text.Length - 1)
+                    {
+                        // Move to next Character position
+                        cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
+                    }
+                }
             }
         }
 

@@ -199,6 +199,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         {
             chkColouredAtoms.Checked = RendererOptions.ColouredAtoms;
             chkShowHydrogens.Checked = RendererOptions.ShowHydrogens;
+            ShowMoleculeLabels.Checked = RendererOptions.ShowMoleculeLabels;
 
             chkClipLines.Checked = RendererOptions.ClipLines;
             chkShowCharacterBox.Checked = RendererOptions.ShowCharacterBoundingBoxes;

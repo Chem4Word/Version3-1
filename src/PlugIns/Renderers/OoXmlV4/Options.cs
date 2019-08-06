@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.Helpers;
 using Newtonsoft.Json;
 
 namespace Chem4Word.Renderer.OoXmlV4
@@ -20,6 +21,10 @@ namespace Chem4Word.Renderer.OoXmlV4
 
         [JsonProperty]
         public bool ShowMoleculeGroups { get; set; }
+
+        // Not editable here, kept in sync by file system watcher
+        [JsonProperty]
+        public int BondLength { get; set; }
 
         // Debugging
         [JsonProperty]
@@ -62,6 +67,8 @@ namespace Chem4Word.Renderer.OoXmlV4
             clone.ShowHydrogens = ShowHydrogens;
             clone.ShowMoleculeGroups = ShowMoleculeGroups;
 
+            clone.BondLength = BondLength;
+
             // Debugging Options
             clone.ClipLines = ClipLines;
             clone.ShowCharacterBoundingBoxes = ShowCharacterBoundingBoxes;
@@ -79,6 +86,8 @@ namespace Chem4Word.Renderer.OoXmlV4
             ShowHydrogens = true;
             ColouredAtoms = true;
             ShowMoleculeGroups = true;
+
+            BondLength = (int)Constants.StandardBondLength;
 
             // Debugging Options
             ClipLines = true;

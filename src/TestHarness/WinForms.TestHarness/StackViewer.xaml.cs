@@ -7,7 +7,7 @@
 
 using System.Windows.Controls;
 
-namespace WinFormsTestHarness
+namespace WinForms.TestHarness
 {
     /// <summary>
     /// Interaction logic for StackViewer.xaml
