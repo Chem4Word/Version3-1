@@ -50,15 +50,16 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 // 1. Measure string
                 var bb = MeasureString(label.Value, measure);
 
-                // 2. Place string
+                // 2. Place string such that they are hanging below the "line"
                 if (bb != Rect.Empty)
                 {
-                    Point place = new Point(measure.X - bb.Width / 2, measure.Y + bb.Height);
+                    Point place = new Point(measure.X - bb.Width / 2, measure.Y + (measure.Y - bb.Top));
+                    Debug.WriteLine($"Y1: {centrePoint.Y} Top: {bb.Top} Y2: {place.Y}");
                     PlaceString(label.Value, place, moleculePath);
                 }
 
                 // 3. Move to next line
-                measure.Offset(0, bb.Height + _meanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
+                measure.Offset(0, bb.Height + _meanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
             }
         }
 

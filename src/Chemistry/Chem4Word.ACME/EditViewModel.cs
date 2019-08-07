@@ -33,6 +33,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using static Chem4Word.Model2.Helpers.Globals;
+// ReSharper disable ConvertToLocalFunction
 
 namespace Chem4Word.ACME
 {
@@ -1077,10 +1078,14 @@ namespace Chem4Word.ACME
             OnPropertyChanged(nameof(SelectedElement));
             OnPropertyChanged(nameof(SelectedBondOptionId));
             OnPropertyChanged(nameof(SelectionType));
-
+            //tell the editor what commands are allowable
             UpdateCommandStatuses();
         }
 
+        /// <summary>
+        /// Updates the command status.  Should generally only be called
+        /// after the active selection is changed
+        /// </summary>
         private void UpdateCommandStatuses()
         {
             CopyCommand.RaiseCanExecChanged();
@@ -2519,23 +2524,31 @@ namespace Chem4Word.ACME
         /// <param name="selection">Active selection within the editor</param>
         public void UnGroup(ObservableCollection<object> selection)
         {
-            UndoManager.BeginUndoBlock();
-            
-            //grab just the grouped molecules first
-            var selGroups = from Molecule mol in selection.OfType<Molecule>()
-                            where mol.IsGrouped
-                            select mol;
-            //keep track of parent child relationships for later
-            Dictionary < Molecule, List<Molecule>> parentsAndChildren = new Dictionary<Molecule, List<Molecule>>();
 
-            foreach (Molecule group in selGroups)
+            List<Molecule> selGroups;
+            //grab just the grouped molecules first
+            selGroups = (from Molecule mol in selection.OfType<Molecule>()
+                         where mol.IsGrouped
+                         select mol).ToList();
+            UnGroup(selGroups);
+        }
+
+        private void UnGroup(List<Molecule> selGroups)
+        {
+
+            //keep track of parent child relationships for later
+            Dictionary<Molecule, List<Molecule>> parentsAndChildren = new Dictionary<Molecule, List<Molecule>>();
+
+            foreach (Molecule selGroup in selGroups)
             {
-                parentsAndChildren[group] = new List<Molecule>();
-                foreach (Molecule child in group.Molecules.Values)
+                parentsAndChildren[selGroup] = new List<Molecule>();
+                foreach (Molecule child in selGroup.Molecules.Values)
                 {
-                    parentsAndChildren[group].Add(child);
+                    parentsAndChildren[selGroup].Add(child);
                 }
             }
+
+            UndoManager.BeginUndoBlock();
 
             Action redo = () =>
                           {
@@ -2550,7 +2563,6 @@ namespace Chem4Word.ACME
                                       Model.AddMolecule(child);
                                       child.UpdateVisual();
                                   }
-                                  
                               }
 
                               foreach (List<Molecule> molecules in parentsAndChildren.Values)
@@ -2560,6 +2572,7 @@ namespace Chem4Word.ACME
                                       AddToSelection(child);
                                   }
                               }
+
                               ActiveMode.CurrentStatus = "Ungrouped.";
                           };
             Action undo = () =>
@@ -2575,14 +2588,86 @@ namespace Chem4Word.ACME
                                       oldParent.Key.AddMolecule(child);
                                       child.UpdateVisual();
                                   }
-                              
+
                                   oldParent.Key.UpdateVisual();
                               }
+
                               foreach (Molecule parent in parentsAndChildren.Keys)
                               {
                                   AddToSelection(parent);
                               }
+
                               ActiveMode.CurrentStatus = "Grouped.";
+                          };
+            redo();
+            UndoManager.RecordAction(undo, redo);
+            UndoManager.EndUndoBlock();
+        }
+
+        /// <summary>
+        ///  Creates a parent molecule and makes all the selected molecules children
+        /// </summary>
+        /// <param name="selection">Observable collection of ChemistryBase objects</param>
+        public void Group(ObservableCollection<object> selection)
+        {
+
+            List<Molecule> children;
+            //grab just the grouped molecules first
+            children = (from Molecule mol in selection.OfType<Molecule>()
+                        select mol).ToList();
+            Group(children);
+        }
+
+        /// <summary>
+        /// Creates a parent molecule and makes all the selected molecules children
+        /// </summary>
+        /// <param name="children">List of child molecules</param>
+        public void Group(List<Molecule> children)
+        {
+            UndoManager.BeginUndoBlock();
+
+            Molecule parent = new Molecule();
+            Action redo = () =>
+                          {
+                              SelectedItems.Clear();
+                              parent.Parent = Model;
+                              Model.AddMolecule(parent);
+                              var kids = children.ToArray();
+                              foreach (var molecule in kids)
+                              {
+                                  if (Model.Molecules.Values.Contains(molecule))
+                                  {
+                                      
+                                      Model.RemoveMolecule(molecule);
+                                      molecule.Parent = parent;
+                                      parent.AddMolecule(molecule);
+                                  }
+
+                              }
+
+                              parent.UpdateVisual();
+                              AddToSelection(parent);
+                          };
+            Action undo = () =>
+                          {
+                              SelectedItems.Clear();
+
+                              Model.RemoveMolecule(parent);
+                              parent.Parent = null;
+                              var kids = parent.Molecules.Values.ToArray();
+                              foreach (var child in kids)
+                              {
+                                  if (parent.Molecules.Values.Contains(child))
+                                  {
+                                      parent.RemoveMolecule(child);
+                                      
+                                      child.Parent = Model;
+                                      Model.AddMolecule(child);
+                                      child.UpdateVisual();
+                                      AddToSelection(child);
+                                  }
+
+                              }
                           };
             redo();
             UndoManager.RecordAction(undo, redo);

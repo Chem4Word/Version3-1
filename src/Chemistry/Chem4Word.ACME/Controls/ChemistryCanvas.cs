@@ -557,10 +557,13 @@ namespace Chem4Word.ACME.Controls
         {
             if (molecule.IsGrouped)
             {
-                var gv = (GroupVisual) chemicalVisuals[molecule];
+                if (chemicalVisuals.TryGetValue(molecule, out DrawingVisual dv))
+                {
+                    var gv = (GroupVisual) dv;
 
-                DeleteVisual(gv);
-                chemicalVisuals.Remove(molecule);
+                    DeleteVisual(gv);
+                    chemicalVisuals.Remove(molecule);
+                }
             }
 
             foreach (Atom moleculeAtom in molecule.Atoms.Values)
@@ -630,16 +633,21 @@ namespace Chem4Word.ACME.Controls
 
         private void AtomRemoved(Atom atom)
         {
-            var av = (AtomVisual) chemicalVisuals[atom];
+            if (chemicalVisuals.TryGetValue(atom, out DrawingVisual dv))
+            {
 
-            if (av.RefCount == 1) //removing this atom will remove the last visual
-            {
-                DeleteVisual(av);
-                chemicalVisuals.Remove(atom);
-            }
-            else
-            {
-                av.RefCount--;
+
+                var av = (AtomVisual) dv;
+
+                if (av.RefCount == 1) //removing this atom will remove the last visual
+                {
+                    DeleteVisual(av);
+                    chemicalVisuals.Remove(atom);
+                }
+                else
+                {
+                    av.RefCount--;
+                }
             }
         }
 
@@ -666,16 +674,19 @@ namespace Chem4Word.ACME.Controls
 
         private void BondRemoved(Bond bond)
         {
-            var bv = (BondVisual) chemicalVisuals[bond];
+            if (chemicalVisuals.TryGetValue(bond, out DrawingVisual dv))
+            {
+                var bv =(BondVisual) dv;
 
-            if (bv.RefCount == 1) //removing this atom will remove the last visual
-            {
-                DeleteVisual(bv);
-                chemicalVisuals.Remove(bond);
-            }
-            else
-            {
-                bv.RefCount--;
+                if (bv.RefCount == 1) //removing this atom will remove the last visual
+                {
+                    DeleteVisual(bv);
+                    chemicalVisuals.Remove(bond);
+                }
+                else
+                {
+                    bv.RefCount--;
+                }
             }
         }
 

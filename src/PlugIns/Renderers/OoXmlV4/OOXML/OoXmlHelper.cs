@@ -5,14 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using A = DocumentFormat.OpenXml.Drawing;
-using Drawing = DocumentFormat.OpenXml.Wordprocessing.Drawing;
-using Point = System.Windows.Point;
-using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
-using Wp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
-using Wpg = DocumentFormat.OpenXml.Office2010.Word.DrawingGroup;
-using Wps = DocumentFormat.OpenXml.Office2010.Word.DrawingShape;
 using DocumentFormat.OpenXml;
+using A = DocumentFormat.OpenXml.Drawing;
+using Wps = DocumentFormat.OpenXml.Office2010.Word.DrawingShape;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
 {
@@ -39,10 +34,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         public const int ACS_LINE_WIDTH_EMUS = 7620;    // This makes bond line width equal to ACS Guide of 0.6pt
         private const int EMUS_PER_CML_POINT = 9144;    // This makes cml bond length of 20 equal ACS guide 0.2" (0.508cm)
 
-        // These calculations yield a font which has a point size of 9 at a bond length of 20
+        // These calculations yield a font which has a point size of 8 at a bond length of 20
         private static double EmusPerCsTtfPoint(double bondLength)
         {
-            return bondLength / 2.5 + 1;
+            return bondLength / 2.5;
         }
 
         private static double EmusPerCsTtfPointSubscript(double bondLength)

@@ -1610,20 +1610,6 @@ namespace Chem4Word.Model2
             return overlap;
         }
 
-        public void Transform(Transform lastOperation)
-        {
-            foreach (Atom atom in Atoms.Values)
-            {
-                atom.Position = lastOperation.Transform(atom.Position);
-                atom.UpdateVisual();
-            }
-            foreach (Molecule mol in Molecules.Values)
-            {
-                mol.Transform(lastOperation);
-                mol.UpdateVisual();
-            }
-            UpdateVisual();
-        }
 
 
         public void ClearProperties()
@@ -1851,6 +1837,28 @@ namespace Chem4Word.Model2
             {
                 bond.Parent = this;
             }
+        }
+
+        public void Transform(Transform lastOperation)
+        {
+            if (!IsGrouped)
+            {
+                foreach (Atom atom in Atoms.Values)
+                {
+                    atom.Position = lastOperation.Transform(atom.Position);
+                    atom.UpdateVisual();
+                }
+            }
+            else
+            {
+                foreach (Molecule mol in Molecules.Values)
+                {
+                    mol.Transform(lastOperation);
+                    mol.UpdateVisual();
+                }
+            }
+
+            UpdateVisual();
         }
     }
 }

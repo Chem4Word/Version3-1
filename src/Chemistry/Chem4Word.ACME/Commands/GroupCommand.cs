@@ -27,7 +27,7 @@ namespace Chem4Word.ACME.Commands
 
         public override void Execute(object parameter)
         {
-            MessageBox.Show("Grouping code goes here");
+            EditViewModel.Group(EditViewModel.SelectedItems);
         }
     }
 }

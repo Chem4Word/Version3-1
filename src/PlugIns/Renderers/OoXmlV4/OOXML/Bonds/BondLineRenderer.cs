@@ -37,8 +37,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         public void DrawWedgeBond(Wpg.WordprocessingGroup wordprocessingGroup, BondLine bl)
         {
-            BondLine leftBondLine = bl.GetParallel(BondOffset());
-            BondLine rightBondLine = bl.GetParallel(-BondOffset());
+            BondLine leftBondLine = bl.GetParallel(BondOffset() /2);
+            BondLine rightBondLine = bl.GetParallel(- BondOffset() / 2);
 
             List<Point> points = new List<Point>();
             points.Add(new Point(bl.Start.X, bl.Start.Y));

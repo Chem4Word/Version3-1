@@ -557,7 +557,7 @@ namespace Chem4Word.ACME.Behaviors
             if (myShape is GroupVisual selGroup)
             {
                 EditViewModel.AddToSelection(selGroup.ParentMolecule);
-                return HitTestResultBehavior.Stop;
+                return HitTestResultBehavior.Continue;
             }
             if (myShape != null && myShape is AtomVisual  | myShape is BondVisual )
             {

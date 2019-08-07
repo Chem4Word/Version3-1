@@ -374,7 +374,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 // Handle optional rendering of molecule labels
                 if (_options.ShowMoleculeLabels && mol.Labels.Any())
                 {
-                    var point = new Point(r2.Left + r2.Width / 2, r2.Bottom + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 4);
+                    var point = new Point(r2.Left + r2.Width / 2, r2.Bottom + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
+
                     var alp = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
                     alp.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
 
@@ -385,7 +386,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 _boundingBoxesOfMoleculeAtoms.Add(r1);
                 _boundingBoxesOfMoleculesIncludingCharacters.Add(r2);
-
 
                 if (mol.IsGrouped)
                 {
@@ -665,7 +665,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             bClipped = true;
                         }
 
-                        if (!bClipped)
+                        if (!bClipped && bl.Bond != null)
                         {
                             // Only convert to two bond lines if not wedge or hatch
                             bool ignoreWedgeOrHatch = bl.Bond.Order == Globals.OrderSingle

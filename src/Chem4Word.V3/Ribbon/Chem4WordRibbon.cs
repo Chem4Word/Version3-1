@@ -741,7 +741,6 @@ namespace Chem4Word
                                 Model temp = new Model();
                                 var mol = molecule.Copy();
                                 temp.AddMolecule(mol);
-                                mol.Parent = temp;
 
                                 int maxAtomicNumber = temp.MaxAtomicNumber;
                                 int minAtomicNumber = temp.MinAtomicNumber;
