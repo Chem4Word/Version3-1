@@ -508,7 +508,7 @@
                             </UniformGrid.Resources>
                             <Button Name="BenzeneButton" ToolTip="Benzene">
                                 <Viewbox>
-                                    <Path Style="{StaticResource BenzeneStyle}" />
+                                   <StaticResource ResourceKey="BenzenePath"/>
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
@@ -518,7 +518,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cyclohexane">
-                                <Path Style="{StaticResource CyclohexStyle}" />
+                                <StaticResource ResourceKey="CyclohexanePath"/>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -527,7 +527,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cyclopentane">
-                                <Path Style="{StaticResource CyclopentStyle}" />
+                                <StaticResource ResourceKey="CyclopentanePath"/>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -536,7 +536,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cyclopentadiene">
-                                <Path Style="{StaticResource CyclopentadieneStyle}" />
+                               <StaticResource ResourceKey="CyclopentadienePath"/>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -545,7 +545,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cycloheptane">
-                                <Path Style="{StaticResource CycloheptaneStyle}" />
+                                <StaticResource ResourceKey="CycloheptanePath"/>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -628,11 +628,12 @@
                     Click="ModeButton_OnChecked"
                     GroupName="Actions"
                     ToolTip="Draw Chain">
-                    <Path Style="{StaticResource ChainStyle}">
-                        <Path.LayoutTransform>
-                            <RotateTransform Angle="180" />
-                        </Path.LayoutTransform>
-                    </Path>
+                    <Viewbox>
+                        <StaticResource ResourceKey="ChainPath"/>
+                        <Viewbox.LayoutTransform>
+                            <RotateTransform Angle="180"/>
+                        </Viewbox.LayoutTransform>
+                    </Viewbox>
                     <RadioButton.Tag>
                         <behaviors:ChainBehavior EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
                     </RadioButton.Tag>

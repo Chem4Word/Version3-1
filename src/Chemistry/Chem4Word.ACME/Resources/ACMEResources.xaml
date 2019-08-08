@@ -47,41 +47,39 @@
         <Setter Property="Stroke" Value="{x:Null}" />
     </Style>
 
-    <Style x:Key="BenzeneStyle" TargetType="Path">
-        <Setter Property="Tag" Value="Benzene" />
+    <Style TargetType="{x:Type Path}" x:Key="RingButtonGraphic">
         <Setter Property="Height" Value="24" />
         <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
         <Setter Property="Width" Value="24" />
-        <Setter Property="Data"
-                Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z M 5.50480947161671,8.24 L 12,4.5 M 18.4951905283833,8.24 L 18.4951905283833,15.75 M 12,19.5 L 5.50480947161671, 15.75" />
     </Style>
-
-    <Style x:Key="CyclohexStyle" TargetType="Path">
-        <Setter Property="Tag" Value="Cyclohexane" />
-        <Setter Property="Height" Value="24" />
-        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Data"
-                Value="M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z" />
-    </Style>
-
-    <Style x:Key="CyclopentStyle" TargetType="Path">
-        <Setter Property="Tag" Value="Cyclopentane" />
-        <Setter Property="Height" Value="25" />
-        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Data"
-                Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z" />
-    </Style>
-
-    <Style x:Key="CyclopentadieneStyle" TargetType="Path">
-        <Setter Property="Tag" Value="Cyclopentadiene" />
-        <Setter Property="Height" Value="25" />
-        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Data"
-                Value="M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z M 12,20.5 M 5.52786404500042,15.7977179816602 L 8,8.18926585129899 M 16,8.18926585129899 L 18.4721359549996,15.7977179816602" />
-    </Style>
+    <Path x:Key="BenzenePath" Style="{StaticResource RingButtonGraphic}" Tag="Benzene">
+        <Path.Data>M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z M 5.50480947161671,8.24 L 12,4.5 M 18.4951905283833,8.24 L 18.4951905283833,15.75 M 12,19.5 L 5.50480947161671, 15.75</Path.Data>
+    </Path>
+    <Path x:Key="CyclohexanePath" Style="{StaticResource RingButtonGraphic}" Tag="Cyclohexane">
+        <Path.Data>M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z</Path.Data>
+    </Path>
+    <Path x:Key="CyclopentanePath" Style="{StaticResource RingButtonGraphic}" Tag="Cyclohexane" Height="25">
+        <Path.Data>M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z</Path.Data>
+    </Path>
+    
+    <Path x:Key="CyclopentadienePath" Style="{StaticResource RingButtonGraphic}" Height="25" Tag="Cyclopentadiene">
+        <Path.Data>M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z M 12,20.5 M 5.52786404500042,15.7977179816602 L 8,8.18926585129899 M 16,8.18926585129899 L 18.4721359549996,15.7977179816602</Path.Data>
+    </Path>
+    <Path x:Key="CycloheptanePath" Style="{StaticResource RingButtonGraphic}" Tag="Cycloheptane">
+        <Path.Data>M4,0L11.2077509432194,3.47106991294047L12.9879184148699,11.2704932103951L8,17.5251450701393L-3.5527136788005E-15,17.5251450701393L-4.98791841486987,11.2704932103951L-3.20775094321936,3.47106991294046z</Path.Data>
+        <Path.RenderTransform>
+            <TranslateTransform X="7.5" Y="5" />
+        </Path.RenderTransform>
+    </Path>
+    <Path x:Key="CyclooctanePath" Style="{StaticResource RingButtonGraphic}" Tag="Cyclooctane">
+        <Path.Data>M4,0L11.3910362600903,3.06146745892072L14.452503719011,10.452503719011L11.3910362600903,17.8435399791013L4,20.905007438022L-3.39103626009029,17.8435399791013L-6.45250371901101,10.452503719011L-3.3910362600903,3.06146745892072z</Path.Data>
+        <Path.RenderTransform>
+            <TranslateTransform X="7.5" Y="5" />
+        </Path.RenderTransform>
+    </Path>
+    <Path x:Key="ChainPath" Style="{StaticResource RingButtonGraphic}" Tag="Chain" StrokeThickness="2">
+        <Path.Data>M 0, 12 L 8.66025403784439, 18 L 17.3205080756888, 12 L 25.9807621135332, 18</Path.Data>
+    </Path>
     <graphics:RegularPolygon
         x:Key="Heptagon"
         PointCount="7"
@@ -90,71 +88,8 @@
         x:Key="Octagon"
         PointCount="8"
         SideLength="8.0" />
-    <Style x:Key="CycloheptaneStyle" TargetType="Path">
-        <Setter Property="Tag" Value="Cycloheptane" />
-        <Setter Property="Height" Value="24" />
-        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
-        <Setter Property="StrokeThickness" Value="1" />
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Data"
-                Value="M4,0L11.2077509432194,3.47106991294047L12.9879184148699,11.2704932103951L8,17.5251450701393L-3.5527136788005E-15,17.5251450701393L-4.98791841486987,11.2704932103951L-3.20775094321936,3.47106991294046z" />
-        <Setter Property="RenderTransform">
-            <Setter.Value>
-                <TranslateTransform X="7.5" Y="5" />
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style x:Key="CyclooctaneStyle" TargetType="Path">
-        <Setter Property="Tag" Value="Cyclooctane" />
-        <Setter Property="Height" Value="24" />
-        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Data"
-                Value="M4,0L11.3910362600903,3.06146745892072L14.452503719011,10.452503719011L11.3910362600903,17.8435399791013L4,20.905007438022L-3.39103626009029,17.8435399791013L-6.45250371901101,10.452503719011L-3.3910362600903,3.06146745892072z" />
-        <Setter Property="RenderTransform">
-            <Setter.Value>
-                <TranslateTransform X="7.5" Y="3" />
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style x:Key="ChainStyle" TargetType="Path">
-        <Setter Property="Height" Value="24" />
-        <Setter Property="Stroke" Value="{StaticResource ResourceKey=Chem4WordBrush}" />
-        <Setter Property="Width" Value="24" />
-        <Setter Property="Data" Value="M 0, 12 L 8.66025403784439, 18 L 17.3205080756888, 12 L 25.9807621135332, 18" />
-    </Style>
 
     <!--  used to populate the bond dropdown combo  -->
-    <!--
-    <x:Array x:Key="BondItems" Type="{x:Type acme:BondOption}">
-        modify these options and you *must* modify LoadBondOptions() in chem4word.acme\editacme.csodel\editacme.cs  
-        <acme:BondOption
-            DisplayStyle="{StaticResource SingleBondStyle}"
-            Id="1"
-            Order="S"
-            Stereo="None" />
-        <acme:BondOption
-            DisplayStyle="{StaticResource DoubleBondStyle}"
-            Id="2"
-            Order="D"
-            Stereo="None" />
-        <acme:BondOption
-            DisplayStyle="{StaticResource TripleBondStyle}"
-            Id="3"
-            Order="T"
-            Stereo="None" />
-        <acme:BondOption
-            DisplayStyle="{StaticResource WedgeBondStyle}"
-            Id="4"
-            Order="S"
-            Stereo="Wedge" />
-        <acme:BondOption
-            DisplayStyle="{StaticResource HatchBondStyle}"
-            Id="5"
-            Order="S"
-            Stereo="Hatch" />
-    </x:Array>
--->
     <x:Array x:Key="AllowedBondLengths" Type="ComboBoxItem">
         <ComboBoxItem>5</ComboBoxItem>
         <ComboBoxItem>10</ComboBoxItem>
