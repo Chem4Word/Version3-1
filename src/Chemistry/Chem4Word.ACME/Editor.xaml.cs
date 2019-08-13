@@ -44,7 +44,15 @@ namespace Chem4Word.ACME
         }
 
         public Point TopLeft { get; set; }
-        public string SettingsFile { get; set; }
+
+        private Options _editorOptions;
+
+        public Options EditorOptions
+        {
+            get => _editorOptions;
+            set => _editorOptions = value;
+        }
+
         public IChem4WordTelemetry Telemetry { get; set; }
 
         public static readonly DependencyProperty SliderVisibilityProperty =
@@ -60,10 +68,11 @@ namespace Chem4Word.ACME
         /// <summary>
         /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         /// </summary>
-        public Editor(string cml, List<string> used1DProperties) : this()
+        public Editor(string cml, List<string> used1DProperties, Options options) : this()
         {
             _cml = cml;
             _used1DProperties = used1DProperties;
+            _editorOptions = options;
         }
 
         public Editor()
@@ -234,9 +243,18 @@ namespace Chem4Word.ACME
                 ChemCanvas.Chemistry = vm;
 
                 vm.Loading = true;
-                var mean = ActiveViewModel.Model.MeanBondLength / Globals.ScaleFactorForXaml;
-                var average = Math.Round(mean / 5.0) * 5;
-                vm.CurrentBondLength = average;
+
+                if (ActiveViewModel.Model.TotalBondsCount == 0)
+                {
+                    vm.CurrentBondLength = EditorOptions.BondLength;
+                }
+                else
+                {
+                    var mean = ActiveViewModel.Model.MeanBondLength / Globals.ScaleFactorForXaml;
+                    var average = Math.Round(mean / 5.0) * 5;
+                    vm.CurrentBondLength = average;
+                }
+
                 vm.Loading = false;
 
                 ScrollIntoView();
@@ -304,20 +322,30 @@ namespace Chem4Word.ACME
         /// </summary>
         private void ScrollIntoView()
         {
-            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Width: {ActiveViewModel.BoundingBox.Width}");
-            //Debug.WriteLine($"ScrollIntoView; BoundingBox.Height: {ActiveViewModel.BoundingBox.Height}");
-            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentWidth: {DrawingArea.ExtentWidth}");
-            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ExtentHeight: {DrawingArea.ExtentHeight}");
-            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportWidth: {DrawingArea.ViewportWidth}");
-            //Debug.WriteLine($"ScrollIntoView; DrawingArea.ViewportHeight: {DrawingArea.ViewportHeight}");
-
             DrawingArea.ScrollToHorizontalOffset((DrawingArea.ExtentWidth - DrawingArea.ViewportWidth) / 2);
             DrawingArea.ScrollToVerticalOffset((DrawingArea.ExtentHeight - DrawingArea.ViewportHeight) / 2);
         }
 
         private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            UIUtils.ShowAcmeSettings(ChemCanvas, SettingsFile, Telemetry, TopLeft);
+            UIUtils.ShowAcmeSettings(ChemCanvas, EditorOptions.SettingsFile, Telemetry, TopLeft);
+            // Re Load settings as they may have changed
+            EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
+            if (ActiveViewModel.Model.TotalAtomsCount == 0)
+            {
+                // Change current selection if the model is empty
+                foreach (ComboBoxItem item in BondLengthSelector.Items)
+                {
+                    if (int.Parse(item.Content.ToString()) == EditorOptions.BondLength)
+                    {
+                        ActiveViewModel.Loading = true;
+                        BondLengthSelector.SelectedItem = item;
+                        ActiveViewModel.CurrentBondLength = EditorOptions.BondLength;
+                        ActiveViewModel.Model.XamlBondLength = EditorOptions.BondLength * Globals.ScaleFactorForXaml;
+                        ActiveViewModel.Loading = false;
+                    }
+                }
+            }
         }
 
         private void SaveButton_OnClick(object sender, RoutedEventArgs e)

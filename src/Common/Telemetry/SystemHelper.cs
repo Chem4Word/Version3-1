@@ -274,7 +274,7 @@ namespace Chem4Word.Telemetry
             {
                 idx++;
                 var primary = screen.Primary ? "[P]" : "";
-                screens.Add($"#{idx}{primary}: X={screen.Bounds.X},Y={screen.Bounds.Y},W={screen.Bounds.Width},H={screen.Bounds.Height}");
+                screens.Add($"#{idx}{primary}: {screen.Bounds.Width}x{screen.Bounds.Height} @ {screen.Bounds.X},{screen.Bounds.Y}");
             }
 
             Screens = string.Join("; ", screens);

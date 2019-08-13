@@ -523,8 +523,8 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             if (AverageBondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
                 || AverageBondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
             {
-                BondLength.Text = Constants.StandardBondLength.ToString("0");
-                AverageBondLength = Constants.StandardBondLength;
+                BondLength.Text = UserOptions.BondLength.ToString("0");
+                AverageBondLength = UserOptions.BondLength;
             }
             else
             {

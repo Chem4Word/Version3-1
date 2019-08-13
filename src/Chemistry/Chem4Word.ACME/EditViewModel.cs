@@ -114,6 +114,7 @@ namespace Chem4Word.ACME
                 _currentBondLength = value;
                 OnPropertyChanged();
                 var scaled = value * ScaleFactorForXaml;
+                // Decide if we need to rescale to current drawing
                 if (!Loading && Math.Abs(Model.MeanBondLength - scaled) > 2.5)
                 {
                     SetAverageBondLength(scaled);

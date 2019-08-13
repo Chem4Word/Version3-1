@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
@@ -20,21 +21,19 @@ namespace Chem4Word.Editor.ACME
     {
         public System.Windows.Point TopLeft { get; set; }
 
-        public List<string> Used1DProperties { get; set; }
-
         public Size FormSize { get; set; }
 
         public DialogResult Result = DialogResult.Cancel;
 
         public string OutputValue { get; set; }
 
-        public EditorHost(string cml)
+        public EditorHost(string cml, List<string> used1DProperties, Options options)
         {
             InitializeComponent();
 
             this.MinimumSize = new Size(300, 200);
 
-            Chem4Word.ACME.Editor ec = new Chem4Word.ACME.Editor(cml, Used1DProperties);
+            Chem4Word.ACME.Editor ec = new Chem4Word.ACME.Editor(cml, used1DProperties, options);
             ec.InitializeComponent();
             elementHost1.Child = ec;
             ec.OnOkButtonClick += OnWpfOkButtonClick;

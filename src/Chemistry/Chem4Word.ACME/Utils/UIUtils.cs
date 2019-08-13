@@ -35,7 +35,6 @@ namespace Chem4Word.ACME.Utils
             var mode = Application.Current.ShutdownMode;
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             var options = FileUtils.LoadAcmeSettings(settingsFile, telemetry, topLeft);
-            options.SettingsFile = settingsFile;
             var pe = new SettingsHost(options, telemetry, topLeft);
             ShowDialog(pe, currentEditor);
             Application.Current.ShutdownMode = mode;

@@ -46,6 +46,7 @@ namespace Chem4Word.ACME.Utils
                         File.WriteAllText(settingsFile, json);
                     }
 
+                    result.SettingsFile = settingsFile;
                     // Clear the Dirty flag
                     result.Dirty = false;
                 }

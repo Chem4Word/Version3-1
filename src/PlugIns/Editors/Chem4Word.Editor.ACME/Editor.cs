@@ -105,7 +105,7 @@ namespace Chem4Word.Editor.ACME
                     LoadSettings();
                 }
 
-                EditorHost host = new EditorHost(Cml);
+                EditorHost host = new EditorHost(Cml, Used1DProperties, _editorOptions);
                 host.TopLeft = TopLeft;
                 host.ShowDialog();
                 result = host.Result;

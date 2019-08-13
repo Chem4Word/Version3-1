@@ -111,6 +111,7 @@ namespace Chem4Word.ACME.Controls
             Options.BondLength = (int) SettingsModel.CurrentBondLength;
             Options.ShowMoleculeGroups = SettingsModel.ShowMoleculeGroups;
             FileUtils.SaveAcmeSettings(Options, Telemetry, TopLeft);
+            Options.Dirty = false;
 
             WpfEventArgs args = new WpfEventArgs();
             args.Button = "SAVE";

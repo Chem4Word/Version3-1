@@ -428,6 +428,7 @@ namespace Chem4Word
                                     break;
 
                                 default:
+                                    // No need to do anything as model is already null
                                     break;
                             }
 
@@ -538,16 +539,10 @@ namespace Chem4Word
 
         public void ActivateChemistryTab()
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
             try
             {
                 RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
             }
-            //catch (Exception ex)
-            //{
-            //    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-            //}
             catch
             {
                 // Do Nothing
@@ -611,16 +606,9 @@ namespace Chem4Word
                     if (Globals.Chem4WordV3.ChemistryAllowed)
                     {
                         CustomXMLPart customXmlPart = null;
-                        string beforeCml = Properties.Resources.EmptyStructure_cml;
-
-                        if (editor.RequiresSeedAtom)
-                        {
-                            beforeCml = Properties.Resources.SingleCarbon_cml;
-                        }
-                        else
-                        {
-                            beforeCml = Properties.Resources.EmptyStructure_cml;
-                        }
+                        string beforeCml = editor.RequiresSeedAtom
+                            ? Properties.Resources.SingleCarbon_cml
+                            : Properties.Resources.EmptyStructure_cml;
 
                         bool isNewDrawing = true;
 
@@ -890,14 +878,12 @@ namespace Chem4Word
                             }
                             else
                             {
-                                string tempfileName = null;
-
                                 // Always render the file.
                                 renderer.Properties = new Dictionary<string, string>();
                                 renderer.Properties.Add("Guid", guidString);
                                 renderer.Cml = afterCml;
 
-                                tempfileName = renderer.Render();
+                                string tempfileName = renderer.Render();
 
                                 if (!isNewDrawing)
                                 {
@@ -1177,6 +1163,7 @@ namespace Chem4Word
                             Word.Application app1 = Globals.Chem4WordV3.Application;
                             string guid = CustomXmlPartHelper.GuidFromTag(cc?.Tag);
 
+                            var used1D = ChemistryHelper.GetUsed1D(doc, guid);
                             customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
                             if (customXmlPart != null)
                             {
@@ -1185,18 +1172,49 @@ namespace Chem4Word
                                 var host = new EditLabelsHost();
                                 host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
                                 host.Cml = cml;
-                                host.Used1D = ChemistryHelper.GetUsed1D(doc, guid);
+                                host.Used1D = used1D;
                                 host.Message = "";
 
                                 var result = host.ShowDialog();
                                 if (result == DialogResult.OK)
                                 {
+                                    string afterCml = host.Cml;
                                     customXmlPart.Delete();
-                                    doc.CustomXMLParts.Add(host.Cml);
+                                    doc.CustomXMLParts.Add(afterCml);
 
-                                    CMLConverter conv = new CMLConverter();
-                                    Model model = conv.Import(host.Cml);
-                                    ChemistryHelper.UpdateThisStructure(doc, model, guid, "");
+                                    IChem4WordRenderer renderer =
+                                        Globals.Chem4WordV3.GetRendererPlugIn(
+                                            Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
+                                    if (renderer == null)
+                                    {
+                                        UserInteractions.WarnUser("Unable to find a Renderer Plug-In");
+                                    }
+                                    else
+                                    {
+                                        // Always render the file.
+                                        renderer.Properties = new Dictionary<string, string>();
+                                        renderer.Properties.Add("Guid", guid);
+                                        renderer.Cml = afterCml;
+
+                                        string tempfileName = renderer.Render();
+
+                                        if (File.Exists(tempfileName))
+                                        {
+                                            CMLConverter conv = new CMLConverter();
+                                            Model model = conv.Import(afterCml, used1D);
+                                            ChemistryHelper.UpdateThisStructure(doc, model, guid, tempfileName);
+
+                                            // Delete the temporary file now we are finished with it
+                                            try
+                                            {
+                                                File.Delete(tempfileName);
+                                            }
+                                            catch
+                                            {
+                                                // Not much we can do here
+                                            }
+                                        }
+                                    }
 
                                     app.Selection.SetRange(cc.Range.Start, cc.Range.End);
                                 }

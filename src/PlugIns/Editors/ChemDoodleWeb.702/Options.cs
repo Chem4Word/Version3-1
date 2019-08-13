@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Core.Helpers;
 using Newtonsoft.Json;
 
 namespace Chem4Word.Editor.ChemDoodleWeb702
@@ -21,6 +22,9 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
         [JsonProperty]
         public bool ShowCarbons { get; set; }
 
+        [JsonProperty]
+        public int BondLength { get; set; }
+
         public Options()
         {
             RestoreDefaults();
@@ -34,6 +38,8 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             clone.ShowHydrogens = ShowHydrogens;
             clone.ShowCarbons = ShowCarbons;
 
+            clone.BondLength = BondLength;
+
             return clone;
         }
 
@@ -42,6 +48,8 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             ShowHydrogens = true;
             ColouredAtoms = true;
             ShowCarbons = false;
+
+            BondLength = (int)Constants.StandardBondLength;
         }
     }
 }
