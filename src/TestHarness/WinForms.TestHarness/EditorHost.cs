@@ -40,14 +40,15 @@ namespace WinForms.TestHarness
             switch (_editorType)
             {
                 case "ACME":
-                    Editor acmeEditor = new Editor(cml, null);
+                    Options options = new Options();
+                    options.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
+                    Editor acmeEditor = new Editor(cml, null, options);
                     acmeEditor.InitializeComponent();
                     elementHost1.Child = acmeEditor;
 
                     // Configure Control
                     acmeEditor.ShowSave = true;
                     acmeEditor.Telemetry = new TelemetryWriter(true);
-                    acmeEditor.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
 
                     // Wire Up Button(s)
                     acmeEditor.OnOkButtonClick += OnWpfButtonClick;
@@ -59,8 +60,6 @@ namespace WinForms.TestHarness
                     elementHost1.Child = labelsEditor;
 
                     // Configure Control
-                    //labelsEditor.Telemetry = new TelemetryWriter(true);
-                    //labelsEditor.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
 
                     // Wire Up Button(s)
                     labelsEditor.OnButtonClick += OnWpfButtonClick;
