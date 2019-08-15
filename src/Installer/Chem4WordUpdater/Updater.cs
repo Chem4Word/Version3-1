@@ -174,7 +174,7 @@ namespace Chem4WordUpdater
                 _downloadedFile = Path.Combine(downloadPath, filename);
 
                 _webClient = new WebClient();
-                _webClient.Headers.Add("user-agent", "Chem4Word Bootstrapper");
+                _webClient.Headers.Add("user-agent", "Chem4Word Updater");
 
                 _webClient.DownloadProgressChanged += OnDownloadProgressChanged;
                 _webClient.DownloadFileCompleted += OnDownloadComplete;

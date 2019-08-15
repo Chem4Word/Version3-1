@@ -209,7 +209,7 @@ namespace Chem4Word.Helpers
                     {
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Looking for Chem4Word-Versions.xml at {domain}");
 
-                        client.DefaultRequestHeaders.Add("user-agent", "Chem4Word Bootstrapper");
+                        client.DefaultRequestHeaders.Add("user-agent", "Chem4Word VersionChecker");
                         client.BaseAddress = new Uri(domain);
                         var response = client.GetAsync(VersionsFile).Result;
                         response.EnsureSuccessStatusCode();
