@@ -5,9 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Annotations;
-using Chem4Word.Core.UI.Forms;
-using Chem4Word.Database;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +18,9 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
+using Chem4Word.ACME.Annotations;
+using Chem4Word.Core.UI.Forms;
+using Chem4Word.Database;
 
 namespace Chem4Word.Library
 {
@@ -492,7 +492,7 @@ namespace Chem4Word.Library
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                XName nameNodeName = Model2.Converters.CML.CMLNamespaces.cml  + "name";
+                XName nameNodeName = Model2.Converters.CML.CMLNamespaces.cml + "name";
 
                 var names = (from namenode in mol.cmlDoc.Descendants(nameNodeName)
                              where namenode.Name == nameNodeName

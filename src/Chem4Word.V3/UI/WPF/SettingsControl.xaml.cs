@@ -5,13 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core;
-using Chem4Word.Core.Helpers;
-using Chem4Word.Core.UI.Forms;
-using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Database;
-using IChem4Word.Contracts;
-using Ookii.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,6 +15,13 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI.Forms;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Database;
+using IChem4Word.Contracts;
+using Ookii.Dialogs;
 using Forms = System.Windows.Forms;
 
 namespace Chem4Word.UI.WPF
@@ -312,7 +312,7 @@ namespace Chem4Word.UI.WPF
             Dirty = true;
         }
 
-        #endregion
+        #endregion General Tab Events
 
         #region Privacy Tab Events
 
@@ -733,7 +733,7 @@ namespace Chem4Word.UI.WPF
                 }
             }
 
-            #endregion
+            #endregion General Tab
         }
 
         private BitmapImage CreateImageFromStream(Stream stream)
@@ -752,6 +752,5 @@ namespace Chem4Word.UI.WPF
         }
 
         #endregion Private methods
-
     }
 }

@@ -1,12 +1,19 @@
-﻿using System;
-using Chem4Word.ACME.Utils;
-using Chem4Word.Core;
-using Chem4Word.Core.UI.Wpf;
-using IChem4Word.Contracts;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
+using System;
 using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
+using Chem4Word.ACME.Utils;
+using Chem4Word.Core;
+using Chem4Word.Core.UI.Wpf;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -82,7 +89,6 @@ namespace Chem4Word.ACME.Controls
 
         private void SettingsHost_OnContentRendered(object sender, EventArgs e)
         {
-
             UcSettings.Options.Dirty = false;
         }
     }

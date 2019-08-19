@@ -385,6 +385,8 @@ namespace WinForms.TestHarness
             ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
 
+            ShowGroupsBox.Enabled = true;
+
             ListStacks();
         }
 

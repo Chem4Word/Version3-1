@@ -5,11 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Windows;
 using Chem4Word.Core.Helpers;
 using Newtonsoft.Json;
-using System;
-using System.Windows;
-using System.Windows.Forms;
 
 namespace Chem4Word
 {
@@ -50,19 +48,23 @@ namespace Chem4Word
 
         [JsonProperty]
         public bool RemoveExplicitHydrogensOnImportFromFile { get; set; }
+
         [JsonProperty]
         public bool RemoveExplicitHydrogensOnImportFromSearch { get; set; }
+
         [JsonProperty]
         public bool RemoveExplicitHydrogensOnImportFromLibrary { get; set; }
 
         [JsonProperty]
         public bool SetBondLengthOnImportFromFile { get; set; }
+
         [JsonProperty]
         public bool SetBondLengthOnImportFromSearch { get; set; }
+
         [JsonProperty]
         public bool SetBondLengthOnImportFromLibrary { get; set; }
 
-        #endregion
+        #endregion General
 
         // Not Saved
         public Point WordTopLeft { get; set; }

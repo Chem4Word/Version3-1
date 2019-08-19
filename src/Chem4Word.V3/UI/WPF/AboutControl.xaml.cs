@@ -5,23 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.UI.Forms;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Chem4Word.Core.UI.Forms;
 
 namespace Chem4Word.UI.WPF
 {
@@ -35,14 +24,14 @@ namespace Chem4Word.UI.WPF
 
         public string VersionString { get; set; }
         public System.Windows.Point TopLeft { get; set; }
+
         public AboutControl()
         {
-                InitializeComponent();
+            InitializeComponent();
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            
         }
 
         private void AboutControl_Loaded(object sender, RoutedEventArgs e)
@@ -57,7 +46,9 @@ namespace Chem4Word.UI.WPF
                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
             }
         }
+
         #region Hyperlink Methods
+
         private void OnChemDoodleClick(object sender, RoutedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -72,6 +63,7 @@ namespace Chem4Word.UI.WPF
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
         }
+
         private void OnTeamsiteLinkClicked(object sender, RoutedEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -161,6 +153,7 @@ namespace Chem4Word.UI.WPF
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
         }
-        #endregion
+
+        #endregion Hyperlink Methods
     }
 }

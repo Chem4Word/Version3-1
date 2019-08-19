@@ -5,10 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.UI.Wpf;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.Core.UI.Wpf;
 
 namespace Chem4Word.ACME
 {

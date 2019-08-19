@@ -5,17 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Windows;
+using System.Windows.Input;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Utils;
-using System.Windows;
-using System.Windows.Input;
 
 namespace Chem4Word.ACME.Behaviors
 {
     public class DeleteBehavior : BaseEditBehavior
     {
-      
         private Window _parent;
 
         private Cursor _cursor;
@@ -53,8 +52,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 var parent = gv.ParentMolecule;
                 EditViewModel.DeleteMolecule(parent);
-                CurrentStatus="Group deleted";
-
+                CurrentStatus = "Group deleted";
             }
             else if (hitTestResult is AtomVisual atomVisual)
             {

@@ -5,16 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using static Chem4Word.Model2.Helpers.Globals;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {

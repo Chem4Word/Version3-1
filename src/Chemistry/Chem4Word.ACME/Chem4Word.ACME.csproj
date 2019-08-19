@@ -69,6 +69,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\MoleculePropertyEditor.xaml.cs">
+      <DependentUpon>MoleculePropertyEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Adorners\Selectors\BaseSelectionAdorner.cs" />
     <Compile Include="Adorners\Feedback\GroupHoverAdorner.cs" />
     <Compile Include="Adorners\Selectors\AtomSelectionAdorner.cs" />
@@ -219,6 +222,10 @@
     <Compile Include="VisualTreeHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\MoleculePropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LabelsEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -295,6 +302,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -315,6 +323,8 @@
   <ItemGroup>
     <Resource Include="Resources\ms-word-16.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Cursors\Pencil.cur" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

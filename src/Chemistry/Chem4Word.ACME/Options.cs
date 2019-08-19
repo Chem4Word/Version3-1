@@ -51,7 +51,7 @@ namespace Chem4Word.ACME
 
         public void RestoreDefaults()
         {
-            BondLength = (int) Constants.StandardBondLength;
+            BondLength = (int)Constants.StandardBondLength;
             ShowMoleculeGroups = true;
             Dirty = false;
         }

@@ -5,10 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Controls;
-using Chem4Word.ACME.Utils;
-using Chem4Word.Model2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +12,10 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Utils;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Behaviors
@@ -69,7 +69,7 @@ namespace Chem4Word.ACME.Behaviors
             base.OnAttached();
             EditViewModel.SelectedItems?.Clear();
 
-            CurrentEditor = (EditorCanvas) AssociatedObject;
+            CurrentEditor = (EditorCanvas)AssociatedObject;
 
             _parent = Application.Current.MainWindow;
 
@@ -240,7 +240,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-
         public List<Point> MarkOutAtoms(Atom startAtom, Point endPoint)
         {
             var bondSize = EditViewModel.Model.XamlBondLength;
@@ -291,10 +290,8 @@ namespace Chem4Word.ACME.Behaviors
             Point branchPoint = start;
             placements.Add(branchPoint);
 
-
             var displacement = endPoint - start;
             var alternationSign = Math.Sign(Vector.CrossProduct(initialDisplacement, displacement));
-
 
             Matrix rotator = new Matrix();
 
@@ -306,7 +303,6 @@ namespace Chem4Word.ACME.Behaviors
                 placements.Add(branchPoint);
                 alternationSign = -alternationSign;
             }
-
 
             return placements;
         }

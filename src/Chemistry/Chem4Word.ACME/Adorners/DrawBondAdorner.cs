@@ -5,16 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections;
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -32,7 +31,7 @@ namespace Chem4Word.ACME.Adorners
 
         public Point StartPoint
         {
-            get { return (Point) GetValue(StartPointProperty); }
+            get { return (Point)GetValue(StartPointProperty); }
             set { SetValue(StartPointProperty, value); }
         }
 
@@ -44,7 +43,7 @@ namespace Chem4Word.ACME.Adorners
 
         public Point EndPoint
         {
-            get { return (Point) GetValue(EndPointProperty); }
+            get { return (Point)GetValue(EndPointProperty); }
             set { SetValue(EndPointProperty, value); }
         }
 
@@ -62,7 +61,7 @@ namespace Chem4Word.ACME.Adorners
             _solidColorBrush.Opacity = 0.5;
             _dashPen = new Pen(SystemColors.HighlightBrush, bondThickness);
 
-            CurrentEditor = (EditorCanvas) adornedElement;
+            CurrentEditor = (EditorCanvas)adornedElement;
 
             PreviewKeyDown += DrawBondAdorner_PreviewKeyDown;
 
@@ -98,12 +97,12 @@ namespace Chem4Word.ACME.Adorners
             if (Stereo == Globals.BondStereo.Hatch)
             {
                 brush = new LinearGradientBrush
-                        {
-                            MappingMode = BrushMappingMode.Absolute,
-                            SpreadMethod = GradientSpreadMethod.Repeat,
-                            StartPoint = new Point(50, 0),
-                            EndPoint = new Point(50, 3),
-                            GradientStops = new GradientStopCollection()
+                {
+                    MappingMode = BrushMappingMode.Absolute,
+                    SpreadMethod = GradientSpreadMethod.Repeat,
+                    StartPoint = new Point(50, 0),
+                    EndPoint = new Point(50, 3),
+                    GradientStops = new GradientStopCollection()
                                             {
                                                 new GradientStop {Offset = 0d, Color = SystemColors.HighlightColor},
                                                 new GradientStop {Offset = 0.25d, Color = SystemColors.HighlightColor},
@@ -111,12 +110,12 @@ namespace Chem4Word.ACME.Adorners
                                                 new GradientStop {Offset = 0.30, Color = Colors.Transparent}
                                             },
 
-                            Transform = new RotateTransform
-                                        {
-                                            Angle = Vector.AngleBetween(Model2.Geometry.BasicGeometry.ScreenNorth,
+                    Transform = new RotateTransform
+                    {
+                        Angle = Vector.AngleBetween(Model2.Geometry.BasicGeometry.ScreenNorth,
                                                                         EndPoint - StartPoint)
-                                        }
-                        };
+                    }
+                };
             }
 
             switch (BondOrder)
@@ -124,16 +123,18 @@ namespace Chem4Word.ACME.Adorners
                 case Globals.OrderZero:
                 case Globals.OrderOther:
                 case "unknown":
-               
+
                     pen = pen.Clone();
                     pen.DashStyle = DashStyles.Dot;
                     drawingContext.DrawGeometry(brush, pen, layout.DefiningGeometry);
                     break;
+
                 case Globals.OrderPartial01:
                     pen = pen.Clone();
                     pen.DashStyle = DashStyles.Dash;
                     drawingContext.DrawGeometry(brush, pen, layout.DefiningGeometry);
                     break;
+
                 case Globals.OrderAromatic:
                 case Globals.OrderPartial12:
                     var secondPen = pen.Clone();
@@ -153,16 +154,17 @@ namespace Chem4Word.ACME.Adorners
                     drawingContext.DrawLine(pen, tbd.Start, tbd.End);
                     drawingContext.DrawLine(secondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                     break;
+
                 case Globals.OrderTriple:
                     tbd = (layout as TripleBondDescriptor);
                     drawingContext.DrawLine(pen, tbd.SecondaryStart, tbd.SecondaryEnd);
                     drawingContext.DrawLine(pen, tbd.Start, tbd.End);
                     drawingContext.DrawLine(pen, tbd.TertiaryStart, tbd.TertiaryEnd);
                     break;
+
                 default:
                     drawingContext.DrawGeometry(brush, pen, layout.DefiningGeometry);
                     break;
-
             }
         }
 
@@ -174,14 +176,14 @@ namespace Chem4Word.ACME.Adorners
             //check to see if it's a wedge or a hatch yet
             if (stereo == Globals.BondStereo.Wedge | stereo == Globals.BondStereo.Hatch)
             {
-                var wbd = new WedgeBondDescriptor {Start = startPoint, End = endPoint};
+                var wbd = new WedgeBondDescriptor { Start = startPoint, End = endPoint };
                 BondGeometry.GetWedgeBondGeometry(wbd, bondLength);
                 return wbd;
             }
 
             if (stereo == Globals.BondStereo.Indeterminate && (order == Globals.OrderSingle))
             {
-                descriptor = new BondDescriptor {Start = startPoint, End = endPoint};
+                descriptor = new BondDescriptor { Start = startPoint, End = endPoint };
                 BondGeometry.GetWavyBondGeometry(descriptor, bondLength);
                 return descriptor;
             }
@@ -190,7 +192,7 @@ namespace Chem4Word.ACME.Adorners
             //single or dotted bond
             if (ordervalue <= 1)
             {
-                descriptor = new BondDescriptor {Start = startPoint, End = endPoint};
+                descriptor = new BondDescriptor { Start = startPoint, End = endPoint };
                 BondGeometry.GetSingleBondGeometry(descriptor);
             }
 
@@ -198,7 +200,7 @@ namespace Chem4Word.ACME.Adorners
             //double bond
             if (ordervalue == 2 | ordervalue == 1.5)
             {
-                DoubleBondDescriptor dbd = new DoubleBondDescriptor() {Start = startPoint, End = endPoint};
+                DoubleBondDescriptor dbd = new DoubleBondDescriptor() { Start = startPoint, End = endPoint };
                 if (stereo == Globals.BondStereo.Indeterminate)
                 {
                     BondGeometry.GetCrossedDoubleGeometry(dbd, bondLength);
@@ -216,7 +218,7 @@ namespace Chem4Word.ACME.Adorners
             //tripe bond
             if (ordervalue == 2.5 | ordervalue == 3)
             {
-                var tbd = new TripleBondDescriptor() {Start = startPoint, End = endPoint};
+                var tbd = new TripleBondDescriptor() { Start = startPoint, End = endPoint };
                 BondGeometry.GetTripleBondGeometry(tbd, bondLength);
                 descriptor = tbd;
             }

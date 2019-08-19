@@ -5,13 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Behaviors;
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2.Annotations;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Behaviors;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Annotations;
 
 namespace Chem4Word.ACME.Adorners
 {

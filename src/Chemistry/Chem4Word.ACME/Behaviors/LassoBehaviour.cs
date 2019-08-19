@@ -5,19 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Enums;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -190,7 +189,7 @@ namespace Chem4Word.ACME.Behaviors
         private object CurrentObject(MouseButtonEventArgs e)
         {
             var visual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor));
-            
+
             object currentObject = null;
             if (visual is AtomVisual av)
             {
@@ -237,8 +236,6 @@ namespace Chem4Word.ACME.Behaviors
                     }
 
                     _lassoAdorner.Outline = outline;
-
-                    
                 }
                 else
                 {
@@ -562,7 +559,7 @@ namespace Chem4Word.ACME.Behaviors
                 EditViewModel.AddToSelection(selGroup.ParentMolecule);
                 return HitTestResultBehavior.Continue;
             }
-            if (myShape != null && myShape is AtomVisual  | myShape is BondVisual )
+            if (myShape != null && myShape is AtomVisual | myShape is BondVisual)
             {
                 switch (id)
                 {

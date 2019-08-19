@@ -10,6 +10,6 @@
             Margin="5"
             Background="White"
             ShowGroups="{Binding ElementName=ACMEDisplay, Path=ShowGroups }"
-            HighlightActive="{Binding ElementName=ACMEDisplay, Path=HighlightActive}"/>
+            HighlightActive="{Binding ElementName=ACMEDisplay, Path=HighlightActive}" />
     </Viewbox>
 </UserControl>

@@ -5,14 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Model2.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Xml.Linq;
+using Chem4Word.Model2.Helpers;
+using Chem4Word.Model2.Interfaces;
 
 namespace Chem4Word.Model2.Converters.CML
 {
@@ -375,10 +375,14 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeIsotopeNumber, atom.IsotopeNumber.Value));
             }
 
-            if (atom.Element as Element == Globals.PeriodicTable.C && atom.ShowSymbol != null)
+            if (atom.Element is Element element2)
             {
-                result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ShowSymbol));
+                if (element2 == Globals.PeriodicTable.C && atom.ShowSymbol != null)
+                {
+                    result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ShowSymbol));
+                }
             }
+
             return result;
         }
 

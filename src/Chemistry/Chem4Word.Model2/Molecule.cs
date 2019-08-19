@@ -5,10 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Model2.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +15,10 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
+using Chem4Word.Model2.Interfaces;
 
 namespace Chem4Word.Model2
 {
@@ -521,38 +521,38 @@ namespace Chem4Word.Model2
                     if (molecule.Atoms.Any())
                     {
                         properties.Add(new TextualProperty
-                                        {
-                                            Id = $"{molecule.Id}.f0",
-                                            Type = "F",
-                                            Value = molecule.ConciseFormula
-                                        });
+                        {
+                            Id = $"{molecule.Id}.f0",
+                            Type = "F",
+                            Value = molecule.ConciseFormula
+                        });
 
                         foreach (var name in molecule.Names)
                         {
                             properties.Add(new TextualProperty
-                                           {
-                                               Id = name.Id,
-                                               Type = "N",
-                                               Value = name.Value
-                                           });
+                            {
+                                Id = name.Id,
+                                Type = "N",
+                                Value = name.Value
+                            });
                         }
 
                         foreach (var formula in molecule.Formulas)
                         {
                             properties.Add(new TextualProperty
-                                           {
-                                               Id = formula.Id,
-                                               Type = "F",
-                                               Value = formula.Value
-                                           });
+                            {
+                                Id = formula.Id,
+                                Type = "F",
+                                Value = formula.Value
+                            });
                         }
 
                         properties.Add(new TextualProperty
-                                       {
-                                           Id = "S",
-                                           Type = "S",
-                                           Value = "S"
-                                       });
+                        {
+                            Id = "S",
+                            Type = "S",
+                            Value = "S"
+                        });
                     }
                     else
                     {
@@ -629,7 +629,6 @@ namespace Chem4Word.Model2
 
                     return childFormulae;
                 }
-
             }
         }
 
@@ -665,7 +664,7 @@ namespace Chem4Word.Model2
                     Molecule mol = (Molecule)oldItem;
                     mol.AtomsChanged -= Atoms_CollectionChanged;
                     mol.BondsChanged -= Bonds_CollectionChanged;
-                    mol.MoleculesChanged -=Molecules_CollectionChanged;
+                    mol.MoleculesChanged -= Molecules_CollectionChanged;
                     mol.PropertyChanged -= ChemObject_PropertyChanged;
                 }
             }
@@ -687,7 +686,6 @@ namespace Chem4Word.Model2
         {
             OnMoleculesChanged(sender, e);
         }
-
 
         private void Bonds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -962,7 +960,6 @@ namespace Chem4Word.Model2
             }
             foreach (Molecule mol in Molecules.Values)
             {
-
                 mol.UpdateVisual();
             }
 
@@ -1609,8 +1606,6 @@ namespace Chem4Word.Model2
 
             return overlap;
         }
-
-
 
         public void ClearProperties()
         {

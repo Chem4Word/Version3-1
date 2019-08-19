@@ -5,11 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 /* Descriptors are simple classes that define the shape of a bond visual.
@@ -17,6 +12,7 @@ using System.Windows;
    You can either use the Point properties and draw primitives directly from those,
    or use the DefinedGeometry and draw that directly
    */
+
 namespace Chem4Word.ACME.Drawing
 {
     public class TripleBondDescriptor : DoubleBondDescriptor

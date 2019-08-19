@@ -13,9 +13,11 @@ namespace Chem4Word.ACME.Adorners.Selectors
     public abstract class SingleChemistryAdorner : BaseSelectionAdorner
     {
         #region Shared Properties
+
         //what the adorner attaches to.  Can be an atom or a bond
         protected ChemistryBase AdornedChemistry { get; }
-        #endregion
+
+        #endregion Shared Properties
 
         #region Constructors
 
@@ -26,6 +28,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             AdornedChemistry = adornedChemistry;
         }
-        #endregion
+
+        #endregion Constructors
     }
 }

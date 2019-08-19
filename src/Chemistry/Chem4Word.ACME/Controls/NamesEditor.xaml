@@ -30,13 +30,15 @@
             </Grid.RowDefinitions>
             <ScrollViewer
                 Grid.Row="0"
+                x:Name="ScrollViewer"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto">
                 <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding ListOfNames, Mode=TwoWay}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="5">
+                            <Grid Margin="3,3,3,0">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition
                                         Width="*"
                                         MinWidth="200"
@@ -45,25 +47,12 @@
                                         Width="*"
                                         MinWidth="200"
                                         SharedSizeGroup="B" />
-                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox
-                                    Grid.Column="0"
-                                    Margin="5"
-                                    VerticalContentAlignment="Center"
-                                    IsReadOnly="True"
-                                    Text="{Binding Path=Type}" />
-                                <TextBox
-                                    Grid.Column="1"
-                                    Margin="5"
-                                    VerticalContentAlignment="Center"
-                                    IsReadOnly="{Binding CanBeEdited}"
-                                    Text="{Binding Path=Value, Mode=TwoWay}" />
                                 <Button
                                     x:Name="DeleteRow"
-                                    Grid.Column="2"
-                                    Width="32"
-                                    Height="32"
+                                    Grid.Column="0"
+                                    Width="20"
+                                    Height="20"
                                     Background="Transparent"
                                     BorderBrush="Transparent"
                                     BorderThickness="0"
@@ -71,37 +60,48 @@
                                     IsEnabled="{Binding CanBeDeleted}"
                                     ToolTip="Delete this item">
                                     <Viewbox
-                                        Width="24"
-                                        Height="24"
+                                        Width="16"
+                                        Height="16"
                                         Stretch="UniformToFill">
                                         <Path
-                                            Width="24"
-                                            Height="24"
+                                            Width="16"
+                                            Height="16"
                                             Data="M3,0 C3.8,0,4.5,0.3,5.1,0.9 L16,11.7 26.9,0.9 C28.1,-0.3 30,-0.3 31.1,0.9 32.3,2.1 32.3,4 31.1,5.1 L20.2,16 31.1,26.9 C32.3,28.1 32.3,30 31.1,31.1 29.9,32.3 28,32.3 26.9,31.1 L16,20.2 5.1,31.1 C3.9,32.3 2,32.3 0.9,31.1 -0.3,29.9 -0.3,28 0.9,26.9 L11.8,16 0.9,5.1 C-0.3,3.9 -0.3,2 0.9,0.9 1.5,0.3 2.2,0 3,0z"
                                             Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled, Converter={StaticResource EnabledConverter}, ConverterParameter={StaticResource ResourceKey=Chem4WordRed}}"
                                             Stretch="Fill" />
                                     </Viewbox>
                                 </Button>
+                                <TextBox
+                                    Grid.Column="1"
+                                    Margin="3,0,0,0"
+                                    VerticalContentAlignment="Center"
+                                    IsReadOnly="True"
+                                    Text="{Binding Path=Type}" />
+                                <TextBox
+                                    Grid.Column="2"
+                                    Margin="3,0,3,0"
+                                    VerticalContentAlignment="Center"
+                                    IsReadOnly="{Binding CanBeEdited}"
+                                    Text="{Binding Path=Value, Mode=TwoWay}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-
             </ScrollViewer>
             <Button
                 x:Name="AddButton"
                 Grid.Row="1"
-                Height="32"
-                Margin="5">
+                Height="20"
+                Margin="3">
                 <StackPanel Orientation="Horizontal">
                     <Viewbox
-                        Width="24"
-                        Height="24"
+                        Width="16"
+                        Height="16"
                         Margin="5,0,5,0"
                         Stretch="UniformToFill">
                         <Path
-                            Width="24"
-                            Height="24"
+                            Width="16"
+                            Height="16"
                             Data="M12.1,0 L19.8,0 19.8,12.1 32,12.1 32,19.8 19.9,19.8 19.9,32 12.2,32 12.2,19.9 0,19.9 0,12.2 12.1,12.2z"
                             Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsEnabled, Converter={StaticResource EnabledConverter}, ConverterParameter={StaticResource ResourceKey=Chem4WordGreen}}"
                             Stretch="Fill" />

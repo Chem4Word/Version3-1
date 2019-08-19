@@ -40,7 +40,7 @@ namespace Chem4Word.ACME.Adorners
             FirstPoint = firstPoint; //where the adorner is anchored
             Placements = placements; //list of placement points to draw the chain to
             CurrentPoint = currentPoint;
-            CurrentEditor = (EditorCanvas) adornedElement;
+            CurrentEditor = (EditorCanvas)adornedElement;
 
             Unanchored = target == null;
 
@@ -63,7 +63,7 @@ namespace Chem4Word.ACME.Adorners
 
         public Point CurrentPoint { get; }
 
-        public float PixelsPerDip() => (float) VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        public float PixelsPerDip() => (float)VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
         protected override void OnRender(DrawingContext drawingContext)
         {
@@ -76,7 +76,7 @@ namespace Chem4Word.ACME.Adorners
             }
 
             var pf = new PathFigure(FirstPoint, psc, false);
-            var pg = new PathGeometry(new[] {pf});
+            var pg = new PathGeometry(new[] { pf });
             drawingContext.DrawGeometry(null, BondPen, pg);
             drawingContext.DrawLine(DashedPen, Placements.Last(), CurrentPoint);
             if (Unanchored)

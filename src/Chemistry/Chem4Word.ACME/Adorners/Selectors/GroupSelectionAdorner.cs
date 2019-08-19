@@ -14,16 +14,15 @@ using Chem4Word.Model2;
 namespace Chem4Word.ACME.Adorners.Selectors
 {
     public class GroupSelectionAdorner : MoleculeSelectionAdorner
+    {
+        public GroupSelectionAdorner(EditorCanvas currentEditor, List<Molecule> molecules)
+            : base(currentEditor, molecules)
         {
-            public GroupSelectionAdorner(EditorCanvas currentEditor, List<Molecule> molecules)
-                : base(currentEditor, molecules)
-            {
-            }
+        }
 
-            protected override void SetThumbStyle(Thumb cornerThumb)
-            {
-                cornerThumb.Style = (Style) FindResource("GroupHandleStyle");
-            }
+        protected override void SetThumbStyle(Thumb cornerThumb)
+        {
+            cornerThumb.Style = (Style)FindResource("GroupHandleStyle");
         }
     }
-
+}

@@ -15,7 +15,7 @@ namespace Chem4Word.ACME.Converters
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            TreeViewItem item = (TreeViewItem) value;
+            TreeViewItem item = (TreeViewItem)value;
             ItemsControl ic = ItemsControl.ItemsControlFromItemContainer(item);
             return ic.ItemContainerGenerator.IndexFromContainer(item) == ic.Items.Count - 1;
         }

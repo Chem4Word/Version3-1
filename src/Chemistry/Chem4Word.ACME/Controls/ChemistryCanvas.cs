@@ -5,10 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +15,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Adorners.Feedback;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -29,6 +28,7 @@ namespace Chem4Word.ACME.Controls
         #region Fields
 
         private Adorner _highlightAdorner;
+        private bool _positionOffsetApplied;
 
         #endregion Fields
 
@@ -76,6 +76,7 @@ namespace Chem4Word.ACME.Controls
                 {
                     case GroupVisual gv:
                         return gv.ParentMolecule;
+
                     case BondVisual bv:
                         return bv.ParentBond;
 
@@ -107,20 +108,19 @@ namespace Chem4Word.ACME.Controls
 
         // Using a DependencyProperty as the backing store for ShowGroups.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowGroupsProperty =
-            DependencyProperty.Register("ShowGroups", typeof(bool), typeof(ChemistryCanvas), new FrameworkPropertyMetadata(true,FrameworkPropertyMetadataOptions.AffectsParentArrange |FrameworkPropertyMetadataOptions.AffectsMeasure, ShowGroupsChanged));
+            DependencyProperty.Register("ShowGroups", typeof(bool), typeof(ChemistryCanvas), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure, ShowGroupsChanged));
 
         private static void ShowGroupsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ChemistryCanvas cc = (ChemistryCanvas) d;
-            bool showGroups = (bool) e.NewValue;
+            ChemistryCanvas cc = (ChemistryCanvas)d;
+            bool showGroups = (bool)e.NewValue;
             cc.Clear();
             cc.DrawChemistry(cc.Chemistry);
         }
 
-
         public bool HighlightActive
         {
-            get { return (bool) GetValue(HighlightActiveProperty); }
+            get { return (bool)GetValue(HighlightActiveProperty); }
             set { SetValue(HighlightActiveProperty, value); }
         }
 
@@ -142,26 +142,31 @@ namespace Chem4Word.ACME.Controls
 
             if (_mychemistry != null && _mychemistry.Model != null)
             {
-                // Only need to do this on "small" structures
-                if (_mychemistry.Model.TotalAtomsCount < 100)
+                if (!_positionOffsetApplied)
                 {
-                    var abb = _mychemistry.Model.OverallAtomBoundingBox;
-
-                    double leftPadding = 0;
-                    double topPadding = 0;
-
-                    if (size.Left < abb.Left)
+                    // Only need to do this on "small" structures
+                    if (_mychemistry.Model.TotalAtomsCount < 100)
                     {
-                        leftPadding = abb.Left - size.Left;
+                        var abb = _mychemistry.Model.OverallAtomBoundingBox;
+
+                        double leftPadding = 0;
+                        double topPadding = 0;
+
+                        if (size.Left < abb.Left)
+                        {
+                            leftPadding = abb.Left - size.Left;
+                        }
+
+                        if (size.Top < abb.Top)
+                        {
+                            topPadding = abb.Top - size.Top;
+                        }
+
+                        _mychemistry.Model.RepositionAll(-leftPadding, -topPadding);
+                        DrawChemistry(_mychemistry);
                     }
 
-                    if (size.Top < abb.Top)
-                    {
-                        topPadding = abb.Top - size.Top;
-                    }
-
-                    _mychemistry.Model.RepositionAll(-leftPadding, -topPadding);
-                    DrawChemistry(_mychemistry);
+                    _positionOffsetApplied = true;
                 }
             }
 
@@ -188,6 +193,7 @@ namespace Chem4Word.ACME.Controls
                 }
 
                 _mychemistry = value;
+                _positionOffsetApplied = false;
                 DrawChemistry(_mychemistry);
                 ConnectHandlers();
             }
@@ -218,6 +224,7 @@ namespace Chem4Word.ACME.Controls
                     case Bond b:
                         RedrawBond(b);
                         break;
+
                     case Molecule m:
                         RedrawMolecule(m, GetDrawnBoundingBox(m));
                         break;
@@ -242,7 +249,7 @@ namespace Chem4Word.ACME.Controls
             if (molecule.IsGrouped & ShowGroups)
             {
                 chemicalVisuals[molecule] = new GroupVisual(molecule, boundingBox);
-                var gv = (GroupVisual) chemicalVisuals[molecule];
+                var gv = (GroupVisual)chemicalVisuals[molecule];
                 gv.ChemicalVisuals = chemicalVisuals;
                 gv.Render();
                 AddVisual(gv);
@@ -255,14 +262,14 @@ namespace Chem4Word.ACME.Controls
             BondVisual bv = null;
             if (chemicalVisuals.ContainsKey(bond))
             {
-                bv = (BondVisual) chemicalVisuals[bond];
+                bv = (BondVisual)chemicalVisuals[bond];
                 refCount = bv.RefCount;
                 BondRemoved(bond);
             }
 
             BondAdded(bond);
 
-            bv = (BondVisual) chemicalVisuals[bond];
+            bv = (BondVisual)chemicalVisuals[bond];
             bv.RefCount = refCount;
         }
 
@@ -272,14 +279,14 @@ namespace Chem4Word.ACME.Controls
             AtomVisual av = null;
             if (chemicalVisuals.ContainsKey(atom))
             {
-                av = (AtomVisual) chemicalVisuals[atom];
+                av = (AtomVisual)chemicalVisuals[atom];
                 refCount = av.RefCount;
                 AtomRemoved(atom);
             }
 
             AtomAdded(atom);
 
-            av = (AtomVisual) chemicalVisuals[atom];
+            av = (AtomVisual)chemicalVisuals[atom];
             av.RefCount = refCount;
         }
 
@@ -290,7 +297,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.NewItems)
                 {
-                    Molecule a = (Molecule) eNewItem;
+                    Molecule a = (Molecule)eNewItem;
 
                     MoleculeAdded(a);
                 }
@@ -300,7 +307,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.OldItems)
                 {
-                    Molecule b = (Molecule) eNewItem;
+                    Molecule b = (Molecule)eNewItem;
 
                     MoleculeRemoved(b);
                 }
@@ -314,7 +321,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.NewItems)
                 {
-                    Bond b = (Bond) eNewItem;
+                    Bond b = (Bond)eNewItem;
 
                     BondAdded(b);
                 }
@@ -324,7 +331,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.OldItems)
                 {
-                    Bond b = (Bond) eNewItem;
+                    Bond b = (Bond)eNewItem;
 
                     BondRemoved(b);
                 }
@@ -338,7 +345,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.NewItems)
                 {
-                    Atom a = (Atom) eNewItem;
+                    Atom a = (Atom)eNewItem;
 
                     AtomAdded(a);
                 }
@@ -348,7 +355,7 @@ namespace Chem4Word.ACME.Controls
             {
                 foreach (var eNewItem in e.OldItems)
                 {
-                    Atom a = (Atom) eNewItem;
+                    Atom a = (Atom)eNewItem;
 
                     AtomRemoved(a);
                 }
@@ -379,7 +386,7 @@ namespace Chem4Word.ACME.Controls
 
         public bool FitToContents
         {
-            get { return (bool) GetValue(FitToContentsProperty); }
+            get { return (bool)GetValue(FitToContentsProperty); }
             set { SetValue(FitToContentsProperty, value); }
         }
 
@@ -434,6 +441,7 @@ namespace Chem4Word.ACME.Controls
                 case GroupVisual gv:
                     _highlightAdorner = new GroupHoverAdorner(this, gv);
                     break;
+
                 case FunctionalGroupVisual fv:
                     _highlightAdorner = new AtomHoverAdorner(this, fv);
                     break;
@@ -508,14 +516,14 @@ namespace Chem4Word.ACME.Controls
             Rect bb = Rect.Empty;
             foreach (var atom in mol.Atoms.Values)
             {
-                bb.Union(((AtomVisual) chemicalVisuals[atom]).ContentBounds);
+                bb.Union(((AtomVisual)chemicalVisuals[atom]).ContentBounds);
             }
 
             foreach (var m in mol.Molecules.Values)
             {
                 if (chemicalVisuals.TryGetValue(m, out DrawingVisual molVisual))
                 {
-                    GroupVisual gv = (GroupVisual) molVisual;
+                    GroupVisual gv = (GroupVisual)molVisual;
                     bb.Union(gv.ContentBounds);
                     bb.Inflate(Spacing, Spacing);
                 }
@@ -556,7 +564,7 @@ namespace Chem4Word.ACME.Controls
             {
                 if (chemicalVisuals.TryGetValue(molecule, out DrawingVisual dv))
                 {
-                    var gv = (GroupVisual) dv;
+                    var gv = (GroupVisual)dv;
 
                     DeleteVisual(gv);
                     chemicalVisuals.Remove(molecule);
@@ -572,7 +580,6 @@ namespace Chem4Word.ACME.Controls
             {
                 BondRemoved(moleculeBond);
             }
-
 
             foreach (Molecule child in molecule.Molecules.Values)
             {
@@ -632,9 +639,7 @@ namespace Chem4Word.ACME.Controls
         {
             if (chemicalVisuals.TryGetValue(atom, out DrawingVisual dv))
             {
-
-
-                var av = (AtomVisual) dv;
+                var av = (AtomVisual)dv;
 
                 if (av.RefCount == 1) //removing this atom will remove the last visual
                 {
@@ -655,7 +660,7 @@ namespace Chem4Word.ACME.Controls
                 chemicalVisuals[bond] = new BondVisual(bond);
             }
 
-            BondVisual bv = (BondVisual) chemicalVisuals[bond];
+            BondVisual bv = (BondVisual)chemicalVisuals[bond];
 
             if (bv.RefCount == 0) // it hasn't been added before
             {
@@ -673,7 +678,7 @@ namespace Chem4Word.ACME.Controls
         {
             if (chemicalVisuals.TryGetValue(bond, out DrawingVisual dv))
             {
-                var bv =(BondVisual) dv;
+                var bv = (BondVisual)dv;
 
                 if (bv.RefCount == 1) //removing this atom will remove the last visual
                 {
@@ -726,7 +731,7 @@ namespace Chem4Word.ACME.Controls
 
             return HitTestResultBehavior.Continue;
         }
-                                          
+
         #endregion Methods
     }
 }

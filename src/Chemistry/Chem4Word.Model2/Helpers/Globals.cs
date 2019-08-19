@@ -237,7 +237,7 @@ namespace Chem4Word.Model2.Helpers
         public const double HoverAdornerThickness = 3.0;
         public static Color HoverAdornerColor => Colors.DarkOrange;
 
-        public static Color Chem4WordColor => (Color) ColorConverter.ConvertFromString("#2A579A");
+        public static Color Chem4WordColor => (Color)ColorConverter.ConvertFromString("#2A579A");
 
         #endregion Layout Constants
 

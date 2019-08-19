@@ -5,11 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2.Annotations;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2.Annotations;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -27,7 +27,6 @@ namespace Chem4Word.ACME.Adorners
             EndPoint = endPoint;
             Focusable = true;
             Focus();
-
         }
 
         private void NRingAdorner_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -44,8 +43,6 @@ namespace Chem4Word.ACME.Adorners
         {
             CurrentEditor.RaiseEvent(e);
         }
-
-        
 
         protected override void OnRender(DrawingContext drawingContext)
         {
@@ -72,7 +69,6 @@ namespace Chem4Word.ACME.Adorners
             string ringLabel = RingSize.ToString();
             var symbolText = new GlyphText(ringLabel,
                                            GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, pixelsPerDip);
-            
 
             Pen boundaryPen = new Pen(fillBrush, 2.0);
 

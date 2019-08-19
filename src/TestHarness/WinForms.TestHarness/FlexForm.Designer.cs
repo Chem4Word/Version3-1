@@ -222,6 +222,7 @@
             // ShowGroupsBox
             // 
             this.ShowGroupsBox.AutoSize = true;
+            this.ShowGroupsBox.Enabled = false;
             this.ShowGroupsBox.Location = new System.Drawing.Point(16, 19);
             this.ShowGroupsBox.Name = "ShowGroupsBox";
             this.ShowGroupsBox.Size = new System.Drawing.Size(130, 17);

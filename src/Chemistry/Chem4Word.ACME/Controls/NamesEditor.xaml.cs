@@ -1,12 +1,18 @@
-﻿using Chem4Word.ACME.Annotations;
-using Chem4Word.ACME.Models;
-using Chem4Word.Model2;
+﻿// ---------------------------------------------------------------------------
+//  Copyright (c) 2019, The .NET Foundation.
+//  This software is released under the Apache License, Version 2.0.
+//  The license and further copyright text can be found in the file LICENSE.md
+//  at the root directory of the distribution.
+// ---------------------------------------------------------------------------
+
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
+using Chem4Word.ACME.Annotations;
+using Chem4Word.ACME.Models;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Controls
 {

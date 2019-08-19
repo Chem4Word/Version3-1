@@ -5,18 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Controls;
-using Chem4Word.ACME.Drawing;
-using Chem4Word.ACME.Utils;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.ACME.Utils;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME.Behaviors
@@ -93,7 +93,7 @@ namespace Chem4Word.ACME.Behaviors
                     if (targetedVisual is GroupVisual gv)
                     {
                         CurrentEditor.Cursor = Cursors.No;
-                        lastPos= null;
+                        lastPos = null;
                     }
                     else if (targetedVisual is AtomVisual atomUnderCursor)
                     {
@@ -136,11 +136,11 @@ namespace Chem4Word.ACME.Behaviors
                     if (lastPos != null)
                     {
                         _adorner = new DrawBondAdorner(CurrentEditor, BondThickness)
-                                   {
-                                       Stereo = EditViewModel.CurrentStereo,
-                                       BondOrder = bondOrder,
-                                       ExistingBond = existingBond
-                                   };
+                        {
+                            Stereo = EditViewModel.CurrentStereo,
+                            BondOrder = bondOrder,
+                            ExistingBond = existingBond
+                        };
                         _adorner.StartPoint = _currentAtomVisual.Position;
                         _adorner.EndPoint = lastPos.Value;
                     }
@@ -259,7 +259,7 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (lastAtom.Element.Symbol != EditViewModel.SelectedElement.Symbol)
                             {
-                                EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() {lastAtom});
+                                EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() { lastAtom });
                             }
                             else
                             {

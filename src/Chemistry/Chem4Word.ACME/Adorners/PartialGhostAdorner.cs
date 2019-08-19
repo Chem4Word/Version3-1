@@ -5,17 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -23,12 +23,16 @@ namespace Chem4Word.ACME.Adorners
     {
         [NotNull]
         private Geometry _outline;
+
         [NotNull]
         private SolidColorBrush _ghostBrush;
+
         [NotNull]
         private Pen _ghostPen;
+
         [NotNull]
         private Transform _shear;
+
         private IEnumerable<Atom> _atomList;
         public EditorCanvas CurrentEditor { get; }
         public EditViewModel CurrentViewModel { get; }
@@ -81,7 +85,7 @@ namespace Chem4Word.ACME.Adorners
 
             HashSet<Bond> bondSet = new HashSet<Bond>();
             Dictionary<Atom, Point> transformedPositions = new Dictionary<Atom, Point>();
-           
+
             //compile a set of all the neighbours of the selected atoms
 
             foreach (Atom atom in _atomList)
@@ -101,7 +105,7 @@ namespace Chem4Word.ACME.Adorners
                 {
                     bondSet.Add(bond); //don't worry about adding them twice
                 }
-                
+
                 //if we're just getting an overlay then don't bother transforming
                 if (_shear != null)
                 {
@@ -138,7 +142,7 @@ namespace Chem4Word.ACME.Adorners
                 }
                 else
                 {
-                    drawingContext.DrawLine(_ghostPen,startAtomPosition, endAtomPosition);
+                    drawingContext.DrawLine(_ghostPen, startAtomPosition, endAtomPosition);
                 }
             }
 

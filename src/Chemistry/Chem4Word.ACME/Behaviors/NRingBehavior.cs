@@ -5,17 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Controls;
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners;
+using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -278,7 +278,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             if (MouseIsDown)
             {
-                if ( _preferredPlacements != null)
+                if (_preferredPlacements != null)
                 {
                     List<NewAtomPlacement> newAtomPlacements = new List<NewAtomPlacement>();
                     FillExistingAtoms(_preferredPlacements, newAtomPlacements, CurrentEditor);
@@ -357,7 +357,7 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         public static void FillExistingAtoms(List<Point> preferredPlacements,
-                                            
+
                                              List<NewAtomPlacement> newAtomPlacements,
                                              EditorCanvas currentEditor)
         {
@@ -396,9 +396,8 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        public static void IdentifyPlacements(Bond hitBond, out List<Point> preferredPlacements, int ringSize, Vector? perpvector=null)
+        public static void IdentifyPlacements(Bond hitBond, out List<Point> preferredPlacements, int ringSize, Vector? perpvector = null)
         {
-
             if (perpvector == null)
             {
                 //get a point on the less crowded side of the bond

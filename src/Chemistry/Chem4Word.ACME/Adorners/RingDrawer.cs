@@ -5,14 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -57,12 +56,12 @@ namespace Chem4Word.ACME.Adorners
                             List<Point> dummy = new List<Point>();
 
                             DoubleBondDescriptor dbd = new DoubleBondDescriptor
-                                                       {
-                                                           Start =oldAtomPlacement.Position,
-                                                           End = newAtomPlacement.Position,
-                                                           Placement = Globals.BondDirection.Anticlockwise,
-                                                           PrimaryCentroid = centroid
-                                                       };
+                            {
+                                Start = oldAtomPlacement.Position,
+                                End = newAtomPlacement.Position,
+                                Placement = Globals.BondDirection.Anticlockwise,
+                                PrimaryCentroid = centroid
+                            };
                             BondGeometry.GetDoubleBondGeometry(dbd, dbd.PrincipleVector.Length);
                             BasicGeometry.DrawGeometry(sgc, dbd.DefiningGeometry);
                             visited.Add(oldAtomPlacement);
@@ -71,12 +70,12 @@ namespace Chem4Word.ACME.Adorners
                         else
                         {
                             BondDescriptor sbd = new BondDescriptor
-                                                       {
-                                                           Start = oldAtomPlacement.Position,
-                                                           End = newAtomPlacement.Position
-                                                       };
+                            {
+                                Start = oldAtomPlacement.Position,
+                                End = newAtomPlacement.Position
+                            };
                             BondGeometry.GetSingleBondGeometry(sbd);
-                            BasicGeometry.DrawGeometry(sgc,sbd.DefiningGeometry);
+                            BasicGeometry.DrawGeometry(sgc, sbd.DefiningGeometry);
                         }
 
                         oldAtomPlacement = newAtomPlacement;

@@ -5,13 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
-using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Commands
@@ -24,7 +22,7 @@ namespace Chem4Word.ACME.Commands
 
         public override bool CanExecute(object parameter)
         {
-            var canExecute = Clipboard.ContainsData(Globals.FormatCML) || Clipboard.ContainsData(Globals.FormatSDFile)||Clipboard.ContainsText();
+            var canExecute = Clipboard.ContainsData(Globals.FormatCML) || Clipboard.ContainsData(Globals.FormatSDFile) || Clipboard.ContainsText();
             return canExecute;
         }
 
@@ -35,7 +33,7 @@ namespace Chem4Word.ACME.Commands
 
             if (Clipboard.ContainsData(Globals.FormatCML))
             {
-                string pastedCML = (string) Clipboard.GetData(Globals.FormatCML);
+                string pastedCML = (string)Clipboard.GetData(Globals.FormatCML);
                 EditViewModel.PasteCML(pastedCML);
             }
             else if (Clipboard.ContainsText())
@@ -47,7 +45,7 @@ namespace Chem4Word.ACME.Commands
                 //try to convert the pasted text with the CML converter first
                 try
                 {
-                     buffer = cmlConverter.Import(pastedText);
+                    buffer = cmlConverter.Import(pastedText);
                 }
                 catch
                 {
@@ -56,9 +54,8 @@ namespace Chem4Word.ACME.Commands
 
                 if (failedCML)
                 {
-                   
-                   buffer = sdfConverter.Import(pastedText);
-                   failedSDF = buffer.GeneralErrors.Any();
+                    buffer = sdfConverter.Import(pastedText);
+                    failedSDF = buffer.GeneralErrors.Any();
                 }
 
                 if (failedCML & failedSDF)

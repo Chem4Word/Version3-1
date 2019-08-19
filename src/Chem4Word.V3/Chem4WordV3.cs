@@ -5,16 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core;
-using Chem4Word.Core.Helpers;
-using Chem4Word.Core.UI.Forms;
-using Chem4Word.Helpers;
-using Chem4Word.Library;
-using Chem4Word.Navigator;
-using Chem4Word.Telemetry;
-using IChem4Word.Contracts;
-using Microsoft.Office.Core;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,12 +14,23 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI.Forms;
+using Chem4Word.Helpers;
+using Chem4Word.Library;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Navigator;
+using Chem4Word.Telemetry;
+using IChem4Word.Contracts;
+using Microsoft.Office.Core;
+using Newtonsoft.Json;
 using Extensions = Microsoft.Office.Tools.Word.Extensions;
 using OfficeTools = Microsoft.Office.Tools;
 using Word = Microsoft.Office.Interop.Word;
@@ -40,9 +41,9 @@ namespace Chem4Word
     public partial class Chem4WordV3
     {
         // Internal variables for class
-        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
 
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+        private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public static CustomRibbon Ribbon;
 
@@ -178,23 +179,8 @@ namespace Chem4Word
             }
         }
 
-        /// <summary>
-        ///   Override the BeginInit method to load Chemistry Fonts.
-        /// </summary>
-        public override void BeginInit()
-        {
-            base.BeginInit();
-
-            // Install 2 Chemisty fonts into current process.
-            // Font name: Ms ChemSans, MS ChemSerif
-            //Chem4Word.Font.ChemistryFontManager.AddChemistryFontToProcess();
-        }
-
         private void C4WLiteAddIn_Startup(object sender, EventArgs e)
         {
-            Debug.WriteLine("C4WLiteAddIn_Startup ...");
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
             PerformStartUpActions();
         }
 
@@ -238,8 +224,8 @@ namespace Chem4Word
 
                 if (app.Documents.Count > 0)
                 {
-                    EnableDocumentEvents(app.Documents[1]);
-                    if (app.Documents[1].CompatibilityMode >= (int)Word.WdCompatibilityMode.wdWord2010)
+                    EnableDocumentEvents(app.ActiveDocument);
+                    if (app.ActiveDocument.CompatibilityMode >= (int)Word.WdCompatibilityMode.wdWord2010)
                     {
                         SetButtonStates(ButtonState.CanInsert);
                     }
@@ -259,17 +245,10 @@ namespace Chem4Word
                     UserInteractions.StopUser(sb.ToString());
                 }
 
-                // Changed to Lazy Loading
-                //LoadOptions();
-
                 // Set parameter mustBeSigned true if assemblies must be signed by us
                 LoadPlugIns(false);
-                ListPlugInsFound();
 
                 ConfigWatcher cw = new ConfigWatcher(AddInInfo.ProductAppDataPath);
-
-                // Changed to Lazy Loading
-                //LoadNamesFromLibrary();
 
                 // Deliberate crash to test Error Reporting
                 //int ii = 2;
@@ -280,7 +259,11 @@ namespace Chem4Word
             {
                 Debug.WriteLine(ex.Message);
                 Debug.WriteLine(ex.StackTrace);
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -357,13 +340,15 @@ namespace Chem4Word
                 {
                     if (SystemOptions.SelectedEditorPlugIn.Equals(Constants.DefaultEditorPlugIn800))
                     {
-                        var browser = new WebBrowser().Version;
-                        if (browser.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion)
+                        using (var browser = new WebBrowser())
                         {
-                            Telemetry.Write(module, "Information", "IE 10+ not detected; Switching to ChemDoodle Web 7.0.2");
-                            SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
-                            string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
-                            File.WriteAllText(optionsFile, temp);
+                            if (browser.Version.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion)
+                            {
+                                Telemetry.Write(module, "Information", "IE 10+ not detected; Switching to ChemDoodle Web 7.0.2");
+                                SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
+                                string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
+                                File.WriteAllText(optionsFile, temp);
+                            }
                         }
                     }
                 }
@@ -474,39 +459,6 @@ namespace Chem4Word
             }
         }
 
-        private void ListPlugInsFound()
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            int count = 0;
-
-            //Telemetry.Write(module, "Debug", $"Found {Editors.Count} Editor PlugIns");
-            Debug.WriteLine($"Found {Editors.Count} Editor PlugIns");
-            foreach (IChem4WordEditor editor in Editors)
-            {
-                count++;
-                //Telemetry.Write(module, "Debug", editor.Name);
-                Debug.WriteLine($"{editor.Name}");
-            }
-
-            //Telemetry.Write(module, "Debug", $"Found {Renderers.Count} Renderer PlugIns");
-            Debug.WriteLine($"Found {Renderers.Count} Renderer PlugIns");
-            foreach (IChem4WordRenderer renderer in Renderers)
-            {
-                count++;
-                //Telemetry.Write(module, "Debug", renderer.Name);
-                Debug.WriteLine($"{renderer.Name}");
-            }
-
-            //Telemetry.Write(module, "Debug", $"Found {Searchers.Count} Searchers PlugIns");
-            Debug.WriteLine($"Found {Searchers.Count} Searcher PlugIns");
-            foreach (IChem4WordSearcher searcher in Searchers)
-            {
-                count++;
-                //Telemetry.Write(module, "Debug", searcher.Name);
-                Debug.WriteLine($"{searcher.Name}");
-            }
-        }
-
         private void LoadPlugIns(bool mustBeSigned)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -533,67 +485,68 @@ namespace Chem4Word
 
             foreach (string file in files)
             {
-                var manager = new AssemblyReflectionManager();
-
-                try
+                using (var manager = new AssemblyReflectionManager())
                 {
-                    var success = manager.LoadAssembly(file, "Chem4WordTempDomain");
-                    if (success)
+                    try
                     {
-                        #region Find Our Interfaces
-
-                        var results = manager.Reflect(file, a =>
+                        var success = manager.LoadAssembly(file, "Chem4WordTempDomain");
+                        if (success)
                         {
-                            var names = new List<string>();
+                            #region Find Our Interfaces
 
-                            #region Get Code Signing Certificate details
-
-                            string signedBy = "";
-
-                            Module mod = a.GetModules().First();
-                            var certificate = mod.GetSignerCertificate();
-                            if (certificate != null)
+                            var results = manager.Reflect(file, a =>
                             {
-                                // E=developer@chem4word.co.uk, CN="Open Source Developer, Mike Williams", O=Open Source Developer, C=GB
-                                Debug.WriteLine(certificate.Subject);
-                                signedBy = certificate.Subject;
-                                // CN=Certum Code Signing CA SHA2, OU=Certum Certification Authority, O=Unizeto Technologies S.A., C=PL
-                                Debug.WriteLine(certificate.Issuer);
-                            }
+                                var names = new List<string>();
 
-                            #endregion Get Code Signing Certificate details
+                                #region Get Code Signing Certificate details
 
-                            var types = a.GetTypes();
-                            foreach (var t in types)
-                            {
-                                if (t.IsClass && t.IsPublic && !t.IsAbstract)
+                                string signedBy = "";
+
+                                Module mod = a.GetModules().First();
+                                var certificate = mod.GetSignerCertificate();
+                                if (certificate != null)
                                 {
-                                    var ifaces = t.GetInterfaces();
-                                    foreach (var iface in ifaces)
+                                    // E=developer@chem4word.co.uk, CN="Open Source Developer, Mike Williams", O=Open Source Developer, C=GB
+                                    Debug.WriteLine(certificate.Subject);
+                                    signedBy = certificate.Subject;
+                                    // CN=Certum Code Signing CA SHA2, OU=Certum Certification Authority, O=Unizeto Technologies S.A., C=PL
+                                    Debug.WriteLine(certificate.Issuer);
+                                }
+
+                                #endregion Get Code Signing Certificate details
+
+                                var types = a.GetTypes();
+                                foreach (var t in types)
+                                {
+                                    if (t.IsClass && t.IsPublic && !t.IsAbstract)
                                     {
-                                        if (iface.FullName.StartsWith("IChem4Word.Contracts"))
+                                        var ifaces = t.GetInterfaces();
+                                        foreach (var iface in ifaces)
                                         {
-                                            string[] parts = a.FullName.Split(',');
-                                            FileInfo fi = new FileInfo(t.Module.FullyQualifiedName);
-                                            names.Add($"{parts[0]}|{iface.FullName}|{fi.Name}|{signedBy}");
+                                            if (iface.FullName.StartsWith("IChem4Word.Contracts"))
+                                            {
+                                                string[] parts = a.FullName.Split(',');
+                                                FileInfo fi = new FileInfo(t.Module.FullyQualifiedName);
+                                                names.Add($"{parts[0]}|{iface.FullName}|{fi.Name}|{signedBy}");
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            return names;
-                        });
+                                return names;
+                            });
 
-                        #endregion Find Our Interfaces
+                            #endregion Find Our Interfaces
 
-                        manager.UnloadAssembly(file);
+                            manager.UnloadAssembly(file);
 
-                        plugInsFound.AddRange(results);
+                            plugInsFound.AddRange(results);
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
                 }
             }
 
@@ -710,8 +663,6 @@ namespace Chem4Word
 
         public IChem4WordEditor GetEditorPlugIn(string name)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
             IChem4WordEditor plugin = null;
 
             if (!string.IsNullOrEmpty(name))
@@ -734,8 +685,6 @@ namespace Chem4Word
 
         public IChem4WordRenderer GetRendererPlugIn(string name)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
             IChem4WordRenderer plugin = null;
 
             if (!string.IsNullOrEmpty(name))
@@ -758,8 +707,6 @@ namespace Chem4Word
 
         public IChem4WordSearcher GetSearcherPlugIn(string name)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
             IChem4WordSearcher plugin = null;
 
             if (!string.IsNullOrEmpty(name))
@@ -896,8 +843,6 @@ namespace Chem4Word
 
         private void SetButtonStates(ButtonState state)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
             if (Ribbon != null)
             {
                 Debug.WriteLine(state.ToString());
@@ -1008,7 +953,7 @@ namespace Chem4Word
                     //Debug.WriteLine($"CC '{cc.Tag}' Range from {cc.Range.Start} to {cc.Range.End}");
 
                     // Already Selected
-                    if (sel.Range.Start == cc.Range.Start -1 && sel.Range.End == cc.Range.End + 1)
+                    if (sel.Range.Start == cc.Range.Start - 1 && sel.Range.End == cc.Range.End + 1)
                     {
                         if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                         {
@@ -1092,7 +1037,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1216,7 +1165,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1254,6 +1207,7 @@ namespace Chem4Word
                             // Handling the selected text sentence by sentence should make us immune to return character sizing.
                             for (int i = 1; i <= sentenceCount; i++)
                             {
+                                // Fix GitHub Issue #10
                                 try
                                 {
                                     var sentence = sel.Sentences[i];
@@ -1268,7 +1222,6 @@ namespace Chem4Word
                                         if (range.ContentControls.Count == 0)
                                         {
                                             string sentenceText = range.Text;
-                                            //Debug.WriteLine($"Sentences[{i}] --> {sentenceText}");
                                             if (!string.IsNullOrEmpty(sentenceText))
                                             {
                                                 foreach (var kvp in LibraryNames)
@@ -1414,7 +1367,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1578,7 +1535,6 @@ namespace Chem4Word
                         {
                             SetButtonStates(ButtonState.NoDocument);
                         }
-
                     }
                 }
             }
@@ -1589,7 +1545,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1614,7 +1574,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1666,7 +1630,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1732,7 +1700,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -1790,7 +1762,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -2037,7 +2013,7 @@ namespace Chem4Word
         private object DecodeStoryType(Word.WdStoryType storyType)
         {
             // Data from https://msdn.microsoft.com/en-us/vba/word-vba/articles/wdstorytype-enumeration-word
-            string result = "";
+            string result;
 
             switch (storyType)
             {
@@ -2120,7 +2096,7 @@ namespace Chem4Word
         private static string DecodeContentControlType(Word.WdContentControlType? contentControlType)
         {
             // Date from https://msdn.microsoft.com/en-us/library/microsoft.office.interop.word.wdcontentcontroltype(v=office.14).aspx
-            string result = "";
+            string result;
 
             switch (contentControlType)
             {
@@ -2199,7 +2175,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -2232,7 +2212,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -2266,35 +2250,41 @@ namespace Chem4Word
                 {
                     if (!ccId.Equals(_lastContentControlAdded))
                     {
-                        string message = $"ContentControl {ccId} added; Looking for structure {ccTag}";
-                        Debug.WriteLine("  " + message);
-                        Telemetry.Write(module, "Information", message);
+                        // Check that tag looks like it might be a C4W Tag
+                        var regex = @"^[0-9a-fmn.:]+$";
+                        Match match = Regex.Match(ccTag, regex, RegexOptions.IgnoreCase);
+                        if (match.Success)
+                        {
+                            string message = $"ContentControl {ccId} added; Looking for structure {ccTag}";
+                            Debug.WriteLine("  " + message);
+                            Telemetry.Write(module, "Information", message);
 
-                        Word.Document doc = NewContentControl.Application.ActiveDocument;
-                        Word.Application app = Application;
-                        CustomXMLPart cxml = CustomXmlPartHelper.GetCustomXmlPart(ccTag, app.ActiveDocument);
-                        if (cxml != null)
-                        {
-                            Telemetry.Write(module, "Information", "Found copy of " + ccTag + " in this document.");
-                        }
-                        else
-                        {
-                            if (doc.Application.Documents.Count > 1)
+                            Word.Document doc = NewContentControl.Application.ActiveDocument;
+                            Word.Application app = Application;
+                            CustomXMLPart cxml = CustomXmlPartHelper.GetCustomXmlPart(ccTag, app.ActiveDocument);
+                            if (cxml != null)
                             {
-                                Word.Application app1 = Application;
-                                cxml = CustomXmlPartHelper.FindCustomXmlPart(ccTag, app1.ActiveDocument);
-                                if (cxml != null)
+                                Telemetry.Write(module, "Information", "Found copy of " + ccTag + " in this document.");
+                            }
+                            else
+                            {
+                                if (doc.Application.Documents.Count > 1)
                                 {
-                                    Telemetry.Write(module, "Information", "Found copy of " + ccTag + " in other document, adding it into this.");
+                                    Word.Application app1 = Application;
+                                    cxml = CustomXmlPartHelper.FindCustomXmlPart(ccTag, app1.ActiveDocument);
+                                    if (cxml != null)
+                                    {
+                                        Telemetry.Write(module, "Information", "Found copy of " + ccTag + " in other document, adding it into this.");
 
-                                    // Generate new molecule Guid and apply it
-                                    string newGuid = Guid.NewGuid().ToString("N");
-                                    NewContentControl.Tag = newGuid;
+                                        // Generate new molecule Guid and apply it
+                                        string newGuid = Guid.NewGuid().ToString("N");
+                                        NewContentControl.Tag = newGuid;
 
-                                    CMLConverter cmlConverter = new CMLConverter();
-                                    Model model = cmlConverter.Import(cxml.XML);
-                                    model.CustomXmlPartGuid = newGuid;
-                                    doc.CustomXMLParts.Add(cmlConverter.Export(model));
+                                        CMLConverter cmlConverter = new CMLConverter();
+                                        Model model = cmlConverter.Import(cxml.XML);
+                                        model.CustomXmlPartGuid = newGuid;
+                                        doc.CustomXMLParts.Add(cmlConverter.Export(model));
+                                    }
                                 }
                             }
                         }
@@ -2310,7 +2300,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -2341,7 +2335,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -2364,14 +2362,6 @@ namespace Chem4Word
                 }
 
                 Debug.WriteLine($"{module.Replace("()", $"({contentControl.Application.ActiveDocument.Name})")}");
-                //if (EventsEnabled)
-                //{
-                //    //Debug.WriteLine("CC ID: " + contentControl.ID + " Tag: " + contentControl.Tag + " Title: " + contentControl.Title);
-                //    Word.Document doc = contentControl.Application.ActiveApp;
-                //    Word.Selection sel = doc.Application.Selection;
-                //    Debug.WriteLine("  Selection: from " + sel.Range.Start + " to " + sel.Range.End);
-                //    SelectChemistry(sel);
-                //}
             }
             catch (Exception ex)
             {
@@ -2380,7 +2370,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
@@ -2423,7 +2417,11 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                new ReportError(Telemetry, WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
+
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }

@@ -5,13 +5,13 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -78,7 +78,7 @@ namespace Chem4Word.ACME.Drawing
 
             Point? centroid = null;
             Point? secondaryCentroid = null;
-            if(!ignoreCentroid)
+            if (!ignoreCentroid)
             {
                 if (parent.IsCyclic())
                 {
@@ -91,7 +91,6 @@ namespace Chem4Word.ACME.Drawing
                     secondaryCentroid = null;
                 }
             }
-          
 
             //do the straightforward cases first -discriminate by stereo
             var parentStereo = parent.Stereo;
@@ -282,7 +281,6 @@ namespace Chem4Word.ACME.Drawing
 
             //first grab the main descriptor
             BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength);
-            
 
             _enclosingPoly = BondDescriptor.Boundary;
             //set up the default pens for rendering
@@ -379,7 +377,7 @@ namespace Chem4Word.ACME.Drawing
                 case "2":
                 case Globals.OrderDouble:
                     // Handle 1.5 bond
-                    DoubleBondDescriptor dbd3 = (DoubleBondDescriptor) BondDescriptor;
+                    DoubleBondDescriptor dbd3 = (DoubleBondDescriptor)BondDescriptor;
                     Point? centroid = ParentBond.Centroid;
                     dbd3.PrimaryCentroid = centroid;
 
@@ -390,7 +388,7 @@ namespace Chem4Word.ACME.Drawing
 
                     _enclosingPoly = dbd3.Boundary;
 
-                    if(ParentBond.Stereo!=Globals.BondStereo.Indeterminate)
+                    if (ParentBond.Stereo != Globals.BondStereo.Indeterminate)
                     {
                         using (DrawingContext dc = RenderOpen())
                         {
@@ -406,13 +404,11 @@ namespace Chem4Word.ACME.Drawing
                         using (DrawingContext dc = RenderOpen())
                         {
                             dc.DrawGeometry(_mainBondPen.Brush, _mainBondPen, BondDescriptor.DefiningGeometry);
-                          
+
                             dc.Close();
                         }
                     }
                     break;
-
-                
 
                 case Globals.OrderPartial23:
                 case "3":

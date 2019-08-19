@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Chem4Word.Model2.Helpers
@@ -38,7 +37,7 @@ namespace Chem4Word.Model2.Helpers
             {
                 // Remove all spaces
                 string temp = input.Replace(" ", "");
-                Debug.WriteLine($"{input} --> {temp}");
+                //Debug.WriteLine($"{input} --> {temp}");
 
                 string[] formulae = temp.Split('.');
                 for (int i = 0; i < formulae.Length; i++)

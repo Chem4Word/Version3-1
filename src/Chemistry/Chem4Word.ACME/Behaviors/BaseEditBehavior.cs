@@ -5,15 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2.Annotations;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interactivity;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Annotations;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -31,7 +30,6 @@ namespace Chem4Word.ACME.Behaviors
 
         private string _currentStatus;
 
-
         private EditorCanvas _currentEditor;
 
         public EditorCanvas CurrentEditor
@@ -39,9 +37,9 @@ namespace Chem4Word.ACME.Behaviors
             get { return _currentEditor; }
             set
             {
-                if (_currentEditor!=null)
+                if (_currentEditor != null)
                 {
-                    _currentEditor.PreviewKeyDown-= CurrentEditor_PreviewKeyDown;
+                    _currentEditor.PreviewKeyDown -= CurrentEditor_PreviewKeyDown;
                 }
                 _currentEditor = value;
                 if (_currentEditor != null)
@@ -51,7 +49,6 @@ namespace Chem4Word.ACME.Behaviors
                     _currentEditor.Focus();
                 }
             }
-            
         }
 
         private void CurrentEditor_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -62,7 +59,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-      
         public virtual string CurrentStatus
         {
             get
@@ -77,7 +73,6 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         public abstract void Abort();
-       
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -95,6 +90,5 @@ namespace Chem4Word.ACME.Behaviors
                 _currentEditor.PreviewKeyDown -= CurrentEditor_PreviewKeyDown;
             }
         }
-
     }
 }

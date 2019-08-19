@@ -5,16 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
-using Microsoft.Office.Interop.Word;
-using System;
-using System.Linq;
-using System.Reflection;
 using Chem4Word.Model2.Converters.CML;
-using DocumentFormat.OpenXml.EMMA;
+using Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Helpers
 {

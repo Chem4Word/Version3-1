@@ -26,7 +26,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
         private static double _halfThumbWidth;
         private static double _rotateThumbWidth;
 
-
         //some things to grab hold of
         protected readonly Thumb TopLeftHandle; //these do the resizing
 
@@ -39,6 +38,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //flags
         protected bool Resizing;
+
         protected bool Rotating;
 
         private double _rotateAngle;
@@ -50,7 +50,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         private Point _originalThumbPos;
 
         public MoleculeSelectionAdorner(EditorCanvas currentEditor, List<Molecule> molecules)
-            : base(currentEditor, molecules.ConvertAll(m => (ChemistryBase) m))
+            : base(currentEditor, molecules.ConvertAll(m => (ChemistryBase)m))
         {
             if (_thumbWidth == null)
             {
@@ -86,7 +86,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         public Rect BoundingBox { get; set; }
         private new bool IsWorking => Dragging || Resizing || Rotating;
 
-        #endregion
+        #endregion Properties
 
         #region Methods
 
@@ -134,7 +134,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             RotateHandle.Width = _rotateThumbWidth;
             RotateHandle.Height = _rotateThumbWidth;
             RotateHandle.Cursor = Cursors.Hand;
-            rotateThumb.Style = (Style) FindResource("RotateThumb");
+            rotateThumb.Style = (Style)FindResource("RotateThumb");
             rotateThumb.DragStarted += RotateStarted;
             rotateThumb.DragDelta += RotateThumb_DragDelta;
             rotateThumb.DragCompleted += HandleResizeCompleted;
@@ -207,7 +207,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
-
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {
             if (cornerThumb != null)
@@ -226,10 +225,10 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         protected virtual void SetThumbStyle(Thumb cornerThumb)
         {
-            cornerThumb.Style = (Style) FindResource("GrabHandleStyle");
+            cornerThumb.Style = (Style)FindResource("GrabHandleStyle");
         }
 
-        #endregion
+        #endregion Methods
 
         #region Overrides
 
@@ -298,7 +297,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
             RotateHandle.Arrange(new Rect(newLoc.X, newLoc.Y, RotateHandle.Width, RotateHandle.Height));
 
-
             base.ArrangeOverride(finalSize);
             return finalSize;
         }
@@ -311,7 +309,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             base.OnRender(drawingContext);
 
-            var brush = (Brush) FindResource("GrabHandleBorderBrush");
+            var brush = (Brush)FindResource("GrabHandleBorderBrush");
             var pen = new Pen(brush, 1.0);
             if (!(BigThumb.IsDragging | TopLeftHandle.IsDragging | TopRightHandle.IsDragging |
                   BottomLeftHandle.IsDragging | BottomRightHandle.IsDragging))
@@ -330,7 +328,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
         }
 
-        #endregion
+        #endregion Overrides
 
         #region Resizing
 

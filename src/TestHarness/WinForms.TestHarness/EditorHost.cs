@@ -5,17 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME;
-using Chem4Word.Core;
-using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Telemetry;
 using System;
 using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
-using Chem4Word.ACME.Controls;
+using Chem4Word.ACME;
+using Chem4Word.Core;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Telemetry;
 using Size = System.Drawing.Size;
 
 namespace WinForms.TestHarness
@@ -31,8 +30,6 @@ namespace WinForms.TestHarness
         {
             InitializeComponent();
             _editorType = type;
-
-            this.MinimumSize = new Size(300, 200);
 
             var appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var settingsPath = Path.Combine(appdata, "Chem4Word.V3");
@@ -55,8 +52,9 @@ namespace WinForms.TestHarness
                     break;
 
                 case "LABELS":
-                    LabelsEditor labelsEditor = new LabelsEditor(cml);
+                    LabelsEditor labelsEditor = new LabelsEditor();
                     labelsEditor.InitializeComponent();
+                    labelsEditor.PopulateTreeView(cml);
                     elementHost1.Child = labelsEditor;
 
                     // Configure Control
@@ -75,12 +73,13 @@ namespace WinForms.TestHarness
                     // Wire Up Button(s)
                     cmlEditor.OnButtonClick += OnWpfButtonClick;
                     break;
-
             }
         }
 
         private void EditorHost_Load(object sender, EventArgs e)
         {
+            MinimumSize = new Size(300, 200);
+
             switch (_editorType)
             {
                 case "ACME":

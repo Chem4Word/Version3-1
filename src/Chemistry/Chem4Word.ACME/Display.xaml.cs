@@ -30,7 +30,7 @@ namespace Chem4Word.ACME
 
         public Brush BackgroundColor
         {
-            get { return (Brush) GetValue(BackgroundColorProperty); }
+            get { return (Brush)GetValue(BackgroundColorProperty); }
             set { SetValue(BackgroundColorProperty, value); }
         }
 
@@ -43,7 +43,7 @@ namespace Chem4Word.ACME
 
         public object Chemistry
         {
-            get { return (object) GetValue(ChemistryProperty); }
+            get { return (object)GetValue(ChemistryProperty); }
             set { SetValue(ChemistryProperty, value); }
         }
 
@@ -73,7 +73,7 @@ namespace Chem4Word.ACME
 
         public double ChemistryWidth
         {
-            get { return (double) GetValue(ChemistryWidthProperty); }
+            get { return (double)GetValue(ChemistryWidthProperty); }
             set { SetValue(ChemistryWidthProperty, value); }
         }
 
@@ -92,7 +92,7 @@ namespace Chem4Word.ACME
 
         public double ChemistryHeight
         {
-            get { return (double) GetValue(ChemistryHeightProperty); }
+            get { return (double)GetValue(ChemistryHeightProperty); }
             set { SetValue(ChemistryHeightProperty, value); }
         }
 
@@ -107,10 +107,9 @@ namespace Chem4Word.ACME
 
         #endregion ChemistryHeight (DependencyProperty)
 
-
         public bool HighlightActive
         {
-            get { return (bool) GetValue(HighlightActiveProperty); }
+            get { return (bool)GetValue(HighlightActiveProperty); }
             set { SetValue(HighlightActiveProperty, value); }
         }
 
@@ -189,7 +188,7 @@ namespace Chem4Word.ACME
 
         public bool ShowGroups
         {
-            get { return (bool) GetValue(ShowGroupsProperty); }
+            get { return (bool)GetValue(ShowGroupsProperty); }
             set { SetValue(ShowGroupsProperty, value); }
         }
 

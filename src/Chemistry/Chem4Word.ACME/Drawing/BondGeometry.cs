@@ -12,16 +12,13 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using static Chem4Word.Model2.Helpers.Globals;
 
 namespace Chem4Word.ACME.Drawing
 {
     /// <summary>
-    ///     Static class to handle bond geometries 
+    ///     Static class to handle bond geometries
     /// </summary>
- 
-  
     public static class BondGeometry
     {
         /// <summary>
@@ -36,10 +33,11 @@ namespace Chem4Word.ACME.Drawing
 
             desc.SecondCorner = desc.End - perp;
 
-            desc.Boundary.AddRange(new[] {desc.Start, desc.FirstCorner, desc.SecondCorner});
+            desc.Boundary.AddRange(new[] { desc.Start, desc.FirstCorner, desc.SecondCorner });
         }
+
         /// <summary>
-        /// Gets the geometry of a wedge bond.  
+        /// Gets the geometry of a wedge bond.
         /// </summary>
         /// <param name="desc">WedgeBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
@@ -51,7 +49,7 @@ namespace Chem4Word.ACME.Drawing
             var perpVector = bondVector.Perpendicular();
             perpVector.Normalize();
             perpVector *= standardBondLength * BondOffsetPercentage;
-            
+
             // shrink the bond so it doesn't overlap any AtomVisuals
             AdjustTerminus(ref desc.Start, desc.End, desc.StartAtomVisual);
             AdjustTerminus(ref desc.End, desc.Start, desc.EndAtomVisual);
@@ -146,7 +144,6 @@ namespace Chem4Word.ACME.Drawing
         public static void GetDoubleBondGeometry(DoubleBondDescriptor descriptor, double standardBondLength)
 
         {
-
             //get the standard points for a double bond
             GetDoubleBondPoints(descriptor, standardBondLength);
             //adjust the line ends
@@ -155,7 +152,6 @@ namespace Chem4Word.ACME.Drawing
                 AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
                 AdjustTerminus(ref descriptor.SecondaryStart, descriptor.SecondaryEnd, descriptor.StartAtomVisual);
             }
-
 
             if (descriptor.EndAtomVisual != null)
             {
@@ -178,7 +174,7 @@ namespace Chem4Word.ACME.Drawing
         }
 
         /// <summary>
-        ///     Defines a double bond 
+        ///     Defines a double bond
         /// </summary>
         /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
@@ -188,19 +184,18 @@ namespace Chem4Word.ACME.Drawing
             Point? point3a;
             Point? point4a;
 
-
             //use a struct here to return the values
             GetDefaultDoubleBondPoints(descriptor, standardBondLength);
 
             if (descriptor.PrimaryCentroid != null)
-                //now, if there is a centroid defined, the bond is part of a ring
+            //now, if there is a centroid defined, the bond is part of a ring
             {
                 Point? workingCentroid = null;
                 //work out whether the bond is place inside or outside the ring
                 var bondvector = descriptor.PrincipleVector;
                 var centreVector = descriptor.PrimaryCentroid - descriptor.Start;
 
-                var computedPlacement = (BondDirection) Math.Sign(Vector.CrossProduct(centreVector.Value, bondvector));
+                var computedPlacement = (BondDirection)Math.Sign(Vector.CrossProduct(centreVector.Value, bondvector));
 
                 if (descriptor.Placement != BondDirection.None)
                 {
@@ -217,7 +212,7 @@ namespace Chem4Word.ACME.Drawing
                 if (workingCentroid != null)
 
                 {
-                    //shorten the secondto fit neatly within the ring 
+                    //shorten the secondto fit neatly within the ring
                     point3a = BasicGeometry.LineSegmentsIntersect(descriptor.Start, workingCentroid.Value,
                                                                   descriptor.SecondaryStart,
                                                                   descriptor.SecondaryEnd);
@@ -237,9 +232,9 @@ namespace Chem4Word.ACME.Drawing
                                                       descriptor.Start, descriptor.End, descriptor.SecondaryEnd,
                                                       descriptor.SecondaryStart
                                                   });
-                
             }
         }
+
         /// <summary>
         /// Gets an unadjusted set of points for a double bond
         /// </summary>
@@ -251,7 +246,6 @@ namespace Chem4Word.ACME.Drawing
             var normal = v.Perpendicular();
             normal.Normalize();
 
-
             var distance = standardBondLength * BondOffsetPercentage;
             //first, calculate the default bond points as if there were no rings involved
             var tempStart = descriptor.Start;
@@ -260,7 +254,6 @@ namespace Chem4Word.ACME.Drawing
             {
                 case BondDirection.None:
 
-                    
                     descriptor.Start = tempStart + normal * distance;
                     descriptor.End = descriptor.Start + v;
 
@@ -270,23 +263,22 @@ namespace Chem4Word.ACME.Drawing
                     break;
 
                 case BondDirection.Clockwise:
-                {
-                   
-                    descriptor.SecondaryStart = tempStart - normal * 2 * distance;
-                    descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
+                    {
+                        descriptor.SecondaryStart = tempStart - normal * 2 * distance;
+                        descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
 
-                    break;
-                }
+                        break;
+                    }
 
                 case BondDirection.Anticlockwise:
 
-                    descriptor.SecondaryStart =tempStart + normal * 2 * distance;
+                    descriptor.SecondaryStart = tempStart + normal * 2 * distance;
                     descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
                     break;
 
                 default:
 
-                    descriptor.Start = tempStart+ normal * distance;
+                    descriptor.Start = tempStart + normal * distance;
                     descriptor.End = descriptor.Start + v;
 
                     descriptor.SecondaryStart = tempStart - normal * distance;
@@ -315,13 +307,11 @@ namespace Chem4Word.ACME.Drawing
             point3 = descriptor.Start - normal * distance;
             point4 = point3 + v;
 
-
             if (descriptor.StartAtomVisual != null)
             {
                 AdjustTerminus(ref point1, point2, descriptor.StartAtomVisual);
                 AdjustTerminus(ref point3, point4, descriptor.StartAtomVisual);
             }
-
 
             if (descriptor.EndAtomVisual != null)
             {
@@ -342,7 +332,7 @@ namespace Chem4Word.ACME.Drawing
             sg.Freeze();
             descriptor.DefiningGeometry = sg;
             descriptor.Boundary.Clear();
-            descriptor.Boundary.AddRange(new[] {point1, point2, point4, point3});
+            descriptor.Boundary.AddRange(new[] { point1, point2, point4, point3 });
         }
 
         public static void GetSingleBondGeometry(BondDescriptor descriptor)
@@ -351,12 +341,11 @@ namespace Chem4Word.ACME.Drawing
             var end = descriptor.End;
 
             var sg = new StreamGeometry();
-            
-            if (descriptor.StartAtomVisual!= null)
+
+            if (descriptor.StartAtomVisual != null)
             {
                 AdjustTerminus(ref start, end, descriptor.StartAtomVisual);
             }
-
 
             if (descriptor.EndAtomVisual != null)
             {
@@ -382,7 +371,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="av">AtomVisual to avoid</param>
         public static void AdjustTerminus(ref Point startPoint, Point endPoint, AtomVisual av)
         {
-            if (av!=null && av.AtomSymbol != "")
+            if (av != null && av.AtomSymbol != "")
             {
                 if (startPoint != endPoint)
                 {
@@ -400,15 +389,16 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
-       private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
+        private static List<PathFigure> GetSingleBondSegment(Point startPoint, Point endPoint)
         {
-            var segments = new List<PathSegment> {new LineSegment(endPoint, false)};
+            var segments = new List<PathSegment> { new LineSegment(endPoint, false) };
 
             var figures = new List<PathFigure>();
             var pf = new PathFigure(startPoint, segments, true);
             figures.Add(pf);
             return figures;
         }
+
         /// <summary>
         /// Quite ghastly routine to draw a wiggly bond
         /// </summary>
@@ -424,7 +414,6 @@ namespace Chem4Word.ACME.Drawing
                 AdjustTerminus(ref descriptor.Start, descriptor.End, descriptor.StartAtomVisual);
             }
 
-
             if (descriptor.EndAtomVisual != null)
             {
                 AdjustTerminus(ref descriptor.End, descriptor.Start, descriptor.EndAtomVisual);
@@ -436,7 +425,7 @@ namespace Chem4Word.ACME.Drawing
             {
                 var bondVector = descriptor.PrincipleVector;
                 //come up with a number of wiggles that looks aesthetically sensible
-                var noOfWiggles = (int) Math.Ceiling(bondVector.Length / (standardBondLength * BondOffsetPercentage *2));
+                var noOfWiggles = (int)Math.Ceiling(bondVector.Length / (standardBondLength * BondOffsetPercentage * 2));
                 if (noOfWiggles < 3)
                 {
                     noOfWiggles = 3;
@@ -448,7 +437,7 @@ namespace Chem4Word.ACME.Drawing
                 halfAWiggle = bondVector;
                 halfAWiggle.Normalize();
                 halfAWiggle *= wiggleLength / 2;
-                
+
                 //work out left and right sprouting vectors
                 var toLeft = new Matrix();
                 toLeft.Rotate(-60);
@@ -527,7 +516,6 @@ namespace Chem4Word.ACME.Drawing
             //the scaling factors are what we multiply the bond edge vectors by
             double firstScalingFactor = 0d, secondScalingFactor = 0d;
 
-
             //work out the biggest scaling factor for either long edge
             foreach (var point in widestPoints)
             {
@@ -566,8 +554,6 @@ namespace Chem4Word.ACME.Drawing
             //and multiply the edges by the scaling factors
             descriptor.FirstCorner = firstEdgeVector * firstScalingFactor + descriptor.Start;
             descriptor.SecondCorner = secondEdgeVector * secondScalingFactor + descriptor.Start;
-
-           
 
             descriptor.CappedOff = true;
 

@@ -5,11 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2;
 using static Chem4Word.ACME.Drawing.BondVisual;
 using static Chem4Word.Model2.Geometry.BasicGeometry;
 
@@ -24,8 +24,6 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion Constructors
-
-
 
         #region Methods
 
@@ -55,7 +53,7 @@ namespace Chem4Word.ACME.Controls
                 }
                 else
                 {
-                    bb= GetMoleculeBoundingBox(molecule);
+                    bb = GetMoleculeBoundingBox(molecule);
                 }
                 union.Union(bb);
             }
@@ -146,18 +144,17 @@ namespace Chem4Word.ACME.Controls
                 }
                 foreach (Bond bond in bondSet)
                 {
-
                     List<Point> throwaway = new List<Point>();
                     var startAtomPosition = transformedPositions[bond.StartAtom];
                     var endAtomPosition = transformedPositions[bond.EndAtom];
-                    var startAtomVisual = (AtomVisual)(chemicalVisuals[bond.StartAtom]) ;
+                    var startAtomVisual = (AtomVisual)(chemicalVisuals[bond.StartAtom]);
                     var endAtomVisual = (AtomVisual)(chemicalVisuals[bond.EndAtom]);
                     var descriptor = GetBondDescriptor(startAtomVisual, endAtomVisual, Chemistry.Model.XamlBondLength,
                                                        bond.Stereo, startAtomPosition, endAtomPosition, bond.OrderValue,
                                                        bond.Placement, bond.Centroid, bond.SubsidiaryRing?.Centroid);
                     descriptor.Start = startAtomPosition;
                     descriptor.End = endAtomPosition;
-                    var bondgeom =  descriptor.DefiningGeometry;
+                    var bondgeom = descriptor.DefiningGeometry;
                     DrawGeometry(ghostContext, bondgeom);
                 }
                 ghostContext.Close();
@@ -165,7 +162,6 @@ namespace Chem4Word.ACME.Controls
 
             return ghostGeometry;
         }
-
 
         #endregion Methods
 

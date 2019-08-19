@@ -9,9 +9,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
     Loaded="LabelsEditor_OnLoaded"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <converters:BoolToVisibilityConverter
+            x:Key="VisConverter"
+            FalseValue="Collapsed"
+            TrueValue="Visible" />
         <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
         <converters:TreeViewLineConverter x:Key="LineConverter" />
         <SolidColorBrush x:Key="GlyphBrush" Color="#444" />
@@ -180,7 +185,8 @@
             Height="Auto"
             MinHeight="16"
             Margin="5"
-            Orientation="Horizontal" />
+            Orientation="Horizontal"
+            Visibility="{Binding Path=ShowTopPanel, Mode=TwoWay, Converter={StaticResource VisConverter}}" />
         <Border
             Grid.Row="1"
             BorderBrush="{StaticResource Chem4WordBrush}"
@@ -203,11 +209,17 @@
                         VerticalScrollBarVisibility="Auto">
                         <TreeView x:Name="TreeView" SelectedItemChanged="TreeView_OnSelectedItemChanged" />
                     </ScrollViewer>
-                    <acme:Display
-                        x:Name="Display"
+                    <Border
                         Grid.Row="2"
-                        Background="White"
-                        HighlightActive="False" />
+                        Grid.Column="0"
+                        BorderBrush="DarkOrange"
+                        BorderThickness="3"
+                        CornerRadius="5">
+                        <acme:Display
+                            x:Name="Display"
+                            Background="White"
+                            HighlightActive="False" />
+                    </Border>
                     <GridSplitter
                         Grid.Row="1"
                         Height="5"
@@ -243,7 +255,7 @@
                     Background="Silver" />
             </Grid>
         </Border>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Visibility="{Binding Path=ShowBottomPanel, Mode=TwoWay, Converter={StaticResource VisConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -262,7 +274,7 @@
                     Margin="5"
                     VerticalAlignment="Center"
                     Click="OnSaveClick"
-                    Content="Ok"
+                    Content="Save"
                     IsDefault="True" />
                 <Button
                     Width="80"
@@ -271,7 +283,6 @@
                     VerticalAlignment="Center"
                     Click="OnCancelClick"
                     Content="Cancel" />
-
             </StackPanel>
         </Grid>
     </Grid>

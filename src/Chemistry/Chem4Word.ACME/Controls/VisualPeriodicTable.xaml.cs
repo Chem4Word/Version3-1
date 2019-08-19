@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
 using System;
 using System.Linq;
 using System.Windows;
@@ -13,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Controls
 {

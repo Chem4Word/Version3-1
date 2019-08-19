@@ -5,11 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2.Annotations;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2.Annotations;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -30,7 +30,6 @@ namespace Chem4Word.ACME.Adorners
             CurrentEditor = (EditorCanvas)adornedElement;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
-
 
             Focusable = true;
             Focus();

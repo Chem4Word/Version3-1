@@ -20,9 +20,9 @@ namespace Chem4Word.ACME.Adorners.Selectors
     public class SingleAtomSelectionAdorner : MultiChemistryAdorner
     {
         protected Thumb BigThumb; //this is the main grab area for the molecule
-       
 
         public List<Molecule> AdornedMolecules => AdornedChemistries.Select(c => (Molecule)c).ToList();
+
         //tracks the last operation performed
         protected Transform LastOperation;
 
@@ -31,16 +31,17 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //tracks the amount of travel during drag operations
         protected double DragXTravel;
+
         protected double DragYTravel;
 
         //where the dragging starts
         protected Point StartPos;
 
         protected bool IsWorking => Dragging;
-        
+
         private Geometry _ghostMolecule;
 
-        public SingleAtomSelectionAdorner(EditorCanvas currentEditor , Molecule molecule)
+        public SingleAtomSelectionAdorner(EditorCanvas currentEditor, Molecule molecule)
             : this(currentEditor, new List<ChemistryBase> { molecule })
         {
         }
@@ -59,11 +60,10 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         protected void AttachHandler()
         {
-          
-           //detach the handlers to stop them interfering with dragging
-           PreviewMouseLeftButtonDown -= BaseSelectionAdorner_PreviewMouseLeftButtonDown;
-           MouseLeftButtonDown -= BaseSelectionAdorner_MouseLeftButtonDown;
-           PreviewMouseMove -= BaseSelectionAdorner_PreviewMouseMove;
+            //detach the handlers to stop them interfering with dragging
+            PreviewMouseLeftButtonDown -= BaseSelectionAdorner_PreviewMouseLeftButtonDown;
+            MouseLeftButtonDown -= BaseSelectionAdorner_MouseLeftButtonDown;
+            PreviewMouseMove -= BaseSelectionAdorner_PreviewMouseMove;
         }
 
         private void BigThumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -73,7 +73,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
                 RaiseEvent(e);
             }
         }
-
 
         protected virtual void AbortDragging()
         {

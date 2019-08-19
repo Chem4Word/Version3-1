@@ -23,12 +23,12 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
 {
     public partial class ChemDoodleWeb : Form, IMessageFilter
     {
-        private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-        private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+        private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private const int WM_KEYDOWN = 0x0100;
 
-        private string ms_AppTitle = "Chem4Word Editor - Powered By ChemDoodle Web V";
+        private readonly string ms_AppTitle = "Chem4Word Editor - Powered By ChemDoodle Web V";
 
         public System.Windows.Point TopLeft { get; set; }
 
@@ -55,7 +55,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
         private bool _eventsEnabled = false;
         private bool _saveSettings = false;
 
-        private Stopwatch _sw = new Stopwatch();
+        private readonly Stopwatch _sw = new Stopwatch();
 
         public ChemDoodleWeb()
         {
@@ -103,7 +103,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
 
             return handled;
@@ -221,7 +224,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -302,7 +308,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -322,7 +331,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        private void OkButton_OnClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -361,11 +370,14 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void CancelButton_OnClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -374,7 +386,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -397,7 +412,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -410,7 +428,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             File.WriteAllText(optionsFile, json);
         }
 
-        private void chkToggleShowHydrogens_CheckedChanged(object sender, EventArgs e)
+        private void ToggleShowHydrogens_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -434,17 +452,19 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void btnAddExplicitHydrogens_Click(object sender, EventArgs e)
+        private void AddExplicitHydrogens_OnClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             try
             {
-                //Telemetry.Write(module, "Action", "Triggered");
                 if (_eventsEnabled)
                 {
                     ExecuteJavaScript("AddExplicitHydrogens");
@@ -452,11 +472,14 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void btnRemoveExplicitHydrogens_Click(object sender, EventArgs e)
+        private void RemoveExplicitHydrogens_OnClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -464,35 +487,39 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             {
                 if (_eventsEnabled)
                 {
-                    //Telemetry.Write(module, "Action", "Triggered");
                     ExecuteJavaScript("RemoveHydrogens");
                 }
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void nudBondLength_ValueChanged(object sender, EventArgs e)
+        private void BondLength_ValueChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
                 if (_eventsEnabled)
                 {
-                    //Telemetry.Write(module, "Action", $"Triggered; New value {nudBondLength.Value}");
                     ExecuteJavaScript("ReScale", nudBondLength.Value);
                     AverageBondLength = (double)nudBondLength.Value;
                 }
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void btnFlip_Click(object sender, EventArgs e)
+        private void FlipButton_OnClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -505,11 +532,14 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void btnMirror_Click(object sender, EventArgs e)
+        private void MirrorButton_OnClick(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -523,13 +553,16 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
         private void SwitchChemDoodleMode()
         {
-            string htmlfile = "";
+            string htmlfile;
             if (IsSingleMolecule)
             {
                 htmlfile = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "ChemDoodleWeb.Single.html");
@@ -547,7 +580,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             browser.Navigate(Path.Combine(ProductAppDataPath, "Editor.html"));
         }
 
-        private void chkColouredAtoms_CheckedChanged(object sender, EventArgs e)
+        private void ColouredAtoms_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -571,11 +604,14 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        private void chkToggleShowCarbons_CheckedChanged(object sender, EventArgs e)
+        private void ToggleShowCarbons_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -599,7 +635,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -624,7 +663,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -649,7 +691,10 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
             }
             catch (Exception ex)
             {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
     }

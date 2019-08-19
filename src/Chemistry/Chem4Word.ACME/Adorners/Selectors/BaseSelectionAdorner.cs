@@ -10,17 +10,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
-using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
 
 namespace Chem4Word.ACME.Adorners.Selectors
 {
     /// <summary>
-/// All selection adorners are 'immutable':  they are drawn once and subsequently destroyed
-/// rather than being visually modified.  This makes coding much easier.
-/// When changing the visual appearance of a selection, create a new instance of the adorner
-/// supplying the element to the constructor along with the editor canvas
-/// </summary>
+    /// All selection adorners are 'immutable':  they are drawn once and subsequently destroyed
+    /// rather than being visually modified.  This makes coding much easier.
+    /// When changing the visual appearance of a selection, create a new instance of the adorner
+    /// supplying the element to the constructor along with the editor canvas
+    /// </summary>
     public abstract class BaseSelectionAdorner : Adorner
     {
         protected double AdornerOpacity;
@@ -29,6 +28,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //the editor that the Adorner attaches to
         public EditorCanvas CurrentEditor => (EditorCanvas)AdornedElement;
+
         public EditViewModel EditViewModel => (CurrentEditor.Chemistry as EditViewModel);
         public SolidColorBrush RenderBrush { get; protected set; }
 
@@ -39,7 +39,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         protected override int VisualChildrenCount => VisualChildren.Count;
 
-        #endregion
+        #endregion Shared Properties
 
         #region Constructors
 
@@ -52,7 +52,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
             IsHitTestVisible = false;
             AdornerOpacity = 0.25;
         }
-
 
         protected override Visual GetVisualChild(int index)
         {
@@ -72,9 +71,11 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             DetachHandlers();
         }
-        #endregion
+
+        #endregion Constructors
 
         #region Methods
+
         /// <summary>
         /// Attaches the default handlers to the adorner.
         /// These simply relay events to the CurrentEditor
@@ -122,10 +123,9 @@ namespace Chem4Word.ACME.Adorners.Selectors
             RenderBrush.Opacity = AdornerOpacity;
         }
 
-        #endregion
+        #endregion Methods
 
         #region Event Handlers
-
 
         //override these methods in derived classes to handle specific events
         //The forwarding chain for events is adorner -> CurrentEditor -> attached behaviour
@@ -169,7 +169,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
             CurrentEditor.RaiseEvent(e);
         }
 
-        #endregion
-
+        #endregion Event Handlers
     }
 }

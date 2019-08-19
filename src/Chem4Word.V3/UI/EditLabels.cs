@@ -5,19 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core;
-using Chem4Word.Core.Helpers;
-using Chem4Word.Core.UI.Forms;
-using Chem4Word.Helpers;
-using Chem4Word.UI.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
+using Chem4Word.UI.UserControls;
 
 namespace Chem4Word.UI
 {
@@ -138,7 +135,6 @@ namespace Chem4Word.UI
 
             this.ResumeLayout();
         }
-
 
         private void OnSaveClick(object sender, EventArgs e)
         {

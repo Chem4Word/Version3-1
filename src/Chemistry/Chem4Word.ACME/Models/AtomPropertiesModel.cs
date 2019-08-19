@@ -5,9 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
 using System.Collections.Generic;
 using Chem4Word.ACME.Entities;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Models
 {
@@ -27,7 +27,7 @@ namespace Chem4Word.ACME.Models
             get => _isFunctionalGroup;
             set
             {
-                _isFunctionalGroup = value; 
+                _isFunctionalGroup = value;
                 OnPropertyChanged();
             }
         }

@@ -5,33 +5,27 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
 /*
- Descriptors are simple classes that define the shape of a bond visual.
-   They simplify the transfer of information into and out of drawing routines.
-   You can either use the Point properties and draw primitives directly from those,
-   or use the DefinedGeometry and draw that directly
-   
-     */
+    Descriptors are simple classes that define the shape of a bond visual.
+    They simplify the transfer of information into and out of drawing routines.
+    You can either use the Point properties and draw primitives directly from those,
+    or use the DefinedGeometry and draw that directly
+*/
+
 namespace Chem4Word.ACME.Drawing
 {
     /// <summary>
     ///     Static class to define bond geometries
     ///     now uses StreamGeometry in preference to PathGeometry
-    ///     Old code is commented out
     /// </summary>
     public class BondDescriptor
     {
-        public System.Windows.Point Start;
-        public System.Windows.Point End;
+        public Point Start;
+        public Point End;
         public AtomVisual StartAtomVisual;
         public AtomVisual EndAtomVisual;
         public virtual List<System.Windows.Point> Boundary { get; }
@@ -44,7 +38,7 @@ namespace Chem4Word.ACME.Drawing
 
         public BondDescriptor()
         {
-            Boundary = new List<System.Windows.Point>();
+            Boundary = new List<Point>();
         }
     }
 }

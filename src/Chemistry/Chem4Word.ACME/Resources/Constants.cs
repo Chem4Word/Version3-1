@@ -5,14 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
-using System.Windows.Documents;
-
 namespace Chem4Word.ACME.Resources
 {
     public static class Constants
     {
-        public static string[] StandardAtoms = {"C","H","N","O","P","S","F","Cl","Br","I", "B", "Si", "Li", "Na", "K"};
+        public static string[] StandardAtoms = { "C", "H", "N", "O", "P", "S", "F", "Cl", "Br", "I", "B", "Si", "Li", "Na", "K" };
         public static string[] StandardFunctionalGroups = { "R1", "R2", "R3", "R4" };
     }
 }

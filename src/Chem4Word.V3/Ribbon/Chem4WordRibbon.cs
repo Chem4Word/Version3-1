@@ -730,6 +730,7 @@ namespace Chem4Word
                                 var mol = molecule.Copy();
                                 temp.AddMolecule(mol);
 
+                                // These new properties circumvent the need to test if Molecule contains any atoms (GitHub Issue #9)
                                 int maxAtomicNumber = temp.MaxAtomicNumber;
                                 int minAtomicNumber = temp.MinAtomicNumber;
 
@@ -1224,7 +1225,6 @@ namespace Chem4Word
                             }
                         }
                     }
-
                 }
                 catch (Exception ex)
                 {

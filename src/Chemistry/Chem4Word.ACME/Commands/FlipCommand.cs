@@ -5,8 +5,8 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
 using System.Diagnostics;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
 {

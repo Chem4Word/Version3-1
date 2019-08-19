@@ -23,7 +23,6 @@ namespace Chem4Word.Model2
         private string _type;
         private string _value;
 
-
         public string Type
         {
             get => _type;

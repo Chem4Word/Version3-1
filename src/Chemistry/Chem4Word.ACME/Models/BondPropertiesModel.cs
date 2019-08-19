@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using Chem4Word.ACME.Controls;
-using System.ComponentModel;
 
 namespace Chem4Word.ACME.Models
 {
@@ -21,8 +20,9 @@ namespace Chem4Word.ACME.Models
 
         public bool Is1Point5 { get; set; }
         public bool Is2Point5 { get; set; }
-       
+
         private double _bondOrderValue;
+
         public double BondOrderValue
         {
             get { return _bondOrderValue; }

@@ -12,19 +12,20 @@ using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
 {
-    public class GroupVisual:ChemicalVisual
+    public class GroupVisual : ChemicalVisual
     {
         private const double MainAreaOpacity = 0.05;
         private const int BracketThickness = 4;
         public Rect BoundingBox { get; }
         public Molecule ParentMolecule { get; }
 
-        public GroupVisual(Molecule parent, Rect? boundingBox=null)
+        public GroupVisual(Molecule parent, Rect? boundingBox = null)
         {
             ParentMolecule = parent;
             BoundingBox = boundingBox ?? ParentMolecule.BoundingBox;
             Render();
         }
+
         public override void Render()
         {
             //first work out the angle bracket size
@@ -34,23 +35,21 @@ namespace Chem4Word.ACME.Drawing
             Brush mainArea = new SolidColorBrush(Colors.Gray);
             mainArea.Opacity = MainAreaOpacity;
             Brush bracketBrush = new SolidColorBrush(Globals.Chem4WordColor);
-            Pen bracketPen = new Pen(bracketBrush,BracketThickness );
+            Pen bracketPen = new Pen(bracketBrush, BracketThickness);
             bracketPen.StartLineCap = PenLineCap.Round;
             bracketPen.EndLineCap = PenLineCap.Round;
 
- 
             using (DrawingContext dc = RenderOpen())
             {
                 var bb = BoundingBox;
 
-                bb.Inflate(new Size(bracketPen.Thickness, bracketPen.Thickness)); 
+                bb.Inflate(new Size(bracketPen.Thickness, bracketPen.Thickness));
 
-                dc.DrawRectangle(mainArea,null, bb);
-                Vector right = new Vector(bracketLength,0);
+                dc.DrawRectangle(mainArea, null, bb);
+                Vector right = new Vector(bracketLength, 0);
                 Vector left = -right;
-                Vector down = new Vector(0,bracketLength);
+                Vector down = new Vector(0, bracketLength);
                 Vector up = -down;
-              
 
                 dc.DrawLine(bracketPen, bb.BottomLeft, bb.BottomLeft + right);
                 dc.DrawLine(bracketPen, bb.BottomLeft, bb.BottomLeft + up);
@@ -65,8 +64,6 @@ namespace Chem4Word.ACME.Drawing
                 dc.DrawLine(bracketPen, bb.TopRight, bb.TopRight + down);
                 dc.Close();
             }
-
-
         }
     }
 }

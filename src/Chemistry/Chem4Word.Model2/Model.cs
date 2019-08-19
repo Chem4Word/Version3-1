@@ -5,17 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.Helpers;
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Model2.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Model2.Helpers;
+using Chem4Word.Model2.Interfaces;
 
 namespace Chem4Word.Model2
 {
@@ -185,23 +184,23 @@ namespace Chem4Word.Model2
                 if (TotalAtomsCount > 0)
                 {
                     list.Add(new TextualProperty
-                             {
-                                 Id = "2D",
-                                 Type = "2D",
-                                 Value = "2D"
-                             });
+                    {
+                        Id = "2D",
+                        Type = "2D",
+                        Value = "2D"
+                    });
                     list.Add(new TextualProperty
-                             {
-                                 Id = "c0",
-                                 Type = "F",
-                                 Value = ConciseFormula
-                             });
+                    {
+                        Id = "c0",
+                        Type = "F",
+                        Value = ConciseFormula
+                    });
                     list.Add(new TextualProperty
-                             {
-                                 Id = "S",
-                                 Type = "S",
-                                 Value = "S"
-                            });
+                    {
+                        Id = "S",
+                        Type = "S",
+                        Value = "S"
+                    });
                 }
 
                 foreach (var child in Molecules.Values)
@@ -217,6 +216,7 @@ namespace Chem4Word.Model2
                 return list;
             }
         }
+
         /// <summary>
         /// Count of atoms in all molecules
         /// </summary>
@@ -242,7 +242,8 @@ namespace Chem4Word.Model2
         {
             get
             {
-                int min = Int32.MaxValue;
+                // This number is used because it is higher than the Maximum value in the periodic table;
+                int min = 255;
 
                 var allAtoms = GetAllAtoms();
 
@@ -265,7 +266,7 @@ namespace Chem4Word.Model2
         {
             get
             {
-                int max = Int32.MinValue;
+                int max = 0;
 
                 var allAtoms = GetAllAtoms();
 
@@ -828,10 +829,10 @@ namespace Chem4Word.Model2
                     if (id.EndsWith("f0"))
                     {
                         tp = new TextualProperty()
-                             {
-                                 Id = $"{molecule.Id}.f0",
-                                 Value = molecule.ConciseFormula,
-                                 Type = "ConciseFormula"
+                        {
+                            Id = $"{molecule.Id}.f0",
+                            Value = molecule.ConciseFormula,
+                            Type = "ConciseFormula"
                         };
                         break;
                     }

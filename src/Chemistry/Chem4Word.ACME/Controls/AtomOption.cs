@@ -5,12 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME
 {
@@ -34,7 +33,7 @@ namespace Chem4Word.ACME
         {
             Element = fg;
             Foreground = new SolidColorBrush(Colors.Black);
-            Content = new FunctionalGroupBlock{ParentGroup = fg};
+            Content = new FunctionalGroupBlock { ParentGroup = fg };
         }
 
         public AtomOption(Element elem)

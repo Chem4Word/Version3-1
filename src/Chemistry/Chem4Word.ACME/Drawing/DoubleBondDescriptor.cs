@@ -5,11 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Chem4Word.Model2.Helpers;
 
@@ -18,6 +13,7 @@ using Chem4Word.Model2.Helpers;
    You can either use the Point properties and draw primitives directly from those,
    or use the DefinedGeometry and draw that directly
    */
+
 namespace Chem4Word.ACME.Drawing
 {
     public class DoubleBondDescriptor : BondDescriptor

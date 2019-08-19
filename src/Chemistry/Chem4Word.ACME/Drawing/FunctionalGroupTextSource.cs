@@ -5,12 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using Group = Chem4Word.Model2.Group;
 
 namespace Chem4Word.ACME.Drawing

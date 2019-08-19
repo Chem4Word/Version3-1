@@ -14,8 +14,8 @@
     Width="1013"
     Height="774"
     d:DataContext="{d:DesignInstance acme:EditViewModel}"
-    PreviewKeyDown="Editor_OnPreviewKeyDown"
     Loaded="ACMEControl_Loaded"
+    PreviewKeyDown="Editor_OnPreviewKeyDown"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -508,7 +508,7 @@
                             </UniformGrid.Resources>
                             <Button Name="BenzeneButton" ToolTip="Benzene">
                                 <Viewbox>
-                                   <StaticResource ResourceKey="BenzenePath"/>
+                                    <StaticResource ResourceKey="BenzenePath" />
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:RingBehavior
@@ -518,7 +518,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cyclohexane">
-                                <StaticResource ResourceKey="CyclohexanePath"/>
+                                <StaticResource ResourceKey="CyclohexanePath" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -527,7 +527,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cyclopentane">
-                                <StaticResource ResourceKey="CyclopentanePath"/>
+                                <StaticResource ResourceKey="CyclopentanePath" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -536,7 +536,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cyclopentadiene">
-                               <StaticResource ResourceKey="CyclopentadienePath"/>
+                                <StaticResource ResourceKey="CyclopentadienePath" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -545,7 +545,7 @@
                                 </Button.Tag>
                             </Button>
                             <Button ToolTip="Cycloheptane">
-                                <StaticResource ResourceKey="CycloheptanePath"/>
+                                <StaticResource ResourceKey="CycloheptanePath" />
                                 <Button.Tag>
                                     <behaviors:RingBehavior
                                         EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}"
@@ -629,9 +629,9 @@
                     GroupName="Actions"
                     ToolTip="Draw Chain">
                     <Viewbox>
-                        <StaticResource ResourceKey="ChainPath"/>
+                        <StaticResource ResourceKey="ChainPath" />
                         <Viewbox.LayoutTransform>
-                            <RotateTransform Angle="180"/>
+                            <RotateTransform Angle="180" />
                         </Viewbox.LayoutTransform>
                     </Viewbox>
                     <RadioButton.Tag>
@@ -853,7 +853,8 @@
                     x:Name="FuseButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FuseCommand}"
                     Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Fuse" Visibility="Collapsed">
+                    ToolTip="Fuse"
+                    Visibility="Collapsed">
                     <Viewbox Width="24" Height="24">
                         <Path
                             Width="24"

@@ -18,7 +18,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
         #region Properties
 
         public Atom AdornedAtom => (Atom)AdornedChemistry;
-        #endregion
+
+        #endregion Properties
 
         #region Constructors
 
@@ -27,7 +28,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             IsHitTestVisible = true;
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Methods
 
@@ -50,9 +51,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
         }
 
-        #endregion
+        #endregion Overrides
 
-        #endregion
-
+        #endregion Methods
     }
 }

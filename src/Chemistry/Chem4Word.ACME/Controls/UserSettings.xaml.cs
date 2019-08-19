@@ -5,23 +5,17 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Models;
-using Chem4Word.Core.Helpers;
-using Chem4Word.Core.UI.Forms;
-using Chem4Word.Model2.Annotations;
-using IChem4Word.Contracts;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
+using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Utils;
-using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2.Annotations;
+using IChem4Word.Contracts;
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace Chem4Word.ACME.Controls
@@ -52,7 +46,7 @@ namespace Chem4Word.ACME.Controls
                     _options = value;
 
                     var model = new SettingsModel();
-                    model.CurrentBondLength = (double) _options.BondLength;
+                    model.CurrentBondLength = (double)_options.BondLength;
                     model.ShowMoleculeGroups = _options.ShowMoleculeGroups;
                     SettingsModel = model;
                     DataContext = SettingsModel;
@@ -108,7 +102,7 @@ namespace Chem4Word.ACME.Controls
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
             // Copy current model values to options before saving
-            Options.BondLength = (int) SettingsModel.CurrentBondLength;
+            Options.BondLength = (int)SettingsModel.CurrentBondLength;
             Options.ShowMoleculeGroups = SettingsModel.ShowMoleculeGroups;
             FileUtils.SaveAcmeSettings(Options, Telemetry, TopLeft);
             Options.Dirty = false;

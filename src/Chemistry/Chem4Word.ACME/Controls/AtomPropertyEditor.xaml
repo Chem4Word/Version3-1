@@ -45,49 +45,50 @@
                 TrueValue="Collapsed" />
         </ResourceDictionary>
     </Window.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Border Margin="5">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <!--  Atom Path display  -->
-        <StackPanel
+            <StackPanel
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2">
-            <TextBlock
+                <!--  Atom Path display  -->
+                <TextBlock
                 x:Name="AtomPath"
                 Margin="5"
                 HorizontalAlignment="Left"
                 Foreground="Black"><Run Text="Atom Path" /></TextBlock>
-            <StackPanel Orientation="Horizontal">
-                <RadioButton
+
+                <!-- Element or Functional Group selector -->
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton
                     x:Name="Element"
                     Margin="5"
                     Foreground="{StaticResource Chem4WordBrush}"
                     IsChecked="{Binding IsElement, Mode=TwoWay}">
-                    Element
-                </RadioButton>
-                <RadioButton
+                        Element
+                    </RadioButton>
+                    <RadioButton
                     x:Name="FunctionalGroup"
                     Margin="5"
                     Foreground="{StaticResource Chem4WordBrush}"
                     IsChecked="{Binding IsFunctionalGroup, Mode=TwoWay}">
-                    Functional Group
-                </RadioButton>
-
+                        Functional Group
+                    </RadioButton>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.Column="0">
             <!--  Stack Panel to hold Element / Functional Group controls  -->
-            <StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0">
                 <!--  Properties of an Element  -->
                 <StackPanel Visibility="{Binding IsChecked, Converter={StaticResource VisConverter}, ElementName=Element}">
                     <Grid>
@@ -270,45 +271,45 @@
                         ToolTip="Click to choose Functional Group" />
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <!--  Preview Pane  -->
-        <StackPanel
+            <!--  Preview Pane  -->
+            <StackPanel
             Grid.Row="1"
             Grid.Column="1"
             MaxWidth="208"
             MaxHeight="208"
             Margin="5">
-            <Border
+                <Border
                 BorderBrush="DarkOrange"
                 BorderThickness="3"
                 CornerRadius="5">
-                <ACME:Display
+                    <ACME:Display
                     x:Name="Preview"
                     Width="200"
                     Height="200"
                     HighlightActive="False" />
-            </Border>
-        </StackPanel>
+                </Border>
+            </StackPanel>
 
-        <!--  Finally the Save and Cancel buttons  -->
-        <StackPanel
+            <!--  Finally the Save and Cancel buttons  -->
+            <StackPanel
             Grid.Row="2"
             Grid.Column="1"
             HorizontalAlignment="Right"
             Orientation="Horizontal">
-            <Button
+                <Button
                 Width="50"
                 Height="25"
                 Margin="5"
                 Click="Save_OnClick"
                 Content="Save" />
-            <Button
+                <Button
                 Width="50"
                 Height="25"
                 Margin="5"
                 Click="Close_OnClick"
                 Content="Cancel" />
-        </StackPanel>
-    </Grid>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>

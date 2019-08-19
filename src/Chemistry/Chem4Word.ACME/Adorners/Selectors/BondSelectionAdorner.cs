@@ -19,7 +19,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         public Bond AdornedBond => (Bond)AdornedChemistry;
 
-        #endregion
+        #endregion Properties
 
         #region Constructors
 
@@ -28,11 +28,12 @@ namespace Chem4Word.ACME.Adorners.Selectors
             IsHitTestVisible = true;
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Methods
 
         #region Overrides
+
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
@@ -81,8 +82,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
             drawingContext.DrawGeometry(renderBrush, null, final);
         }
 
-        #endregion
+        #endregion Overrides
 
-        #endregion
+        #endregion Methods
     }
 }

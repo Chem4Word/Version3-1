@@ -5,23 +5,21 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Behaviors;
-using Chem4Word.Core.UI.Wpf;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Utils;
+using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 using IChem4Word.Contracts;
 
 namespace Chem4Word.ACME
@@ -63,6 +61,7 @@ namespace Chem4Word.ACME
 
         // This is used to store the cml until the editor is Loaded
         private string _cml;
+
         private List<string> _used1DProperties;
 
         /// <summary>
@@ -115,7 +114,7 @@ namespace Chem4Word.ACME
 
         public bool ShowSave
         {
-            get { return (bool) GetValue(ShowSaveProperty); }
+            get { return (bool)GetValue(ShowSaveProperty); }
             set { SetValue(ShowSaveProperty, value); }
         }
 
@@ -157,7 +156,7 @@ namespace Chem4Word.ACME
 
         public AtomOption SelectedAtomOption
         {
-            get { return (AtomOption) GetValue(SelectedAtomOptionProperty); }
+            get { return (AtomOption)GetValue(SelectedAtomOptionProperty); }
             set { SetValue(SelectedAtomOptionProperty, value); }
         }
 
@@ -168,7 +167,7 @@ namespace Chem4Word.ACME
 
         public Visibility SliderVisibility
         {
-            get { return (Visibility) GetValue(SliderVisibilityProperty); }
+            get { return (Visibility)GetValue(SliderVisibilityProperty); }
             set { SetValue(SliderVisibilityProperty, value); }
         }
 
@@ -299,7 +298,7 @@ namespace Chem4Word.ACME
                 else
                 {
                     // child element found.
-                    foundChild = (T) child;
+                    foundChild = (T)child;
                     break;
                 }
             }
@@ -377,7 +376,7 @@ namespace Chem4Word.ACME
                     ActiveViewModel.ActiveMode = null;
                 }
 
-                var radioButton = (RadioButton) sender;
+                var radioButton = (RadioButton)sender;
 
                 if (radioButton.Tag is BaseEditBehavior bh)
                 {
@@ -393,7 +392,6 @@ namespace Chem4Word.ACME
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
         private void Editor_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {

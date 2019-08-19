@@ -5,15 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using static Chem4Word.ACME.Drawing.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
@@ -611,7 +611,7 @@ namespace Chem4Word.ACME.Drawing
                     //Pen _widepen = new Pen(Brushes.Black, BondThickness);
                     return HullGeometry;
                 }
-                
+
                 return null;
             }
         }
@@ -630,6 +630,7 @@ namespace Chem4Word.ACME.Drawing
 
             return null;
         }
+
         /// <summary>
         /// Returns the intersection point of a line with the Convex Hull
         /// </summary>
@@ -641,13 +642,12 @@ namespace Chem4Word.ACME.Drawing
             for (int i = 0; i < Hull.Count; i++)
             {
                 Point? p;
-                if ((p = BasicGeometry.LineSegmentsIntersect(start, end, Hull[i], Hull[(i+1)%Hull.Count])) != null)
+                if ((p = BasicGeometry.LineSegmentsIntersect(start, end, Hull[i], Hull[(i + 1) % Hull.Count])) != null)
                 {
                     return p;
-                } 
+                }
             }
             return null;
         }
-      
     }
 }

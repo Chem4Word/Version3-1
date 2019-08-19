@@ -17,7 +17,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         public List<ChemistryBase> AdornedChemistries { get; }
 
-        #endregion
+        #endregion Shared Properties
 
         #region Constructors
 
@@ -31,6 +31,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             AdornedChemistries.AddRange(chemistries);
         }
-        #endregion
+
+        #endregion Constructors
     }
 }
