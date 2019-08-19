@@ -5,19 +5,18 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Controls;
-using Chem4Word.ACME.Utils;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Utils;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
 
-namespace Chem4Word.ACME.Adorners
+namespace Chem4Word.ACME.Adorners.Selectors
 {
     public class MoleculeSelectionAdorner : SingleAtomSelectionAdorner
     {
@@ -27,39 +26,32 @@ namespace Chem4Word.ACME.Adorners
         private static double _halfThumbWidth;
         private static double _rotateThumbWidth;
 
-        //private Point _canvasPos;
 
         //some things to grab hold of
         protected readonly Thumb TopLeftHandle; //these do the resizing
 
-        protected readonly Thumb TopRightHandle; //these do the resizing
-        protected readonly Thumb BottomLeftHandle; //these do the resizing
+        protected readonly Thumb TopRightHandle;    //these do the resizing
+        protected readonly Thumb BottomLeftHandle;  //these do the resizing
         protected readonly Thumb BottomRightHandle; //these do the resizing
 
         //the rotator
-        protected readonly Thumb RotateHandle;  //Grab hold of this to rotate the molecule
+        protected readonly Thumb RotateHandle; //Grab hold of this to rotate the molecule
 
         //flags
-
         protected bool Resizing;
         protected bool Rotating;
 
         private double _rotateAngle;
         private Point _centroid;
-        private EditorCanvas _editorCanvas;
-        private EditViewModel _currentEVM;
-
         private Point _rotateThumbPos;
         private Snapper _rotateSnapper;
         private double _yPlacement;
         private double _xPlacement;
         private Point _originalThumbPos;
 
-        public MoleculeSelectionAdorner(UIElement adornedElement, List<Molecule> molecules, EditViewModel currentModel)
-            : base(adornedElement, molecules, currentModel)
+        public MoleculeSelectionAdorner(EditorCanvas currentEditor, List<Molecule> molecules)
+            : base(currentEditor, molecules.ConvertAll(m => (ChemistryBase) m))
         {
-            _editorCanvas = (AdornedElement as EditorCanvas);
-
             if (_thumbWidth == null)
             {
                 _thumbWidth = 15;
@@ -74,22 +66,35 @@ namespace Chem4Word.ACME.Adorners
 
             BuildRotateThumb(ref RotateHandle, Cursors.Hand);
 
-            _currentEVM = currentModel;
-
             SetCentroid();
             AttachHandlers();
 
+            IsHitTestVisible = true;
             Focusable = true;
             Focus();
+
+            PreviewMouseLeftButtonUp -= BaseSelectionAdorner_PreviewMouseLeftButtonUp;
+            MouseLeftButtonUp -= BaseSelectionAdorner_MouseLeftButtonUp;
 
             //no need to add the adorner in at this point as the base has already done it
         }
 
-        protected void AttachHandlers()
+        #region Properties
+
+        public double AspectRatio { get; set; }
+
+        public Rect BoundingBox { get; set; }
+        private new bool IsWorking => Dragging || Resizing || Rotating;
+
+        #endregion
+
+        #region Methods
+
+        protected new void AttachHandlers()
         {
             AttachHandler();
-            //wire up the event handling
 
+            //wire up the event handling
             TopLeftHandle.DragStarted += ResizeStarted;
             TopRightHandle.DragStarted += ResizeStarted;
             BottomLeftHandle.DragStarted += ResizeStarted;
@@ -104,6 +109,10 @@ namespace Chem4Word.ACME.Adorners
             TopRightHandle.DragCompleted += HandleResizeCompleted;
             BottomLeftHandle.DragCompleted += HandleResizeCompleted;
             BottomRightHandle.DragCompleted += HandleResizeCompleted;
+
+            //detach the handlers to stop them interfering
+            PreviewMouseLeftButtonDown -= BaseSelectionAdorner_PreviewMouseLeftButtonDown;
+            MouseLeftButtonDown -= BaseSelectionAdorner_MouseLeftButtonDown;
         }
 
         private void ResizeStarted(object sender, DragStartedEventArgs e)
@@ -111,7 +120,7 @@ namespace Chem4Word.ACME.Adorners
             Resizing = true;
             Dragging = false;
             Keyboard.Focus(this);
-            BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
+            BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
         }
@@ -120,10 +129,12 @@ namespace Chem4Word.ACME.Adorners
         {
             rotateThumb = new Thumb();
 
+            rotateThumb.IsHitTestVisible = true;
+
             RotateHandle.Width = _rotateThumbWidth;
             RotateHandle.Height = _rotateThumbWidth;
             RotateHandle.Cursor = Cursors.Hand;
-            rotateThumb.Style = (Style)FindResource("RotateThumb");
+            rotateThumb.Style = (Style) FindResource("RotateThumb");
             rotateThumb.DragStarted += RotateStarted;
             rotateThumb.DragDelta += RotateThumb_DragDelta;
             rotateThumb.DragCompleted += HandleResizeCompleted;
@@ -162,9 +173,9 @@ namespace Chem4Word.ACME.Adorners
 
         private void SetCentroid()
         {
-            _centroid = GetCentroid(_editorCanvas.GetMoleculeBoundingBox(AdornedMolecules));
+            _centroid = GetCentroid(CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules));
             //create a snapper
-            _rotateSnapper = new Snapper(_centroid, _currentEVM);
+            _rotateSnapper = new Snapper(_centroid, CurrentEditor.Chemistry as EditViewModel);
         }
 
         private Point GetCentroid(Rect mbb)
@@ -180,8 +191,8 @@ namespace Chem4Word.ACME.Adorners
 
             if (LastOperation != null)
             {
-                CurrentModel.DoTransform(LastOperation, AdornedMolecules);
-               
+                EditViewModel.DoTransform(LastOperation, AdornedMolecules);
+
                 SetBoundingBox();
                 ResizeCompleted?.Invoke(this, dragCompletedEventArgs);
                 SetCentroid();
@@ -192,41 +203,10 @@ namespace Chem4Word.ACME.Adorners
         private void SetBoundingBox()
         {
             //and work out the aspect ratio for later resizing
-            //AdornedMolecule.ResetBoundingBox();
-            BoundingBox = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
+            BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
-        public double AspectRatio { get; set; }
-
-        public Rect BoundingBox { get; set; }
-
-        /// <summary>
-        /// Override this to
-        /// </summary>
-        /// <param name="drawingContext"></param>
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            base.OnRender(drawingContext);
-
-            if (!(BigThumb.IsDragging|TopLeftHandle.IsDragging|TopRightHandle.IsDragging|BottomLeftHandle.IsDragging|BottomRightHandle.IsDragging))
-            {
-                var brush = (Brush)FindResource("GrabHandleBorderBrush");
-                var pen = new Pen(brush, 1.0);
-                drawingContext.DrawLine(pen, _centroid, _rotateThumbPos);
-                drawingContext.DrawEllipse(brush, pen, _centroid, 2, 2);
-            }
-            if (IsWorking)
-            {
-                //identify which Molecule the atom belongs to
-                //take a snapshot of the molecule
-                var ghost = _editorCanvas.GhostMolecule(AdornedMolecules);
-                ghost.Transform = LastOperation;
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, ghost);
-            }
-        }
-
-        private new bool IsWorking => Dragging || Resizing || Rotating;
 
         private void BuildAdornerCorner(ref Thumb cornerThumb, Cursor customizedCursor)
         {
@@ -240,43 +220,43 @@ namespace Chem4Word.ACME.Adorners
             // Set some arbitrary visual characteristics.
             cornerThumb.Cursor = customizedCursor;
             SetThumbStyle(cornerThumb);
-            cornerThumb.KeyDown += ThisAdorner_KeyDown;
+            cornerThumb.IsHitTestVisible = true;
             VisualChildren.Add(cornerThumb);
         }
 
         protected virtual void SetThumbStyle(Thumb cornerThumb)
         {
-            cornerThumb.Style = (Style)FindResource("GrabHandleStyle");
+            cornerThumb.Style = (Style) FindResource("GrabHandleStyle");
         }
 
-        // Override the VisualChildrenCount and GetVisualChild properties to interface with
-        // the adorner's visual collection.
-        protected override int VisualChildrenCount => VisualChildren.Count;
+        #endregion
 
-        protected override Visual GetVisualChild(int index) => VisualChildren[index];
+        #region Overrides
 
         // Arrange the Adorners.
         protected override Size ArrangeOverride(Size finalSize)
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = _editorCanvas.GetMoleculeBoundingBox(AdornedMolecules);
+            var bbb = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
 
             if (LastOperation != null)
             {
                 bbb = LastOperation.TransformBounds(bbb);
             }
 
-            TopLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
-            TopRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value,
-                _thumbWidth.Value));
+            TopLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top - _halfThumbWidth, _thumbWidth.Value,
+                                           _thumbWidth.Value));
+            TopRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth, bbb.Top - _halfThumbWidth,
+                                            _thumbWidth.Value,
+                                            _thumbWidth.Value));
             BottomLeftHandle.Arrange(new Rect(bbb.Left - _halfThumbWidth, bbb.Top + bbb.Height - _halfThumbWidth,
-                _thumbWidth.Value, _thumbWidth.Value));
+                                              _thumbWidth.Value, _thumbWidth.Value));
             BottomRightHandle.Arrange(new Rect(bbb.Left + bbb.Width - _halfThumbWidth,
-                bbb.Height + bbb.Top - _halfThumbWidth, _thumbWidth.Value, _thumbWidth.Value));
+                                               bbb.Height + bbb.Top - _halfThumbWidth, _thumbWidth.Value,
+                                               _thumbWidth.Value));
 
             //add the rotator
-
             _xPlacement = (bbb.Left + bbb.Right) / 2;
             _yPlacement = bbb.Top - RotateHandle.Height * 3;
             _rotateThumbPos = new Point(_xPlacement, _yPlacement);
@@ -315,22 +295,46 @@ namespace Chem4Word.ACME.Adorners
                 BottomRightHandle.Visibility = Visibility.Visible;
                 BigThumb.Visibility = Visibility.Visible;
             }
+
             RotateHandle.Arrange(new Rect(newLoc.X, newLoc.Y, RotateHandle.Width, RotateHandle.Height));
 
-         
+
             base.ArrangeOverride(finalSize);
             return finalSize;
         }
 
-        #region Events
+        /// <summary>
+        /// Override this to
+        /// </summary>
+        /// <param name="drawingContext"></param>
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
 
+            var brush = (Brush) FindResource("GrabHandleBorderBrush");
+            var pen = new Pen(brush, 1.0);
+            if (!(BigThumb.IsDragging | TopLeftHandle.IsDragging | TopRightHandle.IsDragging |
+                  BottomLeftHandle.IsDragging | BottomRightHandle.IsDragging))
+            {
+                drawingContext.DrawLine(pen, _centroid, _rotateThumbPos);
+                drawingContext.DrawEllipse(brush, pen, _centroid, 2, 2);
+            }
 
-        #endregion Events
+            if (IsWorking)
+            {
+                //identify which Molecule the atom belongs to
+                //take a snapshot of the molecule
+                var ghost = CurrentEditor.GhostMolecule(AdornedMolecules);
+                ghost.Transform = LastOperation;
+                drawingContext.DrawGeometry(brush, pen, ghost);
+            }
+        }
+
+        #endregion
 
         #region Resizing
 
         // Handler for resizing from the bottom-right.
-
         private void IncrementDragging(DragDeltaEventArgs args)
         {
             DragXTravel += args.HorizontalChange;
@@ -349,6 +353,7 @@ namespace Chem4Word.ACME.Adorners
             {
                 scaleFactor = Math.Abs(right - left) / BoundingBox.Width;
             }
+
             return scaleFactor;
         }
 
@@ -360,9 +365,9 @@ namespace Chem4Word.ACME.Adorners
             if (NotDraggingBackwards())
             {
                 var scaleFactor = GetScaleFactor(BoundingBox.Left,
-                    BoundingBox.Top + DragYTravel,
-                    BoundingBox.Right + DragYTravel,
-                    BoundingBox.Bottom);
+                                                 BoundingBox.Top + DragYTravel,
+                                                 BoundingBox.Right + DragYTravel,
+                                                 BoundingBox.Bottom);
 
                 LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Left, BoundingBox.Bottom);
 
@@ -402,9 +407,9 @@ namespace Chem4Word.ACME.Adorners
             if (NotDraggingBackwards())
             {
                 var scaleFactor = GetScaleFactor(BoundingBox.Left + DragXTravel,
-                    BoundingBox.Top + DragYTravel,
-                    BoundingBox.Right,
-                    BoundingBox.Bottom);
+                                                 BoundingBox.Top + DragYTravel,
+                                                 BoundingBox.Right,
+                                                 BoundingBox.Bottom);
 
                 LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Right, BoundingBox.Top);
 
@@ -418,9 +423,9 @@ namespace Chem4Word.ACME.Adorners
             if (NotDraggingBackwards())
             {
                 var scaleFactor = GetScaleFactor(BoundingBox.Left,
-                    BoundingBox.Top,
-                    BoundingBox.Right + DragXTravel,
-                    BoundingBox.Bottom + DragYTravel);
+                                                 BoundingBox.Top,
+                                                 BoundingBox.Right + DragXTravel,
+                                                 BoundingBox.Bottom + DragYTravel);
 
                 LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Left, BoundingBox.Top);
 

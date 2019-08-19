@@ -3,16 +3,16 @@
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
-// ---------------------
+// ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
-namespace Chem4Word.ACME.Adorners
+namespace Chem4Word.ACME.Adorners.Feedback
 {
     public class AtomHoverAdorner : Adorner
     {
@@ -23,7 +23,6 @@ namespace Chem4Word.ACME.Adorners
         public AtomHoverAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
             _solidColorBrush = new SolidColorBrush(Globals.HoverAdornerColor);
-            //_solidColorBrush.Opacity = 0.25;
 
             _bracketPen = new Pen(_solidColorBrush, Globals.HoverAdornerThickness);
             _bracketPen.StartLineCap = PenLineCap.Round;

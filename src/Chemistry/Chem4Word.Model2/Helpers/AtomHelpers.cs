@@ -52,7 +52,7 @@ namespace Chem4Word.Model2.Helpers
         {
             bool success = false;
             result = null;
-
+            
             if (Globals.PeriodicTable.HasElement(text))
             {
                 result = Globals.PeriodicTable.Elements[text];

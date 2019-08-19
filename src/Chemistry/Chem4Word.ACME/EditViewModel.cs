@@ -4,20 +4,6 @@
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
-
-using Chem4Word.ACME.Adorners;
-using Chem4Word.ACME.Behaviors;
-using Chem4Word.ACME.Commands;
-using Chem4Word.ACME.Controls;
-using Chem4Word.ACME.Enums;
-using Chem4Word.ACME.Models;
-using Chem4Word.ACME.Resources;
-using Chem4Word.ACME.Utils;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Converters.CML;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,8 +18,20 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners.Selectors;
+using Chem4Word.ACME.Behaviors;
+using Chem4Word.ACME.Commands;
+using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Enums;
+using Chem4Word.ACME.Models;
+using Chem4Word.ACME.Resources;
+using Chem4Word.ACME.Utils;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using static Chem4Word.Model2.Helpers.Globals;
-// ReSharper disable ConvertToLocalFunction
 
 namespace Chem4Word.ACME
 {
@@ -92,10 +90,6 @@ namespace Chem4Word.ACME
                     result |= SelectionTypeCode.Molecule;
                 }
 
-                //if (SelectedItems.OfType<Reaction>().Any())
-                //{
-                //    result |= SelectionTypeCode.Reaction;
-                //}
                 return result;
             }
         }
@@ -531,7 +525,7 @@ namespace Chem4Word.ACME
                           {
                               existingBond.Stereo = stereo;
                               existingBond.Order = order;
-                              //existingBond.NotifyPlacementChanged();
+
                               existingBond.StartAtom.UpdateVisual();
                               existingBond.EndAtom.UpdateVisual();
                           };
@@ -707,8 +701,8 @@ namespace Chem4Word.ACME
                     bond.UpdateVisual();
                 }
             }
-            //keep a handle on some current properties
 
+            //keep a handle on some current properties
             int theoreticalRings = mol.TheoreticalRings;
             if (stereo == null)
             {
@@ -1050,7 +1044,7 @@ namespace Chem4Word.ACME
 
         /// <summary>
         /// The pivotal routine for handling selection in the EditViewModel
-        /// All display for selrctions *must* go through this routinhe.  No ifs, no buts
+        /// All display for selections *must* go through this routine.  No ifs, no buts
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1148,13 +1142,13 @@ namespace Chem4Word.ACME
                     {
                         RemoveAtomBondAdorners(atom.Parent);
                         MoleculeSelectionAdorner molAdorner =
-                            new MoleculeSelectionAdorner(CurrentEditor, new List<Molecule> {atom.Parent}, this);
+                            new MoleculeSelectionAdorner(CurrentEditor, new List<Molecule> {atom.Parent});
                         SelectionAdorners[newObject] = molAdorner;
                     }
                 }
-                else if (newObject is Bond)
+                else if (newObject is Bond bond)
                 {
-                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(CurrentEditor, (newObject as Bond));
+                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(CurrentEditor, bond);
                     SelectionAdorners[newObject] = bondAdorner;
                     bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 }
@@ -1163,7 +1157,7 @@ namespace Chem4Word.ACME
                     if (mol.Atoms.Count == 1)
                     {
                         SingleAtomSelectionAdorner atomAdorner =
-                            new SingleAtomSelectionAdorner(CurrentEditor, mol, this);
+                            new SingleAtomSelectionAdorner(CurrentEditor, mol);
                         SelectionAdorners[newObject] = atomAdorner;
                         atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                         atomAdorner.DragCompleted += AtomAdorner_DragCompleted;
@@ -1174,14 +1168,12 @@ namespace Chem4Word.ACME
                         if (mol.IsGrouped)
                         {
                             molAdorner = new GroupSelectionAdorner(CurrentEditor,
-                                                                   SelectedItems.OfType<Molecule>().ToList(),
-                                                                   this);
+                                                                   SelectedItems.OfType<Molecule>().ToList());
                         }
                         else
                         {
                             molAdorner = new MoleculeSelectionAdorner(CurrentEditor,
-                                                                      SelectedItems.OfType<Molecule>().ToList(),
-                                                                      this);
+                                                                      SelectedItems.OfType<Molecule>().ToList());
                         }
 
                         RemoveAllAdorners();
@@ -1215,7 +1207,6 @@ namespace Chem4Word.ACME
         {
             //we've completed the drag operation
             //remove the existing molecule adorner
-
             var moleculeSelectionAdorner = ((SingleAtomSelectionAdorner) sender);
             foreach (Molecule mol in moleculeSelectionAdorner.AdornedMolecules)
             {
@@ -1547,8 +1538,6 @@ namespace Chem4Word.ACME
 
                 Action undoAction = () =>
                                     {
-                                        //Model.InhibitEvents = true;
-
                                         foreach (var bond in newBonds)
                                         {
                                             bond.Parent.RemoveBond(bond);
@@ -1558,8 +1547,6 @@ namespace Chem4Word.ACME
                                         {
                                             atom.Parent.RemoveAtom(atom);
                                         }
-
-                                        //Model.InhibitEvents = false;
 
                                         if (mols.Any())
                                         {
@@ -1883,9 +1870,6 @@ namespace Chem4Word.ACME
         public void RemoveFromSelection(List<object> thingsToAdd)
         {
             //grab all the molecules that contain selected objects
-            //var molsInSelection = SelectedItems.Where(o => (o is Atom | o is Bond))
-            //    .Select((dynamic obj) => obj.ParentMolecule as Molecule).Distinct();
-
             var molsInSelection = (from dynamic selItem in SelectedItems
                                    where ((selItem is Atom) | (selItem is Bond))
                                    select selItem.Parent).Distinct();
@@ -2085,8 +2069,6 @@ namespace Chem4Word.ACME
                 neighbours.ExceptWith(atomGroup);
             }
 
-            //Debug.Assert(mol!=null);
-            //Debug.Assert(atomGroups.Count>=1);
             //now, check to see whether there is a single atomgroup.  If so, then we still have one molecule
             if (atomGroups.Count == 1)
             {
@@ -2102,9 +2084,10 @@ namespace Chem4Word.ACME
                                   {
                                       mol.RemoveBond(deleteBond);
                                       RefreshRingBonds(theoreticalRings, mol, deleteBond);
-                                      //deleteBond.UpdateVisual();
+
                                       deleteBond.StartAtom.UpdateVisual();
                                       deleteBond.EndAtom.UpdateVisual();
+
                                       foreach (Bond atomBond in deleteBond.StartAtom.Bonds)
                                       {
                                           atomBond.UpdateVisual();
@@ -2119,7 +2102,6 @@ namespace Chem4Word.ACME
                                   foreach (Atom deleteAtom in deleteAtoms)
                                   {
                                       mol.RemoveAtom(deleteAtom);
-                                      //deleteAtom.UpdateVisual();
                                   }
 
                                   mol.ClearProperties();
@@ -2166,7 +2148,6 @@ namespace Chem4Word.ACME
             }
             else //we have multiple fragments
             {
-                //    ImmutableList<Molecule> newMolecules, oldMolecules;
                 List<Molecule> newMolList = new List<Molecule>();
                 List<Molecule> oldmolList = new List<Molecule>();
                 //add all the relevant atoms and bonds to a new molecule;
@@ -2288,13 +2269,12 @@ namespace Chem4Word.ACME
             int? isotopeBefore = atom.IsotopeNumber;
             bool? showSymbolBefore = atom.ShowSymbol;
 
-            ElementBase elementBaseAfter;
+            ElementBase elementBaseAfter = model.Element;
             int? chargeAfter = null;
             int? isotopeAfter = null;
             bool? showSymbolAfter = null;
 
-            AtomHelpers.TryParse(model.Element.Symbol, out elementBaseAfter);
-            if (elementBaseAfter is Element)
+            if (model.Element is Element)
             {
                 chargeAfter = model.Charge;
                 showSymbolAfter = model.ShowSymbol;
@@ -2525,7 +2505,6 @@ namespace Chem4Word.ACME
         /// <param name="selection">Active selection within the editor</param>
         public void UnGroup(ObservableCollection<object> selection)
         {
-
             List<Molecule> selGroups;
             //grab just the grouped molecules first
             selGroups = (from Molecule mol in selection.OfType<Molecule>()
@@ -2536,7 +2515,6 @@ namespace Chem4Word.ACME
 
         private void UnGroup(List<Molecule> selGroups)
         {
-
             //keep track of parent child relationships for later
             Dictionary<Molecule, List<Molecule>> parentsAndChildren = new Dictionary<Molecule, List<Molecule>>();
 

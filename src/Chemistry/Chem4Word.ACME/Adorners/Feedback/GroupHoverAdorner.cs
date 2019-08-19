@@ -5,14 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Drawing;
-using Chem4Word.Model2.Annotations;
-using Chem4Word.Model2.Helpers;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Drawing;
+using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
-namespace Chem4Word.ACME.Adorners
+namespace Chem4Word.ACME.Adorners.Feedback
 {
     public class GroupHoverAdorner : Adorner
     {

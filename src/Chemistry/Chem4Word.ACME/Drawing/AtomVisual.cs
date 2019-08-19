@@ -577,27 +577,13 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                List<Point> hullList = null;
-
-                if (Hull == null || Hull.Count == 0)
+                if (Hull != null && Hull.Count != 0)
                 {
-                    hullList = null;
-                }
-                else
-                {
-                    hullList = Hull;
-                }
-
-                //need to combine the actually filled atom area
-                //with a stroked outline of it, to give a sufficient margin
-                if (hullList != null)
-                {
-                    Geometry geo1 = BasicGeometry.BuildPolyPath(hullList);
+                    Geometry geo1 = BasicGeometry.BuildPolyPath(Hull);
                     CombinedGeometry cg = new CombinedGeometry(geo1,
-                        geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, Standoff)));
+                                                               geo1.GetWidenedPathGeometry(new Pen(Brushes.Black, Standoff)));
                     return cg;
                 }
-
                 return Geometry.Empty;
             }
         }
@@ -625,7 +611,7 @@ namespace Chem4Word.ACME.Drawing
                     //Pen _widepen = new Pen(Brushes.Black, BondThickness);
                     return HullGeometry;
                 }
-
+                
                 return null;
             }
         }

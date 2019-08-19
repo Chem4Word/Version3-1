@@ -190,7 +190,7 @@ namespace Chem4Word.ACME.Behaviors
         private object CurrentObject(MouseButtonEventArgs e)
         {
             var visual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor));
-            //do a quick test to work out the
+            
             object currentObject = null;
             if (visual is AtomVisual av)
             {
@@ -211,6 +211,7 @@ namespace Chem4Word.ACME.Behaviors
         private void CurrentEditor_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             var pos = Mouse.GetPosition(CurrentEditor);
+            Vector shift; //how much we want to shift the objects by
 
             if (MouseIsDown(e) & !IsDragging)
             {
@@ -250,12 +251,16 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
             //we're dragging an object around
-            else if (MouseIsDown(e) & IsDragging)
+            if (MouseIsDown(e) & IsDragging)
             {
                 if (_initialTarget is Bond b)
                 {
                     CurrentStatus = "Drag bond to reposition.";
                     _atomList = new List<Atom> { b.StartAtom, b.EndAtom };
+                    shift = pos - StartPoint;
+                    var tt = new TranslateTransform(shift.X, shift.Y);
+                    _shift = new TransformGroup();
+                    _shift.Children.Add(tt);
                 }
                 else //we're dragging an atom
                 {
@@ -263,8 +268,6 @@ namespace Chem4Word.ACME.Behaviors
                     //this code is horrendous, apologies
                     //please don't modify it without good reason!
                     //if you must then READ THE COMMENTS FIRST, PLEASE!
-
-                    Vector shift; //how much we want to shift the objects by
 
                     _atomList = EditViewModel.SelectedItems.OfType<Atom>().ToList();
                     var immediateNeighbours = GetImmediateNeighbours(_atomList);

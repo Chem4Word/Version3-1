@@ -375,7 +375,7 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeIsotopeNumber, atom.IsotopeNumber.Value));
             }
 
-            if ((Element)atom.Element == Globals.PeriodicTable.C && atom.ShowSymbol != null)
+            if (atom.Element as Element == Globals.PeriodicTable.C && atom.ShowSymbol != null)
             {
                 result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ShowSymbol));
             }

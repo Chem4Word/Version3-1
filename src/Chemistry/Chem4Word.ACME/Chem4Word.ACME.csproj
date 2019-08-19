@@ -69,8 +69,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adorners\GroupHoverAdorner.cs" />
-    <Compile Include="Adorners\GroupSelectionAdorner.cs" />
+    <Compile Include="Adorners\Selectors\BaseSelectionAdorner.cs" />
+    <Compile Include="Adorners\Feedback\GroupHoverAdorner.cs" />
+    <Compile Include="Adorners\Selectors\AtomSelectionAdorner.cs" />
+    <Compile Include="Adorners\Selectors\BondSelectionAdorner.cs" />
+    <Compile Include="Adorners\Selectors\GroupSelectionAdorner.cs" />
+    <Compile Include="Adorners\Selectors\MoleculeSelectionAdorner.cs" />
+    <Compile Include="Adorners\Selectors\MultiChemistryAdorner.cs" />
+    <Compile Include="Adorners\Selectors\SingleAtomSelectionAdorner.cs" />
+    <Compile Include="Adorners\Selectors\SingleChemistryAdorner.cs" />
     <Compile Include="Converters\TreeViewLineConverter.cs" />
     <Compile Include="Drawing\GroupVisual.cs" />
     <Compile Include="LabelsEditor.xaml.cs">
@@ -84,19 +91,15 @@
     <Compile Include="Drawing\TripleBondDescriptor.cs" />
     <Compile Include="Drawing\WedgeBondDescriptor.cs" />
     <Compile Include="Enums\2Point5BondType.cs" />
-    <Compile Include="Adorners\BondHoverAdorner.cs" />
-    <Compile Include="Adorners\AtomHoverAdorner.cs" />
-    <Compile Include="Adorners\AtomSelectionAdorner.cs" />
-    <Compile Include="Adorners\BondSelectionAdorner.cs" />
+    <Compile Include="Adorners\Feedback\BondHoverAdorner.cs" />
+    <Compile Include="Adorners\Feedback\AtomHoverAdorner.cs" />
     <Compile Include="Adorners\ChainAdorner.cs" />
     <Compile Include="Adorners\DrawBondAdorner.cs" />
     <Compile Include="Adorners\NRingAdorner.cs" />
     <Compile Include="Adorners\FixedRingAdorner.cs" />
     <Compile Include="Adorners\LassoAdorner.cs" />
-    <Compile Include="Adorners\MoleculeSelectionAdorner.cs" />
     <Compile Include="Adorners\PartialGhostAdorner.cs" />
     <Compile Include="Adorners\RingDrawer.cs" />
-    <Compile Include="Adorners\SingleAtomSelectionAdorner.cs" />
     <Compile Include="Controls\AtomOption.cs" />
     <Compile Include="Behaviors\ChainBehavior.cs" />
     <Compile Include="Behaviors\NRingBehavior.cs" />
@@ -312,5 +315,6 @@
   <ItemGroup>
     <Resource Include="Resources\ms-word-16.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

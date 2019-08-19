@@ -5,21 +5,24 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
 
 namespace Chem4Word.ACME.Drawing
 {
     public class FunctionalGroupVisual : AtomVisual
     {
+        private List<Point> _sortedOutline;
         private List<LabelTextSourceRun> ComponentRuns { get; }
         public FunctionalGroup ParentGroup { get; }
         public bool Flipped => ParentAtom.BalancingVector().X < 0d;
+
+        public override List<Point> Hull { get; protected set; }
 
         public FunctionalGroupVisual(Atom parent) : this((FunctionalGroup)parent.Element)
         {
@@ -74,15 +77,12 @@ namespace Chem4Word.ACME.Drawing
                 FunctionalGroup anchorGroup = new FunctionalGroup();
                 anchorGroup.Components = new List<Group>();
                 anchorGroup.Components.Add(ParentGroup.Components[0]); //add in the anchor
-                //var anchorStore = new FunctionalGroupTextSource(anchorGroup, Flipped);
                 anchorString = anchorGroup.Expand().TrimStart('[').TrimEnd(']');
             }
             else
             {
                 anchorString = ParentGroup.Symbol.Replace("{", "").Replace("}", "");
             }
-
-            //ParentVisual.ShowPoints(new List<Point> {startingPoint}, dc);
 
             Vector dispVector;
             IEnumerable<IndexedGlyphRun> glyphRuns;
@@ -146,13 +146,13 @@ namespace Chem4Word.ACME.Drawing
                         advanceWidths += currentRun.AdvanceWidths.Sum();
                     }
 
-                    var sortedOutline = (from Point p in outline
-                                         orderby p.X ascending, p.Y descending
-                                         select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
+                    _sortedOutline = (from Point p in outline
+                                      orderby p.X ascending, p.Y descending
+                                      select p + dispVector + new Vector(0.0, myTextLine.Baseline)).ToList();
 
-                    Hull = Geometry<Point>.GetHull(sortedOutline, p => p);
+                    Hull = Geometry<Point>.GetHull(_sortedOutline, p => p);
 
-                    // Diag: Comment out to show hull and atom position
+                    // Diag: Uncomment to show hull and atom position
                     //dc.DrawGeometry(null, new Pen(Brushes.GreenYellow, thickness: 1), HullGeometry);
                     //dc.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
                     dc.Close();

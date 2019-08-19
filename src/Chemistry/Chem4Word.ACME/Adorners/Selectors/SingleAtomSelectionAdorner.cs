@@ -5,108 +5,65 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.ACME.Controls;
-using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2;
 
-namespace Chem4Word.ACME.Adorners
+namespace Chem4Word.ACME.Adorners.Selectors
 {
-    public class SingleAtomSelectionAdorner : Adorner
+    public class SingleAtomSelectionAdorner : MultiChemistryAdorner
     {
         protected Thumb BigThumb; //this is the main grab area for the molecule
-        protected readonly VisualCollection VisualChildren;
+       
 
+        public List<Molecule> AdornedMolecules => AdornedChemistries.Select(c => (Molecule)c).ToList();
         //tracks the last operation performed
         protected Transform LastOperation;
 
         //status flag
         protected bool Dragging;
 
-        //rendering variables
-        protected readonly Pen BorderPen;
-
-        protected readonly Brush RenderBrush;
-
         //tracks the amount of travel during drag operations
         protected double DragXTravel;
-
         protected double DragYTravel;
-        public readonly EditViewModel CurrentModel;
 
         //where the dragging starts
         protected Point StartPos;
 
-        public EditorCanvas CurrentEditor { get; }
         protected bool IsWorking => Dragging;
-
-        // Override the VisualChildrenCount and GetVisualChild properties to interface with
-        // the adorner's visual collection.
-        protected override int VisualChildrenCount => VisualChildren.Count;
-
-        public readonly List<Molecule> AdornedMolecules;
+        
         private Geometry _ghostMolecule;
 
-        protected override Visual GetVisualChild(int index)
-        {
-            return VisualChildren[index];
-        }
-
-        public SingleAtomSelectionAdorner(UIElement adornedElement, Molecule molecule, EditViewModel currentModel)
-            : this(adornedElement, new List<Molecule> { molecule }, currentModel)
+        public SingleAtomSelectionAdorner(EditorCanvas currentEditor , Molecule molecule)
+            : this(currentEditor, new List<ChemistryBase> { molecule })
         {
         }
 
-        public SingleAtomSelectionAdorner(UIElement adornedElement, List<Molecule> molecules,
-            EditViewModel currentModel) : base(adornedElement)
+        public SingleAtomSelectionAdorner(EditorCanvas currentEditor, List<ChemistryBase> molecules) : base(currentEditor, molecules)
         {
-            AdornedMolecules = new List<Molecule>();
-            CurrentModel = currentModel;
-
-            VisualChildren = new VisualCollection(this);
-
             BuildBigDragArea();
 
             AttachHandler();
-
-            AdornedMolecules.AddRange(molecules);
-
-            BorderPen = (Pen)FindResource("GrabHandlePen");
-            RenderBrush = (Brush)FindResource("BigThumbFillBrush");
             Focusable = false;
             IsHitTestVisible = true;
-
-            CurrentEditor = (EditorCanvas)adornedElement;
-
-            var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
-            myAdornerLayer.Add(this);
 
             Focusable = true;
             Keyboard.Focus(this);
         }
 
-        private void SingleAtomSelectionAdorner_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            CurrentEditor?.RaiseEvent(e);
-        }
-
-        ~SingleAtomSelectionAdorner()
-        {
-            PreviewMouseRightButtonUp -= SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
-        }
-
         protected void AttachHandler()
         {
-            //wire up the event handling
-            MouseLeftButtonDown += BigThumb_MouseLeftButtonDown;
-            KeyDown += ThisAdorner_KeyDown;
-            PreviewMouseRightButtonUp += SingleAtomSelectionAdorner_PreviewMouseRightButtonUp;
+          
+           //detach the handlers to stop them interfering with dragging
+           PreviewMouseLeftButtonDown -= BaseSelectionAdorner_PreviewMouseLeftButtonDown;
+           MouseLeftButtonDown -= BaseSelectionAdorner_MouseLeftButtonDown;
+           PreviewMouseMove -= BaseSelectionAdorner_PreviewMouseMove;
         }
 
         private void BigThumb_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -117,10 +74,6 @@ namespace Chem4Word.ACME.Adorners
             }
         }
 
-        protected void ThisAdorner_KeyDown(object sender, KeyEventArgs e)
-        {
-            CurrentEditor.RaiseEvent(e);
-        }
 
         protected virtual void AbortDragging()
         {
@@ -150,11 +103,13 @@ namespace Chem4Word.ACME.Adorners
         }
 
         /// <summary>
-        /// Override this to
+        /// Override this to change the appearance of the main area
         /// </summary>
         /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
         {
+            var borderPen = (Pen)FindResource("GrabHandlePen");
+            var renderBrush = (Brush)FindResource("BigThumbFillBrush");
             if (IsWorking)
             {
                 object elem = AdornedElement;
@@ -168,7 +123,7 @@ namespace Chem4Word.ACME.Adorners
 
                 _ghostMolecule.Transform = LastOperation;
 
-                drawingContext.DrawGeometry(RenderBrush, BorderPen, _ghostMolecule);
+                drawingContext.DrawGeometry(renderBrush, borderPen, _ghostMolecule);
 
                 base.OnRender(drawingContext);
             }
@@ -179,7 +134,7 @@ namespace Chem4Word.ACME.Adorners
         {
             // desiredWidth and desiredHeight are the width and height of the element that's being adorned.
             // These will be used to place the ResizingAdorner at the corners of the adorned element.
-            var bbb = (AdornedElement as EditorCanvas).GetMoleculeBoundingBox(AdornedMolecules);
+            var bbb = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
 
             if (LastOperation != null)
             {
@@ -187,16 +142,13 @@ namespace Chem4Word.ACME.Adorners
             }
 
             //put a box right around the entire shebang
-
             BigThumb.Arrange(bbb);
             Canvas.SetLeft(BigThumb, bbb.Left);
             Canvas.SetTop(BigThumb, bbb.Top);
             BigThumb.Height = bbb.Height;
             BigThumb.Width = bbb.Width;
 
-
             // Return the final size.
-
             return finalSize;
         }
 
@@ -237,7 +189,7 @@ namespace Chem4Word.ACME.Adorners
 
         /// <summary>
         /// Handles all drag events from all thumbs.
-        /// The actual transformation is set duing other code
+        /// The actual transformation is set in other code
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -252,7 +204,7 @@ namespace Chem4Word.ACME.Adorners
                 InvalidateVisual();
 
                 //move the molecule
-                CurrentModel.DoTransform(LastOperation,AdornedMolecules);
+                EditViewModel.DoTransform(LastOperation, AdornedMolecules);
 
                 RaiseDRCompleted(sender, e);
 
@@ -265,7 +217,7 @@ namespace Chem4Word.ACME.Adorners
             }
             else
             {
-                CurrentModel.SelectedItems.Remove(AdornedMolecules);
+                EditViewModel.SelectedItems.Remove(AdornedMolecules);
             }
             Dragging = false;
         }

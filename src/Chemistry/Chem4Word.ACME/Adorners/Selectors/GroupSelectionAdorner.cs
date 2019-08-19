@@ -5,22 +5,25 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls.Primitives;
+using Chem4Word.ACME.Controls;
+using Chem4Word.Model2;
 
-namespace Chem4Word.ACME.Adorners
+namespace Chem4Word.ACME.Adorners.Selectors
 {
     public class GroupSelectionAdorner : MoleculeSelectionAdorner
-    {
-        public GroupSelectionAdorner(UIElement adornedElement, List<Molecule> molecules, EditViewModel currentModel) : base(adornedElement, molecules, currentModel)
         {
-        }
+            public GroupSelectionAdorner(EditorCanvas currentEditor, List<Molecule> molecules)
+                : base(currentEditor, molecules)
+            {
+            }
 
-        protected override void SetThumbStyle(Thumb cornerThumb)
-        {
-            cornerThumb.Style = (Style)FindResource("GroupHandleStyle");
+            protected override void SetThumbStyle(Thumb cornerThumb)
+            {
+                cornerThumb.Style = (Style) FindResource("GroupHandleStyle");
+            }
         }
     }
-}
+

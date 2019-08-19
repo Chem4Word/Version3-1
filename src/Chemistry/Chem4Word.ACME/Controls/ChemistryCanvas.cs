@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners.Feedback;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -67,9 +68,7 @@ namespace Chem4Word.ACME.Controls
 
         public BondVisual ActiveBondVisual => (ActiveVisual as BondVisual);
 
-        public GroupVisual ActiveGroupVisualVisual => (ActiveVisual as GroupVisual);
-
-        public Model2.ChemistryBase ActiveChemistry
+        public ChemistryBase ActiveChemistry
         {
             get
             {
@@ -99,8 +98,6 @@ namespace Chem4Word.ACME.Controls
                 }
             }
         }
-
-
 
         public bool ShowGroups
         {
@@ -729,7 +726,7 @@ namespace Chem4Word.ACME.Controls
 
             return HitTestResultBehavior.Continue;
         }
-
+                                          
         #endregion Methods
     }
 }
