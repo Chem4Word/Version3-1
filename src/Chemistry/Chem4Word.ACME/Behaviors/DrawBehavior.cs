@@ -47,7 +47,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor = (EditorCanvas)AssociatedObject;
             _lastCursor = CurrentEditor.Cursor;
             CurrentEditor.Cursor = Cursors.Pen;
-            EditViewModel.SelectedItems?.Clear();
+            EditViewModel.ClearSelection();
 
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.PreviewMouseLeftButtonUp += CurrentEditor_PreviewMouseLeftButtonUp;

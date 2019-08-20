@@ -141,7 +141,7 @@ namespace Chem4Word.ACME.Utils
                     if (model.Save)
                     {
                         evm.UpdateAtom(atom, model);
-                        evm.SelectedItems.Clear();
+                        evm.ClearSelection();
                         evm.AddToSelection(atom);
                         if (model.AddedElement != null)
                         {
@@ -241,7 +241,7 @@ namespace Chem4Word.ACME.Utils
                         bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
                     }
 
-                    evm.SelectedItems.Clear();
+                    evm.ClearSelection();
                     evm.AddToSelection(bond);
                 }
             }

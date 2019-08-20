@@ -216,7 +216,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
             else
             {
-                EditViewModel.SelectedItems.Remove(AdornedMolecules);
+                EditViewModel.RemoveFromSelection(AdornedMolecules);
             }
             Dragging = false;
         }

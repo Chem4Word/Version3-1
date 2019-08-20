@@ -25,7 +25,7 @@ namespace Chem4Word.ACME.Commands
 
         public override void Execute(object parameter)
         {
-            EditViewModel.Group(EditViewModel.SelectedItems);
+            EditViewModel.Group(EditViewModel.SelectedItems.ToList());
         }
     }
 }

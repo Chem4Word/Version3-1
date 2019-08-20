@@ -70,7 +70,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
             {
-                EditViewModel.SelectedItems.Clear();
+                EditViewModel.ClearSelection();
             }
 
             _mouseTrack = new PointCollection();
@@ -113,7 +113,7 @@ namespace Chem4Word.ACME.Behaviors
 
             if (EditViewModel.SelectedItems.Any())
             {
-                EditViewModel.SelectedItems.Clear();
+                EditViewModel.ClearSelection();
                 CurrentStatus = DefaultText;
             }
 
@@ -390,7 +390,7 @@ namespace Chem4Word.ACME.Behaviors
 
             if (!(currentObject != null | Utils.KeyboardUtils.HoldingDownShift()))
             {
-                EditViewModel.SelectedItems.Clear();
+                EditViewModel.ClearSelection();
             }
 
             StartPoint = e.GetPosition(CurrentEditor);
@@ -467,7 +467,7 @@ namespace Chem4Word.ACME.Behaviors
                     }
 
                 default:
-                    EditViewModel.SelectedItems.Clear();
+                    EditViewModel.ClearSelection();
                     CurrentStatus = DefaultText;
                     break;
             }
@@ -540,7 +540,7 @@ namespace Chem4Word.ACME.Behaviors
                     }
 
                 default:
-                    EditViewModel.SelectedItems.Clear();
+                    EditViewModel.ClearSelection();
                     CurrentStatus = DefaultText;
                     break;
             }

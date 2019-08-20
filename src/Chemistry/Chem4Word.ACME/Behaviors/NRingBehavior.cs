@@ -311,7 +311,7 @@ namespace Chem4Word.ACME.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            EditViewModel.SelectedItems?.Clear();
+            EditViewModel.ClearSelection();
 
             CurrentEditor = (EditorCanvas)AssociatedObject;
 

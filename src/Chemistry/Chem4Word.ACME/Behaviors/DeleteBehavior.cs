@@ -41,7 +41,7 @@ namespace Chem4Word.ACME.Behaviors
                 _parent.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             }
             //clear the current selection
-            EditViewModel.SelectedItems.Clear();
+            EditViewModel.ClearSelection();
             CurrentStatus = "Click to remove an atom or bond.";
         }
 
@@ -66,7 +66,8 @@ namespace Chem4Word.ACME.Behaviors
                 this.EditViewModel.DeleteBonds(new[] { bond });
                 CurrentStatus = "Bond deleted";
             }
-            EditViewModel.SelectedItems.Clear();
+
+            EditViewModel.ClearSelection();
         }
 
         protected override void OnDetaching()
