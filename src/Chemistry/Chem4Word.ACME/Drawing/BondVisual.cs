@@ -117,7 +117,7 @@ namespace Chem4Word.ACME.Drawing
                 };
 
                 var endAtom = endAtomVisual.ParentAtom;
-                var otherBonds = endAtom.Bonds.Except(new[] { startAtomVisual.ParentAtom.BondBetween(endAtom) });
+                var otherBonds = endAtom.Bonds.Except(new[] { startAtomVisual.ParentAtom.BondBetween(endAtom) }).ToList();
                 Bond bond = null;
                 if (otherBonds.Any())
                 {
@@ -135,12 +135,18 @@ namespace Chem4Word.ACME.Drawing
                 }
                 else
                 {
-                    var nonHPs = from b in otherBonds
-                                 where (b.OtherAtom(endAtom)).Element as Element != Globals.PeriodicTable.H
-                                 select b.OtherAtom(endAtom).Position;
-
-                    wbd.CappedOff = true;
-                    BondGeometry.GetChamferedWedgeGeometry(wbd, modelXamlBondLength, nonHPs.ToList());
+                    var nonHPs = (from b in otherBonds
+                                  select b.OtherAtom(endAtom).Position).ToList();
+                    if (nonHPs.Any())
+                    {
+                        wbd.CappedOff = true;
+                        BondGeometry.GetChamferedWedgeGeometry(wbd, modelXamlBondLength, nonHPs);
+                    }
+                    else
+                    {
+                        wbd.CappedOff = false;
+                        BondGeometry.GetWedgeBondGeometry(wbd, modelXamlBondLength);
+                    }
                 }
 
                 return wbd;
