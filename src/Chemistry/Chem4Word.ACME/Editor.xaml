@@ -306,6 +306,14 @@
             Key="V"
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PasteCommand}"
             Modifiers="Control" />
+        <KeyBinding
+            Key="G"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.GroupCommand}"
+            Modifiers="Control" />
+        <KeyBinding
+            Key="U"
+            Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.UnGroupCommand}"
+            Modifiers="Control" />
     </UserControl.InputBindings>
 
     <Grid Name="SelectorGrid">
