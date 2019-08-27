@@ -5,27 +5,23 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
+using System.Collections.Generic;
 
-namespace Chem4Word.Model
+namespace Chem4Word.Model2
 {
-    public class ChemicalName
+    public class FunctionalGroupTerm
     {
-        public string Id { get; set; }
+        public List<FunctionalGroupPart> Parts { get; set; }
+        public bool IsAnchor { get; set; }
 
-        public string DictRef { get; set; }
-
-        public string Name { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public ChemicalName()
+        public FunctionalGroupTerm()
         {
+            Parts = new List<FunctionalGroupPart>();
         }
 
-        public ChemicalName Clone()
+        public override string ToString()
         {
-            return (this.MemberwiseClone() as ChemicalName);
+            return $"{Parts.Count} parts; IsAnchor {IsAnchor}";
         }
     }
 }

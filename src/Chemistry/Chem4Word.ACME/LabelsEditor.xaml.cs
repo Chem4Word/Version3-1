@@ -335,7 +335,7 @@ namespace Chem4Word.ACME
 
         // Copied from $\src\Chem4Word.V3\Navigator\FormulaBlock.cs
         // Ought to be made into common routine
-        // ToDo: Refactor into common code ...
+        // Refactor into common code [MAW] ...
         private TextBlock TextBlockFromFormula(string formula, string prefix = null)
         {
             var textBlock = new TextBlock();

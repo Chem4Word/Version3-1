@@ -81,7 +81,10 @@
     <Compile Include="ElementBase.cs" />
     <Compile Include="ElementConverter.cs" />
     <Compile Include="FunctionalGroup.cs" />
+    <Compile Include="FunctionalGroupPart.cs" />
+    <Compile Include="FunctionalGroupPartType.cs" />
     <Compile Include="FunctionalGroups.cs" />
+    <Compile Include="FunctionalGroupTerm.cs" />
     <Compile Include="Geometry\BasicGeometry.cs" />
     <Compile Include="Geometry\Geometry.cs" />
     <Compile Include="Geometry\Packer.cs" />

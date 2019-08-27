@@ -5,20 +5,22 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model
+namespace Chem4Word.Model2
 {
-    public class Formula
+    public class FunctionalGroupPart
     {
-        public string Id { get; set; }
+        public string Text { get; set; }
 
-        public string Convention { get; set; }
+        public FunctionalGroupPartType Type { get; set; }
 
-        public string Inline { get; set; }
-
-        public bool IsValid { get; set; }
-
-        public Formula()
+        public FunctionalGroupPart()
         {
+            Type = FunctionalGroupPartType.Normal;
+        }
+
+        public override string ToString()
+        {
+            return $"{Text} {Type}";
         }
     }
 }

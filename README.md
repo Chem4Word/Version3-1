@@ -3,7 +3,7 @@ This project is Version 3.1 of the Chemistry for Word Add-In
 
 ## Getting Started
 1.	Installation process
-2.	Software dependencies Office 2010/2013/2016
+2.	Software dependencies Office 2010/2013/2016/2019/365 (Installed on Desktop)
 3.	Latest releases
 
 ## Build and Test

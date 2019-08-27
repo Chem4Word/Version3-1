@@ -7,137 +7,32 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Windows.Media.TextFormatting;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
-using Group = Chem4Word.Model2.Group;
 
 namespace Chem4Word.ACME.Drawing
 {
     partial class FunctionalGroupTextSource : TextSource
     {
-        private static Regex _superscriptRegEx = new Regex("(?<normal>[^{}]+)|(?<super>\\{[^{}]+\\})");
         public List<LabelTextSourceRun> Runs = new List<LabelTextSourceRun>();
+
+        public FunctionalGroupTextSource()
+        {
+        }
 
         public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
         {
-            Expand(parentGroup, isFlipped);
-        }
-
-        private void Expand(FunctionalGroup parentGroup, bool isFlipped)
-        {
-            if (parentGroup.ShowAsSymbol)
+            foreach (var term in parentGroup.ExpandIntoTerms(isFlipped))
             {
-                var super = _superscriptRegEx.Matches(parentGroup.Symbol);
-
-                foreach (Match match in super)
-                {
-                    if (match.Value.Contains("{"))//it's a superscript
-                    {
-                        Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsSuperscript = true, IsEndParagraph = false, Text = match.Value.TrimStart('{').TrimEnd('}') });
-                    }
-                    else
-                    {
-                        Runs.Add(new LabelTextSourceRun() { IsAnchor = true, IsEndParagraph = false, Text = match.Value });
-                    }
-                }
-            }
-            else
-            {
-                if (isFlipped && parentGroup.Flippable)
-                {
-                    for (int i = parentGroup.Components.Count - 1; i >= 0; i--)
-                    {
-                        Append(parentGroup.Components[i], i == 0);
-                    }
-                }
-                else
-                {
-                    int ii = 0;
-                    foreach (var component in parentGroup.Components)
-                    {
-                        Append(component, ii == 0);
-                        ii++;
-                    }
-                }
-            }
-
-            // Local Function
-            void Append(Group component, bool isAnchor)
-            {
-                ElementBase eb;
-                if (AtomHelpers.TryParse(component.Component, out eb))
-                {
-                    if (eb is Element)
-                    {
-                        Runs.Add(new LabelTextSourceRun
-                        {
-                            IsAnchor = isAnchor,
-                            IsEndParagraph = false,
-                            Text = component.Component
-                        });
-                        if (component.Count > 1)
-                        {
-                            Runs.Add(new LabelTextSourceRun
-                            {
-                                IsAnchor = isAnchor,
-                                IsSubscript = true,
-                                IsEndParagraph = false,
-                                Text = component.Count.ToString()
-                            });
-                        }
-                    }
-                    else if (eb is FunctionalGroup fg)
-                    {
-                        if (component.Count > 1)
-                        {
-                            Runs.Add(new LabelTextSourceRun()
-                            {
-                                IsAnchor = false,
-                                IsEndParagraph = false,
-                                IsSubscript = false,
-                                Text = "("
-                            });
-                        }
-
-                        if (fg.ShowAsSymbol)
-                        {
-                            Runs.Add(new LabelTextSourceRun
-                            {
-                                IsAnchor = isAnchor,
-                                IsEndParagraph = false,
-                                Text = component.Component
-                            });
-                        }
-                        else
-                        {
-                            Expand(fg, false);
-                        }
-
-                        if (component.Count > 1)
-                        {
-                            Runs.Add(new LabelTextSourceRun()
-                            {
-                                IsAnchor = false,
-                                IsEndParagraph = false,
-                                IsSubscript = false,
-                                Text = ")"
-                            });
-                            Runs.Add(new LabelTextSourceRun
-                            { IsAnchor = isAnchor, IsSubscript = true, IsEndParagraph = false, Text = component.Count.ToString() });
-                        }
-                    }
-
-                    //
-                }
-                else
+                foreach (var part in term.Parts)
                 {
                     Runs.Add(new LabelTextSourceRun
                     {
-                        IsAnchor = isAnchor,
+                        IsAnchor = term.IsAnchor,
                         IsEndParagraph = false,
-                        Text = "??" //WTF!
+                        IsSubscript = part.Type == FunctionalGroupPartType.Subscript,
+                        IsSuperscript = part.Type == FunctionalGroupPartType.Superscript,
+                        Text = part.Text
                     });
                 }
             }
@@ -184,25 +79,14 @@ namespace Chem4Word.ACME.Drawing
 
         public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int textSourceCharacterIndexLimit)
         {
+            // Never called, but must be implemented
             throw new Exception("The method or operation is not implemented.");
         }
 
         public override int GetTextEffectCharacterIndexFromTextSourceCharacterIndex(int textSourceCharacterIndex)
         {
+            // Never called, but must be implemented
             throw new Exception("The method or operation is not implemented.");
-        }
-
-        public int Length
-        {
-            get
-            {
-                int r = 0;
-                foreach (var currentRun in Runs)
-                {
-                    r += currentRun.Length;
-                }
-                return r;
-            }
         }
     }
 }

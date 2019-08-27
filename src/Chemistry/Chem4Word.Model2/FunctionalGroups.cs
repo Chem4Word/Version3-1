@@ -6,9 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
@@ -73,23 +71,6 @@ namespace Chem4Word.Model2
                     _shortcutList.Add(kvp.Key, kvp.Value);
                 }
             }
-        }
-
-        //list of valid shortcuts for testing input
-        public static string ValidShortCuts => "(" + _shortcutList.Select(e => e.Key).Aggregate((start, next) => start + "|" + next) + ")";
-
-        //list of valid elements (followed by subscripts) for testing input
-        public static Regex NameParser => new Regex($"^(?<element>{Globals.PeriodicTable.ValidElements}+[0-9]*)+\\s*$");
-
-        //checks to see whether a typed in expression matches a given shortcut
-        public static bool IsValid(string expr)
-        {
-            return NameParser.IsMatch(expr) || IsFunctionalGroup(expr);
-        }
-
-        public static bool IsFunctionalGroup(string expr)
-        {
-            return ValidShortCuts.Contains($"|{expr}|");
         }
     }
 }

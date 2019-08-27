@@ -5,12 +5,12 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-namespace Chem4Word.Model.Converters.MDL
+namespace Chem4Word.Model2
 {
-    public class PropertyType
+    public enum FunctionalGroupPartType
     {
-        public string ExternalName { get; set; }
-        public string InternalName { get; set; }
-        public bool IsFormula { get; set; }
+        Subscript = -1,
+        Normal = 0,
+        Superscript = 1
     }
 }

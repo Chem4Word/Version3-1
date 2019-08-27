@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Chem4Word.Model2.Helpers;
@@ -19,57 +18,19 @@ namespace Chem4Word.Model2
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private double _atomicWeight = 0d;
-
-        public static bool TryParse(string desc, out ElementBase element)
-        {
-            if (TryParse(desc, out FunctionalGroup fg))
-            {
-                element = fg;
-                return true;
-            }
-            else
-            {
-                if (Globals.PeriodicTable.HasElement(desc))
-                {
-                    element = (ElementBase)Globals.PeriodicTable[desc];
-                    return true;
-                }
-            }
-
-            element = null;
-            return false;
-        }
-
-        public static bool TryParse(string desc, out FunctionalGroup fg)
-        {
-            try
-            {
-                if (Globals.FunctionalGroupsDictionary.ContainsKey(desc))
-                {
-                    fg = Globals.FunctionalGroupsDictionary[desc];
-                    return true;
-                }
-                else
-                {
-                    fg = null;
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
-                fg = null;
-                return false;
-            }
-        }
+        private double? _atomicWeight;
+        private Dictionary<string, int> _formulaParts;
 
         public override string Colour => Globals.PeriodicTable.C.Colour;
 
+        /// <summary>
+        /// Overall Atomic Weight of the Functional Group
+        /// </summary>
         public override double AtomicWeight
         {
             get
             {
-                if (_atomicWeight == 0d)
+                if (_atomicWeight == null)
                 {
                     double atwt = 0.0d;
                     if (Components != null)
@@ -80,37 +41,43 @@ namespace Chem4Word.Model2
                             atwt += component.AtomicWeight * component.Count;
                         }
                     }
-                    return atwt;
+                    _atomicWeight = atwt;
                 }
 
-                return _atomicWeight;
+                return _atomicWeight.Value;
             }
             set { _atomicWeight = value; }
         }
 
+        /// <summary>
+        /// List of atoms with frequency of use
+        /// </summary>
         public Dictionary<string, int> FormulaParts
         {
             get
             {
-                Dictionary<string, int> parts = new Dictionary<string, int>();
-
-                foreach (var component in Components)
+                if (_formulaParts == null)
                 {
-                    var pp = component.FormulaParts;
-                    foreach (var p in pp)
+                    _formulaParts = new Dictionary<string, int>();
+
+                    foreach (var component in Components)
                     {
-                        if (parts.ContainsKey(p.Key))
+                        var pp = component.FormulaParts;
+                        foreach (var p in pp)
                         {
-                            parts[p.Key] += p.Value * component.Count;
-                        }
-                        else
-                        {
-                            parts.Add(p.Key, p.Value * component.Count);
+                            if (_formulaParts.ContainsKey(p.Key))
+                            {
+                                _formulaParts[p.Key] += p.Value * component.Count;
+                            }
+                            else
+                            {
+                                _formulaParts.Add(p.Key, p.Value * component.Count);
+                            }
                         }
                     }
                 }
 
-                return parts;
+                return _formulaParts;
             }
         }
 
@@ -121,13 +88,17 @@ namespace Chem4Word.Model2
         public bool Flippable { get; set; }
 
         /// <summary>
-        /// Symbol refers to the 'Ph', 'Bz' etc
-        /// It is a unique key for the functional group
+        /// Symbol to be rendered i.e. 'Ph', 'Bz' 'R{5}' etc
+        /// Any text between '{' and '}' characters should be super scripted
         /// Symbol can also be of the form CH3, CF3, C2H5 etc
         /// </summary>
         [JsonProperty]
         public override string Symbol { get; set; }
 
+        /// <summary>
+        /// True: FunctionalGroup.Symbol should be used as is.
+        /// False: FunctionalGroup should be expanded before rendering it.
+        /// </summary>
         [JsonProperty]
         public bool ShowAsSymbol { get; set; }
 
@@ -135,105 +106,224 @@ namespace Chem4Word.Model2
         /// Defines the constituents of the superatom
         /// The 'pivot' atom that bonds to the fragment appears FIRST in the list
         /// so CH3 can appear as H3C
-        ///
         /// Ths property can be null, which means that the symbol gets rendered
         /// </summary>
         [JsonProperty]
         public List<Group> Components { get; set; }
 
-        public string Expand(bool reverse = false)
+        /// <summary>
+        /// Expand the Functional Group into a flattened list of terms
+        /// </summary>
+        /// <param name="reverse"></param>
+        /// <param name="consolidate"></param>
+        /// <returns></returns>
+        public List<FunctionalGroupTerm> ExpandIntoTerms(bool reverse = false, bool consolidate = true)
         {
-            string result = "";
-
-            // Step 1; Collect a forward list of terms
-            List<string> expanded = new List<string>();
+            List<FunctionalGroupTerm> result = new List<FunctionalGroupTerm>();
 
             if (ShowAsSymbol)
             {
-                expanded.Add(Symbol);
+                var term = new FunctionalGroupTerm
+                {
+                    IsAnchor = true
+                };
+
+                term.Parts = ExpandSymbol(Symbol);
+                result.Add(term);
             }
             else
             {
-                foreach (var component in Components)
+                for (int i = 0; i < Components.Count; i++)
                 {
-                    expanded.Add(ExpandLocal(component));
+                    var term = new FunctionalGroupTerm
+                    {
+                        IsAnchor = i == 0,
+                        Parts = ExpandGroupV2(Components[i])
+                    };
+
+                    result.Add(term);
                 }
             }
 
-            // Step 2; If reverse, reverse the array and set anchor term as last term
-            int anchorTerm = 0;
+            // Consolidate parts of each term
+            if (consolidate)
+            {
+                foreach (var term in result)
+                {
+                    if (term.Parts.Count > 1)
+                    {
+                        var newParts = new List<FunctionalGroupPart>();
+
+                        var newPart = term.Parts[0];
+                        newParts.Add(newPart);
+
+                        for (int i = 1; i < term.Parts.Count; i++)
+                        {
+                            if (term.Parts[i].Type == term.Parts[i - 1].Type)
+                            {
+                                newPart.Text += term.Parts[i].Text;
+                            }
+                            else
+                            {
+                                newPart = term.Parts[i];
+                                newParts.Add(newPart);
+                            }
+                        }
+
+                        term.Parts = newParts;
+                    }
+                }
+            }
+
             if (Flippable && reverse)
             {
-                expanded.Reverse();
-                anchorTerm = expanded.Count - 1;
-            }
-
-            // Step 3; Combine strings together to form final output, surrounding anchor "term" with []
-            for (int i = 0; i < expanded.Count; i++)
-            {
-                if (i == anchorTerm)
-                {
-                    result += $"[{expanded[i]}]";
-                }
-                else
-                {
-                    result += expanded[i];
-                }
+                result.Reverse();
             }
 
             return result;
 
-            // Local Function for recursion
-            string ExpandLocal(Group localComponent)
+            // Local Functions
+
+            // Ensure that Symbols such as "R{1}" and "{i}Pr" are expanded into parts
+            List<FunctionalGroupPart> ExpandSymbol(string symbol)
             {
-                string localResult = "";
+                List<FunctionalGroupPart> expanded = new List<FunctionalGroupPart>();
 
-                ElementBase elementBase;
-                var ok = AtomHelpers.TryParse(localComponent.Component, out elementBase);
-                if (ok)
+                if (symbol.Contains("{") || symbol.Contains("}"))
                 {
-                    if (elementBase is Element element)
+                    var part = new FunctionalGroupPart();
+                    foreach (char c in symbol)
                     {
-                        localResult = element.Symbol;
-
-                        if (localComponent.Count != 1)
+                        switch (c)
                         {
-                            localResult = $"{localResult}{localComponent.Count}";
+                            case '{':
+                                if (!string.IsNullOrEmpty(part.Text))
+                                {
+                                    expanded.Add(part);
+                                }
+
+                                part = new FunctionalGroupPart
+                                {
+                                    Type = FunctionalGroupPartType.Superscript
+                                };
+                                break;
+
+                            case '}':
+                                expanded.Add(part);
+                                part = new FunctionalGroupPart();
+                                break;
+
+                            default:
+                                part.Text += c;
+                                break;
                         }
                     }
 
-                    if (elementBase is FunctionalGroup fg)
+                    // Ensure that trailing characters are not lost
+                    if (!string.IsNullOrEmpty(part.Text))
                     {
-                        if (fg.ShowAsSymbol)
+                        expanded.Add(part);
+                    }
+                }
+                else
+                {
+                    expanded.Add(new FunctionalGroupPart
+                    {
+                        Text = symbol
+                    });
+                }
+
+                return expanded;
+            }
+
+            List<FunctionalGroupPart> ExpandGroupV2(Group componentGroup)
+            {
+                List<FunctionalGroupPart> expanded = new List<FunctionalGroupPart>();
+
+                ElementBase elementBase;
+                if (AtomHelpers.TryParse(componentGroup.Component, out elementBase))
+                {
+                    if (elementBase is Element element)
+                    {
+                        expanded.Add(new FunctionalGroupPart
                         {
-                            localResult = fg.Symbol;
+                            Text = element.Symbol
+                        });
+
+                        if (componentGroup.Count != 1)
+                        {
+                            var part = new FunctionalGroupPart
+                            {
+                                Type = FunctionalGroupPartType.Subscript,
+                                Text = $"{componentGroup.Count}"
+                            };
+                            expanded.Add(part);
+                        }
+                    }
+
+                    if (elementBase is FunctionalGroup functionalGroup)
+                    {
+                        var part = new FunctionalGroupPart();
+
+                        if (componentGroup.Count != 1)
+                        {
+                            part.Text += "(";
+                            expanded.Add(part);
+                            part = new FunctionalGroupPart();
+                        }
+
+                        if (functionalGroup.ShowAsSymbol)
+                        {
+                            if (!string.IsNullOrEmpty(part.Text))
+                            {
+                                expanded.Add(part);
+                            }
+
+                            expanded.AddRange(ExpandSymbol(functionalGroup.Symbol));
+                            part = new FunctionalGroupPart();
                         }
                         else
                         {
-                            if (reverse)
+                            if (functionalGroup.Flippable && reverse)
                             {
-                                for (int i = fg.Components.Count - 1; i >= 0; i--)
+                                for (int ii = functionalGroup.Components.Count - 1; ii >= 0; ii--)
                                 {
-                                    localResult += ExpandLocal(fg.Components[i]);
+                                    expanded.AddRange(ExpandGroupV2(functionalGroup.Components[ii]));
                                 }
                             }
                             else
                             {
-                                foreach (var fgc in fg.Components)
+                                foreach (var fgc in functionalGroup.Components)
                                 {
-                                    localResult += ExpandLocal(fgc);
+                                    expanded.AddRange(ExpandGroupV2(fgc));
                                 }
                             }
                         }
 
-                        if (localComponent.Count != 1)
+                        if (componentGroup.Count != 1)
                         {
-                            localResult = $"({localResult}){localComponent.Count}";
+                            part.Text += ")";
+                            expanded.Add(part);
+
+                            part = new FunctionalGroupPart
+                            {
+                                Type = FunctionalGroupPartType.Subscript,
+                                Text = $"{componentGroup.Count}"
+                            };
+                            expanded.Add(part);
+
+                            part = new FunctionalGroupPart();
+                        }
+
+                        // Ensure that trailing characters are not lost
+                        if (!string.IsNullOrEmpty(part.Text))
+                        {
+                            expanded.Add(part);
                         }
                     }
                 }
 
-                return localResult;
+                return expanded;
             }
         }
     }

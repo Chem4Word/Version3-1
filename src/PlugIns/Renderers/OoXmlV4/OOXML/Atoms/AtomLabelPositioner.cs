@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using DocumentFormat.OpenXml.AdditionalCharacteristics;
 using Point = System.Windows.Point;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
@@ -595,48 +596,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             #endregion Set Up Atom Colours
 
-            List<FunctionalGroupTerm> terms = new List<FunctionalGroupTerm>();
+            List<FunctionalGroupTerm> terms = fg.ExpandIntoTerms(reverse);
 
-            #region Step 1 - Expand Fg into terms
-
-            if (fg.ShowAsSymbol)
-            {
-                var term = new FunctionalGroupTerm();
-                terms.Add(term);
-                term.IsAnchor = true;
-                AddCharacters(fg.Symbol, term);
-            }
-            else
-            {
-                int i = 0;
-                foreach (var component in fg.Components)
-                {
-                    var term = new FunctionalGroupTerm();
-                    terms.Add(term);
-                    term.IsAnchor = i == 0;
-
-                    if (fg.ShowAsSymbol)
-                    {
-                        AddCharacters(fg.Symbol, term);
-                    }
-                    else
-                    {
-                        ExpandGroup(component, term);
-                    }
-
-                    i++;
-                }
-            }
-
-
-            if (reverse)
-            {
-                terms.Reverse();
-            }
-
-            #endregion Step 1 - Expand Fg into terms
-
-            #region Step 2 - Generate the characters and measure Bounding Boxes
+            #region Step 1 - Generate the characters and measure Bounding Boxes
 
             var cursorPosition = atom.Position;
 
@@ -648,52 +610,23 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             foreach (var term in terms)
             {
-                foreach (var alc in term.Characters)
+                foreach (var part in term.Parts)
                 {
-                    Rect thisBoundingBox;
-                    if (alc.IsSmaller)
+                    foreach (char c in part.Text)
                     {
-                        var thisCharacterPosition = cursorPosition;
-                        // Start by assuming it's SubScript
-                        thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, _meanBondLength));
-                        if (alc.IsSuperScript)
+                        Rect bb = AddCharacter(c, part.Type);
+                        fgBoundingBox.Union(bb);
+                        if (term.IsAnchor)
                         {
-                            // Shift up by height of H to make it SuperScript
-                            thisCharacterPosition.Offset(0, - OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _meanBondLength));
+                            anchorBoundingBox.Union(bb);
                         }
-                        alc.Position = thisCharacterPosition;
-
-                        thisBoundingBox = new Rect(alc.Position,
-                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
-
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
-                    }
-                    else
-                    {
-                        alc.Position = cursorPosition;
-
-                        thisBoundingBox = new Rect(alc.Position,
-                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _meanBondLength),
-                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _meanBondLength)));
-
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, _meanBondLength), 0);
-                    }
-
-                    fgCharacters.Add(alc);
-
-                    fgBoundingBox.Union(thisBoundingBox);
-
-                    if (term.IsAnchor)
-                    {
-                        anchorBoundingBox.Union(thisBoundingBox);
                     }
                 }
             }
 
-            #endregion Step 2 - Generate the characters and measure Bounding Boxes
+            #endregion Step 1 - Generate the characters and measure Bounding Boxes
 
-            #region Step 3 - Move all characters such that the anchor term is centered on the atom position
+            #region Step 2 - Move all characters such that the anchor term is centered on the atom position
 
             double offsetX;
             double offsetY;
@@ -715,108 +648,66 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 alc.Position = new Point(alc.Position.X - offsetX, alc.Position.Y - offsetY);
             }
 
-            #endregion Step 3 - Move all characters such that the anchor term is centered on the atom position
+            #endregion Step 2 - Move all characters such that the anchor term is centered on the atom position
 
-            #region Step 4 - Transfer characters into main list
+            #region Step 3 - Transfer characters into main list
 
             foreach (var alc in fgCharacters)
             {
                 _AtomLabelCharacters.Add(alc);
             }
 
-            #endregion Step 4 - Transfer characters into main list
+            #endregion Step 3 - Transfer characters into main list
 
-            #region Step 5 - Convex Hull
+            #region Step 4 - Convex Hull
 
             _convexhHulls.Add(atom.Path, ConvexHull(atom.Path));
 
-            #endregion
+            #endregion Step 4 - Convex Hull
 
-            #region Local Functions
-
-            // Local function to support recursion
-            void AddCharacters(string symbol, FunctionalGroupTerm term, bool isSubscript = false)
+            // Local Function
+            Rect AddCharacter(char c, FunctionalGroupPartType type)
             {
-                bool isSuperScript = false;
-                foreach (var ch in symbol)
+                TtfCharacter ttf = _TtfCharacterSet[c];
+                var thisCharacterPosition = GetCharacterPosition(cursorPosition, ttf);
+                var alc = new AtomLabelCharacter(thisCharacterPosition, ttf, atomColour, c, atom.Path, atom.Parent.Path);
+                alc.IsSubScript = type == FunctionalGroupPartType.Subscript;
+                alc.IsSuperScript = type == FunctionalGroupPartType.Superscript;
+                alc.IsSmaller = alc.IsSubScript || alc.IsSuperScript;
+
+                Rect thisBoundingBox;
+                if (alc.IsSmaller)
                 {
-                    char c = ch;
-
-                    switch (c)
+                    // Start by assuming it's SubScript
+                    thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, _meanBondLength));
+                    if (alc.IsSuperScript)
                     {
-                        case '{':
-                            isSuperScript = true;
-                            break;
-                        case '}':
-                            isSuperScript = false;
-                            break;
-                        default:
-                            var alc = new AtomLabelCharacter(atom.Position, _TtfCharacterSet[c], atomColour, c, atom.Path, atom.Parent.Path);
-                            alc.IsSmaller = isSubscript || isSuperScript;
-                            alc.IsSubScript = isSubscript;
-                            alc.IsSuperScript = isSuperScript;
-                            term.Characters.Add(alc);
-                            break;
+                        // Shift up by height of H to make it SuperScript
+                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _meanBondLength));
                     }
-                }
-            }
 
-            // Local function to support recursion
-            void ExpandGroup(Group componentGroup, FunctionalGroupTerm term)
-            {
-                ElementBase elementBase;
-                var ok = AtomHelpers.TryParse(componentGroup.Component, out elementBase);
-                if (ok)
+                    // Reset the character's position
+                    alc.Position = thisCharacterPosition;
+
+                    thisBoundingBox = new Rect(alc.Position,
+                        new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+
+                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, _meanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                }
+                else
                 {
-                    if (elementBase is Element element)
-                    {
-                        AddCharacters(element.Symbol, term);
+                    thisBoundingBox = new Rect(alc.Position,
+                        new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _meanBondLength),
+                            OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _meanBondLength)));
 
-                        if (componentGroup.Count != 1)
-                        {
-                            AddCharacters($"{componentGroup.Count}", term, true);
-                        }
-                    }
-
-                    if (elementBase is FunctionalGroup functionalGroup)
-                    {
-                        if (componentGroup.Count != 1)
-                        {
-                            AddCharacters("(", term);
-                        }
-
-                        if (functionalGroup.ShowAsSymbol)
-                        {
-                            AddCharacters(functionalGroup.Symbol, term);
-                        }
-                        else
-                        {
-                            if (functionalGroup.Flippable && reverse)
-                            {
-                                for (int ii = functionalGroup.Components.Count - 1; ii >= 0; ii--)
-                                {
-                                    ExpandGroup(functionalGroup.Components[ii], term);
-                                }
-                            }
-                            else
-                            {
-                                foreach (var fgc in functionalGroup.Components)
-                                {
-                                    ExpandGroup(fgc, term);
-                                }
-                            }
-                        }
-
-                        if (componentGroup.Count != 1)
-                        {
-                            AddCharacters(")", term);
-                            AddCharacters($"{componentGroup.Count}", term, true);
-                        }
-                    }
+                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, _meanBondLength), 0);
                 }
-            }
 
-            #endregion Local Functions
+                fgCharacters.Add(alc);
+
+                return thisBoundingBox;
+            }
         }
     }
 }

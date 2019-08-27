@@ -460,18 +460,33 @@ namespace Chem4Word.ACME.Drawing
 
                 Hull = Geometry<Point>.GetHull(sortedHull, p => p);
 
-                // Diag: Show Hull
-                //ShowHull(Hull, drawingContext);
+                // Diag: Show the Hull
+#if DEBUG
+#if SHOWHULLS
+                ShowHull(Hull, drawingContext);
+#endif
+#endif
+                // End Diag
             }
-            // Diag: Show Atom Point
-            //drawingContext.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
+            // Diag: Show the Atom Point
+#if DEBUG
+#if SHOWATOMCENTRES
+            drawingContext.DrawEllipse(Brushes.Red, null, ParentAtom.Position, 5, 5);
+#endif
+#endif
+            // End Diag
         }
 
+#if DEBUG
         private void ShowHull(List<Point> points, DrawingContext drawingContext)
         {
             var path = BasicGeometry.BuildPath(points);
-            //drawingContext.DrawGeometry(BackgroundColor, new Pen(new SolidColorBrush(Colors.GreenYellow), 0.01), path.Data);
-            ShowPoints(Hull, drawingContext);
+            // Diag: Show the Hull or it's Points
+#if SHOWHULLS
+            drawingContext.DrawGeometry(null, new Pen(new SolidColorBrush(Colors.GreenYellow), 0.01), path.Data);
+            //ShowPoints(Hull, drawingContext);
+#endif
+            // End Diag
         }
 
         public void ShowPoints(List<Point> points, DrawingContext drawingContext)
@@ -500,6 +515,8 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
+#endif
+
         /// <summary>
         /// Draws the atom and all associated decorations
         /// </summary>
@@ -524,17 +541,17 @@ namespace Chem4Word.ACME.Drawing
                     if (ParentAtom.SymbolText != "")
                     {
                         RenderAtom(dc);
-                        //debugging code - uncomment to show the convex hull
-                        //#if DEBUG
-                        //                    if (AtomSymbol != "")
-
-                        //                    {
-                        //                        Brush areaBrush = new SolidColorBrush(Colors.Gray);
-                        //                        areaBrush.Opacity = 0.33;
-                        //                        dc.DrawGeometry(areaBrush, new Pen(areaBrush, 1.0), WidenedHullGeometry);
-                        //                    }
-                        //#endif
-                        //dc.Close();
+                        // Diag: Show the convex hull
+#if DEBUG
+#if SHOWHULLS
+                        if (AtomSymbol != "")
+                        {
+                            dc.DrawGeometry(null, new Pen(new SolidColorBrush(Colors.GreenYellow), 1.0), WidenedHullGeometry);
+                        }
+#endif
+#endif
+                        // End Diag
+                        dc.Close();
                     }
                     else //draw an empty circle for hit testing purposes
                     {

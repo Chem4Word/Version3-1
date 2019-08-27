@@ -10,7 +10,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -45,103 +44,33 @@ namespace Chem4Word.ACME.Controls
 
         public void BuildTextBlock(FunctionalGroup fg)
         {
-            if (fg.ShowAsSymbol)
+            foreach (var term in fg.ExpandIntoTerms())
             {
-                //search the symbol for superscripts:  there should be one pattern or zero
-                var superstart = fg.Symbol.IndexOf('{');
-                var superend = fg.Symbol.IndexOf('}');
-                if ((superstart == -1) | (superend == -1))
+                foreach (var part in term.Parts)
                 {
-                    Inlines.Add(new Run(fg.Symbol));
-                }
-                else
-                {
-                    var textbefore = "";
-                    var supertext = "";
-                    var textafter = "";
-
-                    textbefore = fg.Symbol.Substring(0, superstart);
-                    supertext = fg.Symbol.Substring(superstart + 1, superend - superstart - 1);
-                    textafter = fg.Symbol.Substring(superend + 1);
-
-                    if (textbefore != "")
+                    switch (part.Type)
                     {
-                        Inlines.Add(new Run(textbefore));
-                    }
+                        case FunctionalGroupPartType.Superscript:
+                            Inlines.Add(new Run(part.Text)
+                            {
+                                Typography = { Variants = FontVariants.Superscript },
+                                BaselineAlignment = BaselineAlignment.Superscript,
+                                FontSize = FontSize * SuperSubScriptSize
+                            });
+                            break;
 
-                    if (supertext != "")
-                    {
-                        Inlines.Add(new Run(supertext)
-                        {
-                            Typography = { Variants = FontVariants.Subscript },
-                            BaselineAlignment = BaselineAlignment.Superscript,
-                            FontSize = FontSize * SuperSubScriptSize
-                        });
-                    }
+                        case FunctionalGroupPartType.Subscript:
+                            Inlines.Add(new Run(part.Text)
+                            {
+                                Typography = { Variants = FontVariants.Subscript },
+                                BaselineAlignment = BaselineAlignment.Subscript,
+                                FontSize = FontSize * SuperSubScriptSize
+                            });
+                            break;
 
-                    if (textafter != "")
-                    {
-                        Inlines.Add(new Run(textafter));
-                    }
-                }
-            }
-            else
-            {
-                foreach (var component in fg.Components)
-                {
-                    AddRuns(component);
-                }
-            }
-        }
-
-        private void AddRuns(Group group)
-        {
-            var ok = AtomHelpers.TryParse(group.Component, out var elem);
-            if (ok)
-            {
-                if (elem is Element element)
-                {
-                    Inlines.Add(new Run(element.Symbol));
-
-                    if (group.Count != 1)
-                    {
-                        Inlines.Add(new Run(group.Count.ToString())
-                        {
-                            Typography = { Variants = FontVariants.Subscript },
-                            BaselineAlignment = BaselineAlignment.Subscript,
-                            FontSize = FontSize * SuperSubScriptSize
-                        });
-                    }
-                }
-
-                if (elem is FunctionalGroup fg)
-                {
-                    if (group.Count != 1)
-                    {
-                        Inlines.Add(new Run("("));
-                    }
-
-                    if (fg.ShowAsSymbol)
-                    {
-                        Inlines.Add(fg.Symbol);
-                    }
-                    else
-                    {
-                        foreach (var fgc in fg.Components)
-                        {
-                            AddRuns(fgc);
-                        }
-                    }
-
-                    if (group.Count != 1)
-                    {
-                        Inlines.Add(")");
-                        Inlines.Add(new Run(group.Count.ToString())
-                        {
-                            Typography = { Variants = FontVariants.Subscript },
-                            BaselineAlignment = BaselineAlignment.Subscript,
-                            FontSize = FontSize * SuperSubScriptSize
-                        });
+                        default:
+                            Inlines.Add(new Run(part.Text));
+                            break;
                     }
                 }
             }
