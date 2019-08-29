@@ -108,20 +108,19 @@ namespace Chem4Word.ACME.Drawing
         /// <returns>List<Point> of geometry tracing the GlyphRun</Point></returns>
         public static List<Point> GetOutline(this GlyphRun glyphRun)
         {
-            List<Point> retval = new List<Point>();
-
+            
             if (glyphRun != null)
             {
                 var geo = glyphRun.BuildGeometry();
-                // System.Windows.Media.GetFlattenedPathGeometry(double tolerance, ToleranceType type)
-                // tolerance: Smaller values produce more accurate results but cause slower execution
-                GetGeoPoints(geo, retval);
+                return GetGeoPoints(geo);
             }
-            return retval;
+
+            return null;
         }
 
-        public static void GetGeoPoints(Geometry geo, List<Point> retval)
+        public static List<Point> GetGeoPoints(Geometry geo)
         {
+            List<Point> retval = new List<Point>();
             var pg = geo.GetFlattenedPathGeometry(0.01, ToleranceType.Relative);
 
             foreach (var f in pg.Figures)
@@ -137,6 +136,8 @@ namespace Chem4Word.ACME.Drawing
                     }
                 }
             }
+
+            return retval;
         }
 
         /// <summary>

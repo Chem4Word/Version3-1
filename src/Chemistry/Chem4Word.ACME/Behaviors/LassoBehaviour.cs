@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
@@ -40,6 +41,7 @@ namespace Chem4Word.ACME.Behaviors
         private TransformGroup _shift;
 
         private Point _startpoint;
+        private List<object> _lassoHits;
         public bool IsDragging { get; private set; }
         public bool ClickedOnAtomOrBond { get; set; }
 
@@ -165,7 +167,10 @@ namespace Chem4Word.ACME.Behaviors
 
                 if (_lassoAdorner != null)
                 {
-                    ModifySelection(_lassoAdorner.Outline);
+                    _lassoHits= new List<object>();
+                    GatherSelection(_lassoAdorner.Outline);
+                    _lassoHits = _lassoHits.Distinct().ToList();
+                    EditViewModel.AddToSelection(_lassoHits);
                 }
                 if (EditViewModel.SelectedItems.Any())
                 {
@@ -184,6 +189,55 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.ReleaseMouseCapture();
             CurrentEditor.Focus();
             CurrentStatus = DefaultText;
+        }
+
+        private void GatherSelection(StreamGeometry lassoAdornerOutline)
+        {
+            VisualTreeHelper.HitTest(CurrentEditor, null, GatherCallback, new GeometryHitTestParameters(lassoAdornerOutline));
+        }
+
+        private HitTestResultBehavior GatherCallback(HitTestResult result)
+        {
+            var id = ((GeometryHitTestResult)result).IntersectionDetail;
+
+            var myShape = result.VisualHit;
+            if (myShape is GroupVisual selGroup)
+            {
+                _lassoHits.Add(selGroup.ParentMolecule);
+                return HitTestResultBehavior.Continue;
+            }
+            if (myShape != null && myShape is AtomVisual | myShape is BondVisual)
+            {
+                switch (id)
+                {
+                    case IntersectionDetail.FullyContains:
+                    case IntersectionDetail.Intersects:
+                    case IntersectionDetail.FullyInside:
+                        var selAtom = (myShape as AtomVisual)?.ParentAtom;
+                        var selBond = (myShape as BondVisual)?.ParentBond;
+
+                        if (!(EditViewModel.SelectedItems.Contains(selAtom) ||
+                              EditViewModel.SelectedItems.Contains(selBond)))
+                        {
+                            if (selAtom != null)
+                            {
+                                _lassoHits.Add(selAtom);
+                            }
+
+                            if (selBond != null)
+                            {
+                                _lassoHits.Add(selBond);
+                            }
+                        }
+
+                        return HitTestResultBehavior.Continue;
+
+                    default:
+                        return HitTestResultBehavior.Stop;
+                }
+            }
+
+            return HitTestResultBehavior.Continue;
         }
 
         private object CurrentObject(MouseButtonEventArgs e)
@@ -262,88 +316,95 @@ namespace Chem4Word.ACME.Behaviors
                 else //we're dragging an atom
                 {
                     RemoveGhost();
-                    //this code is horrendous, apologies
-                    //please don't modify it without good reason!
-                    //if you must then READ THE COMMENTS FIRST, PLEASE!
-
-                    _atomList = EditViewModel.SelectedItems.OfType<Atom>().ToList();
-                    var immediateNeighbours = GetImmediateNeighbours(_atomList);
-                    //we need to check to see whether we are moving an atom connected to the rest of the molecule by a single bond
-                    //if we are then we can invoke the bond snapper to limit the movement
-                    if (immediateNeighbours.Count == 1) //we are moving an atom attached by a single bond
-                    {
-                        CurrentStatus = "[Shift] = unlock length; [Ctrl] = unlock angle; [Alt] = pivot.";
-                        //so invoke the snapper!
-                        //grab the atom in the static fragment
-                        var staticAtom = immediateNeighbours[0];
-
-                        //now identify the connecting bond with the moving fragment
-                        Bond connectingBond = null;
-                        var staticAtomBonds = staticAtom.Bonds.ToArray();
-                        for (var i = 0; (i < staticAtomBonds.Count()) & (connectingBond == null); i++)
-                        {
-                            var bond = staticAtomBonds[i];
-                            var otherAtom = bond.OtherAtom(staticAtom);
-                            if (_atomList.Contains(otherAtom))
-                            {
-                                connectingBond = staticAtom.BondBetween(otherAtom);
-                            }
-                        }
-
-                        //locate the static atom
-                        var staticPoint = staticAtom.Position;
-                        //identify the moving atom
-                        var movingAtom = connectingBond.OtherAtom(staticAtom);
-                        //get the location of the neighbour of the static atom that is going to move
-                        var movingPoint = movingAtom.Position;
-                        //now work out the separation between the current position and the moving atom
-                        var fragmentSpan = StartPoint - movingPoint; //this gives us the span of the deforming fragment
-                        var originalDistance = pos - staticPoint;
-                        //now we need to work out how far away from the static atom the moving atom should be
-                        var desiredDisplacement = originalDistance - fragmentSpan;
-                        //then we snap it
-
-                        var bondSnapper =
-                            new Snapper(staticPoint, EditViewModel, bondLength: _bondLength, lockAngle: 10);
-
-                        var snappedBondVector = bondSnapper.SnapVector(connectingBond.Angle, desiredDisplacement);
-                        //Vector snappedBondVector = desiredDisplacement;
-                        //subtract the original bond vector to get the actual desired, snapped shift
-                        var bondVector = movingPoint - staticPoint;
-                        //now calculate the angle between the starting bond and the snapped vector
-                        var rotation = Vector.AngleBetween(bondVector, snappedBondVector);
-
-                        shift = snappedBondVector - bondVector;
-                        //shift the atom and rotate the group around the new terminus
-                        var pivot = staticPoint + snappedBondVector;
-                        RotateTransform rt;
-                        if (KeyboardUtils.HoldingDownAlt())
-                        {
-                            rt = new RotateTransform(rotation, pivot.X, pivot.Y);
-                        }
-                        else
-                        {
-                            rt = new RotateTransform();
-                        }
-
-                        var tg = new TransformGroup();
-                        tg.Children.Add(new TranslateTransform(shift.X, shift.Y));
-                        tg.Children.Add(rt);
-
-                        _shift = tg;
-                    }
-                    else //moving an atom linked to two other neighbours
-                    {
-                        shift = pos - StartPoint;
-                        CurrentStatus = "Drag atom to reposition";
-                        var tt = new TranslateTransform(shift.X, shift.Y);
-                        _shift = new TransformGroup();
-                        _shift.Children.Add(tt);
-                    }
+                    DragAtom(pos);
                 }
 
                 RemoveGhost();
                 _ghostAdorner = new PartialGhostAdorner(EditViewModel, _atomList, _shift);
+            }
+        }
+
+        private void DragAtom(Point pos)
+        {
+            Vector shift;
+            
+            //this code is horrendous, apologies
+            //please don't modify it without good reason!
+            //if you must then READ THE COMMENTS FIRST, PLEASE!
+
+            _atomList = EditViewModel.SelectedItems.OfType<Atom>().ToList();
+            var immediateNeighbours = GetImmediateNeighbours(_atomList);
+            //we need to check to see whether we are moving an atom connected to the rest of the molecule by a single bond
+            //if we are then we can invoke the bond snapper to limit the movement
+            if (immediateNeighbours.Count == 1) //we are moving an atom attached by a single bond
+            {
+                CurrentStatus = "[Shift] = unlock length; [Ctrl] = unlock angle; [Alt] = pivot.";
+                //so invoke the snapper!
+                //grab the atom in the static fragment
+                var staticAtom = immediateNeighbours[0];
+
+                //now identify the connecting bond with the moving fragment
+                Bond connectingBond = null;
+                var staticAtomBonds = staticAtom.Bonds.ToArray();
+                for (var i = 0; (i < staticAtomBonds.Count()) & (connectingBond == null); i++)
+                {
+                    var bond = staticAtomBonds[i];
+                    var otherAtom = bond.OtherAtom(staticAtom);
+                    if (_atomList.Contains(otherAtom))
+                    {
+                        connectingBond = staticAtom.BondBetween(otherAtom);
+                    }
+                }
+
+                //locate the static atom
+                var staticPoint = staticAtom.Position;
+                //identify the moving atom
+                var movingAtom = connectingBond.OtherAtom(staticAtom);
+                //get the location of the neighbour of the static atom that is going to move
+                var movingPoint = movingAtom.Position;
+                //now work out the separation between the current position and the moving atom
+                var fragmentSpan = StartPoint - movingPoint; //this gives us the span of the deforming fragment
+                var originalDistance = pos - staticPoint;
+                //now we need to work out how far away from the static atom the moving atom should be
+                var desiredDisplacement = originalDistance - fragmentSpan;
+                //then we snap it
+
+                var bondSnapper =
+                    new Snapper(staticPoint, EditViewModel, bondLength: _bondLength, lockAngle: 10);
+
+                var snappedBondVector = bondSnapper.SnapVector(connectingBond.Angle, desiredDisplacement);
+                //Vector snappedBondVector = desiredDisplacement;
+                //subtract the original bond vector to get the actual desired, snapped shift
+                var bondVector = movingPoint - staticPoint;
+                //now calculate the angle between the starting bond and the snapped vector
+                var rotation = Vector.AngleBetween(bondVector, snappedBondVector);
+
+                shift = snappedBondVector - bondVector;
+                //shift the atom and rotate the group around the new terminus
+                var pivot = staticPoint + snappedBondVector;
+                RotateTransform rt;
+                if (KeyboardUtils.HoldingDownAlt())
+                {
+                    rt = new RotateTransform(rotation, pivot.X, pivot.Y);
+                }
+                else
+                {
+                    rt = new RotateTransform();
+                }
+
+                var tg = new TransformGroup();
+                tg.Children.Add(new TranslateTransform(shift.X, shift.Y));
+                tg.Children.Add(rt);
+
+                _shift = tg;
+            }
+            else //moving an atom linked to two other neighbours
+            {
+                shift = pos - StartPoint;
+                CurrentStatus = "Drag atom to reposition";
+                var tt = new TranslateTransform(shift.X, shift.Y);
+                _shift = new TransformGroup();
+                _shift.Children.Add(tt);
             }
         }
 
@@ -449,8 +510,7 @@ namespace Chem4Word.ACME.Behaviors
                 case AtomVisual av:
                     {
                         var atom = av.ParentAtom;
-                        //MessageBox.Show($"Hit Atom {atom.ParentAtom.Id} at ({atom.Position.X},{atom.Position.Y})");
-
+                        Debug.WriteLine($"Hit Atom {atom.Id} at ({atom.Position.X},{atom.Position.Y})");
                         EditViewModel.AddToSelection(atom);
                         CurrentStatus = ActiveSelText;
                         break;
@@ -459,8 +519,7 @@ namespace Chem4Word.ACME.Behaviors
                 case BondVisual bv:
                     {
                         var bond = bv.ParentBond;
-                        //MessageBox.Show($"Hit Bond {bond.ParentBond.Id} at ({e.GetPosition(CurrentEditor).X},{e.GetPosition(CurrentEditor).Y})");
-
+                        Debug.WriteLine($"Hit Bond {bond.Id} at ({e.GetPosition(CurrentEditor).X},{e.GetPosition(CurrentEditor).Y})");
                         EditViewModel.AddToSelection(bond);
                         CurrentStatus = ActiveSelText;
                         break;

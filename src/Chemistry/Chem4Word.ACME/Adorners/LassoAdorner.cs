@@ -35,16 +35,6 @@ namespace Chem4Word.ACME.Adorners
             Focus();
         }
 
-        private void LassoAdorner_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            CurrentEditor.RaiseEvent(e);
-        }
-
-        private void LassoAdorner_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            CurrentEditor.RaiseEvent(e);
-        }
-
         public LassoAdorner([NotNull] UIElement adornedElement, StreamGeometry outline) : this(adornedElement)
         {
             _outline = outline;

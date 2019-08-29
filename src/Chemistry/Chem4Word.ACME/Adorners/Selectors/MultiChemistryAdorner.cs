@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Linq;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
 
@@ -21,15 +22,10 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         #region Constructors
 
-        protected MultiChemistryAdorner(EditorCanvas currentEditor) : base(currentEditor)
+        protected MultiChemistryAdorner(EditorCanvas currentEditor, List<ChemistryBase> chemistries) :base(currentEditor)
         {
             AdornedChemistries = new List<ChemistryBase>();
-        }
-
-        protected MultiChemistryAdorner(EditorCanvas currentEditor, List<ChemistryBase> chemistries) : this(
-            currentEditor)
-        {
-            AdornedChemistries.AddRange(chemistries);
+            AdornedChemistries.AddRange(chemistries.Distinct());
         }
 
         #endregion Constructors

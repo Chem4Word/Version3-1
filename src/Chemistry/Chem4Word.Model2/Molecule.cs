@@ -1601,9 +1601,6 @@ namespace Chem4Word.Model2
             }
 
             var overlap = new CombinedGeometry(GeometryCombineMode.Intersect, val1, val2).GetOutlinedPathGeometry();
-            //return (id == IntersectionDetail.FullyContains | id == IntersectionDetail.FullyInside |
-            //        id == IntersectionDetail.Intersects);
-
             return overlap;
         }
 
@@ -1852,8 +1849,6 @@ namespace Chem4Word.Model2
                     mol.UpdateVisual();
                 }
             }
-
-            UpdateVisual();
         }
     }
 }

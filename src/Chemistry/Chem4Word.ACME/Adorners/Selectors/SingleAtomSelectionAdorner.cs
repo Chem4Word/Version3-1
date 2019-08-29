@@ -46,6 +46,11 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
         }
 
+        public SingleAtomSelectionAdorner(EditorCanvas currentEditor, List<Molecule> mols)
+            : this(currentEditor, mols.ConvertAll(m=>(ChemistryBase)m))
+        {
+        }
+
         public SingleAtomSelectionAdorner(EditorCanvas currentEditor, List<ChemistryBase> molecules) : base(currentEditor, molecules)
         {
             BuildBigDragArea();
@@ -216,7 +221,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
             else
             {
-                EditViewModel.RemoveFromSelection(AdornedMolecules);
+                EditViewModel.RemoveFromSelection(AdornedMolecules.ConvertAll(am=>(ChemistryBase)am));
             }
             Dragging = false;
         }

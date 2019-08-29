@@ -614,11 +614,7 @@ namespace Chem4Word.Model2
                 OnMoleculesChanged(this, e);
                 UpdateMoleculeEventHandlers(e);
             }
-            else
-            {
-                throw new ArgumentException();
-            }
-
+            
             return res;
         }
 
