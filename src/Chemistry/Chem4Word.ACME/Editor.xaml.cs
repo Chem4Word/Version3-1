@@ -211,6 +211,7 @@ namespace Chem4Word.ACME
         {
             SetCurrentRing(sender);
             ModeButton_OnChecked(RingButton, null);
+            RingButton.IsChecked = true;
             RingPopup.IsOpen = false;
         }
 
@@ -226,6 +227,8 @@ namespace Chem4Word.ACME
             RingButton.Tag = selButton.Tag;
         }
 
+
+     
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (!String.IsNullOrEmpty(_cml))
@@ -262,7 +265,8 @@ namespace Chem4Word.ACME
 
             //refresh the ring button
             SetCurrentRing(BenzeneButton);
-
+            //refresh the selection button
+            SetSelectionMode(LassoButton);
             //HACK: Need to do this to put the editor into the right mode after refreshing the ring button
             ModeButton_OnChecked(DrawButton, new RoutedEventArgs());
         }
@@ -399,6 +403,46 @@ namespace Chem4Word.ACME
             {
                 ActiveViewModel.DeleteSelection();
             }
+        }
+
+       /// <summary>
+       /// detects whether the popup has been clicked
+       /// and sets the mode accordingly
+       /// </summary>
+       /// <param name="sender"></param>
+       /// <param name="e"></param>
+        private void SelectionPopup_OnClick(object sender, RoutedEventArgs e)
+        {
+            SelectionButton.IsChecked = true;
+        }
+
+        private void SelectionDropdownButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            SelectionPopup.IsOpen = true;
+            SelectionPopup.Closed += (senderClosed, eClosed) => { };
+        }
+
+        private void SelectionButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            SetSelectionMode(sender);
+            ModeButton_OnChecked(SelectionButton, null);
+            SelectionButton.IsChecked = true;
+            SelectionPopup.IsOpen = false;
+        }
+
+        private void SetSelectionMode(object sender)
+        {
+            Button selButton = sender as Button;
+            var currentFace = new VisualBrush
+                              {
+                                  AutoLayoutContent = true,
+                                  Stretch = Stretch.Uniform,
+                                  Visual = selButton.Content as Visual
+                              };
+            SelectionPanel.Background = currentFace;
+            //set the behaviour of the button to that of
+            //the selected mode in the dropdown
+            SelectionButton.Tag = selButton.Tag;
         }
     }
 }

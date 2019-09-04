@@ -335,7 +335,6 @@
             <ToolBarTray.Resources>
                 <Style TargetType="{x:Type Popup}">
                     <Setter Property="StaysOpen" Value="False" />
-                    <EventSetter Event="Button.Click" Handler="Popup_Click" />
                 </Style>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="Background" Value="{StaticResource {x:Static SystemColors.MenuBrushKey}}" />
@@ -459,17 +458,139 @@
                         Width="24"
                         Height="24"
                         Stretch="Uniform">
-                        <Path
-                            Width="12.3333"
-                            Height="20"
-                            Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z"
-                            Fill="{StaticResource ResourceKey=Chem4WordBrush}"
-                            Stretch="Fill" />
+                        <StackPanel
+                            Name="SelectionPanel"
+                            Width="24"
+                            Height="24" />
                     </Viewbox>
-                    <RadioButton.Tag>
-                        <behaviors:LassoBehaviour EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
-                    </RadioButton.Tag>
                 </RadioButton>
+                <Button
+                    Name="SelectionDropdownButton"
+                    Width="10"
+                    Click="SelectionDropdownButton_OnClick"
+                    ToolTip="Change Selection Mode">
+                    <Viewbox Stretch="Uniform">
+                        <Path Data="M -7.5,0 l 15,0 l -7.5, 7.5 Z" Fill="{StaticResource ResourceKey=Chem4WordBrush}" />
+                    </Viewbox>
+                </Button>
+                <Popup
+                    x:Name="SelectionPopup"
+                    PlacementTarget="{Binding ElementName=SelectionButton}"
+                    StaysOpen="False">
+                    <Border>
+                        <Grid Background="{x:Static SystemColors.WindowBrush}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.Resources>
+                                <Style TargetType="{x:Type Button}">
+                                    <Style.Setters>
+                                        <Setter Property="Background" Value="Transparent" />
+                                        <Setter Property="BorderBrush" Value="Transparent" />
+                                        <Setter Property="Height" Value="Auto" />
+                                        <EventSetter Event="Click" Handler="SelectionPopup_OnClick" />
+                                    </Style.Setters>
+                                </Style>
+                            </Grid.Resources>
+                            <Button
+                                Name="LassoButton"
+                                Grid.Column="0"
+                                Click="SelectionButton_OnClick"
+                                ToolTip="Lasso Mode">
+                                <Viewbox Width="24" Height="24">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="20" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition Height="20" />
+                                        </Grid.RowDefinitions>
+                                        <Path
+                                            Grid.RowSpan="2"
+                                            Grid.ColumnSpan="2"
+                                            Margin="2.885,1.845,1.064,5.402"
+                                            Data="M16.492973,3.9081249 C4.9465812,3.4957538 3.7095744,12.979825 3.7095744,12.979825 L2.8844375,21.227865 3.2966993,30.712347 8.6576658,33.59937 12.369104,32.774543 16.905307,28.650721 19.379599,29.063103 29.68915,29.887867 34.637738,27.825956 36.700486,25.351878 37.937237,19.166306 32.57593,17.104261 28.452095,12.155676 23.916069,1.8463429 z"
+                                            Stretch="Fill"
+                                            Stroke="{StaticResource Chem4WordBrush}"
+                                            StrokeDashArray="3,1"
+                                            StrokeThickness="2" />
+
+                                        <Viewbox
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Stretch="Uniform">
+
+                                            <Path
+                                                Width="12.3333"
+                                                Height="20"
+                                                Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z"
+                                                Fill="{Binding ElementName=SelectorToolbar, Path=Background}"
+                                                Stretch="Fill"
+                                                Stroke="{StaticResource Chem4WordBrush}"
+                                                StrokeThickness="1" />
+                                        </Viewbox>
+
+                                    </Grid>
+                                </Viewbox>
+                                <Button.Tag>
+                                    <behaviors:LassoBehaviour EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" />
+                                </Button.Tag>
+                            </Button>
+                            <Button
+                                Name="RectButton"
+                                Grid.Column="1"
+                                Click="SelectionButton_OnClick"
+                                ToolTip="Rect Mode">
+                                <Viewbox Width="24" Height="24">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="20" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="20" />
+                                            <RowDefinition Height="20" />
+                                        </Grid.RowDefinitions>
+                                        <Rectangle
+                                            Grid.RowSpan="2"
+                                            Grid.ColumnSpan="2"
+                                            Width="22"
+                                            Height="18"
+                                            Stroke="{StaticResource Chem4WordBrush}"
+                                            StrokeDashArray="3,1"
+                                            StrokeThickness="2" />
+                                        <Viewbox
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Stretch="Uniform">
+                                            <Path
+                                                Width="12.3333"
+                                                Height="20"
+                                                Data="F1 M 28.5,17.4167L 53.8333,44.3333L 43.5417,44.3333L 49.875,55.4167L 43.5417,58.5833L 37.2083,47.5L 28.5,55.4167L 28.5,17.4167 Z"
+                                                Fill="{Binding ElementName=SelectorToolbar, Path=Background}"
+                                                Stretch="Fill"
+                                                Stroke="{StaticResource Chem4WordBrush}"
+                                                StrokeThickness="1" />
+                                        </Viewbox>
+
+                                    </Grid>
+                                </Viewbox>
+                                <Button.Tag>
+                                    <behaviors:LassoBehaviour EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" RectMode="True" />
+                                </Button.Tag>
+                            </Button>
+
+                        </Grid>
+                    </Border>
+                </Popup>
+
                 <RadioButton
                     Name="RingButton"
                     Width="30"

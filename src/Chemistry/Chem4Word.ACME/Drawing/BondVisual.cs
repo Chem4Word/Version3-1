@@ -458,7 +458,7 @@ namespace Chem4Word.ACME.Drawing
             }
             else
             {
-                var widepen = new Pen(Brushes.Black, BondThickness * 8.0);
+                var widepen = new Pen(Brushes.Black, BondThickness * 10.0);
                 if (BondDescriptor.DefiningGeometry.StrokeContains(widepen, hitTestParameters.HitPoint))
                 {
                     return new PointHitTestResult(this, hitTestParameters.HitPoint);

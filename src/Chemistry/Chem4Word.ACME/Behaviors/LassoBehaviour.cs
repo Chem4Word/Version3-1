@@ -40,12 +40,32 @@ namespace Chem4Word.ACME.Behaviors
 
         private TransformGroup _shift;
 
+
         private Point _startpoint;
         private List<object> _lassoHits;
         public bool IsDragging { get; private set; }
         public bool ClickedOnAtomOrBond { get; set; }
 
         public Point StartPoint { get; set; }
+
+
+
+        public bool RectMode
+        {
+            get { return (bool)GetValue(RectModeProperty); }
+            set { SetValue(RectModeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for RectMode.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty RectModeProperty =
+            DependencyProperty.Register("RectMode", typeof(bool), typeof(LassoBehaviour), new PropertyMetadata(default(bool)));
+
+
+
+        public LassoBehaviour() : this(false)
+        { }
+        public LassoBehaviour(bool isRectMode = false)
+        { }
 
         protected override void OnAttached()
         {
@@ -187,7 +207,10 @@ namespace Chem4Word.ACME.Behaviors
             _mouseTrack = null;
 
             CurrentEditor.ReleaseMouseCapture();
+          
             CurrentEditor.Focus();
+            var al = AdornerLayer.GetAdornerLayer(CurrentEditor);
+            al.Update();
             CurrentStatus = DefaultText;
         }
 
@@ -276,8 +299,23 @@ namespace Chem4Word.ACME.Behaviors
                         _mouseTrack = new PointCollection();
                     }
 
-                    _mouseTrack.Add(pos);
-                    var outline = GetPolyGeometry();
+                    StreamGeometry outline = null;
+                    if (!RectMode)
+                    {
+                        //just add the most recent point to the track
+                        _mouseTrack.Add(pos);
+                    }
+                    else
+                    {
+                        //build a rectangle
+                        _mouseTrack.Clear();
+                        _mouseTrack.Add(StartPoint);
+                        _mouseTrack.Add(new Point(pos.X, StartPoint.Y));
+                        _mouseTrack.Add(new Point(pos.X, pos.Y));
+                        _mouseTrack.Add(new Point(StartPoint.X, pos.Y));
+                    }
+
+                    outline = GetPolyGeometry();
 
                     if (_lassoAdorner == null)
                     {
