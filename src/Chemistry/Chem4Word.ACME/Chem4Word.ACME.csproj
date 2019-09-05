@@ -69,13 +69,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adorners\Selectors\MultiAtomBondAdorner.cs" />
     <Compile Include="Controls\MoleculePropertyEditor.xaml.cs">
       <DependentUpon>MoleculePropertyEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Adorners\Selectors\BaseSelectionAdorner.cs" />
     <Compile Include="Adorners\Feedback\GroupHoverAdorner.cs" />
-    <Compile Include="Adorners\Selectors\AtomSelectionAdorner.cs" />
-    <Compile Include="Adorners\Selectors\BondSelectionAdorner.cs" />
     <Compile Include="Adorners\Selectors\GroupSelectionAdorner.cs" />
     <Compile Include="Adorners\Selectors\MoleculeSelectionAdorner.cs" />
     <Compile Include="Adorners\Selectors\MultiChemistryAdorner.cs" />

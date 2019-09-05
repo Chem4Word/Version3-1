@@ -364,7 +364,7 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ToolBarTray.Resources>
-            <ToolBar x:Name="SelectorToolbar" Height="40">
+            <ToolBar x:Name="SelectorToolbar" Height="40" >
                 <ComboBox
                     x:Name="AtomCombo"
                     Width="Auto"

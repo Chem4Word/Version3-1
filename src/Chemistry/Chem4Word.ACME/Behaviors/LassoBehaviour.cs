@@ -221,45 +221,20 @@ namespace Chem4Word.ACME.Behaviors
 
         private HitTestResultBehavior GatherCallback(HitTestResult result)
         {
-            var id = ((GeometryHitTestResult)result).IntersectionDetail;
-
             var myShape = result.VisualHit;
             if (myShape is GroupVisual selGroup)
             {
                 _lassoHits.Add(selGroup.ParentMolecule);
-                return HitTestResultBehavior.Continue;
             }
-            if (myShape != null && myShape is AtomVisual | myShape is BondVisual)
+            if (myShape is AtomVisual av )
             {
-                switch (id)
+                var selAtom = av.ParentAtom;
+
+                if (!EditViewModel.SelectedItems.Contains(selAtom))
                 {
-                    case IntersectionDetail.FullyContains:
-                    case IntersectionDetail.Intersects:
-                    case IntersectionDetail.FullyInside:
-                        var selAtom = (myShape as AtomVisual)?.ParentAtom;
-                        var selBond = (myShape as BondVisual)?.ParentBond;
-
-                        if (!(EditViewModel.SelectedItems.Contains(selAtom) ||
-                              EditViewModel.SelectedItems.Contains(selBond)))
-                        {
-                            if (selAtom != null)
-                            {
-                                _lassoHits.Add(selAtom);
-                            }
-
-                            if (selBond != null)
-                            {
-                                _lassoHits.Add(selBond);
-                            }
-                        }
-
-                        return HitTestResultBehavior.Continue;
-
-                    default:
-                        return HitTestResultBehavior.Stop;
+                    _lassoHits.Add(selAtom);
                 }
             }
-
             return HitTestResultBehavior.Continue;
         }
 
@@ -342,7 +317,10 @@ namespace Chem4Word.ACME.Behaviors
             //we're dragging an object around
             if (MouseIsDown(e) & IsDragging)
             {
-                if (_initialTarget is Bond b)
+                
+                if (_initialTarget is Bond b && 
+                    EditViewModel.SelectionType == SelectionTypeCode.Bond 
+                    && EditViewModel.SelectedItems.Count==1) //i.e. we have one bond selected
                 {
                     CurrentStatus = "Drag bond to reposition.";
                     _atomList = new List<Atom> { b.StartAtom, b.EndAtom };

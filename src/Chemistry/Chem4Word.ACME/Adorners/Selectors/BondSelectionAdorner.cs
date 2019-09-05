@@ -36,7 +36,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            base.OnRender(drawingContext);
+            
 
             Model model = AdornedBond.Model;
             double renderRadius = (model.XamlBondLength * Globals.FontSizePercentageBond) / 4;

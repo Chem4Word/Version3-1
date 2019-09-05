@@ -22,6 +22,7 @@ using Chem4Word.ACME.Adorners.Selectors;
 using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Commands;
 using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Enums;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
@@ -40,6 +41,7 @@ namespace Chem4Word.ACME
         #region Fields
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
+        public  MultiAtomBondAdorner MultiAdorner { get; private set; }
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
@@ -473,19 +475,6 @@ namespace Chem4Word.ACME
         #endregion Constructors
 
         #region Methods
-
-        private bool AllAtomsSelected(Molecule atomParent)
-        {
-            Debug.WriteLine(
-                $"Atom count = {atomParent.Atoms.Count()}, Adorner Count = {MolAtomAdorners(atomParent).Count()}");
-            return atomParent.Atoms.Count() == MolAtomAdorners(atomParent).Count();
-        }
-
-        private IEnumerable<AtomSelectionAdorner> MolAtomAdorners(Molecule atomParent)
-        {
-            return SelectionAdorners.Values.OfType<AtomSelectionAdorner>()
-                                    .Where(asl => asl.AdornedAtom.Parent == atomParent);
-        }
 
         public void IncreaseBondOrder(Bond existingBond)
         {
@@ -1072,11 +1061,9 @@ namespace Chem4Word.ACME
                 RemoveSelectionAdorners(oldObject);
             }
 
-            switch (e.Action)
+            if (e.Action == NotifyCollectionChangedAction.Reset)
             {
-                case NotifyCollectionChangedAction.Reset:
-                    RemoveAllAdorners();
-                    break;
+                RemoveAllAdorners();
             }
 
             OnPropertyChanged(nameof(SelectedElement));
@@ -1105,14 +1092,37 @@ namespace Chem4Word.ACME
         public void RemoveAllAdorners()
         {
             var layer = AdornerLayer.GetAdornerLayer(CurrentEditor);
-            var adornerList = SelectionAdorners.Keys.ToList();
-            foreach (object oldObject in adornerList)
+            var adornerList = layer.GetAdorners(CurrentEditor);
+            if(adornerList!=null)
             {
-                layer.Remove(SelectionAdorners[oldObject]);
-                SelectionAdorners.Remove(oldObject);
+                foreach (Adorner adorner in adornerList)
+                {
+                    layer.Remove(adorner);
+                }
             }
+            SelectionAdorners.Clear();
         }
 
+        public void UpdateAtomBondAdorners()
+        {
+            if (MultiAdorner != null)
+            {
+                MultiAdorner.MouseLeftButtonDown -= SelAdorner_MouseLeftButtonDown;
+                var layer = AdornerLayer.GetAdornerLayer(CurrentEditor);
+                layer.Remove(MultiAdorner);
+                MultiAdorner = null;
+            }
+
+            var selAtomBonds = (from ChemistryBase sel in _selectedItems
+                                where sel is Atom || sel is Bond
+                                select sel).ToList();
+
+            if (selAtomBonds.Any())
+            {
+                MultiAdorner= new MultiAtomBondAdorner(CurrentEditor, selAtomBonds);
+                MultiAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
+            }
+        }
         private void RemoveSelectionAdorners(IList oldObjects)
         {
             var layer = AdornerLayer.GetAdornerLayer(CurrentEditor);
@@ -1145,31 +1155,7 @@ namespace Chem4Word.ACME
         /// <param name="newObjects"></param>
         private void AddSelectionAdorners(IList newObjects)
         {
-            foreach (object newObject in newObjects)
-            {
-                if (newObject is Atom atom && !atom.Singleton)
-                {
-                    AtomSelectionAdorner atomAdorner = new AtomSelectionAdorner(CurrentEditor, atom);
-                    SelectionAdorners[newObject] = atomAdorner;
-                    atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-
-                    //if all atoms are selected then select the mol
-                    if (AllAtomsSelected(atom.Parent))
-                    {
-                        RemoveAtomBondAdorners(atom.Parent);
-                        MoleculeSelectionAdorner molAdorner =
-                            new MoleculeSelectionAdorner(CurrentEditor, new List<Molecule> {atom.Parent});
-                        SelectionAdorners[newObject] = molAdorner;
-                    }
-                }
-                else if (newObject is Bond bond)
-                {
-                    BondSelectionAdorner bondAdorner = new BondSelectionAdorner(CurrentEditor, bond);
-                    SelectionAdorners[newObject] = bondAdorner;
-                    bondAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
-                }
-            }
-
+            
             var singleAtomMols = (from m in newObjects.OfType<Molecule>().Union(SelectedItems.OfType<Molecule>())
                                  where m.Atoms.Count == 1
                                  select m).ToList();
@@ -1270,18 +1256,24 @@ namespace Chem4Word.ACME
             if (e.ClickCount == 2)
             {
                 _selectedItems.Clear();
-                if (sender is AtomSelectionAdorner)
+                Molecule mol=null;
+                var visual= CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor));
+                if (visual is AtomVisual av)
                 {
-                    Molecule mol = (sender as AtomSelectionAdorner).AdornedAtom.Parent;
-                    RemoveAtomBondAdorners(mol);
+                    mol = av.ParentAtom.Parent;
+                }
+                else if (visual is BondVisual bv)
+                {
+                    mol = bv.ParentBond.Parent;
+                }
+              
+                RemoveAtomBondAdorners(mol);
+                if (mol != null)
+                {
                     AddToSelection(mol);
                 }
-                else if (sender is BondSelectionAdorner)
-                {
-                    Molecule mol = (sender as BondSelectionAdorner).AdornedBond.Parent;
-                    RemoveAtomBondAdorners(mol);
-                    AddToSelection(mol);
-                }
+            
+               
             }
         }
 
@@ -1882,6 +1874,7 @@ namespace Chem4Word.ACME
                     _selectedItems.Add(newBond);
                 }
             }
+            UpdateAtomBondAdorners();
         }
 
         public void RemoveFromSelection(List<object> thingsToAdd)
@@ -1930,6 +1923,7 @@ namespace Chem4Word.ACME
                         }
                 }
             }
+            UpdateAtomBondAdorners();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
