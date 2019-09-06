@@ -25,14 +25,15 @@ using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Enums;
 using Chem4Word.ACME.Models;
-using Chem4Word.ACME.Resources;
 using Chem4Word.ACME.Utils;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 using static Chem4Word.Model2.Helpers.Globals;
+using Constants = Chem4Word.ACME.Resources.Constants;
 
 namespace Chem4Word.ACME
 {
@@ -290,6 +291,7 @@ namespace Chem4Word.ACME
         #endregion Properties
 
         private BaseEditBehavior _activeMode;
+        public List<string> Used1DProperties { get; set; }
 
         public BaseEditBehavior ActiveMode
         {
@@ -337,9 +339,10 @@ namespace Chem4Word.ACME
 
         #region Constructors
 
-        public EditViewModel(Model model, EditorCanvas currentEditor) : base(model)
+        public EditViewModel(Model model, EditorCanvas currentEditor, List<string> _used1DProperties) : base(model)
         {
             AtomOptions = new ObservableCollection<AtomOption>();
+            Used1DProperties = _used1DProperties;
 
             LoadAtomOptions();
             _selectedItems = new ObservableCollection<object>();
@@ -867,8 +870,8 @@ namespace Chem4Word.ACME
             UndoManager.BeginUndoBlock();
             double currentLength = Model.MeanBondLength;
 
-            var centre = new Point(Model.BoundingBox.Left + Model.BoundingBox.Width / 2,
-                                   Model.BoundingBox.Top + Model.BoundingBox.Height / 2);
+            var centre = new Point(Model.BoundingBoxWithFontSize.Left + Model.BoundingBoxWithFontSize.Width / 2,
+                                   Model.BoundingBoxWithFontSize.Top + Model.BoundingBoxWithFontSize.Height / 2);
 
             Action redoAction = () =>
                                 {
@@ -1123,6 +1126,7 @@ namespace Chem4Word.ACME
                 MultiAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
             }
         }
+
         private void RemoveSelectionAdorners(IList oldObjects)
         {
             var layer = AdornerLayer.GetAdornerLayer(CurrentEditor);
@@ -1145,7 +1149,6 @@ namespace Chem4Word.ACME
                 }
             }
         }
-
 
         /// <summary>
         /// Adds adorners for a list of objects.  Should only be called from
@@ -1205,8 +1208,6 @@ namespace Chem4Word.ACME
                 molAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 molAdorner.DragCompleted += AtomAdorner_DragCompleted;
             }
-                
-            
         }
 
         #endregion Methods
@@ -1794,11 +1795,18 @@ namespace Chem4Word.ACME
         }
 
         public void AddToSelection(List<object> thingsToAdd)
-        { 
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            DebugHelper.WriteLine($"Started at {DateTime.Now}");
+
             //take a snapshot of the current selection
             var currentSelection = SelectedItems.ToList();
             //add all the new items to the existing selection
             var allItems = currentSelection.Union(thingsToAdd).ToList();
+
+            DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
 
             //phase one - group atoms into the molecules
             //grab all parent molecules for selected atoms
@@ -1812,6 +1820,8 @@ namespace Chem4Word.ACME
             var fullParents = (from m in allParents
                                 where m.Count == m.Parent.AtomCount
                                 select m.Parent).ToList();
+
+            DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
 
             //now add all the molecules that haven't been selected
             //first clear out the atoms
@@ -1835,6 +1845,8 @@ namespace Chem4Word.ACME
                 }
             }
 
+            DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
+
             var newMols = thingsToAdd.OfType<Molecule>().ToList();
             foreach (var molecule in newMols)
             {
@@ -1844,10 +1856,11 @@ namespace Chem4Word.ACME
                 }
                 thingsToAdd.Remove(molecule);
             }
+
+            DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
+
             //now we need to process remaining individual atoms
-
             var newAtoms = thingsToAdd.OfType<Atom>().ToList();
-
             foreach (var newAtom in newAtoms)
             {
                 if (!_selectedItems.Contains(newAtom))
@@ -1864,6 +1877,9 @@ namespace Chem4Word.ACME
                     }
                 }
             }
+
+            DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
+
             //now add in any remaining bonds
             var newBonds = thingsToAdd.OfType<Bond>().ToList();
 
@@ -1874,7 +1890,11 @@ namespace Chem4Word.ACME
                     _selectedItems.Add(newBond);
                 }
             }
+
             UpdateAtomBondAdorners();
+
+            DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
+            DebugHelper.WriteLine($"Finished at {DateTime.Now}");
         }
 
         public void RemoveFromSelection(List<object> thingsToAdd)
@@ -2316,6 +2336,121 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
         }
 
+        public void UpdateMolecule(Molecule molecule, Molecule changedMolecule)
+        {
+            UndoManager.BeginUndoBlock();
+
+            bool? showBefore = molecule.ShowMoleculeBrackets;
+            bool? showAfter = changedMolecule.ShowMoleculeBrackets;
+            int? chargeBefore = molecule.FormalCharge;
+            int? chargeAfter = changedMolecule.FormalCharge;
+            int? countBefore = molecule.Count;
+            int? countAfter = changedMolecule.Count;
+            int? spinBefore = molecule.SpinMultiplicity;
+            int? spinAfter = changedMolecule.SpinMultiplicity;
+
+            var beforeNames = molecule.Names.ToList();
+            var beforeFormulas = molecule.Formulas.ToList();
+            var beforeLabels = molecule.Labels.ToList();
+            var afterNames = changedMolecule.Names.ToList();
+            var afterFormulas = changedMolecule.Formulas.ToList();
+            var afterLabels = changedMolecule.Labels.ToList();
+
+            var childMolecules = molecule.GetChildMolecules();
+            var afterChildren = changedMolecule.GetChildMolecules();
+
+            var beforeChildNames = new Dictionary<string, List<TextualProperty>>();
+            foreach (var child in childMolecules)
+            {
+                beforeChildNames.Add(child.Path, child.Names.ToList());
+            }
+
+            var afterChildNames = new Dictionary<string, List<TextualProperty>>();
+            foreach (var child in afterChildren)
+            {
+                afterChildNames.Add(child.Path, child.Names.ToList());
+            }
+
+            var beforeChildFormulas = new Dictionary<string, List<TextualProperty>>();
+            foreach (var child in childMolecules)
+            {
+                beforeChildFormulas.Add(child.Path, child.Formulas.ToList());
+            }
+
+            var afterChildFormulas = new Dictionary<string, List<TextualProperty>>();
+            foreach (var child in afterChildren)
+            {
+                afterChildFormulas.Add(child.Path, child.Formulas.ToList());
+            }
+
+            var beforeChildLabels = new Dictionary<string, List<TextualProperty>>();
+            foreach (var child in childMolecules)
+            {
+                beforeChildLabels.Add(child.Path, child.Labels.ToList());
+            }
+
+            var afterChildLabels = new Dictionary<string, List<TextualProperty>>();
+            foreach (var child in afterChildren)
+            {
+                afterChildLabels.Add(child.Path, child.Labels.ToList());
+            }
+
+            Action redo = () =>
+            {
+                molecule.ShowMoleculeBrackets = showAfter;
+                molecule.FormalCharge = chargeAfter;
+                molecule.Count = countAfter;
+                molecule.SpinMultiplicity = spinAfter;
+
+                UpdateLabels(molecule, afterNames, afterFormulas, afterLabels);
+                foreach (var child in childMolecules)
+                {
+                    UpdateLabels(child, afterChildNames[child.Path], afterChildFormulas[child.Path], afterChildLabels[child.Path]);
+                }
+            };
+
+            redo();
+
+            Action undo = () =>
+            {
+                molecule.ShowMoleculeBrackets = showBefore;
+                molecule.FormalCharge = chargeBefore;
+                molecule.Count = countBefore;
+                molecule.SpinMultiplicity = spinBefore;
+
+                UpdateLabels(molecule, beforeNames, beforeFormulas, beforeLabels);
+                foreach (var child in childMolecules)
+                {
+                    UpdateLabels(child, beforeChildNames[child.Path], beforeChildFormulas[child.Path], beforeChildLabels[child.Path]);
+                }
+            };
+
+            UndoManager.RecordAction(undo, redo);
+            UndoManager.EndUndoBlock();
+
+            // Local Function
+            void UpdateLabels(Molecule mol, List<TextualProperty> names, List<TextualProperty> formulas, List<TextualProperty> labels)
+            {
+                mol.Names.Clear();
+                foreach (var property in names)
+                {
+                    mol.Names.Add(property);
+                }
+
+                mol.Formulas.Clear();
+                foreach (var property in formulas)
+                {
+                    mol.Formulas.Add(property);
+                }
+
+                mol.Labels.Clear();
+                foreach (var property in labels)
+                {
+                    mol.Labels.Add(property);
+                }
+            }
+        }
+
         public void UpdateBond(Bond bond, BondPropertiesModel model)
         {
             UndoManager.BeginUndoBlock();
@@ -2442,7 +2577,7 @@ namespace Chem4Word.ACME
             }
 
             var molList = buffer.Molecules.Values.ToList();
-            var abb = buffer.BoundingBox;
+            var abb = buffer.BoundingBoxWithFontSize;
             //grab the metrics of the editor's viewport
             var editorControlHorizontalOffset = EditorControl.HorizontalOffset;
             var editorControlViewportWidth = EditorControl.ViewportWidth;

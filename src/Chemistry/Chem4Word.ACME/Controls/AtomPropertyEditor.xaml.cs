@@ -11,6 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using Chem4Word.ACME.Annotations;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
@@ -24,17 +25,17 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class AtomPropertyEditor : Window, INotifyPropertyChanged
     {
-        private AtomPropertiesModel _apeModel;
+        private AtomPropertiesModel _atomPropertiesModel;
 
-        public AtomPropertiesModel ApeModel
+        public AtomPropertiesModel AtomPropertiesModel
         {
             get
             {
-                return _apeModel;
+                return _atomPropertiesModel;
             }
             set
             {
-                _apeModel = value;
+                _atomPropertiesModel = value;
                 OnPropertyChanged();
             }
         }
@@ -48,9 +49,9 @@ namespace Chem4Word.ACME.Controls
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                ApeModel = model;
-                DataContext = ApeModel;
-                AtomPath.Text = ApeModel.Path;
+                AtomPropertiesModel = model;
+                DataContext = AtomPropertiesModel;
+                AtomPath.Text = AtomPropertiesModel.Path;
             }
         }
 
@@ -69,18 +70,24 @@ namespace Chem4Word.ACME.Controls
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
-            if (ValidateModel())
-            {
-                ApeModel.Save = true;
-                Close();
-            }
+            _atomPropertiesModel.Save = true;
+            Close();
         }
 
         private void AtomPropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // This gets it close to the final position
-            Left = ApeModel.Centre.X - ActualWidth / 2;
-            Top = ApeModel.Centre.Y - ActualHeight / 2;
+            int maxX = Int32.MinValue;
+            int maxY = Int32.MinValue;
+
+            foreach (var screen in Screen.AllScreens)
+            {
+                maxX = Math.Max(maxX, screen.Bounds.Right);
+                maxY = Math.Max(maxY, screen.Bounds.Bottom);
+            }
+
+            // This moves the window off screen while it renders
+            Left = maxX + 100;
+            Top = maxY + 100;
 
             LoadAtomItems();
             LoadFunctionalGroups();
@@ -89,9 +96,9 @@ namespace Chem4Word.ACME.Controls
 
         private void AtomPropertyEditor_OnContentRendered(object sender, EventArgs e)
         {
-            // This moves it to the correct position
-            Left = ApeModel.Centre.X - ActualWidth / 2;
-            Top = ApeModel.Centre.Y - ActualHeight / 2;
+            // This moves the window to the correct position
+            Left = AtomPropertiesModel.Centre.X - ActualWidth / 2;
+            Top = AtomPropertiesModel.Centre.Y - ActualHeight / 2;
 
             InvalidateArrange();
         }
@@ -100,7 +107,7 @@ namespace Chem4Word.ACME.Controls
         {
             AtomOption newOption = null;
             var selElement = e.SelectedElement as Element;
-            ApeModel.Element = selElement;
+            AtomPropertiesModel.Element = selElement;
             PeriodicTableExpander.IsExpanded = false;
             bool found = false;
 
@@ -127,7 +134,7 @@ namespace Chem4Word.ACME.Controls
             {
                 newOption = new AtomOption(selElement);
                 AtomPicker.Items.Add(newOption);
-                ApeModel.AddedElement = selElement;
+                AtomPropertiesModel.AddedElement = selElement;
             }
 
             var atomPickerSelectedItem = newOption;
@@ -138,14 +145,14 @@ namespace Chem4Word.ACME.Controls
         private void AtomPicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AtomOption option = AtomPicker.SelectedItem as AtomOption;
-            ApeModel.AddedElement = option?.Element;
+            AtomPropertiesModel.AddedElement = option?.Element;
             ShowPreview();
         }
 
         private void FunctionalGroupPicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AtomOption option = FunctionalGroupPicker.SelectedItem as AtomOption;
-            ApeModel.AddedElement = option?.Element;
+            AtomPropertiesModel.AddedElement = option?.Element;
             ShowPreview();
         }
 
@@ -172,14 +179,14 @@ namespace Chem4Word.ACME.Controls
                 AtomPicker.Items.Add(new AtomOption(Globals.PeriodicTable.Elements[item]));
             }
 
-            if (ApeModel.Element is Element el)
+            if (AtomPropertiesModel.Element is Element el)
             {
                 if (!Constants.StandardAtoms.Contains(el.Symbol))
                 {
                     AtomPicker.Items.Add(new AtomOption(Globals.PeriodicTable.Elements[el.Symbol]));
                 }
 
-                AtomPicker.SelectedItem = new AtomOption(ApeModel.Element as Element);
+                AtomPicker.SelectedItem = new AtomOption(AtomPropertiesModel.Element as Element);
             }
         }
 
@@ -191,47 +198,41 @@ namespace Chem4Word.ACME.Controls
                 FunctionalGroupPicker.Items.Add(new AtomOption(item.Value));
             }
 
-            if (ApeModel.IsFunctionalGroup)
+            if (AtomPropertiesModel.IsFunctionalGroup)
             {
-                FunctionalGroupPicker.SelectedItem = new AtomOption(ApeModel.Element as FunctionalGroup);
+                FunctionalGroupPicker.SelectedItem = new AtomOption(AtomPropertiesModel.Element as FunctionalGroup);
             }
-        }
-
-        private bool ValidateModel()
-        {
-            // There are no properties from user typed entries, so all are good
-            return true;
         }
 
         private void ShowPreview()
         {
-            var atoms = ApeModel.MicroModel.GetAllAtoms();
+            var atoms = AtomPropertiesModel.MicroModel.GetAllAtoms();
             var atom = atoms[0];
 
-            if (ApeModel.IsElement)
+            if (AtomPropertiesModel.IsElement)
             {
-                atom.Element = ApeModel.Element;
-                atom.FormalCharge = ApeModel.Charge;
-                atom.ShowSymbol = ApeModel.ShowSymbol;
-                if (string.IsNullOrEmpty(ApeModel.Isotope))
+                atom.Element = AtomPropertiesModel.Element;
+                atom.FormalCharge = AtomPropertiesModel.Charge;
+                atom.ShowSymbol = AtomPropertiesModel.ShowSymbol;
+                if (string.IsNullOrEmpty(AtomPropertiesModel.Isotope))
                 {
                     atom.IsotopeNumber = null;
                 }
                 else
                 {
-                    atom.IsotopeNumber = int.Parse(ApeModel.Isotope);
+                    atom.IsotopeNumber = int.Parse(AtomPropertiesModel.Isotope);
                 }
             }
 
-            if (ApeModel.IsFunctionalGroup)
+            if (AtomPropertiesModel.IsFunctionalGroup)
             {
-                atom.Element = ApeModel.Element;
+                atom.Element = AtomPropertiesModel.Element;
                 atom.FormalCharge = null;
                 atom.ShowSymbol = null;
                 atom.IsotopeNumber = null;
             }
 
-            Preview.Chemistry = ApeModel.MicroModel.Copy();
+            Preview.Chemistry = AtomPropertiesModel.MicroModel.Copy();
         }
     }
 }

@@ -233,7 +233,6 @@ namespace Chem4Word.Model2
         //tries to get an estimated bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
         {
-            //Debug.WriteLine($"Atom.BoundingBox() FontSize: {fontSize}");
             double halfBoxWidth = fontSize * 0.5;
             Point position = Position;
             Rect baseAtomBox = new Rect(
@@ -273,12 +272,10 @@ namespace Chem4Word.Model2
                     mainElementBox.Union(hydrogenBox);
                 }
 
-                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} mainElementBox: {mainElementBox}");
                 return mainElementBox;
             }
             else
             {
-                //Debug.WriteLine($"Atom.BoundingBox() {SymbolText} baseAtomBox: {baseAtomBox}");
                 return baseAtomBox;
             }
         }

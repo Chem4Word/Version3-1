@@ -185,7 +185,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                         {
                             var cn = new TextualProperty();
                             cn.Value = di.data;
-                            cn.Type = "chebi:Iupac";
+                            cn.FullType = "chebi:Iupac";
                             expModel.Molecules.Values.First().Names.Add(cn);
                         }
                     }
@@ -196,7 +196,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                         {
                             var cn = new TextualProperty();
                             cn.Value = di.data;
-                            cn.Type = "chebi:Synonym";
+                            cn.FullType = "chebi:Synonym";
                             expModel.Molecules.Values.First().Names.Add(cn);
                         }
                     }

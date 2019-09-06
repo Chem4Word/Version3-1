@@ -8,6 +8,7 @@
 using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Forms;
 using Chem4Word.ACME.Models;
 
 namespace Chem4Word.ACME.Controls
@@ -17,7 +18,7 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class BondPropertyEditor : Window
     {
-        private readonly BondPropertiesModel _model;
+        private readonly BondPropertiesModel _bondPropertiesModel;
 
         public BondPropertyEditor()
         {
@@ -28,24 +29,33 @@ namespace Chem4Word.ACME.Controls
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                _model = model;
-                DataContext = _model;
-                BondPath.Text = _model.Path;
+                _bondPropertiesModel = model;
+                DataContext = _bondPropertiesModel;
+                BondPath.Text = _bondPropertiesModel.Path;
             }
         }
 
         private void BondPropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
-            // This gets it close to the final position
-            Left = _model.Centre.X - ActualWidth / 2;
-            Top = _model.Centre.Y - ActualHeight / 2;
+            int maxX = Int32.MinValue;
+            int maxY = Int32.MinValue;
+
+            foreach (var screen in Screen.AllScreens)
+            {
+                maxX = Math.Max(maxX, screen.Bounds.Right);
+                maxY = Math.Max(maxY, screen.Bounds.Bottom);
+            }
+
+            // This moves the window off screen while it renders
+            Left = maxX + 100;
+            Top = maxY + 100;
         }
 
         private void BondPropertyEditor_OnContentRendered(object sender, EventArgs e)
         {
-            // This moves it to the correct position
-            Left = _model.Centre.X - ActualWidth / 2;
-            Top = _model.Centre.Y - ActualHeight / 2;
+            // This moves the window to the correct position
+            Left = _bondPropertiesModel.Centre.X - ActualWidth / 2;
+            Top = _bondPropertiesModel.Centre.Y - ActualHeight / 2;
 
             InvalidateArrange();
         }
@@ -57,13 +67,8 @@ namespace Chem4Word.ACME.Controls
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
-            if (ValidateModel())
-            {
-                _model.Save = true;
-                Close();
-            }
+            _bondPropertiesModel.Save = true;
+            Close();
         }
-
-        private bool ValidateModel() => true;
     }
 }

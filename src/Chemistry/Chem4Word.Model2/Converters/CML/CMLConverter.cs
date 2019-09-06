@@ -50,14 +50,23 @@ namespace Chem4Word.Model2.Converters.CML
                 // Force all ConciseFormulas to be (re) calculated
                 newModel.CalculateFormula();
 
-                if (protectedLabels == null)
+                #region Handle 1D Labels
+
+                newModel.SetMissingIds();
+
+                if (protectedLabels != null && protectedLabels.Count > 0)
                 {
-                    newModel.Relabel(true);
+                    newModel.SetProtectedLabels(protectedLabels);
                 }
                 else
                 {
-                    newModel.Relabel(false, protectedLabels);
+                    newModel.Relabel(true);
                 }
+
+                #endregion Handle 1D Labels
+
+
+                // Calculate dynamic properties
                 newModel.Refresh();
             }
 
@@ -150,9 +159,9 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeId, f.Id));
             }
 
-            if (f.Type != null)
+            if (f.FullType != null)
             {
-                result.Add(new XAttribute(CMLConstants.AttributeConvention, f.Type));
+                result.Add(new XAttribute(CMLConstants.AttributeConvention, f.FullType));
             }
 
             if (f.Value != null)
@@ -192,11 +201,11 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeId, label.Id));
             }
 
-            result.Add(new XAttribute(CMLConstants.AttributeDictRef, CMLConstants.AttributeValueChem4WordLabel));
+            result.Add(new XAttribute(CMLConstants.AttributeDictRef, CMLConstants.ValueChem4WordLabel));
 
             if (label.Value != null)
             {
-                result.Add(new XAttribute(CMLConstants.AttributeValue, label.Value));
+                result.Add(new XAttribute(CMLConstants.AttributeNameValue, label.Value));
             }
 
             return result;
@@ -212,9 +221,9 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeId, name.Id));
             }
 
-            if (name.Type != null)
+            if (name.FullType != null)
             {
-                result.Add(new XAttribute(CMLConstants.AttributeDictRef, name.Type));
+                result.Add(new XAttribute(CMLConstants.AttributeDictRef, name.FullType));
             }
 
             return result;
@@ -270,6 +279,26 @@ namespace Chem4Word.Model2.Converters.CML
         {
             XElement molElement = new XElement(CMLNamespaces.cml + CMLConstants.TagMolecule, new XAttribute(CMLConstants.AttributeId, mol.Id));
 
+            if (mol.ShowMoleculeBrackets != null)
+            {
+                molElement.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeShowMoleculeBrackets, mol.ShowMoleculeBrackets.Value));
+            }
+
+            if (mol.FormalCharge != null)
+            {
+                molElement.Add(new XAttribute(CMLConstants.AttributeFormalCharge, mol.FormalCharge.Value));
+            }
+
+            if (mol.SpinMultiplicity != null)
+            {
+                molElement.Add(new XAttribute(CMLConstants.AttributeSpinMultiplicity, mol.SpinMultiplicity.Value));
+            }
+
+            if (mol.Count != null)
+            {
+                molElement.Add(new XAttribute(CMLConstants.AttributeCount, mol.Count.Value));
+            }
+
             if (mol.Molecules.Any())
             {
                 foreach (var label in mol.Labels)
@@ -281,6 +310,7 @@ namespace Chem4Word.Model2.Converters.CML
                 {
                     molElement.Add(GetMoleculeElement(childMolecule));
                 }
+
             }
             else
             {
@@ -326,6 +356,7 @@ namespace Chem4Word.Model2.Converters.CML
                     molElement.Add(baElement);
                 }
             }
+
             return molElement;
         }
 
@@ -399,10 +430,34 @@ namespace Chem4Word.Model2.Converters.CML
         {
             Molecule molecule = new Molecule();
 
+            string showBracketsValue = cmlElement.Attribute(CMLNamespaces.c4w + CMLConstants.AttributeShowMoleculeBrackets)?.Value;
+            if (!string.IsNullOrEmpty(showBracketsValue))
+            {
+                molecule.ShowMoleculeBrackets = bool.Parse(showBracketsValue);
+            }
+
             string idValue = cmlElement.Attribute(CMLConstants.AttributeId)?.Value;
-            if (idValue != null)
+            if (!string.IsNullOrEmpty(idValue))
             {
                 molecule.Id = idValue;
+            }
+
+            string countValue = cmlElement.Attribute(CMLConstants.AttributeCount)?.Value;
+            if (!string.IsNullOrEmpty(countValue))
+            {
+                molecule.Count = int.Parse(countValue);
+            }
+
+            string chargeValue = cmlElement.Attribute(CMLConstants.AttributeFormalCharge)?.Value;
+            if (!string.IsNullOrEmpty(chargeValue))
+            {
+                molecule.FormalCharge = int.Parse(chargeValue);
+            }
+
+            string spinValue = cmlElement.Attribute(CMLConstants.AttributeSpinMultiplicity)?.Value;
+            if (!string.IsNullOrEmpty(spinValue))
+            {
+                molecule.SpinMultiplicity = int.Parse(spinValue);
             }
 
             molecule.Errors = new List<string>();
@@ -587,17 +642,17 @@ namespace Chem4Word.Model2.Converters.CML
 
             if (cmlElement.Attribute(CMLConstants.AttributeConvention) == null)
             {
-                formula.Type = CMLConstants.AttributeValueChem4WordFormula;
+                formula.FullType = CMLConstants.ValueChem4WordFormula;
             }
             else
             {
-                formula.Type = cmlElement.Attribute(CMLConstants.AttributeConvention)?.Value;
+                formula.FullType = cmlElement.Attribute(CMLConstants.AttributeConvention)?.Value;
             }
 
             // Correct import from legacy Add-In
-            if (string.IsNullOrEmpty(formula.Type))
+            if (string.IsNullOrEmpty(formula.FullType))
             {
-                formula.Type = CMLConstants.AttributeValueChem4WordFormula;
+                formula.FullType = CMLConstants.ValueChem4WordFormula;
             }
 
             if (cmlElement.Attribute(CMLConstants.AttributeInline) != null)
@@ -608,16 +663,21 @@ namespace Chem4Word.Model2.Converters.CML
             return formula;
         }
 
-        // <cml:label dictRef="chem4word:Label" value="C19 />
+        // <cml:label id="" dictRef="chem4word:Label" value="C19 />
         private static TextualProperty GetLabel(XElement cmlElement)
         {
             var result = new TextualProperty();
 
-            result.Type = CMLConstants.AttributeValueChem4WordLabel;
+            result.FullType = CMLConstants.ValueChem4WordLabel;
 
-            if (cmlElement.Attribute(CMLConstants.AttributeValue) != null)
+            if (cmlElement.Attribute(CMLConstants.AttributeId) != null)
             {
-                result.Value = cmlElement.Attribute(CMLConstants.AttributeValue)?.Value;
+                result.Id = cmlElement.Attribute(CMLConstants.AttributeId)?.Value;
+            }
+
+            if (cmlElement.Attribute(CMLConstants.AttributeNameValue) != null)
+            {
+                result.Value = cmlElement.Attribute(CMLConstants.AttributeNameValue)?.Value;
             }
             result.CanBeDeleted = true;
 
@@ -633,17 +693,17 @@ namespace Chem4Word.Model2.Converters.CML
 
             if (cmlElement.Attribute(CMLConstants.AttributeDictRef) == null)
             {
-                name.Type = CMLConstants.AttributeValueChem4WordSynonym;
+                name.FullType = CMLConstants.ValueChem4WordSynonym;
             }
             else
             {
-                name.Type = cmlElement.Attribute(CMLConstants.AttributeDictRef)?.Value;
+                name.FullType = cmlElement.Attribute(CMLConstants.AttributeDictRef)?.Value;
             }
 
             // Correct import from legacy Add-In
-            if (string.IsNullOrEmpty(name.Type) || name.Type.Equals(CMLConstants.AttributeValueNameDictUnknown))
+            if (string.IsNullOrEmpty(name.FullType) || name.FullType.Equals(CMLConstants.ValueNameDictUnknown))
             {
-                name.Type = CMLConstants.AttributeValueChem4WordSynonym;
+                name.FullType = CMLConstants.ValueChem4WordSynonym;
             }
 
             name.Value = cmlElement.Value;

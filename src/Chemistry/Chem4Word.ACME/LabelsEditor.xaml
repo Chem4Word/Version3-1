@@ -217,6 +217,7 @@
                         CornerRadius="5">
                         <acme:Display
                             x:Name="Display"
+                            Margin="3"
                             Background="White"
                             HighlightActive="False" />
                     </Border>

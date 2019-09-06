@@ -248,6 +248,18 @@ namespace Chem4Word.Model2
 
         #region Chemical properties
 
+        private bool? _showMoleculeBrackets;
+
+        public bool? ShowMoleculeBrackets
+        {
+            get => _showMoleculeBrackets;
+            set
+            {
+                _showMoleculeBrackets = value;
+                OnPropertyChanged();
+            }
+        }
+
         private int? _spinMultiplicity;
 
         public int? SpinMultiplicity
@@ -260,7 +272,17 @@ namespace Chem4Word.Model2
             }
         }
 
-        #endregion Chemical properties
+        private int? _count;
+
+        public int? Count
+        {
+            get => _count;
+            set
+            {
+                _count = value;
+                OnPropertyChanged();
+            }
+        }
 
         private int? _formalCharge;
 
@@ -270,10 +292,11 @@ namespace Chem4Word.Model2
             set
             {
                 _formalCharge = value;
-                //Attributed call knows who we are, no need to pass "FormalCharge" as an argument
                 OnPropertyChanged();
             }
         }
+
+        #endregion Chemical properties
 
         public string CalculatedFormula()
         {
@@ -514,6 +537,7 @@ namespace Chem4Word.Model2
 
                 return list;
 
+                // Local function for recursion
                 List<TextualProperty> GetChildProperties(Molecule molecule)
                 {
                     var properties = new List<TextualProperty>();
@@ -523,7 +547,7 @@ namespace Chem4Word.Model2
                         properties.Add(new TextualProperty
                         {
                             Id = $"{molecule.Id}.f0",
-                            Type = "F",
+                            TypeCode = "F",
                             Value = molecule.ConciseFormula
                         });
 
@@ -532,7 +556,8 @@ namespace Chem4Word.Model2
                             properties.Add(new TextualProperty
                             {
                                 Id = name.Id,
-                                Type = "N",
+                                TypeCode = "N",
+                                FullType = name.FullType,
                                 Value = name.Value
                             });
                         }
@@ -542,7 +567,8 @@ namespace Chem4Word.Model2
                             properties.Add(new TextualProperty
                             {
                                 Id = formula.Id,
-                                Type = "F",
+                                TypeCode = "F",
+                                FullType = formula.FullType,
                                 Value = formula.Value
                             });
                         }
@@ -550,7 +576,8 @@ namespace Chem4Word.Model2
                         properties.Add(new TextualProperty
                         {
                             Id = "S",
-                            Type = "S",
+                            TypeCode = "S",
+                            FullType = "Separator",
                             Value = "S"
                         });
                     }
@@ -814,74 +841,59 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void ReLabel(ref int iMolcount, ref int iAtomCount, ref int iBondcount, bool includeNames, List<string> protectedLabels)
+        public List<Molecule> GetChildMolecules()
         {
-            Id = $"m{++iMolcount}";
+            List<Molecule> molecules = new List<Molecule>();
 
-            foreach (Atom a in Atoms.Values)
+            foreach (var kvp in Molecules)
             {
-                a.Id = $"a{++iAtomCount}";
-            }
+                var molecule = kvp.Value;
+                molecules.Add(molecule);
 
-            foreach (Bond b in Bonds)
-            {
-                b.Id = $"b{++iBondcount}";
-            }
-
-            if (includeNames)
-            {
-                int count = 1;
-                foreach (var formula in Formulas)
+                if (molecule.Molecules.Any())
                 {
-                    formula.Id = $"{Id}.f{count++}";
-                    formula.CanBeDeleted = true;
-                }
-
-                count = 1;
-                foreach (var name in Names)
-                {
-                    name.Id = $"{Id}.n{count++}";
-                    name.CanBeDeleted = true;
-                }
-
-                count = 1;
-                foreach (var label in Labels)
-                {
-                    label.Id = $"{Id}.l{count++}";
-                    label.CanBeDeleted = true;
-                }
-            }
-            else
-            {
-                // Fix any missing Ids
-                foreach (var formula in Formulas)
-                {
-                    if (string.IsNullOrEmpty(formula.Id))
-                    {
-                        formula.Id = GetNextId(Formulas, "f");
-                        formula.CanBeDeleted = true;
-                    }
-                }
-
-                foreach (var name in Names)
-                {
-                    if (string.IsNullOrEmpty(name.Id))
-                    {
-                        name.Id = GetNextId(Names, "n");
-                        name.CanBeDeleted = true;
-                    }
-                }
-
-                foreach (var label in Labels)
-                {
-                    if (string.IsNullOrEmpty(label.Id))
-                    {
-                        label.Id = GetNextId(Labels, "l");
-                        label.CanBeDeleted = true;
-                    }
+                    molecules.AddRange(molecule.GetChildMolecules());
                 }
             }
 
+            return molecules;
+        }
+
+        public void SetMissingIds()
+        {
+            // Fix any missing Ids
+            foreach (var formula in Formulas)
+            {
+                if (string.IsNullOrEmpty(formula.Id))
+                {
+                    formula.Id = GetNextId(Formulas, "f");
+                }
+            }
+
+            foreach (var name in Names)
+            {
+                if (string.IsNullOrEmpty(name.Id))
+                {
+                    name.Id = GetNextId(Names, "n");
+                }
+            }
+
+            foreach (var label in Labels)
+            {
+                if (string.IsNullOrEmpty(label.Id))
+                {
+                    label.Id = GetNextId(Labels, "l");
+                }
+            }
+
+            foreach (Molecule mol in Molecules.Values)
+            {
+                mol.SetMissingIds();
+            }
+        }
+
+        public void SetProtectedLabels(List<string> protectedLabels)
+        {
             if (protectedLabels != null)
             {
                 foreach (var formula in Formulas)
@@ -902,7 +914,48 @@ namespace Chem4Word.Model2
 
             foreach (Molecule mol in Molecules.Values)
             {
-                mol.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames, protectedLabels);
+                mol.SetProtectedLabels(protectedLabels);
+            }
+        }
+
+        public void ReLabel(ref int iMolcount, ref int iAtomCount, ref int iBondcount, bool includeNames)
+        {
+            Id = $"m{++iMolcount}";
+
+            foreach (Atom a in Atoms.Values)
+            {
+                a.Id = $"a{++iAtomCount}";
+            }
+
+            foreach (Bond b in Bonds)
+            {
+                b.Id = $"b{++iBondcount}";
+            }
+
+            if (includeNames)
+            {
+                int count = 1;
+                foreach (var formula in Formulas)
+                {
+                    formula.Id = $"{Id}.f{count++}";
+                }
+
+                count = 1;
+                foreach (var name in Names)
+                {
+                    name.Id = $"{Id}.n{count++}";
+                }
+
+                count = 1;
+                foreach (var label in Labels)
+                {
+                    label.Id = $"{Id}.l{count++}";
+                }
+            }
+
+            foreach (var molecule in Molecules.Values)
+            {
+                molecule.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames);
             }
         }
 
@@ -1013,7 +1066,8 @@ namespace Chem4Word.Model2
                 var n = new TextualProperty();
 
                 n.Id = cn.Id;
-                n.Type = cn.Type;
+                n.TypeCode = cn.TypeCode;
+                n.FullType = cn.FullType;
                 n.Value = cn.Value;
 
                 copy.Names.Add(n);
@@ -1024,7 +1078,8 @@ namespace Chem4Word.Model2
                 var ff = new TextualProperty();
 
                 ff.Id = f.Id;
-                ff.Type = f.Type;
+                ff.TypeCode = f.TypeCode;
+                ff.FullType = f.FullType;
                 ff.Value = f.Value;
 
                 copy.Formulas.Add(f);
@@ -1034,6 +1089,12 @@ namespace Chem4Word.Model2
             {
                 copy.Labels.Add(label);
             }
+
+            copy.Id = Id;
+            copy.FormalCharge = FormalCharge;
+            copy.Count = Count;
+            copy.SpinMultiplicity = SpinMultiplicity;
+            copy.ShowMoleculeBrackets = ShowMoleculeBrackets;
 
             // Copy child molecules
             foreach (var child in Molecules.Values)
@@ -1608,6 +1669,7 @@ namespace Chem4Word.Model2
         {
             Names.Clear();
             Formulas.Clear();
+            Labels.Clear();
         }
 
         /// <summary>

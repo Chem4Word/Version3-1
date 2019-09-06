@@ -272,7 +272,7 @@ namespace Chem4Word
                                     ribbonButton.Label = item.Value;
                                     ribbonButton.Click += OnRenderAsButtonClick;
 
-                                    switch (item.Type)
+                                    switch (item.TypeCode)
                                     {
                                         case "S":
                                             ShowAsMenu.Items.Add(Factory.CreateRibbonSeparator());
@@ -748,7 +748,7 @@ namespace Chem4Word
                                     // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 0 or > 4 or Elements < 1 or > 118
 
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
-                                    calculatedNames.Add(new TextualProperty { Type = Constants.Chem4WordInchiKeyName, Value = "Not Requested" });
+                                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = "Not Requested" });
                                 }
                                 else
                                 {
@@ -770,21 +770,21 @@ namespace Chem4Word
                                             if (first != null)
                                             {
                                                 var value = string.IsNullOrEmpty(first.InchiKey) ? "Not found" : first.InchiKey;
-                                                calculatedNames.Add(new TextualProperty { Type = Constants.Chem4WordInchiKeyName, Value = value });
+                                                calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = value });
 
                                                 value = string.IsNullOrEmpty(first.Formula) ? "Not found" : first.Formula;
-                                                calculatedFormulae.Add(new TextualProperty { Type = Constants.Chem4WordResolverFormulaName, Value = value });
+                                                calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverFormulaName, Value = value });
 
                                                 value = string.IsNullOrEmpty(first.Name) ? "Not found" : first.Name;
-                                                calculatedNames.Add(new TextualProperty { Type = Constants.Chem4WordResolverIupacName, Value = value });
+                                                calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverIupacName, Value = value });
 
                                                 value = string.IsNullOrEmpty(first.Smiles) ? "Not found" : first.Smiles;
-                                                calculatedFormulae.Add(new TextualProperty { Type = Constants.Chem4WordResolverSmilesName, Value = value });
+                                                calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverSmilesName, Value = value });
                                             }
 
                                             foreach (var formula in calculatedFormulae)
                                             {
-                                                var target = molecule.Formulas.FirstOrDefault(f => f.Type.Equals(formula.Type));
+                                                var target = molecule.Formulas.FirstOrDefault(f => f.FullType.Equals(formula.FullType));
                                                 if (target == null)
                                                 {
                                                     molecule.Formulas.Add(formula);
@@ -802,7 +802,7 @@ namespace Chem4Word
 
                                             foreach (var name in calculatedNames)
                                             {
-                                                var target = molecule.Names.FirstOrDefault(f => f.Type.Equals(name.Type));
+                                                var target = molecule.Names.FirstOrDefault(f => f.FullType.Equals(name.FullType));
                                                 if (target == null)
                                                 {
                                                     molecule.Names.Add(name);

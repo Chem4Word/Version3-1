@@ -206,7 +206,7 @@ namespace Chem4Word.Helpers
                                     doc.Application.Selection.SetRange(start - 1, start - 1);
                                     var model = new Model();
                                     var molecule = new Molecule();
-                                    molecule.Names.Add(new TextualProperty { Id = "m1.n1", Value = cci.Text, Type = Constants.Chem4WordUserSynonym });
+                                    molecule.Names.Add(new TextualProperty { Id = "m1.n1", Value = cci.Text, FullType = CMLConstants.ValueChem4WordSynonym });
                                     model.AddMolecule(molecule);
                                     molecule.Parent = model;
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");

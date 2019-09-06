@@ -22,8 +22,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <WebBrowser x:Name="WebBrowser"
-            LoadCompleted="WebBrowser_OnLoadCompleted" />
+        <WebBrowser x:Name="WebBrowser" LoadCompleted="WebBrowser_OnLoadCompleted" />
         <Grid Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -42,7 +41,8 @@
                     Margin="5,5,0,0"
                     HorizontalAlignment="Left"
                     Orientation="Vertical">
-                    <Button x:Name="AddHydrogens"
+                    <Button
+                        x:Name="AddHydrogens"
                         Width="40"
                         Height="24"
                         Margin="0,0,0,5"
@@ -50,7 +50,8 @@
                         Content="+ H"
                         Foreground="{StaticResource Chem4WordBlue}"
                         ToolTip="Add explicit Hydrogen atoms" />
-                    <Button x:Name="RemoveHydrogens"
+                    <Button
+                        x:Name="RemoveHydrogens"
                         Width="40"
                         Height="24"
                         Click="RemoveHydrogens_OnClick"
@@ -64,22 +65,23 @@
                 BorderThickness="2"
                 Foreground="{StaticResource Chem4WordBlue}"
                 Header="Rendering">
-                <StackPanel
-                    Margin="5,5,0,0"
-                    Orientation="Vertical">
-                    <CheckBox x:Name="ShowHydrogens"
+                <StackPanel Margin="5,5,0,0" Orientation="Vertical">
+                    <CheckBox
+                        x:Name="ShowHydrogens"
                         Margin="0,0,2,2"
                         Click="ShowHydrogens_OnClick"
                         Content="Hydrogen counts"
                         Foreground="{StaticResource Chem4WordBlue}"
                         ToolTip="Show hydrogen counts of terminal atoms" />
-                    <CheckBox x:Name="ShowColour"
+                    <CheckBox
+                        x:Name="ShowColour"
                         Margin="0,0,2,2"
                         Click="ShowColour_OnClick"
                         Content="Coloured atoms"
                         Foreground="{StaticResource Chem4WordBlue}"
                         ToolTip="Show visible atoms in colour" />
-                    <CheckBox x:Name="ShowCarbons"
+                    <CheckBox
+                        x:Name="ShowCarbons"
                         Margin="0,0,2,0"
                         Click="ShowCarbons_OnClick"
                         Content="All Carbon atoms"
@@ -97,27 +99,32 @@
                         <ColumnDefinition Width="50" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="BondLength"
+                    <TextBox
+                        x:Name="BondLength"
                         Grid.Column="0"
                         Width="30"
-                        VerticalAlignment="Center"
+                        Height="20"
+                        Padding="0"
                         HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
                         HorizontalContentAlignment="Right"
+                        BorderThickness="1,1,0,1"
                         Text="20"
                         TextChanged="BondLength_OnTextChanged"
                         ToolTip="Set bond length" />
-                    <Grid
-                        Grid.Column="1"
-                        HorizontalAlignment="Left">
+                    <Grid Grid.Column="1" HorizontalAlignment="Left">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <RepeatButton x:Name="IncreaseButton"
+                        <RepeatButton
+                            x:Name="IncreaseButton"
                             Grid.Row="0"
-                            Width="15"
-                            Height="15"
+                            Width="16"
+                            Height="10"
+                            HorizontalAlignment="Left"
                             VerticalAlignment="Bottom"
+                            BorderBrush="#FFABADB3"
                             Click="IncreaseButton_OnClick"
                             Focusable="False"
                             ToolTip="Increment bond length by 5">
@@ -126,11 +133,13 @@
                                 Fill="{StaticResource Chem4WordBlue}"
                                 Stretch="Uniform" />
                         </RepeatButton>
-                        <RepeatButton x:Name="DecreaseButton"
+                        <RepeatButton
+                            x:Name="DecreaseButton"
                             Grid.Row="1"
-                            Width="15"
-                            Height="15"
+                            Width="16"
+                            Height="10"
                             VerticalAlignment="Top"
+                            BorderBrush="#FFABADB3"
                             Click="DecreaseButton_OnClick"
                             Focusable="False"
                             ToolTip="Decrement bond length by 5">
@@ -147,10 +156,9 @@
                 BorderThickness="2"
                 Foreground="{StaticResource Chem4WordBlue}"
                 Header="Drawing">
-                <StackPanel
-                    Margin="5,5,5,0"
-                    Orientation="Vertical">
-                    <Button x:Name="FlipStructures"
+                <StackPanel Margin="5,5,5,0" Orientation="Vertical">
+                    <Button
+                        x:Name="FlipStructures"
                         Width="80"
                         Height="33"
                         Margin="0,0,0,2"
@@ -177,7 +185,8 @@
                                 Foreground="{StaticResource Chem4WordBlue}" />
                         </Grid>
                     </Button>
-                    <Button x:Name="MirrorStructures"
+                    <Button
+                        x:Name="MirrorStructures"
                         Width="80"
                         Height="33"
                         HorizontalAlignment="Left"
@@ -215,7 +224,8 @@
                     Margin="5,5,5,0"
                     VerticalAlignment="Top"
                     Orientation="Vertical">
-                    <RadioButton x:Name="SwitchToSingle"
+                    <RadioButton
+                        x:Name="SwitchToSingle"
                         Margin="1,1,1,1"
                         Click="SwitchToSingle_OnClick"
                         Content="Single"
@@ -223,7 +233,8 @@
                         GroupName="Mode"
                         IsChecked="True"
                         ToolTip="Switch to single molecule mode" />
-                    <RadioButton x:Name="SwitchToMulti"
+                    <RadioButton
+                        x:Name="SwitchToMulti"
                         Margin="1,1,1,1"
                         Click="SwitchToMulti_OnClick"
                         Content="Multi"
@@ -238,14 +249,16 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Orientation="Vertical">
-                <Button x:Name="Cancel"
+                <Button
+                    x:Name="Cancel"
                     Width="75"
                     Height="32"
                     Margin="0,0,0,5"
                     Click="Cancel_OnClick"
                     Content="Cancel"
                     Foreground="{StaticResource Chem4WordBlue}" />
-                <Button x:Name="Ok"
+                <Button
+                    x:Name="Ok"
                     Width="75"
                     Height="32"
                     Click="Ok_OnClick"

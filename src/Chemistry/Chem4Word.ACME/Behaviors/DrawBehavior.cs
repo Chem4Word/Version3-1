@@ -184,16 +184,16 @@ namespace Chem4Word.ACME.Behaviors
             CurrentStatus = "";
             if (IsDrawing)
             {
-                //first get the current active visuals
-
                 var newAtomPos = e.GetPosition(CurrentEditor);
+
+                //first get the current active visuals
                 var landedGroupVisual = CurrentEditor.GetTargetedVisual(newAtomPos) as GroupVisual;
-
                 var landedAtomVisual = CurrentEditor.GetTargetedVisual(newAtomPos) as AtomVisual;
-
                 var landedBondVisual = CurrentEditor.GetTargetedVisual(newAtomPos) as BondVisual;
+
                 //check to see whether or not we've clicked and released on the same atom
                 bool sameAtom = landedAtomVisual == _currentAtomVisual;
+
                 //check to see whether the target is in the same molecule
                 bool sameMolecule = landedAtomVisual?.ParentAtom.Parent == _currentAtomVisual?.ParentAtom.Parent;
 
@@ -310,25 +310,17 @@ namespace Chem4Word.ACME.Behaviors
             }
 
             ClearTemporaries();
-
-            void ClearTemporaries()
-            {
-                if (_adorner != null)
-                {
-                    RemoveAdorner(ref _adorner);
-                }
-
-                _currentAtomVisual = null;
-                IsDrawing = false;
-                //clear this to prevent a weird bug in drawing
-                CurrentEditor.ActiveChemistry = null;
-            }
         }
 
         public override void Abort()
         {
             CurrentEditor.ReleaseMouseCapture();
             CurrentStatus = "";
+            ClearTemporaries();
+        }
+
+        private void ClearTemporaries()
+        {
             if (_adorner != null)
             {
                 RemoveAdorner(ref _adorner);

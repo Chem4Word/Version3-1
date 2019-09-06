@@ -364,7 +364,7 @@
                     <Setter Property="Padding" Value="0" />
                 </Style>
             </ToolBarTray.Resources>
-            <ToolBar x:Name="SelectorToolbar" Height="40" >
+            <ToolBar x:Name="SelectorToolbar" Height="40">
                 <ComboBox
                     x:Name="AtomCombo"
                     Width="Auto"
@@ -376,7 +376,7 @@
                     FontWeight="DemiBold"
                     Foreground="{Binding Path=SelectedItem.Foreground, RelativeSource={RelativeSource Self}}"
                     ItemsSource="{Binding ElementName=AcmeControl, Path=ActiveViewModel.AtomOptions}"
-                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, PresentationTraceSources.TraceLevel=High, Mode=TwoWay, Converter={StaticResource DoNothing}}"
+                    SelectedValue="{Binding ElementName=AcmeControl, Path=ActiveViewModel.SelectedElement, PresentationTraceSources.TraceLevel=None, Mode=TwoWay, Converter={StaticResource DoNothing}}"
                     SelectedValuePath="Element"
                     ToolTip="Current Atom Type">
                     <ComboBox.ItemTemplate>

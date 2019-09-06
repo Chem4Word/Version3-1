@@ -143,8 +143,7 @@ namespace WinForms.TestHarness
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Model model = Display.Chemistry as Model;
-                if (model != null)
+                if (Display.Chemistry is Model model)
                 {
                     Model copy = model.Copy();
                     //SetCarbons(copy, ShowCarbons.Checked);
@@ -167,8 +166,7 @@ namespace WinForms.TestHarness
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Model model = Display.Chemistry as Model;
-                if (model != null)
+                if (Display.Chemistry is Model model)
                 {
                     var allAtoms = model.GetAllAtoms();
                     if (model.GetAllAtoms().Any())
@@ -208,8 +206,7 @@ namespace WinForms.TestHarness
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Model model = Display.Chemistry as Model;
-                if (model != null)
+                if (Display.Chemistry is Model model)
                 {
                     var allAtoms = model.GetAllAtoms();
                     if (allAtoms.Any())
@@ -266,22 +263,27 @@ namespace WinForms.TestHarness
             {
                 if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    EditorHost editorHost = new EditorHost(_lastCml, "LABELS");
-                    editorHost.ShowDialog(this);
-                    if (editorHost.Result == DialogResult.OK)
+                    using (EditorHost editorHost = new EditorHost(_lastCml, "LABELS"))
                     {
-                        CMLConverter cc = new CMLConverter();
-                        var clone = cc.Import(_lastCml);
-                        Debug.WriteLine(
-                            $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                        _undoStack.Push(clone);
+                        editorHost.ShowDialog(this);
+                        if (editorHost.Result == DialogResult.OK)
+                        {
+                            CMLConverter cc = new CMLConverter();
+                            var clone = cc.Import(_lastCml);
+                            Debug.WriteLine(
+                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                            _undoStack.Push(clone);
 
-                        Model m = cc.Import(editorHost.OutputValue);
-                        m.Relabel(true);
-                        _lastCml = cc.Export(m);
+                            Model m = cc.Import(editorHost.OutputValue);
+                            m.Relabel(true);
+                            _lastCml = cc.Export(m);
 
-                        ShowChemistry($"Edited {m.ConciseFormula}", m);
+                            ShowChemistry($"Edited {m.ConciseFormula}", m);
+                        }
                     }
+                    TopMost = true;
+                    TopMost = false;
+                    Activate();
                 }
             }
 #if !DEBUG
@@ -303,22 +305,27 @@ namespace WinForms.TestHarness
             {
                 if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    EditorHost editorHost = new EditorHost(_lastCml, "ACME");
-                    editorHost.ShowDialog(this);
-                    if (editorHost.Result == DialogResult.OK)
+                    using (EditorHost editorHost = new EditorHost(_lastCml, "ACME"))
                     {
-                        CMLConverter cc = new CMLConverter();
-                        var clone = cc.Import(_lastCml);
-                        Debug.WriteLine(
-                            $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                        _undoStack.Push(clone);
+                        editorHost.ShowDialog(this);
+                        if (editorHost.Result == DialogResult.OK)
+                        {
+                            CMLConverter cc = new CMLConverter();
+                            var clone = cc.Import(_lastCml);
+                            Debug.WriteLine(
+                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                            _undoStack.Push(clone);
 
-                        Model m = cc.Import(editorHost.OutputValue);
-                        m.Relabel(true);
-                        _lastCml = cc.Export(m);
+                            Model m = cc.Import(editorHost.OutputValue);
+                            m.Relabel(true);
+                            _lastCml = cc.Export(m);
 
-                        ShowChemistry($"Edited {m.ConciseFormula}", m);
+                            ShowChemistry($"Edited {m.ConciseFormula}", m);
+                        }
                     }
+                    TopMost = true;
+                    TopMost = false;
+                    Activate();
                 }
             }
 #if !DEBUG
@@ -503,22 +510,27 @@ namespace WinForms.TestHarness
             {
                 if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    EditorHost editorHost = new EditorHost(_lastCml, "CML");
-                    editorHost.ShowDialog(this);
-                    if (editorHost.Result == DialogResult.OK)
+                    using (EditorHost editorHost = new EditorHost(_lastCml, "CML"))
                     {
-                        CMLConverter cc = new CMLConverter();
-                        var clone = cc.Import(_lastCml);
-                        Debug.WriteLine(
-                            $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                        _undoStack.Push(clone);
+                        editorHost.ShowDialog(this);
+                        if (editorHost.Result == DialogResult.OK)
+                        {
+                            CMLConverter cc = new CMLConverter();
+                            var clone = cc.Import(_lastCml);
+                            Debug.WriteLine(
+                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                            _undoStack.Push(clone);
 
-                        Model m = cc.Import(editorHost.OutputValue);
-                        m.Relabel(true);
-                        _lastCml = cc.Export(m);
+                            Model m = cc.Import(editorHost.OutputValue);
+                            m.Relabel(true);
+                            _lastCml = cc.Export(m);
 
-                        ShowChemistry($"Edited {m.ConciseFormula}", m);
+                            ShowChemistry($"Edited {m.ConciseFormula}", m);
+                        }
                     }
+                    TopMost = true;
+                    TopMost = false;
+                    Activate();
                 }
             }
             catch (Exception exception)
@@ -536,9 +548,10 @@ namespace WinForms.TestHarness
             {
                 if (!string.IsNullOrEmpty(_lastCml))
                 {
-                    var f = new ShowCml();
-                    f.Cml = _lastCml;
-                    f.ShowDialog(this);
+                    using (var f = new ShowCml { Cml = _lastCml })
+                    {
+                        f.ShowDialog(this);
+                    }
                 }
             }
             catch (Exception exception)
@@ -558,36 +571,39 @@ namespace WinForms.TestHarness
                 Model m = cmlConverter.Import(_lastCml);
                 m.CustomXmlPartGuid = "";
 
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "CML molecule files (*.cml)|*.cml|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf";
-                DialogResult dr = sfd.ShowDialog();
-                if (dr == DialogResult.OK)
+                string filter = "CML molecule files (*.cml)|*.cml|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf";
+                using (SaveFileDialog sfd = new SaveFileDialog {Filter = filter})
                 {
-                    FileInfo fi = new FileInfo(sfd.FileName);
-                    _telemetry.Write(module, "Information", $"Exporting to '{fi.Name}'");
-                    string fileType = Path.GetExtension(sfd.FileName).ToLower();
-                    switch (fileType)
+                    DialogResult dr = sfd.ShowDialog();
+                    if (dr == DialogResult.OK)
                     {
-                        case ".cml":
-                            string temp = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-                                + Environment.NewLine
-                                + cmlConverter.Export(m);
-                            File.WriteAllText(sfd.FileName, temp);
-                            break;
+                        FileInfo fi = new FileInfo(sfd.FileName);
+                        _telemetry.Write(module, "Information", $"Exporting to '{fi.Name}'");
+                        string fileType = Path.GetExtension(sfd.FileName).ToLower();
+                        switch (fileType)
+                        {
+                            case ".cml":
+                                string temp = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                              + Environment.NewLine
+                                              + cmlConverter.Export(m);
+                                File.WriteAllText(sfd.FileName, temp);
+                                break;
 
-                        case ".mol":
-                        case ".sdf":
-                            // https://www.chemaxon.com/marvin-archive/6.0.2/marvin/help/formats/mol-csmol-doc.html
-                            double before = m.MeanBondLength;
-                            // Set bond length to 1.54 angstroms (Å)
-                            m.ScaleToAverageBondLength(1.54);
-                            double after = m.MeanBondLength;
-                            _telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
-                            SdFileConverter converter = new SdFileConverter();
-                            File.WriteAllText(sfd.FileName, converter.Export(m));
-                            break;
+                            case ".mol":
+                            case ".sdf":
+                                // https://www.chemaxon.com/marvin-archive/6.0.2/marvin/help/formats/mol-csmol-doc.html
+                                double before = m.MeanBondLength;
+                                // Set bond length to 1.54 angstroms (Å)
+                                m.ScaleToAverageBondLength(1.54);
+                                double after = m.MeanBondLength;
+                                _telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
+                                SdFileConverter converter = new SdFileConverter();
+                                File.WriteAllText(sfd.FileName, converter.Export(m));
+                                break;
+                        }
                     }
                 }
+
             }
             catch (Exception exception)
             {

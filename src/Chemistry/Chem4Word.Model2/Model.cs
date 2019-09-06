@@ -174,6 +174,7 @@ namespace Chem4Word.Model2
             }
         }
 
+
         public List<TextualProperty> AllTextualProperties
         {
             get
@@ -186,19 +187,22 @@ namespace Chem4Word.Model2
                     list.Add(new TextualProperty
                     {
                         Id = "2D",
-                        Type = "2D",
+                        TypeCode = "2D",
+                        FullType = "2D",
                         Value = "2D"
                     });
                     list.Add(new TextualProperty
                     {
                         Id = "c0",
-                        Type = "F",
+                        TypeCode = "F",
+                        FullType = "ConciseFormula",
                         Value = ConciseFormula
                     });
                     list.Add(new TextualProperty
                     {
                         Id = "S",
-                        Type = "S",
+                        TypeCode = "S",
+                        FullType = "Separator",
                         Value = "S"
                     });
                 }
@@ -337,10 +341,9 @@ namespace Chem4Word.Model2
         public double XamlBondLength { get; set; }
 
         /// <summary>
-        /// Overall bounding box for all atoms
+        /// Overall Cml bounding box for all atoms
         /// </summary>
-        // ToDo: Check if this is the same as BoundingBox ???
-        public Rect OverallAtomBoundingBox
+        public Rect BoundingBoxOfCmlPoints
         {
             get
             {
@@ -362,16 +365,15 @@ namespace Chem4Word.Model2
 
         private Rect _boundingBox = Rect.Empty;
 
-        public double MinX => BoundingBox.Left;
-        public double MaxX => BoundingBox.Right;
-        public double MinY => BoundingBox.Top;
-        public double MaxY => BoundingBox.Bottom;
+        public double MinX => BoundingBoxWithFontSize.Left;
+        public double MaxX => BoundingBoxWithFontSize.Right;
+        public double MinY => BoundingBoxWithFontSize.Top;
+        public double MaxY => BoundingBoxWithFontSize.Bottom;
 
         /// <summary>
-        /// Overall bounding box for all atoms
+        /// Overall bounding box for all atoms allowing for Font Size
         /// </summary>
-        // ToDo: Check if this is the same as OverallAtomBoundingBox ???
-        public Rect BoundingBox
+        public Rect BoundingBoxWithFontSize
         {
             get
             {
@@ -564,8 +566,8 @@ namespace Chem4Word.Model2
 
         public void CenterOn(Point point)
         {
-            Rect boundingBox = BoundingBox;
-            Point midPoint = new Point(BoundingBox.Left + boundingBox.Width / 2, BoundingBox.Top + BoundingBox.Height / 2);
+            Rect boundingBox = BoundingBoxWithFontSize;
+            Point midPoint = new Point(BoundingBoxWithFontSize.Left + boundingBox.Width / 2, BoundingBoxWithFontSize.Top + BoundingBoxWithFontSize.Height / 2);
             Vector displacement = midPoint - point;
             RepositionAll(displacement.X, displacement.Y);
         }
@@ -629,13 +631,29 @@ namespace Chem4Word.Model2
             return newMol;
         }
 
-        public void Relabel(bool includeNames, List<string> protectedLabels = null)
+        public void SetMissingIds()
+        {
+            foreach (Molecule m in Molecules.Values)
+            {
+                m.SetMissingIds();
+            }
+        }
+
+        public void SetProtectedLabels(List<string> protectedLabels)
+        {
+            foreach (Molecule m in Molecules.Values)
+            {
+                m.SetProtectedLabels(protectedLabels);
+            }
+        }
+
+        public void Relabel(bool includeNames)
         {
             int iBondcount = 0, iAtomCount = 0, iMolcount = 0;
 
             foreach (Molecule m in Molecules.Values)
             {
-                m.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames, protectedLabels);
+                m.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames);
             }
         }
 
@@ -771,7 +789,7 @@ namespace Chem4Word.Model2
             {
                 ScaleToAverageBondLength(newLength);
 
-                var bb = BoundingBox;
+                var bb = BoundingBoxWithFontSize;
                 var c = new Point(bb.Left + bb.Width / 2, bb.Top + bb.Height / 2);
                 RepositionAll(c.X - centre.X, c.Y - centre.Y);
                 _boundingBox = Rect.Empty;
@@ -824,11 +842,11 @@ namespace Chem4Word.Model2
                 {
                     if (id.EndsWith("f0"))
                     {
-                        tp = new TextualProperty()
+                        tp = new TextualProperty
                         {
                             Id = $"{molecule.Id}.f0",
                             Value = molecule.ConciseFormula,
-                            Type = "ConciseFormula"
+                            FullType = "ConciseFormula"
                         };
                         break;
                     }
@@ -893,7 +911,7 @@ namespace Chem4Word.Model2
                 XamlBondLength = newLength;
                 ScaledForXaml = true;
 
-                var middle = OverallAtomBoundingBox;
+                var middle = BoundingBoxOfCmlPoints;
 
                 if (forDisplay)
                 {
@@ -901,7 +919,7 @@ namespace Chem4Word.Model2
                     RepositionAll(middle.Left, middle.Top);
                 }
 
-                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBox)));
+                OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(BoundingBoxWithFontSize)));
                 OnPropertyChanged(this, new PropertyChangedEventArgs(nameof(XamlBondLength)));
             }
         }
@@ -922,10 +940,10 @@ namespace Chem4Word.Model2
         public void CentreInCanvas(Size size)
         {
             // Re-Centre scaled drawing on Canvas, does not need to be undone
-            double desiredLeft = (size.Width - BoundingBox.Width) / 2.0;
-            double desiredTop = (size.Height - BoundingBox.Height) / 2.0;
-            double offsetLeft = BoundingBox.Left - desiredLeft;
-            double offsetTop = BoundingBox.Top - desiredTop;
+            double desiredLeft = (size.Width - BoundingBoxWithFontSize.Width) / 2.0;
+            double desiredTop = (size.Height - BoundingBoxWithFontSize.Height) / 2.0;
+            double offsetLeft = BoundingBoxWithFontSize.Left - desiredLeft;
+            double offsetTop = BoundingBoxWithFontSize.Top - desiredTop;
 
             RepositionAll(offsetLeft, offsetTop);
         }

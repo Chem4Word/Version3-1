@@ -76,12 +76,12 @@
                                     Margin="3,0,0,0"
                                     VerticalContentAlignment="Center"
                                     IsReadOnly="True"
-                                    Text="{Binding Path=Type}" />
+                                    Text="{Binding Path=FullType}" />
                                 <TextBox
                                     Grid.Column="2"
                                     Margin="3,0,3,0"
                                     VerticalContentAlignment="Center"
-                                    IsReadOnly="{Binding CanBeEdited}"
+                                    IsReadOnly="{Binding IsReadOnly}"
                                     Text="{Binding Path=Value, Mode=TwoWay}" />
                             </Grid>
                         </DataTemplate>

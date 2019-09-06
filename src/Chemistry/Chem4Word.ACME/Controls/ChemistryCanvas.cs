@@ -147,7 +147,7 @@ namespace Chem4Word.ACME.Controls
                     // Only need to do this on "small" structures
                     if (_mychemistry.Model.TotalAtomsCount < 100)
                     {
-                        var abb = _mychemistry.Model.OverallAtomBoundingBox;
+                        var abb = _mychemistry.Model.BoundingBoxOfCmlPoints;
 
                         double leftPadding = 0;
                         double topPadding = 0;
@@ -375,7 +375,6 @@ namespace Chem4Word.ACME.Controls
 
         #region Fields
 
-        //private Rect _boundingBox = default(Rect);
         private ChemicalVisual _visualHit;
 
         private List<ChemicalVisual> _visuals = new List<ChemicalVisual>();
@@ -708,26 +707,40 @@ namespace Chem4Word.ACME.Controls
         public ChemicalVisual GetTargetedVisual(Point p)
         {
             _visuals.Clear();
+
+            // Re-Populate _visuals via ResultCallback with *ALL* ChemicalVisual's which are under the mouse cursor
+            // GroupVisual's seem to be added first (with outermost first) one for each Group
+            // Next are any BondVisual's one for each Bond
+            // Next is the AtomVisual for the Atom
             VisualTreeHelper.HitTest(this, null, ResultCallback, new PointHitTestParameters(p));
-            var groupVisual = _visuals.FirstOrDefault(v => v is GroupVisual);
-            if (groupVisual != null)
+
+            // First try to get a GroupVisual
+            // HACK: What guarantees that the first one found is the "top level" group?
+            ChemicalVisual result = _visuals.FirstOrDefault(v => v is GroupVisual);
+
+            // If not successful try to get an AtomVisual (should only ever be one!)
+            if (result == null)
             {
-                return groupVisual;
+                result = _visuals.FirstOrDefault(v => v is AtomVisual);
             }
 
-            var visual = _visuals.FirstOrDefault(v => v is AtomVisual);
-            if (visual != null)
+            // Finally get first ChemicalVisual which ought to be a BondVisual
+            if (result == null)
             {
-                return visual;
+                result = _visuals.FirstOrDefault();
             }
 
-            return _visuals.FirstOrDefault();
+            return result;
         }
 
-        public HitTestResultBehavior ResultCallback(HitTestResult result)
+        private HitTestResultBehavior ResultCallback(HitTestResult result)
         {
             _visualHit = result.VisualHit as ChemicalVisual;
-            _visuals.Add(_visualHit);
+
+            if (_visualHit != null)
+            {
+                _visuals.Add(_visualHit);
+            }
 
             return HitTestResultBehavior.Continue;
         }

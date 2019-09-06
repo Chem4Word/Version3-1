@@ -29,20 +29,6 @@ namespace Chem4Word.Core.Helpers
 
         public static string DefaultRendererPlugIn = "Open Office Xml Renderer V4";
 
-        public const string ChemspiderIdName = "chemspider:Id";
-        public const string ChemspiderInchiKeyName = "chemspider:Inchikey";
-        public const string ChemSpiderSynonymName = "chemspider:Synonym";
-        public const string ChemspiderFormulaName = "chemspider:Formula";
-        public const string ChemSpiderSmilesName = "chemspider:Smiles";
-
-        public const string Chem4WordInchiKeyName = "chem4word:CalculatedInchikey";
-        public const string Chem4WordResolverIupacName = "chem4word:ResolvedIupacname";
-        public const string Chem4WordResolverSmilesName = "chem4word:ResolvedSmiles";
-        public const string Chem4WordResolverFormulaName = "chem4word:ResolvedFormula";
-
-        public const string Chem4WordUserFormula = "chem4word:Formula";
-        public const string Chem4WordUserSynonym = "chem4word:Synonym";
-
         // Registry Locations
         public const string Chem4WordRegistryKey = @"SOFTWARE\Chem4Word V3";
 

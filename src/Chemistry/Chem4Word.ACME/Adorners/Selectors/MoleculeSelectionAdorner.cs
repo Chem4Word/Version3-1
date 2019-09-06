@@ -47,7 +47,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
         private Snapper _rotateSnapper;
         private double _yPlacement;
         private double _xPlacement;
-        private Point _originalThumbPos;
 
         public MoleculeSelectionAdorner(EditorCanvas currentEditor, List<Molecule> molecules)
             : base(currentEditor, molecules.ConvertAll(m => (ChemistryBase)m))
@@ -67,6 +66,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             BuildRotateThumb(ref RotateHandle, Cursors.Hand);
 
             SetCentroid();
+            SetBoundingBox();
             AttachHandlers();
 
             IsHitTestVisible = true;
@@ -84,6 +84,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         public double AspectRatio { get; set; }
 
         public Rect BoundingBox { get; set; }
+
         private new bool IsWorking => Dragging || Resizing || Rotating;
 
         #endregion Properties
@@ -149,7 +150,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
             {
                 //we have not yet rotated anything
                 //so take a snapshot of the centroid of the molecule
-                _originalThumbPos = _rotateThumbPos;
                 SetCentroid();
             }
         }
@@ -301,10 +301,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
             return finalSize;
         }
 
-        /// <summary>
-        /// Override this to
-        /// </summary>
-        /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);

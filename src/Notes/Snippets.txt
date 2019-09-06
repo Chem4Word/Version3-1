@@ -100,3 +100,6 @@ if (Globals.Chem4WordV3.EventsEnabled)
 
     Globals.Chem4WordV3.EventsEnabled = true;
 }
+
+https://spin.atomicobject.com/2013/12/11/wpf-data-binding-debug/
+Debugging DataBinding

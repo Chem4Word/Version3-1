@@ -81,6 +81,7 @@
     <Compile Include="Adorners\Selectors\SingleAtomSelectionAdorner.cs" />
     <Compile Include="Adorners\Selectors\SingleChemistryAdorner.cs" />
     <Compile Include="Converters\TreeViewLineConverter.cs" />
+    <Compile Include="Converters\ValueToStringConverter.cs" />
     <Compile Include="Drawing\GroupVisual.cs" />
     <Compile Include="LabelsEditor.xaml.cs">
       <DependentUpon>LabelsEditor.xaml</DependentUpon>
@@ -169,6 +170,7 @@
     <Compile Include="Drawing\SuperscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\SubscriptTextRunTypographyProperties.cs" />
     <Compile Include="Drawing\LabelTextRunTypographyProperties.cs" />
+    <Compile Include="Models\MoleculePropertiesModel.cs" />
     <Compile Include="Models\NamesModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\NewAtomPlacement.cs" />

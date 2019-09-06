@@ -507,7 +507,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
             Vector step = direction;
             step.Normalize();
-            step *= 10 * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE;
+            step *= 15 * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE;
 
             int steps = (int)Math.Ceiling(direction.Length / step.Length);
             double stepLength = direction.Length / steps;

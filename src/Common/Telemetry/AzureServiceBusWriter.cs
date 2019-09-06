@@ -123,7 +123,7 @@ namespace Chem4Word.Telemetry
                         $@"Chem4Word.V3\Telemetry\{DateTime.Now.ToString("yyyy-MM-dd")}.log");
                     using (StreamWriter w = File.AppendText(fileName))
                     {
-                        w.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}] Exception in WriteMessage: {ex.Message}");
+                        w.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}] Exception in WriteLine: {ex.Message}");
                     }
                 }
                 catch

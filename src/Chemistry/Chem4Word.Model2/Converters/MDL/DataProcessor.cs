@@ -70,14 +70,14 @@ namespace Chem4Word.Model2.Converters.MDL
                                 if (isFormula)
                                 {
                                     var formula = new TextualProperty();
-                                    formula.Type = internalName;
+                                    formula.FullType = internalName;
                                     formula.Value = line;
                                     _molecule.Formulas.Add(formula);
                                 }
                                 else
                                 {
                                     var name = new TextualProperty();
-                                    name.Type = internalName;
+                                    name.FullType = internalName;
                                     name.Value = line;
                                     _molecule.Names.Add(name);
                                 }
@@ -105,29 +105,29 @@ namespace Chem4Word.Model2.Converters.MDL
 
             foreach (var name in names)
             {
-                if (properties.ContainsKey(name.Type))
+                if (properties.ContainsKey(name.FullType))
                 {
-                    properties[name.Type].Add(name.Value);
+                    properties[name.FullType].Add(name.Value);
                 }
                 else
                 {
                     List<string> dataNames = new List<string>();
                     dataNames.Add(name.Value);
-                    properties.Add(name.Type, dataNames);
+                    properties.Add(name.FullType, dataNames);
                 }
             }
 
             foreach (var formula in formulas)
             {
-                if (properties.ContainsKey(formula.Type))
+                if (properties.ContainsKey(formula.FullType))
                 {
-                    properties[formula.Type].Add(formula.Value);
+                    properties[formula.FullType].Add(formula.Value);
                 }
                 else
                 {
                     List<string> dataNames = new List<string>();
                     dataNames.Add(formula.Value);
-                    properties.Add(formula.Type, dataNames);
+                    properties.Add(formula.FullType, dataNames);
                 }
             }
 

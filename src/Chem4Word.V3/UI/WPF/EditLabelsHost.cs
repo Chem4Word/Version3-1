@@ -105,7 +105,7 @@ namespace Chem4Word.UI.WPF
 
                             case DialogResult.Yes:
                                 var cmlConvertor = new CMLConverter();
-                                Cml = cmlConvertor.Export(labelsEditor.Data);
+                                Cml = cmlConvertor.Export(labelsEditor.SubModel);
                                 DialogResult = DialogResult.OK;
                                 break;
 

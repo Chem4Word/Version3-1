@@ -6,6 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -13,6 +15,7 @@ using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Telemetry;
 using Size = System.Drawing.Size;
@@ -34,12 +37,15 @@ namespace WinForms.TestHarness
             var appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var settingsPath = Path.Combine(appdata, "Chem4Word.V3");
 
+            var used1D = GetUsedProperties(cml);
+
             switch (_editorType)
             {
                 case "ACME":
                     Options options = new Options();
                     options.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
-                    Editor acmeEditor = new Editor(cml, null, options);
+
+                    Editor acmeEditor = new Editor(cml, used1D, options);
                     acmeEditor.InitializeComponent();
                     elementHost1.Child = acmeEditor;
 
@@ -54,6 +60,7 @@ namespace WinForms.TestHarness
                 case "LABELS":
                     LabelsEditor labelsEditor = new LabelsEditor();
                     labelsEditor.InitializeComponent();
+                    labelsEditor.Used1D = used1D;
                     labelsEditor.PopulateTreeView(cml);
                     elementHost1.Child = labelsEditor;
 
@@ -74,6 +81,29 @@ namespace WinForms.TestHarness
                     cmlEditor.OnButtonClick += OnWpfButtonClick;
                     break;
             }
+        }
+
+        private List<string> GetUsedProperties(string cml)
+        {
+            CMLConverter cc = new CMLConverter();
+            Model model = cc.Import(cml);
+
+            List<string> used1D = new List<string>();
+
+            foreach (var property in model.AllTextualProperties)
+            {
+                if (property.FullType != null)
+                {
+                    if (property.FullType.Equals(CMLConstants.ValueChem4WordLabel)
+                        || property.FullType.Equals(CMLConstants.ValueChem4WordFormula)
+                        || property.FullType.Equals(CMLConstants.ValueChem4WordSynonym))
+                    {
+                        used1D.Add(property.Id);
+                    }
+                }
+            }
+
+            return used1D;
         }
 
         private void EditorHost_Load(object sender, EventArgs e)
@@ -169,7 +199,7 @@ namespace WinForms.TestHarness
                                 case DialogResult.Yes:
                                     Result = DialogResult.OK;
                                     CMLConverter cc = new CMLConverter();
-                                    OutputValue = cc.Export(labelsEditor.Data);
+                                    OutputValue = cc.Export(labelsEditor.SubModel);
                                     Hide();
                                     labelsEditor.OnButtonClick -= OnWpfButtonClick;
                                     break;

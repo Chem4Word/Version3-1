@@ -174,8 +174,8 @@
     <Reference Include="Microsoft.Azure.Services.AppAuthentication, Version=1.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Azure.Services.AppAuthentication.1.3.1\lib\net461\Microsoft.Azure.Services.AppAuthentication.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=5.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.5.2.0\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=5.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.5.2.1\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=5.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.5.5.0\lib\net461\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
@@ -206,7 +206,7 @@
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.Azure.3.3.19\lib\net461\Microsoft.Rest.ClientRuntime.Azure.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ServiceBus, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAzure.ServiceBus.5.2.0\lib\net45\Microsoft.ServiceBus.dll</HintPath>
+      <HintPath>..\packages\WindowsAzure.ServiceBus.6.0.0\lib\net462\Microsoft.ServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -379,12 +379,6 @@
     <Compile Include="UI\AutomaticUpdate.Designer.cs">
       <DependentUpon>AutomaticUpdate.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\EditLabels.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UI\EditLabels.Designer.cs">
-      <DependentUpon>EditLabels.cs</DependentUpon>
-    </Compile>
     <Compile Include="UI\ImportErrors.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -403,24 +397,6 @@
     </Compile>
     <Compile Include="UI\UpdateFailure.Designer.cs">
       <DependentUpon>UpdateFailure.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\UserControls\UcEditFormula.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\UserControls\UcEditFormula.Designer.cs">
-      <DependentUpon>UcEditFormula.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\UserControls\UcEditName.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\UserControls\UcEditName.Designer.cs">
-      <DependentUpon>UcEditName.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UI\UserControls\UcMoleculeLabelEditor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UI\UserControls\UcMoleculeLabelEditor.Designer.cs">
-      <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\WaitCursor.cs" />
     <Compile Include="UI\WPF\AboutControl.xaml.cs">
@@ -528,9 +504,6 @@
     <EmbeddedResource Include="UI\AutomaticUpdate.resx">
       <DependentUpon>AutomaticUpdate.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\EditLabels.resx">
-      <DependentUpon>EditLabels.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="UI\ImportErrors.resx">
       <DependentUpon>ImportErrors.cs</DependentUpon>
     </EmbeddedResource>
@@ -539,15 +512,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UI\UpdateFailure.resx">
       <DependentUpon>UpdateFailure.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\UserControls\UcEditFormula.resx">
-      <DependentUpon>UcEditFormula.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\UserControls\UcEditName.resx">
-      <DependentUpon>UcEditName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UI\UserControls\UcMoleculeLabelEditor.resx">
-      <DependentUpon>UcMoleculeLabelEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\WPF\AboutHost.resx">
       <DependentUpon>AboutHost.cs</DependentUpon>

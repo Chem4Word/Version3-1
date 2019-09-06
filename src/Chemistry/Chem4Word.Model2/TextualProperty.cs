@@ -17,20 +17,31 @@ namespace Chem4Word.Model2
         public string Id { get; set; }
 
         public bool CanBeDeleted { get; set; }
-        public bool CanBeEdited { get; private set; }
+        public bool IsReadOnly { get; private set; }
         public bool IsValid { get; private set; }
 
-        private string _type;
+        private string _typeCode;
+        private string _fullType;
         private string _value;
 
-        public string Type
+        public string TypeCode
         {
-            get => _type;
+            get => _typeCode;
             set
             {
-                _type = value;
+                _typeCode = value;
+                OnPropertyChanged(nameof(TypeCode));
+            }
+        }
+
+        public string FullType
+        {
+            get => _fullType;
+            set
+            {
+                _fullType = value;
                 SetEditFlag();
-                OnPropertyChanged(nameof(Type));
+                OnPropertyChanged(nameof(FullType));
             }
         }
 
@@ -47,11 +58,11 @@ namespace Chem4Word.Model2
 
         private void SetEditFlag()
         {
-            if (!string.IsNullOrEmpty(Type))
+            if (!string.IsNullOrEmpty(_fullType))
             {
-                CanBeEdited = !(Type.Equals(CMLConstants.AttributeValueChem4WordLabel)
-                                || Type.Equals(CMLConstants.AttributeValueChem4WordFormula)
-                                || Type.Equals(CMLConstants.AttributeValueChem4WordSynonym));
+                IsReadOnly = !(_fullType.Equals(CMLConstants.ValueChem4WordLabel)
+                               || _fullType.Equals(CMLConstants.ValueChem4WordFormula)
+                               || _fullType.Equals(CMLConstants.ValueChem4WordSynonym));
             }
         }
 
@@ -64,9 +75,14 @@ namespace Chem4Word.Model2
                 result += $"{Id} ";
             }
 
-            if (!string.IsNullOrEmpty(_type))
+            if (!string.IsNullOrEmpty(_typeCode))
             {
-                result += $"{_type} ";
+                result += $"{_typeCode} ";
+            }
+
+            if (!string.IsNullOrEmpty(_fullType))
+            {
+                result += $"{_fullType} ";
             }
 
             if (!string.IsNullOrEmpty(_value))

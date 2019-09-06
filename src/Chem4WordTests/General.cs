@@ -108,15 +108,15 @@ namespace Chem4WordTests
             molecule.Parent = model;
 
             var formula = new TextualProperty();
-            formula.Type = "";
+            formula.FullType = "";
             formula.Value = "";
             molecule.Formulas.Add(formula);
 
             Assert.True(molecule.Formulas.Count == 1, "Expected count to be 1");
-            Assert.Equal("", molecule.Formulas[0].Type);
+            Assert.Equal("", molecule.Formulas[0].FullType);
 
-            molecule.Formulas[0].Type = "convention";
-            Assert.Equal("convention", molecule.Formulas[0].Type);
+            molecule.Formulas[0].FullType = "convention";
+            Assert.Equal("convention", molecule.Formulas[0].FullType);
         }
 
         [Fact]
@@ -130,15 +130,15 @@ namespace Chem4WordTests
             molecule.Parent = model;
 
             var name = new TextualProperty();
-            name.Type = "";
+            name.FullType = "";
             name.Value = "";
             molecule.Names.Add(name);
 
             Assert.True(molecule.Names.Count == 1, "Expected count to be 1");
-            Assert.Equal("", molecule.Names[0].Type);
+            Assert.Equal("", molecule.Names[0].FullType);
 
-            molecule.Names[0].Type = "dictref";
-            Assert.Equal("dictref", molecule.Names[0].Type);
+            molecule.Names[0].FullType = "dictref";
+            Assert.Equal("dictref", molecule.Names[0].FullType);
         }
     }
 }

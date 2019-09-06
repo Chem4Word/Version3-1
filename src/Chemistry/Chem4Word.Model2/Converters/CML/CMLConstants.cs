@@ -24,8 +24,11 @@ namespace Chem4Word.Model2.Converters.CML
 
         // Molecule
         public const string TagMolecule = "molecule";
+        public const string AttributeSpinMultiplicity = "spinMultiplicity";
+        public const string AttributeCount = "count";
 
         public const string TagXmlPartGuid = "customXmlPartGuid";
+        public const string AttributeShowMoleculeBrackets = "showBrackets";
 
         // Atoms
         public const string TagAtomArray = "atomArray";
@@ -64,15 +67,21 @@ namespace Chem4Word.Model2.Converters.CML
         public const string TagName = "name";
 
         public const string AttributeDictRef = "dictRef";
-        public const string AttributeValueChem4WordFormula = "chem4word:Formula";
-        public const string AttributeValueChem4WordSynonym = "chem4word:Synonym";
-        public const string AttributeValueNameDictUnknown = "nameDict:unknown";
+        public const string ValueChem4WordFormula = "chem4word:Formula";
+        public const string ValueChem4WordSynonym = "chem4word:Synonym";
+        public const string ValueNameDictUnknown = "nameDict:unknown";
 
         // Labels
         // <cml:label id="m1.l1" dictRef="chem4word:Label" value="m1.l1" />
         public const string TagLabel = "label";
 
-        public const string AttributeValue = "value";
-        public const string AttributeValueChem4WordLabel = "chem4word:Label";
+        public const string AttributeNameValue = "value";
+        public const string ValueChem4WordLabel = "chem4word:Label";
+
+        // Our DictRef values
+        public const string ValueChem4WordInchiKeyName = "chem4word:CalculatedInchikey";
+        public const string ValueChem4WordResolverIupacName = "chem4word:ResolvedIupacname";
+        public const string ValueChem4WordResolverSmilesName = "chem4word:ResolvedSmiles";
+        public const string ValueChem4WordResolverFormulaName = "chem4word:ResolvedFormula";
     }
 }

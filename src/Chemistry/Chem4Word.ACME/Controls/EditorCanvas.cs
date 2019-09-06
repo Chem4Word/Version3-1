@@ -6,8 +6,12 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
+using Chem4Word.ACME.Adorners.Selectors;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
 using static Chem4Word.ACME.Drawing.BondVisual;
@@ -87,7 +91,6 @@ namespace Chem4Word.ACME.Controls
         /// <returns>Geometry of deformed atoms</returns>
         public Geometry PartialGhost(List<Atom> selectedAtoms, Transform shear = null)
         {
-            //var neighbourSet = new HashSet<Atom>();
             HashSet<Bond> bondSet = new HashSet<Bond>();
             Dictionary<Atom, Point> transformedPositions = new Dictionary<Atom, Point>();
             //compile a set of all the neighbours of the selected atoms
@@ -98,7 +101,6 @@ namespace Chem4Word.ACME.Controls
                     //add in all the existing position for neigbours not in selected atoms
                     if (!selectedAtoms.Contains(neighbour))
                     {
-                        //neighbourSet.Add(neighbour); //don't worry about adding them twice
                         transformedPositions[neighbour] = neighbour.Position;
                     }
                 }
@@ -125,8 +127,6 @@ namespace Chem4Word.ACME.Controls
             double atomRadius = this.Chemistry.Model.XamlBondLength / 7.50;
             using (StreamGeometryContext ghostContext = ghostGeometry.Open())
             {
-                Dictionary<Atom, Geometry> atomGeometries = new Dictionary<Atom, Geometry>();
-
                 foreach (Atom atom in transformedPositions.Keys)
                 {
                     var newPosition = transformedPositions[atom];
@@ -135,16 +135,10 @@ namespace Chem4Word.ACME.Controls
                     {
                         EllipseGeometry atomCircle = new EllipseGeometry(newPosition, atomRadius, atomRadius);
                         DrawGeometry(ghostContext, atomCircle);
-                        atomGeometries[atom] = atomCircle;
-                    }
-                    else
-                    {
-                        atomGeometries[atom] = Geometry.Empty;
                     }
                 }
                 foreach (Bond bond in bondSet)
                 {
-                    List<Point> throwaway = new List<Point>();
                     var startAtomPosition = transformedPositions[bond.StartAtom];
                     var endAtomPosition = transformedPositions[bond.EndAtom];
                     var startAtomVisual = (AtomVisual)(chemicalVisuals[bond.StartAtom]);
@@ -163,6 +157,33 @@ namespace Chem4Word.ACME.Controls
             return ghostGeometry;
         }
 
+        public AtomVisual GetAtomVisual(Atom adornedAtom)
+        {
+            return chemicalVisuals[adornedAtom] as AtomVisual;
+        }
+
+        public MoleculeSelectionAdorner GetMoleculeAdorner(Point p)
+        {
+            MoleculeSelectionAdorner result = null;
+
+            var layer = AdornerLayer.GetAdornerLayer(this);
+            var children = layer.GetAdorners(this);
+            foreach (var adorner in children)
+            {
+                if (adorner is MoleculeSelectionAdorner moleculeAdorner)
+                {
+                    var bb = moleculeAdorner.BoundingBox;
+                    if (bb.Contains(p))
+                    {
+                        result = moleculeAdorner;
+                    }
+                    break;
+                }
+            }
+
+            return result;
+        }
+
         #endregion Methods
 
         #region Overrides
@@ -178,10 +199,5 @@ namespace Chem4Word.ACME.Controls
         }
 
         #endregion Overrides
-
-        public AtomVisual GetAtomVisual(Atom adornedAtom)
-        {
-            return chemicalVisuals[adornedAtom] as AtomVisual;
-        }
     }
 }

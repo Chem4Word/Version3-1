@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -42,209 +43,262 @@ namespace Chem4Word.ACME.Utils
 
         public static void DoPropertyEdit(MouseButtonEventArgs e, EditorCanvas currentEditor)
         {
-            var pp = currentEditor.PointToScreen(e.GetPosition(currentEditor));
+            EditViewModel evm = (EditViewModel)currentEditor.Chemistry;
 
-            EditViewModel evm;
-            var activeVisual = currentEditor.GetTargetedVisual(e.GetPosition(currentEditor));
-            if (activeVisual != null)
+            var position = e.GetPosition(currentEditor);
+            var screenPosition = currentEditor.PointToScreen(position);
+
+            // Did RightClick occur on a Molecule Selection Adorner?
+            var moleculeAdorner = currentEditor.GetMoleculeAdorner(position);
+            if (moleculeAdorner != null)
             {
-                PresentationSource source = PresentationSource.FromVisual(activeVisual);
-                if (source != null && source.CompositionTarget != null)
+                if (moleculeAdorner.AdornedMolecules.Count == 1)
                 {
-                    double dpiX = 96.0 * source.CompositionTarget.TransformToDevice.M11;
-                    double dpiY = 96.0 * source.CompositionTarget.TransformToDevice.M22;
+                    screenPosition = GetDpiAwareScaledPosition(screenPosition, moleculeAdorner);
 
-                    pp = new Point(pp.X * 96.0 / dpiX, pp.Y * 96.0 / dpiY);
-                }
-
-                if (activeVisual is AtomVisual av)
-                {
-                    evm = (EditViewModel)((EditorCanvas)av.Parent).Chemistry;
                     var mode = Application.Current.ShutdownMode;
-
                     Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-                    var atom = av.ParentAtom;
-                    var model = new AtomPropertiesModel
-                    {
-                        Centre = pp,
-                        Path = atom.Path,
-                        Element = atom.Element,
-                    };
+                    var model = new MoleculePropertiesModel();
+                    model.Centre = screenPosition;
+                    model.Path = moleculeAdorner.AdornedMolecules[0].Path;
+                    model.Used1DProperties = evm.Used1DProperties;
 
-                    if (atom.Element is Element)
-                    {
-                        model.IsFunctionalGroup = false;
-                        model.IsElement = true;
+                    model.SubModel = new Model();
+                    Molecule mol = moleculeAdorner.AdornedMolecules[0].Copy();
+                    model.SubModel.AddMolecule(mol);
+                    mol.Parent = model.SubModel;
 
-                        model.Charge = atom.FormalCharge ?? 0;
-                        model.Isotope = atom.IsotopeNumber.ToString();
-                        model.ShowSymbol = atom.ShowSymbol;
-                    }
+                    model.Charge = mol.FormalCharge;
+                    model.Count = mol.Count;
+                    model.SpinMultiplicity = mol.SpinMultiplicity;
+                    model.ShowMoleculeBrackets = mol.ShowMoleculeBrackets;
 
-                    if (atom.Element is FunctionalGroup)
-                    {
-                        model.IsElement = false;
-                        model.IsFunctionalGroup = true;
-                    }
-
-                    model.MicroModel = new Model();
-
-                    Molecule m = new Molecule();
-                    model.MicroModel.AddMolecule(m);
-                    m.Parent = model.MicroModel;
-
-                    Atom a = new Atom();
-                    a.Element = atom.Element;
-                    a.Position = atom.Position;
-                    a.FormalCharge = atom.FormalCharge;
-                    a.IsotopeNumber = atom.IsotopeNumber;
-                    m.AddAtom(a);
-                    a.Parent = m;
-
-                    foreach (var bond in atom.Bonds)
-                    {
-                        Atom ac = new Atom();
-                        ac.Element = Globals.PeriodicTable.C;
-                        ac.ShowSymbol = false;
-                        ac.Position = bond.OtherAtom(atom).Position;
-                        m.AddAtom(ac);
-                        ac.Parent = m;
-                        Bond b = new Bond(a, ac);
-                        b.Order = bond.Order;
-                        if (bond.Stereo != Globals.BondStereo.None)
-                        {
-                            b.Stereo = bond.Stereo;
-                            if (bond.Stereo == Globals.BondStereo.Wedge || bond.Stereo == Globals.BondStereo.Hatch)
-                            {
-                                if (atom.Path.Equals(bond.StartAtom.Path))
-                                {
-                                    b.StartAtomInternalId = a.InternalId;
-                                    b.EndAtomInternalId = ac.InternalId;
-                                }
-                                else
-                                {
-                                    b.StartAtomInternalId = ac.InternalId;
-                                    b.EndAtomInternalId = a.InternalId;
-                                }
-                            }
-                        }
-                        m.AddBond(b);
-                        b.Parent = m;
-                    }
-                    model.MicroModel.ScaleToAverageBondLength(20);
-
-                    var pe = new AtomPropertyEditor(model);
+                    var pe = new MoleculePropertyEditor(model);
                     ShowDialog(pe, currentEditor);
-                    Application.Current.ShutdownMode = mode;
 
                     if (model.Save)
                     {
-                        evm.UpdateAtom(atom, model);
-                        evm.ClearSelection();
-                        evm.AddToSelection(atom);
-                        if (model.AddedElement != null)
-                        {
-                            if (model.IsElement)
-                            {
-                                var newOption = new AtomOption(model.AddedElement as Element);
-                                if (!evm.AtomOptions.Contains(newOption))
-                                {
-                                    evm.AtomOptions.Add(newOption);
-                                }
-                            }
-
-                            if (model.IsFunctionalGroup)
-                            {
-                                var newOption = new AtomOption(model.AddedElement as FunctionalGroup);
-                                if (!evm.AtomOptions.Contains(newOption))
-                                {
-                                    evm.AtomOptions.Add(newOption);
-                                }
-                            }
-                        }
-                        evm.SelectedElement = model.Element;
-                    }
-                }
-
-                if (activeVisual is BondVisual bv)
-                {
-                    evm = (EditViewModel)((EditorCanvas)bv.Parent).Chemistry;
-                    var mode = Application.Current.ShutdownMode;
-
-                    Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-
-                    var bond = bv.ParentBond;
-                    var model = new BondPropertiesModel
-                    {
-                        Centre = pp,
-                        Path = bond.Path,
-                        Angle = bond.Angle,
-                        BondOrderValue = bond.OrderValue.Value,
-                        IsSingle = bond.Order.Equals(Globals.OrderSingle),
-                        IsDouble = bond.Order.Equals(Globals.OrderDouble),
-                        Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
-                        Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
-                    };
-
-                    model.DoubleBondChoice = DoubleBondType.Auto;
-
-                    if (model.IsDouble | model.Is1Point5 | model.Is2Point5)
-                    {
-                        if (bond.ExplicitPlacement != null)
-                        {
-                            model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
-                        }
-                        else
-                        {
-                            if (model.IsDouble)
-                            {
-                                if (bond.Stereo == Globals.BondStereo.Indeterminate)
-                                {
-                                    model.DoubleBondChoice = DoubleBondType.Indeterminate;
-                                }
-                            }
-                        }
+                        var thisMolecule = model.SubModel.Molecules.First().Value;
+                        evm.UpdateMolecule(moleculeAdorner.AdornedMolecules[0], thisMolecule);
                     }
 
-                    if (model.IsSingle)
-                    {
-                        model.SingleBondChoice = SingleBondType.None;
-
-                        switch (bond.Stereo)
-                        {
-                            case Globals.BondStereo.Wedge:
-                                model.SingleBondChoice = SingleBondType.Wedge;
-                                break;
-
-                            case Globals.BondStereo.Hatch:
-                                model.SingleBondChoice = SingleBondType.Hatch;
-                                break;
-
-                            case Globals.BondStereo.Indeterminate:
-                                model.SingleBondChoice = SingleBondType.Indeterminate;
-                                break;
-
-                            default:
-                                model.SingleBondChoice = SingleBondType.None;
-                                break;
-                        }
-                    }
-
-                    var pe = new BondPropertyEditor(model);
-                    ShowDialog(pe, currentEditor);
                     Application.Current.ShutdownMode = mode;
-
-                    if (model.Save)
-                    {
-                        evm.UpdateBond(bond, model);
-                        bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
-                    }
-
-                    evm.ClearSelection();
-                    evm.AddToSelection(bond);
                 }
             }
+            else
+            {
+                // Did RightClick occur on a ChemicalVisual?
+                var activeVisual = currentEditor.GetTargetedVisual(position);
+                if (activeVisual != null)
+                {
+                    screenPosition = GetDpiAwareScaledPosition(screenPosition, activeVisual);
+
+                    // Did RightClick occur on an AtomVisual?
+                    if (activeVisual is AtomVisual av)
+                    {
+                        var mode = Application.Current.ShutdownMode;
+
+                        Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+                        var atom = av.ParentAtom;
+                        var model = new AtomPropertiesModel
+                        {
+                            Centre = screenPosition,
+                            Path = atom.Path,
+                            Element = atom.Element
+                        };
+
+                        if (atom.Element is Element)
+                        {
+                            model.IsFunctionalGroup = false;
+                            model.IsElement = true;
+
+                            model.Charge = atom.FormalCharge ?? 0;
+                            model.Isotope = atom.IsotopeNumber.ToString();
+                            model.ShowSymbol = atom.ShowSymbol;
+                        }
+
+                        if (atom.Element is FunctionalGroup)
+                        {
+                            model.IsElement = false;
+                            model.IsFunctionalGroup = true;
+                        }
+
+                        model.MicroModel = new Model();
+
+                        Molecule m = new Molecule();
+                        model.MicroModel.AddMolecule(m);
+                        m.Parent = model.MicroModel;
+
+                        Atom a = new Atom();
+                        a.Element = atom.Element;
+                        a.Position = atom.Position;
+                        a.FormalCharge = atom.FormalCharge;
+                        a.IsotopeNumber = atom.IsotopeNumber;
+                        m.AddAtom(a);
+                        a.Parent = m;
+
+                        foreach (var bond in atom.Bonds)
+                        {
+                            Atom ac = new Atom();
+                            ac.Element = Globals.PeriodicTable.C;
+                            ac.ShowSymbol = false;
+                            ac.Position = bond.OtherAtom(atom).Position;
+                            m.AddAtom(ac);
+                            ac.Parent = m;
+                            Bond b = new Bond(a, ac);
+                            b.Order = bond.Order;
+                            if (bond.Stereo != Globals.BondStereo.None)
+                            {
+                                b.Stereo = bond.Stereo;
+                                if (bond.Stereo == Globals.BondStereo.Wedge || bond.Stereo == Globals.BondStereo.Hatch)
+                                {
+                                    if (atom.Path.Equals(bond.StartAtom.Path))
+                                    {
+                                        b.StartAtomInternalId = a.InternalId;
+                                        b.EndAtomInternalId = ac.InternalId;
+                                    }
+                                    else
+                                    {
+                                        b.StartAtomInternalId = ac.InternalId;
+                                        b.EndAtomInternalId = a.InternalId;
+                                    }
+                                }
+                            }
+                            m.AddBond(b);
+                            b.Parent = m;
+                        }
+                        model.MicroModel.ScaleToAverageBondLength(20);
+
+                        var pe = new AtomPropertyEditor(model);
+                        ShowDialog(pe, currentEditor);
+                        Application.Current.ShutdownMode = mode;
+
+                        if (model.Save)
+                        {
+                            evm.UpdateAtom(atom, model);
+                            evm.ClearSelection();
+                            evm.AddToSelection(atom);
+                            if (model.AddedElement != null)
+                            {
+                                if (model.IsElement)
+                                {
+                                    var newOption = new AtomOption(model.AddedElement as Element);
+                                    if (!evm.AtomOptions.Contains(newOption))
+                                    {
+                                        evm.AtomOptions.Add(newOption);
+                                    }
+                                }
+
+                                if (model.IsFunctionalGroup)
+                                {
+                                    var newOption = new AtomOption(model.AddedElement as FunctionalGroup);
+                                    if (!evm.AtomOptions.Contains(newOption))
+                                    {
+                                        evm.AtomOptions.Add(newOption);
+                                    }
+                                }
+                            }
+                            evm.SelectedElement = model.Element;
+                        }
+                    }
+
+                    // Did RightClick occur on a BondVisual?
+                    if (activeVisual is BondVisual bv)
+                    {
+                        var mode = Application.Current.ShutdownMode;
+
+                        Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+                        var bond = bv.ParentBond;
+                        var model = new BondPropertiesModel
+                        {
+                            Centre = screenPosition,
+                            Path = bond.Path,
+                            Angle = bond.Angle,
+                            BondOrderValue = bond.OrderValue.Value,
+                            IsSingle = bond.Order.Equals(Globals.OrderSingle),
+                            IsDouble = bond.Order.Equals(Globals.OrderDouble),
+                            Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
+                            Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
+                        };
+
+                        model.DoubleBondChoice = DoubleBondType.Auto;
+
+                        if (model.IsDouble | model.Is1Point5 | model.Is2Point5)
+                        {
+                            if (bond.ExplicitPlacement != null)
+                            {
+                                model.DoubleBondChoice = (DoubleBondType)bond.ExplicitPlacement.Value;
+                            }
+                            else
+                            {
+                                if (model.IsDouble)
+                                {
+                                    if (bond.Stereo == Globals.BondStereo.Indeterminate)
+                                    {
+                                        model.DoubleBondChoice = DoubleBondType.Indeterminate;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (model.IsSingle)
+                        {
+                            model.SingleBondChoice = SingleBondType.None;
+
+                            switch (bond.Stereo)
+                            {
+                                case Globals.BondStereo.Wedge:
+                                    model.SingleBondChoice = SingleBondType.Wedge;
+                                    break;
+
+                                case Globals.BondStereo.Hatch:
+                                    model.SingleBondChoice = SingleBondType.Hatch;
+                                    break;
+
+                                case Globals.BondStereo.Indeterminate:
+                                    model.SingleBondChoice = SingleBondType.Indeterminate;
+                                    break;
+
+                                default:
+                                    model.SingleBondChoice = SingleBondType.None;
+                                    break;
+                            }
+                        }
+
+                        var pe = new BondPropertyEditor(model);
+                        ShowDialog(pe, currentEditor);
+                        Application.Current.ShutdownMode = mode;
+
+                        if (model.Save)
+                        {
+                            evm.UpdateBond(bond, model);
+                            bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
+                        }
+
+                        evm.ClearSelection();
+                        evm.AddToSelection(bond);
+                    }
+                }
+            }
+        }
+
+        private static Point GetDpiAwareScaledPosition(Point screenPosition, Visual visual)
+        {
+            Point pp = screenPosition;
+
+            PresentationSource source = PresentationSource.FromVisual(visual);
+            if (source != null && source.CompositionTarget != null)
+            {
+                double dpiX = 96.0 * source.CompositionTarget.TransformToDevice.M11;
+                double dpiY = 96.0 * source.CompositionTarget.TransformToDevice.M22;
+
+                pp = new Point(pp.X * 96.0 / dpiX, pp.Y * 96.0 / dpiY);
+            }
+
+            return pp;
         }
     }
 }

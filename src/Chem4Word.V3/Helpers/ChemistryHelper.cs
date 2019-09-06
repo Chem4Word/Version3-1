@@ -345,8 +345,8 @@ namespace Chem4Word.Helpers
                 }
                 else
                 {
-                    source = tp.Type;
-                    isFormula = tp.Type.ToLower().Contains("formula");
+                    source = tp.FullType;
+                    isFormula = tp.FullType.ToLower().Contains("formula");
                 }
             }
             else

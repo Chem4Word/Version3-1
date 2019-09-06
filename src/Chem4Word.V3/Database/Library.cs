@@ -145,7 +145,7 @@ namespace Chem4Word.Database
                         var id = AddChemistry(conn, cml, chemicalName, model.ConciseFormula);
                         foreach (var name in mol.Names)
                         {
-                            AddChemicalName(conn, id, name.Value, name.Type);
+                            AddChemicalName(conn, id, name.Value, name.FullType);
                         }
                     }
 

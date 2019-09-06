@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xaml;
 using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Core.UI.Wpf;
@@ -235,9 +236,9 @@ namespace Chem4Word.ACME
             {
                 CMLConverter cc = new CMLConverter();
                 Model tempModel = cc.Import(_cml, _used1DProperties);
-
                 tempModel.RescaleForXaml(false);
-                var vm = new EditViewModel(tempModel, ChemCanvas);
+                var vm = new EditViewModel(tempModel, ChemCanvas, _used1DProperties);
+
                 ActiveViewModel = vm;
                 ActiveViewModel.EditorControl = this;
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
@@ -246,6 +247,7 @@ namespace Chem4Word.ACME
 
                 vm.Loading = true;
 
+                EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
                 if (ActiveViewModel.Model.TotalBondsCount == 0)
                 {
                     vm.CurrentBondLength = EditorOptions.BondLength;
@@ -267,47 +269,9 @@ namespace Chem4Word.ACME
             SetCurrentRing(BenzeneButton);
             //refresh the selection button
             SetSelectionMode(LassoButton);
+
             //HACK: Need to do this to put the editor into the right mode after refreshing the ring button
             ModeButton_OnChecked(DrawButton, new RoutedEventArgs());
-        }
-
-        public static T FindChild<T>(DependencyObject parent)
-            where T : DependencyObject
-        {
-            // Confirm parent is valid.
-            if (parent == null)
-            {
-                return null;
-            }
-
-            T foundChild = null;
-
-            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < childrenCount; i++)
-            {
-                var child = VisualTreeHelper.GetChild(parent, i);
-                // If the child is not of the request child type child
-                T childType = child as T;
-                if (childType == null)
-                {
-                    // recursively drill down the tree
-                    foundChild = FindChild<T>(child);
-
-                    // If the child is found, break so we do not overwrite the found child.
-                    if (foundChild != null)
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    // child element found.
-                    foundChild = (T)child;
-                    break;
-                }
-            }
-
-            return foundChild;
         }
 
         /// <summary>
@@ -334,7 +298,7 @@ namespace Chem4Word.ACME
             UIUtils.ShowAcmeSettings(ChemCanvas, EditorOptions.SettingsFile, Telemetry, TopLeft);
             // Re Load settings as they may have changed
             EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
-            if (ActiveViewModel.Model.TotalAtomsCount == 0)
+            if (ActiveViewModel.Model.TotalBondsCount == 0)
             {
                 // Change current selection if the model is empty
                 foreach (ComboBoxItem item in BondLengthSelector.Items)

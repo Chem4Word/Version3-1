@@ -30,6 +30,7 @@ namespace Chem4Word.ACME
         public List<string> Used1D { get; set; }
         public string Message { get; set; }
         public bool IsDirty { get; set; }
+        public bool IsInitialised { get; set; }
 
         private string _cml;
 
@@ -70,7 +71,7 @@ namespace Chem4Word.ACME
                                                                         | FrameworkPropertyMetadataOptions.AffectsMeasure
                                                                         | FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public Model Data { get; private set; }
+        public Model SubModel { get; private set; }
 
         private void LabelsEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
@@ -78,9 +79,13 @@ namespace Chem4Word.ACME
             {
                 if (!string.IsNullOrEmpty(_cml))
                 {
-                    PopulateTreeView(_cml);
-                    WarningMessage.Text = Message;
-                    TreeView_OnSelectedItemChanged(null, null);
+                    if (!IsInitialised)
+                    {
+                        PopulateTreeView(_cml);
+                        WarningMessage.Text = Message;
+                        TreeView_OnSelectedItemChanged(null, null);
+                        IsInitialised = true;
+                    }
                 }
             }
         }
@@ -127,28 +132,28 @@ namespace Chem4Word.ACME
         {
             _cml = cml;
             var cc = new CMLConverter();
-            Data = cc.Import(_cml, Used1D);
+            SubModel = cc.Import(_cml, Used1D);
             TreeView.Items.Clear();
             bool initialSelectionMade = false;
 
-            if (Data != null)
+            if (SubModel != null)
             {
-                OverallConciseFormulaPanel.Children.Add(TextBlockFromFormula(Data.ConciseFormula));
+                OverallConciseFormulaPanel.Children.Add(TextBlockFromFormula(SubModel.ConciseFormula));
 
                 var root = new TreeViewItem
                 {
                     Header = "Structure",
-                    Tag = Data
+                    Tag = SubModel
                 };
                 TreeView.Items.Add(root);
                 root.IsExpanded = true;
-                if (Data.GetAllMolecules().Count > 1)
+                if (SubModel.GetAllMolecules().Count > 1)
                 {
                     root.IsSelected = true;
                     initialSelectionMade = true;
                 }
 
-                AddNodes(root, Data.Molecules.Values);
+                AddNodes(root, SubModel.Molecules.Values);
             }
 
             SetupNamesEditor(NamesGrid, "Add new Name", OnAddNameClick, "Alternative name for molecule");
@@ -226,7 +231,7 @@ namespace Chem4Word.ACME
                     molecule.Formulas.Add(new TextualProperty
                     {
                         Id = molecule.GetNextId(molecule.Formulas, "f"),
-                        Type = CMLConstants.AttributeValueChem4WordFormula,
+                        FullType = CMLConstants.ValueChem4WordFormula,
                         Value = "?",
                         CanBeDeleted = true
                     });
@@ -244,7 +249,7 @@ namespace Chem4Word.ACME
                     molecule.Names.Add(new TextualProperty
                     {
                         Id = molecule.GetNextId(molecule.Names, "n"),
-                        Type = CMLConstants.AttributeValueChem4WordSynonym,
+                        FullType = CMLConstants.ValueChem4WordSynonym,
                         Value = "?",
                         CanBeDeleted = true
                     });
@@ -262,7 +267,7 @@ namespace Chem4Word.ACME
                     molecule.Labels.Add(new TextualProperty
                     {
                         Id = molecule.GetNextId(molecule.Labels, "l"),
-                        Type = CMLConstants.AttributeValueChem4WordLabel,
+                        FullType = CMLConstants.ValueChem4WordLabel,
                         Value = "?",
                         CanBeDeleted = true
                     });
@@ -310,9 +315,7 @@ namespace Chem4Word.ACME
             WpfEventArgs args = new WpfEventArgs();
             var cmlConvertor = new CMLConverter();
             args.Button = "OK";
-            args.OutputValue = cmlConvertor.Export(Data);
-
-            //Clipboard.SetText(cmlConvertor.Export(_model));
+            args.OutputValue = cmlConvertor.Export(SubModel);
 
             OnButtonClick?.Invoke(this, args);
         }

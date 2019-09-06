@@ -1,9 +1,10 @@
 ﻿// Shared file (Add As Link)
 
-using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Win32;
 
 namespace Chem4Word.Shared
 {
@@ -15,6 +16,7 @@ namespace Chem4Word.Shared
         private static string InstallRootTemplate32 = @"SOFTWARE\Wow6432Node\Microsoft\Office\{0}.0\Word\InstallRoot";
 
         private static int[] OfficeVersions = { 16, 15, 14, 17 };
+        private static Dictionary<string, string> OfficeVersionNumbers;
 
         private static string[] FileSearchTemplates =
         {
@@ -22,6 +24,15 @@ namespace Chem4Word.Shared
             @"Microsoft Office\root\Office{0}",
             @"Microsoft Office {0}\Client{1}\Root\Office{0}"
         };
+
+        private static void Initialise()
+        {
+            if (OfficeVersionNumbers == null)
+            {
+                OfficeVersionNumbers = new Dictionary<string, string>();
+                OfficeVersionNumbers.Add("16.0.11929.20254", "Office 365 1908");
+            }
+        }
 
         public static int GetWinWordVersion(string path = null)
         {
