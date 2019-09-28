@@ -94,7 +94,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             return boundingBox;
         }
 
-        private void PlaceString(string text, Point startPoint, string path)
+        public void PlaceString(string text, Point startPoint, string path)
         {
             Point cursor = new Point(startPoint.X, startPoint.Y);
 
@@ -140,13 +140,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             double lastOffset = 0;
 
-            //Debug.WriteLine("  X: " + atom.X2 + " Y: " + atom.Y2 + " Implicit H Count: " + implicitHCount);
-
-            //int ringCount = atom.Rings.Count;
             int bondCount = atom.Bonds.ToList().Count;
-
-            //var bv = atom.BalancingVector;
-            //_telemetry.Write(module, "Debugging", $"Atom {atomLabel} [{atom.Id}] at {atom.Position} BalancingVector {bv} [{CoordinateTool.BearingOfVector(bv)}°]");
 
             #region Decide if atom label is to be displayed
 
@@ -250,7 +244,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
                 isotopeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
                 labelBounds = new Rect(cursorPosition, new Size(width, height));
-                //_telemetry.Write(module, "Debugging", $"Atom {atomLabel} [{atom.Id}] Label Bounds {labelBounds}");
 
                 #endregion Step 2 - Reset Cursor such that the text is centered about the atom's co-ordinates
 
@@ -405,7 +398,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             case CompassPoints.West:
                                 if (implicitHCount == 1)
                                 {
-                                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2), _meanBondLength), 0);
+                                    if (iAbsCharge == 0)
+                                    {
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2), _meanBondLength), 0);
+                                    }
+                                    else
+                                    {
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25)), _meanBondLength), 0);
+                                    }
                                 }
                                 else
                                 {
@@ -415,13 +415,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                                     }
                                     else
                                     {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.5)), _meanBondLength), 0);
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25)), _meanBondLength), 0);
                                     }
                                 }
                                 break;
                         }
 
-                        //_telemetry.Write(module, "Debugging", $"Adding H at {cursorPosition}");
                         thisCharacterPosition = GetCharacterPosition(cursorPosition, hydrogenCharacter);
                         AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, hydrogenCharacter, atomColour, 'H', atom.Path, atom.Parent.Path);
                         _AtomLabelCharacters.Add(alc);

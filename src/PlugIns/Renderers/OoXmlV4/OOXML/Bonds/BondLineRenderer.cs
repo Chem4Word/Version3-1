@@ -255,7 +255,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             }
 
             double wiggleLength = bondVector.Length / noOfWiggles;
-            //Debug.WriteLine($"v.Length: {bondVector.Length} noOfWiggles: {noOfWiggles}");
 
             Vector originalWigglePortion = bondVector;
             originalWigglePortion.Normalize();

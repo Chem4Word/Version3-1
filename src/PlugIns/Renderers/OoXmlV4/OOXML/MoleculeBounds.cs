@@ -9,13 +9,13 @@ using System.Windows;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
 {
-    public class MoleculeGroup
+    public class MoleculeBounds
     {
         public string Path { get; set; }
 
         public Rect BoundingBox { get; set; }
 
-        public MoleculeGroup(string path, Rect boundingBox)
+        public MoleculeBounds(string path, Rect boundingBox)
         {
             Path = path;
             BoundingBox = boundingBox;

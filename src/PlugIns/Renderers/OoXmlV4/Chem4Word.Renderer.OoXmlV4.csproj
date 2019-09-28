@@ -75,7 +75,7 @@
     <Compile Include="OOXML\Bonds\BondLine.cs" />
     <Compile Include="OOXML\Bonds\BondLinePositioner.cs" />
     <Compile Include="OOXML\Bonds\BondLineRenderer.cs" />
-    <Compile Include="OOXML\MoleculeGroup.cs" />
+    <Compile Include="OOXML\MoleculeBounds.cs" />
     <Compile Include="OOXML\OoXmlFile.cs" />
     <Compile Include="OOXML\OoXmlHelper.cs" />
     <Compile Include="OOXML\OoXmlRenderer.cs" />
@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\Tahoma.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
