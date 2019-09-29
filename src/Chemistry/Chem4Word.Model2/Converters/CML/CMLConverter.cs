@@ -53,9 +53,11 @@ namespace Chem4Word.Model2.Converters.CML
                 #region Handle 1D Labels
 
                 newModel.SetMissingIds();
-
                 if (protectedLabels != null && protectedLabels.Count > 0)
                 {
+                    // Replace any temporary Ids which are Guids
+                    newModel.ReLabelGuids();
+
                     newModel.SetProtectedLabels(protectedLabels);
                 }
                 else
@@ -64,7 +66,6 @@ namespace Chem4Word.Model2.Converters.CML
                 }
 
                 #endregion Handle 1D Labels
-
 
                 // Calculate dynamic properties
                 newModel.Refresh();

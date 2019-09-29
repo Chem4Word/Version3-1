@@ -647,13 +647,53 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void Relabel(bool includeNames)
+        public void ReLabelGuids()
         {
-            int iBondcount = 0, iAtomCount = 0, iMolcount = 0;
+            int bondCount = 0, atomCount = 0, molCount = 0;
+
+            foreach (var molecule in GetAllMolecules())
+            {
+                var number = molecule.Id.Substring(1);
+                int n;
+                if (int.TryParse(number, out n))
+                {
+                    molCount = Math.Max(molCount, n);
+                }
+            }
+
+            foreach (var atom in GetAllAtoms())
+            {
+                var number = atom.Id.Substring(1);
+                int n;
+                if (int.TryParse(number, out n))
+                {
+                    atomCount = Math.Max(atomCount, n);
+                }
+            }
+
+            foreach (var bond in GetAllBonds())
+            {
+                var number = bond.Id.Substring(1);
+                int n;
+                if (int.TryParse(number, out n))
+                {
+                    bondCount = Math.Max(bondCount, n);
+                }
+            }
 
             foreach (Molecule m in Molecules.Values)
             {
-                m.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames);
+                m.ReLabelGuids(ref molCount, ref atomCount, ref bondCount);
+            }
+        }
+
+        public void Relabel(bool includeNames)
+        {
+            int bondCount = 0, atomCount = 0, molCount = 0;
+
+            foreach (Molecule m in Molecules.Values)
+            {
+                m.ReLabel(ref molCount, ref atomCount, ref bondCount, includeNames);
             }
         }
 
@@ -676,6 +716,7 @@ namespace Chem4Word.Model2
             }
 
             copy.ScaledForXaml = ScaledForXaml;
+            copy.CustomXmlPartGuid = CustomXmlPartGuid;
 
             return copy;
         }

@@ -85,6 +85,10 @@ namespace WinForms.TestHarness
                     if (model != null)
                     {
                         model.EnsureBondLength(20, false);
+                        if (string.IsNullOrEmpty(model.CustomXmlPartGuid))
+                        {
+                            model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
+                        }
 
                         if (!string.IsNullOrEmpty(_lastCml))
                         {

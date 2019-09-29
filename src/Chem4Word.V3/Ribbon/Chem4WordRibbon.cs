@@ -840,7 +840,11 @@ namespace Chem4Word
                                 Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing existing structure {fullTag}");
                             }
 
-                            afterModel.CustomXmlPartGuid = guidString;
+                            // Copy back CustomXmlPartGuid which will get lost if edited via ChemDoodle Web
+                            if (string.IsNullOrEmpty(afterModel.CustomXmlPartGuid))
+                            {
+                                afterModel.CustomXmlPartGuid = guidString;
+                            }
 
                             #region Show Label Editor
 

@@ -918,18 +918,48 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void ReLabel(ref int iMolcount, ref int iAtomCount, ref int iBondcount, bool includeNames)
+        public void ReLabelGuids(ref int molCount, ref int atomCount, ref int bondCount)
         {
-            Id = $"m{++iMolcount}";
+            Guid guid;
+            if (Guid.TryParse(Id, out guid))
+            {
+                Id = $"m{++molCount}";
+            }
 
             foreach (Atom a in Atoms.Values)
             {
-                a.Id = $"a{++iAtomCount}";
+                if (Guid.TryParse(a.Id, out guid))
+                {
+                    a.Id = $"a{++atomCount}";
+                }
             }
 
             foreach (Bond b in Bonds)
             {
-                b.Id = $"b{++iBondcount}";
+                if (Guid.TryParse(b.Id, out guid))
+                {
+                    b.Id = $"b{++bondCount}";
+                }
+            }
+
+            foreach (var molecule in Molecules.Values)
+            {
+                molecule.ReLabelGuids(ref molCount, ref atomCount, ref bondCount);
+            }
+        }
+
+        public void ReLabel(ref int molCount, ref int atomCount, ref int bondCount, bool includeNames)
+        {
+            Id = $"m{++molCount}";
+
+            foreach (Atom a in Atoms.Values)
+            {
+                a.Id = $"a{++atomCount}";
+            }
+
+            foreach (Bond b in Bonds)
+            {
+                b.Id = $"b{++bondCount}";
             }
 
             if (includeNames)
@@ -955,7 +985,7 @@ namespace Chem4Word.Model2
 
             foreach (var molecule in Molecules.Values)
             {
-                molecule.ReLabel(ref iMolcount, ref iAtomCount, ref iBondcount, includeNames);
+                molecule.ReLabel(ref molCount, ref atomCount, ref bondCount, includeNames);
             }
         }
 

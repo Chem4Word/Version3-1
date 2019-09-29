@@ -89,6 +89,7 @@ namespace WinForms.TestHarness
             Model model = cc.Import(cml);
 
             List<string> used1D = new List<string>();
+            used1D.Add(model.CustomXmlPartGuid);
 
             foreach (var property in model.AllTextualProperties)
             {
@@ -98,7 +99,7 @@ namespace WinForms.TestHarness
                         || property.FullType.Equals(CMLConstants.ValueChem4WordFormula)
                         || property.FullType.Equals(CMLConstants.ValueChem4WordSynonym))
                     {
-                        used1D.Add(property.Id);
+                        used1D.Add($"{property.Id}:{model.CustomXmlPartGuid}");
                     }
                 }
             }
