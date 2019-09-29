@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -22,10 +23,9 @@ namespace Chem4Word.ACME.Adorners
 
         public LassoAdorner([NotNull] UIElement adornedElement) : base(adornedElement)
         {
-            _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
-            _solidColorBrush.Opacity = 0.25;
+            _solidColorBrush = (SolidColorBrush)FindResource(Globals.AdornerFillBrush);
 
-            _dashPen = new Pen(SystemColors.HighlightBrush, 1);
+            _dashPen = new Pen((SolidColorBrush)FindResource(Globals.AdornerBorderBrush), 1);
             _dashPen.DashStyle = DashStyles.Dash;
             CurrentEditor = (EditorCanvas)adornedElement;
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);

@@ -19,7 +19,6 @@ namespace Chem4Word.ACME.Adorners
 {
     public class DrawBondAdorner : Adorner
     {
-        //private StreamGeometry _outline;
         private SolidColorBrush _solidColorBrush;
 
         private Pen _dashPen;
@@ -57,9 +56,8 @@ namespace Chem4Word.ACME.Adorners
 
         public DrawBondAdorner([NotNull] UIElement adornedElement, double bondThickness) : base(adornedElement)
         {
-            _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
-            _solidColorBrush.Opacity = 0.5;
-            _dashPen = new Pen(SystemColors.HighlightBrush, bondThickness);
+            _solidColorBrush = (SolidColorBrush) FindResource(Globals.DrawAdornerBrush);
+            _dashPen = new Pen(_solidColorBrush, bondThickness);
 
             CurrentEditor = (EditorCanvas)adornedElement;
 
@@ -104,8 +102,8 @@ namespace Chem4Word.ACME.Adorners
                     EndPoint = new Point(50, 3),
                     GradientStops = new GradientStopCollection()
                                             {
-                                                new GradientStop {Offset = 0d, Color = SystemColors.HighlightColor},
-                                                new GradientStop {Offset = 0.25d, Color = SystemColors.HighlightColor},
+                                                new GradientStop {Offset = 0d, Color = _solidColorBrush.Color},
+                                                new GradientStop {Offset = 0.25d, Color = _solidColorBrush.Color},
                                                 new GradientStop {Offset = 0.25d, Color = Colors.Transparent},
                                                 new GradientStop {Offset = 0.30, Color = Colors.Transparent}
                                             },
@@ -174,7 +172,7 @@ namespace Chem4Word.ACME.Adorners
         {
             BondDescriptor descriptor = null;
             //check to see if it's a wedge or a hatch yet
-            if (stereo == Globals.BondStereo.Wedge | stereo == Globals.BondStereo.Hatch)
+            if (stereo == Globals.BondStereo.Wedge || stereo == Globals.BondStereo.Hatch)
             {
                 var wbd = new WedgeBondDescriptor { Start = startPoint, End = endPoint };
                 BondGeometry.GetWedgeBondGeometry(wbd, bondLength);
@@ -198,7 +196,7 @@ namespace Chem4Word.ACME.Adorners
 
             List<Point> dummy = new List<Point>();
             //double bond
-            if (ordervalue == 2 | ordervalue == 1.5)
+            if (ordervalue == 2 || ordervalue == 1.5)
             {
                 DoubleBondDescriptor dbd = new DoubleBondDescriptor() { Start = startPoint, End = endPoint };
                 if (stereo == Globals.BondStereo.Indeterminate)
@@ -216,7 +214,7 @@ namespace Chem4Word.ACME.Adorners
             }
 
             //tripe bond
-            if (ordervalue == 2.5 | ordervalue == 3)
+            if (ordervalue == 2.5 || ordervalue == 3)
             {
                 var tbd = new TripleBondDescriptor() { Start = startPoint, End = endPoint };
                 BondGeometry.GetTripleBondGeometry(tbd, bondLength);

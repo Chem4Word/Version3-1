@@ -236,8 +236,29 @@ namespace Chem4Word.Model2.Helpers
         public const double BondThickness = ScaleFactorForXaml * 0.8;
         public const double HoverAdornerThickness = 3.0;
         public static Color HoverAdornerColor => Colors.DarkOrange;
+        public static Color ThumbAdornerFillColour => Colors.Orange;
 
         public static Color Chem4WordColor => (Color)ColorConverter.ConvertFromString("#2A579A");
+
+        public const string AdornerBorderPen = "GrabHandlePen";
+
+        public const string GhostBrush = "GrabHandleBorderBrush";
+
+        public const string GroupHandleStyle = "GroupHandleStyle";
+
+        public const string GrabHandleStyle = "GrabHandleStyle";
+
+        public const string ThumbStyle = "BigThumbStyle";
+
+        public const string DrawAdornerBrush = "DrawBondBrush";
+
+        public const string RotateThumbStyle = "RotateThumb";
+
+        public const string AdornerBorderBrush = "GrabHandleBorderBrush";
+
+        public const string AdornerFillBrush = "ThumbFillBrush";
+
+        public const string AtomBondSelectorBrush = "AtomBondSelectorBrush";
 
         #endregion Layout Constants
 

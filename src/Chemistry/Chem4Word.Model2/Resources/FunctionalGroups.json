@@ -281,7 +281,7 @@
     "CH2": {
         "Symbol": "CH2",
         "ShowAsSymbol": false,
-        "Flippable": true,
+        "Flippable": false,
         "Components": [
             {
                 "Component": "C",

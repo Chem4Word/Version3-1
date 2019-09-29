@@ -18,6 +18,7 @@ using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Telemetry;
+using Application = System.Windows.Application;
 using Size = System.Drawing.Size;
 
 namespace WinForms.TestHarness

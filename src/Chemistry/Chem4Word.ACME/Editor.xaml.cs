@@ -65,10 +65,7 @@ namespace Chem4Word.ACME
 
         private List<string> _used1DProperties;
 
-        /// <summary>
-        /// See http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
-        /// </summary>
-        public Editor(string cml, List<string> used1DProperties, Options options) : this()
+       public Editor(string cml, List<string> used1DProperties, Options options) : this()
         {
             _cml = cml;
             _used1DProperties = used1DProperties;
@@ -123,35 +120,45 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty ShowSaveProperty =
             DependencyProperty.Register("ShowSave", typeof(bool), typeof(Editor), new PropertyMetadata(true));
 
+        //see http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         private void EnsureApplicationResources()
         {
             if (Application.Current == null)
             {
                 // create the Application object
-                new Application();
+                try 
+                {
+                    new Application {ShutdownMode = ShutdownMode.OnExplicitShutdown};
+                }
+                catch //just in case the application already exists
+                {
+                    //no action required
+                }
 
-                // Merge in your application resources
-                // We need to do this for controls hosted in Winforms
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
-                                UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/AdornerBrushes.xaml",
-                                UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
-                                UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
-                                UriKind.Relative)) as ResourceDictionary);
-                Application.Current.Resources.MergedDictionaries.Add(
-                    Application.LoadComponent(
-                        new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
-                                UriKind.Relative)) as ResourceDictionary);
+                //check to make sure we managed to initialize a
+                //new application before adding in resources
+                if (Application.Current != null) 
+                {
+                    // Merge in your application resources
+                    // We need to do this for controls hosted in Winforms
+                    Application.Current.Resources.MergedDictionaries.Add(
+                        Application.LoadComponent(
+                            new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
+                                    UriKind.Relative)) as ResourceDictionary);
+
+                    Application.Current.Resources.MergedDictionaries.Add(
+                        Application.LoadComponent(
+                            new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
+                                    UriKind.Relative)) as ResourceDictionary);
+                    Application.Current.Resources.MergedDictionaries.Add(
+                        Application.LoadComponent(
+                            new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
+                                    UriKind.Relative)) as ResourceDictionary);
+                    Application.Current.Resources.MergedDictionaries.Add(
+                        Application.LoadComponent(
+                            new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
+                                    UriKind.Relative)) as ResourceDictionary);
+                }
             }
         }
 
@@ -228,8 +235,6 @@ namespace Chem4Word.ACME
             RingButton.Tag = selButton.Tag;
         }
 
-
-     
         private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
         {
             if (!String.IsNullOrEmpty(_cml))

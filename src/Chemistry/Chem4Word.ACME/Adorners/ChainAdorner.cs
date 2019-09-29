@@ -13,6 +13,7 @@ using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -22,16 +23,11 @@ namespace Chem4Word.ACME.Adorners
     /// </summary>
     public class ChainAdorner : Adorner
     {
-        private readonly SolidColorBrush _solidColorBrush;
-
         public ChainAdorner(Point firstPoint, [NotNull] UIElement adornedElement, double bondThickness,
                             List<Point> placements, Point currentPoint, Atom target) : base(adornedElement)
         {
-            _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
-            _solidColorBrush.Opacity = 0.1;
-
-            BondPen = new Pen(SystemColors.HighlightBrush, bondThickness);
-            DashedPen = new Pen(SystemColors.HighlightBrush, bondThickness);
+            BondPen = new Pen((SolidColorBrush)FindResource(Globals.DrawAdornerBrush), bondThickness);
+            DashedPen = BondPen.Clone();
             DashedPen.DashStyle = DashStyles.Dash;
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);

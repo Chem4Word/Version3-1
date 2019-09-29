@@ -79,9 +79,8 @@ namespace Chem4Word.ACME.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            _ghostBrush = new SolidColorBrush(SystemColors.HighlightColor);
-            _ghostBrush.Opacity = 0.25;
-            _ghostPen = new Pen(SystemColors.HighlightBrush, Globals.BondThickness);
+            _ghostBrush = (SolidColorBrush) FindResource(Globals.GhostBrush);
+            _ghostPen = new Pen(_ghostBrush, Globals.BondThickness);
 
             HashSet<Bond> bondSet = new HashSet<Bond>();
             Dictionary<Atom, Point> transformedPositions = new Dictionary<Atom, Point>();
@@ -125,7 +124,7 @@ namespace Chem4Word.ACME.Adorners
                 List<Point> throwaway = new List<Point>();
                 var startAtomPosition = transformedPositions[bond.StartAtom];
                 var endAtomPosition = transformedPositions[bond.EndAtom];
-                if (bond.OrderValue != 1.0 |
+                if (bond.OrderValue != 1.0 ||
                     !(bond.Stereo == Globals.BondStereo.Hatch | bond.Stereo == Globals.BondStereo.Wedge))
                 {
                     var descriptor = BondVisual.GetBondDescriptor(CurrentEditor.GetAtomVisual(bond.StartAtom),

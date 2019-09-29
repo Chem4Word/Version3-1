@@ -14,12 +14,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners.Selectors
 {
     public class SingleAtomSelectionAdorner : MultiChemistryAdorner
     {
-        protected Thumb BigThumb; //this is the main grab area for the molecule
+        //this is the main grab area for the molecule
+        protected Thumb BigThumb; 
 
         public List<Molecule> AdornedMolecules => AdornedChemistries.Select(c => (Molecule)c).ToList();
 
@@ -31,7 +33,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //tracks the amount of travel during drag operations
         protected double DragXTravel;
-
         protected double DragYTravel;
 
         //where the dragging starts
@@ -96,7 +97,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             VisualChildren.Add(BigThumb);
             BigThumb.IsHitTestVisible = true;
 
-            BigThumb.Style = (Style)FindResource("BigThumbStyle");
+            BigThumb.Style = (Style)FindResource(Globals.ThumbStyle);
             BigThumb.Cursor = Cursors.Hand;
             BigThumb.DragStarted += BigThumb_DragStarted;
             BigThumb.DragCompleted += BigThumb_DragCompleted;
@@ -112,8 +113,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
         /// <param name="drawingContext"></param>
         protected override void OnRender(DrawingContext drawingContext)
         {
-            var borderPen = (Pen)FindResource("GrabHandlePen");
-            var renderBrush = (Brush)FindResource("BigThumbFillBrush");
+            var borderPen = (Pen)FindResource(Globals.AdornerBorderPen);
+            var renderBrush = (Brush)FindResource(Globals.AdornerFillBrush);
             if (IsWorking)
             {
                 object elem = AdornedElement;

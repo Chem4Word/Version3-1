@@ -12,6 +12,7 @@ using System.Windows.Media;
 using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -26,24 +27,16 @@ namespace Chem4Word.ACME.Adorners
 
         public FixedRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, bool unsaturated = false) : base(adornedElement)
         {
-            _solidColorBrush = new SolidColorBrush(SystemColors.HighlightColor);
-            _solidColorBrush.Opacity = 0.1;
+            _solidColorBrush = (SolidColorBrush) FindResource(Globals.AdornerFillBrush);
 
-            BondPen = new Pen(SystemColors.HighlightBrush, bondThickness);
+            BondPen = new Pen((SolidColorBrush)FindResource(Globals.DrawAdornerBrush), bondThickness);
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
             Placements = placements;
             Unsaturated = unsaturated;
             CurrentEditor = (EditorCanvas)adornedElement;
-            MouseLeftButtonDown += FixedRingAdorner_MouseLeftButtonDown;
             _ringDrawer = new RingDrawer(this);
-        }
-
-        private void FixedRingAdorner_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            //_currentEditor.RaiseEvent(e);
-            //e.Handled = true;
         }
 
         protected override void OnRender(DrawingContext drawingContext)

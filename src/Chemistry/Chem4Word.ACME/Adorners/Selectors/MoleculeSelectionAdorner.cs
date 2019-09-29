@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -15,6 +16,7 @@ using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners.Selectors
 {
@@ -28,7 +30,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //some things to grab hold of
         protected readonly Thumb TopLeftHandle; //these do the resizing
-
         protected readonly Thumb TopRightHandle;    //these do the resizing
         protected readonly Thumb BottomLeftHandle;  //these do the resizing
         protected readonly Thumb BottomRightHandle; //these do the resizing
@@ -75,8 +76,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
             PreviewMouseLeftButtonUp -= BaseSelectionAdorner_PreviewMouseLeftButtonUp;
             MouseLeftButtonUp -= BaseSelectionAdorner_MouseLeftButtonUp;
-
-            //no need to add the adorner in at this point as the base has already done it
         }
 
         #region Properties
@@ -121,7 +120,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
             Resizing = true;
             Dragging = false;
             Keyboard.Focus(this);
-            BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
+            Mouse.Capture((Thumb)sender);
+            SetBoundingBox();
             DragXTravel = 0.0d;
             DragYTravel = 0.0d;
         }
@@ -135,7 +135,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             RotateHandle.Width = _rotateThumbWidth;
             RotateHandle.Height = _rotateThumbWidth;
             RotateHandle.Cursor = Cursors.Hand;
-            rotateThumb.Style = (Style)FindResource("RotateThumb");
+            rotateThumb.Style = (Style)FindResource(Globals.RotateThumbStyle);
             rotateThumb.DragStarted += RotateStarted;
             rotateThumb.DragDelta += RotateThumb_DragDelta;
             rotateThumb.DragCompleted += HandleResizeCompleted;
@@ -174,7 +174,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
         private void SetCentroid()
         {
             _centroid = GetCentroid(CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules));
-            //create a snapper
             _rotateSnapper = new Snapper(_centroid, CurrentEditor.Chemistry as EditViewModel);
         }
 
@@ -198,12 +197,13 @@ namespace Chem4Word.ACME.Adorners.Selectors
                 SetCentroid();
                 InvalidateVisual();
             }
+            (sender as Thumb)?.ReleaseMouseCapture();
         }
 
         private void SetBoundingBox()
         {
-            //and work out the aspect ratio for later resizing
-            BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
+           BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
+           //and work out the aspect ratio for later resizing
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
@@ -225,7 +225,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         protected virtual void SetThumbStyle(Thumb cornerThumb)
         {
-            cornerThumb.Style = (Style)FindResource("GrabHandleStyle");
+            cornerThumb.Style = (Style)FindResource(Globals.GrabHandleStyle);
         }
 
         #endregion Methods
@@ -260,7 +260,11 @@ namespace Chem4Word.ACME.Adorners.Selectors
             _yPlacement = bbb.Top - RotateHandle.Height * 3;
             _rotateThumbPos = new Point(_xPlacement, _yPlacement);
 
-            if (BigThumb.IsDragging)
+            if (BigThumb.IsDragging 
+                || TopLeftHandle.IsDragging
+                || TopRightHandle.IsDragging
+                || BottomLeftHandle.IsDragging
+                || BottomRightHandle.IsDragging)
             {
                 RotateHandle.Visibility = Visibility.Hidden;
             }
@@ -270,7 +274,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
                 SetCentroid();
             }
 
-            if (Rotating & LastOperation != null)
+            if (Rotating && LastOperation != null)
             {
                 _rotateThumbPos = LastOperation.Transform(_rotateThumbPos);
             }
@@ -278,7 +282,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             Vector rotateThumbTweak = new Vector(-RotateHandle.Width / 2, -RotateHandle.Height / 2);
             Point newLoc = _rotateThumbPos + rotateThumbTweak;
 
-            if (Rotating & LastOperation != null)
+            if (Rotating && LastOperation != null)
             {
                 TopLeftHandle.Visibility = Visibility.Collapsed;
                 TopRightHandle.Visibility = Visibility.Collapsed;
@@ -305,10 +309,10 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             base.OnRender(drawingContext);
 
-            var brush = (Brush)FindResource("GrabHandleBorderBrush");
+            var brush = (Brush)FindResource(Globals.AdornerBorderBrush);
             var pen = new Pen(brush, 1.0);
-            if (!(BigThumb.IsDragging | TopLeftHandle.IsDragging | TopRightHandle.IsDragging |
-                  BottomLeftHandle.IsDragging | BottomRightHandle.IsDragging))
+            if (!(BigThumb.IsDragging || TopLeftHandle.IsDragging || TopRightHandle.IsDragging 
+                  || BottomLeftHandle.IsDragging || BottomRightHandle.IsDragging))
             {
                 drawingContext.DrawLine(pen, _centroid, _rotateThumbPos);
                 drawingContext.DrawEllipse(brush, pen, _centroid, 2, 2);
@@ -331,8 +335,21 @@ namespace Chem4Word.ACME.Adorners.Selectors
         // Handler for resizing from the bottom-right.
         private void IncrementDragging(DragDeltaEventArgs args)
         {
-            DragXTravel += args.HorizontalChange;
-            DragYTravel += args.VerticalChange;
+            var argsHorizontalChange = args.HorizontalChange;
+            var argsVerticalChange = args.VerticalChange;
+         
+            if (double.IsNaN(argsHorizontalChange))
+            {
+                argsHorizontalChange = 0d;
+            }
+
+            if (double.IsNaN(argsVerticalChange))
+            {
+                argsVerticalChange = 0d;
+            }
+
+            DragXTravel += argsHorizontalChange;
+            DragYTravel += argsVerticalChange;
         }
 
         private double GetScaleFactor(double left, double top, double right, double bottom)
@@ -360,18 +377,13 @@ namespace Chem4Word.ACME.Adorners.Selectors
             {
                 var scaleFactor = GetScaleFactor(BoundingBox.Left,
                                                  BoundingBox.Top + DragYTravel,
-                                                 BoundingBox.Right + DragYTravel,
+                                                 BoundingBox.Right + DragXTravel,
                                                  BoundingBox.Bottom);
 
                 LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Left, BoundingBox.Bottom);
 
                 InvalidateVisual();
             }
-        }
-
-        private bool NotDraggingBackwards()
-        {
-            return BigThumb.Height >= 10 && BigThumb.Width >= 10;
         }
 
         // Handler for resizing from the top-left.
@@ -401,9 +413,9 @@ namespace Chem4Word.ACME.Adorners.Selectors
             if (NotDraggingBackwards())
             {
                 var scaleFactor = GetScaleFactor(BoundingBox.Left + DragXTravel,
-                                                 BoundingBox.Top + DragYTravel,
+                                                 BoundingBox.Top ,
                                                  BoundingBox.Right,
-                                                 BoundingBox.Bottom);
+                                                 BoundingBox.Bottom + DragYTravel);
 
                 LastOperation = new ScaleTransform(scaleFactor, scaleFactor, BoundingBox.Right, BoundingBox.Top);
 
@@ -411,6 +423,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
         }
 
+        // Handler for resizing from the bottom-right.
         private void BottomRightHandleDragDelta(object sender, DragDeltaEventArgs args)
         {
             IncrementDragging(args);
@@ -427,6 +440,10 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
         }
 
+        private bool NotDraggingBackwards()
+        {
+            return BigThumb.Height >= 10 && BigThumb.Width >= 10;
+        }
         #endregion Resizing
     }
 }

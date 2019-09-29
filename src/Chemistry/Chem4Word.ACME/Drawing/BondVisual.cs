@@ -106,7 +106,7 @@ namespace Chem4Word.ACME.Drawing
                                                         double? parentOrderValue, Globals.BondDirection parentPlacement,
                                                         Point? centroid, Point? secondaryCentroid)
         {
-            if (parentStereo == Globals.BondStereo.Wedge | parentStereo == Globals.BondStereo.Hatch)
+            if (parentStereo == Globals.BondStereo.Wedge || parentStereo == Globals.BondStereo.Hatch)
             {
                 WedgeBondDescriptor wbd = new WedgeBondDescriptor()
                 {
@@ -124,8 +124,8 @@ namespace Chem4Word.ACME.Drawing
                     bond = otherBonds.ToArray()[0];
                 }
 
-                bool chamferBond = (otherBonds.Any() &&
-                                    (endAtom.Element as Element) == Globals.PeriodicTable.C
+                bool chamferBond = (otherBonds.Any() 
+                                    && (endAtom.Element as Element) == Globals.PeriodicTable.C
                                     && endAtom.SymbolText == ""
                                     && bond.Order == Globals.OrderSingle);
                 if (!chamferBond)
@@ -310,9 +310,8 @@ namespace Chem4Word.ACME.Drawing
                     using (DrawingContext dc = RenderOpen())
                     {
                         dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
-                        //we need to draw another transparent thicker line on top of the existing one
-                        dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4),
-                                        BondDescriptor.DefiningGeometry);
+                        //we need to draw another transparent rectangle to expand the bounding box
+                        DrawHitTestOverlay(dc);
                         dc.Close();
                     }
                     DoubleBondDescriptor dbd = new DoubleBondDescriptor
@@ -333,8 +332,7 @@ namespace Chem4Word.ACME.Drawing
                     {
                         dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
                         //we need to draw another transparent thicker line on top of the existing one
-                        dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, BondThickness * 4),
-                                        BondDescriptor.DefiningGeometry);
+                        DrawHitTestOverlay(dc);
                         dc.Close();
                     }
 
@@ -362,7 +360,8 @@ namespace Chem4Word.ACME.Drawing
                             using (DrawingContext dc = RenderOpen())
                             {
                                 dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
-
+                                //we need to draw another transparent rectangle to expand the bounding box
+                                DrawHitTestOverlay(dc);
                                 dc.Close();
                             }
                             break;
@@ -371,7 +370,8 @@ namespace Chem4Word.ACME.Drawing
                             using (DrawingContext dc = RenderOpen())
                             {
                                 dc.DrawGeometry(GetHatchBrush(ParentBond.Angle), _mainBondPen, BondDescriptor.DefiningGeometry);
-
+                                //we need to draw another transparent rectangle to expand the bounding box
+                                DrawHitTestOverlay(dc);
                                 dc.Close();
                             }
                             break;
@@ -382,12 +382,11 @@ namespace Chem4Word.ACME.Drawing
                 case Globals.OrderAromatic:
                 case "2":
                 case Globals.OrderDouble:
-                    // Handle 1.5 bond
                     DoubleBondDescriptor dbd3 = (DoubleBondDescriptor)BondDescriptor;
                     Point? centroid = ParentBond.Centroid;
                     dbd3.PrimaryCentroid = centroid;
 
-                    if (ParentBond.Order == Globals.OrderPartial12 | ParentBond.Order == Globals.OrderAromatic)
+                    if (ParentBond.Order == Globals.OrderPartial12 || ParentBond.Order == Globals.OrderAromatic) // Handle 1.5 bond
                     {
                         _subsidiaryBondPen.DashStyle = DashStyles.Dash;
                     }
@@ -419,8 +418,7 @@ namespace Chem4Word.ACME.Drawing
                 case Globals.OrderPartial23:
                 case "3":
                 case Globals.OrderTriple:
-                    // Handle 2.5 bond
-                    if (ParentBond.Order == Globals.OrderPartial23)
+                    if (ParentBond.Order == Globals.OrderPartial23) // Handle 2.5 bond
                     {
                         _subsidiaryBondPen.DashStyle = DashStyles.Dash;
                     }
@@ -444,6 +442,19 @@ namespace Chem4Word.ACME.Drawing
                         dc.Close();
                     }
                     break;
+            }
+
+            void DrawHitTestOverlay(DrawingContext dc)
+            {
+                SolidColorBrush outliner = new SolidColorBrush(Colors.Salmon);
+#if SHOWBOUNDS
+                outliner.Opacity = 0.2d;
+#else
+                outliner.Opacity = 0d;
+#endif
+
+                Pen outlinePen = new Pen(outliner, BondThickness * 5);
+                dc.DrawGeometry(outliner, outlinePen, BondDescriptor.DefiningGeometry);
             }
         }
 

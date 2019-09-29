@@ -135,9 +135,6 @@ namespace Chem4Word.Model2
 
                 _order = value;
                 OnPropertyChanged();
-
-                //StartAtom?.ImplicitHChanged();
-                //EndAtom?.ImplicitHChanged();
             }
         }
 
@@ -236,7 +233,7 @@ namespace Chem4Word.Model2
             Point posEndPoint = endAtom.Position + posDisplacementVector;
             Point negEndPoint = endAtom.Position + negDisplacementVector;
 
-            Atom nonHAtom = startAtom.Neighbours.FirstOrDefault(n => n != endAtom && (Element)n.Element != Globals.PeriodicTable.H);
+            Atom nonHAtom = startAtom.Neighbours.FirstOrDefault(n => n != endAtom && n.Element as Element != Globals.PeriodicTable.H);
             if (nonHAtom != null)
             {
                 Point nonHAtomLoc = nonHAtom.Position;
@@ -257,8 +254,7 @@ namespace Chem4Word.Model2
         {
             get
             {
-                //Debug.Assert(Parent.RingsCalculated);
-                if (!Rings.Any()) //no rings
+               if (!Rings.Any()) //no rings
                 {
                     return null;
                 }
@@ -340,8 +336,7 @@ namespace Chem4Word.Model2
 
             // We're acyclic.
 
-            //GetAtomAndLigandIDs(0, out StartAtom, out a1LigandIDs);
-
+          
             var startLigands = (from Atom a in StartAtom.Neighbours
                                 where a != EndAtom
                                 select a).ToList();
@@ -388,8 +383,7 @@ namespace Chem4Word.Model2
                     {
                         //Double sided bond on the side of the non H atom from StartLigands
                         //Elbow bond :¬)
-                        //DrawElbowBond(StartAtom);
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
+                       return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
                     }
                     // Now must have 1 H and 1 !H
                     if (AtomsAreCis(startLigands.GetFirstNonH(), endLigands.GetFirstNonH())
@@ -476,9 +470,6 @@ namespace Chem4Word.Model2
                 {
                     if (endLigands.AreAllH())
                     {
-                        // Already caught.
-                        // ToDo: Check with Clyde
-                        //throw new ApplicationException("This scenario should already have been caught");
                         return null;
                     }
                     if (endLigands.ContainNoH())
@@ -493,10 +484,7 @@ namespace Chem4Word.Model2
 
                 if (endLigands.AreAllH())
                 {
-                    // Already caught.
-                    // ToDo: Check with Clyde
-                    //throw new ApplicationException("This scenario should already hve been caught");
-                    return null;
+                   return null;
                 }
             }
             else if (startLigands.GetHCount() == 0)
@@ -526,7 +514,7 @@ namespace Chem4Word.Model2
                     return null;
                 }
 
-                // atoms2Atoms length = 1
+                // atoms2Atoms length == 1
                 if (endLigands.GetHCount() == 1)
                 {
                     //double bond on side of StartLigands' !H, bevel one end.
@@ -770,10 +758,7 @@ namespace Chem4Word.Model2
 
         public bool AtomsAreCis(Atom atomA, Atom atomB)
         {
-            //do an assert to make sure that we're not calling this routine with atoms detached from the bond atoms
-            //Debug.Assert(StartAtom.Neighbours.Contains(atomA) & EndAtom.Neighbours.Contains(atomB)|| StartAtom.Neighbours.Contains(atomB) & EndAtom.Neighbours.Contains(atomA));
-
-            // Note: Add null checks as this has been found to be blowing up
+           // Note: Add null checks as this has been found to be blowing up
             if (atomA != null && atomB != null
                               && StartAtom.Neighbours != null & EndAtom.Neighbours != null
                               && StartAtom.Neighbours.Count() > 0 && EndAtom.Neighbours.Count() > 0)

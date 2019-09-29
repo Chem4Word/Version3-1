@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
@@ -38,7 +39,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
                 }
             }
 
-            //detect mouse clicks:
+            //enable detection of mouse clicks:
             IsHitTestVisible = true;
         }
 
@@ -135,13 +136,9 @@ namespace Chem4Word.ACME.Adorners.Selectors
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
-
-            SolidColorBrush renderBrush = new SolidColorBrush(Globals.HoverAdornerColor);
-            renderBrush.Opacity = 0.5;
-
+            SolidColorBrush renderBrush = (SolidColorBrush)FindResource(Globals.AtomBondSelectorBrush);
             drawingContext.DrawGeometry(renderBrush, null, OverallGeometry);
         }
-
 
         #endregion
     }

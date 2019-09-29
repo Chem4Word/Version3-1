@@ -56,7 +56,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             //Atom startAtom = thisBond.StartAtom;
 
             // EndAtom == C and Label is ""
-            if ((Element)endAtom.Element == Globals.PeriodicTable.C
+            if (endAtom.Element as Element == Globals.PeriodicTable.C
                 && thisBond.Rings.Count == 0
                 && string.IsNullOrEmpty(endAtom.SymbolText))
             {
@@ -75,7 +75,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                         }
 
                         var otherAtom = otherBond.OtherAtom(endAtom);
-                        if ((Element)otherAtom.Element != Globals.PeriodicTable.H)
+                        if (otherAtom.Element as Element != Globals.PeriodicTable.H)
                         {
                             nonHydrogenBonds.Add(otherBond);
                         }
