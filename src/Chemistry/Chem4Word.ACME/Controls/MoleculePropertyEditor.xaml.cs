@@ -7,16 +7,14 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using Chem4Word.ACME.Annotations;
 using Chem4Word.ACME.Entities;
 using Chem4Word.ACME.Models;
-using Chem4Word.Core.Helpers;
+using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 
@@ -66,6 +64,26 @@ namespace Chem4Word.ACME.Controls
                 DataContext = model;
                 MoleculePath.Text = MpeModel.Path;
             }
+        }
+
+        private void MoleculePropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var point = UIUtils.GetOffScreenPoint();
+            Left = point.X;
+            Top = point.Y;
+
+            PopulateTabOne();
+            PopulateTabTwo();
+        }
+
+        private void MoleculePropertyEditor_OnContentRendered(object sender, EventArgs e)
+        {
+            // This moves the window to the correct position
+            var point = UIUtils.GetOnScreenPoint(_moleculePropertiesModel.Centre, ActualWidth, ActualHeight);
+            Left = point.X;
+            Top = point.Y;
+
+            InvalidateArrange();
         }
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
@@ -123,25 +141,6 @@ namespace Chem4Word.ACME.Controls
             Close();
         }
 
-        private void MoleculePropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            int maxX = Int32.MinValue;
-            int maxY = Int32.MinValue;
-
-            foreach (var screen in Screen.AllScreens)
-            {
-                maxX = Math.Max(maxX, screen.Bounds.Right);
-                maxY = Math.Max(maxY, screen.Bounds.Bottom);
-            }
-
-            // This moves the window off screen while it renders
-            Left = maxX + 100;
-            Top = maxY + 100;
-
-            PopulateTabOne();
-            PopulateTabTwo();
-        }
-
         private void PopulateTabOne()
         {
             Preview.Chemistry = _moleculePropertiesModel.SubModel;
@@ -155,15 +154,6 @@ namespace Chem4Word.ACME.Controls
                 LabelsEditor.Used1D = _moleculePropertiesModel.Used1DProperties;
                 LabelsEditor.PopulateTreeView(cc.Export(_moleculePropertiesModel.SubModel));
             }
-        }
-
-        private void MoleculePropertyEditor_OnContentRendered(object sender, EventArgs e)
-        {
-            // This moves the window to the correct position
-            Left = MpeModel.Centre.X - ActualWidth / 2;
-            Top = MpeModel.Centre.Y - ActualHeight / 2;
-
-            InvalidateArrange();
         }
 
         private void CountSpinner_OnTextChanged(object sender, TextChangedEventArgs e)

@@ -480,12 +480,15 @@ namespace Chem4Word.ACME.Controls
         {
             Clear();
 
-            foreach (Molecule molecule in vm.Model.Molecules.Values)
+            if (vm != null)
             {
-                MoleculeAdded(molecule);
-            }
+                foreach (Molecule molecule in vm.Model.Molecules.Values)
+                {
+                    MoleculeAdded(molecule);
+                }
 
-            InvalidateMeasure();
+                InvalidateMeasure();
+            }
         }
 
         public void Clear()

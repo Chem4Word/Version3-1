@@ -71,7 +71,8 @@
                                 Height="400"
                                 Margin="3"
                                 Background="White"
-                                HighlightActive="False" />
+                                HighlightActive="False" 
+                                ShowGroups="false" />
                         </Border>
                         <CheckBox
                             x:Name="ShowBracketsValue"

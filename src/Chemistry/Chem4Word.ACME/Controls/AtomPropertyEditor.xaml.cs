@@ -11,10 +11,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using Chem4Word.ACME.Annotations;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
+using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 
@@ -55,6 +55,28 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
+        private void AtomPropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            // This moves the window off screen while it renders
+            var point = UIUtils.GetOffScreenPoint();
+            Left = point.X;
+            Top = point.Y;
+
+            LoadAtomItems();
+            LoadFunctionalGroups();
+            ShowPreview();
+        }
+
+        private void AtomPropertyEditor_OnContentRendered(object sender, EventArgs e)
+        {
+            // This moves the window to the correct position
+            var point = UIUtils.GetOnScreenPoint(_atomPropertiesModel.Centre, ActualWidth, ActualHeight);
+            Left = point.X;
+            Top = point.Y;
+
+            InvalidateArrange();
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -72,35 +94,6 @@ namespace Chem4Word.ACME.Controls
         {
             _atomPropertiesModel.Save = true;
             Close();
-        }
-
-        private void AtomPropertyEditor_OnLoaded(object sender, RoutedEventArgs e)
-        {
-            int maxX = Int32.MinValue;
-            int maxY = Int32.MinValue;
-
-            foreach (var screen in Screen.AllScreens)
-            {
-                maxX = Math.Max(maxX, screen.Bounds.Right);
-                maxY = Math.Max(maxY, screen.Bounds.Bottom);
-            }
-
-            // This moves the window off screen while it renders
-            Left = maxX + 100;
-            Top = maxY + 100;
-
-            LoadAtomItems();
-            LoadFunctionalGroups();
-            ShowPreview();
-        }
-
-        private void AtomPropertyEditor_OnContentRendered(object sender, EventArgs e)
-        {
-            // This moves the window to the correct position
-            Left = AtomPropertiesModel.Centre.X - ActualWidth / 2;
-            Top = AtomPropertiesModel.Centre.Y - ActualHeight / 2;
-
-            InvalidateArrange();
         }
 
         private void AtomTable_OnElementSelected(object sender, VisualPeriodicTable.ElementEventArgs e)

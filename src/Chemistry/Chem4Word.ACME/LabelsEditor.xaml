@@ -219,7 +219,8 @@
                             x:Name="Display"
                             Margin="3"
                             Background="White"
-                            HighlightActive="False" />
+                            HighlightActive="False"
+                            ShowGroups="false" />
                     </Border>
                     <GridSplitter
                         Grid.Row="1"

@@ -5,8 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -16,6 +19,8 @@ using Chem4Word.ACME.Models;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using IChem4Word.Contracts;
+using Application = System.Windows.Application;
+using Point = System.Windows.Point;
 
 namespace Chem4Word.ACME.Utils
 {
@@ -39,6 +44,60 @@ namespace Chem4Word.ACME.Utils
             var pe = new SettingsHost(options, telemetry, topLeft);
             ShowDialog(pe, currentEditor);
             Application.Current.ShutdownMode = mode;
+        }
+
+        public static Point GetOffScreenPoint()
+        {
+            int maxX = Int32.MinValue;
+            int maxY = Int32.MinValue;
+
+            foreach (var screen in Screen.AllScreens)
+            {
+                maxX = Math.Max(maxX, screen.Bounds.Right);
+                maxY = Math.Max(maxY, screen.Bounds.Bottom);
+            }
+
+            return new Point(maxX + 100, maxY);
+        }
+
+        public static Point GetOnScreenPoint(Point target, double width, double height)
+        {
+            double left = target.X - width / 2;
+            double top = target.Y - height / 2;
+
+            foreach (var screen in Screen.AllScreens)
+            {
+                if (screen.Bounds.Contains((int)target.X, (int)target.Y))
+                {
+                    // Checks are done in this order to ensure the title bar is always accessible
+
+                    // Handle too far right
+                    if (left + width > screen.WorkingArea.Right)
+                    {
+                        left = screen.WorkingArea.Right - width;
+                    }
+
+                    // Handle too low
+                    if (top + height > screen.WorkingArea.Bottom)
+                    {
+                        top = screen.WorkingArea.Bottom - height;
+                    }
+
+                    // Handle too far left
+                    if (left < screen.WorkingArea.Left)
+                    {
+                        left = screen.WorkingArea.Left;
+                    }
+
+                    // Handle too high
+                    if (top < screen.WorkingArea.Top)
+                    {
+                        top = screen.WorkingArea.Top;
+                    }
+                }
+            }
+
+            return new Point(left, top);
         }
 
         public static void DoPropertyEdit(MouseButtonEventArgs e, EditorCanvas currentEditor)
