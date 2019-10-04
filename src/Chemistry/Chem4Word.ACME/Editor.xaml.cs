@@ -326,6 +326,8 @@ namespace Chem4Word.ACME
 
             Model result = ActiveViewModel.Model.Copy();
             result.RescaleForCml();
+            // Replace any temporary Ids which are Guids
+            result.ReLabelGuids();
 
             CMLConverter conv = new CMLConverter();
             args.OutputValue = conv.Export(result);

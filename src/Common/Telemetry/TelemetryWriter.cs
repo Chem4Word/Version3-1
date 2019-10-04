@@ -69,7 +69,7 @@ namespace Chem4Word.Telemetry
             }
 
             string debugMessage = $"[{_counter}] {operation} - {level} - {message}";
-            Debug.WriteLine(debugMessage);
+            //Debug.WriteLine(debugMessage);
 
             try
             {

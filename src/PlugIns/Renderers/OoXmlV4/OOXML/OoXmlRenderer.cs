@@ -50,7 +50,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private Dictionary<char, TtfCharacter> _TtfCharacterSet;
 
         private long _ooxmlId = 1;
-        private Rect _boundingBoxOfAllCharacters;
+        private Rect _boundingBoxOfEverything;
 
         private double _medianBondLength;
         private Rect _boundingBoxOfAllAtoms;
@@ -60,11 +60,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private List<AtomLabelCharacter> _atomLabelCharacters;
         private List<BondLine> _bondLines;
 
-        private List<Rect> _boundingBoxesOfMoleculeAtoms = new List<Rect>();
-        private List<Rect> _boundingBoxesOfMoleculesIncludingInternalCharacters = new List<Rect>();
-        private List<MoleculeBounds> _boundingBoxesOfMolecules = new List<MoleculeBounds>();
-        private List<MoleculeBounds> _boundingBoxesOfGroupedMolecules = new List<MoleculeBounds>();
+        private List<MoleculeExtents> _allMoleculeExtents = new List<MoleculeExtents>();
+
         private List<Rect> _moleculeBrackets = new List<Rect>();
+        private List<Rect> _groupBrackets = new List<Rect>();
+
         private List<Point> _ringCentres = new List<Point>();
         private Dictionary<string, List<Point>> _convexHulls = new Dictionary<string, List<Point>>();
 
@@ -166,10 +166,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Drawing drawing1 = new Drawing();
             A.Graphic graphic1 = CreateGraphic();
             A.GraphicData graphicData1 = CreateGraphicData();
-            Wpg.WordprocessingGroup wordprocessingGroup1 = new Wpg.WordprocessingGroup();
+            Wpg.WordprocessingGroup wordprocessingGroup = new Wpg.WordprocessingGroup();
 
             // Create Inline Drawing using canvas extents
-            Wp.Inline inline1 = CreateInline(wordprocessingGroup1);
+            Wp.Inline inline1 = CreateInline(wordprocessingGroup);
 
             #endregion Step 5 - Create main OoXml drawing objects
 
@@ -178,17 +178,17 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             // Render molecule grouping brackets
             if (_options.ShowMoleculeGroups)
             {
-                foreach (var group in _boundingBoxesOfGroupedMolecules)
+                foreach (var group in _groupBrackets)
                 {
                     string bracketColour = _options.ColouredAtoms ? "2A579A" : "000000";
-                    DrawGroupBrackets(wordprocessingGroup1, group.BoundingBox, _medianBondLength / 2, OoXmlHelper.ACS_LINE_WIDTH * 2, bracketColour);
+                    DrawGroupBrackets(wordprocessingGroup, group, _medianBondLength / 2, OoXmlHelper.ACS_LINE_WIDTH * 2, bracketColour);
                 }
             }
 
             // Render molecule brackets
             foreach (var moleculeBracket in _moleculeBrackets)
             {
-                DrawMoleculeBrackets(wordprocessingGroup1, moleculeBracket, _medianBondLength / 10, OoXmlHelper.ACS_LINE_WIDTH * 2, "000000");
+                DrawMoleculeBrackets(wordprocessingGroup, moleculeBracket, _medianBondLength / 10, OoXmlHelper.ACS_LINE_WIDTH * 2, "000000");
             }
 
             #endregion Step 5.1 - Show Molecule and Group Brackets
@@ -197,25 +197,21 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             if (_options.ShowMoleculeBoundingBoxes)
             {
-                foreach (var box in _boundingBoxesOfMoleculeAtoms)
+                foreach (var item in _allMoleculeExtents)
                 {
-                    DrawBox(wordprocessingGroup1, box, "ff0000", .75);
+                    DrawBox(wordprocessingGroup, item.AtomExtents, "ff0000", .25);
+                    DrawBox(wordprocessingGroup, item.InternalCharacterExtents, "00ff00", .25);
+                    DrawBox(wordprocessingGroup, item.ExternalCharacterExtents, "0000ff", .25);
                 }
 
-                foreach (var box in _boundingBoxesOfMoleculesIncludingInternalCharacters)
-                {
-                    DrawBox(wordprocessingGroup1, box, "00ff00", .25);
-                }
-
-                DrawBox(wordprocessingGroup1, _boundingBoxOfAllAtoms, "ff0000", .25);
-
-                DrawBox(wordprocessingGroup1, _boundingBoxOfAllCharacters, "000000", .25);
+                //DrawBox(wordprocessingGroup, _boundingBoxOfAllAtoms, "ff0000", .25);
+                //DrawBox(wordprocessingGroup, _boundingBoxOfEverything, "000000", .25);
 
                 //Point centre = new Point(_boundingBoxOfAllAtoms.Left + _boundingBoxOfAllAtoms.Width / 2, _boundingBoxOfAllAtoms.Top + _boundingBoxOfAllAtoms.Height / 2);
-                //DrawArrow(wordprocessingGroup1, centre, _boundingBoxOfAllAtoms.TopLeft, "000000", 0.25);
-                //DrawArrow(wordprocessingGroup1, centre, _boundingBoxOfAllAtoms.TopRight, "000000", 0.25);
-                //DrawArrow(wordprocessingGroup1, centre, _boundingBoxOfAllAtoms.BottomLeft, "000000", 0.25);
-                //DrawArrow(wordprocessingGroup1, centre, _boundingBoxOfAllAtoms.BottomRight, "000000", 0.25);
+                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.TopLeft, "000000", 0.25);
+                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.TopRight, "000000", 0.25);
+                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.BottomLeft, "000000", 0.25);
+                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.BottomRight, "000000", 0.25);
             }
 
             if (_options.ShowCharacterBoundingBoxes)
@@ -241,43 +237,43 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                     if (!atomCharsRect.IsEmpty)
                     {
-                        DrawBox(wordprocessingGroup1, atomCharsRect, "FFA500", 0.5);
+                        DrawBox(wordprocessingGroup, atomCharsRect, "FFA500", 0.5);
                     }
                 }
             }
 
             if (_options.ShowRingCentres)
             {
-                ShowRingCentres(wordprocessingGroup1);
+                ShowRingCentres(wordprocessingGroup);
             }
 
             if (_options.ShowAtomPositions)
             {
-                ShowAtomCentres(wordprocessingGroup1);
+                ShowAtomCentres(wordprocessingGroup);
             }
 
             if (_options.ShowHulls)
             {
-                ShowConvexHulls(wordprocessingGroup1);
+                ShowConvexHulls(wordprocessingGroup);
             }
 
             #endregion Step 5a - Diagnostics
 
             #region Step 6 - Create and append OoXml objects for all Bond Lines
 
-            AppendBondOoxml(pb, wordprocessingGroup1);
+            AppendBondOoxml(pb, wordprocessingGroup);
 
             #endregion Step 6 - Create and append OoXml objects for all Bond Lines
 
             #region Step 7 - Create and append OoXml objects for Atom Labels
 
-            AppendAtomLabelOoxml(pb, wordprocessingGroup1);
+            AppendAtomLabelOoxml(pb, wordprocessingGroup);
 
             #endregion Step 7 - Create and append OoXml objects for Atom Labels
 
             #region Step 8 - Append OoXml drawing objects to OoXml run object
 
-            AppendAllOoXml(graphicData1, wordprocessingGroup1, graphic1, inline1, drawing1, run);
+            AppendAllOoXml(graphicData1, wordprocessingGroup, graphic1, inline1, drawing1, run);
 
             #endregion Step 8 - Append OoXml drawing objects to OoXml run object
 
@@ -315,22 +311,29 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     ProcessMolecule(child, ref molNumber);
                 }
 
-                Rect boundingBoxOfAtoms = mol.BoundingBox;
-                _boundingBoxesOfMoleculeAtoms.Add(boundingBoxOfAtoms);
-
-                Rect boundingBoxOfCharacters = CharacterExtents(mol);
-                _boundingBoxesOfMoleculesIncludingInternalCharacters.Add(boundingBoxOfCharacters);
+                var thisMoleculeExtents = new MoleculeExtents(mol.Path, mol.BoundingBox);
+                thisMoleculeExtents.SetInternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.AtomExtents));
+                _allMoleculeExtents.Add(thisMoleculeExtents);
 
                 bool showBrackets = mol.ShowMoleculeBrackets.HasValue && mol.ShowMoleculeBrackets.Value
                                     || mol.Count.HasValue
                                     || mol.FormalCharge.HasValue
                                     || mol.SpinMultiplicity.HasValue;
 
-                Rect outside = Inflate(boundingBoxOfCharacters, OoXmlHelper.DRAWING_MARGIN);
+                var rect = thisMoleculeExtents.ExternalCharacterExtents;
+                var children = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();
+                foreach (var child in children)
+                {
+                    //rect.Union(child.ExternalCharacterExtents);
+                    rect.Union(child.GroupBracketsExtents);
+                }
+
                 if (showBrackets)
                 {
-                    _moleculeBrackets.Add(outside);
+                    rect = Inflate(rect, OoXmlHelper.DRAWING_MARGIN);
+                    _moleculeBrackets.Add(rect);
                 }
+                thisMoleculeExtents.SetMoleculeBracketExtents(rect);
 
                 var alp = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
                 TtfCharacter hydrogenCharacter = _TtfCharacterSet['H'];
@@ -376,9 +379,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 if (!string.IsNullOrEmpty(characters))
                 {
                     // Draw characters at top right (outside of any brackets)
-                    var point = new Point(outside.Right
+                    var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Right
                                           + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
-                                          outside.Top
+                                          thisMoleculeExtents.MoleculeBracketsExtents.Top
                                           + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
                     alp.PlaceString(characters, point, mol.Path);
                 }
@@ -386,9 +389,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 if (mol.Count.HasValue && mol.Count.Value > 0)
                 {
                     // Draw Count at bottom right
-                    var point = new Point(outside.Right
+                    var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Right
                                           + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
-                                          outside.Bottom
+                                          thisMoleculeExtents.MoleculeBracketsExtents.Bottom
                                           + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
                     alp.PlaceString($"{mol.Count}", point, mol.Path);
                 }
@@ -396,9 +399,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 // Handle optional rendering of molecule labels (outside of any brackets)
                 if (_options.ShowMoleculeLabels && mol.Labels.Any())
                 {
-                    var point = new Point(outside.Left
-                                          + outside.Width / 2,
-                                          outside.Bottom
+                    var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Left
+                                          + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
+                                          thisMoleculeExtents.MoleculeBracketsExtents.Bottom
                                           + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
                     alp.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
                 }
@@ -409,35 +412,32 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     || _options.ShowMoleculeLabels && mol.Labels.Any())
                 {
                     // Recalculate as we may have just added extra characters
-                    boundingBoxOfCharacters = CharacterExtents(mol, outside);
+                    thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
                 }
-                _boundingBoxesOfMolecules.Add(new MoleculeBounds(mol.Path, boundingBoxOfCharacters));
 
                 if (mol.IsGrouped)
                 {
                     Rect boundingBox = Rect.Empty;
 
-                    var childMolecules = _boundingBoxesOfMolecules.Where(g => g.Path.StartsWith(mol.Path)).ToList();
-                    foreach (var child in childMolecules)
-                    {
-                        boundingBox.Union(child.BoundingBox);
-                    }
-
-                    var childGroups = _boundingBoxesOfGroupedMolecules.Where(g => g.Path.StartsWith(mol.Path)).ToList();
+                    var childGroups = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();
                     foreach (var child in childGroups)
                     {
-                        boundingBox.Union(child.BoundingBox);
+                        boundingBox.Union(child.ExternalCharacterExtents);
+                        boundingBox.Union(child.GroupBracketsExtents);
                     }
 
                     if (boundingBox != Rect.Empty)
                     {
-                        _boundingBoxesOfGroupedMolecules.Add(new MoleculeBounds(mol.Path, Inflate(boundingBox, OoXmlHelper.DRAWING_MARGIN)));
+                        boundingBox.Union(thisMoleculeExtents.ExternalCharacterExtents);
+                        boundingBox = Inflate(boundingBox, OoXmlHelper.DRAWING_MARGIN);
+                        _groupBrackets.Add(boundingBox);
+                        thisMoleculeExtents.SetGroupBracketExtents(boundingBox);
                     }
                 }
             }
         }
 
-        // Helper function to create a ne inflated Rect
+        // Helper function to create a new inflated Rect
         private Rect Inflate(Rect r, double x)
         {
             Rect r1 = r;
@@ -445,16 +445,16 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return r1;
         }
 
-        private void ShowConvexHulls(Wpg.WordprocessingGroup wordprocessingGroup1)
+        private void ShowConvexHulls(Wpg.WordprocessingGroup wordprocessingGroup)
         {
             foreach (var hull in _convexHulls)
             {
                 var points = hull.Value.ToList();
-                DrawPolygon(wordprocessingGroup1, points, 0.25, "ff0000");
+                DrawPolygon(wordprocessingGroup, points, 0.25, "ff0000");
             }
         }
 
-        private void ShowAtomCentres(Wpg.WordprocessingGroup wordprocessingGroup1)
+        private void ShowAtomCentres(Wpg.WordprocessingGroup wordprocessingGroup)
         {
             double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 6;
 
@@ -492,7 +492,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             void DrawAtomCentre(Atom atom)
             {
                 Rect bb = new Rect(new Point(atom.Position.X - xx, atom.Position.Y - xx), new Point(atom.Position.X + xx, atom.Position.Y + xx));
-                DrawShape(wordprocessingGroup1, bb, A.ShapeTypeValues.Ellipse, "ff0000");
+                DrawShape(wordprocessingGroup, bb, A.ShapeTypeValues.Ellipse, "ff0000");
             }
         }
 
@@ -513,9 +513,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             run.Append(drawing);
         }
 
-        private void AppendAtomLabelOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup1)
+        private void AppendAtomLabelOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup)
         {
-            AtomLabelRenderer alr = new AtomLabelRenderer(_boundingBoxOfAllCharacters, ref _ooxmlId, _options, _medianBondLength);
+            AtomLabelRenderer alr = new AtomLabelRenderer(_boundingBoxOfEverything, ref _ooxmlId, _options, _medianBondLength);
 
             if (_chemistryModel.TotalAtomsCount > 1)
             {
@@ -528,13 +528,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             foreach (AtomLabelCharacter alc in _atomLabelCharacters)
             {
                 pb.Increment(1);
-                alr.DrawCharacter(wordprocessingGroup1, alc);
+                alr.DrawCharacter(wordprocessingGroup, alc);
             }
         }
 
-        private void AppendBondOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup1)
+        private void AppendBondOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup)
         {
-            BondLineRenderer blr = new BondLineRenderer(_boundingBoxOfAllCharacters, ref _ooxmlId, _medianBondLength);
+            BondLineRenderer blr = new BondLineRenderer(_boundingBoxOfEverything, ref _ooxmlId, _medianBondLength);
 
             if (_chemistryModel.TotalBondsCount > 1)
             {
@@ -551,24 +551,24 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 {
                     case BondLineStyle.Wedge:
                     case BondLineStyle.Hatch:
-                        blr.DrawWedgeBond(wordprocessingGroup1, bl);
+                        blr.DrawWedgeBond(wordprocessingGroup, bl);
                         break;
 
                     default:
-                        blr.DrawBondLine(wordprocessingGroup1, bl);
+                        blr.DrawBondLine(wordprocessingGroup, bl);
                         break;
                 }
             }
         }
 
-        private void ShowRingCentres(Wpg.WordprocessingGroup wordprocessingGroup1)
+        private void ShowRingCentres(Wpg.WordprocessingGroup wordprocessingGroup)
         {
             double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
 
             foreach (var point in _ringCentres)
             {
                 Rect bb = new Rect(new Point(point.X - xx, point.Y - xx), new Point(point.X + xx, point.Y + xx));
-                DrawShape(wordprocessingGroup1, bb, A.ShapeTypeValues.Ellipse, "0000ff");
+                DrawShape(wordprocessingGroup, bb, A.ShapeTypeValues.Ellipse, "0000ff");
             }
         }
 
@@ -734,7 +734,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         /// </summary>
         private void SetCanvasSize()
         {
-            _boundingBoxOfAllCharacters = _boundingBoxOfAllAtoms;
+            _boundingBoxOfEverything = _boundingBoxOfAllAtoms;
 
             foreach (AtomLabelCharacter alc in _atomLabelCharacters)
             {
@@ -743,23 +743,23 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     Rect r = new Rect(alc.Position,
                         new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
                                  OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
-                    _boundingBoxOfAllCharacters.Union(r);
+                    _boundingBoxOfEverything.Union(r);
                 }
                 else
                 {
                     Rect r = new Rect(alc.Position,
                                       new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
                                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
-                    _boundingBoxOfAllCharacters.Union(r);
+                    _boundingBoxOfEverything.Union(r);
                 }
             }
 
-            foreach (var group in _boundingBoxesOfGroupedMolecules)
+            foreach (var group in _allMoleculeExtents)
             {
-                _boundingBoxOfAllCharacters.Union(group.BoundingBox);
+                _boundingBoxOfEverything.Union(group.GroupBracketsExtents);
             }
 
-            _boundingBoxOfAllCharacters.Inflate(OoXmlHelper.DRAWING_MARGIN, OoXmlHelper.DRAWING_MARGIN);
+            _boundingBoxOfEverything.Inflate(OoXmlHelper.DRAWING_MARGIN, OoXmlHelper.DRAWING_MARGIN);
         }
 
         private void ProcessBonds(Molecule mol, Progress pb, int moleculeNo)
@@ -921,7 +921,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void LoadFont()
         {
-            // Use either Arial or Tahoma
+            // Use either Arial or Tahoma (experimental)
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "Arial.json");
             _TtfCharacterSet = JsonConvert.DeserializeObject<Dictionary<char, TtfCharacter>>(json);
         }
@@ -942,8 +942,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfAllCharacters.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfAllCharacters.Height);
+            Int64Value width = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Width);
+            Int64Value height = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Height);
 
             Wp.Inline inline = new Wp.Inline() { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U };
             Wp.Extent extent = new Wp.Extent() { Cx = width, Cy = height };
@@ -989,7 +989,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             Point location = new Point(left, top);
             Size size = new Size(width, height);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
 
             width = (Int64Value)boundingBox.Width;
@@ -1107,7 +1107,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             Point location = new Point(left, top);
             Size size = new Size(width, height);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
             Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
 
@@ -1295,7 +1295,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             Point location = new Point(left, top);
             Size size = new Size(width, height);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
             Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
 
@@ -1442,7 +1442,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
 
             // Move Extents to have 0,0 Top Left Reference
-            cmlExtents.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
+            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
 
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
             Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
@@ -1474,7 +1474,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.Point MakePoint(Point point)
             {
                 Point startPoint = point;
-                startPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
+                startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
                 startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
                 return new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
             }
@@ -1532,9 +1532,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Rect cmlExtents = new Rect(startPoint, endPoint);
 
             // Move Bond Line Extents and Points to have 0,0 Top Left Reference
-            startPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
-            endPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
-            cmlExtents.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
+            startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            endPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
 
             // Move points into New Bond Line Extents
             startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
@@ -1631,9 +1631,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Rect cmlExtents = new Rect(startPoint, endPoint);
 
             // Move Bond Line Extents and Points to have 0,0 Top Left Reference
-            startPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
-            endPoint.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
-            cmlExtents.Offset(-_boundingBoxOfAllCharacters.Left, -_boundingBoxOfAllCharacters.Top);
+            startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            endPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
 
             // Move points into New Bond Line Extents
             startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
@@ -1737,7 +1737,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             Point location = new Point(left, top);
             Size size = new Size(width, height);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfAllCharacters.Top));
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
 
             width = (Int64Value)boundingBox.Width;

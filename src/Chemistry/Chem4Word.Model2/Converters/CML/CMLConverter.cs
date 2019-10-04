@@ -55,9 +55,6 @@ namespace Chem4Word.Model2.Converters.CML
                 newModel.SetMissingIds();
                 if (protectedLabels != null && protectedLabels.Count > 0)
                 {
-                    // Replace any temporary Ids which are Guids
-                    newModel.ReLabelGuids();
-
                     newModel.SetProtectedLabels(protectedLabels);
                 }
                 else
