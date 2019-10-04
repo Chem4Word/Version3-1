@@ -201,6 +201,22 @@ namespace Chem4Word.Telemetry
             WritePrivate("StartUp", "Information", _helper.GitStatus);
 #endif
 
+            #region Log critical System Info again to ensure we get it
+
+            // Log Add-In Version
+            WritePrivate("StartUp", "Information", _helper.AddInVersion); // ** Used by Andy's Knime protocol ?
+
+            // Log Word
+            WritePrivate("StartUp", "Information", _helper.WordProduct); // ** Used by Andy's Knime protocol
+
+            // Log System
+            WritePrivate("StartUp", "Information", _helper.SystemOs); // ** Used by Andy's Knime protocol
+
+            // Log IP Address
+            WritePrivate("StartUp", "Information", _helper.IpAddress); // ** Used by Andy's Knime protocol
+
+            #endregion Log critical System Info again to ensure we get it
+
             _systemInfoSent = true;
         }
 

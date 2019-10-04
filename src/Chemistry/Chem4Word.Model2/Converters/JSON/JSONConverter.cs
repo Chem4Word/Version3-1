@@ -181,44 +181,49 @@ namespace Chem4Word.Model2.Converters.JSON
             var newMol = new Molecule();
             ElementBase ce = Globals.PeriodicTable.C;
             int atomCount = 0;
-            foreach (AtomJSON a in data.a)
-            {
-                if (!string.IsNullOrEmpty(a.l))
-                {
-                    ElementBase eb;
-                    var ok = AtomHelpers.TryParse(a.l, out eb);
-                    if (ok)
-                    {
-                        if (eb is Element element)
-                        {
-                            ce = element;
-                        }
 
-                        if (eb is FunctionalGroup functionalGroup)
+            // GitHub: Issue #13 https://github.com/Chem4Word/Version3/issues/13
+            if (data.a != null)
+            {
+                foreach (AtomJSON a in data.a)
+                {
+                    if (!string.IsNullOrEmpty(a.l))
+                    {
+                        ElementBase eb;
+                        var ok = AtomHelpers.TryParse(a.l, out eb);
+                        if (ok)
                         {
-                            ce = functionalGroup;
+                            if (eb is Element element)
+                            {
+                                ce = element;
+                            }
+
+                            if (eb is FunctionalGroup functionalGroup)
+                            {
+                                ce = functionalGroup;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    ce = Globals.PeriodicTable.C;
-                }
+                    else
+                    {
+                        ce = Globals.PeriodicTable.C;
+                    }
 
-                Atom atom = new Atom()
-                {
-                    Element = ce,
-                    Position = new Point(a.x, a.y)
-                };
+                    Atom atom = new Atom()
+                                {
+                                    Element = ce,
+                                    Position = new Point(a.x, a.y)
+                                };
 
-                if (a.c != null)
-                {
-                    atom.FormalCharge = a.c.Value;
+                    if (a.c != null)
+                    {
+                        atom.FormalCharge = a.c.Value;
+                    }
+
+                    atoms.Add(atomCount++, atom.InternalId);
+                    newMol.AddAtom(atom);
+                    atom.Parent = newMol;
                 }
-
-                atoms.Add(atomCount++, atom.InternalId);
-                newMol.AddAtom(atom);
-                atom.Parent = newMol;
             }
 
             if (data.b != null)

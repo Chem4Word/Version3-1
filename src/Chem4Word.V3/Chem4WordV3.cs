@@ -1207,7 +1207,7 @@ namespace Chem4Word
                             // Handling the selected text sentence by sentence should make us immune to return character sizing.
                             for (int i = 1; i <= sentenceCount; i++)
                             {
-                                // Fix GitHub Issue #10
+                                // GitHub: Issue #10 https://github.com/Chem4Word/Version3/issues/10
                                 try
                                 {
                                     var sentence = sel.Sentences[i];

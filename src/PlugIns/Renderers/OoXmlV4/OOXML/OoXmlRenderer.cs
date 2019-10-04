@@ -335,58 +335,52 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 var alp = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
                 TtfCharacter hydrogenCharacter = _TtfCharacterSet['H'];
 
-                // We will use the length of this later to offset the dots
-                string chargeText = string.Empty;
+                string characters = string.Empty;
 
                 if (mol.FormalCharge.HasValue && mol.FormalCharge.Value != 0)
                 {
-                    // Draw FormalCharge at top right
+                    // Add FormalCharge at top right
                     int charge = mol.FormalCharge.Value;
                     int absCharge = Math.Abs(charge);
 
                     if (absCharge > 1)
                     {
-                        chargeText = absCharge.ToString();
+                        characters = absCharge.ToString();
                     }
 
                     if (charge >= 1)
                     {
-                        chargeText += "+";
+                        characters += "+";
                     }
                     else if (charge <= 1)
                     {
-                        chargeText += "-";
+                        characters += "-";
                     }
-
-                    var point = new Point(outside.Right
-                                          + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
-                                          outside.Top
-                                          + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
-                    alp.PlaceString(chargeText, point, mol.Path);
                 }
 
                 if (mol.SpinMultiplicity.HasValue && mol.SpinMultiplicity.Value > 1)
                 {
-                    // Draw SpinMultiplicity at top right (after FormalCharge if present)
-                    string dots = string.Empty;
-
+                    // Append SpinMultiplicity
                     switch (mol.SpinMultiplicity.Value)
                     {
                         case 2:
-                            dots = "•";
+                            characters += "•";
                             break;
 
                         case 3:
-                            dots = "••";
+                            characters += "•";
                             break;
                     }
+                }
 
+                if (!string.IsNullOrEmpty(characters))
+                {
+                    // Draw characters at top right (outside of any brackets)
                     var point = new Point(outside.Right
-                                          + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) * chargeText.Length
                                           + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
                                           outside.Top
                                           + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
-                    alp.PlaceString(dots, point, mol.Path);
+                    alp.PlaceString(characters, point, mol.Path);
                 }
 
                 if (mol.Count.HasValue && mol.Count.Value > 0)

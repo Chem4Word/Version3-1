@@ -222,32 +222,40 @@ namespace Chem4Word.Model2
 
         private Vector? VectorOnSideOfNonHAtomFromStartLigands(Atom startAtom, Atom endAtom, IEnumerable<Atom> startLigands)
         {
-            Vector posDisplacementVector = BondVector.Perpendicular();
-            Vector negDisplacementVector = -posDisplacementVector;
-            posDisplacementVector.Normalize();
-            negDisplacementVector.Normalize();
+            Vector? displacementVector = null;
 
-            posDisplacementVector = posDisplacementVector * 3;
-            negDisplacementVector = negDisplacementVector * 3;
-
-            Point posEndPoint = endAtom.Position + posDisplacementVector;
-            Point negEndPoint = endAtom.Position + negDisplacementVector;
-
-            Atom nonHAtom = startAtom.Neighbours.FirstOrDefault(n => n != endAtom && n.Element as Element != Globals.PeriodicTable.H);
-            if (nonHAtom != null)
+            // GitHub: Issue #15 https://github.com/Chem4Word/Version3/issues/15
+            try
             {
-                Point nonHAtomLoc = nonHAtom.Position;
+                Vector posDisplacementVector = BondVector.Perpendicular();
+                Vector negDisplacementVector = -posDisplacementVector;
+                posDisplacementVector.Normalize();
+                negDisplacementVector.Normalize();
 
-                double posDist = (nonHAtomLoc - posEndPoint).Length;
-                double negDist = (nonHAtomLoc - negEndPoint).Length;
+                posDisplacementVector = posDisplacementVector * 3;
+                negDisplacementVector = negDisplacementVector * 3;
 
-                bool posDisplacement = posDist < negDist;
-                Vector displacementVector = posDisplacement ? posDisplacementVector : negDisplacementVector;
+                Point posEndPoint = endAtom.Position + posDisplacementVector;
+                Point negEndPoint = endAtom.Position + negDisplacementVector;
 
-                return displacementVector;
+                Atom nonHAtom = startAtom.Neighbours.FirstOrDefault(n => n != endAtom && n.Element as Element != Globals.PeriodicTable.H);
+                if (nonHAtom != null)
+                {
+                    Point nonHAtomLoc = nonHAtom.Position;
+
+                    double posDist = (nonHAtomLoc - posEndPoint).Length;
+                    double negDist = (nonHAtomLoc - negEndPoint).Length;
+
+                    bool posDisplacement = posDist < negDist;
+                    displacementVector = posDisplacement ? posDisplacementVector : negDisplacementVector;
+                }
+            }
+            catch
+            {
+                // Do Nothing
             }
 
-            return null;
+            return displacementVector;
         }
 
         public Ring PrimaryRing
@@ -493,7 +501,7 @@ namespace Chem4Word.Model2
                 {
                     if (endLigands.AreAllH())
                     {
-                        //Double dbond on the side of StartLigands' !H, bevel one end.
+                        //Double bond on the side of StartLigands' !H, bevel one end.
                         return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
                     }
                     if (endLigands.ContainNoH())

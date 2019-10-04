@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -155,6 +156,52 @@ namespace Chem4Word.Telemetry
                 WordProduct = OfficeHelper.GetWordProduct();
 
                 Click2RunProductIds = GetClick2RunProductIds();
+
+                if (WordProduct.Contains("2010") || WordProduct.Contains("2013") || WordProduct.Contains("2016") || WordProduct.Contains("365"))
+                {
+                    // This is ok, leave as is
+                }
+                else
+                {
+                    // Use last of Click2RunProductIds which have a number in
+                    var ctrVersion = "";
+                    if (!string.IsNullOrEmpty(Click2RunProductIds))
+                    {
+                        ctrVersion = "2016";
+                        var parts = Click2RunProductIds.Split(',');
+                        foreach (var part in parts)
+                        {
+                            string numberOnly = Regex.Replace(part, "[^0-9]", "");
+                            if (!string.IsNullOrEmpty(numberOnly))
+                            {
+                                int n = int.Parse(numberOnly);
+                                if (n == 2016 || n == 2019 || n == 365)
+                                {
+                                    ctrVersion = numberOnly;
+                                }
+                            }
+                        }
+                    }
+
+                    if (WordProduct.Contains("[16."))
+                    {
+                        if (string.IsNullOrEmpty(ctrVersion))
+                        {
+                            // Best guess as not ctr version found
+                            WordProduct = WordProduct.Replace("Office", $"Office 2016");
+                        }
+                        else
+                        {
+                            WordProduct = WordProduct.Replace("Office", $"Office {ctrVersion}");
+                        }
+                    }
+
+                    // Not 100% sure why we ever get this ???
+                    if (WordProduct.Contains("[11."))
+                    {
+                        WordProduct = $"Microsoft Office 2003 {WordVersion}";
+                    }
+                }
 
                 WordVersion = OfficeHelper.GetWinWordVersion();
             }

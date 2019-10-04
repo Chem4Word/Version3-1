@@ -147,11 +147,6 @@ namespace Chem4Word.ACME
                 };
                 TreeView.Items.Add(root);
                 root.IsExpanded = true;
-                if (SubModel.GetAllMolecules().Count > 1)
-                {
-                    root.IsSelected = true;
-                    initialSelectionMade = true;
-                }
 
                 AddNodes(root, SubModel.Molecules.Values);
             }
@@ -199,6 +194,7 @@ namespace Chem4Word.ACME
                     if (!initialSelectionMade)
                     {
                         tvi.IsSelected = true;
+                        initialSelectionMade = true;
                     }
 
                     molecule.Labels.CollectionChanged += OnCollectionChanged;
