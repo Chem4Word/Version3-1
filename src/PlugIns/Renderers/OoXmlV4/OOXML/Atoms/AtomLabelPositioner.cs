@@ -55,7 +55,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 if (bb != Rect.Empty)
                 {
                     Point place = new Point(measure.X - bb.Width / 2, measure.Y + (measure.Y - bb.Top));
-                    Debug.WriteLine($"Y1: {centrePoint.Y} Top: {bb.Top} Y2: {place.Y}");
                     PlaceString(label.Value, place, moleculePath);
                 }
 
@@ -68,6 +67,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         {
             Rect boundingBox = Rect.Empty;
             Point cursor = new Point(startPoint.X, startPoint.Y);
+            TtfCharacter i = _TtfCharacterSet['i'];
 
             for (int idx = 0; idx < text.Length; idx++)
             {
@@ -86,7 +86,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     if (idx < text.Length - 1)
                     {
                         // Move to next Character position
-                        cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
+                        cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.Width + i.Width, _meanBondLength), 0);
                     }
                 }
             }
@@ -97,6 +97,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         public void PlaceString(string text, Point startPoint, string path)
         {
             Point cursor = new Point(startPoint.X, startPoint.Y);
+
+            TtfCharacter i = _TtfCharacterSet['i'];
 
             for (int idx = 0; idx < text.Length; idx++)
             {
@@ -112,7 +114,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     if (idx < text.Length - 1)
                     {
                         // Move to next Character position
-                        cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
+                        cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.Width + i.Width, _meanBondLength), 0);
                     }
                 }
             }

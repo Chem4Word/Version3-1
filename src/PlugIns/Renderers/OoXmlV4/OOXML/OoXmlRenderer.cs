@@ -324,13 +324,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 var children = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();
                 foreach (var child in children)
                 {
-                    //rect.Union(child.ExternalCharacterExtents);
                     rect.Union(child.GroupBracketsExtents);
                 }
 
                 if (showBrackets)
                 {
-                    rect = Inflate(rect, OoXmlHelper.DRAWING_MARGIN);
+                    rect = Inflate(rect, OoXmlHelper.BracketOffset(_medianBondLength));
                     _moleculeBrackets.Add(rect);
                 }
                 thisMoleculeExtents.SetMoleculeBracketExtents(rect);
@@ -396,22 +395,24 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     alp.PlaceString($"{mol.Count}", point, mol.Path);
                 }
 
-                // Handle optional rendering of molecule labels (outside of any brackets)
+                if (mol.Count.HasValue
+                    || mol.FormalCharge.HasValue
+                    || mol.SpinMultiplicity.HasValue)
+                {
+                    // Recalculate as we have just added extra characters
+                    thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
+                }
+
+                // Handle optional rendering of molecule labels centered on brackets (if any) and below any molecule property characters
                 if (_options.ShowMoleculeLabels && mol.Labels.Any())
                 {
                     var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Left
                                           + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
-                                          thisMoleculeExtents.MoleculeBracketsExtents.Bottom
+                                          thisMoleculeExtents.ExternalCharacterExtents.Bottom
                                           + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
                     alp.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
-                }
 
-                if (mol.Count.HasValue
-                    || mol.FormalCharge.HasValue
-                    || mol.SpinMultiplicity.HasValue
-                    || _options.ShowMoleculeLabels && mol.Labels.Any())
-                {
-                    // Recalculate as we may have just added extra characters
+                    // Recalculate again as we have just added extra characters
                     thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
                 }
 
@@ -422,14 +423,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     var childGroups = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();
                     foreach (var child in childGroups)
                     {
-                        boundingBox.Union(child.ExternalCharacterExtents);
                         boundingBox.Union(child.GroupBracketsExtents);
                     }
 
                     if (boundingBox != Rect.Empty)
                     {
                         boundingBox.Union(thisMoleculeExtents.ExternalCharacterExtents);
-                        boundingBox = Inflate(boundingBox, OoXmlHelper.DRAWING_MARGIN);
+                        boundingBox = Inflate(boundingBox, OoXmlHelper.BracketOffset(_medianBondLength));
                         _groupBrackets.Add(boundingBox);
                         thisMoleculeExtents.SetGroupBracketExtents(boundingBox);
                     }

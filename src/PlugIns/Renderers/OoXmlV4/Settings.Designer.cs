@@ -37,6 +37,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.chkShowHydrogens = new System.Windows.Forms.CheckBox();
             this.chkColouredAtoms = new System.Windows.Forms.CheckBox();
             this.tabDebug = new System.Windows.Forms.TabPage();
+            this.ShowMoleculeLabels = new System.Windows.Forms.CheckBox();
             this.chkShowConvexHulls = new System.Windows.Forms.CheckBox();
             this.chkShowAtomPositions = new System.Windows.Forms.CheckBox();
             this.chkShowRingCentres = new System.Windows.Forms.CheckBox();
@@ -45,7 +46,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.chkClipLines = new System.Windows.Forms.CheckBox();
             this.btnSetDefaults = new System.Windows.Forms.Button();
             this.btnOk = new System.Windows.Forms.Button();
-            this.ShowMoleculeLabels = new System.Windows.Forms.CheckBox();
             this.tabControlEx.SuspendLayout();
             this.tabRendering.SuspendLayout();
             this.tabDebug.SuspendLayout();
@@ -68,6 +68,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             // 
             this.tabRendering.BackColor = System.Drawing.SystemColors.Control;
             this.tabRendering.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tabRendering.Controls.Add(this.ShowMoleculeLabels);
             this.tabRendering.Controls.Add(this.chkShowGroups);
             this.tabRendering.Controls.Add(this.chkShowHydrogens);
             this.tabRendering.Controls.Add(this.chkColouredAtoms);
@@ -83,7 +84,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.chkShowGroups.AutoSize = true;
             this.chkShowGroups.Checked = true;
             this.chkShowGroups.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkShowGroups.Location = new System.Drawing.Point(12, 83);
+            this.chkShowGroups.Location = new System.Drawing.Point(12, 96);
             this.chkShowGroups.Margin = new System.Windows.Forms.Padding(4);
             this.chkShowGroups.Name = "chkShowGroups";
             this.chkShowGroups.Size = new System.Drawing.Size(136, 17);
@@ -111,7 +112,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.chkColouredAtoms.AutoSize = true;
             this.chkColouredAtoms.Checked = true;
             this.chkColouredAtoms.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkColouredAtoms.Location = new System.Drawing.Point(12, 47);
+            this.chkColouredAtoms.Location = new System.Drawing.Point(12, 54);
             this.chkColouredAtoms.Margin = new System.Windows.Forms.Padding(4);
             this.chkColouredAtoms.Name = "chkColouredAtoms";
             this.chkColouredAtoms.Size = new System.Drawing.Size(158, 17);
@@ -124,7 +125,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             // 
             this.tabDebug.BackColor = System.Drawing.SystemColors.Control;
             this.tabDebug.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tabDebug.Controls.Add(this.ShowMoleculeLabels);
             this.tabDebug.Controls.Add(this.chkShowConvexHulls);
             this.tabDebug.Controls.Add(this.chkShowAtomPositions);
             this.tabDebug.Controls.Add(this.chkShowRingCentres);
@@ -137,6 +137,20 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabDebug.Size = new System.Drawing.Size(409, 180);
             this.tabDebug.TabIndex = 1;
             this.tabDebug.Text = "Debug";
+            // 
+            // ShowMoleculeLabels
+            // 
+            this.ShowMoleculeLabels.AutoSize = true;
+            this.ShowMoleculeLabels.Checked = true;
+            this.ShowMoleculeLabels.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowMoleculeLabels.Location = new System.Drawing.Point(12, 138);
+            this.ShowMoleculeLabels.Margin = new System.Windows.Forms.Padding(4);
+            this.ShowMoleculeLabels.Name = "ShowMoleculeLabels";
+            this.ShowMoleculeLabels.Size = new System.Drawing.Size(133, 17);
+            this.ShowMoleculeLabels.TabIndex = 23;
+            this.ShowMoleculeLabels.Text = "Show Molecule Labels";
+            this.ShowMoleculeLabels.UseVisualStyleBackColor = true;
+            this.ShowMoleculeLabels.CheckedChanged += new System.EventHandler(this.ShowMoleculeLabels_CheckedChanged);
             // 
             // chkShowConvexHulls
             // 
@@ -245,20 +259,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.btnOk.Text = "OK";
             this.btnOk.UseVisualStyleBackColor = true;
             this.btnOk.Click += new System.EventHandler(this.btnOk_Click);
-            // 
-            // ShowMoleculeLabels
-            // 
-            this.ShowMoleculeLabels.AutoSize = true;
-            this.ShowMoleculeLabels.Checked = true;
-            this.ShowMoleculeLabels.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowMoleculeLabels.Location = new System.Drawing.Point(203, 87);
-            this.ShowMoleculeLabels.Margin = new System.Windows.Forms.Padding(4);
-            this.ShowMoleculeLabels.Name = "ShowMoleculeLabels";
-            this.ShowMoleculeLabels.Size = new System.Drawing.Size(133, 17);
-            this.ShowMoleculeLabels.TabIndex = 23;
-            this.ShowMoleculeLabels.Text = "Show Molecule Labels";
-            this.ShowMoleculeLabels.UseVisualStyleBackColor = true;
-            this.ShowMoleculeLabels.CheckedChanged += new System.EventHandler(this.ShowMoleculeLabels_CheckedChanged);
             // 
             // Settings
             // 

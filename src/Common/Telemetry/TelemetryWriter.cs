@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace Chem4Word.Telemetry
@@ -67,9 +68,6 @@ namespace Chem4Word.Telemetry
             {
                 operation = operation.Remove(0, unwanted.Length);
             }
-
-            string debugMessage = $"[{_counter}] {operation} - {level} - {message}";
-            //Debug.WriteLine(debugMessage);
 
             try
             {
@@ -229,8 +227,8 @@ namespace Chem4Word.Telemetry
             sbm.Message = message;
             sbm.AssemblyVersionNumber = _helper.AssemblyVersionNumber;
 
-            //_azureServiceBusWriter.QueueMessage(sbm);
-            _azureServiceBusWriter.WriteMessage(sbm);
+            _azureServiceBusWriter.QueueMessage(sbm);
+            //_azureServiceBusWriter.WriteMessage(sbm);
         }
     }
 }

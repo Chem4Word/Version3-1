@@ -22,6 +22,9 @@ namespace Chem4Word.Renderer.OoXmlV4
         [JsonProperty]
         public bool ShowMoleculeGroups { get; set; }
 
+        [JsonProperty]
+        public bool ShowMoleculeLabels { get; set; }
+
         // Not editable here, kept in sync by file system watcher
         [JsonProperty]
         public int BondLength { get; set; }
@@ -37,10 +40,6 @@ namespace Chem4Word.Renderer.OoXmlV4
         // Debugging
         [JsonProperty]
         public bool ShowMoleculeBoundingBoxes { get; set; }
-
-        // Debugging
-        [JsonProperty]
-        public bool ShowMoleculeLabels { get; set; }
 
         // Debugging
         [JsonProperty]
@@ -63,10 +62,13 @@ namespace Chem4Word.Renderer.OoXmlV4
         {
             Options clone = new Options();
 
+            // Main User Options
             clone.ColouredAtoms = ColouredAtoms;
             clone.ShowHydrogens = ShowHydrogens;
             clone.ShowMoleculeGroups = ShowMoleculeGroups;
+            clone.ShowMoleculeLabels = ShowMoleculeLabels;
 
+            // Hidden
             clone.BondLength = BondLength;
 
             // Debugging Options
@@ -76,7 +78,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             clone.ShowRingCentres = ShowRingCentres;
             clone.ShowAtomPositions = ShowAtomPositions;
             clone.ShowHulls = ShowHulls;
-            clone.ShowMoleculeLabels = ShowMoleculeLabels;
 
             return clone;
         }
@@ -86,6 +87,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             ShowHydrogens = true;
             ColouredAtoms = true;
             ShowMoleculeGroups = true;
+            ShowMoleculeLabels = false;
 
             BondLength = (int)Constants.StandardBondLength;
 
@@ -96,7 +98,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             ShowRingCentres = false;
             ShowAtomPositions = false;
             ShowHulls = false;
-            ShowMoleculeLabels = false;
         }
     }
 }

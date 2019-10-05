@@ -19,11 +19,13 @@ namespace Chem4Word.Telemetry
     public class AzureServiceBusWriter
     {
         // Make sure this is a Send Only Access key
-        string ServiceBus = "Endpoint=sb://c4w-telemetry.servicebus.windows.net/;SharedAccessKeyName=TelemetrySender;SharedAccessKey=J8tkibrh5CHc2vZJgn1gbynZRmMLUf0mz/WZtmcjH6Q=";
-        string QueueName = "telemetry";
+        private string ServiceBus = "Endpoint=sb://c4w-telemetry.servicebus.windows.net/;SharedAccessKeyName=TelemetrySender;SharedAccessKey=J8tkibrh5CHc2vZJgn1gbynZRmMLUf0mz/WZtmcjH6Q=";
+
+        private string QueueName = "telemetry";
         private static QueueClient _client;
 
-        private readonly object _queueLock = new object();
+        private static readonly object QueueLock = Guid.NewGuid();
+
         private Queue<ServiceBusMessage> _buffer1 = new Queue<ServiceBusMessage>();
         private bool _running = false;
 
@@ -40,10 +42,10 @@ namespace Chem4Word.Telemetry
 
         public void QueueMessage(ServiceBusMessage message)
         {
-            lock (_queueLock)
+            lock (QueueLock)
             {
                 _buffer1.Enqueue(message);
-                Monitor.PulseAll(_queueLock);
+                Monitor.PulseAll(QueueLock);
             }
 
             if (!_running)
@@ -56,25 +58,21 @@ namespace Chem4Word.Telemetry
 
         private void WriteOnThread()
         {
-            Debug.WriteLine($"WriteOnThread() - Started at {DateTime.Now.ToString("HH:mm:ss.fff")}");
-
+            // Small sleep before we start
             Thread.Sleep(25);
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
 
             Queue<ServiceBusMessage> buffer2 = new Queue<ServiceBusMessage>();
 
             while (_running)
             {
                 // Move messages from 1st stage buffer to 2nd stage buffer
-                lock (_queueLock)
+                lock (QueueLock)
                 {
                     while (_buffer1.Count > 0)
                     {
                         buffer2.Enqueue(_buffer1.Dequeue());
                     }
-                    Monitor.PulseAll(_queueLock);
+                    Monitor.PulseAll(QueueLock);
                 }
 
                 while (buffer2.Count > 0)
@@ -83,16 +81,13 @@ namespace Chem4Word.Telemetry
                     Thread.Sleep(10);
                 }
 
-                lock (_queueLock)
+                lock (QueueLock)
                 {
                     if (_buffer1.Count == 0)
                     {
                         _running = false;
-                        sw.Stop();
-                        Debug.WriteLine($"WriteOnThread() - Queue emptied at {DateTime.Now.ToString("HH:mm:ss.fff")}");
-                        Debug.WriteLine($"WriteOnThread() - Elapsed Time {sw.ElapsedMilliseconds.ToString("#,##0")}ms");
                     }
-                    Monitor.PulseAll(_queueLock);
+                    Monitor.PulseAll(QueueLock);
                 }
             }
         }
@@ -112,6 +107,8 @@ namespace Chem4Word.Telemetry
                 bm.Properties["IsDebug"] = "True";
 #endif
                 _client.Send(bm);
+                // Small sleep between each message
+                Thread.Sleep(25);
             }
             catch (Exception ex)
             {

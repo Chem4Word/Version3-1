@@ -34,6 +34,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         public const int ACS_LINE_WIDTH_EMUS = 7620;    // This makes bond line width equal to ACS Guide of 0.6pt
         private const int EMUS_PER_CML_POINT = 9144;    // This makes cml bond length of 20 equal ACS guide 0.2" (0.508cm)
 
+        private const double BRACKET_OFFSET_PERCENTAGE = 0.25;
+
         // These calculations yield a font which has a point size of 8 at a bond length of 20
         private static double EmusPerCsTtfPoint(double bondLength)
         {
@@ -154,6 +156,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 return XorY / CsTtfToCml(20);
             }
+        }
+
+        public static double BracketOffset (double bondLength)
+        {
+            return bondLength * BRACKET_OFFSET_PERCENTAGE;
         }
 
         #endregion C# TTF
