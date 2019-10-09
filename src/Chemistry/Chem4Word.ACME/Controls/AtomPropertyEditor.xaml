@@ -303,7 +303,7 @@
                     Height="25"
                     Margin="5"
                     Click="Save_OnClick"
-                    Content="Save" />
+                    Content="OK" />
                 <Button
                     Width="50"
                     Height="25"

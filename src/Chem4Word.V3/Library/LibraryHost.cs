@@ -40,9 +40,5 @@ namespace Chem4Word.Library
                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
             }
         }
-
-        private void LibraryHost_Load(object sender, EventArgs e)
-        {
-        }
     }
 }

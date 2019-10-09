@@ -199,7 +199,6 @@
                     Header="Labels">
                     <acme:LabelsEditor
                         x:Name="LabelsEditor"
-                        ShowBottomPanel="False"
                         ShowTopPanel="False" />
                 </TabItem>
             </TabControl>
@@ -215,7 +214,7 @@
                     Height="25"
                     Margin="5"
                     Click="Save_OnClick"
-                    Content="Save" />
+                    Content="OK" />
                 <Button
                     Width="50"
                     Height="25"

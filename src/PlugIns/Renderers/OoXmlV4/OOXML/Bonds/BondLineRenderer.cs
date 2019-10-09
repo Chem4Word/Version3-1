@@ -5,16 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Media;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using DocumentFormat.OpenXml;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows;
-using System.Windows.Media;
 using A = DocumentFormat.OpenXml.Drawing;
 using Point = System.Windows.Point;
 using Wpg = DocumentFormat.OpenXml.Office2010.Word.DrawingGroup;
@@ -37,8 +36,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         public void DrawWedgeBond(Wpg.WordprocessingGroup wordprocessingGroup, BondLine bl)
         {
-            BondLine leftBondLine = bl.GetParallel(BondOffset() /2);
-            BondLine rightBondLine = bl.GetParallel(- BondOffset() / 2);
+            BondLine leftBondLine = bl.GetParallel(BondOffset() / 2);
+            BondLine rightBondLine = bl.GetParallel(-BondOffset() / 2);
 
             List<Point> points = new List<Point>();
             points.Add(new Point(bl.Start.X, bl.Start.Y));

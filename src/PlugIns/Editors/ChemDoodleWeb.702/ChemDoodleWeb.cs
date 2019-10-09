@@ -251,7 +251,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
                 if (AverageBondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
                     || AverageBondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
                 {
-                    nudBondLength.Value = (decimal) UserOptions.BondLength;
+                    nudBondLength.Value = (decimal)UserOptions.BondLength;
                 }
                 else
                 {

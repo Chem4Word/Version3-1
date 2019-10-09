@@ -7,13 +7,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Forms;
-using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.UI.WPF
@@ -35,46 +35,31 @@ namespace Chem4Word.UI.WPF
             InitializeComponent();
         }
 
-        private void OnWpfButtonClick(object sender, EventArgs e)
-        {
-            WpfEventArgs args = (WpfEventArgs)e;
-            switch (args.Button.ToLower())
-            {
-                case "ok":
-                case "save":
-                    DialogResult = DialogResult.OK;
-                    _closedInCode = true;
-                    if (elementHost1.Child is LabelsEditor labelsEditor)
-                    {
-                        Cml = args.OutputValue;
-                        Hide();
-                    }
-                    break;
-
-                case "cancel":
-                    DialogResult = DialogResult.Cancel;
-                    _closedInCode = true;
-                    Hide();
-                    break;
-            }
-        }
-
         private void EditLabelsHost_Load(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                MinimumSize = new Size(300, 200);
+
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;
 
-                if (elementHost1.Child is LabelsEditor labelsEditor)
+                // Fix bottom panel
+                int margin = Buttons.Height - Save.Bottom;
+                splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
+                splitContainer1.FixedPanel = FixedPanel.Panel2;
+                splitContainer1.IsSplitterFixed = true;
+
+                // Set Up WPF UC
+                if (elementHost1.Child is LabelsEditor editor)
                 {
-                    labelsEditor.TopLeft = TopLeft;
-                    labelsEditor.Used1D = Used1D;
-                    labelsEditor.PopulateTreeView(Cml);
-                    labelsEditor.Message = Message;
-                    labelsEditor.OnButtonClick += OnWpfButtonClick;
+                    editor.TopLeft = TopLeft;
+                    editor.Used1D = Used1D;
+                    editor.PopulateTreeView(Cml);
                 }
+
+                Warning.Text = Message;
             }
             catch (Exception ex)
             {
@@ -82,13 +67,31 @@ namespace Chem4Word.UI.WPF
             }
         }
 
+        private void Save_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.OK;
+            _closedInCode = true;
+            if (elementHost1.Child is LabelsEditor editor)
+            {
+                CMLConverter cc = new CMLConverter();
+                DialogResult = DialogResult.OK;
+                Cml = cc.Export(editor.EditedModel);
+                Hide();
+            }
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
+            Hide();
+        }
+
         private void EditLabelsHost_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!_closedInCode)
             {
-                if (elementHost1.Child is LabelsEditor labelsEditor)
+                if (elementHost1.Child is LabelsEditor editor)
                 {
-                    if (labelsEditor.IsDirty)
+                    if (editor.IsDirty)
                     {
                         StringBuilder sb = new StringBuilder();
                         sb.AppendLine("Do you wish to save your changes?");
@@ -105,7 +108,7 @@ namespace Chem4Word.UI.WPF
 
                             case DialogResult.Yes:
                                 var cmlConvertor = new CMLConverter();
-                                Cml = cmlConvertor.Export(labelsEditor.SubModel);
+                                Cml = cmlConvertor.Export(editor.EditedModel);
                                 DialogResult = DialogResult.OK;
                                 break;
 

@@ -270,7 +270,7 @@ namespace WinForms.TestHarness
                     using (EditorHost editorHost = new EditorHost(_lastCml, "LABELS"))
                     {
                         editorHost.ShowDialog(this);
-                        if (editorHost.Result == DialogResult.OK)
+                        if (editorHost.DialogResult == DialogResult.OK)
                         {
                             CMLConverter cc = new CMLConverter();
                             var clone = cc.Import(_lastCml);
@@ -312,7 +312,7 @@ namespace WinForms.TestHarness
                     using (EditorHost editorHost = new EditorHost(_lastCml, "ACME"))
                     {
                         editorHost.ShowDialog(this);
-                        if (editorHost.Result == DialogResult.OK)
+                        if (editorHost.DialogResult == DialogResult.OK)
                         {
                             CMLConverter cc = new CMLConverter();
                             var clone = cc.Import(_lastCml);
@@ -517,7 +517,7 @@ namespace WinForms.TestHarness
                     using (EditorHost editorHost = new EditorHost(_lastCml, "CML"))
                     {
                         editorHost.ShowDialog(this);
-                        if (editorHost.Result == DialogResult.OK)
+                        if (editorHost.DialogResult == DialogResult.OK)
                         {
                             CMLConverter cc = new CMLConverter();
                             var clone = cc.Import(_lastCml);
@@ -576,7 +576,7 @@ namespace WinForms.TestHarness
                 m.CustomXmlPartGuid = "";
 
                 string filter = "CML molecule files (*.cml)|*.cml|MDL molecule files (*.mol, *.sdf)|*.mol;*.sdf";
-                using (SaveFileDialog sfd = new SaveFileDialog {Filter = filter})
+                using (SaveFileDialog sfd = new SaveFileDialog { Filter = filter })
                 {
                     DialogResult dr = sfd.ShowDialog();
                     if (dr == DialogResult.OK)
@@ -607,7 +607,6 @@ namespace WinForms.TestHarness
                         }
                     }
                 }
-
             }
             catch (Exception exception)
             {

@@ -27,6 +27,7 @@ using Chem4Word.ACME.Enums;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Converters.CML;
@@ -39,6 +40,8 @@ namespace Chem4Word.ACME
 {
     public class EditViewModel : ViewModel, INotifyPropertyChanged
     {
+        public event EventHandler<WpfEventArgs> OnFeedbackChange;
+
         #region Fields
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
@@ -70,6 +73,13 @@ namespace Chem4Word.ACME
         public double EditHalfBondThickness
         {
             get { return EditBondThickness / 2; }
+        }
+
+        internal void SendStatus(string value)
+        {
+            WpfEventArgs args = new WpfEventArgs();
+            args.OutputValue = value;
+            OnFeedbackChange?.Invoke(this, args);
         }
 
         public SelectionTypeCode SelectionType
@@ -305,7 +315,11 @@ namespace Chem4Word.ACME
                 }
 
                 _activeMode = value;
-                _activeMode?.Attach(CurrentEditor);
+                if (_activeMode != null)
+                {
+                    _activeMode.Attach(CurrentEditor);
+                    SendStatus(_activeMode.CurrentStatus);
+                }
                 OnPropertyChanged();
             }
         }
@@ -1095,12 +1109,15 @@ namespace Chem4Word.ACME
         public void RemoveAllAdorners()
         {
             var layer = AdornerLayer.GetAdornerLayer(CurrentEditor);
-            var adornerList = layer.GetAdorners(CurrentEditor);
-            if(adornerList!=null)
+            if (layer != null)
             {
-                foreach (Adorner adorner in adornerList)
+                var adornerList = layer.GetAdorners(CurrentEditor);
+                if (adornerList != null)
                 {
-                    layer.Remove(adorner);
+                    foreach (Adorner adorner in adornerList)
+                    {
+                        layer.Remove(adorner);
+                    }
                 }
             }
             SelectionAdorners.Clear();
@@ -2789,5 +2806,6 @@ namespace Chem4Word.ACME
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
         }
+
     }
 }

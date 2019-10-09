@@ -13,7 +13,7 @@ namespace Chem4Word.ACME.Models
 {
     public class MoleculePropertiesModel : BaseDialogModel
     {
-        public Model SubModel { get; set; }
+        public Model Data { get; set; }
 
         public List<string> Used1DProperties { get; set; }
 

@@ -94,7 +94,7 @@ namespace Chem4Word.Editor.ACME
 
         public DialogResult Edit()
         {
-            DialogResult result = DialogResult.Cancel;
+            DialogResult dialogResult = DialogResult.Cancel;
 
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -105,20 +105,24 @@ namespace Chem4Word.Editor.ACME
                     LoadSettings();
                 }
 
-                EditorHost host = new EditorHost(Cml, Used1DProperties, _editorOptions);
-                host.TopLeft = TopLeft;
-                host.ShowDialog();
-                result = host.Result;
-                Cml = host.OutputValue;
-                host.Close();
-                host.Dispose();
+                using (EditorHost host = new EditorHost(Cml, Used1DProperties, _editorOptions))
+                {
+                    host.TopLeft = TopLeft;
+
+                    DialogResult showDialog = host.ShowDialog();
+                    if (showDialog == DialogResult.OK)
+                    {
+                        dialogResult = showDialog;
+                        Cml = host.OutputValue;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
             }
 
-            return result;
+            return dialogResult;
         }
     }
 }

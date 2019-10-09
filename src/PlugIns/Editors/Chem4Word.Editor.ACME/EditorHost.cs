@@ -23,33 +23,18 @@ namespace Chem4Word.Editor.ACME
 
         public Size FormSize { get; set; }
 
-        public DialogResult Result = DialogResult.Cancel;
-
         public string OutputValue { get; set; }
+        private string _cml;
+        private List<string> _used1DProperties;
+        private Options _options;
 
         public EditorHost(string cml, List<string> used1DProperties, Options options)
         {
             InitializeComponent();
 
-            this.MinimumSize = new Size(300, 200);
-
-            Chem4Word.ACME.Editor ec = new Chem4Word.ACME.Editor(cml, used1DProperties, options);
-            ec.InitializeComponent();
-            elementHost1.Child = ec;
-            ec.OnOkButtonClick += OnWpfOkButtonClick;
-        }
-
-        private void OnWpfOkButtonClick(object sender, EventArgs e)
-        {
-            WpfEventArgs args = (WpfEventArgs)e;
-            var button = args.Button.ToLower();
-
-            if (button.Equals("save") || button.Equals("ok"))
-            {
-                Result = DialogResult.OK;
-                OutputValue = args.OutputValue;
-                Hide();
-            }
+            _cml = cml;
+            _used1DProperties = used1DProperties;
+            _options = options;
         }
 
         private void EditorHost_Load(object sender, EventArgs e)
@@ -59,46 +44,89 @@ namespace Chem4Word.Editor.ACME
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;
             }
+
+            MinimumSize = new Size(300, 200);
+
             if (FormSize.Width != 0 && FormSize.Height != 0)
             {
                 Width = FormSize.Width;
                 Height = FormSize.Height;
             }
+
+            // Fix bottom panel
+            int margin = Buttons.Height - Save.Bottom;
+            splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
+            splitContainer1.FixedPanel = FixedPanel.Panel2;
+            splitContainer1.IsSplitterFixed = true;
+
+            // Set Up WPF UC
+            if (elementHost1.Child is Chem4Word.ACME.Editor editor)
+            {
+                editor.SetProperties(_cml, _used1DProperties, _options);
+                editor.ShowFeedback = false;
+                editor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
+            }
+        }
+
+        private void AcmeEditorOnFeedbackChange(object sender, WpfEventArgs e)
+        {
+            MessageFromWpf.Text = e.OutputValue;
+        }
+
+        private void Save_Click(object sender, EventArgs e)
+        {
+            CMLConverter cc = new CMLConverter();
+            DialogResult = DialogResult.Cancel;
+
+            if (elementHost1.Child is Chem4Word.ACME.Editor editor
+                && editor.IsDirty)
+            {
+                DialogResult = DialogResult.OK;
+                OutputValue = cc.Export(editor.EditedModel);
+            }
+            Hide();
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Hide();
         }
 
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Result != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
+            if (DialogResult != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
             {
-                if (elementHost1.Child is Chem4Word.ACME.Editor editor)
+                if (elementHost1.Child is Chem4Word.ACME.Editor editor
+                    && editor.IsDirty)
                 {
-                    if (editor.IsDirty)
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendLine("Do you wish to save your changes?");
+                    sb.AppendLine("  Click 'Yes' to save your changes and exit.");
+                    sb.AppendLine("  Click 'No' to discard your changes and exit.");
+                    sb.AppendLine("  Click 'Cancel' to return to the form.");
+                    DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                    switch (dr)
                     {
-                        StringBuilder sb = new StringBuilder();
-                        sb.AppendLine("Do you wish to save your changes?");
-                        sb.AppendLine("  Click 'Yes' to save your changes and exit.");
-                        sb.AppendLine("  Click 'No' to discard your changes and exit.");
-                        sb.AppendLine("  Click 'Cancel' to return to the form.");
-                        DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
-                        switch (dr)
-                        {
-                            case DialogResult.Cancel:
-                                e.Cancel = true;
-                                break;
+                        case DialogResult.Cancel:
+                            e.Cancel = true;
+                            break;
 
-                            case DialogResult.Yes:
-                                Result = DialogResult.OK;
-                                CMLConverter cc = new CMLConverter();
-                                OutputValue = cc.Export(editor.Data);
-                                Hide();
-                                editor.OnOkButtonClick -= OnWpfOkButtonClick;
-                                editor = null;
-                                break;
+                        case DialogResult.Yes:
+                            DialogResult = DialogResult.OK;
+                            var model = editor.EditedModel;
+                            model.RescaleForCml();
+                            // Replace any temporary Ids which are Guids
+                            model.ReLabelGuids();
+                            CMLConverter cc = new CMLConverter();
+                            OutputValue = cc.Export(model);
+                            Hide();
+                            editor = null;
+                            break;
 
-                            case DialogResult.No:
-                                editor = null;
-                                break;
-                        }
+                        case DialogResult.No:
+                            editor = null;
+                            break;
                     }
                 }
             }

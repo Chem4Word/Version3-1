@@ -11,7 +11,7 @@ body {
 
 #container {
     background-color: white;
-    height:100vh;
+    height: 100vh;
     margin: 5px;
     padding: 0;
 }
@@ -25,5 +25,5 @@ body {
 #sketcher_button_open,
 #sketcher_button_save,
 #sketcher_buttons_shape {
-    display:none;
+    display: none;
 }

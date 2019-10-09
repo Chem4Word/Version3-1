@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -14,7 +13,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using Chem4Word.ACME.Controls;
-using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
@@ -24,17 +22,16 @@ namespace Chem4Word.ACME
     /// <summary>
     /// Interaction logic for LabelsEditor.xaml
     /// </summary>
-    public partial class LabelsEditor : UserControl
+    public partial class LabelsEditor : UserControl, IHostedWpfEditor
     {
         public Point TopLeft { get; set; }
         public List<string> Used1D { get; set; }
-        public string Message { get; set; }
-        public bool IsDirty { get; set; }
         public bool IsInitialised { get; set; }
 
-        private string _cml;
+        public bool IsDirty { get; set; }
+        public Model EditedModel { get; private set; }
 
-        public event EventHandler<WpfEventArgs> OnButtonClick;
+        private string _cml;
 
         public LabelsEditor()
         {
@@ -56,23 +53,6 @@ namespace Chem4Word.ACME
                                                                         | FrameworkPropertyMetadataOptions.AffectsMeasure
                                                                         | FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public bool ShowBottomPanel
-        {
-            get { return (bool)GetValue(ShowBottomPanelProperty); }
-            set { SetValue(ShowBottomPanelProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ShowBottomPanel.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ShowBottomPanelProperty =
-            DependencyProperty.Register("ShowBottomPanel", typeof(bool),
-                                        typeof(LabelsEditor),
-                                        new FrameworkPropertyMetadata(true,
-                                                                      FrameworkPropertyMetadataOptions.AffectsArrange
-                                                                        | FrameworkPropertyMetadataOptions.AffectsMeasure
-                                                                        | FrameworkPropertyMetadataOptions.AffectsRender));
-
-        public Model SubModel { get; private set; }
-
         private void LabelsEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
@@ -82,7 +62,6 @@ namespace Chem4Word.ACME
                     if (!IsInitialised)
                     {
                         PopulateTreeView(_cml);
-                        WarningMessage.Text = Message;
                         TreeView_OnSelectedItemChanged(null, null);
                         IsInitialised = true;
                     }
@@ -132,23 +111,23 @@ namespace Chem4Word.ACME
         {
             _cml = cml;
             var cc = new CMLConverter();
-            SubModel = cc.Import(_cml, Used1D);
+            EditedModel = cc.Import(_cml, Used1D);
             TreeView.Items.Clear();
             bool initialSelectionMade = false;
 
-            if (SubModel != null)
+            if (EditedModel != null)
             {
-                OverallConciseFormulaPanel.Children.Add(TextBlockFromFormula(SubModel.ConciseFormula));
+                OverallConciseFormulaPanel.Children.Add(TextBlockFromFormula(EditedModel.ConciseFormula));
 
                 var root = new TreeViewItem
                 {
                     Header = "Structure",
-                    Tag = SubModel
+                    Tag = EditedModel
                 };
                 TreeView.Items.Add(root);
                 root.IsExpanded = true;
 
-                AddNodes(root, SubModel.Molecules.Values);
+                AddNodes(root, EditedModel.Molecules.Values);
             }
 
             SetupNamesEditor(NamesGrid, "Add new Name", OnAddNameClick, "Alternative name for molecule");
@@ -156,6 +135,8 @@ namespace Chem4Word.ACME
             SetupNamesEditor(LabelsGrid, "Add new Label", OnAddLabelClick, "Custom metadata");
 
             TreeView.Focus();
+
+            TreeView_OnSelectedItemChanged(null, null);
 
             // Local Function to support recursion
             void AddNodes(TreeViewItem parent, IEnumerable<Molecule> molecules)
@@ -295,25 +276,6 @@ namespace Chem4Word.ACME
                     item.PropertyChanged -= OnTextualPropertyChanged;
                 }
             }
-        }
-
-        private void OnCancelClick(object sender, RoutedEventArgs e)
-        {
-            WpfEventArgs args = new WpfEventArgs();
-            args.Button = "CANCEL";
-            args.OutputValue = "";
-
-            OnButtonClick?.Invoke(this, args);
-        }
-
-        private void OnSaveClick(object sender, RoutedEventArgs e)
-        {
-            WpfEventArgs args = new WpfEventArgs();
-            var cmlConvertor = new CMLConverter();
-            args.Button = "OK";
-            args.OutputValue = cmlConvertor.Export(SubModel);
-
-            OnButtonClick?.Invoke(this, args);
         }
 
         private void SetupNamesEditor(NamesEditor namesEditor, string buttonCaption, RoutedEventHandler routedEventHandler, string toolTip)

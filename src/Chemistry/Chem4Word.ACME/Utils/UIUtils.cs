@@ -123,10 +123,10 @@ namespace Chem4Word.ACME.Utils
                     model.Path = moleculeAdorner.AdornedMolecules[0].Path;
                     model.Used1DProperties = evm.Used1DProperties;
 
-                    model.SubModel = new Model();
+                    model.Data = new Model();
                     Molecule mol = moleculeAdorner.AdornedMolecules[0].Copy();
-                    model.SubModel.AddMolecule(mol);
-                    mol.Parent = model.SubModel;
+                    model.Data.AddMolecule(mol);
+                    mol.Parent = model.Data;
 
                     model.Charge = mol.FormalCharge;
                     model.Count = mol.Count;
@@ -138,7 +138,7 @@ namespace Chem4Word.ACME.Utils
 
                     if (model.Save)
                     {
-                        var thisMolecule = model.SubModel.Molecules.First().Value;
+                        var thisMolecule = model.Data.Molecules.First().Value;
                         evm.UpdateMolecule(moleculeAdorner.AdornedMolecules[0], thisMolecule);
                     }
 

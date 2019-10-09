@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
@@ -100,6 +99,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             onePointFiveDotted = new BondLine(BondLineStyle.Dotted, onePointFiveStart, onePointFiveEnd, bond);
                             m_BondLines.Add(onePointFiveDotted);
                             break;
+
                         case Globals.BondDirection.Anticlockwise:
                             onePointFive = new BondLine(BondLineStyle.Solid, bond);
                             m_BondLines.Add(onePointFive);
@@ -110,6 +110,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             onePointFiveDotted = new BondLine(BondLineStyle.Dotted, onePointFiveStart, onePointFiveEnd, bond);
                             m_BondLines.Add(onePointFiveDotted);
                             break;
+
                         case Globals.BondDirection.None:
                             onePointFive = new BondLine(BondLineStyle.Solid, bond);
                             m_BondLines.Add(onePointFive.GetParallel(-(BondOffset() / 2)));
@@ -287,6 +288,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             twoPointFiveDotted = new BondLine(BondLineStyle.Dotted, twoPointFiveStart, twoPointFiveEnd, bond);
                             m_BondLines.Add(twoPointFiveDotted);
                             break;
+
                         case Globals.BondDirection.Anticlockwise:
                             // Central bond line
                             twoPointFive = new BondLine(BondLineStyle.Solid, bond);
@@ -306,6 +308,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             twoPointFiveParallel = new BondLine(BondLineStyle.Solid, twoPointFiveStart, twoPointFiveEnd, bond);
                             m_BondLines.Add(twoPointFiveParallel);
                             break;
+
                         case Globals.BondDirection.None:
                             twoPointFive = new BondLine(BondLineStyle.Solid, bond);
                             m_BondLines.Add(twoPointFive);
@@ -324,7 +327,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                     m_BondLines.Add(tripple.GetParallel(BondOffset()));
                     m_BondLines.Add(tripple.GetParallel(-BondOffset()));
                     break;
-
 
                 default:
                     // Draw a single line, so that there is something to see

@@ -5,13 +5,9 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Core.Helpers;
-using Chem4Word.Shared;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,6 +17,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Shared;
+using Microsoft.Win32;
 
 namespace Chem4Word.Telemetry
 {
@@ -570,7 +569,7 @@ namespace Chem4Word.Telemetry
                                             UtcOffset = SystemUtcDateTime.Ticks - ServerUtcDateTime.Ticks;
                                         }
 
-                                        #endregion
+                                        #endregion Detect Php UTC Date
 
                                         if (!IpAddress.Contains("0.0.0.0"))
                                         {

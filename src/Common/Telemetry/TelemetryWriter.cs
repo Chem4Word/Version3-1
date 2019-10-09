@@ -5,14 +5,11 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using IChem4Word.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Text;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.Telemetry
 {

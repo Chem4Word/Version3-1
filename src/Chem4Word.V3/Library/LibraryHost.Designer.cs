@@ -48,7 +48,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.elementHost1);
             this.Name = "LibraryHost";
-            this.Load += new System.EventHandler(this.LibraryHost_Load);
             this.ResumeLayout(false);
 
         }

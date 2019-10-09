@@ -332,7 +332,7 @@ namespace Chem4Word.Shared
                     }
                     break;
 
-                #endregion Office 2016
+                    #endregion Office 2016
             }
 
             #region 32 / 64 bit

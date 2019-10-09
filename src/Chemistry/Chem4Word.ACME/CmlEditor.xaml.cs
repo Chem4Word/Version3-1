@@ -9,41 +9,44 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using Chem4Word.Core.UI.Wpf;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.ACME
 {
     /// <summary>
     /// Interaction logic for CmlEditor.xaml
     /// </summary>
-    public partial class CmlEditor : UserControl
+    public partial class CmlEditor : UserControl, IHostedWpfEditor
     {
-        public event EventHandler<WpfEventArgs> OnButtonClick;
-
         public CmlEditor()
         {
             InitializeComponent();
         }
 
-        public CmlEditor(string cml)
+        public string Cml
         {
-            InitializeComponent();
-            CmlText.Text = cml;
+            set
+            {
+                CmlText.Text = value;
+                IsDirty = false;
+            }
         }
 
-        private void OnSaveClick(object sender, RoutedEventArgs e)
+        public bool IsDirty { get; private set; }
+
+        public Model EditedModel
         {
-            WpfEventArgs args = new WpfEventArgs();
-            args.OutputValue = CmlText.Text;
-            args.Button = "OK";
-            OnButtonClick?.Invoke(this, args);
+            get
+            {
+                CMLConverter cc = new CMLConverter();
+                return cc.Import(CmlText.Text);
+            }
         }
 
-        private void OnCancelClick(object sender, RoutedEventArgs e)
+        private void CmlText_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            WpfEventArgs args = new WpfEventArgs();
-            args.OutputValue = "";
-            args.Button = "CANCEL";
-            OnButtonClick?.Invoke(this, args);
+            IsDirty = true;
         }
     }
 }

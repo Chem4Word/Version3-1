@@ -28,7 +28,7 @@ namespace Chem4Word.ACME
     /// <summary>
     /// Interaction logic for Editor.xaml
     /// </summary>
-    public partial class Editor : UserControl, INotifyPropertyChanged
+    public partial class Editor : UserControl, INotifyPropertyChanged, IHostedWpfEditor
     {
         private EditViewModel _activeViewModel;
 
@@ -44,6 +44,9 @@ namespace Chem4Word.ACME
 
         public Point TopLeft { get; set; }
 
+        // This is used to store the cml until the editor is Loaded
+        private string _cml;
+        private List<string> _used1DProperties;
         private Options _editorOptions;
 
         public Options EditorOptions
@@ -54,28 +57,40 @@ namespace Chem4Word.ACME
 
         public IChem4WordTelemetry Telemetry { get; set; }
 
+        public bool ShowFeedback
+        {
+            get { return (bool)GetValue(ShowFeedbackProperty); }
+            set { SetValue(ShowFeedbackProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ShowFeedback.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ShowFeedbackProperty =
+            DependencyProperty.Register("ShowFeedback", typeof(bool), typeof(Editor), new PropertyMetadata(true));
+
         public static readonly DependencyProperty SliderVisibilityProperty =
             DependencyProperty.Register("SliderVisibility", typeof(Visibility), typeof(Editor),
                                         new PropertyMetadata(default(Visibility)));
-
-        public event EventHandler<WpfEventArgs> OnOkButtonClick;
-
-        // This is used to store the cml until the editor is Loaded
-        private string _cml;
-
-        private List<string> _used1DProperties;
-
-       public Editor(string cml, List<string> used1DProperties, Options options) : this()
-        {
-            _cml = cml;
-            _used1DProperties = used1DProperties;
-            _editorOptions = options;
-        }
 
         public Editor()
         {
             EnsureApplicationResources();
             InitializeComponent();
+        }
+
+        public void SetProperties(string cml, List<string> used1DProperties, Options options)
+        {
+            _cml = cml;
+            _used1DProperties = used1DProperties;
+            _editorOptions = options;
+
+            InitialiseEditor();
+        }
+
+        public event EventHandler<WpfEventArgs> OnFeedbackChange;
+
+        private void ActiveViewModelOnFeedbackChange(object sender, WpfEventArgs e)
+        {
+            OnFeedbackChange?.Invoke(this, e);
         }
 
         public bool IsDirty
@@ -93,7 +108,7 @@ namespace Chem4Word.ACME
             }
         }
 
-        public Model Data
+        public Model EditedModel
         {
             get
             {
@@ -109,16 +124,6 @@ namespace Chem4Word.ACME
                 }
             }
         }
-
-        public bool ShowSave
-        {
-            get { return (bool)GetValue(ShowSaveProperty); }
-            set { SetValue(ShowSaveProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ShowSave.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ShowSaveProperty =
-            DependencyProperty.Register("ShowSave", typeof(bool), typeof(Editor), new PropertyMetadata(true));
 
         //see http://drwpf.com/blog/2007/10/05/managing-application-resources-when-wpf-is-hosted/
         private void EnsureApplicationResources()
@@ -235,7 +240,7 @@ namespace Chem4Word.ACME
             RingButton.Tag = selButton.Tag;
         }
 
-        private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
+        private void InitialiseEditor()
         {
             if (!String.IsNullOrEmpty(_cml))
             {
@@ -268,6 +273,8 @@ namespace Chem4Word.ACME
 
                 ScrollIntoView();
                 BindControls(vm);
+
+                vm.OnFeedbackChange += ActiveViewModelOnFeedbackChange;
             }
 
             //refresh the ring button
@@ -277,6 +284,11 @@ namespace Chem4Word.ACME
 
             //HACK: Need to do this to put the editor into the right mode after refreshing the ring button
             ModeButton_OnChecked(DrawButton, new RoutedEventArgs());
+        }
+
+        private void ACMEControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitialiseEditor();
         }
 
         /// <summary>
@@ -318,22 +330,6 @@ namespace Chem4Word.ACME
                     }
                 }
             }
-        }
-
-        private void SaveButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            WpfEventArgs args = new WpfEventArgs();
-
-            Model result = ActiveViewModel.Model.Copy();
-            result.RescaleForCml();
-            // Replace any temporary Ids which are Guids
-            result.ReLabelGuids();
-
-            CMLConverter conv = new CMLConverter();
-            args.OutputValue = conv.Export(result);
-            args.Button = "SAVE";
-
-            OnOkButtonClick?.Invoke(this, args);
         }
 
         /// <summary>

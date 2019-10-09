@@ -204,9 +204,7 @@
     </Geometry>
 
     <!--  thumb styles  -->
-    <SolidColorBrush
-        x:Key="DrawBondBrush"
-        Color="OrangeRed"></SolidColorBrush>
+    <SolidColorBrush x:Key="DrawBondBrush" Color="OrangeRed" />
     <SolidColorBrush
         x:Key="GrabHandleFillBrush"
         Opacity="0.75"
@@ -214,24 +212,24 @@
     <SolidColorBrush
         x:Key="AtomBondSelectorBrush"
         Opacity="0.5"
-        Color="DarkOrange"/>
+        Color="DarkOrange" />
 
-    <SolidColorBrush 
+    <SolidColorBrush
         x:Key="GrabHandleBorderBrush"
         Opacity="0.8"
         Color="DarkOrange" />
-    <SolidColorBrush x:Key="ThumbFillBrush"  Opacity="0.25"
-                     Color="Gold"/>
+    <SolidColorBrush
+        x:Key="ThumbFillBrush"
+        Opacity="0.25"
+        Color="Gold" />
 
     <!--  manipulator styles  -->
-    <Pen x:Key="GrabHandlePen"
-        Thickness="1.0">
+    <Pen x:Key="GrabHandlePen" Thickness="1.0">
         <Pen.Brush>
-            <StaticResource ResourceKey="GrabHandleBorderBrush"/>
+            <StaticResource ResourceKey="GrabHandleBorderBrush" />
         </Pen.Brush>
     </Pen>
-    <Style x:Key="AtomThumb"
-        TargetType="Thumb">
+    <Style x:Key="AtomThumb" TargetType="Thumb">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Background" Value="{StaticResource GrabHandleFillBrush}" />
@@ -250,8 +248,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="GrabHandleStyle"
-        TargetType="Thumb">
+    <Style x:Key="GrabHandleStyle" TargetType="Thumb">
         <Setter Property="SnapsToDevicePixels" Value="true" />
         <Setter Property="OverridesDefaultStyle" Value="true" />
         <Setter Property="Background" Value="{StaticResource ThumbFillBrush}" />
@@ -259,15 +256,14 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Ellipse
-                        Fill="{x:Static SystemColors.WindowBrush}"
-                        Stroke="{StaticResource GrabHandleBorderBrush}" />
+                    <Ellipse Fill="{x:Static SystemColors.WindowBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <Style x:Key="BigThumbStyle"
+    <Style
+        x:Key="BigThumbStyle"
         BasedOn="{StaticResource GrabHandleStyle}"
         TargetType="Thumb">
 
@@ -275,15 +271,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Rectangle
-                        Fill="{StaticResource ThumbFillBrush}"
-                        Stroke="{StaticResource GrabHandleBorderBrush}" />
+                    <Rectangle Fill="{StaticResource ThumbFillBrush}" Stroke="{StaticResource GrabHandleBorderBrush}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
- 
+
 
     <Style
         x:Key="GroupHandleStyle"
@@ -353,7 +347,7 @@
                         Height="15"
                         Stroke="{StaticResource GrabHandleBorderBrush}">
                         <Ellipse.Fill>
-                            <StaticResource ResourceKey="GrabHandleBorderBrush"/>
+                            <StaticResource ResourceKey="GrabHandleBorderBrush" />
                         </Ellipse.Fill>
                     </Ellipse>
                 </ControlTemplate>

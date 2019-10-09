@@ -59,7 +59,7 @@
                               IsChecked="{Binding Path=ShowMoleculeGroups, Mode=TwoWay}" />
                 </Grid>
             </TabItem>
-            <!--
+            <!-- If required ...
             <TabItem Foreground="{StaticResource Chem4WordBlue}" Header="Debug">
                 <Grid>
                     <TextBlock Margin="5">Hello</TextBlock>
@@ -74,12 +74,12 @@
             <!--  Defaults Button  -->
             <Button Width="80" Margin="25,5,25,5" Click="Defaults_OnClick" Content="Defaults"
                     Foreground="{StaticResource Chem4WordBlue}" />
+            <Button Width="80" Margin="5" Click="Save_OnClick" Content="OK"
+                    Foreground="{StaticResource Chem4WordBlue}" />
             <!--  Cancel Button  -->
             <Button Width="80" Margin="5" Click="Cancel_OnClick" Content="Cancel"
                     Foreground="{StaticResource Chem4WordBlue}" />
             <!--  Save Button  -->
-            <Button Width="80" Margin="5" Click="Save_OnClick" Content="Save"
-                    Foreground="{StaticResource Chem4WordBlue}" />
         </StackPanel>
     </Grid>
 </UserControl>

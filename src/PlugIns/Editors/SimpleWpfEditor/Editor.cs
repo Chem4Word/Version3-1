@@ -32,7 +32,6 @@ namespace Chem4Word.Editor.SimpleWpfEditor
         public bool RequiresSeedAtom => false;
         public List<string> Used1DProperties { get; set; }
 
-
         public string Cml { get; set; }
 
         public Dictionary<string, string> Properties { get; set; }
@@ -59,7 +58,7 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
         public DialogResult Edit()
         {
-            DialogResult result = DialogResult.Cancel;
+            DialogResult dialogResult = DialogResult.Cancel;
 
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -70,24 +69,26 @@ namespace Chem4Word.Editor.SimpleWpfEditor
                     LoadSettings();
                 }
 
-                EditorHost host = new EditorHost(Cml);
-                host.TopLeft = TopLeft;
-                DialogResult dr = host.ShowDialog();
-                if (dr == DialogResult.OK)
+                using (EditorHost host = new EditorHost(Cml))
                 {
-                    result = host.Result;
-                    Cml = host.OutputValue;
-                }
+                    host.TopLeft = TopLeft;
 
-                host.Close();
-                host.Dispose();
+                    DialogResult showDialog = host.ShowDialog();
+                    if (showDialog == DialogResult.OK)
+                    {
+                        dialogResult = showDialog;
+                        Cml = host.OutputValue;
+                    }
+
+                    host.Close();
+                }
             }
             catch (Exception ex)
             {
                 new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
             }
 
-            return result;
+            return dialogResult;
         }
     }
 }

@@ -21,7 +21,10 @@ namespace Chem4Word.ACME.Behaviors
         public EditViewModel EditViewModel
         {
             get { return (EditViewModel)GetValue(EditViewModelProperty); }
-            set { SetValue(EditViewModelProperty, value); }
+            set
+            {
+                SetValue(EditViewModelProperty, value);
+            }
         }
 
         // Using a DependencyProperty as the backing store for EditViewModel.  This enables animation, styling, binding, etc...
@@ -68,6 +71,7 @@ namespace Chem4Word.ACME.Behaviors
             set
             {
                 _currentStatus = value;
+                EditViewModel.SendStatus(value);
                 OnPropertyChanged();
             }
         }

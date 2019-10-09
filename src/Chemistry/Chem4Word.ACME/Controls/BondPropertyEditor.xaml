@@ -890,7 +890,7 @@
                     Margin="0,5,5,0"
                     HorizontalAlignment="Right"
                     Click="Save_OnClick">
-                    Save
+                    OK
                 </Button>
                 <Button
                     Width="50"

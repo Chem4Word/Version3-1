@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -18,17 +17,15 @@ using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Telemetry;
-using Application = System.Windows.Application;
 using Size = System.Drawing.Size;
 
 namespace WinForms.TestHarness
 {
     public partial class EditorHost : Form
     {
-        public DialogResult Result = DialogResult.Cancel;
-
         public string OutputValue { get; set; }
-        private string _editorType;
+
+        private readonly string _editorType;
 
         public EditorHost(string cml, string type)
         {
@@ -40,48 +37,52 @@ namespace WinForms.TestHarness
 
             var used1D = GetUsedProperties(cml);
 
+            MessageFromWpf.Text = "";
+
             switch (_editorType)
             {
                 case "ACME":
                     Options options = new Options();
                     options.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
 
-                    Editor acmeEditor = new Editor(cml, used1D, options);
+                    Editor acmeEditor = new Editor();
                     acmeEditor.InitializeComponent();
                     elementHost1.Child = acmeEditor;
 
                     // Configure Control
-                    acmeEditor.ShowSave = true;
+                    acmeEditor.ShowFeedback = false;
                     acmeEditor.Telemetry = new TelemetryWriter(true);
+                    acmeEditor.SetProperties(cml, used1D, options);
+                    acmeEditor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
 
-                    // Wire Up Button(s)
-                    acmeEditor.OnOkButtonClick += OnWpfButtonClick;
                     break;
 
                 case "LABELS":
                     LabelsEditor labelsEditor = new LabelsEditor();
                     labelsEditor.InitializeComponent();
-                    labelsEditor.Used1D = used1D;
-                    labelsEditor.PopulateTreeView(cml);
                     elementHost1.Child = labelsEditor;
 
                     // Configure Control
+                    labelsEditor.Used1D = used1D;
+                    labelsEditor.PopulateTreeView(cml);
 
-                    // Wire Up Button(s)
-                    labelsEditor.OnButtonClick += OnWpfButtonClick;
                     break;
 
                 default:
-                    CmlEditor cmlEditor = new CmlEditor(cml);
+                    CmlEditor cmlEditor = new CmlEditor();
                     cmlEditor.InitializeComponent();
                     elementHost1.Child = cmlEditor;
 
                     // Configure Control
+                    cmlEditor.Cml = cml;
 
-                    // Wire Up Button(s)
-                    cmlEditor.OnButtonClick += OnWpfButtonClick;
                     break;
             }
+        }
+
+        private void AcmeEditorOnFeedbackChange(object sender, WpfEventArgs e)
+        {
+            MessageFromWpf.Text = e.OutputValue;
         }
 
         private List<string> GetUsedProperties(string cml)
@@ -112,6 +113,12 @@ namespace WinForms.TestHarness
         {
             MinimumSize = new Size(300, 200);
 
+            // Fix bottom panel
+            int margin = Buttons.Height - Save.Bottom;
+            splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
+            splitContainer1.FixedPanel = FixedPanel.Panel2;
+            splitContainer1.IsSplitterFixed = true;
+
             switch (_editorType)
             {
                 case "ACME":
@@ -134,31 +141,63 @@ namespace WinForms.TestHarness
             }
         }
 
-        private void OnWpfButtonClick(object sender, EventArgs e)
+        private void Save_Click(object sender, EventArgs e)
         {
-            WpfEventArgs args = (WpfEventArgs)e;
-            if (args.Button.Equals("OK") || args.Button.Equals("SAVE"))
-            {
-                Result = DialogResult.OK;
-                OutputValue = args.OutputValue;
-            }
-            else
-            {
-                Result = DialogResult.Cancel;
-            }
+            CMLConverter cc = new CMLConverter();
+            DialogResult = DialogResult.Cancel;
 
+            switch (_editorType)
+            {
+                case "ACME":
+                    if (elementHost1.Child is Editor acmeEditor
+                        && acmeEditor.IsDirty)
+                    {
+                        DialogResult = DialogResult.OK;
+                        var model = acmeEditor.EditedModel;
+                        model.RescaleForCml();
+                        // Replace any temporary Ids which are Guids
+                        model.ReLabelGuids();
+                        OutputValue = cc.Export(model);
+                    }
+                    break;
+
+                case "LABELS":
+                    if (elementHost1.Child is LabelsEditor labelsEditor
+                        && labelsEditor.IsDirty)
+                    {
+                        DialogResult = DialogResult.OK;
+                        OutputValue = cc.Export(labelsEditor.EditedModel);
+                    }
+                    break;
+
+                default:
+                    if (elementHost1.Child is CmlEditor cmlEditor
+                        && cmlEditor.IsDirty)
+                    {
+                        DialogResult = DialogResult.OK;
+                        OutputValue = cc.Export(cmlEditor.EditedModel);
+                    }
+                    break;
+            }
+            Hide();
+        }
+
+        private void Cancel_Click(object sender, EventArgs e)
+        {
             Hide();
         }
 
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (Result != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
+            if (DialogResult != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("Do you wish to save your changes?");
                 sb.AppendLine("  Click 'Yes' to save your changes and exit.");
                 sb.AppendLine("  Click 'No' to discard your changes and exit.");
                 sb.AppendLine("  Click 'Cancel' to return to the form.");
+
+                CMLConverter cc = new CMLConverter();
 
                 switch (_editorType)
                 {
@@ -174,11 +213,13 @@ namespace WinForms.TestHarness
                                     break;
 
                                 case DialogResult.Yes:
-                                    Result = DialogResult.OK;
-                                    CMLConverter cc = new CMLConverter();
-                                    OutputValue = cc.Export(acmeEditor.Data);
+                                    DialogResult = DialogResult.OK;
+                                    var model = acmeEditor.EditedModel;
+                                    model.RescaleForCml();
+                                    // Replace any temporary Ids which are Guids
+                                    model.ReLabelGuids();
+                                    OutputValue = cc.Export(model);
                                     Hide();
-                                    acmeEditor.OnOkButtonClick -= OnWpfButtonClick;
                                     break;
 
                                 case DialogResult.No:
@@ -199,11 +240,9 @@ namespace WinForms.TestHarness
                                     break;
 
                                 case DialogResult.Yes:
-                                    Result = DialogResult.OK;
-                                    CMLConverter cc = new CMLConverter();
-                                    OutputValue = cc.Export(labelsEditor.SubModel);
+                                    DialogResult = DialogResult.OK;
+                                    OutputValue = cc.Export(labelsEditor.EditedModel);
                                     Hide();
-                                    labelsEditor.OnButtonClick -= OnWpfButtonClick;
                                     break;
 
                                 case DialogResult.No:
@@ -213,9 +252,25 @@ namespace WinForms.TestHarness
                         break;
 
                     default:
-                        if (elementHost1.Child is CmlEditor cmlEditor)
+                        if (elementHost1.Child is CmlEditor editor
+                            && editor.IsDirty)
                         {
-                            // We don't care just ignore it
+                            DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                            switch (dr)
+                            {
+                                case DialogResult.Cancel:
+                                    e.Cancel = true;
+                                    break;
+
+                                case DialogResult.Yes:
+                                    DialogResult = DialogResult.OK;
+                                    OutputValue = cc.Export(editor.EditedModel);
+                                    Hide();
+                                    break;
+
+                                case DialogResult.No:
+                                    break;
+                            }
                         }
                         break;
                 }

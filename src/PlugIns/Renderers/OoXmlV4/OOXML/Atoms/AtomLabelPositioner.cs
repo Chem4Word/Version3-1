@@ -5,18 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
-using Chem4Word.Renderer.OoXmlV4.TTF;
-using IChem4Word.Contracts;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using DocumentFormat.OpenXml.AdditionalCharacteristics;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Renderer.OoXmlV4.TTF;
+using IChem4Word.Contracts;
 using Point = System.Windows.Point;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
@@ -71,8 +68,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             for (int idx = 0; idx < text.Length; idx++)
             {
+                TtfCharacter c = _TtfCharacterSet['?'];
                 char chr = text[idx];
-                TtfCharacter c = _TtfCharacterSet[chr];
+                if (_TtfCharacterSet.ContainsKey(chr))
+                {
+                    c = _TtfCharacterSet[chr];
+                }
+
                 if (c != null)
                 {
                     Point position = GetCharacterPosition(cursor, c);
@@ -102,8 +104,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             for (int idx = 0; idx < text.Length; idx++)
             {
+                TtfCharacter c = _TtfCharacterSet['?'];
                 char chr = text[idx];
-                TtfCharacter c = _TtfCharacterSet[chr];
+                if (_TtfCharacterSet.ContainsKey(chr))
+                {
+                    c = _TtfCharacterSet[chr];
+                }
+
                 if (c != null)
                 {
                     Point position = GetCharacterPosition(cursor, c);
@@ -172,7 +179,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                             showLabel = true;
                         }
                     }
-
                 }
 
                 // Force on if atom has charge
@@ -185,7 +191,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 {
                     showLabel = true;
                 }
-
             }
 
             #endregion Decide if atom label is to be displayed
@@ -391,7 +396,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                                 {
                                     cursorPosition.X = labelBounds.X + (labelBounds.Width / 2)
                                                        - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width, _meanBondLength) / 2);
-                                    cursorPosition.Y = cursorPosition.Y 
+                                    cursorPosition.Y = cursorPosition.Y
                                                        + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _meanBondLength)
                                                        + OoXmlHelper.CHARACTER_VERTICAL_SPACING;
                                 }
@@ -522,13 +527,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                     }
                 }
 
-                #endregion Step 6 Add IsoTope Number if required
+                #endregion Step 6 - Add IsoTope Number if required
 
                 #region Step 7 - Create Convex Hull
 
                 _convexhHulls.Add(atom.Path, ConvexHull(atom.Path));
 
-                #endregion
+                #endregion Step 7 - Create Convex Hull
             }
         }
 

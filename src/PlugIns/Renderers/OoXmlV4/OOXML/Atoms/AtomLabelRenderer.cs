@@ -181,20 +181,20 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             A.Point MakeSubscriptPoint(TtfPoint ttfPoint)
             {
                 A.Point pp = new A.Point
-                             {
-                                 X = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(ttfPoint.X - alc.Character.OriginX, _meanBondLength)}",
-                                 Y = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _meanBondLength)}"
-                             };
+                {
+                    X = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(ttfPoint.X - alc.Character.OriginX, _meanBondLength)}",
+                    Y = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _meanBondLength)}"
+                };
                 return pp;
             }
 
             A.Point MakeNormalPoint(TtfPoint ttfPoint)
             {
                 A.Point pp = new A.Point
-                             {
-                                 X = $"{OoXmlHelper.ScaleCsTtfToEmu(ttfPoint.X - alc.Character.OriginX, _meanBondLength)}",
-                                 Y = $"{OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _meanBondLength)}"
-                             };
+                {
+                    X = $"{OoXmlHelper.ScaleCsTtfToEmu(ttfPoint.X - alc.Character.OriginX, _meanBondLength)}",
+                    Y = $"{OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _meanBondLength)}"
+                };
                 return pp;
             }
         }

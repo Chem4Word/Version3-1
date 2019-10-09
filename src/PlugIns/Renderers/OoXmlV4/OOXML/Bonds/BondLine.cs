@@ -71,6 +71,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
         public BondLineStyle Style { get; private set; }
 
         private Point _start;
+
         public Point Start
         {
             get { return _start; }
@@ -81,6 +82,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
         }
 
         private Point _end;
+
         public Point End
         {
             get { return _end; }
@@ -161,7 +163,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             string result = $"{Style} from {PointAsString(_start)} to {PointAsString(_end)}";
             if (Bond != null)
             {
-                result+= $" [{Bond}]";
+                result += $" [{Bond}]";
             }
 
             return result;

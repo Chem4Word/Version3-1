@@ -23,15 +23,11 @@ namespace Chem4Word.UI.WPF
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public string VersionString { get; set; }
-        public System.Windows.Point TopLeft { get; set; }
+        public Point TopLeft { get; set; }
 
         public AboutControl()
         {
             InitializeComponent();
-        }
-
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
         }
 
         private void AboutControl_Loaded(object sender, RoutedEventArgs e)

@@ -13,33 +13,16 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBox x:Name="CmlText"
+        <TextBox
+            x:Name="CmlText"
             Grid.Row="0"
             Margin="5"
             HorizontalAlignment="Stretch"
             AcceptsReturn="True"
             FontFamily="Consolas"
             HorizontalScrollBarVisibility="Auto"
+            TextChanged="CmlText_OnTextChanged"
             TextWrapping="NoWrap"
             VerticalScrollBarVisibility="Auto" />
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button
-                Width="75"
-                Height="26"
-                Margin="5"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Click="OnSaveClick"
-                Content="OK"
-                IsDefault="True" />
-            <Button
-                Width="75"
-                Height="26"
-                Margin="5"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Click="OnCancelClick"
-                Content="Cancel" />
-        </StackPanel>
     </Grid>
 </UserControl>

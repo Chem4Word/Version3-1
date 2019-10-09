@@ -61,6 +61,7 @@ namespace Chem4Word.Renderer.OoXmlV4
 
         // For debugging.
         private static Point[] _minMaxCorners;
+
         private static Rect _minMaxBox;
         private static Point[] _nonCulledPoints;
 
@@ -200,7 +201,7 @@ namespace Chem4Word.Renderer.OoXmlV4
 
             // Start wrapping up the other points.
             double sweepAngle = 0;
-            for (;;)
+            for (; ; )
             {
                 // Find the point with smallest AngleValue
                 // from the last point.

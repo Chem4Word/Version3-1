@@ -83,6 +83,7 @@
     <Compile Include="Converters\TreeViewLineConverter.cs" />
     <Compile Include="Converters\ValueToStringConverter.cs" />
     <Compile Include="Drawing\GroupVisual.cs" />
+    <Compile Include="IHostedWpfEditor.cs" />
     <Compile Include="LabelsEditor.xaml.cs">
       <DependentUpon>LabelsEditor.xaml</DependentUpon>
     </Compile>

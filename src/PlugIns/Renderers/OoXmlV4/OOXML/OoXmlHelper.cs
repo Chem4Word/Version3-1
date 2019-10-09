@@ -158,7 +158,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
         }
 
-        public static double BracketOffset (double bondLength)
+        public static double BracketOffset(double bondLength)
         {
             return bondLength * BRACKET_OFFSET_PERCENTAGE;
         }

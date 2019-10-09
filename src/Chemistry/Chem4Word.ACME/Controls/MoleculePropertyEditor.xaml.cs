@@ -91,10 +91,10 @@ namespace Chem4Word.ACME.Controls
             _moleculePropertiesModel.Save = true;
 
             // Get data from labels editor
-            _moleculePropertiesModel.SubModel = LabelsEditor.SubModel;
+            _moleculePropertiesModel.Data = LabelsEditor.EditedModel;
 
             // Merge in data from the first tab
-            var thisMolecule = _moleculePropertiesModel.SubModel.Molecules.First().Value;
+            var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
 
             thisMolecule.Count = null;
             if (!string.IsNullOrEmpty(CountSpinner.Text))
@@ -143,7 +143,7 @@ namespace Chem4Word.ACME.Controls
 
         private void PopulateTabOne()
         {
-            Preview.Chemistry = _moleculePropertiesModel.SubModel;
+            Preview.Chemistry = _moleculePropertiesModel.Data;
         }
 
         private void PopulateTabTwo()
@@ -152,7 +152,7 @@ namespace Chem4Word.ACME.Controls
             {
                 CMLConverter cc = new CMLConverter();
                 LabelsEditor.Used1D = _moleculePropertiesModel.Used1DProperties;
-                LabelsEditor.PopulateTreeView(cc.Export(_moleculePropertiesModel.SubModel));
+                LabelsEditor.PopulateTreeView(cc.Export(_moleculePropertiesModel.Data));
             }
         }
 

@@ -177,7 +177,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <StackPanel
             x:Name="OverallConciseFormulaPanel"
@@ -257,35 +256,5 @@
                     Background="Silver" />
             </Grid>
         </Border>
-        <Grid Grid.Row="2" Visibility="{Binding Path=ShowBottomPanel, Mode=TwoWay, Converter={StaticResource VisConverter}}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBlock
-                x:Name="WarningMessage"
-                Margin="10"
-                FontWeight="Bold"
-                Foreground="Red">
-                Message
-            </TextBlock>
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button
-                    Width="80"
-                    Height="32"
-                    Margin="5"
-                    VerticalAlignment="Center"
-                    Click="OnSaveClick"
-                    Content="Save"
-                    IsDefault="True" />
-                <Button
-                    Width="80"
-                    Height="32"
-                    Margin="5"
-                    VerticalAlignment="Center"
-                    Click="OnCancelClick"
-                    Content="Cancel" />
-            </StackPanel>
-        </Grid>
     </Grid>
 </UserControl>
