@@ -101,7 +101,7 @@ namespace Chem4Word.Helpers
             XmlNode node = xdoc.SelectSingleNode("//c4w:customXmlPartGuid", nsmgr);
             if (node != null)
             {
-                Debug.WriteLine(node.InnerText);
+                //Debug.WriteLine(node.InnerText);
                 result = node.InnerText;
             }
 

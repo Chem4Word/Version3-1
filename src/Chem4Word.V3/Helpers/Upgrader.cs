@@ -123,7 +123,7 @@ namespace Chem4Word.Helpers
             foreach (Word.ContentControl cc in doc.ContentControls)
             {
                 Word.WdContentControlType? contentControlType = cc.Type;
-                Debug.WriteLine($"{cc.ID} {cc.Range.Start} {DecodeContentControlType(contentControlType)} {cc.Tag}");
+                //Debug.WriteLine($"{cc.ID} {cc.Range.Start} {DecodeContentControlType(contentControlType)} {cc.Tag}");
                 try
                 {
                     if (cc.Title != null && cc.Title.Equals(Constants.LegacyContentControlTitle))
@@ -146,7 +146,7 @@ namespace Chem4Word.Helpers
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             int sel = doc.Application.Selection.Range.Start;
-            Globals.Chem4WordV3.DisableDocumentEvents(doc);
+            Globals.Chem4WordV3.DisableContentControlEvents(doc);
 
             try
             {
@@ -253,7 +253,7 @@ namespace Chem4Word.Helpers
                 kvp.Value.Delete();
             }
 
-            Globals.Chem4WordV3.EnableDocumentEvents(doc);
+            Globals.Chem4WordV3.EnableContentControlEvents(doc);
             doc.Application.Selection.SetRange(sel, sel);
             if (upgradedCCs + upgradedXml > 0)
             {
@@ -341,7 +341,7 @@ namespace Chem4Word.Helpers
                 string xml = xmlPart.XML;
                 if (xml.Contains("<cml"))
                 {
-                    Debug.WriteLine($"Custom Xml Part: {xmlPart.Id} is CML");
+                    //Debug.WriteLine($"Custom Xml Part: {xmlPart.Id} is CML");
                     UpgradeTarget ut = new UpgradeTarget();
                     ut.CxmlPartId = xmlPart.Id;
                     ut.Cml = xmlPart.XML;
@@ -361,7 +361,7 @@ namespace Chem4Word.Helpers
 
                 if (xml.Contains("<ChemistryZone"))
                 {
-                    Debug.WriteLine($"Custom Xml Part: {xmlPart.Id} is ChemistryZone");
+                    //Debug.WriteLine($"Custom Xml Part: {xmlPart.Id} is ChemistryZone");
                     //Debug.WriteLine($"  {xmlPart.Id}");
                     //Debug.WriteLine(xml);
                     XmlDocument xmlDoc = new XmlDocument();
@@ -377,14 +377,14 @@ namespace Chem4Word.Helpers
                     if (ddNode != null)
                     {
                         ddValue = ddNode.Attributes["value"].Value;
-                        Debug.WriteLine("  " + ddValue);
+                        //Debug.WriteLine("  " + ddValue);
                     }
 
                     if (refNode != null)
                     {
                         ccValue = refNode.Attributes["cc"].Value;
                         cmlValue = refNode.Attributes["cml"].Value;
-                        Debug.WriteLine($"  CC Id: {ccValue} CML Id: {cmlValue}");
+                        //Debug.WriteLine($"  CC Id: {ccValue} CML Id: {cmlValue}");
 
                         foreach (UpgradeTarget target in targets)
                         {

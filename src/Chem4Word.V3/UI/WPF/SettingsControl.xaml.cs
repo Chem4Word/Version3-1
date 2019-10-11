@@ -20,6 +20,8 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Database;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
 using IChem4Word.Contracts;
 using Ookii.Dialogs;
 using Forms = System.Windows.Forms;
@@ -415,7 +417,7 @@ namespace Chem4Word.UI.WPF
 
                                     var cml = File.ReadAllText(cmlFile);
                                     var lib = new Database.Library();
-                                    if (lib.ImportCml(cml, true))
+                                    if (lib.ImportCml(cml))
                                     {
                                         fileCount++;
                                     }
@@ -490,7 +492,17 @@ namespace Chem4Word.UI.WPF
                             foreach (var obj in dto)
                             {
                                 var filename = Path.Combine(browser.SelectedPath, $"Chem4Word-{obj.Id:000000000}.cml");
-                                File.WriteAllText(filename, obj.Cml);
+
+                                var converter = new CMLConverter();
+                                Model model = converter.Import(obj.Cml);
+
+                                var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                                if (!string.IsNullOrEmpty(outcome))
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                                }
+
+                                File.WriteAllText(filename, converter.Export(model));
                                 exported++;
                             }
 

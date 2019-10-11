@@ -110,7 +110,7 @@ namespace Chem4Word.Helpers
                 }
             }
 
-            Globals.Chem4WordV3.SetUpdateButtonState();
+            Globals.Chem4WordV3.ShowUpdateShield();
 
             return Globals.Chem4WordV3.VersionsBehind;
         }
@@ -162,6 +162,7 @@ namespace Chem4Word.Helpers
                     }
 
                     // Save VersionsBehind for next start up
+                    Debug.WriteLine($"Saving Versions Behind in Registry: {Globals.Chem4WordV3.VersionsBehind}");
                     key.SetValue(Constants.RegistryValueNameVersionsBehind, Globals.Chem4WordV3.VersionsBehind.ToString());
 
                     #endregion Got Our File

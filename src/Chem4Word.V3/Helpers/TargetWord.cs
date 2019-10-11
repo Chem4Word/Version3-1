@@ -13,5 +13,7 @@ namespace Chem4Word.Helpers
         public int Start { get; set; }
         public int End { get; set; }
         public int ChemistryId { get; set; }
+
+        public override string ToString() => $"{ChemicalName} Start:{Start} End:{End} Id:{ChemistryId}";
     }
 }

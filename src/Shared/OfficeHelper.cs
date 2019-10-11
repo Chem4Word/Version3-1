@@ -396,9 +396,6 @@ namespace Chem4Word.Shared
 
                 case 16: // Word 2016
                     break;
-
-                case 17: // Word 2019
-                    break;
             }
 
             if (!string.IsNullOrEmpty(servicePack))

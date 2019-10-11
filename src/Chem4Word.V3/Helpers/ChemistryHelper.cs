@@ -50,7 +50,7 @@ namespace Chem4Word.Helpers
                 try
                 {
                     app.ScreenUpdating = false;
-                    Globals.Chem4WordV3.DisableDocumentEvents(doc);
+                    Globals.Chem4WordV3.DisableContentControlEvents(doc);
 
                     var converter = new CMLConverter();
                     var model = converter.Import(cml);
@@ -108,7 +108,7 @@ namespace Chem4Word.Helpers
                 finally
                 {
                     app.ScreenUpdating = true;
-                    Globals.Chem4WordV3.EnableDocumentEvents(doc);
+                    Globals.Chem4WordV3.EnableContentControlEvents(doc);
                 }
             }
 

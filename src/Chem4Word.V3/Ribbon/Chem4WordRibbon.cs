@@ -101,7 +101,7 @@ namespace Chem4Word
                     try
                     {
                         RibbonButton b = sender as RibbonButton;
-                        Debug.WriteLine($"User chose {b.Tag}");
+                        //Debug.WriteLine($"User chose {b.Tag}");
 
                         Word.Selection sel = app.Selection;
 
@@ -134,7 +134,7 @@ namespace Chem4Word
                                         {
                                             // Stop Screen Updating and Disable Document Event Handlers
                                             app.ScreenUpdating = false;
-                                            Globals.Chem4WordV3.DisableDocumentEvents(doc);
+                                            Globals.Chem4WordV3.DisableContentControlEvents(doc);
 
                                             // Erase old CC
                                             cc.LockContents = false;
@@ -208,7 +208,7 @@ namespace Chem4Word
                     {
                         // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
                         app.ScreenUpdating = true;
-                        Globals.Chem4WordV3.EnableDocumentEvents(doc);
+                        Globals.Chem4WordV3.EnableContentControlEvents(doc);
 
                         if (cc != null)
                         {
@@ -681,7 +681,7 @@ namespace Chem4Word
                         {
                             // Stop Screen Updating and Disable Document Event Handlers
                             app.ScreenUpdating = false;
-                            Globals.Chem4WordV3.DisableDocumentEvents(doc);
+                            Globals.Chem4WordV3.DisableContentControlEvents(doc);
 
                             CMLConverter cmlConverter = new CMLConverter();
                             SdFileConverter molConverter = new SdFileConverter();
@@ -894,7 +894,7 @@ namespace Chem4Word
                                 {
                                     // Erase old CC
                                     cc.LockContents = false;
-                                    Debug.WriteLine(cc.Type);
+                                    //Debug.WriteLine(cc.Type);
                                     if (cc.Type == Word.WdContentControlType.wdContentControlPicture)
                                     {
                                         cc.Range.InlineShapes[1].Delete();
@@ -971,7 +971,7 @@ namespace Chem4Word
             {
                 // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
                 app.ScreenUpdating = true;
-                Globals.Chem4WordV3.EnableDocumentEvents(doc);
+                Globals.Chem4WordV3.EnableContentControlEvents(doc);
 
                 if (cc != null)
                 {
@@ -1423,7 +1423,7 @@ namespace Chem4Word
                                     }
 
                                     var lib = new Database.Library();
-                                    lib.ImportCml(cml, false);
+                                    lib.ImportCml(cml);
 
                                     // Re- Read the Library Names
                                     Globals.Chem4WordV3.LoadNamesFromLibrary();
@@ -1473,7 +1473,7 @@ namespace Chem4Word
             {
                 //see https://msdn.microsoft.com/en-us/library/bb608620(v=vs.100).aspx
 
-                Debug.WriteLine($"OnNavigatorClick() {ShowNavigator.Checked}");
+                //Debug.WriteLine($"OnNavigatorClick() {ShowNavigator.Checked}");
 
                 Word.Application app = Globals.Chem4WordV3.Application;
 
@@ -1536,7 +1536,7 @@ namespace Chem4Word
 
             try
             {
-                Debug.WriteLine($"OnNavigatorPaneVisibleChanged() {ShowNavigator.Checked}");
+                //Debug.WriteLine($"OnNavigatorPaneVisibleChanged() {ShowNavigator.Checked}");
 
                 CustomTaskPane taskPane = sender as CustomTaskPane;
                 Word.Application app = Globals.Chem4WordV3.Application;
@@ -1549,11 +1549,11 @@ namespace Chem4Word
                         if (window != null)
                         {
                             string taskdoc = window.Document.Name;
-                            Debug.WriteLine(taskdoc);
+                            //Debug.WriteLine(taskdoc);
 
                             if (taskdoc.Equals(app.ActiveDocument.Name))
                             {
-                                Debug.WriteLine($"Navigator Visible: {taskPane.Visible}");
+                                //Debug.WriteLine($"Navigator Visible: {taskPane.Visible}");
                                 if (ShowNavigator.Checked != taskPane.Visible)
                                 {
                                     ShowNavigator.Checked = taskPane.Visible;
@@ -1653,7 +1653,7 @@ namespace Chem4Word
 
             try
             {
-                Debug.WriteLine($"OnLibraryPaneVisibleChanged() {ShowLibrary.Checked}");
+                //Debug.WriteLine($"OnLibraryPaneVisibleChanged() {ShowLibrary.Checked}");
 
                 Word.Application app = Globals.Chem4WordV3.Application;
                 CustomTaskPane taskPane = sender as CustomTaskPane;
@@ -1666,7 +1666,7 @@ namespace Chem4Word
                         if (window != null)
                         {
                             string taskdoc = window.Document.Name;
-                            Debug.WriteLine(taskdoc);
+                            //Debug.WriteLine(taskdoc);
                             if (taskdoc.Equals(app.ActiveDocument.Name))
                             {
                                 //Debug.WriteLine($"Library Visible: {taskPane.Visible}");
@@ -1706,7 +1706,7 @@ namespace Chem4Word
 
                 // Stop Screen Updating and Disable Document Event Handlers
                 app.ScreenUpdating = false;
-                Globals.Chem4WordV3.DisableDocumentEvents(doc);
+                Globals.Chem4WordV3.DisableContentControlEvents(doc);
 
                 try
                 {
@@ -1768,7 +1768,7 @@ namespace Chem4Word
 
                                         // Insert a new CC
                                         cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
-                                        Debug.WriteLine("Inserted ContentControl " + cc.ID);
+                                        //Debug.WriteLine("Inserted ContentControl " + cc.ID);
 
                                         cc.Title = Constants.ContentControlTitle;
                                         cc.Tag = fullTag;
@@ -1801,7 +1801,7 @@ namespace Chem4Word
                 {
                     // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
                     app.ScreenUpdating = true;
-                    Globals.Chem4WordV3.EnableDocumentEvents(doc);
+                    Globals.Chem4WordV3.EnableContentControlEvents(doc);
 
                     if (cc != null)
                     {

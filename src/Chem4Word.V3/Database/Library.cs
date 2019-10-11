@@ -90,7 +90,7 @@ namespace Chem4Word.Database
             }
         }
 
-        public bool ImportCml(string cmlFile, bool fixUp)
+        public bool ImportCml(string cmlFile)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -101,13 +101,10 @@ namespace Chem4Word.Database
                 var converter = new CMLConverter();
                 Model model = converter.Import(cmlFile);
 
-                if (fixUp)
+                var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                if (!string.IsNullOrEmpty(outcome))
                 {
-                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
-                    if (!string.IsNullOrEmpty(outcome))
-                    {
-                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
-                    }
+                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
                 }
 
                 if (model.TotalAtomsCount > 0)

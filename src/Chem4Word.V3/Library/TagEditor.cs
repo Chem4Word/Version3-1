@@ -118,7 +118,7 @@ namespace Chem4Word.Library
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Debug.WriteLine($"Keydown code = {e.Key} ");
+                //Debug.WriteLine($"Keydown code = {e.Key} ");
                 if (e.Key == Key.Return)
                 {
                     //swallow the keystroke
