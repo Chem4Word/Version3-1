@@ -9,6 +9,8 @@ using System.Windows;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
 {
+    // Atoms <= InternalCharacters <= GroupBrackets <= MoleculesBrackets <= ExternalCharacters
+
     public class MoleculeExtents
     {
         private Rect _internalCharacterExtents;
@@ -25,7 +27,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         /// <summary>
         /// BoundingBox of Atom points and Atom label characters
-        /// This will be a Union of AtomExtents and bounding box of each AtomLabelCharacter(s) belonging to this molecule
+        /// This will be a Union of AtomExtents and bounding box of each AtomLabelCharacter belonging to the atoms of this molecule
         /// </summary>
         public Rect InternalCharacterExtents
         {
@@ -33,9 +35,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         }
 
         /// <summary>
+        /// Where to draw Molecule Group Brackets
+        /// </summary>
+        public Rect GroupBracketsExtents
+        {
+            get => _groupBracketsExtents;
+        }
+
+        /// <summary>
         /// Where to draw Molecule Brackets
-        /// If brackets are not being drawn this will be equal to InternalCharacterExtents
-        /// If brackets are being drawn this will be equal to InternalCharacterExtents + margin
         /// </summary>
         public Rect MoleculeBracketsExtents
         {
@@ -43,21 +51,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         }
 
         /// <summary>
-        /// BoundingBox of molecule and it's external characters
+        /// BoundingBox of molecule and all of it's characters
         /// </summary>
         public Rect ExternalCharacterExtents
         {
             get => _externalCharacterExtents;
-        }
-
-        /// <summary>
-        /// Where to draw Molecule Group Brackets
-        /// If brackets are not being drawn this will be equal to ExternalCharacterExtents
-        /// If brackets are being drawn this will be equal to ExternalCharacterExtents + margin
-        /// </summary>
-        public Rect GroupBracketsExtents
-        {
-            get => _groupBracketsExtents;
         }
 
         public MoleculeExtents(string path, Rect extents)
@@ -85,22 +83,23 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             _groupBracketsExtents = extents;
         }
 
+
+        public void SetGroupBracketExtents(Rect extents)
+        {
+            _groupBracketsExtents = extents;
+            _moleculeBracketsExtents = extents;
+            _externalCharacterExtents = extents;
+        }
+
         public void SetMoleculeBracketExtents(Rect extents)
         {
             _moleculeBracketsExtents = extents;
             _externalCharacterExtents = extents;
-            _groupBracketsExtents = extents;
         }
 
         public void SetExternalCharacterExtents(Rect extents)
         {
             _externalCharacterExtents = extents;
-            _groupBracketsExtents = extents;
-        }
-
-        public void SetGroupBracketExtents(Rect extents)
-        {
-            _groupBracketsExtents = extents;
         }
     }
 }

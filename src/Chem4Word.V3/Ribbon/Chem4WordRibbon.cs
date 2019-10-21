@@ -359,7 +359,7 @@ namespace Chem4Word
                     if (dr == DialogResult.OK)
                     {
                         Globals.Chem4WordV3.SystemOptions = f.SystemOptions.Clone();
-                        Globals.Chem4WordV3.Telemetry = new TelemetryWriter(Globals.Chem4WordV3.SystemOptions.TelemetryEnabled);
+                        Globals.Chem4WordV3.Telemetry = new TelemetryWriter(Globals.Chem4WordV3.SystemOptions.TelemetryEnabled, Globals.Chem4WordV3.Helper);
                     }
                 }
                 catch (Exception ex)
@@ -571,7 +571,17 @@ namespace Chem4Word
                 Globals.Chem4WordV3.LoadOptions();
             }
 
-            UpdateHelper.CheckForUpdates(Globals.Chem4WordV3.SystemOptions.AutoUpdateFrequency);
+            // Only do update check if we are not coming from an update button
+            bool checkForUpdates = true;
+            if (button != null)
+            {
+                checkForUpdates = !button.Label.ToLower().Contains("update");
+            }
+
+            if (checkForUpdates)
+            {
+                UpdateHelper.CheckForUpdates(Globals.Chem4WordV3.SystemOptions.AutoUpdateFrequency);
+            }
 
             Globals.Chem4WordV3.EvaluateChemistryAllowed();
         }
@@ -1264,8 +1274,6 @@ namespace Chem4Word
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
             }
-
-            AfterButtonChecks(sender as RibbonButton);
         }
 
         private void OnSearchItemsLoading(object sender, RibbonControlEventArgs e)
@@ -1301,8 +1309,6 @@ namespace Chem4Word
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
             }
-
-            AfterButtonChecks(sender as RibbonButton);
         }
 
         private void OnSearcherClick(object sender, RibbonControlEventArgs ribbonControlEventArgs)

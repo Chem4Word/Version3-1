@@ -48,6 +48,8 @@ namespace Chem4Word
         public static CustomRibbon Ribbon;
 
         public int VersionsBehind = 0;
+        public DateTime VersionLastChecked = DateTime.MinValue;
+
         public XDocument AllVersions;
         public XDocument ThisVersion;
 
@@ -60,13 +62,14 @@ namespace Chem4Word
         private bool _chemistrySelected = false;
         private bool _markAsChemistryHandled = false;
         private int _rightClickEvents = 0;
+        private ConfigWatcher _configWatcher;
 
         public bool LibraryState = false;
 
         public C4wAddInInfo AddInInfo = new C4wAddInInfo();
         public SystemHelper Helper;
         public Options SystemOptions;
-        public TelemetryWriter Telemetry = new TelemetryWriter(true);
+        public TelemetryWriter Telemetry;
 
         public List<IChem4WordEditor> Editors;
         public List<IChem4WordRenderer> Renderers;
@@ -164,10 +167,6 @@ namespace Chem4Word
                         case "16.0":
                             version = 2016;
                             break;
-
-                        case "17.0":
-                            version = 2019;
-                            break;
                     }
                 }
                 catch
@@ -199,56 +198,69 @@ namespace Chem4Word
 
             try
             {
+                Helper = new SystemHelper();
+
                 ServicePointManager.DefaultConnectionLimit = 100;
                 ServicePointManager.UseNagleAlgorithm = false;
                 ServicePointManager.Expect100Continue = false;
 
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-                UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
-
-                Word.Application app = Application;
-
-                // Hook in Global Application level events
-                app.WindowBeforeDoubleClick += OnWindowBeforeDoubleClick;
-                app.WindowSelectionChange += OnWindowSelectionChange;
-                app.WindowActivate += OnWindowActivate;
-                app.WindowBeforeRightClick += OnWindowBeforeRightClick;
-
-                // Hook in Global Document Level Events
-                app.DocumentOpen += OnDocumentOpen;
-                app.DocumentChange += OnDocumentChange;
-                app.DocumentBeforeClose += OnDocumentBeforeClose;
-                app.DocumentBeforeSave += OnDocumentBeforeSave;
-                ((Word.ApplicationEvents4_Event)Application).NewDocument += OnNewDocument;
-
-                if (app.Documents.Count > 0)
-                {
-                    EnableContentControlEvents(app.ActiveDocument);
-                    if (app.ActiveDocument.CompatibilityMode >= (int)Word.WdCompatibilityMode.wdWord2010)
-                    {
-                        SetButtonStates(ButtonState.CanInsert);
-                    }
-                    else
-                    {
-                        SetButtonStates(ButtonState.NoDocument);
-                    }
-                }
-
-                if (AddInInfo.DeploymentPath.ToLower().Contains("vso-ci"))
-                {
-                    StringBuilder sb = new StringBuilder();
-                    sb.AppendLine($"Hey {Environment.UserName}");
-                    sb.AppendLine("");
-                    sb.AppendLine("You should not be running this build configuration");
-                    sb.AppendLine("Please select Debug or Release build!");
-                    UserInteractions.StopUser(sb.ToString());
-                }
+                Telemetry = new TelemetryWriter(true, Helper);
 
                 // Set parameter mustBeSigned true if assemblies must be signed by us
                 LoadPlugIns(false);
 
-                ConfigWatcher cw = new ConfigWatcher(AddInInfo.ProductAppDataPath);
+                _configWatcher = new ConfigWatcher(AddInInfo.ProductAppDataPath);
+
+                UpdateHelper.ReadSavedValues();
+                UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
+                ShowOrHideUpdateShield();
+
+                if (Globals.Chem4WordV3.VersionsBehind < Constants.MaximunVersionsBehind)
+                {
+                    Word.Application app = Application;
+
+                    // Hook in Global Application level events
+                    app.WindowBeforeDoubleClick += OnWindowBeforeDoubleClick;
+                    app.WindowSelectionChange += OnWindowSelectionChange;
+                    app.WindowActivate += OnWindowActivate;
+                    app.WindowBeforeRightClick += OnWindowBeforeRightClick;
+
+                    // Hook in Global Document Level Events
+                    app.DocumentOpen += OnDocumentOpen;
+                    app.DocumentChange += OnDocumentChange;
+                    app.DocumentBeforeClose += OnDocumentBeforeClose;
+                    app.DocumentBeforeSave += OnDocumentBeforeSave;
+                    ((Word.ApplicationEvents4_Event)Application).NewDocument += OnNewDocument;
+
+                    if (app.Documents.Count > 0)
+                    {
+                        EnableContentControlEvents(app.ActiveDocument);
+                        if (app.ActiveDocument.CompatibilityMode >= (int)Word.WdCompatibilityMode.wdWord2010)
+                        {
+                            SetButtonStates(ButtonState.CanInsert);
+                        }
+                        else
+                        {
+                            SetButtonStates(ButtonState.NoDocument);
+                        }
+                    }
+
+                    if (AddInInfo.DeploymentPath.ToLower().Contains("vso-ci"))
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine($"Hey {Environment.UserName}");
+                        sb.AppendLine("");
+                        sb.AppendLine("You should not be running this build configuration");
+                        sb.AppendLine("Please select Debug or Release build!");
+                        UserInteractions.StopUser(sb.ToString());
+                    }
+                }
+                else
+                {
+                    Telemetry.Write(module, "Exception(Data)", $"Chem4Word is disabled because it is {VersionsBehind} versions behind!");
+                }
 
                 // Deliberate crash to test Error Reporting
                 //int ii = 2;
@@ -289,7 +301,7 @@ namespace Chem4Word
 
             try
             {
-                // Initiallize Telemetry with send permission
+                // Initialize Telemetry with send permission
                 Telemetry = new TelemetryWriter(true, Helper);
 
                 // Read in options file
@@ -852,6 +864,7 @@ namespace Chem4Word
 
                 switch (state)
                 {
+                    case ButtonState.Disabled:
                     case ButtonState.NoDocument:
                         Ribbon.EditStructure.Enabled = false;
                         Ribbon.EditStructure.Label = "Draw";
@@ -900,35 +913,50 @@ namespace Chem4Word
                         Ribbon.ButtonsDisabled.Enabled = false;
                         break;
                 }
-
-                ShowUpdateShield();
             }
         }
 
-        public void ShowUpdateShield()
+        public void ShowOrHideUpdateShield()
         {
-            if (VersionsBehind == 0)
+            switch (VersionsBehind)
             {
-                Ribbon.Update.Visible = false;
-                Ribbon.Update.Image = Properties.Resources.Shield_Good;
-            }
-            else
-            {
-                Ribbon.Update.Visible = true;
-                if (VersionsBehind < 3)
-                {
+                case 0:
+                    Ribbon.Update.Visible = false;
+                    Ribbon.Update.Image = Properties.Resources.Shield_Good;
+                    ChemistryProhibitedReason = "";
+                    break;
+
+                case 1:
+                case 2:
+                case 3:
+                    Ribbon.Update.Visible = true;
                     Ribbon.Update.Image = Properties.Resources.Shield_Warning;
                     Ribbon.Update.Label = "Update Advised";
                     Ribbon.Update.ScreenTip = "Please update";
-                    Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind";
-                }
-                else
-                {
+                    Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind.";
+                    ChemistryProhibitedReason = "";
+                    break;
+
+                case 4:
+                case 5:
+                case 6:
+                    Ribbon.Update.Visible = true;
                     Ribbon.Update.Image = Properties.Resources.Shield_Danger;
                     Ribbon.Update.Label = "Update Essential";
                     Ribbon.Update.ScreenTip = "Please update";
-                    Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind";
-                }
+                    Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind.";
+                    ChemistryProhibitedReason = "";
+                    break;
+
+                default:
+                    Ribbon.Update.Visible = true;
+                    Ribbon.Update.Image = Properties.Resources.Shield_Danger;
+                    Ribbon.Update.Label = "Update to use Chem4Word again";
+                    Ribbon.Update.ScreenTip = "You must update to continue using Chem4Word";
+                    Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind and Chem4Word has been disabled because it is too many versions old.";
+                    SetButtonStates(ButtonState.Disabled);
+                    ChemistryProhibitedReason = "Chem4Word is too many versions old.";
+                    break;
             }
         }
 
@@ -1782,7 +1810,7 @@ namespace Chem4Word
 
             bool allowed = true;
 
-            // Skip checks if ChemistryProhibitedReason already set
+            // Skip checks if ChemistryProhibitedReason is already set
             if (string.IsNullOrEmpty(ChemistryProhibitedReason))
             {
                 ChemistryProhibitedReason = "";
@@ -2450,6 +2478,7 @@ namespace Chem4Word
 
     public enum ButtonState
     {
+        Disabled,
         NoDocument,
         CanEdit,
         CanInsert

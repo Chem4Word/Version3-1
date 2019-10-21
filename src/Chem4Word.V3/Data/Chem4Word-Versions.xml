@@ -1,16 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This file must be uploaded to https://www.chem4word.co.uk/files3/ folder as Chem4Word-Versions.xml -->
 <ChangeLog>
-  <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
-  <Version>
-    <Number>3.1.0 Alpha 1</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Jan-2019</Released>
-    <Changes>
-      <Change>...</Change>
-      <Change>...</Change>
-      <Change>Please download Chem4Word-Setup.exe from https://github.com/Chem4Word/Version3-1/releases/latest if you encounter any difficulties updating.</Change>
-    </Changes>
-    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
-  </Version>
+    <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
+    <Version>
+        <Number>3.1.0 Update Test #9</Number>
+        <IsBeta>true</IsBeta>
+        <Released>09-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #9</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #8</Number>
+        <IsBeta>true</IsBeta>
+        <Released>08-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #8</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #7</Number>
+        <IsBeta>true</IsBeta>
+        <Released>07-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #7</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #6</Number>
+        <IsBeta>true</IsBeta>
+        <Released>06-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #6</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #5</Number>
+        <IsBeta>true</IsBeta>
+        <Released>05-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #5</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #4</Number>
+        <IsBeta>true</IsBeta>
+        <Released>04-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #4</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #3</Number>
+        <IsBeta>true</IsBeta>
+        <Released>03-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #3</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #2</Number>
+        <IsBeta>true</IsBeta>
+        <Released>02-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #2</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Update Test #1</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Feb-2019</Released>
+        <Changes>
+            <Change>Update Test #1</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.0 Alpha 1</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Jan-2019</Released>
+        <Changes>
+            <Change>...</Change>
+            <Change>...</Change>
+            <Change>Please download Chem4Word-Setup.exe from https://github.com/Chem4Word/Version3-1/releases/latest if you encounter any difficulties updating.</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.0.Alpha.1.msi</Url>
+    </Version>
 </ChangeLog>

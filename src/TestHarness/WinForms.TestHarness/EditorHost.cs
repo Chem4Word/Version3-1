@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
@@ -51,7 +52,8 @@ namespace WinForms.TestHarness
 
                     // Configure Control
                     acmeEditor.ShowFeedback = false;
-                    acmeEditor.Telemetry = new TelemetryWriter(true);
+                    SystemHelper helper = new SystemHelper();
+                    acmeEditor.Telemetry = new TelemetryWriter(true, helper);
                     acmeEditor.SetProperties(cml, used1D, options);
                     acmeEditor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
 
