@@ -28,7 +28,8 @@ namespace WinForms.TestHarness
         private Stack<Model> _undoStack = new Stack<Model>();
         private Stack<Model> _redoStack = new Stack<Model>();
 
-        private TelemetryWriter _telemetry = new TelemetryWriter(true);
+        private SystemHelper _helper;
+        private TelemetryWriter _telemetry;
 
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
@@ -38,6 +39,8 @@ namespace WinForms.TestHarness
         public FlexForm()
         {
             InitializeComponent();
+            _helper = new SystemHelper();
+            _telemetry = new TelemetryWriter(true, _helper);
         }
 
         private void LoadStructure_Click(object sender, EventArgs e)

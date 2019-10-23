@@ -180,15 +180,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 foreach (var group in _groupBrackets)
                 {
-                    string bracketColour = _options.ColouredAtoms ? "2A579A" : "000000";
-                    DrawGroupBrackets(wordprocessingGroup, group, _medianBondLength / 2, OoXmlHelper.ACS_LINE_WIDTH * 2, bracketColour);
+                    string bracketColour = _options.ColouredAtoms ? "00bbff" : "000000";
+                    DrawGroupBrackets(wordprocessingGroup, group, _medianBondLength * 0.5, OoXmlHelper.ACS_LINE_WIDTH * 2, bracketColour);
                 }
             }
 
             // Render molecule brackets
             foreach (var moleculeBracket in _moleculeBrackets)
             {
-                DrawMoleculeBrackets(wordprocessingGroup, moleculeBracket, _medianBondLength / 10, OoXmlHelper.ACS_LINE_WIDTH * 2, "000000");
+                DrawMoleculeBrackets(wordprocessingGroup, moleculeBracket, _medianBondLength * 0.2, OoXmlHelper.ACS_LINE_WIDTH, "000000");
             }
 
             #endregion Step 5.1 - Show Molecule and Group Brackets
@@ -397,7 +397,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             break;
 
                         case 3:
-                            characters += "•";
+                            characters += "••";
                             break;
                     }
                 }

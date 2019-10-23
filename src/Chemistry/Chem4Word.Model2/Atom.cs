@@ -66,7 +66,7 @@ namespace Chem4Word.Model2
             {
                 int result = 0;
 
-                var allRings = ((Molecule)Parent).Rings;
+                var allRings = Parent.Rings;
                 foreach (Ring ring in allRings)
                 {
                     if (ring.Atoms.Contains(this))
@@ -88,7 +88,7 @@ namespace Chem4Word.Model2
             {
                 var result = new List<Ring>();
 
-                var allRings = ((Molecule)Parent).Rings;
+                var allRings = Parent.Rings;
                 foreach (Ring ring in allRings)
                 {
                     if (ring.Atoms.Contains(this))
@@ -110,7 +110,7 @@ namespace Chem4Word.Model2
             {
                 var result = false;
 
-                var allRings = ((Molecule)Parent).Rings;
+                var allRings = Parent.Rings;
                 foreach (Ring ring in allRings)
                 {
                     if (ring.Atoms.Contains(this))
@@ -152,9 +152,7 @@ namespace Chem4Word.Model2
             {
                 if (_id != value)
                 {
-                    var oldID = _id;
                     _id = value;
-                    //Parent?.UpdateBondRefs(oldID, value); //could be updating while orphaned
                 }
             }
         }
@@ -198,7 +196,7 @@ namespace Chem4Word.Model2
                 switch (Element)
                 {
                     case Element e
-                        when (e == Globals.PeriodicTable.C & IsotopeNumber != null | (FormalCharge ?? 0) != 0):
+                        when (e == Globals.PeriodicTable.C & IsotopeNumber != null || (FormalCharge ?? 0) != 0):
                         return true;
 
                     case Element e when (e == Globals.PeriodicTable.C):
@@ -219,12 +217,6 @@ namespace Chem4Word.Model2
                         _explicitC = value;
                         OnPropertyChanged();
                         OnPropertyChanged(nameof(SymbolText));
-                        break;
-
-                    default:
-                        //just ignore it for now
-                        //Debugger.Break();
-                        //throw new ArgumentOutOfRangeException("ShowSymbol", "Cannot set explicit display on a non-carbon atom.");
                         break;
                 }
             }
@@ -596,13 +588,7 @@ namespace Chem4Word.Model2
         /// <summary>
         /// The internal ID is what is used to tie atoms and bonds together
         /// </summary>
-        private string _internalId;
-
-        public string InternalId
-        {
-            get { return _internalId; }
-            set { _internalId = value; }
-        }
+        public string InternalId { get; set; }
 
         public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms.Values.First() == this;
 
@@ -640,7 +626,7 @@ namespace Chem4Word.Model2
         {
             if (ImplicitHydrogenCount >= 1)
             {
-                if (Bonds.Count() == 0)
+                if (!Bonds.Any())
                 {
                     return CompassPoints.East;
                 }
@@ -650,11 +636,11 @@ namespace Chem4Word.Model2
                         Bonds.First().OtherAtom(this).Position - Position);
                     int clockDirection = BasicGeometry.SnapToClock(angle);
 
-                    if (clockDirection == 0 | clockDirection == 6)
+                    if (clockDirection == 0 || clockDirection == 6)
                     {
                         return CompassPoints.East;
                     }
-                    else if (clockDirection >= 6 & clockDirection <= 11)
+                    else if (clockDirection >= 6 && clockDirection <= 11)
                     {
                         return CompassPoints.East;
                     }

@@ -387,7 +387,7 @@ namespace Chem4Word.ACME.Drawing
         private void RenderAtom(DrawingContext drawingContext)
         {
             //renders the atom complete with charges, hydrogens and labels.
-            //this code is *complex*
+            //this code is *complex* - alter it at your own risk!
 
             List<Point> symbolPoints = new List<Point>();
             List<Point> hydrogenPoints = new List<Point>();

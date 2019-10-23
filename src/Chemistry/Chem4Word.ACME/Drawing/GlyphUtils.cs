@@ -38,6 +38,10 @@ namespace Chem4Word.ACME.Drawing
             FontWeights.Bold,
             FontStretches.Normal);
 
+        public  static Typeface MoleculelabelTypeface = new Typeface(new FontFamily("Arial"),
+            FontStyles.Normal,
+            FontWeights.Normal,
+            FontStretches.Normal);
         static GlyphUtils()
         {
             if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
@@ -56,8 +60,6 @@ namespace Chem4Word.ACME.Drawing
         public static Vector GetOffsetVector(GlyphRun glyphRun, double symbolSize)
         {
             Rect rect = glyphRun.ComputeAlignmentBox();
-
-            //Vector offset = (rect.BottomLeftHandle - rect.TopRightHandle) / 2;
             Vector offset = new Vector(-rect.Width / 2, glyphRun.GlyphTypeface.CapsHeight * symbolSize / 2);
             return offset;
         }

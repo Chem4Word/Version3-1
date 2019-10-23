@@ -22,17 +22,9 @@ namespace Chem4Word.Model2
     {
         #region Properties
 
-        public string EndAtomInternalId
-        {
-            get => _endAtomInternalId;
-            set => _endAtomInternalId = value;
-        }
+        public string EndAtomInternalId { get; set; }
 
-        public string StartAtomInternalId
-        {
-            get => _startAtomInternalId;
-            set => _startAtomInternalId = value;
-        }
+        public string StartAtomInternalId { get; set; }
 
         public Atom EndAtom
         {
@@ -78,11 +70,7 @@ namespace Chem4Word.Model2
 
         public string Id { get; set; }
 
-        public string InternalId
-        {
-            get { return _internalId; }
-            set { _internalId = value; }
-        }
+        public string InternalId { get; set; }
 
         public override string Path
         {
@@ -177,8 +165,6 @@ namespace Chem4Word.Model2
         #endregion Bond Orders
 
         private Globals.BondStereo _stereo;
-        private string _endAtomInternalId;
-        private string _startAtomInternalId;
 
         public Globals.BondStereo Stereo
         {
@@ -192,8 +178,6 @@ namespace Chem4Word.Model2
 
         public object Tag { get; set; }
         public List<string> Messages { get; private set; }
-
-        private string _internalId;
 
         public Globals.BondDirection Placement
         {
@@ -220,7 +204,7 @@ namespace Chem4Word.Model2
 
         public Globals.BondDirection? ExplicitPlacement { get; set; }
 
-        private Vector? VectorOnSideOfNonHAtomFromStartLigands(Atom startAtom, Atom endAtom, IEnumerable<Atom> startLigands)
+        private Vector? VectorOnSideOfNonHAtomFromStartLigands(Atom startAtom, Atom endAtom )
         {
             Vector? displacementVector = null;
 
@@ -363,12 +347,12 @@ namespace Chem4Word.Model2
                 return null;
             }
 
-            if (startLigands.Count() > 2 || endLigands.Count() > 2)
+            if (startLigands.Count > 2 || endLigands.Count > 2)
             {
                 return null;
             }
 
-            if (startLigands.Count() == 2 && endLigands.Count() == 2)
+            if (startLigands.Count == 2 && endLigands.Count == 2)
             {
                 return null;
             }
@@ -385,20 +369,20 @@ namespace Chem4Word.Model2
 
             if (startLigands.GetHCount() == 1 && endLigands.GetNonHCount() == 1)
             {
-                if (endLigands.Count() == 2)
+                if (endLigands.Count == 2)
                 {
                     if (endLigands.GetHCount() == 2 || endLigands.ContainNoH())
                     {
                         //Double sided bond on the side of the non H atom from StartLigands
                         //Elbow bond :¬)
-                       return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
+                       return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                     }
                     // Now must have 1 H and 1 !H
                     if (AtomsAreCis(startLigands.GetFirstNonH(), endLigands.GetFirstNonH())
                         /*if a2a H on the same side as a1a H*/)
                     {
                         //double bond on the side of non H
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
+                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                     }
 
                     //Now must be a trans bond.
@@ -409,7 +393,7 @@ namespace Chem4Word.Model2
                 if (endLigands.GetHCount() == 1)
                 {
                     //Double bond on the side of non H from StartLigands, bevel 1 end.
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                 }
 
                 //Now !H
@@ -417,7 +401,7 @@ namespace Chem4Word.Model2
                     /*EndAtomAtom's !H is on the same side as StartAtomAtom's !H*/)
                 {
                     //double bond on the side of !H from StartLigands, bevel both ends
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                 }
 
                 //Now must be a trans bond.
@@ -426,7 +410,7 @@ namespace Chem4Word.Model2
 
             if (startLigands.AreAllH())
             {
-                if (endLigands.Count() == 2)
+                if (endLigands.Count == 2)
                 {
                     if (endLigands.ContainNoH())
                     {
@@ -435,17 +419,17 @@ namespace Chem4Word.Model2
 
                     //Must now have 1 H and 1 !H
                     //double bond on the side of EndLigands' !H, bevel 1 end only
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                 }
                 //Count must now be 1
                 // Must now be 1 !H
                 // Double bond on the side of EndLigands' !H, bevel 1 end only.
-                return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
+                return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
             }
 
             if (startLigands.GetHCount() == 0)
             {
-                if (endLigands.Count() == 2)
+                if (endLigands.Count == 2)
                 {
                     if (endLigands.AreAllH())
                     {
@@ -457,7 +441,7 @@ namespace Chem4Word.Model2
                     }
                     // Now must have 1 H and 1 !H
                     //Double bond on the side of EndLigands' !H, bevel both ends.
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                 }
                 //Count is 1
                 if (endLigands.GetHCount() == 1)
@@ -468,13 +452,13 @@ namespace Chem4Word.Model2
                 if (endLigands.GetHCount() == 0)
                 {
                     //double bond on the side of EndLigands' !H, bevel both ends.
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                 }
             }
             // StartLigands' count = 1
             else if (startLigands.GetHCount() == 1)
             {
-                if (endLigands.Count() == 2)
+                if (endLigands.Count == 2)
                 {
                     if (endLigands.AreAllH())
                     {
@@ -487,7 +471,7 @@ namespace Chem4Word.Model2
 
                     //Now EndLigands contains 1 H and 1 !H
                     //double bond on side of EndLigands' !H, bevel 1 end
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, endLigands);
+                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom);
                 }
 
                 if (endLigands.AreAllH())
@@ -495,52 +479,6 @@ namespace Chem4Word.Model2
                    return null;
                 }
             }
-            else if (startLigands.GetHCount() == 0)
-            {
-                if (endLigands.Count() == 2)
-                {
-                    if (endLigands.AreAllH())
-                    {
-                        //Double bond on the side of StartLigands' !H, bevel one end.
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                    }
-                    if (endLigands.ContainNoH())
-                    {
-                        //double bond on the side of StartLigands' !H, bevel both end.
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                    }
-
-                    //Now EndLigands contains 1 H and 1 !H
-                    if (AtomsAreCis(startLigands.GetFirstNonH(), endLigands.GetFirstNonH())
-                        /* EndLigands' !H is on the same side as StartAtomAtom's !H */)
-                    {
-                        //double bond on the side of StartLigands' !H, bevel both ends
-                        return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                    }
-
-                    // Must be trans
-                    return null;
-                }
-
-                // atoms2Atoms length == 1
-                if (endLigands.GetHCount() == 1)
-                {
-                    //double bond on side of StartLigands' !H, bevel one end.
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                }
-
-                // EndLigands must contain 1 !H
-                if (AtomsAreCis(startLigands.GetFirstNonH(), endLigands.GetFirstNonH())
-                    /* EndLigands' !H is on same side as StartLigands' !H */)
-                {
-                    //double bond on side of StartLigands' !H, bevel both ends
-                    return VectorOnSideOfNonHAtomFromStartLigands(StartAtom, EndAtom, startLigands);
-                }
-
-                //Must be trans
-                return null;
-            }
-
             return vector;
         }
 
@@ -559,13 +497,13 @@ namespace Chem4Word.Model2
                 }
                 else
                 {
-                    if (StartAtom.Neighbours.Count() == 1 & EndAtom.Neighbours.Count() == 2)
+                    if (StartAtom.Neighbours.Count() == 1 && EndAtom.Neighbours.Count() == 2)
                     {
                         var tempvector = EndAtom.NeighboursExcept(StartAtom)[0].Position - StartAtom.Position;
                         var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector) * BondVector.Perpendicular();
                         return perp;
                     }
-                    else if (StartAtom.Neighbours.Count() == 2 & EndAtom.Neighbours.Count() == 1)
+                    else if (StartAtom.Neighbours.Count() == 2 && EndAtom.Neighbours.Count() == 1)
                     {
                         var tempvector = StartAtom.NeighboursExcept(EndAtom)[0].Position - EndAtom.Position;
                         var perp = Vector.Multiply(BondVector.Perpendicular(), tempvector) * BondVector.Perpendicular();
@@ -638,7 +576,7 @@ namespace Chem4Word.Model2
                     }
                 }
                 //if we have two atoms on the same side as the bond...
-                if (preferredStartLigand != null & preferredEndLigand != null)
+                if (preferredStartLigand != null && preferredEndLigand != null)
                 {
                     return preferredStartLigand.Position +
                            (preferredEndLigand.Position - preferredStartLigand.Position) / 2;

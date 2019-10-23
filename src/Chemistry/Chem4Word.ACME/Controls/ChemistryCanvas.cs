@@ -113,7 +113,6 @@ namespace Chem4Word.ACME.Controls
         private static void ShowGroupsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ChemistryCanvas cc = (ChemistryCanvas)d;
-            bool showGroups = (bool)e.NewValue;
             cc.Clear();
             cc.DrawChemistry(cc.Chemistry);
         }
@@ -226,7 +225,7 @@ namespace Chem4Word.ACME.Controls
                         break;
 
                     case Molecule m:
-                        RedrawMolecule(m, GetDrawnBoundingBox(m));
+                        RedrawMolecule(m);
                         break;
                 }
 
@@ -239,23 +238,57 @@ namespace Chem4Word.ACME.Controls
 
         private void RedrawMolecule(Molecule molecule, Rect? boundingBox = null)
         {
+            
+            if (chemicalVisuals.ContainsKey(molecule))
+            {
+                var doomed = chemicalVisuals[molecule];
+                DeleteVisual(doomed);
+                chemicalVisuals.Remove(molecule);
+            }
+
+            bool showBrackets = molecule.ShowMoleculeBrackets.HasValue && molecule.ShowMoleculeBrackets.Value
+                                || molecule.Count.HasValue
+                                || molecule.FormalCharge.HasValue
+                                || molecule.SpinMultiplicity.HasValue;
+
             var groupKey = molecule.GetGroupKey();
             if (chemicalVisuals.ContainsKey(groupKey)) //it's already in the list
             {
                 var doomed = chemicalVisuals[groupKey];
                 DeleteVisual(doomed);
-                chemicalVisuals.Remove(molecule);
+                chemicalVisuals.Remove(groupKey);
             }
 
-            if (molecule.IsGrouped & ShowGroups)
+            var footprint = GetExtents(molecule);
+            
+            if (molecule.IsGrouped && ShowGroups)
             {
-                chemicalVisuals[groupKey] = new GroupVisual(molecule, boundingBox);
+                //we may be passing in a null bounding box here
+
+                chemicalVisuals[groupKey] = new GroupVisual(molecule, footprint);
                 var gv = (GroupVisual)chemicalVisuals[groupKey];
                 gv.ChemicalVisuals = chemicalVisuals;
                 gv.Render();
                 AddVisual(gv);
             }
+
+            if (boundingBox == null)
+            {
+                boundingBox = Rect.Empty;
+            }
+            if (showBrackets)
+            {
+                boundingBox.Value.Union(footprint);
+                var mv = new MoleculeVisual(molecule, footprint);
+                chemicalVisuals[molecule] = mv;
+                mv.Render();
+                AddVisual(mv);
+                boundingBox.Value.Union(mv.ContentBounds);
+            }
+          
         }
+
+       
 
         private void RedrawBond(Bond bond)
         {
@@ -378,7 +411,7 @@ namespace Chem4Word.ACME.Controls
 
         private ChemicalVisual _visualHit;
 
-        private List<ChemicalVisual> _visuals = new List<ChemicalVisual>();
+        private readonly List<ChemicalVisual> _visuals = new List<ChemicalVisual>();
 
         #endregion Fields
 
@@ -458,8 +491,6 @@ namespace Chem4Word.ACME.Controls
                     _highlightAdorner = null;
                     break;
             }
-
-            ;
         }
 
         //overrides
@@ -514,17 +545,13 @@ namespace Chem4Word.ACME.Controls
             AddLogicalChild(visual);
         }
 
-        public Rect GetDrawnBoundingBox(Molecule mol)
+        public Rect GetDrawnBoundingBox(Molecule molecule)
         {
-            Rect bb = Rect.Empty;
-            foreach (var atom in mol.Atoms.Values)
-            {
-                bb.Union(((AtomVisual)chemicalVisuals[atom]).ContentBounds);
-            }
+            var bb = GetExtents(molecule);
 
-            foreach (var m in mol.Molecules.Values)
+            foreach (var m in molecule.Molecules.Values)
             {
-                if (chemicalVisuals.TryGetValue(m, out DrawingVisual molVisual))
+                if (chemicalVisuals.TryGetValue(m.GetGroupKey(), out DrawingVisual molVisual))
                 {
                     GroupVisual gv = (GroupVisual)molVisual;
                     bb.Union(gv.ContentBounds);
@@ -536,6 +563,29 @@ namespace Chem4Word.ACME.Controls
                 }
             }
 
+            return bb;
+        }
+
+        private Rect GetExtents(Molecule molecule)
+        {
+            Rect bb = Rect.Empty;
+           
+            foreach (var atom in molecule.Atoms.Values)
+            {
+                var mv = (AtomVisual) chemicalVisuals[atom];
+                var contentBounds = mv.ContentBounds;
+                bb.Union(contentBounds);
+            }
+
+            if(chemicalVisuals.TryGetValue(molecule, out DrawingVisual molvisual))
+            {
+                bb.Union(molvisual.ContentBounds);
+            }
+
+            foreach (var mol in molecule.Molecules.Values)
+            {
+                bb.Union(GetExtents(mol));
+            }
             return bb;
         }
 
@@ -563,8 +613,13 @@ namespace Chem4Word.ACME.Controls
 
         private void MoleculeRemoved(Molecule molecule)
         {
-
-
+            //get rid of the molecule visual if any
+            if (chemicalVisuals.TryGetValue(molecule, out DrawingVisual mv))
+            {
+                DeleteVisual((MoleculeVisual)mv);
+                chemicalVisuals.Remove(molecule);
+            }
+            //do the group visual, if any
             if (molecule.IsGrouped)
             {
                 if (chemicalVisuals.TryGetValue(molecule.GetGroupKey(), out DrawingVisual dv))

@@ -543,48 +543,53 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
         }
 
-        public void DoTransform(Transform operation, List<Atom> toList)
+        public void DoTransform(Transform operation, List<Atom> transformedAtoms)
         {
-            UndoManager.BeginUndoBlock();
-            var inverse = operation.Inverse;
-            Atom[] transformList = toList.ToArray();
+            if (transformedAtoms.Any())
+            {
+                UndoManager.BeginUndoBlock();
+                var inverse = operation.Inverse;
+                Atom[] transformList = transformedAtoms.ToArray();
+                //need an reference to the mol later
+                Molecule transformedMol = transformedAtoms[0].Parent;
 
-            Action undo = () =>
-                          {
-                              _selectedItems.Clear();
-                              foreach (Atom atom in transformList)
+                Action undo = () =>
                               {
-                                  atom.Position = inverse.Transform(atom.Position);
-                                  atom.UpdateVisual();
-                              }
+                                  _selectedItems.Clear();
+                                  foreach (Atom atom in transformList)
+                                  {
+                                      atom.Position = inverse.Transform(atom.Position);
+                                      atom.UpdateVisual();
+                                  }
 
-                              toList[0].Parent.UpdateVisual();
-                              foreach (Atom o in transformList)
+                                  transformedMol.RootMolecule.UpdateVisual();
+                                  foreach (Atom o in transformList)
+                                  {
+                                      AddToSelection(o);
+                                  }
+                              };
+                Action redo = () =>
                               {
-                                  AddToSelection(o);
-                              }
-                          };
-            Action redo = () =>
-                          {
-                              _selectedItems.Clear();
-                              foreach (Atom atom in transformList)
-                              {
-                                  atom.Position = operation.Transform(atom.Position);
-                                  atom.UpdateVisual();
-                              }
+                                  _selectedItems.Clear();
+                                  foreach (Atom atom in transformList)
+                                  {
+                                      atom.Position = operation.Transform(atom.Position);
+                                      atom.UpdateVisual();
+                                  }
 
-                              toList[0].Parent.UpdateVisual();
-                              foreach (Atom o in transformList)
-                              {
-                                  AddToSelection(o);
-                              }
-                          };
+                                  transformedMol.RootMolecule.UpdateVisual();
+                                  foreach (Atom o in transformList)
+                                  {
+                                      AddToSelection(o);
+                                  }
+                              };
 
-            UndoManager.RecordAction(undo, redo);
+                UndoManager.RecordAction(undo, redo);
 
-            redo();
+                redo();
 
-            UndoManager.EndUndoBlock();
+                UndoManager.EndUndoBlock();
+            }
         }
 
         public void DoTransform(Transform operation, List<Molecule> toList)

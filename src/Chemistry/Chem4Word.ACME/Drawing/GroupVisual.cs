@@ -15,7 +15,7 @@ namespace Chem4Word.ACME.Drawing
     public class GroupVisual : ChemicalVisual
     {
         private const double MainAreaOpacity = 0.05;
-        private const int BracketThickness = 4;
+       
         public Rect BoundingBox { get; }
         public Molecule ParentMolecule { get; }
 
@@ -30,20 +30,21 @@ namespace Chem4Word.ACME.Drawing
         {
             //first work out the angle bracket size
             double bondLength = ParentMolecule.Model.XamlBondLength;
-            double bracketLength = bondLength / 2;
+            double bracketLength = Globals.BracketFactor * bondLength;
             //now work out the main area
             Brush mainArea = new SolidColorBrush(Colors.Gray);
             mainArea.Opacity = MainAreaOpacity;
-            Brush bracketBrush = new SolidColorBrush(Globals.Chem4WordColor);
-            Pen bracketPen = new Pen(bracketBrush, BracketThickness);
+            Brush bracketBrush = new SolidColorBrush(Globals.GroupBracketColor);
+            Pen bracketPen = new Pen(bracketBrush, Globals.BracketThickness);
             bracketPen.StartLineCap = PenLineCap.Round;
             bracketPen.EndLineCap = PenLineCap.Round;
 
             using (DrawingContext dc = RenderOpen())
             {
+                var inflateFactor = ParentMolecule.Model.XamlBondLength * Globals.GroupInflateFactor;
                 var bb = BoundingBox;
 
-                bb.Inflate(new Size(bracketPen.Thickness, bracketPen.Thickness));
+                bb.Inflate(new Size(inflateFactor, inflateFactor));
 
                 dc.DrawRectangle(mainArea, null, bb);
                 Vector right = new Vector(bracketLength, 0);
