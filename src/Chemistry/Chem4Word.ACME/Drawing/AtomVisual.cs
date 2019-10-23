@@ -408,7 +408,6 @@ namespace Chem4Word.ACME.Drawing
                 //grab the hull for later
                 if (symbolText.FlattenedPath != null)
                 {
-                    symbolPoints = symbolText.FlattenedPath;
                     Hull.AddRange(symbolText.FlattenedPath);
                 }
             }

@@ -239,17 +239,18 @@ namespace Chem4Word.ACME.Controls
 
         private void RedrawMolecule(Molecule molecule, Rect? boundingBox = null)
         {
-            if (chemicalVisuals.ContainsKey(molecule)) //it's already in the list
+            var groupKey = molecule.GetGroupKey();
+            if (chemicalVisuals.ContainsKey(groupKey)) //it's already in the list
             {
-                var doomed = chemicalVisuals[molecule];
+                var doomed = chemicalVisuals[groupKey];
                 DeleteVisual(doomed);
                 chemicalVisuals.Remove(molecule);
             }
 
             if (molecule.IsGrouped & ShowGroups)
             {
-                chemicalVisuals[molecule] = new GroupVisual(molecule, boundingBox);
-                var gv = (GroupVisual)chemicalVisuals[molecule];
+                chemicalVisuals[groupKey] = new GroupVisual(molecule, boundingBox);
+                var gv = (GroupVisual)chemicalVisuals[groupKey];
                 gv.ChemicalVisuals = chemicalVisuals;
                 gv.Render();
                 AddVisual(gv);
@@ -562,14 +563,16 @@ namespace Chem4Word.ACME.Controls
 
         private void MoleculeRemoved(Molecule molecule)
         {
+
+
             if (molecule.IsGrouped)
             {
-                if (chemicalVisuals.TryGetValue(molecule, out DrawingVisual dv))
+                if (chemicalVisuals.TryGetValue(molecule.GetGroupKey(), out DrawingVisual dv))
                 {
                     var gv = (GroupVisual)dv;
 
                     DeleteVisual(gv);
-                    chemicalVisuals.Remove(molecule);
+                    chemicalVisuals.Remove(molecule.GetGroupKey());
                 }
             }
 

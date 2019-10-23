@@ -22,7 +22,7 @@ namespace Chem4Word.ACME.Drawing
     ///     Static class to define bond geometries
     ///     now uses StreamGeometry in preference to PathGeometry
     /// </summary>
-    public class BondDescriptor
+    public class BondLayout
     {
         public Point Start;
         public Point End;
@@ -36,7 +36,7 @@ namespace Chem4Word.ACME.Drawing
             get { return End - Start; }
         }
 
-        public BondDescriptor()
+        public BondLayout()
         {
             Boundary = new List<Point>();
         }

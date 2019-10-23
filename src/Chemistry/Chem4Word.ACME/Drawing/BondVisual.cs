@@ -33,7 +33,7 @@ namespace Chem4Word.ACME.Drawing
         #endregion Fields
 
         private Geometry _hullGeometry;
-        public BondDescriptor BondDescriptor { get; private set; }
+        public BondLayout BondDescriptor { get; private set; }
 
         public Geometry HullGeometry
         {
@@ -70,7 +70,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="modelXamlBondLength"></param>
         /// <param name="ignoreCentroid"></param>
         /// <returns></returns>
-        public static BondDescriptor GetBondDescriptor(Bond parent, AtomVisual startAtomVisual, AtomVisual endAtomVisual, double modelXamlBondLength, bool ignoreCentroid = false)
+        public static BondLayout GetBondDescriptor(Bond parent, AtomVisual startAtomVisual, AtomVisual endAtomVisual, double modelXamlBondLength, bool ignoreCentroid = false)
         {
             //check to see if it's a wedge or a hatch yet
             var startAtomPosition = parent.StartAtom.Position;
@@ -100,7 +100,7 @@ namespace Chem4Word.ACME.Drawing
             return GetBondDescriptor(startAtomVisual, endAtomVisual, modelXamlBondLength, parentStereo, startAtomPosition, endAtomPosition, parentOrderValue, parentPlacement, centroid, secondaryCentroid);
         }
 
-        public static BondDescriptor GetBondDescriptor(AtomVisual startAtomVisual, AtomVisual endAtomVisual,
+        public static BondLayout GetBondDescriptor(AtomVisual startAtomVisual, AtomVisual endAtomVisual,
                                                         double modelXamlBondLength, Globals.BondStereo parentStereo,
                                                         Point startAtomPosition, Point endAtomPosition,
                                                         double? parentOrderValue, Globals.BondDirection parentPlacement,
@@ -108,7 +108,7 @@ namespace Chem4Word.ACME.Drawing
         {
             if (parentStereo == Globals.BondStereo.Wedge || parentStereo == Globals.BondStereo.Hatch)
             {
-                WedgeBondDescriptor wbd = new WedgeBondDescriptor()
+                WedgeBondLayout wbd = new WedgeBondLayout()
                 {
                     Start = startAtomPosition,
                     End = endAtomPosition,
@@ -155,7 +155,7 @@ namespace Chem4Word.ACME.Drawing
             //wavy bond
             if (parentStereo == Globals.BondStereo.Indeterminate && parentOrderValue == 1.0)
             {
-                BondDescriptor sbd = new BondDescriptor
+                BondLayout sbd = new BondLayout
                 {
                     Start = startAtomPosition,
                     End = endAtomPosition,
@@ -170,7 +170,7 @@ namespace Chem4Word.ACME.Drawing
             {
                 //indeterminate double
                 case 2 when parentStereo == Globals.BondStereo.Indeterminate:
-                    DoubleBondDescriptor dbd = new DoubleBondDescriptor()
+                    DoubleBondLayout dbd = new DoubleBondLayout()
                     {
                         StartAtomVisual = startAtomVisual,
                         EndAtomVisual = endAtomVisual,
@@ -184,7 +184,7 @@ namespace Chem4Word.ACME.Drawing
                 case 0:
                 case 0.5:
                 case 1.0:
-                    BondDescriptor sbd = new BondDescriptor
+                    BondLayout sbd = new BondLayout
                     {
                         Start = startAtomPosition,
                         End = endAtomPosition,
@@ -198,7 +198,7 @@ namespace Chem4Word.ACME.Drawing
                 //double bond & 1.5 bond
                 case 1.5:
                 case 2:
-                    DoubleBondDescriptor dbd2 = new DoubleBondDescriptor()
+                    DoubleBondLayout dbd2 = new DoubleBondLayout()
                     {
                         StartAtomVisual = startAtomVisual,
                         EndAtomVisual = endAtomVisual,
@@ -215,7 +215,7 @@ namespace Chem4Word.ACME.Drawing
                 //triple and 2.5 bond
                 case 2.5:
                 case 3:
-                    TripleBondDescriptor tbd = new TripleBondDescriptor()
+                    TripleBondLayout tbd = new TripleBondLayout()
                     {
                         StartAtomVisual = startAtomVisual,
                         EndAtomVisual = endAtomVisual,
@@ -314,7 +314,7 @@ namespace Chem4Word.ACME.Drawing
                         DrawHitTestOverlay(dc);
                         dc.Close();
                     }
-                    DoubleBondDescriptor dbd = new DoubleBondDescriptor
+                    DoubleBondLayout dbd = new DoubleBondLayout
                     {
                         Start = startPoint,
                         End = endPoint,
@@ -337,7 +337,7 @@ namespace Chem4Word.ACME.Drawing
                     }
 
                     //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                    DoubleBondDescriptor dbd2 = new DoubleBondDescriptor
+                    DoubleBondLayout dbd2 = new DoubleBondLayout
                     {
                         Start = startPoint,
                         End = endPoint,
@@ -382,7 +382,7 @@ namespace Chem4Word.ACME.Drawing
                 case Globals.OrderAromatic:
                 case "2":
                 case Globals.OrderDouble:
-                    DoubleBondDescriptor dbd3 = (DoubleBondDescriptor)BondDescriptor;
+                    DoubleBondLayout dbd3 = (DoubleBondLayout)BondDescriptor;
                     Point? centroid = ParentBond.Centroid;
                     dbd3.PrimaryCentroid = centroid;
 
@@ -423,7 +423,7 @@ namespace Chem4Word.ACME.Drawing
                         _subsidiaryBondPen.DashStyle = DashStyles.Dash;
                     }
 
-                    var tbd = (BondDescriptor as TripleBondDescriptor);
+                    var tbd = (BondDescriptor as TripleBondLayout);
                     using (DrawingContext dc = RenderOpen())
                     {
                         if (ParentBond.Placement == Globals.BondDirection.Clockwise)

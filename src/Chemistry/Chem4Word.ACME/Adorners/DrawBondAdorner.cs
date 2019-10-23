@@ -79,7 +79,7 @@ namespace Chem4Word.ACME.Adorners
         {
             Brush brush = _solidColorBrush;
             Pen pen = _dashPen;
-            BondDescriptor layout;
+            BondLayout layout;
 
             var length = CurrentEditor.Chemistry.Model.XamlBondLength;
             if (ExistingBond == null || !ExistingBond.IsCyclic())
@@ -138,14 +138,14 @@ namespace Chem4Word.ACME.Adorners
                     var secondPen = pen.Clone();
                     secondPen.DashStyle = DashStyles.Dash;
                     drawingContext.DrawLine(pen, layout.Start, layout.End);
-                    var doubleBondDescriptor = (layout as DoubleBondDescriptor);
+                    var doubleBondDescriptor = (layout as DoubleBondLayout);
                     drawingContext.DrawLine(secondPen,
                                             doubleBondDescriptor.SecondaryStart,
                                             doubleBondDescriptor.SecondaryEnd);
                     break;
 
                 case Globals.OrderPartial23:
-                    var tbd = (layout as TripleBondDescriptor);
+                    var tbd = (layout as TripleBondLayout);
                     secondPen = pen.Clone();
                     secondPen.DashStyle = DashStyles.Dash;
                     drawingContext.DrawLine(pen, tbd.SecondaryStart, tbd.SecondaryEnd);
@@ -154,7 +154,7 @@ namespace Chem4Word.ACME.Adorners
                     break;
 
                 case Globals.OrderTriple:
-                    tbd = (layout as TripleBondDescriptor);
+                    tbd = (layout as TripleBondLayout);
                     drawingContext.DrawLine(pen, tbd.SecondaryStart, tbd.SecondaryEnd);
                     drawingContext.DrawLine(pen, tbd.Start, tbd.End);
                     drawingContext.DrawLine(pen, tbd.TertiaryStart, tbd.TertiaryEnd);
@@ -166,22 +166,22 @@ namespace Chem4Word.ACME.Adorners
             }
         }
 
-        public static BondDescriptor GetBondLayout(Point startPoint, Point endPoint, double bondLength,
+        public static BondLayout GetBondLayout(Point startPoint, Point endPoint, double bondLength,
                                                    Globals.BondStereo stereo, string order, Ring existingRing = null,
                                                    Ring subsidiaryRing = null)
         {
-            BondDescriptor descriptor = null;
+            BondLayout descriptor = null;
             //check to see if it's a wedge or a hatch yet
             if (stereo == Globals.BondStereo.Wedge || stereo == Globals.BondStereo.Hatch)
             {
-                var wbd = new WedgeBondDescriptor { Start = startPoint, End = endPoint };
+                var wbd = new WedgeBondLayout { Start = startPoint, End = endPoint };
                 BondGeometry.GetWedgeBondGeometry(wbd, bondLength);
                 return wbd;
             }
 
             if (stereo == Globals.BondStereo.Indeterminate && (order == Globals.OrderSingle))
             {
-                descriptor = new BondDescriptor { Start = startPoint, End = endPoint };
+                descriptor = new BondLayout { Start = startPoint, End = endPoint };
                 BondGeometry.GetWavyBondGeometry(descriptor, bondLength);
                 return descriptor;
             }
@@ -190,7 +190,7 @@ namespace Chem4Word.ACME.Adorners
             //single or dotted bond
             if (ordervalue <= 1)
             {
-                descriptor = new BondDescriptor { Start = startPoint, End = endPoint };
+                descriptor = new BondLayout { Start = startPoint, End = endPoint };
                 BondGeometry.GetSingleBondGeometry(descriptor);
             }
 
@@ -198,7 +198,7 @@ namespace Chem4Word.ACME.Adorners
             //double bond
             if (ordervalue == 2 || ordervalue == 1.5)
             {
-                DoubleBondDescriptor dbd = new DoubleBondDescriptor() { Start = startPoint, End = endPoint };
+                DoubleBondLayout dbd = new DoubleBondLayout() { Start = startPoint, End = endPoint };
                 if (stereo == Globals.BondStereo.Indeterminate)
                 {
                     BondGeometry.GetCrossedDoubleGeometry(dbd, bondLength);
@@ -216,7 +216,7 @@ namespace Chem4Word.ACME.Adorners
             //tripe bond
             if (ordervalue == 2.5 || ordervalue == 3)
             {
-                var tbd = new TripleBondDescriptor() { Start = startPoint, End = endPoint };
+                var tbd = new TripleBondLayout() { Start = startPoint, End = endPoint };
                 BondGeometry.GetTripleBondGeometry(tbd, bondLength);
                 descriptor = tbd;
             }

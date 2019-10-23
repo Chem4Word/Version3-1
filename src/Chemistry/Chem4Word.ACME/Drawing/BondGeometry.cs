@@ -27,7 +27,7 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         /// <param name="desc">Descriptor defining the bond shape</param>
         /// <param name="perp">perpendicular vector to the bond</param>
-        public static void GetWedgePoints(WedgeBondDescriptor desc, Vector perp)
+        public static void GetWedgePoints(WedgeBondLayout desc, Vector perp)
         {
             desc.FirstCorner = desc.End + perp;
 
@@ -41,7 +41,7 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         /// <param name="desc">WedgeBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
-        public static void GetWedgeBondGeometry(WedgeBondDescriptor desc, double standardBondLength)
+        public static void GetWedgeBondGeometry(WedgeBondLayout desc, double standardBondLength)
 
         {
             //get the width of the wedge bond's thick end
@@ -70,7 +70,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="descriptor.StartAtomVisual">AtomVisual defining the starting atom</param>
         /// <param name="descriptor.EndAtomVisual">AtomVisual defining the end atom</param>
         /// <returns></returns>
-        public static void GetTripleBondGeometry(TripleBondDescriptor descriptor, double standardBondLength)
+        public static void GetTripleBondGeometry(TripleBondLayout descriptor, double standardBondLength)
         {
             //start by getting the six points that define a standard triple bond
             GetTripleBondPoints(descriptor, standardBondLength);
@@ -96,7 +96,7 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         /// <param name="descriptor">TripleBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
-        public static void GetTripleBondPoints(TripleBondDescriptor descriptor, double standardBondLength)
+        public static void GetTripleBondPoints(TripleBondLayout descriptor, double standardBondLength)
         {
             //get a standard perpendicular vector
             var v = descriptor.PrincipleVector;
@@ -141,7 +141,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         /// <returns></returns>
-        public static void GetDoubleBondGeometry(DoubleBondDescriptor descriptor, double standardBondLength)
+        public static void GetDoubleBondGeometry(DoubleBondLayout descriptor, double standardBondLength)
 
         {
             //get the standard points for a double bond
@@ -179,7 +179,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         /// <returns></returns>
-        public static void GetDoubleBondPoints(DoubleBondDescriptor descriptor, double standardBondLength)
+        public static void GetDoubleBondPoints(DoubleBondLayout descriptor, double standardBondLength)
         {
             Point? point3a;
             Point? point4a;
@@ -240,7 +240,7 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         /// <param name="descriptor">DoubleBondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
-        private static void GetDefaultDoubleBondPoints(DoubleBondDescriptor descriptor, double standardBondLength)
+        private static void GetDefaultDoubleBondPoints(DoubleBondLayout descriptor, double standardBondLength)
         {
             var v = descriptor.PrincipleVector;
             var normal = v.Perpendicular();
@@ -291,7 +291,7 @@ namespace Chem4Word.ACME.Drawing
         ///     Draws the crossed double bond to indicate indeterminate geometry
         /// </summary>
         /// <returns></returns>
-        public static void GetCrossedDoubleGeometry(DoubleBondDescriptor descriptor, double standardBondLength)
+        public static void GetCrossedDoubleGeometry(DoubleBondLayout descriptor, double standardBondLength)
         {
             var v = descriptor.PrincipleVector;
             var normal = v.Perpendicular();
@@ -335,7 +335,7 @@ namespace Chem4Word.ACME.Drawing
             descriptor.Boundary.AddRange(new[] { point1, point2, point4, point3 });
         }
 
-        public static void GetSingleBondGeometry(BondDescriptor descriptor)
+        public static void GetSingleBondGeometry(BondLayout descriptor)
         {
             var start = descriptor.Start;
             var end = descriptor.End;
@@ -404,7 +404,7 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         /// <param name="descriptor">BondDescriptor which is populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
-        public static void GetWavyBondGeometry(BondDescriptor descriptor, double standardBondLength)
+        public static void GetWavyBondGeometry(BondLayout descriptor, double standardBondLength)
         {
             var sg = new StreamGeometry();
 
@@ -496,7 +496,7 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="descriptor"> WedgeBondDescriptor to be populated</param>
         /// <param name="standardBondLength">Standard bond length as defined by the model</param>
         /// <param name="otherAtomPoints">List of positions of atoms splaying from the end atom</param>
-        public static void GetChamferedWedgeGeometry(WedgeBondDescriptor descriptor,
+        public static void GetChamferedWedgeGeometry(WedgeBondLayout descriptor,
                                                          double standardBondLength, List<Point> otherAtomPoints)
         {
             var bondVector = descriptor.PrincipleVector;

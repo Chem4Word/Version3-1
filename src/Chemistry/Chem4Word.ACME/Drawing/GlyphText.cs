@@ -134,7 +134,7 @@ namespace Chem4Word.ACME.Drawing
         {
             get
             {
-                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector + new Vector(LeadingBearing, 0.0);
+                Vector offset = new Vector(0.0, MaxBaselineOffset) + this.TextMetrics.OffsetVector;
                 return TextRun.GetOutline().Select(p => p + offset).ToList();
             }
         }

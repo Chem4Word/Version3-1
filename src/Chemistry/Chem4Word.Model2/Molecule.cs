@@ -1942,5 +1942,10 @@ namespace Chem4Word.Model2
                 }
             }
         }
+
+        public string GetGroupKey()
+        {
+            return "G" + InternalId;
+        }
     }
 }

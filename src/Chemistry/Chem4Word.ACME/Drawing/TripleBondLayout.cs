@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows;
-using System.Windows.Media;
 
 /* Descriptors are simple classes that define the shape of a bond visual.
    They simplify the transfer of information into and out of drawing routines.
@@ -16,28 +15,9 @@ using System.Windows.Media;
 
 namespace Chem4Word.ACME.Drawing
 {
-    public class WedgeBondDescriptor : BondDescriptor
+    public class TripleBondLayout : DoubleBondLayout
     {
-        public Point FirstCorner;
-        public Point SecondCorner;
-        public bool CappedOff; //is the bond end drawn as a line?
-
-        public StreamGeometry GetOutline()
-        {
-            var streamGeometry = new StreamGeometry();
-            ;
-            using (var sgc = streamGeometry.Open())
-            {
-                sgc.BeginFigure(Start, true, false);
-                sgc.LineTo(FirstCorner, false, true);
-                sgc.LineTo(End, CappedOff, true);
-                sgc.LineTo(SecondCorner, CappedOff, true);
-
-                sgc.Close();
-            }
-
-            streamGeometry.Freeze();
-            return streamGeometry;
-        }
+        public Point TertiaryStart;
+        public Point TertiaryEnd;
     }
 }

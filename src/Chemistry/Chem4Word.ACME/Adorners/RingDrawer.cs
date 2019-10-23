@@ -55,7 +55,7 @@ namespace Chem4Word.ACME.Adorners
                         {
                             List<Point> dummy = new List<Point>();
 
-                            DoubleBondDescriptor dbd = new DoubleBondDescriptor
+                            DoubleBondLayout dbd = new DoubleBondLayout
                             {
                                 Start = oldAtomPlacement.Position,
                                 End = newAtomPlacement.Position,
@@ -69,7 +69,7 @@ namespace Chem4Word.ACME.Adorners
                         }
                         else
                         {
-                            BondDescriptor sbd = new BondDescriptor
+                            BondLayout sbd = new BondLayout
                             {
                                 Start = oldAtomPlacement.Position,
                                 End = newAtomPlacement.Position

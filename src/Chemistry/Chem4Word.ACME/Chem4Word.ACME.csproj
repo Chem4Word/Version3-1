@@ -90,10 +90,10 @@
     <Compile Include="Controls\NamesEditor.xaml.cs">
       <DependentUpon>NamesEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Drawing\BondDescriptor.cs" />
-    <Compile Include="Drawing\DoubleBondDescriptor.cs" />
-    <Compile Include="Drawing\TripleBondDescriptor.cs" />
-    <Compile Include="Drawing\WedgeBondDescriptor.cs" />
+    <Compile Include="Drawing\BondLayout.cs" />
+    <Compile Include="Drawing\DoubleBondLayout.cs" />
+    <Compile Include="Drawing\TripleBondLayout.cs" />
+    <Compile Include="Drawing\WedgeBondLayout.cs" />
     <Compile Include="Enums\2Point5BondType.cs" />
     <Compile Include="Adorners\Feedback\BondHoverAdorner.cs" />
     <Compile Include="Adorners\Feedback\AtomHoverAdorner.cs" />

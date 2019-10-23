@@ -16,7 +16,7 @@ using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
 {
-    public class DoubleBondDescriptor : BondDescriptor
+    public class DoubleBondLayout : BondLayout
     {
         public Point SecondaryStart; //refers to the subsidiary bond (dotted in line in 1.5 bonds)
         public Point SecondaryEnd;
