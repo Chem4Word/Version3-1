@@ -273,6 +273,7 @@
       </Component>
       <Component Id="System.Windows.Interactivity">
         <File Id="System.Windows.Interactivity.dll" Source="$(var.Chem4Word.V3.TargetDir)System.Windows.Interactivity.dll" />
+        <File Id="System.Windows.Interactivity.xml" Source="$(var.Chem4Word.V3.TargetDir)System.Windows.Interactivity.xml" />
       </Component>
       <!-- Azure -->
       <Component Id="Microsoft.ServiceBus">
