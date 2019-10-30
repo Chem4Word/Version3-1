@@ -25,10 +25,11 @@
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}">
+            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}" >
+                
                 <ComboBoxItem Tag="0" Height="Auto">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">None</TextBlock>
+                        <TextBlock FontWeight="DemiBold" Width="50">None</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black"  StrokeThickness="2" StrokeDashArray="1,1" StrokeEndLineCap="Round" />
                         </Canvas>
@@ -36,7 +37,7 @@
                 </ComboBoxItem>
                 <ComboBoxItem Tag="0.5">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">Half</TextBlock>
+                        <TextBlock FontWeight="DemiBold" Width="50">Half</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black"  StrokeThickness="2" StrokeDashArray="2,1" StrokeEndLineCap="Round" />
                         </Canvas>
@@ -44,7 +45,7 @@
                 </ComboBoxItem>
                 <ComboBoxItem Tag="1">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">Single</TextBlock>
+                        <TextBlock FontWeight="DemiBold" Width="50">Single</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black"  StrokeThickness="2" StrokeEndLineCap="Round" />
                         </Canvas>
@@ -52,7 +53,7 @@
                 </ComboBoxItem>
                 <ComboBoxItem Tag="1.5">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">1.5</TextBlock>
+                        <TextBlock FontWeight="DemiBold"  Width="50">1.5</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black" StrokeThickness="2" StrokeEndLineCap="Round" />
                             <Line X1="0" Y1="12" X2="50" Y2="12" Stroke="Black" StrokeDashArray="2,1" StrokeEndLineCap="Round" StrokeThickness="2" />
@@ -61,7 +62,7 @@
                 </ComboBoxItem>
                 <ComboBoxItem Tag="2">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">Double</TextBlock>
+                        <TextBlock FontWeight="DemiBold"  Width="50">Double</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="5" X2="50" Y2="5" Stroke="Black" StrokeThickness="2" />
                             <Line X1="0" Y1="10" X2="50" Y2="10" Stroke="Black" StrokeThickness="2" />
@@ -70,7 +71,7 @@
                 </ComboBoxItem>
                 <ComboBoxItem Tag="2.5">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">2.5</TextBlock>
+                        <TextBlock FontWeight="DemiBold"  Width="50">2.5</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="3" X2="50" Y2="3" Stroke="Black" StrokeThickness="2" />
                             <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black" StrokeThickness="2" />
@@ -80,7 +81,7 @@
                 </ComboBoxItem>
                 <ComboBoxItem Tag="3">
                     <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock  Width="50">Triple</TextBlock>
+                        <TextBlock FontWeight="DemiBold"  Width="50">Triple</TextBlock>
                         <Canvas Width="60" Height="Auto">
                             <Line X1="0" Y1="3" X2="50" Y2="3" Stroke="Black" StrokeThickness="2" />
                             <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black" StrokeThickness="2" />
@@ -116,12 +117,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="Foreground" Value="{StaticResource Chem4WordBrush}" />
-                <Setter Property="FontSize" Value="14" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
+            
         </ResourceDictionary>
     </Window.Resources>
     <Border Margin="5">
@@ -151,8 +147,7 @@
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="0"
-                Margin="0,5,5,0"
-                VerticalAlignment="Center">
+                Style="{StaticResource LabelTextBlock}">
                 Order
             </TextBlock>
             <ComboBox
@@ -162,14 +157,13 @@
                 SelectedValue="{Binding Path=BondOrderValue, Mode=TwoWay}"
                 FontSize="12"
                 ItemsSource="{Binding Source={StaticResource BondItems}}"
-                Foreground="{StaticResource Chem4WordBrush}"
+                Style="{StaticResource StandardCombo}"
                 SelectedValuePath="Tag">
             </ComboBox>
             <TextBlock
                 Grid.Row="2"
                 Grid.Column="0"
-                Margin="0,5,5,0"
-                VerticalAlignment="Center"
+                Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=IsSingle, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Stereo
             </TextBlock>
@@ -475,8 +469,7 @@
             <TextBlock
                 Grid.Row="4"
                 Grid.Column="0"
-                Margin="0,5,5,0"
-                VerticalAlignment="Center"
+                Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
@@ -659,8 +652,7 @@
             <TextBlock
                 Grid.Row="5"
                 Grid.Column="0"
-                Margin="0,5,5,0"
-                VerticalAlignment="Center"
+                Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=Is1Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
@@ -764,8 +756,7 @@
             <TextBlock
                 Grid.Row="6"
                 Grid.Column="0"
-                Margin="0,5,5,0"
-                VerticalAlignment="Center"
+                Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=Is2Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
@@ -886,15 +877,11 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <Button
-                    Width="50"
-                    Margin="0,5,5,0"
                     HorizontalAlignment="Right"
                     Click="Save_OnClick">
                     OK
                 </Button>
                 <Button
-                    Width="50"
-                    Margin="0,5,0,0"
                     HorizontalAlignment="Right"
                     Click="Cancel_OnClick">
                     Cancel

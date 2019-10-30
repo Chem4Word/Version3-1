@@ -30,12 +30,12 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditorHost));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.editor1 = new Chem4Word.ACME.Editor();
             this.Buttons = new System.Windows.Forms.Panel();
+            this.MessageFromWpf = new System.Windows.Forms.Label();
             this.Save = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
-            this.MessageFromWpf = new System.Windows.Forms.Label();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.editor1 = new Chem4Word.ACME.Editor();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -58,21 +58,10 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.Buttons);
-            this.splitContainer1.Size = new System.Drawing.Size(984, 661);
-            this.splitContainer1.SplitterDistance = 587;
+            this.splitContainer1.Size = new System.Drawing.Size(984, 702);
+            this.splitContainer1.SplitterDistance = 623;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 2;
-            // 
-            // elementHost1
-            // 
-            this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.elementHost1.Location = new System.Drawing.Point(0, 0);
-            this.elementHost1.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(984, 587);
-            this.elementHost1.TabIndex = 0;
-            this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.editor1;
             // 
             // Buttons
             // 
@@ -83,16 +72,29 @@
             this.Buttons.Location = new System.Drawing.Point(0, 0);
             this.Buttons.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.Buttons.Name = "Buttons";
-            this.Buttons.Size = new System.Drawing.Size(984, 68);
+            this.Buttons.Size = new System.Drawing.Size(984, 73);
             this.Buttons.TabIndex = 3;
+            // 
+            // MessageFromWpf
+            // 
+            this.MessageFromWpf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.MessageFromWpf.AutoSize = true;
+            this.MessageFromWpf.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MessageFromWpf.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.MessageFromWpf.Location = new System.Drawing.Point(12, 35);
+            this.MessageFromWpf.Name = "MessageFromWpf";
+            this.MessageFromWpf.Size = new System.Drawing.Size(20, 16);
+            this.MessageFromWpf.TabIndex = 4;
+            this.MessageFromWpf.Text = "...";
             // 
             // Save
             // 
             this.Save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Save.Location = new System.Drawing.Point(816, 28);
+            this.Save.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+            this.Save.Location = new System.Drawing.Point(816, 31);
             this.Save.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.Save.Name = "Save";
-            this.Save.Size = new System.Drawing.Size(75, 25);
+            this.Save.Size = new System.Drawing.Size(75, 27);
             this.Save.TabIndex = 1;
             this.Save.Text = "OK";
             this.Save.UseVisualStyleBackColor = true;
@@ -101,34 +103,34 @@
             // Cancel
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Cancel.Location = new System.Drawing.Point(897, 28);
+            this.Cancel.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+            this.Cancel.Location = new System.Drawing.Point(897, 31);
             this.Cancel.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new System.Drawing.Size(75, 25);
+            this.Cancel.Size = new System.Drawing.Size(75, 27);
             this.Cancel.TabIndex = 0;
             this.Cancel.Text = "Cancel";
             this.Cancel.UseVisualStyleBackColor = true;
             this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
             // 
-            // MessageFromWpf
+            // elementHost1
             // 
-            this.MessageFromWpf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.MessageFromWpf.AutoSize = true;
-            this.MessageFromWpf.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MessageFromWpf.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.MessageFromWpf.Location = new System.Drawing.Point(12, 32);
-            this.MessageFromWpf.Name = "MessageFromWpf";
-            this.MessageFromWpf.Size = new System.Drawing.Size(20, 16);
-            this.MessageFromWpf.TabIndex = 4;
-            this.MessageFromWpf.Text = "...";
+            this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost1.Location = new System.Drawing.Point(0, 0);
+            this.elementHost1.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(984, 623);
+            this.elementHost1.TabIndex = 0;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = this.editor1;
             // 
             // EditorHost
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 661);
+            this.ClientSize = new System.Drawing.Size(984, 702);
             this.Controls.Add(this.splitContainer1);
-            this.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "EditorHost";

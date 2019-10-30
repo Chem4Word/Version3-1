@@ -17,8 +17,14 @@
     ShowInTaskbar="False"
     mc:Ignorable="d">
     <Window.Resources>
-        <converters:ValueToForegroundColorConverter x:Key="PositiveConverter" />
-        <converters:ValueToString x:Key="RadicalConverter" />
+
+        <ResourceDictionary>
+            <converters:ValueToForegroundColorConverter x:Key="PositiveConverter" />
+            <converters:ValueToString x:Key="RadicalConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     <Border Margin="5">
         <Grid>
@@ -71,7 +77,7 @@
                                 Height="400"
                                 Margin="3"
                                 Background="White"
-                                HighlightActive="False" 
+                                HighlightActive="False"
                                 ShowGroups="false" />
                         </Border>
                         <CheckBox
@@ -79,9 +85,10 @@
                             Grid.Row="1"
                             Grid.Column="0"
                             Margin="5"
+                            VerticalContentAlignment="Center"
                             IsChecked="{Binding ShowMoleculeBrackets}"
                             IsThreeState="True">
-                            Show Brackets
+                            <TextBlock Style="{StaticResource LabelTextBlock}">Show Brackets</TextBlock>
                         </CheckBox>
                         <Grid Grid.Row="0" Grid.Column="1">
                             <Grid.RowDefinitions>
@@ -89,54 +96,64 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <StackPanel
-                                Grid.Row="0"
-                                HorizontalAlignment="Left"
-                                Orientation="Horizontal">
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource LabelTextBlock}" Text="Charge" />
                                 <TextBlock
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Text="Charge:" />
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Style="{StaticResource LabelTextBlock}"
+                                    Text="Radical" />
                                 <ComboBox
                                     x:Name="ChargeValues"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
                                     Width="50"
-                                    Margin="5"
                                     ItemsSource="{Binding Charges}"
                                     SelectedValue="{Binding Charge, Mode=TwoWay}"
-                                    SelectedValuePath="Value">
+                                    SelectedValuePath="Value"
+                                    Style="{StaticResource StandardCombo}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Foreground="{Binding Value, Converter={StaticResource PositiveConverter}}" Text="{Binding Label}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
-                                <TextBlock
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Text="Spin Multiplicity:" />
                                 <ComboBox
                                     x:Name="SpinMultiplicityValues"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
                                     Width="70"
-                                    Margin="5"
                                     ItemsSource="{Binding MultiplicityValues}"
                                     SelectedValue="{Binding SpinMultiplicity, Mode=TwoWay}"
-                                    SelectedValuePath="Value">
+                                    SelectedValuePath="Value"
+                                    Style="{StaticResource StandardCombo}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Foreground="{Binding Value, Converter={StaticResource RadicalConverter}}" Text="{Binding Label}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
-                            </StackPanel>
-                            <StackPanel
+                            </Grid>
+                            <Grid Margin="5"
                                 Grid.Row="2"
-                                HorizontalAlignment="Left"
-                                Orientation="Horizontal">
+                                HorizontalAlignment="Left">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
                                 <TextBlock
-                                    Margin="5"
-                                    VerticalAlignment="Center"
-                                    Text="Count:" />
-                                <Grid>
+                                    Margin="0,0"
+                                    Style="{StaticResource LabelTextBlock}"
+                                    Text="Count" />
+                                <Grid Grid.Row="1">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
@@ -144,8 +161,9 @@
                                     <TextBox
                                         x:Name="CountSpinner"
                                         Grid.Column="0"
-                                        Width="24"
-                                        HorizontalAlignment="Right"
+                                        Width="28"
+                                        Margin="0,0,0,0"
+                                        HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         HorizontalContentAlignment="Right"
                                         Text="{Binding Count, Mode=TwoWay}"
@@ -188,7 +206,7 @@
                                         </RepeatButton>
                                     </Grid>
                                 </Grid>
-                            </StackPanel>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </TabItem>
@@ -197,9 +215,7 @@
                     Height="22"
                     VerticalAlignment="Top"
                     Header="Labels">
-                    <acme:LabelsEditor
-                        x:Name="LabelsEditor"
-                        ShowTopPanel="False" />
+                    <acme:LabelsEditor x:Name="LabelsEditor" ShowTopPanel="False" />
                 </TabItem>
             </TabControl>
 
@@ -210,15 +226,9 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <Button
-                    Width="50"
-                    Height="25"
-                    Margin="5"
                     Click="Save_OnClick"
                     Content="OK" />
                 <Button
-                    Width="50"
-                    Height="25"
-                    Margin="5"
                     Click="Close_OnClick"
                     Content="Cancel" />
             </StackPanel>

@@ -5,16 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Chem4Word.ACME.Controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             FontFamily="Tahoma" FontSize="16" Loaded="UserSettings_OnLoaded"
+             Loaded="UserSettings_OnLoaded"
+             FontFamily="Segoe UI"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
+                <ResourceDictionary Source="../Resources/ACMEResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <SolidColorBrush x:Key="Chem4WordBlue">
-                <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
-            </SolidColorBrush>
+            
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -24,8 +23,7 @@
         </Grid.RowDefinitions>
         <TabControl Grid.Row="0" Margin="5"
                     Background="{DynamicResource {x:Static SystemColors.ControlColor}}">
-            <TabItem Foreground="{StaticResource Chem4WordBlue}"
-                     Header="General">
+            <TabItem Header="General">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -39,8 +37,7 @@
                     </Grid.RowDefinitions>
 
                     <!--  Bond Length (DropDown)  -->
-                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"
-                               Foreground="{StaticResource Chem4WordBlue}">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Style="{StaticResource LabelTextBlock}">
                         Default Bond Length
                     </TextBlock>
                     <ComboBox Grid.Row="0" Grid.Column="1" Width="50" Margin="5"
@@ -51,8 +48,7 @@
                               ToolTip="Set Default Bond Length" />
 
                     <!--  Show Grouping  -->
-                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"
-                               Foreground="{StaticResource Chem4WordBlue}">
+                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelTextBlock}" >
                         Show grouping of molecules
                     </TextBlock>
                     <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
@@ -60,7 +56,7 @@
                 </Grid>
             </TabItem>
             <!-- If required ...
-            <TabItem Foreground="{StaticResource Chem4WordBlue}" Header="Debug">
+            <TabItem FontFamily="Segoe UI" Header="Debug">
                 <Grid>
                     <TextBlock Margin="5">Hello</TextBlock>
                 </Grid>
@@ -72,13 +68,12 @@
         <StackPanel Grid.Row="1" Margin="0,0,0,5" HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <!--  Defaults Button  -->
-            <Button Width="80" Margin="25,5,25,5" Click="Defaults_OnClick" Content="Defaults"
-                    Foreground="{StaticResource Chem4WordBlue}" />
-            <Button Width="80" Margin="5" Click="Save_OnClick" Content="OK"
-                    Foreground="{StaticResource Chem4WordBlue}" />
+            <Button Click="Defaults_OnClick" Content="Defaults"/>
+            <Button  Click="Save_OnClick" Content="OK"
+                   />
             <!--  Cancel Button  -->
-            <Button Width="80" Margin="5" Click="Cancel_OnClick" Content="Cancel"
-                    Foreground="{StaticResource Chem4WordBlue}" />
+            <Button Click="Cancel_OnClick" Content="Cancel"
+                     />
             <!--  Save Button  -->
         </StackPanel>
     </Grid>

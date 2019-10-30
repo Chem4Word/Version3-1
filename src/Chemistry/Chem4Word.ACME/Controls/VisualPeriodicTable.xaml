@@ -8,10 +8,17 @@
     xmlns:model2="clr-namespace:Chem4Word.Model2;assembly=Chem4Word.Model2"
     Width="511.557"
     Height="260.771"
+    FontFamily="Segoe UI"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <model2:PeriodicTable x:Key="PeriodicTable" />
-        <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
+        <ResourceDictionary>
+            <model2:PeriodicTable x:Key="PeriodicTable" />
+            <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/ACMEResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+           
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="5,5,5,5">
         <Grid.Resources>
@@ -63,7 +70,14 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-            <Style x:Key="ElementText" TargetType="TextBlock">
+            <Style x:Key="ElementText" BasedOn="{StaticResource LabelTextBlock}" TargetType="TextBlock">
+                <Setter Property="Height" Value="Auto"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter Property="Foreground" Value="Black" />
@@ -206,19 +220,11 @@
                             </ToolTip>
                         </Border.ToolTip>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock
+                            <TextBlock 
                                 Name="ElementBlock"
-                                Height="Auto"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontFamily="Arial"
-                                FontSize="11"
-                                FontWeight="Bold"
                                 Style="{StaticResource ElementText}"
                                 Tag="{Binding}"
-                                Text="{Binding Symbol}"
-                                TextAlignment="Center"
-                                TextWrapping="Wrap" />
+                                Text="{Binding Symbol}"/>
                         </StackPanel>
                     </Border>
                 </DataTemplate>

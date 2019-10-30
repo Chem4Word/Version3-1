@@ -24,16 +24,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style TargetType="{x:Type ComboBox}">
-                <Setter Property="Background" Value="{x:Static SystemColors.WindowBrush}" />
-                <Setter Property="BorderBrush" Value="{StaticResource Chem4WordBrush}" />
-            </Style>
-            <Style TargetType="{x:Type TextBlock}">
-                <Setter Property="Foreground" Value="{StaticResource Chem4WordBrush}" />
-                <Setter Property="FontSize" Value="18" />
-                <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-            </Style>
+        
             <conv:ValueToForegroundColorConverter x:Key="PositiveConverter" />
             <conv:BoolToVisibilityConverter
                 x:Key="VisConverter"
@@ -72,17 +63,15 @@
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
                         x:Name="Element"
-                        Margin="5"
-                        Foreground="{StaticResource Chem4WordBrush}"
+                        Style="{StaticResource StandardRadioButton}"
                         IsChecked="{Binding IsElement, Mode=TwoWay}">
-                        Element
+                        <TextBlock Style="{StaticResource RadioButtonTextBlock}">Element</TextBlock>
                     </RadioButton>
                     <RadioButton
                         x:Name="FunctionalGroup"
-                        Margin="5"
-                        Foreground="{StaticResource Chem4WordBrush}"
+                        Style="{StaticResource StandardRadioButton}"
                         IsChecked="{Binding IsFunctionalGroup, Mode=TwoWay}">
-                        Functional Group
+                        <TextBlock Style="{StaticResource RadioButtonTextBlock}">Functional Group</TextBlock>
                     </RadioButton>
                 </StackPanel>
             </StackPanel>
@@ -104,10 +93,9 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock
+                        <TextBlock Style="{StaticResource LabelTextBlock}"
                             Grid.Row="1"
-                            Grid.Column="0"
-                            Margin="5"><Run Text="Symbol" /></TextBlock>
+                            Grid.Column="0"><Run Text="Symbol" /></TextBlock>
                         <Grid
                             Grid.Row="1"
                             Grid.Column="1"
@@ -207,10 +195,11 @@
                         </Grid>
                         <TextBlock
                             Grid.Row="2"
-                            Grid.Column="0"
-                            Margin="5"><Run Text="Charge" /></TextBlock>
+                            Style="{StaticResource LabelTextBlock}"
+                            Grid.Column="0"><Run Text="Charge" /></TextBlock>
                         <ComboBox
                             x:Name="ChargeCombo"
+                            Style="{StaticResource StandardCombo}"
                             Grid.Row="2"
                             Grid.Column="1"
                             Width="50"
@@ -229,12 +218,13 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <TextBlock
+                            Style="{StaticResource LabelTextBlock}"
                             Grid.Row="3"
                             Grid.Column="0"
-                            Margin="5"
                             Visibility="{Binding HasIsotopes, Converter={StaticResource VisConverter}, Mode=OneWay}"><Run Text="Isotope" /></TextBlock>
                         <ComboBox
                             x:Name="IsotopePicker"
+                            Style="{StaticResource StandardCombo}"
                             Grid.Row="3"
                             Grid.Column="1"
                             Width="50"
@@ -251,8 +241,8 @@
                 </StackPanel>
 
                 <!--  Properties of a Functional Group  -->
-                <StackPanel Visibility="{Binding IsChecked, Converter={StaticResource VisConverter}, ElementName=FunctionalGroup}">
-                    <TextBlock Margin="5"><Run Text="Choose a group" /></TextBlock>
+                <StackPanel Visibility="{Binding IsChecked, Converter={StaticResource VisConverter}, ElementName=FunctionalGroup}"  Orientation="Horizontal">
+                    <TextBlock Margin="5" Style="{StaticResource LabelTextBlock}"><Run Text="Group" /></TextBlock>
                     <ComboBox
                         x:Name="FunctionalGroupPicker"
                         Width="Auto"
@@ -299,15 +289,9 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <Button
-                    Width="50"
-                    Height="25"
-                    Margin="5"
                     Click="Save_OnClick"
                     Content="OK" />
                 <Button
-                    Width="50"
-                    Height="25"
-                    Margin="5"
                     Click="Close_OnClick"
                     Content="Cancel" />
             </StackPanel>
