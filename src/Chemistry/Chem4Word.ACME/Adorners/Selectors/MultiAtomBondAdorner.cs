@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2;
@@ -16,15 +11,16 @@ namespace Chem4Word.ACME.Adorners.Selectors
     /// <summary>
     /// Creates a single Adorner to span all selected atoms and bonds
     /// </summary>
-    public class MultiAtomBondAdorner: MultiChemistryAdorner
+    public class MultiAtomBondAdorner : MultiChemistryAdorner
     {
         public CombinedGeometry OverallGeometry { get; }
-        private double RenderRadius=> (EditViewModel.Model.XamlBondLength * Globals.FontSizePercentageBond) / 4;
+        private double RenderRadius => (EditViewModel.Model.XamlBondLength * Globals.FontSizePercentageBond) / 4;
+
         public MultiAtomBondAdorner(EditorCanvas currentEditor, List<ChemistryBase> chemistries) : base(currentEditor, chemistries)
         {
             //first, create an empty PathGeometry to hold the summed-up atoms and bonds
             OverallGeometry = new CombinedGeometry();
-            
+
             //iterate through each of the adorned atoms and bonds
             foreach (ChemistryBase adornedChemistry in AdornedChemistries)
             {
@@ -33,6 +29,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
                     case Atom a:
                         OverallGeometry = new CombinedGeometry(GeometryCombineMode.Union, OverallGeometry, GetAtomAdornerGeometry(a));
                         break;
+
                     case Bond b:
                         OverallGeometry = new CombinedGeometry(GeometryCombineMode.Union, OverallGeometry, GetBondAdornerGeometry(b));
                         break;
@@ -52,7 +49,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
             AtomVisual startAtomVisual = CurrentEditor.GetAtomVisual(bond.StartAtom);
             AtomVisual endAtomVisual = CurrentEditor.GetAtomVisual(bond.EndAtom);
-            
+
             //work out where the bond vector intersects the start and end points of the bond
             if (!string.IsNullOrEmpty(bond.StartAtom.SymbolText))
             {
@@ -108,12 +105,12 @@ namespace Chem4Word.ACME.Adorners.Selectors
             PathGeometry pathGeometry = new PathGeometry(figures);
 
             //work out the end caps
-            Geometry start = new EllipseGeometry(startPoint, RenderRadius,RenderRadius);
+            Geometry start = new EllipseGeometry(startPoint, RenderRadius, RenderRadius);
             Geometry end = new EllipseGeometry(endPoint, RenderRadius, RenderRadius);
 
             //add them in
             CombinedGeometry result = new CombinedGeometry(GeometryCombineMode.Union, pathGeometry, start);
-             result = new CombinedGeometry(GeometryCombineMode.Union, result, end);
+            result = new CombinedGeometry(GeometryCombineMode.Union, result, end);
 
             //and return
             return result;
@@ -140,6 +137,6 @@ namespace Chem4Word.ACME.Adorners.Selectors
             drawingContext.DrawGeometry(renderBrush, null, OverallGeometry);
         }
 
-        #endregion
+        #endregion Overrides
     }
 }

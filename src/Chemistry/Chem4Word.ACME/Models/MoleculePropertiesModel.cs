@@ -30,6 +30,7 @@ namespace Chem4Word.ACME.Models
         }
 
         private int? _spinMultiplicity;
+
         public int? SpinMultiplicity
         {
             get => _spinMultiplicity;
@@ -41,6 +42,7 @@ namespace Chem4Word.ACME.Models
         }
 
         private int? _count;
+
         public int? Count
         {
             get => _count;
@@ -52,6 +54,7 @@ namespace Chem4Word.ACME.Models
         }
 
         private int? _charge;
+
         public int? Charge
         {
             get => _charge;
@@ -62,24 +65,13 @@ namespace Chem4Word.ACME.Models
             }
         }
 
-        private int? _multiplicity;
-        public int? Multiplicity
-        {
-            get => _multiplicity;
-            set
-            {
-                _multiplicity = value;
-                OnPropertyChanged();
-            }
-        }
-
         public List<ChargeValue> MultiplicityValues
         {
             get
             {
                 List<ChargeValue> values = new List<ChargeValue>();
 
-                values.Add(new ChargeValue { Value = 0, Label = "(none)"});
+                values.Add(new ChargeValue { Value = 0, Label = "(none)" });
                 values.Add(new ChargeValue { Value = 2, Label = "•" });
                 values.Add(new ChargeValue { Value = 3, Label = "• •" });
 

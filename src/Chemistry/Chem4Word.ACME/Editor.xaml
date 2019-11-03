@@ -534,7 +534,6 @@
                                                 Stroke="{StaticResource Chem4WordBrush}"
                                                 StrokeThickness="1" />
                                         </Viewbox>
-
                                     </Grid>
                                 </Viewbox>
                                 <Button.Tag>
@@ -579,14 +578,12 @@
                                                 Stroke="{StaticResource Chem4WordBrush}"
                                                 StrokeThickness="1" />
                                         </Viewbox>
-
                                     </Grid>
                                 </Viewbox>
                                 <Button.Tag>
                                     <behaviors:LassoBehaviour EditViewModel="{Binding ElementName=AcmeControl, Path=ActiveViewModel}" RectMode="True" />
                                 </Button.Tag>
                             </Button>
-
                         </Grid>
                     </Border>
                 </Popup>

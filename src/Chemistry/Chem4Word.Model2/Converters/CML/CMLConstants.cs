@@ -24,6 +24,7 @@ namespace Chem4Word.Model2.Converters.CML
 
         // Molecule
         public const string TagMolecule = "molecule";
+
         public const string AttributeSpinMultiplicity = "spinMultiplicity";
         public const string AttributeCount = "count";
 
@@ -80,6 +81,7 @@ namespace Chem4Word.Model2.Converters.CML
 
         // Our DictRef values
         public const string ValueChem4WordInchiKeyName = "chem4word:CalculatedInchikey";
+
         public const string ValueChem4WordResolverIupacName = "chem4word:ResolvedIupacname";
         public const string ValueChem4WordResolverSmilesName = "chem4word:ResolvedSmiles";
         public const string ValueChem4WordResolverFormulaName = "chem4word:ResolvedFormula";

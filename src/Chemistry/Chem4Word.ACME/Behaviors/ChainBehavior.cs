@@ -12,7 +12,6 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Controls;
 using Chem4Word.ACME.Drawing;
@@ -120,19 +119,19 @@ namespace Chem4Word.ACME.Behaviors
                 Clashing = false;
                 CurrentStatus = "Drag to start sizing chain: [Esc] to cancel.";
                 var endPoint = e.GetPosition(EditViewModel.CurrentEditor);
-                
+
                 MarkOutAtoms(endPoint, e);
                 CurrentAdorner =
                     new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements, endPoint, Target);
 
                 var targetedVisual = EditViewModel.CurrentEditor.GetTargetedVisual(endPoint);
-                //check to see we're not overwriting 
+                //check to see we're not overwriting
                 bool overWritingSelf = false;
                 if (CurrentAdorner.Geometry != null)
                 {
-                    overWritingSelf=CurrentAdorner.Geometry.StrokeContains(new Pen(Brushes.Black, Globals.AtomRadius * 2), endPoint);
+                    overWritingSelf = CurrentAdorner.Geometry.StrokeContains(new Pen(Brushes.Black, Globals.AtomRadius * 2), endPoint);
                 }
-                Clashing = (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) |overWritingSelf;
+                Clashing = (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) | overWritingSelf;
                 //set the cursor appropriately
                 SetCursor();
             }

@@ -29,8 +29,8 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ScrollViewer
-                Grid.Row="0"
                 x:Name="ScrollViewer"
+                Grid.Row="0"
                 HorizontalScrollBarVisibility="Auto"
                 VerticalScrollBarVisibility="Auto">
                 <ItemsControl Grid.IsSharedSizeScope="True" ItemsSource="{Binding ListOfNames, Mode=TwoWay}">
@@ -91,6 +91,7 @@
             <Button
                 x:Name="AddButton"
                 Grid.Row="1"
+                Width="Auto"
                 Height="20"
                 Margin="3">
                 <StackPanel Orientation="Horizontal">

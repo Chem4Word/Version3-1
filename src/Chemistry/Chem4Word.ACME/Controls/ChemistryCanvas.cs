@@ -238,7 +238,6 @@ namespace Chem4Word.ACME.Controls
 
         private void RedrawMolecule(Molecule molecule, Rect? boundingBox = null)
         {
-            
             if (chemicalVisuals.ContainsKey(molecule))
             {
                 var doomed = chemicalVisuals[molecule];
@@ -260,7 +259,7 @@ namespace Chem4Word.ACME.Controls
             }
 
             var footprint = GetExtents(molecule);
-            
+
             if (molecule.IsGrouped && ShowGroups)
             {
                 //we may be passing in a null bounding box here
@@ -285,10 +284,7 @@ namespace Chem4Word.ACME.Controls
                 AddVisual(mv);
                 boundingBox.Value.Union(mv.ContentBounds);
             }
-          
         }
-
-       
 
         private void RedrawBond(Bond bond)
         {
@@ -569,15 +565,15 @@ namespace Chem4Word.ACME.Controls
         private Rect GetExtents(Molecule molecule)
         {
             Rect bb = Rect.Empty;
-           
+
             foreach (var atom in molecule.Atoms.Values)
             {
-                var mv = (AtomVisual) chemicalVisuals[atom];
+                var mv = (AtomVisual)chemicalVisuals[atom];
                 var contentBounds = mv.ContentBounds;
                 bb.Union(contentBounds);
             }
 
-            if(chemicalVisuals.TryGetValue(molecule, out DrawingVisual molvisual))
+            if (chemicalVisuals.TryGetValue(molecule, out DrawingVisual molvisual))
             {
                 bb.Union(molvisual.ContentBounds);
             }

@@ -15,7 +15,7 @@ namespace Chem4Word.ACME.Drawing
     public class GroupVisual : ChemicalVisual
     {
         private const double MainAreaOpacity = 0.05;
-       
+
         public Rect BoundingBox { get; }
         public Molecule ParentMolecule { get; }
 

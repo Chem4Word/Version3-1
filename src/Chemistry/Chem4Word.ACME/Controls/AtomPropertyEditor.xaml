@@ -16,6 +16,7 @@
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
     Loaded="AtomPropertyEditor_OnLoaded"
     ResizeMode="NoResize"
+    Closing="AtomPropertyEditor_OnClosing"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">
@@ -24,7 +25,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-        
+
             <conv:ValueToForegroundColorConverter x:Key="PositiveConverter" />
             <conv:BoolToVisibilityConverter
                 x:Key="VisConverter"

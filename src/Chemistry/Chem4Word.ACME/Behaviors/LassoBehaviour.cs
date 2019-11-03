@@ -40,15 +40,12 @@ namespace Chem4Word.ACME.Behaviors
 
         private TransformGroup _shift;
 
-
         private Point _startpoint;
         private List<object> _lassoHits;
         public bool IsDragging { get; private set; }
         public bool ClickedOnAtomOrBond { get; set; }
 
         public Point StartPoint { get; set; }
-
-
 
         public bool RectMode
         {
@@ -60,10 +57,9 @@ namespace Chem4Word.ACME.Behaviors
         public static readonly DependencyProperty RectModeProperty =
             DependencyProperty.Register("RectMode", typeof(bool), typeof(LassoBehaviour), new PropertyMetadata(default(bool)));
 
-
-
         public LassoBehaviour() : this(false)
         { }
+
         public LassoBehaviour(bool isRectMode = false)
         { }
 
@@ -187,7 +183,7 @@ namespace Chem4Word.ACME.Behaviors
 
                 if (_lassoAdorner != null)
                 {
-                    _lassoHits= new List<object>();
+                    _lassoHits = new List<object>();
                     GatherSelection(_lassoAdorner.Outline);
                     _lassoHits = _lassoHits.Distinct().ToList();
                     EditViewModel.AddToSelection(_lassoHits);
@@ -207,7 +203,7 @@ namespace Chem4Word.ACME.Behaviors
             _mouseTrack = null;
 
             CurrentEditor.ReleaseMouseCapture();
-          
+
             CurrentEditor.Focus();
             var al = AdornerLayer.GetAdornerLayer(CurrentEditor);
             al.Update();
@@ -226,7 +222,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 _lassoHits.Add(selGroup.ParentMolecule);
             }
-            if (myShape is AtomVisual av )
+            if (myShape is AtomVisual av)
             {
                 var selAtom = av.ParentAtom;
 
@@ -317,10 +313,9 @@ namespace Chem4Word.ACME.Behaviors
             //we're dragging an object around
             if (MouseIsDown(e) & IsDragging)
             {
-                
-                if (_initialTarget is Bond b && 
-                    EditViewModel.SelectionType == SelectionTypeCode.Bond 
-                    && EditViewModel.SelectedItems.Count==1) //i.e. we have one bond selected
+                if (_initialTarget is Bond b &&
+                    EditViewModel.SelectionType == SelectionTypeCode.Bond
+                    && EditViewModel.SelectedItems.Count == 1) //i.e. we have one bond selected
                 {
                     CurrentStatus = "Drag bond to reposition.";
                     _atomList = new List<Atom> { b.StartAtom, b.EndAtom };
@@ -343,7 +338,7 @@ namespace Chem4Word.ACME.Behaviors
         private void DragAtom(Point pos)
         {
             Vector shift;
-            
+
             //this code is horrendous, apologies
             //please don't modify it without good reason!
             //if you must then READ THE COMMENTS FIRST, PLEASE!

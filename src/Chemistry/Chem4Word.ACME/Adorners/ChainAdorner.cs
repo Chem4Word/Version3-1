@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
-using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
@@ -54,7 +53,6 @@ namespace Chem4Word.ACME.Adorners
 
             Focusable = true;
             Focus();
-          
         }
 
         public Pen BondPen { get; }
@@ -76,7 +74,6 @@ namespace Chem4Word.ACME.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-          
             drawingContext.DrawGeometry(null, BondPen, Geometry);
             drawingContext.DrawLine(DashedPen, Placements.Last(), CurrentPoint);
             if (Unanchored)

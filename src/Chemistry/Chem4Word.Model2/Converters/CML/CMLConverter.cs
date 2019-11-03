@@ -308,7 +308,6 @@ namespace Chem4Word.Model2.Converters.CML
                 {
                     molElement.Add(GetMoleculeElement(childMolecule));
                 }
-
             }
             else
             {

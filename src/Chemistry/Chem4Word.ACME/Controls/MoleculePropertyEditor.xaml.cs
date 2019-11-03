@@ -9,13 +9,15 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using Chem4Word.ACME.Annotations;
 using Chem4Word.ACME.Entities;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Utils;
-using Chem4Word.Model2;
+using Chem4Word.Core;
 using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.ACME.Controls
@@ -25,11 +27,19 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class MoleculePropertyEditor : Window, INotifyPropertyChanged
     {
+        private bool _closedByUser;
+
+        private bool _isDirty;
+
+        private bool IsDirty
+        {
+            get => _isDirty || LabelsEditor.IsDirty;
+            set => _isDirty = value;
+        }
+
         private MoleculePropertiesModel _moleculePropertiesModel;
 
-        public Model MicroModel { get; set; }
-
-        public MoleculePropertiesModel MpeModel
+        private MoleculePropertiesModel MpeModel
         {
             get
             {
@@ -74,6 +84,19 @@ namespace Chem4Word.ACME.Controls
 
             PopulateTabOne();
             PopulateTabTwo();
+            SetControlState();
+        }
+
+        private void SetControlState()
+        {
+            var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
+
+            bool showBrackets = thisMolecule.Count.HasValue
+                             || thisMolecule.FormalCharge.HasValue
+                             || thisMolecule.SpinMultiplicity.HasValue;
+
+            ShowBracketsValue.IsEnabled = !showBrackets;
+            IsDirty = true;
         }
 
         private void MoleculePropertyEditor_OnContentRendered(object sender, EventArgs e)
@@ -84,56 +107,29 @@ namespace Chem4Word.ACME.Controls
             Top = point.Y;
 
             InvalidateArrange();
+            IsDirty = false;
         }
 
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
             _moleculePropertiesModel.Save = true;
+            _closedByUser = true;
 
+            GatherData();
+            Close();
+        }
+
+        private void GatherData()
+        {
             // Get data from labels editor
             _moleculePropertiesModel.Data = LabelsEditor.EditedModel;
 
             // Merge in data from the first tab
             var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
-
-            thisMolecule.Count = null;
-            if (!string.IsNullOrEmpty(CountSpinner.Text))
-            {
-                int value;
-                if (int.TryParse(CountSpinner.Text, out value))
-                {
-                    if (value > 0 && value <= 99)
-                    {
-                        thisMolecule.Count = value;
-                    }
-                }
-            }
-
-            thisMolecule.FormalCharge = null;
-            if (ChargeValues.SelectedItem is ChargeValue charge)
-            {
-                if (charge.Value != 0)
-                {
-                    thisMolecule.FormalCharge = charge.Value;
-                }
-            }
-
-            thisMolecule.SpinMultiplicity = null;
-            if (SpinMultiplicityValues.SelectedItem is ChargeValue spin)
-            {
-                if (spin.Value != 0)
-                {
-                    thisMolecule.SpinMultiplicity = spin.Value;
-                }
-            }
-
-            thisMolecule.ShowMoleculeBrackets = null;
-            if (ShowBracketsValue.IsChecked != null)
-            {
-                thisMolecule.ShowMoleculeBrackets = ShowBracketsValue.IsChecked;
-            }
-
-            Close();
+            thisMolecule.Count = GetCountField();
+            thisMolecule.FormalCharge = GetChargeField();
+            thisMolecule.SpinMultiplicity = GetMultiplicityField();
+            thisMolecule.ShowMoleculeBrackets = GetShowBracketsField();
         }
 
         private void Close_OnClick(object sender, RoutedEventArgs e)
@@ -143,7 +139,7 @@ namespace Chem4Word.ACME.Controls
 
         private void PopulateTabOne()
         {
-            Preview.Chemistry = _moleculePropertiesModel.Data;
+            Preview.Chemistry = _moleculePropertiesModel.Data.Copy();
         }
 
         private void PopulateTabTwo()
@@ -156,11 +152,6 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-        private void CountSpinner_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            //throw new NotImplementedException();
-        }
-
         private void CountSpinnerIncreaseButton_OnClick(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(CountSpinner.Text))
@@ -170,13 +161,11 @@ namespace Chem4Word.ACME.Controls
             else
             {
                 int count;
-                if (int.TryParse(CountSpinner.Text, out count))
+                if (int.TryParse(CountSpinner.Text, out count)
+                    && count < 100)
                 {
-                    if (count < 100)
-                    {
-                        count++;
-                        CountSpinner.Text = count.ToString();
-                    }
+                    count++;
+                    CountSpinner.Text = count.ToString();
                 }
             }
         }
@@ -194,6 +183,130 @@ namespace Chem4Word.ACME.Controls
                 else
                 {
                     CountSpinner.Text = "";
+                }
+            }
+        }
+
+        private void CountSpinner_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
+            var value = GetCountField();
+            thisMolecule.Count = value;
+            LabelsEditor.SetCount(value);
+            Preview.Chemistry = _moleculePropertiesModel.Data.Copy();
+            SetControlState();
+        }
+
+        private void ChargeValues_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
+            var value = GetChargeField();
+            thisMolecule.FormalCharge = value;
+            LabelsEditor.SetFormalCharge(value);
+            Preview.Chemistry = _moleculePropertiesModel.Data.Copy();
+            SetControlState();
+        }
+
+        private void SpinMultiplicityValues_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
+            var value = GetMultiplicityField();
+            thisMolecule.SpinMultiplicity = value;
+            LabelsEditor.SetMultiplicity(value);
+            Preview.Chemistry = _moleculePropertiesModel.Data.Copy();
+            SetControlState();
+        }
+
+        private void ShowBracketsValue_OnClick(object sender, RoutedEventArgs e)
+        {
+            var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
+            var value = GetShowBracketsField();
+            thisMolecule.ShowMoleculeBrackets = value;
+            LabelsEditor.SetShowBrackets(value);
+            Preview.Chemistry = _moleculePropertiesModel.Data.Copy();
+            SetControlState();
+        }
+
+        private bool? GetShowBracketsField()
+        {
+            bool? result = null;
+
+            if (ShowBracketsValue.IsChecked != null)
+            {
+                result = ShowBracketsValue.IsChecked;
+            }
+
+            return result;
+        }
+
+        private int? GetMultiplicityField()
+        {
+            int? result = null;
+
+            if (SpinMultiplicityValues.SelectedItem is ChargeValue spin
+                && spin.Value != 0)
+            {
+                result = spin.Value;
+            }
+
+            return result;
+        }
+
+        private int? GetChargeField()
+        {
+            int? result = null;
+
+            if (ChargeValues.SelectedItem is ChargeValue charge
+                && charge.Value != 0)
+            {
+                result = charge.Value;
+            }
+
+            return result;
+        }
+
+        private int? GetCountField()
+        {
+            int? result = null;
+
+            if (!string.IsNullOrEmpty(CountSpinner.Text))
+            {
+                int value;
+                if (int.TryParse(CountSpinner.Text, out value)
+                    && value > 0 && value <= 99)
+                {
+                    result = value;
+                }
+            }
+
+            return result;
+        }
+
+        private void MoleculePropertyEditor_OnClosing(object sender, CancelEventArgs e)
+        {
+            if (!_closedByUser && IsDirty)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("Do you wish to save your changes?");
+                sb.AppendLine("  Click 'Yes' to save your changes and exit.");
+                sb.AppendLine("  Click 'No' to discard your changes and exit.");
+                sb.AppendLine("  Click 'Cancel' to return to the form.");
+
+                DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                switch (dr)
+                {
+                    case System.Windows.Forms.DialogResult.Yes:
+                        GatherData();
+                        _moleculePropertiesModel.Save = true;
+                        break;
+
+                    case System.Windows.Forms.DialogResult.No:
+                        _moleculePropertiesModel.Save = false;
+                        break;
+
+                    case System.Windows.Forms.DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
                 }
             }
         }

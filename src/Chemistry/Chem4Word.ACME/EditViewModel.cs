@@ -45,7 +45,7 @@ namespace Chem4Word.ACME
         #region Fields
 
         public readonly Dictionary<object, Adorner> SelectionAdorners = new Dictionary<object, Adorner>();
-        public  MultiAtomBondAdorner MultiAdorner { get; private set; }
+        public MultiAtomBondAdorner MultiAdorner { get; private set; }
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
@@ -1144,7 +1144,7 @@ namespace Chem4Word.ACME
 
             if (selAtomBonds.Any())
             {
-                MultiAdorner= new MultiAtomBondAdorner(CurrentEditor, selAtomBonds);
+                MultiAdorner = new MultiAtomBondAdorner(CurrentEditor, selAtomBonds);
                 MultiAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
             }
         }
@@ -1180,19 +1180,18 @@ namespace Chem4Word.ACME
         /// <param name="newObjects"></param>
         private void AddSelectionAdorners(IList newObjects)
         {
-            
             var singleAtomMols = (from m in newObjects.OfType<Molecule>().Union(SelectedItems.OfType<Molecule>())
-                                 where m.Atoms.Count == 1
-                                 select m).ToList();
-            var groupMols= (from m in newObjects.OfType<Molecule>().Union(SelectedItems.OfType<Molecule>())
-                                  where m.IsGrouped
+                                  where m.Atoms.Count == 1
                                   select m).ToList();
+            var groupMols = (from m in newObjects.OfType<Molecule>().Union(SelectedItems.OfType<Molecule>())
+                             where m.IsGrouped
+                             select m).ToList();
             var allMolecules = (from m in newObjects.OfType<Molecule>().Union(SelectedItems.OfType<Molecule>())
-                               select m).ToList();
+                                select m).ToList();
 
             var allSingletons = singleAtomMols.Count() == allMolecules.Count() && singleAtomMols.Any();
             var allGroups = allMolecules.Count() == groupMols.Count() & groupMols.Any();
-            
+
             if (allSingletons)
             {
                 RemoveAllAdorners();
@@ -1202,7 +1201,7 @@ namespace Chem4Word.ACME
                 {
                     SelectionAdorners[mol] = atomAdorner;
                 }
-                
+
                 atomAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 atomAdorner.DragCompleted += AtomAdorner_DragCompleted;
             }
@@ -1218,7 +1217,7 @@ namespace Chem4Word.ACME
                 groupAdorner.MouseLeftButtonDown += SelAdorner_MouseLeftButtonDown;
                 groupAdorner.DragCompleted += AtomAdorner_DragCompleted;
             }
-            else if(allMolecules.Any())
+            else if (allMolecules.Any())
             {
                 RemoveAllAdorners();
                 var molAdorner = new MoleculeSelectionAdorner(CurrentEditor,
@@ -1279,8 +1278,8 @@ namespace Chem4Word.ACME
             if (e.ClickCount == 2)
             {
                 _selectedItems.Clear();
-                Molecule mol=null;
-                var visual= CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor));
+                Molecule mol = null;
+                var visual = CurrentEditor.GetTargetedVisual(e.GetPosition(CurrentEditor));
                 if (visual is AtomVisual av)
                 {
                     mol = av.ParentAtom.Parent;
@@ -1289,14 +1288,12 @@ namespace Chem4Word.ACME
                 {
                     mol = bv.ParentBond.Parent;
                 }
-              
+
                 RemoveAtomBondAdorners(mol);
                 if (mol != null)
                 {
                     AddToSelection(mol);
                 }
-            
-               
             }
         }
 
@@ -1833,15 +1830,18 @@ namespace Chem4Word.ACME
             //phase one - group atoms into the molecules
             //grab all parent molecules for selected atoms
             var allParents = (from a in allItems.OfType<Atom>()
-                               group a by a.Parent
+                              group a by a.Parent
                                into parent
-                               select new {Parent = parent.Key,
-                                              Count = parent.Count()}).ToList();
+                              select new
+                              {
+                                  Parent = parent.Key,
+                                  Count = parent.Count()
+                              }).ToList();
 
             //and grab all of those that have all atoms selected
             var fullParents = (from m in allParents
-                                where m.Count == m.Parent.AtomCount
-                                select m.Parent).ToList();
+                               where m.Count == m.Parent.AtomCount
+                               select m.Parent).ToList();
 
             DebugHelper.WriteLine($"Timing: {sw.ElapsedMilliseconds}ms");
 
@@ -1907,7 +1907,7 @@ namespace Chem4Word.ACME
 
             foreach (Bond newBond in newBonds)
             {
-                if(!(_selectedItems.Contains(newBond)|_selectedItems.Contains(newBond.Parent.RootMolecule)))
+                if (!(_selectedItems.Contains(newBond) | _selectedItems.Contains(newBond.Parent.RootMolecule)))
                 {
                     _selectedItems.Add(newBond);
                 }
@@ -2010,7 +2010,7 @@ namespace Chem4Word.ACME
                               parent.AddMolecule(molB);
                               parent.RemoveMolecule(newMol);
                               newMol.Parent = null;
-                             
+
                               molA.UpdateVisual();
                               molB.UpdateVisual();
                           };
@@ -2811,6 +2811,5 @@ namespace Chem4Word.ACME
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
         }
-
     }
 }

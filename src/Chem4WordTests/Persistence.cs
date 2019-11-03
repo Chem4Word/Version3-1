@@ -112,7 +112,6 @@ namespace Chem4WordTests
             CMLConverter mc = new CMLConverter();
             Model m = mc.Import(ResourceHelper.GetStringResource("CopperPhthalocyanine.xml"));
 
-
             // Basic Sanity Checks
             Assert.True(m.Molecules.Count == 1, $"Expected 1 Molecule; Got {m.Molecules.Count}");
             Assert.True(m.TotalAtomsCount == 57, $"Expected 57 Atoms; Got {m.TotalAtomsCount}");
@@ -258,14 +257,14 @@ namespace Chem4WordTests
             Assert.True(m.Molecules.Count == 1, $"Expected 1 Molecule; Got {m.Molecules.Count}");
 
             var mol = m.Molecules.Values.First();
-            Assert.True(mol.Molecules.Count == 2, 
+            Assert.True(mol.Molecules.Count == 2,
                         $"Expected 2 Child Molecules; Got {mol.Molecules.Count}");
             Assert.True(m.TotalAtomsCount == 41, $"Expected 41 Atoms; Got {m.TotalAtomsCount}");
             Assert.True(m.TotalBondsCount == 42, $"Expected 42 Bonds; Got {m.TotalBondsCount}");
 
             // Check that we got three rings
             var mol2 = mol.Molecules.Values.Skip(1).First();
-            Assert.True(mol2.Rings.Count == 3, 
+            Assert.True(mol2.Rings.Count == 3,
                         $"Expected 3 Rings; Got {mol2.Rings.Count}");
 
             string molstring = mc.Export(m);

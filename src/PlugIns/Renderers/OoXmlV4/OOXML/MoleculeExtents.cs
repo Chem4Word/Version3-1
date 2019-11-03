@@ -83,7 +83,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             _groupBracketsExtents = extents;
         }
 
-
         public void SetGroupBracketExtents(Rect extents)
         {
             _groupBracketsExtents = extents;

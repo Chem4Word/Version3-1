@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Chem4Word.Core.Helpers;
@@ -246,7 +245,6 @@ namespace Chem4Word.Model2
                 catch (Exception ex)
                 {
                     string message = $"Exception {ex.Message} setting properties of Element {data[0]}";
-                    Debugger.Break();
                     throw new NotImplementedException(message);
                 }
             }
@@ -292,12 +290,19 @@ namespace Chem4Word.Model2
 
         public static int GetValence(Element element, int sumOfChargeAndBondOrder)
         {
-            var allowedValencies = element.Valencies; //GetAllowedValencies(element);
-            foreach (var valency in allowedValencies.Where(valency => valency >= sumOfChargeAndBondOrder))
+            int result = -1;
+
+            if (element != null)
             {
-                return valency;
+                var allowedValencies = element.Valencies;
+                foreach (var valency in allowedValencies.Where(valency => valency >= sumOfChargeAndBondOrder))
+                {
+                    result = valency;
+                    break;
+                }
             }
-            return -1;
+
+            return result;
         }
     }
 }

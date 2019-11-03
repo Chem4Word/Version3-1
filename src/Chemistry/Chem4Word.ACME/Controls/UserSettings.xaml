@@ -11,9 +11,8 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resources/ACMEResources.xaml"/>
+                <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -48,7 +47,7 @@
                               ToolTip="Set Default Bond Length" />
 
                     <!--  Show Grouping  -->
-                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelTextBlock}" >
+                    <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource LabelTextBlock}">
                         Show grouping of molecules
                     </TextBlock>
                     <CheckBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalAlignment="Center"
@@ -68,12 +67,10 @@
         <StackPanel Grid.Row="1" Margin="0,0,0,5" HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <!--  Defaults Button  -->
-            <Button Click="Defaults_OnClick" Content="Defaults"/>
-            <Button  Click="Save_OnClick" Content="OK"
-                   />
+            <Button Click="Defaults_OnClick" Content="Defaults" />
+            <Button  Click="Save_OnClick" Content="OK" />
             <!--  Cancel Button  -->
-            <Button Click="Cancel_OnClick" Content="Cancel"
-                     />
+            <Button Click="Cancel_OnClick" Content="Cancel" />
             <!--  Save Button  -->
         </StackPanel>
     </Grid>

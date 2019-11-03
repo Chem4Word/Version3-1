@@ -46,6 +46,5 @@ namespace Chem4Word.Core.Helpers
         public const double StandardBondLength = 20;
         public const double MaximumBondLength = 95;
         public const double BondLengthTolerance = 1;
-
     }
 }

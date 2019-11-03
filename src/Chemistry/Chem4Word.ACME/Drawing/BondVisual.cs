@@ -124,7 +124,7 @@ namespace Chem4Word.ACME.Drawing
                     bond = otherBonds.ToArray()[0];
                 }
 
-                bool chamferBond = (otherBonds.Any() 
+                bool chamferBond = (otherBonds.Any()
                                     && (endAtom.Element as Element) == Globals.PeriodicTable.C
                                     && endAtom.SymbolText == ""
                                     && bond.Order == Globals.OrderSingle);

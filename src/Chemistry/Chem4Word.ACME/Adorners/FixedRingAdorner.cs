@@ -27,7 +27,7 @@ namespace Chem4Word.ACME.Adorners
 
         public FixedRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, bool unsaturated = false) : base(adornedElement)
         {
-            _solidColorBrush = (SolidColorBrush) FindResource(Globals.AdornerFillBrush);
+            _solidColorBrush = (SolidColorBrush)FindResource(Globals.AdornerFillBrush);
 
             BondPen = new Pen((SolidColorBrush)FindResource(Globals.DrawAdornerBrush), bondThickness);
 

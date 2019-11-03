@@ -56,7 +56,7 @@ namespace Chem4Word.ACME.Adorners
 
         public DrawBondAdorner([NotNull] UIElement adornedElement, double bondThickness) : base(adornedElement)
         {
-            _solidColorBrush = (SolidColorBrush) FindResource(Globals.DrawAdornerBrush);
+            _solidColorBrush = (SolidColorBrush)FindResource(Globals.DrawAdornerBrush);
             _dashPen = new Pen(_solidColorBrush, bondThickness);
 
             CurrentEditor = (EditorCanvas)adornedElement;

@@ -246,7 +246,7 @@ namespace Chem4Word.Model2.Helpers
         public static Color ThumbAdornerFillColour => (Color)ColorConverter.ConvertFromString(ThumbAdornerFillColorDef);
 
         public const string Chem4WordColorDef = "#2A579A";
-        public static Color Chem4WordColor =>(Color) ColorConverter.ConvertFromString(Chem4WordColorDef);
+        public static Color Chem4WordColor => (Color)ColorConverter.ConvertFromString(Chem4WordColorDef);
 
         public const string GroupBracketColorDef = "#FF00BFFF"; //deep sky blue
         public static Color GroupBracketColor => (Color)ColorConverter.ConvertFromString(GroupBracketColorDef);
@@ -254,7 +254,7 @@ namespace Chem4Word.Model2.Helpers
 
         //thickness of molecule brackets
         public const double BracketThickness = BondThickness;
-        
+
         //spacing between molecule and brackets as multiple of bond length
         public const double BracketFactor = 0.2;
 

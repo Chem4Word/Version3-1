@@ -174,7 +174,6 @@ namespace Chem4Word.Model2
             }
         }
 
-
         public List<TextualProperty> AllTextualProperties
         {
             get
@@ -616,7 +615,7 @@ namespace Chem4Word.Model2
                 OnMoleculesChanged(this, e);
                 UpdateMoleculeEventHandlers(e);
             }
-            
+
             return res;
         }
 

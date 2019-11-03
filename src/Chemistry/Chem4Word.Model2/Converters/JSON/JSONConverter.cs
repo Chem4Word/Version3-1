@@ -210,10 +210,10 @@ namespace Chem4Word.Model2.Converters.JSON
                     }
 
                     Atom atom = new Atom()
-                                {
-                                    Element = ce,
-                                    Position = new Point(a.x, a.y)
-                                };
+                    {
+                        Element = ce,
+                        Position = new Point(a.x, a.y)
+                    };
 
                     if (a.c != null)
                     {

@@ -9,12 +9,15 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using Chem4Word.ACME.Annotations;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
 using Chem4Word.ACME.Utils;
+using Chem4Word.Core;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 
@@ -25,6 +28,10 @@ namespace Chem4Word.ACME.Controls
     /// </summary>
     public partial class AtomPropertyEditor : Window, INotifyPropertyChanged
     {
+        private bool _closedByUser;
+
+        private bool IsDirty { get; set; }
+
         private AtomPropertiesModel _atomPropertiesModel;
 
         public AtomPropertiesModel AtomPropertiesModel
@@ -93,6 +100,7 @@ namespace Chem4Word.ACME.Controls
         private void Save_OnClick(object sender, RoutedEventArgs e)
         {
             _atomPropertiesModel.Save = true;
+            _closedByUser = true;
             Close();
         }
 
@@ -226,6 +234,35 @@ namespace Chem4Word.ACME.Controls
             }
 
             Preview.Chemistry = AtomPropertiesModel.MicroModel.Copy();
+            IsDirty = true;
+        }
+
+        private void AtomPropertyEditor_OnClosing(object sender, CancelEventArgs e)
+        {
+            if (!_closedByUser && IsDirty)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("Do you wish to save your changes?");
+                sb.AppendLine("  Click 'Yes' to save your changes and exit.");
+                sb.AppendLine("  Click 'No' to discard your changes and exit.");
+                sb.AppendLine("  Click 'Cancel' to return to the form.");
+
+                DialogResult dr = UserInteractions.AskUserYesNoCancel(sb.ToString());
+                switch (dr)
+                {
+                    case System.Windows.Forms.DialogResult.Yes:
+                        _atomPropertiesModel.Save = true;
+                        break;
+
+                    case System.Windows.Forms.DialogResult.No:
+                        _atomPropertiesModel.Save = false;
+                        break;
+
+                    case System.Windows.Forms.DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                }
+            }
         }
     }
 }

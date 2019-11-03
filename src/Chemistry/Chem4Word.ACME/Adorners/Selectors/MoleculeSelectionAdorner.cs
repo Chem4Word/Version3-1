@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -30,6 +29,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //some things to grab hold of
         protected readonly Thumb TopLeftHandle; //these do the resizing
+
         protected readonly Thumb TopRightHandle;    //these do the resizing
         protected readonly Thumb BottomLeftHandle;  //these do the resizing
         protected readonly Thumb BottomRightHandle; //these do the resizing
@@ -202,8 +202,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         private void SetBoundingBox()
         {
-           BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
-           //and work out the aspect ratio for later resizing
+            BoundingBox = CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules);
+            //and work out the aspect ratio for later resizing
             AspectRatio = BoundingBox.Width / BoundingBox.Height;
         }
 
@@ -260,7 +260,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             _yPlacement = bbb.Top - RotateHandle.Height * 3;
             _rotateThumbPos = new Point(_xPlacement, _yPlacement);
 
-            if (BigThumb.IsDragging 
+            if (BigThumb.IsDragging
                 || TopLeftHandle.IsDragging
                 || TopRightHandle.IsDragging
                 || BottomLeftHandle.IsDragging
@@ -311,7 +311,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
             var brush = (Brush)FindResource(Globals.AdornerBorderBrush);
             var pen = new Pen(brush, 1.0);
-            if (!(BigThumb.IsDragging || TopLeftHandle.IsDragging || TopRightHandle.IsDragging 
+            if (!(BigThumb.IsDragging || TopLeftHandle.IsDragging || TopRightHandle.IsDragging
                   || BottomLeftHandle.IsDragging || BottomRightHandle.IsDragging))
             {
                 drawingContext.DrawLine(pen, _centroid, _rotateThumbPos);
@@ -337,7 +337,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             var argsHorizontalChange = args.HorizontalChange;
             var argsVerticalChange = args.VerticalChange;
-         
+
             if (double.IsNaN(argsHorizontalChange))
             {
                 argsHorizontalChange = 0d;
@@ -413,7 +413,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             if (NotDraggingBackwards())
             {
                 var scaleFactor = GetScaleFactor(BoundingBox.Left + DragXTravel,
-                                                 BoundingBox.Top ,
+                                                 BoundingBox.Top,
                                                  BoundingBox.Right,
                                                  BoundingBox.Bottom + DragYTravel);
 
@@ -444,6 +444,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         {
             return BigThumb.Height >= 10 && BigThumb.Width >= 10;
         }
+
         #endregion Resizing
     }
 }

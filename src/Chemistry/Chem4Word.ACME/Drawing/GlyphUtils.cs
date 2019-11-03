@@ -38,10 +38,11 @@ namespace Chem4Word.ACME.Drawing
             FontWeights.Bold,
             FontStretches.Normal);
 
-        public  static Typeface MoleculelabelTypeface = new Typeface(new FontFamily("Arial"),
+        public static Typeface MoleculelabelTypeface = new Typeface(new FontFamily("Arial"),
             FontStyles.Normal,
             FontWeights.Normal,
             FontStretches.Normal);
+
         static GlyphUtils()
         {
             if (!SymbolTypeface.TryGetGlyphTypeface(out _glyphTypeface))
@@ -110,7 +111,6 @@ namespace Chem4Word.ACME.Drawing
         /// <returns>List<Point> of geometry tracing the GlyphRun</Point></returns>
         public static List<Point> GetOutline(this GlyphRun glyphRun)
         {
-            
             if (glyphRun != null)
             {
                 var geo = glyphRun.BuildGeometry();

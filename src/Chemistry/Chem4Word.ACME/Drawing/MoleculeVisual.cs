@@ -5,13 +5,10 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Globalization;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
-using FlowDirection = System.Windows.FlowDirection;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -19,11 +16,11 @@ namespace Chem4Word.ACME.Drawing
     /// Draws a bracket around a molecule
     /// with charges and counts
     /// </summary>
-    public class MoleculeVisual:ChemicalVisual
+    public class MoleculeVisual : ChemicalVisual
     {
         private readonly Molecule _molecule;
         private Rect _boundingBox;
-        
+
         public MoleculeVisual(Molecule molecule, Rect? bb = null)
         {
             _molecule = molecule;
@@ -41,7 +38,7 @@ namespace Chem4Word.ACME.Drawing
             Pen bracketPen = new Pen(bracketBrush, Globals.BracketThickness);
             StreamGeometry sg = new StreamGeometry();
 
-            using (DrawingContext dc= RenderOpen())
+            using (DrawingContext dc = RenderOpen())
             {
                 using (StreamGeometryContext sgc = sg.Open())
                 {
@@ -58,7 +55,7 @@ namespace Chem4Word.ACME.Drawing
                     sgc.Close();
                 }
 
-                dc.DrawGeometry(bracketBrush,bracketPen, sg);
+                dc.DrawGeometry(bracketBrush, bracketPen, sg);
 
                 //now draw the charges and radicals
                 string chargeString = AtomHelpers.GetChargeString(_molecule.FormalCharge);
@@ -81,8 +78,8 @@ namespace Chem4Word.ACME.Drawing
 
                 if (chargeString != "")
                 {
-                   Point pos = bb.TopRight +
-                                horizontal;
+                    Point pos = bb.TopRight +
+                                 horizontal;
                     var mlv = new MoleculeLabelVisual(chargeString, pos, bracketBrush, _molecule.Model.XamlBondLength / 2.0d);
                     mlv.Render(dc);
                     AddVisualChild(mlv);

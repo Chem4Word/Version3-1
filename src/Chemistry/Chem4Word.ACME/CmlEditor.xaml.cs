@@ -5,10 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Windows;
 using System.Windows.Controls;
-using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 

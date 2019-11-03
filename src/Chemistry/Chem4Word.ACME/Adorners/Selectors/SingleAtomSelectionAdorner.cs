@@ -21,7 +21,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
     public class SingleAtomSelectionAdorner : MultiChemistryAdorner
     {
         //this is the main grab area for the molecule
-        protected Thumb BigThumb; 
+        protected Thumb BigThumb;
 
         public List<Molecule> AdornedMolecules => AdornedChemistries.Select(c => (Molecule)c).ToList();
 
@@ -33,6 +33,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         //tracks the amount of travel during drag operations
         protected double DragXTravel;
+
         protected double DragYTravel;
 
         //where the dragging starts
@@ -48,7 +49,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
         }
 
         public SingleAtomSelectionAdorner(EditorCanvas currentEditor, List<Molecule> mols)
-            : this(currentEditor, mols.ConvertAll(m=>(ChemistryBase)m))
+            : this(currentEditor, mols.ConvertAll(m => (ChemistryBase)m))
         {
         }
 
@@ -222,7 +223,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
             }
             else
             {
-                EditViewModel.RemoveFromSelection(AdornedMolecules.ConvertAll(am=>(ChemistryBase)am));
+                EditViewModel.RemoveFromSelection(AdornedMolecules.ConvertAll(am => (ChemistryBase)am));
             }
             Dragging = false;
         }

@@ -79,7 +79,7 @@ namespace Chem4Word.ACME.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            _ghostBrush = (SolidColorBrush) FindResource(Globals.GhostBrush);
+            _ghostBrush = (SolidColorBrush)FindResource(Globals.GhostBrush);
             _ghostPen = new Pen(_ghostBrush, Globals.BondThickness);
 
             HashSet<Bond> bondSet = new HashSet<Bond>();

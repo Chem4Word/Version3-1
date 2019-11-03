@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -88,8 +89,6 @@ namespace Chem4Word.ACME
 
                 if (item.Tag is Molecule thisMolecule)
                 {
-                    //Debug.WriteLine($"Molecule {thisMolecule.Path} [{thisMolecule.ConciseFormula}] selected");
-
                     model = new Model();
                     var copy = thisMolecule.Copy();
                     model.AddMolecule(copy);
@@ -196,6 +195,46 @@ namespace Chem4Word.ACME
 
                     AddNodes(tvi, molecule.Molecules.Values);
                 }
+            }
+        }
+
+        public void SetCount(int? value)
+        {
+            if (EditedModel != null)
+            {
+                var parent = EditedModel.Molecules.First().Value;
+                parent.Count = value;
+                TreeView_OnSelectedItemChanged(null, null);
+            }
+        }
+
+        public void SetFormalCharge(int? value)
+        {
+            if (EditedModel != null)
+            {
+                var parent = EditedModel.Molecules.First().Value;
+                parent.FormalCharge = value;
+                TreeView_OnSelectedItemChanged(null, null);
+            }
+        }
+
+        public void SetMultiplicity(int? value)
+        {
+            if (EditedModel != null)
+            {
+                var parent = EditedModel.Molecules.First().Value;
+                parent.SpinMultiplicity = value;
+                TreeView_OnSelectedItemChanged(null, null);
+            }
+        }
+
+        public void SetShowBrackets(bool? value)
+        {
+            if (EditedModel != null)
+            {
+                var parent = EditedModel.Molecules.First().Value;
+                parent.ShowMoleculeBrackets = value;
+                TreeView_OnSelectedItemChanged(null, null);
             }
         }
 

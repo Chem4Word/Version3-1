@@ -1260,12 +1260,12 @@ namespace Chem4Word
                                                     if (idx >= 0)
                                                     {
                                                         var tw = new TargetWord
-                                                                 {
-                                                                     ChemicalName = kvp.Key,
-                                                                     Start = start + idx,
-                                                                     ChemistryId = kvp.Value,
-                                                                     End = start + idx + kvp.Key.Length
-                                                                 };
+                                                        {
+                                                            ChemicalName = kvp.Key,
+                                                            Start = start + idx,
+                                                            ChemistryId = kvp.Value,
+                                                            End = start + idx + kvp.Key.Length
+                                                        };
                                                         //Debug.WriteLine(tw.ToString());
                                                         selectedWords.Add(tw);
                                                     }

@@ -13,7 +13,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xaml;
 using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Core.UI.Wpf;
@@ -46,6 +45,7 @@ namespace Chem4Word.ACME
 
         // This is used to store the cml until the editor is Loaded
         private string _cml;
+
         private List<string> _used1DProperties;
         private Options _editorOptions;
 
@@ -131,9 +131,9 @@ namespace Chem4Word.ACME
             if (Application.Current == null)
             {
                 // create the Application object
-                try 
+                try
                 {
-                    new Application {ShutdownMode = ShutdownMode.OnExplicitShutdown};
+                    new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
                 }
                 catch //just in case the application already exists
                 {
@@ -142,7 +142,7 @@ namespace Chem4Word.ACME
 
                 //check to make sure we managed to initialize a
                 //new application before adding in resources
-                if (Application.Current != null) 
+                if (Application.Current != null)
                 {
                     // Merge in your application resources
                     // We need to do this for controls hosted in Winforms
@@ -372,12 +372,12 @@ namespace Chem4Word.ACME
             }
         }
 
-       /// <summary>
-       /// detects whether the popup has been clicked
-       /// and sets the mode accordingly
-       /// </summary>
-       /// <param name="sender"></param>
-       /// <param name="e"></param>
+        /// <summary>
+        /// detects whether the popup has been clicked
+        /// and sets the mode accordingly
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SelectionPopup_OnClick(object sender, RoutedEventArgs e)
         {
             SelectionButton.IsChecked = true;
@@ -401,11 +401,11 @@ namespace Chem4Word.ACME
         {
             Button selButton = sender as Button;
             var currentFace = new VisualBrush
-                              {
-                                  AutoLayoutContent = true,
-                                  Stretch = Stretch.Uniform,
-                                  Visual = selButton.Content as Visual
-                              };
+            {
+                AutoLayoutContent = true,
+                Stretch = Stretch.Uniform,
+                Visual = selButton.Content as Visual
+            };
             SelectionPanel.Background = currentFace;
             //set the behaviour of the button to that of
             //the selected mode in the dropdown

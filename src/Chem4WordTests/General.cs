@@ -89,7 +89,7 @@ namespace Chem4WordTests
 
             // Get atom to test
             var atoms = molecule.Atoms.Values.Where(a => a.SymbolText == element).ToList();
-            Assert.True(atoms.Count == 1,"Expected only one atom");
+            Assert.True(atoms.Count == 1, "Expected only one atom");
             Atom atom = atoms.FirstOrDefault();
             Assert.NotNull(atom);
 

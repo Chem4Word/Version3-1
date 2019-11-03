@@ -8,9 +8,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="Bond Properties"
     MinWidth="200"
+    Closing="BondPropertyEditor_OnClosing"
+    ContentRendered="BondPropertyEditor_OnContentRendered"
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
     Loaded="BondPropertyEditor_OnLoaded"
-    ContentRendered="BondPropertyEditor_OnContentRendered"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
@@ -25,67 +26,155 @@
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
-            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}" >
-                
-                <ComboBoxItem Tag="0" Height="Auto">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold" Width="50">None</TextBlock>
+            <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}">
+
+                <ComboBoxItem Height="Auto" Tag="0">
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">None</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black"  StrokeThickness="2" StrokeDashArray="1,1" StrokeEndLineCap="Round" />
+                            <Line
+                                Stroke="Black"
+                                StrokeDashArray="1,1"
+                                StrokeEndLineCap="Round"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="7"
+                                Y2="7" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
                 <ComboBoxItem Tag="0.5">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold" Width="50">Half</TextBlock>
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">Half</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black"  StrokeThickness="2" StrokeDashArray="2,1" StrokeEndLineCap="Round" />
+                            <Line
+                                Stroke="Black"
+                                StrokeDashArray="2,1"
+                                StrokeEndLineCap="Round"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="7"
+                                Y2="7" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
                 <ComboBoxItem Tag="1">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold" Width="50">Single</TextBlock>
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">Single</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black"  StrokeThickness="2" StrokeEndLineCap="Round" />
+                            <Line
+                                Stroke="Black"
+                                StrokeEndLineCap="Round"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="8"
+                                Y2="8" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
                 <ComboBoxItem Tag="1.5">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold"  Width="50">1.5</TextBlock>
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">1.5</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="7" X2="50" Y2="7" Stroke="Black" StrokeThickness="2" StrokeEndLineCap="Round" />
-                            <Line X1="0" Y1="12" X2="50" Y2="12" Stroke="Black" StrokeDashArray="2,1" StrokeEndLineCap="Round" StrokeThickness="2" />
+                            <Line
+                                Stroke="Black"
+                                StrokeEndLineCap="Round"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="7"
+                                Y2="7" />
+                            <Line
+                                Stroke="Black"
+                                StrokeDashArray="2,1"
+                                StrokeEndLineCap="Round"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="12"
+                                Y2="12" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
                 <ComboBoxItem Tag="2">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold"  Width="50">Double</TextBlock>
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">Double</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="5" X2="50" Y2="5" Stroke="Black" StrokeThickness="2" />
-                            <Line X1="0" Y1="10" X2="50" Y2="10" Stroke="Black" StrokeThickness="2" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="5"
+                                Y2="5" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="10"
+                                Y2="10" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
                 <ComboBoxItem Tag="2.5">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold"  Width="50">2.5</TextBlock>
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">2.5</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="3" X2="50" Y2="3" Stroke="Black" StrokeThickness="2" />
-                            <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black" StrokeThickness="2" />
-                            <Line X1="0" Y1="13" X2="50" Y2="13" Stroke="Black" StrokeThickness="2"  StrokeDashArray="2,1" StrokeEndLineCap="Round" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="3"
+                                Y2="3" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="8"
+                                Y2="8" />
+                            <Line
+                                Stroke="Black"
+                                StrokeDashArray="2,1"
+                                StrokeEndLineCap="Round"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="13"
+                                Y2="13" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
                 <ComboBoxItem Tag="3">
-                    <StackPanel Orientation="Horizontal" Height="Auto">
-                        <TextBlock FontWeight="DemiBold"  Width="50">Triple</TextBlock>
+                    <StackPanel Height="Auto" Orientation="Horizontal">
+                        <TextBlock Width="50" FontWeight="DemiBold">Triple</TextBlock>
                         <Canvas Width="60" Height="Auto">
-                            <Line X1="0" Y1="3" X2="50" Y2="3" Stroke="Black" StrokeThickness="2" />
-                            <Line X1="0" Y1="8" X2="50" Y2="8" Stroke="Black" StrokeThickness="2" />
-                            <Line X1="0" Y1="13" X2="50" Y2="13" Stroke="Black" StrokeThickness="2" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="3"
+                                Y2="3" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="8"
+                                Y2="8" />
+                            <Line
+                                Stroke="Black"
+                                StrokeThickness="2"
+                                X1="0"
+                                X2="50"
+                                Y1="13"
+                                Y2="13" />
                         </Canvas>
                     </StackPanel>
                 </ComboBoxItem>
@@ -117,7 +206,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
         </ResourceDictionary>
     </Window.Resources>
     <Border Margin="5">
@@ -154,12 +242,11 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="0,5,0,0"
-                SelectedValue="{Binding Path=BondOrderValue, Mode=TwoWay}"
                 FontSize="12"
                 ItemsSource="{Binding Source={StaticResource BondItems}}"
-                Style="{StaticResource StandardCombo}"
-                SelectedValuePath="Tag">
-            </ComboBox>
+                SelectedValue="{Binding Path=BondOrderValue, Mode=TwoWay}"
+                SelectedValuePath="Tag"
+                Style="{StaticResource StandardCombo}" />
             <TextBlock
                 Grid.Row="2"
                 Grid.Column="0"
@@ -704,8 +791,8 @@
                             Y2="38" />
                         <Line
                             Stroke="Black"
-                            StrokeThickness="2"
                             StrokeDashArray="2,1"
+                            StrokeThickness="2"
                             X1="17"
                             X2="17"
                             Y1="10"
@@ -744,8 +831,8 @@
                             Y2="38" />
                         <Line
                             Stroke="Black"
-                            StrokeThickness="2"
                             StrokeDashArray="2,1"
+                            StrokeThickness="2"
                             X1="31"
                             X2="31"
                             Y1="10"
@@ -808,8 +895,8 @@
                             Y2="38" />
                         <Line
                             Stroke="Black"
-                            StrokeThickness="2"
                             StrokeDashArray="2,1"
+                            StrokeThickness="2"
                             X1="17"
                             X2="17"
                             Y1="10"
@@ -855,8 +942,8 @@
                             Y2="38" />
                         <Line
                             Stroke="Black"
-                            StrokeThickness="2"
                             StrokeDashArray="2,1"
+                            StrokeThickness="2"
                             X1="31"
                             X2="31"
                             Y1="10"
@@ -876,14 +963,10 @@
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
-                <Button
-                    HorizontalAlignment="Right"
-                    Click="Save_OnClick">
+                <Button HorizontalAlignment="Right" Click="Save_OnClick">
                     OK
                 </Button>
-                <Button
-                    HorizontalAlignment="Right"
-                    Click="Cancel_OnClick">
+                <Button HorizontalAlignment="Right" Click="Cancel_OnClick">
                     Cancel
                 </Button>
             </StackPanel>

@@ -477,6 +477,7 @@ namespace Chem4Word.ACME.Drawing
         }
 
 #if DEBUG
+
         private void ShowHull(List<Point> points, DrawingContext drawingContext)
         {
             var path = BasicGeometry.BuildPath(points);

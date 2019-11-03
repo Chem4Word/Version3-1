@@ -8,7 +8,6 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
-using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
 {
@@ -28,7 +27,7 @@ namespace Chem4Word.ACME.Drawing
             _textSize = textSize;
         }
 
-        public float PixelsPerDip() => (float) VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        public float PixelsPerDip() => (float)VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
         public void Render(DrawingContext dc, bool isSubscript = false)
         {

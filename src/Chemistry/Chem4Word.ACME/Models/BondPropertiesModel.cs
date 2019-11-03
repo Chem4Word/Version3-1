@@ -11,8 +11,31 @@ namespace Chem4Word.ACME.Models
 {
     public class BondPropertiesModel : BaseDialogModel
     {
-        public DoubleBondType DoubleBondChoice { get; set; }
-        public SingleBondType SingleBondChoice { get; set; }
+        public bool IsDirty { get; set; }
+
+        private DoubleBondType _doubleBondChoice;
+
+        public DoubleBondType DoubleBondChoice
+        {
+            get => _doubleBondChoice;
+            set
+            {
+                _doubleBondChoice = value;
+                IsDirty = true;
+            }
+        }
+
+        private SingleBondType _singleBondChoice;
+
+        public SingleBondType SingleBondChoice
+        {
+            get => _singleBondChoice;
+            set
+            {
+                _singleBondChoice = value;
+                IsDirty = true;
+            }
+        }
 
         public double Angle { get; set; }
         public bool IsSingle { get; set; }
@@ -55,6 +78,7 @@ namespace Chem4Word.ACME.Models
                     }
 
                     OnPropertyChanged();
+                    IsDirty = true;
                 }
             }
         }

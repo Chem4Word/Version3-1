@@ -22,7 +22,7 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         #region Constructors
 
-        protected MultiChemistryAdorner(EditorCanvas currentEditor, List<ChemistryBase> chemistries) :base(currentEditor)
+        protected MultiChemistryAdorner(EditorCanvas currentEditor, List<ChemistryBase> chemistries) : base(currentEditor)
         {
             AdornedChemistries = new List<ChemistryBase>();
             AdornedChemistries.AddRange(chemistries.Distinct());

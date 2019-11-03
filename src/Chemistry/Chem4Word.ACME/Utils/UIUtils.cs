@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
@@ -237,8 +236,10 @@ namespace Chem4Word.ACME.Utils
                         if (model.Save)
                         {
                             evm.UpdateAtom(atom, model);
+
                             evm.ClearSelection();
                             evm.AddToSelection(atom);
+
                             if (model.AddedElement != null)
                             {
                                 if (model.IsElement)
@@ -334,11 +335,11 @@ namespace Chem4Word.ACME.Utils
                         if (model.Save)
                         {
                             evm.UpdateBond(bond, model);
-                            bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
-                        }
+                            evm.ClearSelection();
 
-                        evm.ClearSelection();
-                        evm.AddToSelection(bond);
+                            bond.Order = Globals.OrderValueToOrder(model.BondOrderValue);
+                            evm.AddToSelection(bond);
+                        }
                     }
                 }
             }

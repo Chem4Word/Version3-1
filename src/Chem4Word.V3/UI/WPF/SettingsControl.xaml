@@ -503,7 +503,6 @@
                 VerticalAlignment="Center"
                 Click="CancelButton_OnClick"
                 Content="Cancel" />
-
         </StackPanel>
     </Grid>
 </UserControl>

@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using Chem4Word.Model2;
 using Xunit;
+
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace Chem4WordTests

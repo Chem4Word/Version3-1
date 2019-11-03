@@ -715,7 +715,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                                       && bl.Bond.Stereo == Globals.BondStereo.Wedge || bl.Bond.Stereo == Globals.BondStereo.Hatch;
                             if (!ignoreWedgeOrHatch)
                             {
-                                // Line was clipped at both ends;
+                                // Line was clipped at both ends
                                 // 1. Generate new line
                                 BondLine extraLine = new BondLine(bl.Style, new Point(end.X, end.Y), new Point(bl.End.X, bl.End.Y), bl.Bond);
                                 extraBondLines.Add(extraLine);
@@ -930,7 +930,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void LoadFont()
         {
-            // Use either Arial or Tahoma (experimental)
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "Arial.json");
             _TtfCharacterSet = JsonConvert.DeserializeObject<Dictionary<char, TtfCharacter>>(json);
         }
