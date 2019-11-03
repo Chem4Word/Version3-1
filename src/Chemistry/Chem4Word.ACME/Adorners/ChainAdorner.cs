@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Model2;
@@ -23,6 +24,8 @@ namespace Chem4Word.ACME.Adorners
     /// </summary>
     public class ChainAdorner : Adorner
     {
+        public PathGeometry Geometry { get; private set; }
+
         public ChainAdorner(Point firstPoint, [NotNull] UIElement adornedElement, double bondThickness,
                             List<Point> placements, Point currentPoint, Atom target) : base(adornedElement)
         {
@@ -38,10 +41,20 @@ namespace Chem4Word.ACME.Adorners
             CurrentPoint = currentPoint;
             CurrentEditor = (EditorCanvas)adornedElement;
 
+            var psc = new PathSegmentCollection();
+            foreach (var point in Placements)
+            {
+                psc.Add(new LineSegment(point, true));
+            }
+
+            var pf = new PathFigure(FirstPoint, psc, false);
+            Geometry = new PathGeometry(new[] { pf });
+
             Unanchored = target == null;
 
             Focusable = true;
             Focus();
+          
         }
 
         public Pen BondPen { get; }
@@ -63,17 +76,8 @@ namespace Chem4Word.ACME.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            // ToDo: This may not be accurate
-
-            var psc = new PathSegmentCollection();
-            foreach (var point in Placements)
-            {
-                psc.Add(new LineSegment(point, true));
-            }
-
-            var pf = new PathFigure(FirstPoint, psc, false);
-            var pg = new PathGeometry(new[] { pf });
-            drawingContext.DrawGeometry(null, BondPen, pg);
+          
+            drawingContext.DrawGeometry(null, BondPen, Geometry);
             drawingContext.DrawLine(DashedPen, Placements.Last(), CurrentPoint);
             if (Unanchored)
             {

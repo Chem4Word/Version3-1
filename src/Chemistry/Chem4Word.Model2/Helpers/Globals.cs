@@ -250,6 +250,7 @@ namespace Chem4Word.Model2.Helpers
 
         public const string GroupBracketColorDef = "#FF00BFFF"; //deep sky blue
         public static Color GroupBracketColor => (Color)ColorConverter.ConvertFromString(GroupBracketColorDef);
+        public const double AtomRadius = 5.0;
 
         //thickness of molecule brackets
         public const double BracketThickness = BondThickness;

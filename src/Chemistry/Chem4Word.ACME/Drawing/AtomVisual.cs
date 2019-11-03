@@ -554,7 +554,7 @@ namespace Chem4Word.ACME.Drawing
                     }
                     else //draw an empty circle for hit testing purposes
                     {
-                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, 5.0, 5.0);
+                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, Globals.AtomRadius, Globals.AtomRadius);
 
                         dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), eg);
                         //very simple hull definition

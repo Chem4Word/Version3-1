@@ -12,11 +12,14 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using Chem4Word.ACME.Adorners;
 using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Drawing;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Behaviors
 {
@@ -25,6 +28,7 @@ namespace Chem4Word.ACME.Behaviors
         private ChainAdorner _currentAdorner;
         private Window _parent;
         public List<Point> Placements { get; private set; }
+        public bool Clashing { get; private set; } = false;
 
         public ChainAdorner CurrentAdorner
         {
@@ -90,7 +94,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (IsDrawing)
+            if (IsDrawing & !Clashing)
             {
                 EditViewModel.DrawChain(Placements, Target);
             }
@@ -100,6 +104,8 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.ReleaseMouseCapture();
             CurrentAdorner = null;
             Placements = null;
+            Clashing = false;
+            SetCursor();
         }
 
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
@@ -111,13 +117,36 @@ namespace Chem4Word.ACME.Behaviors
 
             if (IsDrawing)
             {
+                Clashing = false;
                 CurrentStatus = "Drag to start sizing chain: [Esc] to cancel.";
                 var endPoint = e.GetPosition(EditViewModel.CurrentEditor);
-
+                
                 MarkOutAtoms(endPoint, e);
-
                 CurrentAdorner =
                     new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements, endPoint, Target);
+
+                var targetedVisual = EditViewModel.CurrentEditor.GetTargetedVisual(endPoint);
+                //check to see we're not overwriting 
+                bool overWritingSelf = false;
+                if (CurrentAdorner.Geometry != null)
+                {
+                    overWritingSelf=CurrentAdorner.Geometry.StrokeContains(new Pen(Brushes.Black, Globals.AtomRadius * 2), endPoint);
+                }
+                Clashing = (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) |overWritingSelf;
+                //set the cursor appropriately
+                SetCursor();
+            }
+        }
+
+        private void SetCursor()
+        {
+            if (Clashing)
+            {
+                CurrentEditor.Cursor = System.Windows.Input.Cursors.No;
+            }
+            else
+            {
+                CurrentEditor.Cursor = System.Windows.Input.Cursors.Pen;
             }
         }
 
