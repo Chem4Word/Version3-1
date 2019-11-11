@@ -370,6 +370,10 @@ namespace Chem4Word.ACME
             {
                 ActiveViewModel.DeleteSelection();
             }
+            else if (e.Key == Key.A && KeyboardUtils.HoldingDownControl())
+            {
+                ActiveViewModel.SelectAll();
+            }
         }
 
         /// <summary>

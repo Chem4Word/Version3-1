@@ -2811,5 +2811,18 @@ namespace Chem4Word.ACME
             UndoManager.RecordAction(undo, redo);
             UndoManager.EndUndoBlock();
         }
+
+        /// <summary>
+        /// Selects all visible molecules
+        /// </summary>
+        public void SelectAll()
+        {
+            ClearSelection();
+            foreach (var mol in Model.Molecules.Values)
+            {
+                AddToSelection(mol);
+            }
+            
+        }
     }
 }
