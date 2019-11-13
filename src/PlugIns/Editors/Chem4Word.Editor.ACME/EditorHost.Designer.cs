@@ -30,12 +30,12 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditorHost));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
+            this.editor1 = new Chem4Word.ACME.Editor();
             this.Buttons = new System.Windows.Forms.Panel();
             this.MessageFromWpf = new System.Windows.Forms.Label();
             this.Save = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
-            this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this.editor1 = new Chem4Word.ACME.Editor();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -63,6 +63,17 @@
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 2;
             // 
+            // elementHost1
+            // 
+            this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.elementHost1.Location = new System.Drawing.Point(0, 0);
+            this.elementHost1.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.elementHost1.Name = "elementHost1";
+            this.elementHost1.Size = new System.Drawing.Size(984, 623);
+            this.elementHost1.TabIndex = 0;
+            this.elementHost1.Text = "elementHost1";
+            this.elementHost1.Child = this.editor1;
+            // 
             // Buttons
             // 
             this.Buttons.Controls.Add(this.MessageFromWpf);
@@ -83,7 +94,7 @@
             this.MessageFromWpf.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.MessageFromWpf.Location = new System.Drawing.Point(12, 35);
             this.MessageFromWpf.Name = "MessageFromWpf";
-            this.MessageFromWpf.Size = new System.Drawing.Size(20, 16);
+            this.MessageFromWpf.Size = new System.Drawing.Size(17, 17);
             this.MessageFromWpf.TabIndex = 4;
             this.MessageFromWpf.Text = "...";
             // 
@@ -113,17 +124,6 @@
             this.Cancel.UseVisualStyleBackColor = true;
             this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
             // 
-            // elementHost1
-            // 
-            this.elementHost1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.elementHost1.Location = new System.Drawing.Point(0, 0);
-            this.elementHost1.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(984, 623);
-            this.elementHost1.TabIndex = 0;
-            this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this.editor1;
-            // 
             // EditorHost
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -137,6 +137,7 @@
             this.Text = "ACME";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EditorHost_FormClosing);
             this.Load += new System.EventHandler(this.EditorHost_Load);
+            this.LocationChanged += new System.EventHandler(this.EditorHost_LocationChanged);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

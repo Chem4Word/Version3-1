@@ -11,8 +11,8 @@
     xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="AcmeControl"
-    Width="1013"
-    Height="774"
+    Width="1024"
+    Height="768"
     d:DataContext="{d:DesignInstance acme:EditViewModel}"
     Loaded="ACMEControl_Loaded"
     PreviewKeyDown="Editor_OnPreviewKeyDown"
@@ -394,6 +394,91 @@
                         </Style>
                     </ComboBox.ItemContainerStyle>
                 </ComboBox>
+                <Button
+                    x:Name="PTPickerButton"
+                    Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PickElementCommand}"
+                    Style="{StaticResource CommandButtonStyle}"
+                    ToolTip="Periodic Table">
+                    <Viewbox Stretch="Uniform">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="5" />
+                                <RowDefinition Height="10" />
+                                <RowDefinition Height="10" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="10" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle
+                                Grid.Row="0"
+                                Grid.RowSpan="7"
+                                Grid.Column="1"
+                                Grid.ColumnSpan="2"
+                                Fill="{StaticResource PTAlkaliBrush}"
+                                Stroke="Black"
+                                StrokeThickness="2" />
+                            <Rectangle
+                                Grid.Row="3"
+                                Grid.RowSpan="4"
+                                Grid.Column="3"
+                                Grid.ColumnSpan="10"
+                                Fill="{StaticResource PTTransitionMetalBrush}"
+                                Stroke="Black"
+                                StrokeThickness="2" />
+                            <Rectangle
+                                Grid.Row="1"
+                                Grid.RowSpan="6"
+                                Grid.Column="13"
+                                Grid.ColumnSpan="5"
+                                Fill="{StaticResource PTMetalloidBrush}"
+                                Stroke="Black"
+                                StrokeThickness="2" />
+                            <Rectangle
+                                Grid.Row="0"
+                                Grid.RowSpan="7"
+                                Grid.Column="18"
+                                Grid.ColumnSpan="2"
+                                Fill="{StaticResource PTNobleGasBrush}"
+                                Stroke="Black"
+                                StrokeThickness="2" />
+                            <Rectangle
+                                Grid.Row="8"
+                                Grid.RowSpan="2"
+                                Grid.Column="3"
+                                Grid.ColumnSpan="14"
+                                Fill="{StaticResource PTActinideBrush}"
+                                Stroke="Black"
+                                StrokeThickness="2" />
+                        </Grid>
+                    </Viewbox>
+                </Button>
+                <Separator />
                 <ComboBox
                     x:Name="BondCombo"
                     Width="60"

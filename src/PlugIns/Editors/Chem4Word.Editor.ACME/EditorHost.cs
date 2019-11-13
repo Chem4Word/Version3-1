@@ -7,26 +7,31 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
+using Size = System.Drawing.Size;
 
 namespace Chem4Word.Editor.ACME
 {
     public partial class EditorHost : Form
     {
-        public System.Windows.Point TopLeft { get; set; }
+        public Point TopLeft { get; set; }
 
         public Size FormSize { get; set; }
 
         public string OutputValue { get; set; }
-        private string _cml;
-        private List<string> _used1DProperties;
-        private Options _options;
+
+        private readonly string _cml;
+        private readonly List<string> _used1DProperties;
+        private readonly Options _options;
+
+        private bool IsLoading { get; set; } = true;
 
         public EditorHost(string cml, List<string> used1DProperties, Options options)
         {
@@ -37,8 +42,22 @@ namespace Chem4Word.Editor.ACME
             _options = options;
         }
 
+        private void EditorHost_LocationChanged(object sender, EventArgs e)
+        {
+            if (!IsLoading)
+            {
+                TopLeft = new Point(Left + Constants.TopLeftOffset / 2, Top + Constants.TopLeftOffset / 2);
+                if (elementHost1.Child is Chem4Word.ACME.Editor editor)
+                {
+                    editor.TopLeft = TopLeft;
+                }
+            }
+        }
+
         private void EditorHost_Load(object sender, EventArgs e)
         {
+            IsLoading = true;
+
             if (TopLeft.X != 0 && TopLeft.Y != 0)
             {
                 Left = (int)TopLeft.X;
@@ -63,9 +82,12 @@ namespace Chem4Word.Editor.ACME
             if (elementHost1.Child is Chem4Word.ACME.Editor editor)
             {
                 editor.SetProperties(_cml, _used1DProperties, _options);
+                editor.TopLeft = TopLeft;
                 editor.ShowFeedback = false;
                 editor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
             }
+
+            IsLoading = false;
         }
 
         private void AcmeEditorOnFeedbackChange(object sender, WpfEventArgs e)

@@ -343,9 +343,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 // 3. Brackets
                 bool showBrackets = mol.ShowMoleculeBrackets.HasValue && mol.ShowMoleculeBrackets.Value
-                                    || mol.Count.HasValue
-                                    || mol.FormalCharge.HasValue
-                                    || mol.SpinMultiplicity.HasValue;
+                                    || mol.Count.HasValue && mol.Count.Value > 0
+                                    || mol.FormalCharge.HasValue && mol.FormalCharge.Value != 0
+                                    || mol.SpinMultiplicity.HasValue && mol.SpinMultiplicity.Value > 1;
 
                 var rect = thisMoleculeExtents.GroupBracketsExtents;
                 var children = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();

@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Media;
 
 /*
-    Descriptors are simple classes that define the shape of a bond visual.
+    These are simple classes that define the shape of a bond visual.
     They simplify the transfer of information into and out of drawing routines.
     You can either use the Point properties and draw primitives directly from those,
     or use the DefinedGeometry and draw that directly

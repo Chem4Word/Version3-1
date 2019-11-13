@@ -91,9 +91,9 @@ namespace Chem4Word.ACME.Controls
         {
             var thisMolecule = _moleculePropertiesModel.Data.Molecules.First().Value;
 
-            bool showBrackets = thisMolecule.Count.HasValue
-                             || thisMolecule.FormalCharge.HasValue
-                             || thisMolecule.SpinMultiplicity.HasValue;
+            bool showBrackets = thisMolecule.Count.HasValue && thisMolecule.Count.Value > 0
+                             || thisMolecule.FormalCharge.HasValue && thisMolecule.FormalCharge.Value != 0
+                             || thisMolecule.SpinMultiplicity.HasValue && thisMolecule.SpinMultiplicity.Value > 1;
 
             ShowBracketsValue.IsEnabled = !showBrackets;
             IsDirty = true;

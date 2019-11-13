@@ -18,4 +18,26 @@
     <SolidColorBrush x:Key="RBrush" Color="Black" />
     <SolidColorBrush x:Key="NobleBrush" Color="Cyan" />
     <SolidColorBrush x:Key="AlkaliBrush" Color="BlueViolet" />
+    <Brush x:Key="PTNonMetalBrush">#EEA5EE</Brush>
+    <Brush x:Key="PTNobleGasBrush">#87FFFF</Brush>
+    <Brush x:Key="PTHalogenBrush">#704FC0</Brush>
+    <Brush x:Key="PTActinideBrush">Pink</Brush>
+    <Brush x:Key="PTMetalBrush">PaleGreen</Brush>
+    <Brush x:Key="PTMetalloidBrush">GreenYellow</Brush>
+    <Brush x:Key="PTTransitionMetalBrush">#166616</Brush>
+    <Brush x:Key="PTAlkalineEarthBrush">#FFFF71</Brush>
+    <Brush x:Key="PTAlkaliBrush">DarkSalmon</Brush>
+    <Brush x:Key="PTOtherMetalBrush">Yellow</Brush>
+    <Brush x:Key="PTPseudoBrush">DarkOrange</Brush>
+    <Brush x:Key="PTOtherBrush">Gray</Brush>
+    <Brush x:Key="PTLanthanideBrush">LightPink</Brush>
+    <Brush x:Key="PTGridOverForeground">Black</Brush>
+    <Brush x:Key="PTGridOverBackground">Red</Brush>
+    <Brush x:Key="PTGridHalogenForeground">White</Brush>
+    <Brush x:Key="PTGridTMForeground">#DAEEDA</Brush>
+    <Brush x:Key="PRGridAEMForeground">#786200</Brush>
+    <Brush x:Key="PTGridAMForeground">White</Brush>
+    <Brush x:Key="PTGridOtherForeground">White</Brush>
+    <Brush x:Key="PTGridPseudoForeground">White</Brush>
+    <Brush x:Key="PTGridHighlightBackground">Red</Brush>
 </ResourceDictionary>

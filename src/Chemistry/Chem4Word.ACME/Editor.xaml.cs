@@ -312,7 +312,9 @@ namespace Chem4Word.ACME
 
         private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            UIUtils.ShowAcmeSettings(ChemCanvas, EditorOptions.SettingsFile, Telemetry, TopLeft);
+            var dialogueTopLeft = new Point(TopLeft.X + Core.Helpers.Constants.TopLeftOffset,
+                                            TopLeft.Y + Core.Helpers.Constants.TopLeftOffset);
+            UIUtils.ShowAcmeSettings(ChemCanvas, EditorOptions.SettingsFile, Telemetry, dialogueTopLeft);
             // Re Load settings as they may have changed
             EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
             if (ActiveViewModel.Model.TotalBondsCount == 0)

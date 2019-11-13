@@ -15,8 +15,9 @@
             <model2:PeriodicTable x:Key="PeriodicTable" />
             <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
+                <ResourceDictionary Source="../Resources/ACMEResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+           
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="5,5,5,5">
@@ -26,82 +27,83 @@
                 <Style.Triggers>
 
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="non_metal">
-                        <Setter Property="Background" Value="#EEA5EE" />
+                        <Setter Property="Background" Value="{StaticResource PTNonMetalBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="noble_gas">
-                        <Setter Property="Background" Value="#87FFFF" />
+                        <Setter Property="Background" Value="{StaticResource PTNobleGasBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="halogen">
-                        <Setter Property="Background" Value="#704FC0" />
+                        <Setter Property="Background" Value="{StaticResource PTHalogenBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="actinide">
-                        <Setter Property="Background" Value="Pink" />
+                        <Setter Property="Background" Value="{StaticResource PTActinideBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="lanthanide">
-                        <Setter Property="Background" Value="LightPink" />
+                        <Setter Property="Background" Value="{StaticResource PTLanthanideBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="metal">
-                        <Setter Property="Background" Value="PaleGreen" />
+                        <Setter Property="Background" Value="{StaticResource PTMetalBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="metalloid">
-                        <Setter Property="Background" Value="GreenYellow" />
+                        <Setter Property="Background" Value="{StaticResource PTMetalloidBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="transition_metal">
-                        <Setter Property="Background" Value="#166616" />
+                        <Setter Property="Background" Value="{StaticResource PTTransitionMetalBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="alkaline_earth_metal">
-                        <Setter Property="Background" Value="#FFFF71" />
+                        <Setter Property="Background" Value="{StaticResource PTAlkalineEarthBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="alkali_metal">
-                        <Setter Property="Background" Value="DarkSalmon" />
+                        <Setter Property="Background" Value="{StaticResource PTAlkaliBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="other_metal">
-                        <Setter Property="Background" Value="Yellow" />
+                        <Setter Property="Background" Value="{StaticResource PTOtherMetalBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="pseudo">
-                        <Setter Property="Background" Value="DarkOrange" />
+                        <Setter Property="Background" Value="{StaticResource PTPseudoBrush}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="other">
-                        <Setter Property="Background" Value="Gray" />
+                        <Setter Property="Background" Value="{StaticResource PTOtherBrush}" />
                     </DataTrigger>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="Red" />
+                        <Setter Property="Background" Value="{StaticResource PTGridHighlightBackground}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
             <Style x:Key="ElementText" BasedOn="{StaticResource LabelTextBlock}" TargetType="TextBlock">
-                <Setter Property="Height" Value="Auto" />
-                <Setter Property="HorizontalAlignment" Value="Center" />
-                <Setter Property="Margin" Value="0" />
-                <Setter Property="FontSize" Value="12" />
-                <Setter Property="FontWeight" Value="Bold" />
-                <Setter Property="TextAlignment" Value="Center" />
-                <Setter Property="TextWrapping" Value="Wrap" />
+                <Setter Property="Height" Value="Auto"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="TextAlignment" Value="Center"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
                 <Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Foreground" Value="Black" />
-                        <Setter Property="Background" Value="Red" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridOverForeground}" />
+                        <Setter Property="Background" Value="{StaticResource PTGridOverBackground}" />
                     </Trigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="halogen">
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridHalogenForeground}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="transition_metal">
-                        <Setter Property="Foreground" Value="#DAEEDA" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridTMForeground}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="alkaline_earth_metal">
-                        <Setter Property="Foreground" Value="#786200" />
+                        <Setter Property="Foreground" Value="{StaticResource PRGridAEMForeground}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="alkali_metal">
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridAMForeground}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="other_metal">
-                        <Setter Property="Foreground" Value="Black" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridOverForeground}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="pseudo">
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridPseudoForeground}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=PTElementType}" Value="other">
-                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="Foreground" Value="{StaticResource PTGridOtherForeground}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -219,11 +221,11 @@
                             </ToolTip>
                         </Border.ToolTip>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock
+                            <TextBlock 
                                 Name="ElementBlock"
                                 Style="{StaticResource ElementText}"
                                 Tag="{Binding}"
-                                Text="{Binding Symbol}" />
+                                Text="{Binding Symbol}"/>
                         </StackPanel>
                     </Border>
                 </DataTemplate>

@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adorners\Selectors\MultiAtomBondAdorner.cs" />
+    <Compile Include="Commands\PickElementCommand.cs" />
     <Compile Include="Controls\MoleculePropertyEditor.xaml.cs">
       <DependentUpon>MoleculePropertyEditor.xaml</DependentUpon>
     </Compile>
@@ -201,6 +202,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PTPopup.xaml.cs">
+      <DependentUpon>PTPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="UndoHandler.cs" />
     <Compile Include="Utils\ClipboardMonitor.cs" />
@@ -255,6 +259,10 @@
     <Page Include="Controls\NamesEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\PTPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\BondOptions.xaml">
       <SubType>Designer</SubType>

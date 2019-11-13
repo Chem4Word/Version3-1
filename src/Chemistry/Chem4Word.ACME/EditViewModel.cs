@@ -348,6 +348,7 @@ namespace Chem4Word.ACME
         public GroupCommand GroupCommand { get; set; }
         public UnGroupCommand UnGroupCommand { get; set; }
         public SettingsCommand SettingsCommand { get; set; }
+        public PickElementCommand PickElementCommand { get; set; }
 
         #endregion Commands
 
@@ -392,6 +393,7 @@ namespace Chem4Word.ACME
             GroupCommand = new GroupCommand(this);
             UnGroupCommand = new UnGroupCommand(this);
             SettingsCommand = new SettingsCommand(this);
+            PickElementCommand = new PickElementCommand(this);
         }
 
         private void ClipboardMonitor_OnClipboardContentChanged(object sender, EventArgs e)

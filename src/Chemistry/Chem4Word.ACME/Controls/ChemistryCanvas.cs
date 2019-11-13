@@ -246,9 +246,9 @@ namespace Chem4Word.ACME.Controls
             }
 
             bool showBrackets = molecule.ShowMoleculeBrackets.HasValue && molecule.ShowMoleculeBrackets.Value
-                                || molecule.Count.HasValue
-                                || molecule.FormalCharge.HasValue
-                                || molecule.SpinMultiplicity.HasValue;
+                                || molecule.Count.HasValue && molecule.Count.Value > 0
+                                || molecule.FormalCharge.HasValue && molecule.FormalCharge.Value != 0
+                                || molecule.SpinMultiplicity.HasValue && molecule.SpinMultiplicity.Value > 1;
 
             var groupKey = molecule.GetGroupKey();
             if (chemicalVisuals.ContainsKey(groupKey)) //it's already in the list

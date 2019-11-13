@@ -242,23 +242,8 @@ namespace Chem4Word.ACME.Utils
 
                             if (model.AddedElement != null)
                             {
-                                if (model.IsElement)
-                                {
-                                    var newOption = new AtomOption(model.AddedElement as Element);
-                                    if (!evm.AtomOptions.Contains(newOption))
-                                    {
-                                        evm.AtomOptions.Add(newOption);
-                                    }
-                                }
-
-                                if (model.IsFunctionalGroup)
-                                {
-                                    var newOption = new AtomOption(model.AddedElement as FunctionalGroup);
-                                    if (!evm.AtomOptions.Contains(newOption))
-                                    {
-                                        evm.AtomOptions.Add(newOption);
-                                    }
-                                }
+                                AddOptionIfNeeded(model);
+                           
                             }
                             evm.SelectedElement = model.Element;
                         }
@@ -341,6 +326,24 @@ namespace Chem4Word.ACME.Utils
                             evm.AddToSelection(bond);
                         }
                     }
+                }
+            }
+
+            void AddOptionIfNeeded(AtomPropertiesModel model)
+            {
+                if (!evm.AtomOptions.Any(ao => ao.Element.Symbol == model.AddedElement.Symbol))
+                {
+                    AtomOption newOption=null;
+                    switch (model.AddedElement)
+                    {
+                        case Element elem:
+                            newOption = new AtomOption(elem);
+                            break;
+                        case FunctionalGroup group:
+                            newOption =new AtomOption(group);
+                            break;
+                    }
+                    evm.AtomOptions.Add(newOption);
                 }
             }
         }
