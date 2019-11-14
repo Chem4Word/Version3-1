@@ -16,7 +16,7 @@ namespace Chem4Word.Model2
     {
         public string Id { get; set; }
 
-        public bool CanBeDeleted { get; set; }
+        public bool CanBeDeleted { get; set; } = true;
         public bool IsReadOnly { get; private set; }
         public bool IsValid { get; private set; }
 

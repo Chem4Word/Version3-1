@@ -29,7 +29,6 @@ namespace Chem4Word.ACME.Controls
     public partial class AtomPropertyEditor : Window, INotifyPropertyChanged
     {
         private bool _closedByUser;
-
         private bool IsDirty { get; set; }
 
         private AtomPropertiesModel _atomPropertiesModel;
@@ -82,6 +81,7 @@ namespace Chem4Word.ACME.Controls
             Top = point.Y;
 
             InvalidateArrange();
+            IsDirty = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

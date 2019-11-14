@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -61,11 +62,12 @@ namespace Chem4Word
 
         private bool _chemistrySelected = false;
         private bool _markAsChemistryHandled = false;
-        private int _rightClickEvents = 0;
+        private int _rightClickEvents;
         private ConfigWatcher _configWatcher;
 
         public bool LibraryState = false;
 
+        public List<string> StartUpTimings = new List<string>();
         public C4wAddInInfo AddInInfo = new C4wAddInInfo();
         public SystemHelper Helper;
         public Options SystemOptions;
@@ -180,38 +182,73 @@ namespace Chem4Word
 
         private void C4WAddIn_Startup(object sender, EventArgs e)
         {
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
+
+            string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
+            Debug.WriteLine(message);
+            StartUpTimings.Add(message);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             PerformStartUpActions();
+
+            sw.Stop();
+            message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            Debug.WriteLine(message);
+            StartUpTimings.Add(message);
         }
 
         private void C4WAddIn_Shutdown(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            //Debug.WriteLine(module);
 
             PerformShutDownActions();
         }
 
+        private void SlowOperations()
+        {
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
+
+            string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
+            Debug.WriteLine(message);
+            StartUpTimings.Add(message);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            Thread thread = new Thread(LoadPluginsOnThread);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+
+            Helper = new SystemHelper(StartUpTimings);
+
+            ServicePointManager.DefaultConnectionLimit = 100;
+            ServicePointManager.UseNagleAlgorithm = false;
+            ServicePointManager.Expect100Continue = false;
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            _configWatcher = new ConfigWatcher(AddInInfo.ProductAppDataPath);
+
+            Telemetry = new TelemetryWriter(true, Helper);
+
+            sw.Stop();
+            message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            Debug.WriteLine(message);
+            StartUpTimings.Add(message);
+        }
+
         private void PerformStartUpActions()
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            //Debug.WriteLine(module);
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
 
             try
             {
-                Helper = new SystemHelper();
-
-                ServicePointManager.DefaultConnectionLimit = 100;
-                ServicePointManager.UseNagleAlgorithm = false;
-                ServicePointManager.Expect100Continue = false;
-
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-                Telemetry = new TelemetryWriter(true, Helper);
-
-                // Set parameter mustBeSigned true if assemblies must be signed by us
-                LoadPlugIns(false);
-
-                _configWatcher = new ConfigWatcher(AddInInfo.ProductAppDataPath);
+                // Handle slower startup stuff on thread
+                Thread thread = new Thread(SlowOperations);
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
 
                 UpdateHelper.ReadSavedValues();
                 UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
@@ -259,7 +296,7 @@ namespace Chem4Word
                 }
                 else
                 {
-                    Telemetry.Write(module, "Exception(Data)", $"Chem4Word is disabled because it is {VersionsBehind} versions behind!");
+                    StartUpTimings.Add($"{module} chemistry operations disabled because Chem4Word is {VersionsBehind} versions behind!");
                 }
 
                 // Deliberate crash to test Error Reporting
@@ -471,10 +508,19 @@ namespace Chem4Word
             }
         }
 
+        private void LoadPluginsOnThread()
+        {
+            LoadPlugIns(false);
+        }
+
         private void LoadPlugIns(bool mustBeSigned)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
             // http://www.codeproject.com/Articles/453778/Loading-Assemblies-from-Anywhere-into-a-New-AppDom
+
+            string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
+            StartUpTimings.Add(message);
+            Debug.WriteLine(message);
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -669,8 +715,10 @@ namespace Chem4Word
             }
 
             sw.Stop();
-            Debug.WriteLine($"Examining {filesFound} files took {sw.ElapsedMilliseconds.ToString("#,000")}ms");
-            //Telemetry.Write(module, "Verbose", $"Examining {filesFound} files took {sw.ElapsedMilliseconds.ToString("#,000")}ms");
+
+            message = $"{module} examining {filesFound} files took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            Debug.WriteLine(message);
+            StartUpTimings.Add(message);
         }
 
         public IChem4WordEditor GetEditorPlugIn(string name)

@@ -1820,7 +1820,7 @@ namespace Chem4Word.ACME
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            DebugHelper.WriteLine($"Started at {DateTime.Now}");
+            DebugHelper.WriteLine($"Started at {SafeDate.ToShortTime(DateTime.Now)}");
 
             //take a snapshot of the current selection
             var currentSelection = SelectedItems.ToList();

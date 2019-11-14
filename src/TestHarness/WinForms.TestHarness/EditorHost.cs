@@ -35,7 +35,7 @@ namespace WinForms.TestHarness
             var appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var settingsPath = Path.Combine(appdata, "Chem4Word.V3");
 
-            var used1D = GetUsedProperties(cml);
+            var used1D = SimulateGetUsed1DLabels(cml);
 
             MessageFromWpf.Text = "";
 
@@ -86,13 +86,12 @@ namespace WinForms.TestHarness
             MessageFromWpf.Text = e.OutputValue;
         }
 
-        private List<string> GetUsedProperties(string cml)
+        private List<string> SimulateGetUsed1DLabels(string cml)
         {
             CMLConverter cc = new CMLConverter();
             Model model = cc.Import(cml);
 
             List<string> used1D = new List<string>();
-            used1D.Add(model.CustomXmlPartGuid);
 
             foreach (var property in model.AllTextualProperties)
             {

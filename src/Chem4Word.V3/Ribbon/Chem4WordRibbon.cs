@@ -35,9 +35,12 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 using Word = Microsoft.Office.Interop.Word;
 
-// ++++++++++++++++++++++++++++
-// Do NOT Change this Namespace
-// ++++++++++++++++++++++++++++
+/*
+ * ****************************
+ * Do NOT Change this Namespace
+ * ****************************
+ */
+
 // ReSharper disable once CheckNamespace
 namespace Chem4Word
 {
@@ -101,7 +104,6 @@ namespace Chem4Word
                     try
                     {
                         RibbonButton b = sender as RibbonButton;
-                        //Debug.WriteLine($"User chose {b.Tag}");
 
                         Word.Selection sel = app.Selection;
 
@@ -110,7 +112,6 @@ namespace Chem4Word
                         if (sel.ContentControls.Count > 0)
                         {
                             cc = sel.ContentControls[1];
-                            //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc?.Tag + " Title: " + cc.Title);
                             if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                             {
                                 string chosenState = b.Tag.ToString();
@@ -240,7 +241,6 @@ namespace Chem4Word
                 if (sel.ContentControls.Count > 0)
                 {
                     cc = sel.ContentControls[1];
-                    //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc?.Tag + " Title: " + cc.Title);
                     if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                     {
                         string prefix = "2D";
@@ -549,7 +549,7 @@ namespace Chem4Word
             }
         }
 
-        public bool BeforeButtonChecks(RibbonButton button)
+        private bool BeforeButtonChecks(RibbonButton button)
         {
             if (Globals.Chem4WordV3.SystemOptions == null)
             {
@@ -561,7 +561,7 @@ namespace Chem4Word
             return true;
         }
 
-        public void AfterButtonChecks(RibbonButton button)
+        private void AfterButtonChecks(RibbonButton button)
         {
             RegistryHelper.SendSetupActions();
             RegistryHelper.SendUpdateActions();
@@ -627,7 +627,6 @@ namespace Chem4Word
                         if (sel.ContentControls.Count > 0)
                         {
                             cc = sel.ContentControls[1];
-                            //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc?.Tag + " Title: " + cc.Title);
                             if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                             {
                                 Word.Application app1 = Globals.Chem4WordV3.Application;
@@ -847,7 +846,7 @@ namespace Chem4Word
                             }
                             else
                             {
-                                Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing existing structure {fullTag}");
+                                Globals.Chem4WordV3.Telemetry.Write(module, "Information", $" structure {fullTag}");
                             }
 
                             // Copy back CustomXmlPartGuid which will get lost if edited via ChemDoodle Web
@@ -1172,7 +1171,6 @@ namespace Chem4Word
                     if (sel.ContentControls.Count > 0)
                     {
                         cc = sel.ContentControls[1];
-                        //Debug.WriteLine("Existing CC ID: " + cc.ID + " Tag: " + cc?.Tag + " Title: " + cc.Title);
                         if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
                         {
                             Word.Application app1 = Globals.Chem4WordV3.Application;

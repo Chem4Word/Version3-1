@@ -8,6 +8,7 @@
 using System;
 using System.Globalization;
 using System.Management;
+using Chem4Word.Core.Helpers;
 
 namespace Chem4Word.Telemetry
 {
@@ -196,7 +197,7 @@ namespace Chem4Word.Telemetry
                 {
                     var mgtObject = (ManagementObject)o;
                     DateTime lastBootUp = ManagementDateTimeConverter.ToDateTime(mgtObject["LastBootUpTime"].ToString());
-                    _lastBootUpTime = lastBootUp.ToUniversalTime().ToString("dd-MMM-yyyy HH:mm:ss UTC", CultureInfo.InvariantCulture);
+                    _lastBootUpTime = SafeDate.ToLongDate(lastBootUp.ToUniversalTime()) + " UTC";
                     break;
                 }
             }

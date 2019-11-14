@@ -53,7 +53,7 @@ namespace Chem4Word.Model2.Converters.CML
                 #region Handle 1D Labels
 
                 newModel.SetMissingIds();
-                if (protectedLabels != null && protectedLabels.Count > 0)
+                if (protectedLabels != null && protectedLabels.Count >= 1)
                 {
                     newModel.SetProtectedLabels(protectedLabels);
                 }

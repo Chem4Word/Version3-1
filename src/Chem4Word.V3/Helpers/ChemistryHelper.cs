@@ -410,8 +410,10 @@ namespace Chem4Word.Helpers
             // Using $"{}" to coerce null to empty string
             List<string> targets = (from Word.ContentControl ccs in doc.ContentControls
                                     orderby ccs.Range.Start
-                                    where $"{ccs.Title}" == Constants.ContentControlTitle & $"{ccs.Tag}".Contains(guidString)
-                                    select ccs.Tag).ToList();
+                                    where $"{ccs.Title}" == Constants.ContentControlTitle
+                                          && $"{ccs.Tag}".Contains(guidString)
+                                          && !$"{ccs.Tag}".Equals(guidString)
+                                    select ccs.Tag).Distinct().ToList();
 
             return targets;
         }
@@ -423,8 +425,9 @@ namespace Chem4Word.Helpers
             // Using $"{}" to coerce null to empty string
             List<string> targets = (from Word.ContentControl ccs in doc.ContentControls
                                     orderby ccs.Range.Start
-                                    where $"{ccs.Title}" == Constants.ContentControlTitle & $"{ccs.Tag}".Equals(guidString)
-                                    select ccs.Tag).ToList();
+                                    where $"{ccs.Title}" == Constants.ContentControlTitle 
+                                          && $"{ccs.Tag}".Equals(guidString)
+                                    select ccs.Tag).Distinct().ToList();
 
             return targets;
         }

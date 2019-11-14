@@ -45,7 +45,7 @@ namespace Chem4Word.Helpers
                     if (frequency > 0)
                     {
                         TimeSpan delta = DateTime.Today - Globals.Chem4WordV3.VersionLastChecked;
-                        if (delta.TotalDays < frequency)
+                        if (Math.Abs(delta.TotalDays) < frequency)
                         {
                             doCheck = false;
                         }
@@ -183,7 +183,7 @@ namespace Chem4Word.Helpers
             {
                 string currentVersionNumber = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                 DateTime currentReleaseDate = SafeDate.Parse(Globals.Chem4WordV3.ThisVersion.Root.Element("Released").Value);
-                Debug.WriteLine("Current Version " + currentVersionNumber + " Released " + currentReleaseDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture));
+                Debug.WriteLine("Current Version " + currentVersionNumber + " Released " + SafeDate.ToShortDate(currentReleaseDate));
 
                 string xml = GetVersionsXmlFile();
                 if (!string.IsNullOrEmpty(xml))
@@ -196,7 +196,7 @@ namespace Chem4Word.Helpers
                     {
                         var thisVersionNumber = version.Element("Number").Value;
                         DateTime thisVersionDate = SafeDate.Parse(version.Element("Released").Value);
-                        Debug.WriteLine("New Version " + thisVersionNumber + " Released " + thisVersionDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture));
+                        Debug.WriteLine("New Version " + thisVersionNumber + " Released " + SafeDate.ToShortDate(thisVersionDate));
                         if (thisVersionDate > currentReleaseDate)
                         {
                             Globals.Chem4WordV3.VersionsBehind++;

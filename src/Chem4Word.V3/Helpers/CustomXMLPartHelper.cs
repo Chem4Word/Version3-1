@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Xml;
 using Chem4Word.Core.Helpers;
 using Microsoft.Office.Core;
@@ -27,7 +26,6 @@ namespace Chem4Word.Helpers
             {
                 if (!otherDocument.Name.Equals(activeDocumentName))
                 {
-                    //Debug.WriteLine("Looking in " + otherDoc.Name);
                     foreach (
                         CustomXMLPart x in
                             otherDocument.CustomXMLParts.SelectByNamespace("http://www.xml-cml.org/schema"))
@@ -101,7 +99,6 @@ namespace Chem4Word.Helpers
             XmlNode node = xdoc.SelectSingleNode("//c4w:customXmlPartGuid", nsmgr);
             if (node != null)
             {
-                //Debug.WriteLine(node.InnerText);
                 result = node.InnerText;
             }
 
@@ -110,8 +107,6 @@ namespace Chem4Word.Helpers
 
         public static void RemoveOrphanedXmlParts(Word.Document doc)
         {
-            //Diagnostics(doc, "Before RemoveOrphanedXmlParts()");
-
             Dictionary<string, int> referencedXmlParts = new Dictionary<string, int>();
 
             foreach (Word.ContentControl cc in doc.ContentControls)
@@ -138,41 +133,6 @@ namespace Chem4Word.Helpers
                     x.Delete();
                 }
             }
-
-            //Diagnostics(doc, "After RemoveOrphanedXmlParts()");
-        }
-
-        public static void Diagnostics(Word.Document doc, string when)
-        {
-            Debug.WriteLine("----- Diagnostics " + when + " -----");
-
-            int counter = 0;
-
-            // List all of our ContentControl(s)
-            foreach (Word.ContentControl ccc in doc.ContentControls)
-            {
-                if (ccc.Title.Equals(Constants.ContentControlTitle))
-                {
-                    counter++;
-                    Debug.WriteLine("ContentControl: " + ccc.ID);
-                    Debug.WriteLine("   Range.Start: " + ccc.Range.Start);
-                    Debug.WriteLine("           Tag: " + ccc?.Tag);
-                }
-            }
-
-            Debug.WriteLine("  Found " + counter + " ContentControl(s)");
-
-            // List all of our CustomXMLPart(s)
-            counter = 0;
-            foreach (CustomXMLPart x in doc.CustomXMLParts.SelectByNamespace("http://www.xml-cml.org/schema"))
-            {
-                counter++;
-                Debug.WriteLine("CustomXMLPart: " + x.Id);
-                string molId = CustomXmlPartHelper.GetCmlId(x);
-                Debug.WriteLine("   MoleculeId: " + molId);
-            }
-
-            Debug.WriteLine("  Found " + counter + " CustomXMLPart(s)");
         }
     }
 }

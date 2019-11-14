@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
+using Chem4Word.Core.Helpers;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 
@@ -51,6 +52,7 @@ namespace Chem4Word.Telemetry
             if (!_running)
             {
                 Thread t = new Thread(new ThreadStart(WriteOnThread));
+                t.SetApartmentState(ApartmentState.STA);
                 _running = true;
                 t.Start();
             }
@@ -117,10 +119,10 @@ namespace Chem4Word.Telemetry
                 try
                 {
                     string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        $@"Chem4Word.V3\Telemetry\{DateTime.Now.ToString("yyyy-MM-dd")}.log");
+                        $@"Chem4Word.V3\Telemetry\{SafeDate.ToIsoShortDate(DateTime.Now)}.log");
                     using (StreamWriter w = File.AppendText(fileName))
                     {
-                        w.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss.fff")}] Exception in WriteMessage: {ex.Message}");
+                        w.WriteLine($"[{SafeDate.ToShortTime(DateTime.Now)}] Exception in WriteMessage: {ex.Message}");
                     }
                 }
                 catch

@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Globalization;
 
 namespace Chem4Word.Core.Helpers
 {
@@ -100,6 +101,56 @@ namespace Chem4Word.Core.Helpers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// "dd-MMM-yyyy HH:mm:ss.fff
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static string ToLongDate(DateTime dateTime)
+        {
+            return dateTime.ToString("dd-MMM-yyyy HH:mm:ss.fff", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// "dd-MMM-yyyy"
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static string ToShortDate(DateTime dateTime)
+        {
+            return dateTime.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// "HH:mm:ss.fff"
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static string ToShortTime(DateTime dateTime)
+        {
+            return dateTime.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// "yyyy-MM-dd"
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static string ToIsoShortDate(DateTime dateTime)
+        {
+            return dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// "MMddyyHHmm"
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static string ToMdlHeaderTime(DateTime dateTime)
+        {
+            return dateTime.ToString("MMddyyHHmm", CultureInfo.InvariantCulture);
         }
     }
 }

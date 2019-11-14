@@ -189,7 +189,7 @@ namespace Chem4Word.UI
                 string currentVersionNumber = CurrentVersion.Root.Element("Number").Value;
                 DateTime currentReleaseDate = SafeDate.Parse(CurrentVersion.Root.Element("Released").Value);
 
-                lblInfo.Text = "Your current version of Chem4Word is " + currentVersionNumber + "; Released " + currentReleaseDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture);
+                lblInfo.Text = "Your current version of Chem4Word is " + currentVersionNumber + "; Released " + SafeDate.ToShortDate(currentReleaseDate);
                 _telemetry.Write(module, "AutomaticUpdate", lblInfo.Text);
 
                 var versions = NewVersions.XPathSelectElements("//Version");
@@ -208,7 +208,7 @@ namespace Chem4Word.UI
                         break;
                     }
 
-                    AddHeaderLine("Version " + thisVersionNumber + "; Released " + thisVersionDate.ToString("dd-MMM-yyyy", CultureInfo.InvariantCulture), Color.Blue);
+                    AddHeaderLine("Version " + thisVersionNumber + "; Released " + SafeDate.ToShortDate(thisVersionDate), Color.Blue);
                     var changes = version.XPathSelectElements("Changes/Change");
                     foreach (var change in changes)
                     {

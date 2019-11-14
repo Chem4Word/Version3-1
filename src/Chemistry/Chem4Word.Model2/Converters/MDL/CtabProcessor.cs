@@ -12,6 +12,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2.Converters.MDL
@@ -374,7 +375,7 @@ namespace Chem4Word.Model2.Converters.MDL
             // Ss == scaling factors
             // E == Energy
             // R == registry number
-            writer.WriteLine($"  Chem4Wrd{DateTime.Now.ToString("MMddyyHHmm")}");
+            writer.WriteLine($"  Chem4Wrd{SafeDate.ToMdlHeaderTime(DateTime.Now)}");
 
             // Line 3 - Comments (80)
             writer.WriteLine("");
@@ -393,42 +394,6 @@ namespace Chem4Word.Model2.Converters.MDL
             writer.WriteLine($"{OutputMDLInt(atoms)}{OutputMDLInt(bonds)}  0     0  0              0 V2000");
         }
 
-        //private void WriteHeader(StreamWriter writer)
-        //{
-        //    // Line 1 - Molecule Name (80)
-        //    writer.WriteLine("");
-
-        //    // Line 2
-        //    // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        //    //           1         2         3         4         5         6         7
-        //    // IIPPPPPPPPMMDDYYHHmmddSSssssssssssEEEEEEEEEEEERRRRRR
-        //    // A2<--A8--><---A10-->A2I2<--F10.5-><---F12.5--><-I6->
-        //    // I == User Initials
-        //    // P == Program Name
-        //    // MMDDYYHHmm == Date and Time
-        //    // d == dimensional codes
-        //    // Ss == scaling factors
-        //    // E == Energy
-        //    // R == registry number
-        //    writer.WriteLine($"  Chem4Wrd{DateTime.Now.ToString("MMddyyHHmm")}");
-
-        //    // Line 3 - Comments (80)
-        //    writer.WriteLine("");
-
-        //    // Counts line
-        //    // 01234567890123456789012345678901234567890123456789012345678901234567890123456789
-        //    //           1         2         3         4         5         6         7
-        //    // aaabbblll---cccsss------------mmm-vvvvv
-        //    //   6  5  0     0  0              3 V2000
-        //    // a == number of atoms
-        //    // b == number of bonds
-        //    // l == number of atom lists
-        //    // c == chiral flag; 0=not chiral, 1=chiral
-        //    // m == number of additional properties
-        //    // v == version number
-        //    writer.WriteLine($"{OutputMDLInt(_molecule.Atoms.Count)}{OutputMDLInt(_molecule.Bonds.Count)}  0     0  0              0 V2000");
-        //}
-
         private void WriteAtoms(StreamWriter writer, List<Atom> atoms)
         {
             int i = 0;
@@ -439,16 +404,6 @@ namespace Chem4Word.Model2.Converters.MDL
             }
         }
 
-        //private void WriteAtoms(StreamWriter writer)
-        //{
-        //    int i = 0;
-        //    foreach (var atom in _molecule.Atoms.Values)
-        //    {
-        //        writer.WriteLine(CreateAtomLine(atom));
-        //        numberByAtom.Add(atom, ++i);
-        //    }
-        //}
-
         private void WriteBonds(StreamWriter writer, List<Bond> bonds)
         {
             foreach (var bond in bonds)
@@ -456,14 +411,6 @@ namespace Chem4Word.Model2.Converters.MDL
                 writer.WriteLine(CreateBondLine(bond));
             }
         }
-
-        //private void WriteBonds(StreamWriter writer)
-        //{
-        //    foreach (var bond in _molecule.Bonds)
-        //    {
-        //        writer.WriteLine(CreateBondLine(bond));
-        //    }
-        //}
 
         private string CreateAtomLine(Atom atom)
         {

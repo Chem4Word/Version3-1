@@ -26,7 +26,6 @@ namespace Chem4Word.Telemetry
     public class SystemHelper
     {
         private static string CryptoRoot = @"SOFTWARE\Microsoft\Cryptography";
-        private static string Click2RunConfiguration = @"SOFTWARE\Microsoft\Office\ClickToRun\Configuration";
         private string DotNetVersionKey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
 
         private static readonly string DetectionFile = $"{Constants.Chem4WordVersionFiles}/client-ip-date.php";
@@ -66,6 +65,7 @@ namespace Chem4Word.Telemetry
         public string ServerUtcDateRaw { get; set; }
         public DateTime ServerUtcDateTime { get; set; }
         public string BrowserVersion { get; set; }
+        public List<string> StartUpTimings { get; set; }
 
         private static int _retryCount;
 
@@ -86,8 +86,17 @@ namespace Chem4Word.Telemetry
             return result;
         }
 
-        public SystemHelper()
+        private List<string> Initialise()
         {
+            List<string> timings = new List<string>();
+
+            string message = $"SystemHelper.Initialise() started at {SafeDate.ToLongDate(DateTime.Now)}";
+            timings.Add(message);
+            Debug.WriteLine(message);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             WordVersion = -1;
 
             #region Get Machine Guid
@@ -154,7 +163,7 @@ namespace Chem4Word.Telemetry
             {
                 WordProduct = OfficeHelper.GetWordProduct();
 
-                Click2RunProductIds = GetClick2RunProductIds();
+                Click2RunProductIds = OfficeHelper.GetClick2RunProductIds();
 
                 if (WordProduct.Contains("2010") || WordProduct.Contains("2013") || WordProduct.Contains("2016") || WordProduct.Contains("365"))
                 {
@@ -229,8 +238,9 @@ namespace Chem4Word.Telemetry
             #region Get IpAddress
 
             ParameterizedThreadStart pts = GetExternalIpAddress;
-            Thread t = new Thread(pts);
-            t.Start(null);
+            Thread thread = new Thread(pts);
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start(null);
 
             #endregion Get IpAddress
 
@@ -250,23 +260,31 @@ namespace Chem4Word.Telemetry
 #if DEBUG
             GetGitStatus();
 #endif
+
+            sw.Stop();
+
+            message = $"SystemHelper.Initialise() took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            timings.Add(message);
+            Debug.WriteLine(message);
+
+            return timings;
         }
 
-        private string GetClick2RunProductIds()
+        public SystemHelper(List<string> timings)
         {
-            string result = "";
-            try
+            StartUpTimings = timings;
+
+            StartUpTimings.AddRange(Initialise());
+        }
+
+        public SystemHelper()
+        {
+            if (StartUpTimings == null)
             {
-                // Need special routine here as MachineGuid does not exist in the wow6432 path
-                result = RegistryWOW6432.GetRegKey64(RegHive.HKEY_LOCAL_MACHINE, Click2RunConfiguration, "ProductReleaseIds");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                result = "Exception " + ex.Message;
+                StartUpTimings = new List<string>();
             }
 
-            return result;
+            StartUpTimings.AddRange(Initialise());
         }
 
         private void GetGitStatus()
@@ -482,6 +500,15 @@ namespace Chem4Word.Telemetry
 
         private void GetExternalIpAddress(object o)
         {
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
+
+            string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
+            StartUpTimings.Add(message);
+            Debug.WriteLine(message);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             // http://www.ipv6proxy.net/ --> "Your IP address : 2600:3c00::f03c:91ff:fe93:dcd4"
 
             try
@@ -604,10 +631,17 @@ namespace Chem4Word.Telemetry
                     _retryCount++;
                     Thread.Sleep(500);
                     ParameterizedThreadStart pts = GetExternalIpAddress;
-                    Thread t = new Thread(pts);
-                    t.Start(null);
+                    Thread thread = new Thread(pts);
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start(null);
                 }
             }
+
+            sw.Stop();
+
+            message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            StartUpTimings.Add(message);
+            Debug.WriteLine(message);
         }
 
         private DateTime FromPhpDate(string line)
