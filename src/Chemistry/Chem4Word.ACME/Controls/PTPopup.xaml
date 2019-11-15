@@ -24,11 +24,7 @@
                 <ResourceDictionary Source="../Resources/ACMEResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-
     </Window.Resources>
-    <Window.Effect>
-        <DropShadowEffect />
-    </Window.Effect>
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type TextBlock}">

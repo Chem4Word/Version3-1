@@ -74,6 +74,8 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.PreviewMouseMove += CurrentEditor_PreviewMouseMove;
             CurrentEditor.PreviewMouseRightButtonUp += CurrentEditor_PreviewMouseRightButtonUp;
 
+            CurrentEditor.Cursor = Cursors.Arrow;
+
             CurrentEditor.IsHitTestVisible = true;
             _bondLength = CurrentEditor.Chemistry.Model.MeanBondLength;
             CurrentStatus = DefaultText;

@@ -28,6 +28,7 @@ namespace Chem4Word.ACME.Behaviors
         private Window _parent;
         public List<Point> Placements { get; private set; }
         public bool Clashing { get; private set; } = false;
+        private Cursor _lastCursor;
 
         public ChainAdorner CurrentAdorner
         {
@@ -76,6 +77,9 @@ namespace Chem4Word.ACME.Behaviors
 
             _parent = Application.Current.MainWindow;
 
+            _lastCursor = CurrentEditor.Cursor;
+            CurrentEditor.Cursor = CursorUtils.Pencil;
+
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
             CurrentEditor.MouseMove += CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp += CurrentEditor_MouseLeftButtonUp;
@@ -116,24 +120,37 @@ namespace Chem4Word.ACME.Behaviors
 
             if (IsDrawing)
             {
-                Clashing = false;
-                CurrentStatus = "Drag to start sizing chain: [Esc] to cancel.";
-                var endPoint = e.GetPosition(EditViewModel.CurrentEditor);
-
-                MarkOutAtoms(endPoint, e);
-                CurrentAdorner =
-                    new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements, endPoint, Target);
-
-                var targetedVisual = EditViewModel.CurrentEditor.GetTargetedVisual(endPoint);
-                //check to see we're not overwriting
-                bool overWritingSelf = false;
-                if (CurrentAdorner.Geometry != null)
+                if (CurrentEditor.ActiveVisual is GroupVisual gv)
                 {
-                    overWritingSelf = CurrentAdorner.Geometry.StrokeContains(new Pen(Brushes.Black, Globals.AtomRadius * 2), endPoint);
+                    CurrentEditor.Cursor = Cursors.No;
                 }
-                Clashing = (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) | overWritingSelf;
-                //set the cursor appropriately
-                SetCursor();
+                else
+                {
+                    Clashing = false;
+                    CurrentStatus = "Drag to start sizing chain: [Esc] to cancel.";
+                    var endPoint = e.GetPosition(EditViewModel.CurrentEditor);
+
+                    MarkOutAtoms(endPoint, e);
+                    CurrentAdorner =
+                        new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements,
+                                         endPoint, Target);
+
+                    var targetedVisual = EditViewModel.CurrentEditor.GetTargetedVisual(endPoint);
+                    //check to see we're not overwriting
+                    bool overWritingSelf = false;
+                    if (CurrentAdorner.Geometry != null)
+                    {
+                        overWritingSelf =
+                            CurrentAdorner.Geometry.StrokeContains(new Pen(Brushes.Black, Globals.AtomRadius * 2),
+                                                                   endPoint);
+                    }
+
+                    Clashing =
+                        (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) |
+                        overWritingSelf;
+                    //set the cursor appropriately
+                    SetCursor();
+                }
             }
         }
 
@@ -145,7 +162,7 @@ namespace Chem4Word.ACME.Behaviors
             }
             else
             {
-                CurrentEditor.Cursor = System.Windows.Input.Cursors.Pen;
+                CurrentEditor.Cursor = CursorUtils.Pencil;
             }
         }
 
@@ -348,6 +365,7 @@ namespace Chem4Word.ACME.Behaviors
                 _parent.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;
             }
 
+            CurrentEditor.Cursor = _lastCursor;
             _parent = null;
         }
     }

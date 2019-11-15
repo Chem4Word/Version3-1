@@ -46,7 +46,7 @@ namespace Chem4Word.ACME.Behaviors
 
             CurrentEditor = (EditorCanvas)AssociatedObject;
             _lastCursor = CurrentEditor.Cursor;
-            CurrentEditor.Cursor = Cursors.Pen;
+            CurrentEditor.Cursor = CursorUtils.Pencil;
             EditViewModel.ClearSelection();
 
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
@@ -77,8 +77,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 RemoveAdorner(ref _adorner);
             }
-
-            CurrentEditor.Cursor = Cursors.Pen;
+            
             var targetedVisual = CurrentEditor.ActiveVisual;
             string bondOrder = EditViewModel.CurrentBondOrder;
             //check to see if we have already got an atom remembered
@@ -97,7 +96,7 @@ namespace Chem4Word.ACME.Behaviors
                     }
                     else if (targetedVisual is AtomVisual atomUnderCursor)
                     {
-                        CurrentEditor.Cursor = Cursors.Pen;
+                        CurrentEditor.Cursor = CursorUtils.Pencil;
                         //if so. snap to the atom's position
                         lastPos = atomUnderCursor.Position;
                         //if we are stroking over an existing bond
@@ -123,7 +122,7 @@ namespace Chem4Word.ACME.Behaviors
                     }
                     else //or dangling over free space?
                     {
-                        CurrentEditor.Cursor = Cursors.Pen;
+                        CurrentEditor.Cursor = CursorUtils.Pencil;
                         lastPos = e.GetPosition(CurrentEditor);
 
                         var angleBetween =
@@ -155,7 +154,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else if (targetedVisual is AtomVisual av)
                 {
-                    CurrentEditor.Cursor = Cursors.Pen;
+                    CurrentEditor.Cursor = CursorUtils.Pencil;
                     if (EditViewModel.SelectedElement != av.ParentAtom.Element)
                     {
                         CurrentStatus = "Click to set element.";
@@ -167,7 +166,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else if (targetedVisual is BondVisual bv)
                 {
-                    CurrentEditor.Cursor = Cursors.Pen;
+                    CurrentEditor.Cursor = CursorUtils.Pencil;
                     CurrentStatus = "Click to modify bond";
                 }
             }

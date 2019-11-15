@@ -44,6 +44,7 @@
     <OutputPath>bin\Vso-Ci\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Expression.Controls, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
@@ -197,13 +198,13 @@
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\NewAtomPlacement.cs" />
     <Compile Include="Options.cs" />
+    <Compile Include="Controls\PTPopup.xaml.cs">
+      <DependentUpon>PTPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\PTPopup.xaml.cs">
-      <DependentUpon>PTPopup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="UndoHandler.cs" />
@@ -343,6 +344,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
@@ -350,7 +352,7 @@
     <Resource Include="Resources\ms-word-16.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Cursors\Pencil.cur" />
+    <None Include="Cursors\Pencil.cur" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -12,11 +12,11 @@
     Title="Atom Properties"
     MinWidth="200"
     d:DataContext="{d:DesignInstance {x:Type models:AtomPropertiesModel}}"
+    Closing="AtomPropertyEditor_OnClosing"
     ContentRendered="AtomPropertyEditor_OnContentRendered"
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
     Loaded="AtomPropertyEditor_OnLoaded"
     ResizeMode="NoResize"
-    Closing="AtomPropertyEditor_OnClosing"
     ShowInTaskbar="False"
     SizeToContent="WidthAndHeight"
     mc:Ignorable="d">
@@ -64,14 +64,14 @@
                 <StackPanel Orientation="Horizontal">
                     <RadioButton
                         x:Name="Element"
-                        Style="{StaticResource StandardRadioButton}"
-                        IsChecked="{Binding IsElement, Mode=TwoWay}">
+                        IsChecked="{Binding IsElement, Mode=TwoWay}"
+                        Style="{StaticResource StandardRadioButton}">
                         <TextBlock Style="{StaticResource RadioButtonTextBlock}">Element</TextBlock>
                     </RadioButton>
                     <RadioButton
                         x:Name="FunctionalGroup"
-                        Style="{StaticResource StandardRadioButton}"
-                        IsChecked="{Binding IsFunctionalGroup, Mode=TwoWay}">
+                        IsChecked="{Binding IsFunctionalGroup, Mode=TwoWay}"
+                        Style="{StaticResource StandardRadioButton}">
                         <TextBlock Style="{StaticResource RadioButtonTextBlock}">Functional Group</TextBlock>
                     </RadioButton>
                 </StackPanel>
@@ -94,9 +94,10 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Style="{StaticResource LabelTextBlock}"
+                        <TextBlock
                             Grid.Row="1"
-                            Grid.Column="0"><Run Text="Symbol" /></TextBlock>
+                            Grid.Column="0"
+                            Style="{StaticResource LabelTextBlock}"><Run Text="Symbol" /></TextBlock>
                         <Grid
                             Grid.Row="1"
                             Grid.Column="1"
@@ -196,11 +197,10 @@
                         </Grid>
                         <TextBlock
                             Grid.Row="2"
-                            Style="{StaticResource LabelTextBlock}"
-                            Grid.Column="0"><Run Text="Charge" /></TextBlock>
+                            Grid.Column="0"
+                            Style="{StaticResource LabelTextBlock}"><Run Text="Charge" /></TextBlock>
                         <ComboBox
                             x:Name="ChargeCombo"
-                            Style="{StaticResource StandardCombo}"
                             Grid.Row="2"
                             Grid.Column="1"
                             Width="50"
@@ -211,6 +211,7 @@
                             SelectedValue="{Binding Charge}"
                             SelectedValuePath="Value"
                             SelectionChanged="ChargeCombo_OnSelectionChanged"
+                            Style="{StaticResource StandardCombo}"
                             ToolTip=" Increase or decrease charge">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -219,13 +220,12 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <TextBlock
-                            Style="{StaticResource LabelTextBlock}"
                             Grid.Row="3"
                             Grid.Column="0"
+                            Style="{StaticResource LabelTextBlock}"
                             Visibility="{Binding HasIsotopes, Converter={StaticResource VisConverter}, Mode=OneWay}"><Run Text="Isotope" /></TextBlock>
                         <ComboBox
                             x:Name="IsotopePicker"
-                            Style="{StaticResource StandardCombo}"
                             Grid.Row="3"
                             Grid.Column="1"
                             Width="50"
@@ -237,12 +237,13 @@
                             SelectedValue="{Binding Isotope}"
                             SelectedValuePath="Label"
                             SelectionChanged="IsotopePicker_OnSelectionChanged"
+                            Style="{StaticResource StandardCombo}"
                             Visibility="{Binding HasIsotopes, Converter={StaticResource VisConverter}, Mode=OneWay}" />
                     </Grid>
                 </StackPanel>
 
                 <!--  Properties of a Functional Group  -->
-                <StackPanel Visibility="{Binding IsChecked, Converter={StaticResource VisConverter}, ElementName=FunctionalGroup}"  Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Visibility="{Binding IsChecked, Converter={StaticResource VisConverter}, ElementName=FunctionalGroup}">
                     <TextBlock Margin="5" Style="{StaticResource LabelTextBlock}"><Run Text="Group" /></TextBlock>
                     <ComboBox
                         x:Name="FunctionalGroupPicker"
@@ -289,12 +290,8 @@
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
-                <Button
-                    Click="Save_OnClick"
-                    Content="OK" />
-                <Button
-                    Click="Close_OnClick"
-                    Content="Cancel" />
+                <Button Click="Save_OnClick" Content="OK" />
+                <Button Click="Close_OnClick" Content="Cancel" />
             </StackPanel>
         </Grid>
     </Border>

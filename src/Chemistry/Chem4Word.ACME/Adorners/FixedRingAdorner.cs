@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using Chem4Word.ACME.Behaviors;
 using Chem4Word.ACME.Controls;
+using Chem4Word.ACME.Utils;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Helpers;
 
@@ -29,6 +30,7 @@ namespace Chem4Word.ACME.Adorners
         {
             _solidColorBrush = (SolidColorBrush)FindResource(Globals.AdornerFillBrush);
 
+            Cursor = CursorUtils.Pencil;
             BondPen = new Pen((SolidColorBrush)FindResource(Globals.DrawAdornerBrush), bondThickness);
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);

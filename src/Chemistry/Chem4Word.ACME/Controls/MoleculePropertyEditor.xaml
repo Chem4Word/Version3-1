@@ -10,10 +10,10 @@
     Title="Molecule Properties"
     Width="800"
     Height="600"
+    Closing="MoleculePropertyEditor_OnClosing"
     ContentRendered="MoleculePropertyEditor_OnContentRendered"
     Icon="/Chem4Word.ACME;component/Resources/ms-word-16.ico"
     Loaded="MoleculePropertyEditor_OnLoaded"
-    Closing="MoleculePropertyEditor_OnClosing"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     mc:Ignorable="d">

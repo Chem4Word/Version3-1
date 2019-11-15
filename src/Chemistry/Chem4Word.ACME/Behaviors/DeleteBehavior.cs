@@ -31,7 +31,6 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor = (EditorCanvas)AssociatedObject;
 
             _cursor = CurrentEditor.Cursor;
-
             CurrentEditor.Cursor = CursorUtils.Eraser;
             CurrentEditor.MouseLeftButtonDown += CurrentEditor_MouseLeftButtonDown;
 
