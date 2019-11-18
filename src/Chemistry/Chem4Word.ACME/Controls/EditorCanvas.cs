@@ -166,16 +166,20 @@ namespace Chem4Word.ACME.Controls
 
             var layer = AdornerLayer.GetAdornerLayer(this);
             var children = layer.GetAdorners(this);
-            foreach (var adorner in children)
+            if (children != null)
             {
-                if (adorner is MoleculeSelectionAdorner moleculeAdorner)
+                foreach (var adorner in children)
                 {
-                    var bb = moleculeAdorner.BoundingBox;
-                    if (bb.Contains(p))
+                    if (adorner is MoleculeSelectionAdorner moleculeAdorner)
                     {
-                        result = moleculeAdorner;
+                        var bb = moleculeAdorner.BoundingBox;
+                        if (bb.Contains(p))
+                        {
+                            result = moleculeAdorner;
+                        }
+
+                        break;
                     }
-                    break;
                 }
             }
 
