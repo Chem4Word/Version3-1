@@ -229,7 +229,7 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        public static void IdentifyPlacements(Atom hitAtom, double xamlBondSize, out List<Point> preferredPlacements,
+        public void IdentifyPlacements(Atom hitAtom, double xamlBondSize, out List<Point> preferredPlacements,
                                               int ringSize)
         {
             Molecule parentMolecule;
@@ -255,9 +255,31 @@ namespace Chem4Word.ACME.Behaviors
             {
                 preferredPlacements = null;
             }
+            else if (ClashesWithOtherFragments(preferredPlacements, parentMolecule))
+            {
+                preferredPlacements = null;
+            }
         }
 
-        public static void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements,
+        private bool ClashesWithOtherFragments(List<Point> preferredPlacements, Molecule parentMolecule)
+        {
+            if (preferredPlacements == null)
+            {
+                return true;
+            }
+            foreach (Point placement in preferredPlacements)
+            {
+                var atomVisual = CurrentEditor.GetTargetedVisual(placement) as AtomVisual;
+                if (atomVisual != null && atomVisual.ParentAtom.Parent != parentMolecule)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements,
                                               out List<Point> preferredPlacements, int ringSize, Point position)
         {
             Molecule parentMolecule;
@@ -303,6 +325,11 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
             else
+            {
+                preferredPlacements = null;
+                altPlacements = null;
+            }
+            if (ClashesWithOtherFragments(preferredPlacements, parentMolecule))
             {
                 preferredPlacements = null;
                 altPlacements = null;
