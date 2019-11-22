@@ -21,7 +21,11 @@ namespace Chem4Word.Model2
         private double? _atomicWeight;
         private Dictionary<string, int> _formulaParts;
 
-        public override string Colour => Globals.PeriodicTable.C.Colour;
+        [JsonProperty]
+        public override string Colour { get; set; }
+
+        [JsonProperty]
+        public override string Name { get; set; }
 
         /// <summary>
         /// Overall Atomic Weight of the Functional Group
@@ -110,6 +114,9 @@ namespace Chem4Word.Model2
         /// </summary>
         [JsonProperty]
         public List<Group> Components { get; set; }
+
+        [JsonProperty]
+        public object Expansion { get; set; }
 
         /// <summary>
         /// Expand the Functional Group into a flattened list of terms
@@ -325,6 +332,11 @@ namespace Chem4Word.Model2
 
                 return expanded;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{Symbol}";
         }
     }
 }

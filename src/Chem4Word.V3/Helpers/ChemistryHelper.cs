@@ -425,7 +425,7 @@ namespace Chem4Word.Helpers
             // Using $"{}" to coerce null to empty string
             List<string> targets = (from Word.ContentControl ccs in doc.ContentControls
                                     orderby ccs.Range.Start
-                                    where $"{ccs.Title}" == Constants.ContentControlTitle 
+                                    where $"{ccs.Title}" == Constants.ContentControlTitle
                                           && $"{ccs.Tag}".Equals(guidString)
                                     select ccs.Tag).Distinct().ToList();
 

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using Chem4Word.Core.Helpers;
 using IChem4Word.Contracts;

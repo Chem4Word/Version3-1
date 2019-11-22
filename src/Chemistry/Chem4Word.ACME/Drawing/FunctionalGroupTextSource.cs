@@ -16,12 +16,12 @@ namespace Chem4Word.ACME.Drawing
     {
         public List<LabelTextSourceRun> Runs = new List<LabelTextSourceRun>();
 
-        public FunctionalGroupTextSource()
-        {
-        }
+        private readonly string _colour;
 
-        public FunctionalGroupTextSource(FunctionalGroup parentGroup, bool isFlipped = false)
+        public FunctionalGroupTextSource(FunctionalGroup parentGroup, string colour, bool isFlipped = false)
         {
+            _colour = colour;
+
             foreach (var term in parentGroup.ExpandIntoTerms(isFlipped))
             {
                 foreach (var part in term.Parts)
@@ -53,15 +53,15 @@ namespace Chem4Word.ACME.Drawing
                     TextRunProperties props;
                     if (currentRun.IsSubscript)
                     {
-                        props = new SubscriptTextRunProperties();
+                        props = new SubscriptTextRunProperties(_colour);
                     }
                     else if (currentRun.IsSuperscript)
                     {
-                        props = new SuperscriptTextRunProperties();
+                        props = new SuperscriptTextRunProperties(_colour);
                     }
                     else
                     {
-                        props = new LabelTextRunProperties();
+                        props = new LabelTextRunProperties(_colour);
                     }
 
                     return new TextCharacters(

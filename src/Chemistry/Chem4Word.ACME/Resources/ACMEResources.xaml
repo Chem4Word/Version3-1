@@ -421,7 +421,6 @@
                                     Point2="25.8696, 47.0904"
                                     Point3="21.5367, 46.0076" />
                             </PathFigure>
-
                         </PathGeometry>
                     </GeometryDrawing.Geometry>
                 </GeometryDrawing>

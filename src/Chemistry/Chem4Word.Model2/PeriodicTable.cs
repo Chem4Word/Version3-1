@@ -225,7 +225,7 @@ namespace Chem4Word.Model2
                         x.Name = data[1];
                         x.AtomicNumber = IntParser(data[2]);
                         x.AddHydrogens = BoolParser(data[3]);
-                        x.Colour = data[4];
+                        x.Colour = string.IsNullOrEmpty(data[4]) ? "#000000" : data[4];
                         x.CovalentRadius = DoubleParser(data[5]);
                         x.VdWRadius = DoubleParser(data[6]);
                         x.Valency = IntParser(data[7]);

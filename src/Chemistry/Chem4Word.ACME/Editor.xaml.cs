@@ -44,7 +44,8 @@ namespace Chem4Word.ACME
         public Point TopLeft { get; set; }
 
         // This is used to store the cml until the editor is Loaded
-        private string _cml;
+        //private string _cml;
+        private Model _model;
 
         private List<string> _used1DProperties;
         private Options _editorOptions;
@@ -77,9 +78,18 @@ namespace Chem4Word.ACME
             InitializeComponent();
         }
 
+        public void SetModel(Model model)
+        {
+            _model = model.Copy();
+
+            InitialiseEditor();
+        }
+
         public void SetProperties(string cml, List<string> used1DProperties, Options options)
         {
-            _cml = cml;
+            CMLConverter cc = new CMLConverter();
+            _model = cc.Import(cml, used1DProperties);
+
             _used1DProperties = used1DProperties;
             _editorOptions = options;
 
@@ -139,31 +149,31 @@ namespace Chem4Word.ACME
                 {
                     //no action required
                 }
+            }
 
-                //check to make sure we managed to initialize a
-                //new application before adding in resources
-                if (Application.Current != null)
-                {
-                    // Merge in your application resources
-                    // We need to do this for controls hosted in Winforms
-                    Application.Current.Resources.MergedDictionaries.Add(
-                        Application.LoadComponent(
-                            new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
-                                    UriKind.Relative)) as ResourceDictionary);
+            //check to make sure we managed to initialize a
+            //new application before adding in resources
+            if (Application.Current != null)
+            {
+                // Merge in your application resources
+                // We need to do this for controls hosted in Winforms
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ACMEResources.xaml",
+                                UriKind.Relative)) as ResourceDictionary);
 
-                    Application.Current.Resources.MergedDictionaries.Add(
-                        Application.LoadComponent(
-                            new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
-                                    UriKind.Relative)) as ResourceDictionary);
-                    Application.Current.Resources.MergedDictionaries.Add(
-                        Application.LoadComponent(
-                            new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
-                                    UriKind.Relative)) as ResourceDictionary);
-                    Application.Current.Resources.MergedDictionaries.Add(
-                        Application.LoadComponent(
-                            new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
-                                    UriKind.Relative)) as ResourceDictionary);
-                }
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/Brushes.xaml",
+                                UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ControlStyles.xaml",
+                                UriKind.Relative)) as ResourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(
+                    Application.LoadComponent(
+                        new Uri("Chem4Word.ACME;component/Resources/ZoomBox.xaml",
+                                UriKind.Relative)) as ResourceDictionary);
             }
         }
 
@@ -230,51 +240,58 @@ namespace Chem4Word.ACME
 
         private void SetCurrentRing(object sender)
         {
-            Button selButton = sender as Button;
-            var currentFace = new VisualBrush();
-            currentFace.AutoLayoutContent = true;
-            currentFace.Stretch = Stretch.Uniform;
+            if (sender is Button button)
+            {
+                var currentFace = new VisualBrush();
+                currentFace.AutoLayoutContent = true;
+                currentFace.Stretch = Stretch.Uniform;
 
-            currentFace.Visual = selButton.Content as Visual;
-            RingPanel.Background = currentFace;
-            RingButton.Tag = selButton.Tag;
+                currentFace.Visual = button.Content as Visual;
+                RingPanel.Background = currentFace;
+                RingButton.Tag = button.Tag;
+            }
         }
 
         private void InitialiseEditor()
         {
-            if (!String.IsNullOrEmpty(_cml))
+            if (_model != null)
             {
-                CMLConverter cc = new CMLConverter();
-                Model tempModel = cc.Import(_cml, _used1DProperties);
-                tempModel.RescaleForXaml(false);
-                var vm = new EditViewModel(tempModel, ChemCanvas, _used1DProperties);
+                _model.RescaleForXaml(false);
 
-                ActiveViewModel = vm;
+                ActiveViewModel = new EditViewModel(_model, ChemCanvas, _used1DProperties);
                 ActiveViewModel.EditorControl = this;
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
 
-                ChemCanvas.Chemistry = vm;
+                ChemCanvas.Chemistry = ActiveViewModel;
 
-                vm.Loading = true;
+                ActiveViewModel.Loading = true;
 
-                EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
+                if (EditorOptions != null)
+                {
+                    EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
+                }
+                else
+                {
+                    EditorOptions = new Options();
+                }
+
                 if (ActiveViewModel.Model.TotalBondsCount == 0)
                 {
-                    vm.CurrentBondLength = EditorOptions.BondLength;
+                    ActiveViewModel.CurrentBondLength = EditorOptions.BondLength;
                 }
                 else
                 {
                     var mean = ActiveViewModel.Model.MeanBondLength / Globals.ScaleFactorForXaml;
                     var average = Math.Round(mean / 5.0) * 5;
-                    vm.CurrentBondLength = average;
+                    ActiveViewModel.CurrentBondLength = average;
                 }
 
-                vm.Loading = false;
+                ActiveViewModel.Loading = false;
 
                 ScrollIntoView();
-                BindControls(vm);
+                BindControls(ActiveViewModel);
 
-                vm.OnFeedbackChange += ActiveViewModelOnFeedbackChange;
+                ActiveViewModel.OnFeedbackChange += ActiveViewModelOnFeedbackChange;
             }
 
             //refresh the ring button

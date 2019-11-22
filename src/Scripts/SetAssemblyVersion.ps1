@@ -153,7 +153,7 @@ Write-Host "$($wixFile)" -ForegroundColor Green
 
 $xml = [xml](Get-Content $wixFile)
 $xml.Wix.Product.Version = "$($version).$($delta.Days)"
-$xml.Wix.Product.Name = "Chemistry Add-In for Microsoft Word $($version) $($name)"
+$xml.Wix.Product.Name = "Chemistry Add-In for Microsoft Word 2020 $($name)"
 $xml.Save($wixFile)
 
 # ---------------------------------------------------------- #

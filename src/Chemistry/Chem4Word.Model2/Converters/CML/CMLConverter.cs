@@ -383,7 +383,7 @@ namespace Chem4Word.Model2.Converters.CML
 
             if (atom.Element is FunctionalGroup functionalGroup)
             {
-                elementType = FunctionalGroups.GetKey(functionalGroup);
+                elementType = functionalGroup.Name;
             }
 
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,

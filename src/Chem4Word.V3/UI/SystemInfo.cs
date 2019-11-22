@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Helpers;
 
@@ -52,7 +51,7 @@ namespace Chem4Word.UI
                     string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                     string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                     int idx = temp.IndexOf(" ");
-                    version = $"Chem4Word Version: V{Constants.Chem4WordVersion} {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+                    version = $"Chem4Word 2020 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
                 }
                 else
                 {

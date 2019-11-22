@@ -11,7 +11,7 @@ using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class GroupCommand : ACME.Commands.BaseCommand
+    public class GroupCommand : BaseCommand
     {
         public GroupCommand(EditViewModel vm) : base(vm)
         {

@@ -475,7 +475,7 @@ namespace Chem4Word.ACME
 
             foreach (var fg in Constants.StandardFunctionalGroups)
             {
-                AtomOptions.Add(new AtomOption(FunctionalGroupsDictionary[fg]));
+                AtomOptions.Add(new AtomOption(FunctionalGroupsList.FirstOrDefault(f => f.Name.Equals(fg))));
             }
         }
 
@@ -2824,7 +2824,6 @@ namespace Chem4Word.ACME
             {
                 AddToSelection(mol);
             }
-            
         }
     }
 }

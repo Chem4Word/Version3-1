@@ -6,7 +6,9 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Chem4Word.Shared;
@@ -19,9 +21,10 @@ namespace WiX.CustomAction
     {
         private const string OfficeKey = @"Microsoft\Office";
         private const string WordAddinsKey = @"Word\Addins\Chem4Word V3";
-        private const string ProductShortName = "Chem4Word V3";
-        private const string ProgrammDataFolder = "Chem4Word.V3";
-        private const string ProductLongName = "Chemistry Add-In for Word (Chem4Word) V3";
+        private const string ProductShortName = "Chem4Word 2020";
+        private const string ProductInstallFolder = "Chem4Word V3";
+        private const string ProgramDataFolder = "Chem4Word.V3";
+        private const string ProductLongName = "Chemistry Add-In for Word (Chem4Word) 2020";
         private const string ManifestFile = "Chem4Word.V3.vsto";
 
         [CustomAction]
@@ -42,13 +45,13 @@ namespace WiX.CustomAction
                     session.Log($"  Environment.SpecialFolder.ProgramFiles: {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}");
                     session.Log($"  Environment.SpecialFolder.ProgramFilesX86: {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)}");
 
-                    c4wPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), ProductShortName);
+                    c4wPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), ProductInstallFolder);
                 }
                 else
                 {
                     session.Log("  Detected 32bit OS");
                     session.Log($"  Environment.SpecialFolder.ProgramFiles: {Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}");
-                    c4wPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), ProductShortName);
+                    c4wPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), ProductInstallFolder);
                 }
 
                 session.Log($"  Looking for folder '{c4wPath}'");
@@ -60,10 +63,18 @@ namespace WiX.CustomAction
                     if (File.Exists(manifestFileLocation))
                     {
                         session.Log("  Found Chem4Word Add-In Manifest File");
-                        AlterRegistry(session, manifestFileLocation);
+                        AlterRegistry(session, $"file:///{manifestFileLocation}");
+                    }
+                    else
+                    {
+                        session.Log("  Found Chem4Word Add-In Manifest File not found !!!");
                     }
 
                     ModifyFolderPermissions(session);
+                }
+                else
+                {
+                    session.Log("  Found Chem4Word installation folder not found !!!");
                 }
             }
             catch (Exception ex)
@@ -78,12 +89,12 @@ namespace WiX.CustomAction
 
         private static void ModifyFolderPermissions(Session session)
         {
-            session.Log($"  Fixing SpecialFolder.CommonApplicationData {ProgrammDataFolder}");
+            session.Log($"  Fixing SpecialFolder.CommonApplicationData {ProgramDataFolder}");
 
             try
             {
                 string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                string folderPath = Path.Combine(programData, ProgrammDataFolder);
+                string folderPath = Path.Combine(programData, ProgramDataFolder);
                 DirectorySecurity sec = Directory.GetAccessControl(folderPath);
                 SecurityIdentifier users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
                 sec.AddAccessRule(new FileSystemAccessRule(users, FileSystemRights.Modify | FileSystemRights.Synchronize, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
@@ -94,7 +105,7 @@ namespace WiX.CustomAction
                 session.Log(ex.Message);
             }
 
-            session.Log($"  Fixed SpecialFolder.CommonApplicationData {ProgrammDataFolder}");
+            session.Log($"  Fixed SpecialFolder.CommonApplicationData {ProgramDataFolder}");
         }
 
         [CustomAction]
@@ -131,6 +142,23 @@ namespace WiX.CustomAction
             }
 
             session.Log("End FindWord()");
+
+            return ActionResult.Success;
+        }
+
+        [CustomAction]
+        public static ActionResult WordProcessCount(Session session)
+        {
+            session.Log("Begin WordProcessCount()");
+
+            Process[] processes = Process.GetProcessesByName("winword");
+
+            if (processes.Length > 0)
+            {
+                session["WINWORDPROCESSCOUNT"] = processes.Length.ToString();
+            }
+
+            session.Log("End WordProcessCount()");
 
             return ActionResult.Success;
         }
@@ -204,13 +232,15 @@ namespace WiX.CustomAction
                 }
                 else
                 {
-                    string keyName = WordAddinsKey.Replace($@"\{ProductShortName}", "");
-                    session.Log($"  Opening {keyName}");
-                    RegistryKey rk2 = rk.OpenSubKey(keyName, true);
+                    string[] parts = WordAddinsKey.Split('\\');
+                    string keyName = parts.Last();
+                    string keyParent = string.Join(@"\", parts.Take(parts.Length - 1));
+                    session.Log($"  Opening {keyParent}");
+                    RegistryKey rk2 = rk.OpenSubKey(keyParent, true);
                     if (rk2 != null)
                     {
                         session.Log(" UnRegistering Chem4Word Add-In");
-                        rk2.DeleteSubKey(ProductShortName);
+                        rk2.DeleteSubKey(keyName);
                     }
                 }
             }

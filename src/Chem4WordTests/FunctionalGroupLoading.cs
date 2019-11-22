@@ -24,19 +24,19 @@ namespace Chem4WordTests
             Assert.True(FunctionalGroups.ShortcutList.Any(), message);
         }
 
-        [Fact]
-        public void ShortcutListDoesNotContainNullKeys()
-        {
-            var message = "Did not expect any null keys";
-            Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Key != null), message);
-        }
+        //[Fact]
+        //public void ShortcutListDoesNotContainNullKeys()
+        //{
+        //    var message = "Did not expect any null keys";
+        //    Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Key != null), message);
+        //}
 
-        [Fact]
-        public void ShortcutListDoesNotContainNullValues()
-        {
-            var message = "Did not expect any null values";
-            Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Value != null), message);
-        }
+        //[Fact]
+        //public void ShortcutListDoesNotContainNullValues()
+        //{
+        //    var message = "Did not expect any null values";
+        //    Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Value != null), message);
+        //}
 
         [Theory]
         [InlineData("R1", "R 1")]
@@ -49,7 +49,7 @@ namespace Chem4WordTests
         [InlineData("TMS", "Si 1 C 3 H 3")]
         public void FormulaPartsCalculated(string shortcut, string expected)
         {
-            var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
+            var functionalGroup = FunctionalGroups.ShortcutList.FirstOrDefault(f => f.Name.Equals(shortcut));
 
             var calculated = functionalGroup.FormulaParts;
             string actual = string.Empty;
@@ -73,7 +73,7 @@ namespace Chem4WordTests
         [InlineData("TMS", 73.19)]
         public void AtomicWeightIsCalculated(string shortcut, double expectedAtomicWeight)
         {
-            var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
+            var functionalGroup = FunctionalGroups.ShortcutList.FirstOrDefault(f => f.Name.Equals(shortcut));
 
             var actualAtomicWeight = functionalGroup.AtomicWeight;
 
@@ -96,7 +96,7 @@ namespace Chem4WordTests
         [InlineData("TMS", true, "(CH3)3[Si]")]
         public void Expansion(string shortcut, bool reverse, string expected)
         {
-            var functionalGroup = FunctionalGroups.ShortcutList[shortcut];
+            var functionalGroup = FunctionalGroups.ShortcutList.FirstOrDefault(f => f.Name.Equals(shortcut));
 
             var terms = functionalGroup.ExpandIntoTerms(reverse);
             var item = Flatten(terms);
@@ -136,11 +136,11 @@ namespace Chem4WordTests
 
         private void ExpandAllFunctionalGroupsV2()
         {
-            foreach (var fg in Chem4Word.Model2.FunctionalGroups.ShortcutList)
+            foreach (var fg in FunctionalGroups.ShortcutList)
             {
-                Debug.WriteLine($"{fg.Key}");
-                Debug.WriteLine($" Fwd: {Flatten(fg.Value.ExpandIntoTerms())}");
-                Debug.WriteLine($" Rev: {Flatten(fg.Value.ExpandIntoTerms(true))}");
+                Debug.WriteLine($"{fg}");
+                Debug.WriteLine($" Fwd: {Flatten(fg.ExpandIntoTerms())}");
+                Debug.WriteLine($" Rev: {Flatten(fg.ExpandIntoTerms(true))}");
             }
 
             //Debug.WriteLine("...");

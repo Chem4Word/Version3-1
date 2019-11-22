@@ -14,7 +14,7 @@ namespace Chem4Word.ACME.Commands
     /// <summary>
     /// handles the ungrouping of molecules
     /// </summary>
-    public class UnGroupCommand : ACME.Commands.BaseCommand
+    public class UnGroupCommand : BaseCommand
     {
         public UnGroupCommand(EditViewModel vm) : base(vm)
         {

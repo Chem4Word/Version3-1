@@ -595,9 +595,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             string atomColour = "000000";
             if (options.ColouredAtoms)
             {
-                atomColour = fg.Colour;
-                // Strip out # as OoXml does not use it
-                atomColour = atomColour.Replace("#", "");
+                if (!string.IsNullOrEmpty(fg.Colour))
+                {
+                    atomColour = fg.Colour;
+                    // Strip out # as OoXml does not use it
+                    atomColour = atomColour.Replace("#", "");
+                }
             }
 
             #endregion Set Up Atom Colours

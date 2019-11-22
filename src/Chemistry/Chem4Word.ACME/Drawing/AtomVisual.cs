@@ -571,7 +571,6 @@ namespace Chem4Word.ACME.Drawing
         protected void SetTextParams()
         {
             GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
-
             GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
             GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
             MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
@@ -625,7 +624,6 @@ namespace Chem4Word.ACME.Drawing
             {
                 if (!string.IsNullOrEmpty(AtomSymbol))
                 {
-                    //Pen _widepen = new Pen(Brushes.Black, BondThickness);
                     return HullGeometry;
                 }
 
@@ -635,9 +633,7 @@ namespace Chem4Word.ACME.Drawing
 
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
-            Pen _widepen = new Pen(Brushes.Black, BondThickness);
-
-            if (ParentAtom.Element is Element e)
+            if (ParentAtom.Element is Element)
             {
                 if (HullGeometry.FillContains(hitTestParameters.HitPoint))
                 {

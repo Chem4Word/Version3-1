@@ -6,10 +6,10 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using Chem4Word.Model2;
 using System.Windows;
 using System.Windows.Input;
 using Chem4Word.ACME.Utils;
+using Chem4Word.Model2;
 
 namespace Chem4Word.ACME
 {
@@ -19,11 +19,12 @@ namespace Chem4Word.ACME
     public partial class PTPopup : Window
     {
         #region Properties
+
         public Point CentrePoint { get; set; }
 
         public ElementBase SelectedElement
         {
-            get => (ElementBase) GetValue(SelectedElementProperty);
+            get => (ElementBase)GetValue(SelectedElementProperty);
             set => SetValue(SelectedElementProperty, value);
         }
 
@@ -32,7 +33,7 @@ namespace Chem4Word.ACME
             DependencyProperty.Register("SelectedElement", typeof(ElementBase), typeof(PTPopup),
                                         new PropertyMetadata(default(ElementBase)));
 
-        #endregion
+        #endregion Properties
 
         public PTPopup()
         {

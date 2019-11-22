@@ -10,7 +10,7 @@ using Chem4Word.ACME.Enums;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class CutCommand : ACME.Commands.BaseCommand
+    public class CutCommand : BaseCommand
     {
         public CutCommand(EditViewModel vm) : base(vm)
         {

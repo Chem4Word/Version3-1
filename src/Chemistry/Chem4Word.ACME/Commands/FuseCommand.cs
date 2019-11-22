@@ -9,7 +9,7 @@ using System.Diagnostics;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class FuseCommand : ACME.Commands.BaseCommand
+    public class FuseCommand : BaseCommand
     {
         public FuseCommand(EditViewModel vm) : base(vm)
         {

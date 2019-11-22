@@ -10,7 +10,7 @@ using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class FlipCommand : ACME.Commands.BaseCommand
+    public class FlipCommand : BaseCommand
     {
         public FlipCommand(EditViewModel vm) : base(vm)
         {

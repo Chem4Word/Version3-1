@@ -611,7 +611,7 @@ namespace Chem4Word.Model2.Converters.MDL
             // Bit of a bodge, but it ensures that it can be re-loaded without exploding
             if (atom.Element is FunctionalGroup functionalGroup)
             {
-                elementType = FunctionalGroups.GetKey(functionalGroup);
+                elementType = functionalGroup.Name;
                 if (elementType.Length > 3)
                 {
                     elementType = "*";

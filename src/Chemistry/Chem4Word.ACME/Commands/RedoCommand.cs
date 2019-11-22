@@ -7,7 +7,7 @@
 
 namespace Chem4Word.ACME.Commands
 {
-    public class RedoCommand : ACME.Commands.BaseCommand
+    public class RedoCommand : BaseCommand
     {
         private EditViewModel _currentVM;
 

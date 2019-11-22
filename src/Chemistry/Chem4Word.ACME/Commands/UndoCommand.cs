@@ -9,7 +9,7 @@ using System;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class UndoCommand : ACME.Commands.BaseCommand
+    public class UndoCommand : BaseCommand
     {
         //private EditViewModel _currentVM;
 

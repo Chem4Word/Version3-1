@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 
 namespace Chem4Word.Model2.Helpers
 {
@@ -58,10 +59,10 @@ namespace Chem4Word.Model2.Helpers
                 result = Globals.PeriodicTable.Elements[text];
                 success = true;
             }
-            else if (Globals.FunctionalGroupsDictionary.ContainsKey(text))
+            else
             {
-                result = Globals.FunctionalGroupsDictionary[text];
-                success = true;
+                result = Globals.FunctionalGroupsList.FirstOrDefault(n => n.Name.Equals(text));
+                success = result != null;
             }
 
             return success;

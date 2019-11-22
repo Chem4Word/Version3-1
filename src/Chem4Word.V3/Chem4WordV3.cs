@@ -196,7 +196,6 @@ namespace Chem4Word
             sw.Stop();
             message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
             Debug.WriteLine(message);
-            StartUpTimings.Add(message);
         }
 
         private void C4WAddIn_Shutdown(object sender, EventArgs e)

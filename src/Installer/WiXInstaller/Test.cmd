@@ -1,12 +1,12 @@
 del setup.log
 del remove.log
 
-msiexec /i Chem4Word-Setup.msi /l*v setup.log
+msiexec /i Chem4Word-Setup.3.1.1.Beta.1.msi /l*v setup.log
+
+rem pause
+
+msiexec /uninstall Chem4Word-Setup.3.1.1.Beta.1.msi /l*v remove.log
 
 pause
 
-msiexec /uninstall Chem4Word-Setup.msi /l*v remove.log
-
-pause
-
-find "Property(" setup.log > properties.log
+rem find "Property(" setup.log > properties.log

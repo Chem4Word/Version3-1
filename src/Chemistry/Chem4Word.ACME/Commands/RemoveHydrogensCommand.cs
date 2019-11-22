@@ -10,7 +10,7 @@ using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
 {
-    public class RemoveHydrogensCommand : ACME.Commands.BaseCommand
+    public class RemoveHydrogensCommand : BaseCommand
     {
         public RemoveHydrogensCommand(EditViewModel vm) : base(vm)
         {

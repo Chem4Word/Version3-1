@@ -194,9 +194,9 @@ namespace Chem4Word.ACME.Controls
         private void LoadFunctionalGroups()
         {
             FunctionalGroupPicker.Items.Clear();
-            foreach (var item in Globals.FunctionalGroupsDictionary)
+            foreach (var item in Globals.FunctionalGroupsList)
             {
-                FunctionalGroupPicker.Items.Add(new AtomOption(item.Value));
+                FunctionalGroupPicker.Items.Add(new AtomOption(item));
             }
 
             if (AtomPropertiesModel.IsFunctionalGroup)

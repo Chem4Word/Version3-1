@@ -12,6 +12,10 @@ namespace Chem4Word.ACME.Drawing
 {
     public class SubscriptTextRunProperties : LabelTextRunProperties
     {
+        public SubscriptTextRunProperties(string colour) : base(colour)
+        {
+        }
+
         public override double FontHintingEmSize
         {
             get { return GlyphText.ScriptSize; }

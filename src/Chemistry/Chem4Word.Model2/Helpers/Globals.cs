@@ -13,7 +13,7 @@ namespace Chem4Word.Model2.Helpers
     public static class Globals
     {
         public static PeriodicTable PeriodicTable = new PeriodicTable();
-        public static Dictionary<string, FunctionalGroup> FunctionalGroupsDictionary = FunctionalGroups.ShortcutList;
+        public static List<FunctionalGroup> FunctionalGroupsList = FunctionalGroups.ShortcutList;
 
         #region Geometry Stuff
 

@@ -79,11 +79,6 @@ namespace Chem4Word.ACME.Drawing
                 get { return null; }
             }
 
-            //public override double ParagraphIndent
-            //{
-            //    get { return _paragraphIndent; }
-            //}
-
             private FlowDirection _flowDirection;
             private TextAlignment _textAlignment;
             private bool _firstLineInParagraph;
@@ -92,7 +87,6 @@ namespace Chem4Word.ACME.Drawing
             private TextWrapping _textWrap;
             private double _indent;
 
-            //private double _paragraphIndent;
             private double _lineHeight;
         }
     }

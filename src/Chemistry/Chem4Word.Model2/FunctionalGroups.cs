@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Chem4Word.Core.Helpers;
-using Chem4Word.Model2.Helpers;
 using Newtonsoft.Json;
 
 namespace Chem4Word.Model2
@@ -18,34 +17,13 @@ namespace Chem4Word.Model2
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private static Dictionary<string, FunctionalGroup> _shortcutList;
-
-        /// <summary>
-        /// Gets the Dictionary key for a given FunctionalGroup
-        /// </summary>
-        /// <param name="functionalGroup"></param>
-        /// <returns></returns>
-        public static string GetKey(FunctionalGroup functionalGroup)
-        {
-            string key = "";
-
-            foreach (var kvp in Globals.FunctionalGroupsDictionary)
-            {
-                if (kvp.Value.Equals(functionalGroup))
-                {
-                    key = kvp.Key;
-                    break;
-                }
-            }
-
-            return key;
-        }
+        private static List<FunctionalGroup> _shortcutList;
 
         /// <summary>
         /// ShortcutList represent text as a user might type in a superatom,
         /// actual values control how they are rendered
         /// </summary>
-        public static Dictionary<string, FunctionalGroup> ShortcutList
+        public static List<FunctionalGroup> ShortcutList
         {
             get
             {
@@ -59,16 +37,16 @@ namespace Chem4Word.Model2
 
         private static void LoadFromResource()
         {
-            _shortcutList = new Dictionary<string, FunctionalGroup>();
+            _shortcutList = new List<FunctionalGroup>();
 
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "FunctionalGroups.json");
             if (!string.IsNullOrEmpty(json))
             {
                 // Copy the values one by one to prevent recursive issue found during unit tests
-                var temp = JsonConvert.DeserializeObject<Dictionary<string, FunctionalGroup>>(json);
-                foreach (var kvp in temp)
+                var temp = JsonConvert.DeserializeObject<List<FunctionalGroup>>(json);
+                foreach (var item in temp)
                 {
-                    _shortcutList.Add(kvp.Key, kvp.Value);
+                    _shortcutList.Add(item);
                 }
             }
         }

@@ -55,15 +55,16 @@ namespace Chem4Word.Model2.Converters.JSON
         public string Description => "JSON Molecular Format";
         public string[] Extensions => new string[] { "*.json" };
 
-        public string Export(Model model)
+        public string Export(Model model, bool compressed = false)
         {
             ModelJSON mdJson = new ModelJSON();
             model.Relabel(false);
+
             if (model.Molecules.Count == 1)
             {
                 Molecule m1 = model.Molecules.Values.First();
                 var mj = ExportMol(m1);
-                return JsonConvert.SerializeObject(mj, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Ignore });
+                return WriteJson(mj, compressed);
             }
             else if (model.Molecules.Count > 1)
             {
@@ -76,8 +77,17 @@ namespace Chem4Word.Model2.Converters.JSON
                     i++;
                 }
             }
-            return JsonConvert.SerializeObject(mdJson, Formatting.Indented, new JsonSerializerSettings() { DefaultValueHandling = DefaultValueHandling.Ignore });
+
+            return WriteJson(mdJson, compressed);
         }
+
+        private static string WriteJson(object json, bool compressed) =>
+            JsonConvert.SerializeObject(json,
+                                        compressed ? Formatting.None : Formatting.Indented,
+                                        new JsonSerializerSettings
+                                        {
+                                            DefaultValueHandling = DefaultValueHandling.Ignore
+                                        });
 
         private static MolJSON ExportMol(Molecule m1)
         {
@@ -99,7 +109,7 @@ namespace Chem4Word.Model2.Converters.JSON
 
                     if (a.Element is FunctionalGroup functionalGroup)
                     {
-                        elem = FunctionalGroups.GetKey(functionalGroup);
+                        elem = functionalGroup.Name;
                     }
                 }
                 mj.a[iAtom] = new AtomJSON()

@@ -397,7 +397,7 @@
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.PickElementCommand}"
                     Style="{StaticResource CommandButtonStyle}"
                     ToolTip="Periodic Table">
-                   <StaticResource ResourceKey="PTPickerIcon"/>
+                    <StaticResource ResourceKey="PTPickerIcon" />
                 </Button>
                 <Separator />
                 <ComboBox
@@ -1077,7 +1077,7 @@
             Visibility="{Binding ElementName=AcmeControl, Path=ShowFeedback, Converter={StaticResource VisConverter}}">
             <TextBlock
                 FontFamily="Segoe UI"
-                Foreground="{StaticResource Chem4WordBrush}"
+                Foreground="Black"
                 Text="{Binding ElementName=AcmeControl, Path=ActiveViewModel.ActiveMode.CurrentStatus}" />
         </StatusBar>
     </Grid>

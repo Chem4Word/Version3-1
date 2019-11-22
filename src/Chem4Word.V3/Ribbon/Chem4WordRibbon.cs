@@ -754,7 +754,7 @@ namespace Chem4Word
 
                                 if (invalidBonds.Any() || minAtomicNumber < 1 || maxAtomicNumber > 118)
                                 {
-                                    // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 0 or > 4 or Elements < 1 or > 118
+                                    // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 1 or > 4 or Elements < 1 or > 118
 
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
                                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = "Not Requested" });
@@ -1877,7 +1877,7 @@ namespace Chem4Word
                         string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                         string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                         int idx = temp.IndexOf(" ");
-                        ah.VersionString = $"Chem4Word V{Constants.Chem4WordVersion} {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+                        ah.VersionString = $"Chem4Word 2020 {temp.Substring(idx + 1)}";
                     }
                     else
                     {

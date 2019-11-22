@@ -243,7 +243,6 @@ namespace Chem4Word.ACME.Utils
                             if (model.AddedElement != null)
                             {
                                 AddOptionIfNeeded(model);
-                           
                             }
                             evm.SelectedElement = model.Element;
                         }
@@ -333,14 +332,15 @@ namespace Chem4Word.ACME.Utils
             {
                 if (!evm.AtomOptions.Any(ao => ao.Element.Symbol == model.AddedElement.Symbol))
                 {
-                    AtomOption newOption=null;
+                    AtomOption newOption = null;
                     switch (model.AddedElement)
                     {
                         case Element elem:
                             newOption = new AtomOption(elem);
                             break;
+
                         case FunctionalGroup group:
-                            newOption =new AtomOption(group);
+                            newOption = new AtomOption(group);
                             break;
                     }
                     evm.AtomOptions.Add(newOption);

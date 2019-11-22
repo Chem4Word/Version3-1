@@ -35,7 +35,7 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                tbVersion.Text = VersionString;
+                Chem4WordVersion.Text = VersionString;
             }
             catch (Exception ex)
             {

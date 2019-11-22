@@ -14,7 +14,7 @@ namespace Chem4Word.ACME.Utils
     {
         //see https://stackoverflow.com/questions/38377743/how-to-customize-and-add-cursor-files-to-a-project
 
-        public static  Cursor Eraser { get; }
+        public static Cursor Eraser { get; }
         public static Cursor Pencil { get; }
 
         static CursorUtils()

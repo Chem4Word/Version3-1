@@ -4,7 +4,7 @@
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
- 
+
 // Shared file (Add As Link)
 
 using System;
@@ -337,7 +337,6 @@ namespace Chem4Word.Shared
             string language = officeGuid.Substring(15, 4);
             string bitFlag = officeGuid.Substring(20, 1);
             string debugFlag = officeGuid.Substring(25, 1);
-
 
             #region 32 / 64 bit
 

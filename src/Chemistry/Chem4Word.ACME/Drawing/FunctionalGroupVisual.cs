@@ -36,10 +36,10 @@ namespace Chem4Word.ACME.Drawing
         public override void Render()
         {
             SetTextParams();
-            Render(ParentAtom.Position);
+            Render(ParentAtom.Position, ParentGroup.Colour);
         }
 
-        private void Render(Point location)
+        private void Render(Point location, string colour)
         {
             int textStorePosition = 0;
             bool flipped;
@@ -53,7 +53,7 @@ namespace Chem4Word.ACME.Drawing
                 flipped = Flipped;
             }
 
-            var textStore = new FunctionalGroupTextSource(ParentGroup, flipped);
+            var textStore = new FunctionalGroupTextSource(ParentGroup, colour, flipped);
 
             //main textformatter - this does the writing of the visual
             using (TextFormatter textFormatter = TextFormatter.Create())
@@ -64,7 +64,7 @@ namespace Chem4Word.ACME.Drawing
                     TextAlignment.Left,
                     true,
                     false,
-                    new LabelTextRunProperties(),
+                    new LabelTextRunProperties(colour),
                     TextWrapping.NoWrap,
                     GlyphText.SymbolSize,
                     0d);
@@ -151,6 +151,7 @@ namespace Chem4Word.ACME.Drawing
                             var runOutline = GlyphUtils.GetOutline(currentRun);
                             //need to see if the run has been super or sub-scripted
                             var variants = originalRun.Properties.TypographyProperties.Variants;
+
                             if (variants == FontVariants.Subscript || variants == FontVariants.Superscript)
                             {
                                 //simply union in the rect -it's easier!

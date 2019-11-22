@@ -15,7 +15,14 @@ namespace Chem4Word.ACME.Drawing
 {
     public class LabelTextRunProperties : TextRunProperties
     {
-        public override System.Windows.Media.Brush BackgroundBrush
+        private string _colour;
+
+        public LabelTextRunProperties(string colour)
+        {
+            _colour = colour;
+        }
+
+        public override Brush BackgroundBrush
         {
             get { return null; }
         }
@@ -42,7 +49,14 @@ namespace Chem4Word.ACME.Drawing
                 var brush = Brushes.Black;
                 try
                 {
-                    brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Globals.PeriodicTable.C.Colour));
+                    if (string.IsNullOrEmpty(_colour))
+                    {
+                        brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(Globals.PeriodicTable.C.Colour));
+                    }
+                    else
+                    {
+                        brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(_colour));
+                    }
                 }
                 catch (Exception)
                 {

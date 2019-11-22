@@ -1,8 +1,9 @@
-{
-    "*": {
+[
+    {
+        "Colour": "#ff0000",
+        "Name": "*",
         "Symbol": "*",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -10,10 +11,10 @@
             }
         ]
     },
-    "R#": {
+    {
+        "Name": "R#",
         "Symbol": "R{#}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -21,10 +22,10 @@
             }
         ]
     },
-    "R1": {
+    {
+        "Name": "R1",
         "Symbol": "R{1}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -32,10 +33,10 @@
             }
         ]
     },
-    "R2": {
+    {
+        "Name": "R2",
         "Symbol": "R{2}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -43,10 +44,10 @@
             }
         ]
     },
-    "R3": {
+    {
+        "Name": "R3",
         "Symbol": "R{3}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -54,10 +55,10 @@
             }
         ]
     },
-    "R4": {
+    {
+        "Name": "R4",
         "Symbol": "R{4}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -65,10 +66,10 @@
             }
         ]
     },
-    "R5": {
+    {
+        "Name": "R5",
         "Symbol": "R{5}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -76,10 +77,10 @@
             }
         ]
     },
-    "R6": {
+    {
+        "Name": "R6",
         "Symbol": "R{6}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -87,10 +88,10 @@
             }
         ]
     },
-    "R7": {
+    {
+        "Name": "R7",
         "Symbol": "R{7}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -98,10 +99,10 @@
             }
         ]
     },
-    "R8": {
+    {
+        "Name": "R8",
         "Symbol": "R{8}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -109,10 +110,10 @@
             }
         ]
     },
-    "R9": {
+    {
+        "Name": "R9",
         "Symbol": "R{9}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -120,10 +121,10 @@
             }
         ]
     },
-    "R10": {
+    {
+        "Name": "R10",
         "Symbol": "R{10}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -131,10 +132,10 @@
             }
         ]
     },
-    "R11": {
+    {
+        "Name": "R11",
         "Symbol": "R{11}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -142,10 +143,10 @@
             }
         ]
     },
-    "R12": {
+    {
+        "Name": "R12",
         "Symbol": "R{12}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -153,10 +154,10 @@
             }
         ]
     },
-    "R13": {
+    {
+        "Name": "R13",
         "Symbol": "R{13}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -164,10 +165,10 @@
             }
         ]
     },
-    "R14": {
+    {
+        "Name": "R14",
         "Symbol": "R{14}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -175,10 +176,10 @@
             }
         ]
     },
-    "R15": {
+    {
+        "Name": "R15",
         "Symbol": "R{15}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -186,10 +187,10 @@
             }
         ]
     },
-    "R16": {
+    {
+        "Name": "R16",
         "Symbol": "R{16}",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "R",
@@ -197,10 +198,10 @@
             }
         ]
     },
-    "Uut": {
+    {
+        "Name": "Uut",
         "Symbol": "Uut",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "Nh",
@@ -208,10 +209,10 @@
             }
         ]
     },
-    "Uuq": {
+    {
+        "Name": "Uuq",
         "Symbol": "Uuq",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "Fl",
@@ -219,10 +220,10 @@
             }
         ]
     },
-    "Uup": {
+    {
+        "Name": "Uup",
         "Symbol": "Uup",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "Mc",
@@ -230,10 +231,10 @@
             }
         ]
     },
-    "Uuh": {
+    {
+        "Name": "Uuh",
         "Symbol": "Uuh",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "Lv",
@@ -241,10 +242,10 @@
             }
         ]
     },
-    "Uus": {
+    {
+        "Name": "Uus",
         "Symbol": "Uus",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "Ts",
@@ -252,10 +253,10 @@
             }
         ]
     },
-    "Uuo": {
+    {
+        "Name": "Uuo",
         "Symbol": "Uuo",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "Og",
@@ -263,10 +264,10 @@
             }
         ]
     },
-    "OH": {
-        "Symbol": "OH",
-        "ShowAsSymbol": false,
+    {
+        "Name": "OH",
         "Flippable": true,
+        "Symbol": "OH",
         "Components": [
             {
                 "Component": "O",
@@ -278,10 +279,9 @@
             }
         ]
     },
-    "CH2": {
+    {
+        "Name": "CH2",
         "Symbol": "CH2",
-        "ShowAsSymbol": false,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -293,10 +293,9 @@
             }
         ]
     },
-    "CH3": {
+    {
+        "Name": "CH3",
         "Symbol": "CH3",
-        "ShowAsSymbol": false,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -308,10 +307,9 @@
             }
         ]
     },
-    "C2H5": {
+    {
+        "Name": "C2H5",
         "Symbol": "C2H5",
-        "ShowAsSymbol": false,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -321,12 +319,44 @@
                 "Component": "H",
                 "Count": 5
             }
-        ]
+        ],
+        "Expansion": {
+            "a": [
+                {
+                    "i": "a1",
+                    "x": 500.0,
+                    "y": 375.0,
+                    "l": "*"
+                },
+                {
+                    "i": "a2",
+                    "x": 517.32050807568874,
+                    "y": 365.0
+                },
+                {
+                    "i": "a3",
+                    "x": 534.64101615137747,
+                    "y": 375.0
+                }
+            ],
+            "b": [
+                {
+                    "i": "b1",
+                    "b": 0,
+                    "e": 1
+                },
+                {
+                    "i": "b2",
+                    "b": 1,
+                    "e": 2
+                }
+            ]
+        }
     },
-    "Me": {
+    {
+        "Name": "Me",
         "Symbol": "Me",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -338,10 +368,10 @@
             }
         ]
     },
-    "Et": {
+    {
+        "Name": "Et",
         "Symbol": "Et",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -353,10 +383,10 @@
             }
         ]
     },
-    "Pr": {
+    {
+        "Name": "Pr",
         "Symbol": "Pr",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -368,10 +398,10 @@
             }
         ]
     },
-    "i-Pr": {
+    {
+        "Name": "i-Pr",
         "Symbol": "i-Pr",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -383,10 +413,10 @@
             }
         ]
     },
-    "iPr": {
+    {
+        "Name": "iPr",
         "Symbol": "{i}Pr",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -398,10 +428,10 @@
             }
         ]
     },
-    "nBu": {
+    {
+        "Name": "nBu",
         "Symbol": "{n}Bu",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -413,10 +443,10 @@
             }
         ]
     },
-    "n-Bu": {
+    {
+        "Name": "n-Bu",
         "Symbol": "n-Bu",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -428,10 +458,10 @@
             }
         ]
     },
-    "tBu": {
+    {
+        "Name": "tBu",
         "Symbol": "{t}Bu",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -443,10 +473,10 @@
             }
         ]
     },
-    "t-Bu": {
-        "Symbol": "t-Bu",
-        "ShowAsSymbol": false,
+    {
+        "Name": "t-Bu",
         "Flippable": true,
+        "Symbol": "t-Bu",
         "Components": [
             {
                 "Component": "C",
@@ -458,10 +488,10 @@
             }
         ]
     },
-    "Ph": {
+    {
+        "Name": "Ph",
         "Symbol": "Ph",
         "ShowAsSymbol": true,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -473,10 +503,10 @@
             }
         ]
     },
-    "CF3": {
-        "Symbol": "CF3",
-        "ShowAsSymbol": false,
+    {
+        "Name": "CF3",
         "Flippable": true,
+        "Symbol": "CF3",
         "Components": [
             {
                 "Component": "C",
@@ -488,10 +518,10 @@
             }
         ]
     },
-    "CCl3": {
-        "Symbol": "CCl3",
-        "ShowAsSymbol": false,
+    {
+        "Name": "CCl3",
         "Flippable": true,
+        "Symbol": "CCl3",
         "Components": [
             {
                 "Component": "C",
@@ -503,10 +533,9 @@
             }
         ]
     },
-    "C2F5": {
+    {
+        "Name": "C2F5",
         "Symbol": "C2F5",
-        "ShowAsSymbol": false,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -518,10 +547,10 @@
             }
         ]
     },
-    "TMS": {
-        "Symbol": "TMS",
-        "ShowAsSymbol": false,
+    {
+        "Name": "TMS",
         "Flippable": true,
+        "Symbol": "TMS",
         "Components": [
             {
                 "Component": "Si",
@@ -533,10 +562,10 @@
             }
         ]
     },
-    "COOH": {
+    {
+        "Name": "COOH",
+        "Flippable": true,
         "Symbol": "COOH",
-        "ShowAsSymbol": false,
-        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -556,10 +585,9 @@
             }
         ]
     },
-    "CO2H": {
+    {
+        "Name": "CO2H",
         "Symbol": "CO2H",
-        "ShowAsSymbol": false,
-        "Flippable": false,
         "Components": [
             {
                 "Component": "C",
@@ -575,10 +603,10 @@
             }
         ]
     },
-    "NO2": {
+    {
+        "Name": "NO2",
+        "Flippable": true,
         "Symbol": "NO2",
-        "ShowAsSymbol": false,
-        "Flippable": true,
         "Components": [
             {
                 "Component": "N",
@@ -590,10 +618,10 @@
             }
         ]
     },
-    "NH2": {
+    {
+        "Name": "NH2",
+        "Flippable": true,
         "Symbol": "NH2",
-        "ShowAsSymbol": false,
-        "Flippable": true,
         "Components": [
             {
                 "Component": "N",
@@ -605,10 +633,10 @@
             }
         ]
     },
-    "CH2OH": {
+    {
+        "Name": "CH2OH",
+        "Flippable": true,
         "Symbol": "CH2OH",
-        "ShowAsSymbol": false,
-        "Flippable": true,
         "Components": [
             {
                 "Component": "CH2",
@@ -624,10 +652,10 @@
             }
         ]
     },
-    "CH2CH2OH": {
+    {
+        "Name": "CH2CH2OH",
+        "Flippable": true,
         "Symbol": "CH2CH2OH",
-        "ShowAsSymbol": false,
-        "Flippable": true,
         "Components": [
             {
                 "Component": "CH2",
@@ -647,10 +675,10 @@
             }
         ]
     },
-    "CH2CH2CH2OH": {
-        "Symbol": "CH2CH2CH2OH",
-        "ShowAsSymbol": false,
+    {
+        "Name": "CH2CH2CH2OH",
         "Flippable": true,
+        "Symbol": "CH2CH2CH2OH",
         "Components": [
             {
                 "Component": "CH2",
@@ -666,10 +694,10 @@
             }
         ]
     },
-    "OMe": {
-        "Symbol": "OMe",
-        "ShowAsSymbol": false,
+    {
+        "Name": "OMe",
         "Flippable": true,
+        "Symbol": "OMe",
         "Components": [
             {
                 "Component": "O",
@@ -681,10 +709,10 @@
             }
         ]
     },
-    "OEt": {
-        "Symbol": "OEt",
-        "ShowAsSymbol": false,
+    {
+        "Name": "OEt",
         "Flippable": true,
+        "Symbol": "OEt",
         "Components": [
             {
                 "Component": "O",
@@ -696,10 +724,10 @@
             }
         ]
     },
-    "Bz": {
-        "Symbol": "Bz",
-        "ShowAsSymbol": false,
+    {
+        "Name": "Bz",
         "Flippable": true,
+        "Symbol": "Bz",
         "Components": [
             {
                 "Component": "Ph",
@@ -711,4 +739,4 @@
             }
         ]
     }
-}
+]

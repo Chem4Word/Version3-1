@@ -108,13 +108,11 @@
     <Compile Include="TextualProperty.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\FunctionalGroups.json" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\PeriodicTable.csv" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\FunctionalGroups.json" />
     <None Include="Resources\PeriodicTable.xlsx" />
     <EmbeddedResource Include="Resources\PropertyTypes.json" />
   </ItemGroup>
