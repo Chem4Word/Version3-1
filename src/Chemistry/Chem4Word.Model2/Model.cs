@@ -794,7 +794,7 @@ namespace Chem4Word.Model2
                 {
                     if (force)
                     {
-                        result = $"Forced BondLength to {Stringify(target)} from {Stringify(MeanBondLength)}";
+                        result = $"Forced BondLength from {Stringify(MeanBondLength)} to {Stringify(target)}";
                         ScaleToAverageBondLength(target);
                     }
                     else
@@ -813,7 +813,6 @@ namespace Chem4Word.Model2
                 }
             }
 
-            //Debug.WriteLine(result);
             return result;
 
             // Local Function

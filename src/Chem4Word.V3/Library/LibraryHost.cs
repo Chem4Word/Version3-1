@@ -18,6 +18,7 @@ namespace Chem4Word.Library
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
+        private LibraryViewModel _libraryViewModel;
         public LibraryHost()
         {
             InitializeComponent();
@@ -31,7 +32,11 @@ namespace Chem4Word.Library
                 Word.Application app = Globals.Chem4WordV3.Application;
                 using (new UI.WaitCursor())
                 {
-                    libraryView1.MainGrid.DataContext = new LibraryViewModel();
+                    if (_libraryViewModel == null)
+                    {
+                        _libraryViewModel = new LibraryViewModel();
+                    }
+                    libraryView1.MainGrid.DataContext = _libraryViewModel;
                 }
                 app.System.Cursor = Word.WdCursorType.wdCursorNormal;
             }

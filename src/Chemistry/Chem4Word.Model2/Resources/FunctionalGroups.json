@@ -1,8 +1,8 @@
 [
     {
-        "Colour": "#ff0000",
         "Name": "*",
         "Symbol": "*",
+        "Colour": "#ff0000",
         "ShowAsSymbol": true,
         "Components": [
             {
@@ -384,8 +384,8 @@
         ]
     },
     {
-        "Name": "Pr",
-        "Symbol": "Pr",
+        "Name": "n-Pr",
+        "Symbol": "n-Pr",
         "ShowAsSymbol": true,
         "Components": [
             {

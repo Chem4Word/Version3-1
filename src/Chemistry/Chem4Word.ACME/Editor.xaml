@@ -434,7 +434,6 @@
 
                 <RadioButton
                     x:Name="DrawButton"
-                    Background="Transparent"
                     Click="ModeButton_OnChecked"
                     GroupName="Actions"
                     IsChecked="True"

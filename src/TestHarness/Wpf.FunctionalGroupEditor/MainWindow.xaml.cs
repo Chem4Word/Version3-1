@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Chem4Word.ACME;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.JSON;
 using Chem4Word.Model2.Helpers;
@@ -61,7 +60,7 @@ namespace Wpf.FunctionalGroupEditor
 
                 if (fg.Expansion == null)
                 {
-                    var model = jsonConvertor.Import("{'a':[{'l':'" + StripBraces(fg.Symbol) + "','x':0,'y':0}]}");
+                    var model = jsonConvertor.Import("{'a':[{'l':'" + fg.Name + "','x':0,'y':0}]}");
                     Editor.SetModel(model);
                 }
                 else
@@ -71,11 +70,6 @@ namespace Wpf.FunctionalGroupEditor
                     Editor.SetModel(model);
                 }
             }
-        }
-
-        private string StripBraces(string value)
-        {
-            return value.Replace("{", "").Replace("}", "");
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
@@ -94,18 +88,19 @@ namespace Wpf.FunctionalGroupEditor
                 }
             }
 
-            List<FunctionalGroup> gg = new List<FunctionalGroup>();
+            List<FunctionalGroup> listOfGroups = new List<FunctionalGroup>();
             foreach (var group in _functionalGroups)
             {
-                gg.Add(group);
+                listOfGroups.Add(group);
             }
 
-            string json2 = JsonConvert.SerializeObject(gg, Formatting.Indented,
-                                                       new JsonSerializerSettings
-                                                       {
-                                                           DefaultValueHandling = DefaultValueHandling.Ignore
-                                                       });
-            Clipboard.SetText(json2);
+            string json = JsonConvert.SerializeObject(listOfGroups,
+                                                        Formatting.Indented,
+                                                        new JsonSerializerSettings
+                                                        {
+                                                            DefaultValueHandling = DefaultValueHandling.Ignore
+                                                        });
+            Clipboard.SetText(json);
             MessageBox.Show("Results on Clipboard !");
         }
     }

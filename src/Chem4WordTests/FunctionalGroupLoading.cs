@@ -8,7 +8,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
@@ -17,6 +19,16 @@ namespace Chem4WordTests
 {
     public class FunctionalGroupLoading
     {
+
+        [Fact]
+        public void ShortCutListHasNoDuplicates()
+        {
+            var names = FunctionalGroups.ShortcutList.Select(s => s.Name).ToList();
+            var distinct = names.Distinct().ToList();
+
+            Assert.Equal(names.Count, distinct.Count);
+        }
+
         [Fact]
         public void ShortcutListIsPopulated()
         {
@@ -24,19 +36,16 @@ namespace Chem4WordTests
             Assert.True(FunctionalGroups.ShortcutList.Any(), message);
         }
 
-        //[Fact]
-        //public void ShortcutListDoesNotContainNullKeys()
-        //{
-        //    var message = "Did not expect any null keys";
-        //    Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Key != null), message);
-        //}
+        [Fact]
+        public void ShortcutListDoesNotContainElements()
+        {
+            var names = FunctionalGroups.ShortcutList.Select(s => s.Name).ToList();
+            var elements = Globals.PeriodicTable.Elements.Keys.ToList();
+            var mixed = names.Intersect(elements).ToList();
 
-        //[Fact]
-        //public void ShortcutListDoesNotContainNullValues()
-        //{
-        //    var message = "Did not expect any null values";
-        //    Assert.True(FunctionalGroups.ShortcutList.All(entry => entry.Value != null), message);
-        //}
+            Assert.True(mixed.Count == 0);
+        }
+
 
         [Theory]
         [InlineData("R1", "R 1")]

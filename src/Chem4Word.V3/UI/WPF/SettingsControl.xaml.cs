@@ -417,7 +417,8 @@ namespace Chem4Word.UI.WPF
 
                                     var cml = File.ReadAllText(cmlFile);
                                     var lib = new Database.Library();
-                                    if (lib.ImportCml(cml))
+                                    // Set second parameter to true if properties are to be calculated on import
+                                    if (lib.ImportCml(cml, false))
                                     {
                                         fileCount++;
                                     }
@@ -545,20 +546,6 @@ namespace Chem4Word.UI.WPF
                     var lib = new Database.Library();
                     lib.DeleteAllChemistry();
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
-
-#if DEBUG
-                    Debugger.Break();
-#endif
-                    // Close the existing Library Pane
-                    //var app = Globals.Chem4WordV3.Application;
-                    //foreach (CustomTaskPane taskPane in Globals.Chem4WordV3.CustomTaskPanes)
-                    //{
-                    //    if (app.ActiveWindow == taskPane.Window && taskPane.Title == Constants.LibraryTaskPaneTitle)
-                    //    {
-                    //        var custTaskPane = taskPane;
-                    //        (custTaskPane.Control as LibraryHost)?.Refresh();
-                    //    }
-                    //}
                 }
             }
             catch (Exception ex)

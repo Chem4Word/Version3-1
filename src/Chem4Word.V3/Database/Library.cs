@@ -9,14 +9,18 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
+using Chem4Word.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
+using Chem4Word.WebServices;
 
 namespace Chem4Word.Database
 {
@@ -49,11 +53,13 @@ namespace Chem4Word.Database
         public Dictionary<string, int> GetLibraryNames()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            var allNames = new Dictionary<string, int>();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
             try
             {
-                Dictionary<string, int> allNames = new Dictionary<string, int>();
-
                 using (SQLiteConnection conn = LibraryConnection())
                 {
                     using (SQLiteDataReader names = GetAllNames(conn))
@@ -63,23 +69,29 @@ namespace Chem4Word.Database
                             string name = names["Name"] as string;
                             if (!string.IsNullOrEmpty(name) && name.Length > 3)
                             {
-                                int id = int.Parse(names["ChemistryId"].ToString());
-                                if (!allNames.ContainsKey(name))
+                                // Exclude any purely numeric names
+                                long numeric = -1;
+                                if (!long.TryParse(name, out numeric))
                                 {
-                                    allNames.Add(name, id);
+                                    int id = int.Parse(names["ChemistryId"].ToString());
+                                    if (!allNames.ContainsKey(name))
+                                    {
+                                        allNames.Add(name, id);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-
-                return allNames;
             }
             catch (Exception ex)
             {
                 new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                return null;
             }
+
+            sw.Stop();
+            Globals.Chem4WordV3.Telemetry.Write(module, "Timing", $"Reading {allNames.Count} Chemical names took {sw.ElapsedMilliseconds.ToString("#,##0")}ms");
+            return allNames;
         }
 
         public void DeleteAllChemistry()
@@ -90,7 +102,7 @@ namespace Chem4Word.Database
             }
         }
 
-        public bool ImportCml(string cmlFile)
+        public bool ImportCml(string cmlFile, bool calculateProperties = false)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -98,8 +110,8 @@ namespace Chem4Word.Database
 
             try
             {
-                var converter = new CMLConverter();
-                Model model = converter.Import(cmlFile);
+                var cmlConverter = new CMLConverter();
+                Model model = cmlConverter.Import(cmlFile);
 
                 var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
                 if (!string.IsNullOrEmpty(outcome))
@@ -118,7 +130,12 @@ namespace Chem4Word.Database
                         }
                     }
 
-                    CMLConverter cmlConverter = new CMLConverter();
+                    if (calculateProperties)
+                    {
+                        var newMolecules = model.GetAllMolecules();
+                        ChemistryHelper.CalculateProperties(newMolecules);
+                    }
+
                     model.CustomXmlPartGuid = "";
                     var cml = cmlConverter.Export(model);
 
@@ -385,12 +402,16 @@ namespace Chem4Word.Database
                 SQLiteCommand command = new SQLiteCommand("DELETE FROM ChemistryByTags", conn);
                 SQLiteCommand command2 = new SQLiteCommand("DELETE FROM Gallery", conn);
                 SQLiteCommand command3 = new SQLiteCommand("DELETE FROM ChemicalNames", conn);
+                SQLiteCommand command4 = new SQLiteCommand("UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='Gallery'", conn);
 
                 using (SQLiteTransaction tr = conn.BeginTransaction())
                 {
                     command.ExecuteNonQuery();
                     command2.ExecuteNonQuery();
                     command3.ExecuteNonQuery();
+#if DEBUG
+                    command4.ExecuteNonQuery();
+#endif
                     tr.Commit();
                 }
             }
@@ -425,7 +446,14 @@ namespace Chem4Word.Database
 
         public List<ChemistryDTO> GetAllChemistry(string filter)
         {
-            List<ChemistryDTO> results = new List<ChemistryDTO>();
+            // This is called via Microsoft.Office.Tools.CustomTaskPaneImpl.OnVisibleChanged and Chem4Word.CustomRibbon.OnShowLibraryClick
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            var results = new List<ChemistryDTO>();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             using (SQLiteConnection conn = LibraryConnection())
             {
                 SQLiteDataReader chemistry = GetAllChemistry(conn, filter);
@@ -445,6 +473,9 @@ namespace Chem4Word.Database
                 chemistry.Close();
                 chemistry.Dispose();
             }
+
+            sw.Stop();
+            Globals.Chem4WordV3.Telemetry.Write(module, "Timing", $"Reading {results.Count} structures took {sw.ElapsedMilliseconds.ToString("#,##0")}ms");
 
             return results;
         }
