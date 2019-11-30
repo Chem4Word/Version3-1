@@ -191,13 +191,25 @@ namespace Chem4Word.ACME.Controls
         #region Overrides
 
         /// <summary>
-        /// Doesn't autosize the chemistry to fit, unlike the display
+        /// Autosizes display to chemistry
         /// </summary>
         /// <param name="constraint"></param>
         /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
-            return DesiredSize;
+            var tempSize = DesiredSize;
+            var modelWidth = Chemistry.Model.MaxX - Chemistry.Model.MinX;
+            var modelHeight = Chemistry.Model.MaxY - Chemistry.Model.MinY;
+            if (tempSize.Width < modelWidth)
+            {
+                tempSize.Width = modelWidth;
+            }
+
+            if (tempSize.Height < modelHeight)
+            {
+                tempSize.Height = modelHeight;
+            }
+            return tempSize;
         }
 
         #endregion Overrides
