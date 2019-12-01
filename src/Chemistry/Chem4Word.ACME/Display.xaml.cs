@@ -13,6 +13,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.Core;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Converters.MDL;
 
 namespace Chem4Word.ACME
 {
@@ -152,7 +154,13 @@ namespace Chem4Word.ACME
                 {
                     if (data.StartsWith("<"))
                     {
-                        var conv = new Model2.Converters.CML.CMLConverter();
+                        var conv = new CMLConverter();
+                        chemistryModel = conv.Import(data);
+                        chemistryModel.EnsureBondLength(20, false);
+                    }
+                    if (data.Contains("M  END"))
+                    {
+                        var conv = new SdFileConverter();
                         chemistryModel = conv.Import(data);
                         chemistryModel.EnsureBondLength(20, false);
                     }

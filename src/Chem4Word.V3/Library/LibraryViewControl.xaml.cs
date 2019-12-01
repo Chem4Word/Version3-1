@@ -52,7 +52,7 @@ namespace Chem4Word.Library
                     //then try to match part of either its name or an alternative name to the string typed in
                     filteredView.Filter = ci =>
                     {
-                        var itm = ci as LibraryViewModel.Chemistry;
+                        var itm = ci as Chemistry;
                         var queryString = SearchBox.Text.ToUpper();
                         return itm.Name.ToUpper().Contains(queryString)
                                || itm.OtherNames.Any(n => n.ToUpper().Contains(queryString));
@@ -64,7 +64,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -81,7 +84,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -103,7 +109,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
     }

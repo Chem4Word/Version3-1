@@ -19,8 +19,6 @@ namespace Chem4Word.Model2.Converters.CML
     // ReSharper disable once InconsistentNaming
     public class CMLConverter
     {
-        public bool Compressed { get; set; }
-
         public Model Import(object data, List<string> protectedLabels = null)
         {
             Model newModel = new Model();
@@ -71,7 +69,7 @@ namespace Chem4Word.Model2.Converters.CML
             return newModel;
         }
 
-        public string Export(Model model)
+        public string Export(Model model, bool compressed = false)
         {
             XDocument xd = new XDocument();
 
@@ -132,17 +130,7 @@ namespace Chem4Word.Model2.Converters.CML
             }
             xd.Add(root);
 
-            string cml = string.Empty;
-            if (Compressed)
-            {
-                cml = xd.ToString(SaveOptions.DisableFormatting);
-            }
-            else
-            {
-                cml = xd.ToString();
-            }
-
-            return cml;
+            return compressed ? xd.ToString(SaveOptions.DisableFormatting) : xd.ToString();
         }
 
         #region Export Helpers

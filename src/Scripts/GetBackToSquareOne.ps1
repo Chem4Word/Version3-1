@@ -139,6 +139,7 @@ for ($i=14; $i -le 16; $i++)
 
 ## Folders
 ## $env:ProgramData\Chem4Word.V3
+## $env:USERPROFILE\AppData\Local\Chemistry Add-in for Word
 ## $env:USERPROFILE\AppData\Local\Chem4Word.V3
 ## $env:USERPROFILE\AppData\Local\assembly\dl3
 
@@ -153,6 +154,14 @@ if ($exists -eq $false -and $delete -eq $true)
     }
 
     $folder = "$($env:USERPROFILE)\AppData\Local\Chem4Word.V3"
+    if (Test-Path $folder)
+    {
+        Write-Host "Deleting folder tree '$($folder)'"
+        Get-ChildItem -Path $folder -Recurse | Remove-Item -force -recurse
+        Remove-Item $folder
+    }
+
+    $folder = "$($env:USERPROFILE)\AppData\Local\Chemistry Add-in for Word"
     if (Test-Path $folder)
     {
         Write-Host "Deleting folder tree '$($folder)'"

@@ -558,7 +558,5 @@ namespace Chem4Word.Helpers
 
             return changedProperties + newProperties;
         }
-
-
     }
 }

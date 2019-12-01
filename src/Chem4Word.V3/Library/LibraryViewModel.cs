@@ -10,17 +10,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
-using Chem4Word.ACME.Annotations;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Database;
+using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Library
 {
@@ -31,230 +29,14 @@ namespace Chem4Word.Library
 
         private bool _initializing = false;
 
-        public class Chemistry : INotifyPropertyChanged
-        {
-            public ObservableCollection<UserTag> Tags { get; }
-
-            internal XDocument cmlDoc;
-
-            public string XML
-            {
-                get { return cmlDoc.ToString(); }
-                set
-                {
-                    cmlDoc = XDocument.Parse(value);
-                    if (!Initializing)
-                    {
-                        Save();
-                    }
-                    OnPropertyChanged();
-                }
-            }
-
-            private string _name;
-
-            public string Name
-            {
-                get { return _name; }
-                set
-                {
-                    _name = value;
-                    if (!Initializing)
-                    {
-                        Save();
-                    }
-                    OnPropertyChanged();
-                }
-            }
-
-            public List<String> OtherNames { get; }
-            public bool HasOtherNames { get; internal set; }
-
-            private long _id;
-
-            public long ID
-            {
-                get { return _id; }
-                set
-                {
-                    _id = value;
-                    OnPropertyChanged();
-                }
-            }
-
-            private string _formula;
-
-            public string Formula
-            {
-                get { return _formula; }
-                set
-                {
-                    _formula = value;
-                    if (!Initializing)
-                    {
-                        Save();
-                    }
-                }
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            [NotifyPropertyChangedInvocator]
-            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-            {
-                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-                try
-                {
-                    Dirty = true;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-                }
-                catch (Exception ex)
-                {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                }
-            }
-
-            public void Save()
-            {
-                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-                try
-                {
-                    var lib = new Database.Library();
-                    lib.UpdateChemistry(ID, Name, XML, Formula);
-                    Dirty = false;
-                }
-                catch (Exception ex)
-                {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                }
-            }
-
-            public bool Dirty { get; set; }
-            public bool Initializing { get; set; }
-
-            public Chemistry()
-            {
-                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-                try
-                {
-                    OtherNames = new List<string>();
-                    Dirty = false;
-                    Tags = new ObservableCollection<UserTag>();
-                    Tags.CollectionChanged += Tags_CollectionChanged;
-                    HasOtherNames = false;
-                }
-                catch (Exception ex)
-                {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                }
-            }
-
-            private void Tags_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-                try
-                {
-                    if (Initializing)
-                    {
-                        return;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                }
-            }
-        }
-
-        public class UserTag : INotifyPropertyChanged
-        {
-            public event PropertyChangedEventHandler PropertyChanged;
-
-            private long _id;
-
-            public long ID
-            {
-                get { return _id; }
-                set { _id = value; }
-            }
-
-            private string _text;
-
-            public string Text
-            {
-                get { return _text; }
-                set { _text = value; }
-            }
-
-            [NotifyPropertyChangedInvocator]
-            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-            {
-                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-                try
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-                }
-                catch (Exception ex)
-                {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                }
-            }
-        }
-
-        public class ChemistryByTag : INotifyPropertyChanged
-        {
-            private long _galleryID;
-
-            public long GalleryID
-            {
-                get { return _galleryID; }
-                set { _galleryID = value; }
-            }
-
-            private long _tagID;
-
-            public long tagID
-            {
-                get { return _tagID; }
-                set { _tagID = value; }
-            }
-
-            private long _id;
-
-            public long ID
-            {
-                get { return _id; }
-                set { _id = value; }
-            }
-
-            [NotifyPropertyChangedInvocator]
-            protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-            {
-                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-                try
-                {
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-                }
-                catch (Exception ex)
-                {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
-                }
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged;
-        }
-
         //used for XAML data binding
-        public ObservableCollection<LibraryItem> GalleryItems { get; }
+        public ObservableCollection<LibraryItem> LibraryItems { get; }
 
         public ObservableCollection<Chemistry> ChemistryItems { get; }
 
         public ObservableCollection<ChemistryByTag> ChemistryByTagItems { get; }
 
         public ObservableCollection<UserTag> UserTagItems { get; }
-
-        // NOT SURE WE NEED THIS!!
-        //references the custom XML parts in the document
 
         public LibraryViewModel(string filter = "")
         {
@@ -276,14 +58,17 @@ namespace Chem4Word.Library
                 LoadUserTagItems();
                 AssignUserTags();
 
-                GalleryItems = new ObservableCollection<LibraryItem>();
+                LibraryItems = new ObservableCollection<LibraryItem>();
 
                 sw.Stop();
                 Debug.WriteLine($"LibraryViewModel() took {sw.ElapsedMilliseconds}ms");
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -309,7 +94,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -337,7 +125,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -357,7 +148,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -371,13 +165,17 @@ namespace Chem4Word.Library
                     var lib = new Database.Library();
                     foreach (Chemistry chemistry in eNewItems)
                     {
-                        chemistry.ID = lib.AddChemistry(chemistry.XML, chemistry.Name, chemistry.Formula);
+                        var cmlConverter = new CMLConverter();
+                        chemistry.ID = lib.AddChemistry(cmlConverter.Import(chemistry.XML), chemistry.Name, chemistry.Formula);
                     }
                 }
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -400,7 +198,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -423,7 +224,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
             return results;
         }
@@ -450,7 +254,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -483,7 +290,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -492,11 +302,11 @@ namespace Chem4Word.Library
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                XName nameNodeName = Model2.Converters.CML.CMLNamespaces.cml + "name";
+                XName nameNodeName = CMLNamespaces.cml + "name";
 
-                var names = (from namenode in mol.cmlDoc.Descendants(nameNodeName)
-                             where namenode.Name == nameNodeName
-                             select namenode.Value).Distinct();
+                var names = (from element in mol.CmlDoc.Descendants(nameNodeName)
+                             where element.Name == nameNodeName
+                             select element.Value).Distinct();
 
                 foreach (string name in names)
                 {
@@ -506,7 +316,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -530,7 +343,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 

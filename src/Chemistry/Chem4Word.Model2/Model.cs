@@ -725,6 +725,23 @@ namespace Chem4Word.Model2
             _molecules.Clear();
         }
 
+        public void RemoveExplicitHydrogens()
+        {
+            var targets = GetHydrogenTargets();
+
+            if (targets.Atoms.Any())
+            {
+                foreach (var bond in targets.Bonds)
+                {
+                    bond.Parent.RemoveBond(bond);
+                }
+                foreach (var atom in targets.Atoms)
+                {
+                    atom.Parent.RemoveAtom(atom);
+                }
+            }
+        }
+
         public HydrogenTargets GetHydrogenTargets(List<Molecule> molecules = null)
         {
             var targets = new HydrogenTargets();

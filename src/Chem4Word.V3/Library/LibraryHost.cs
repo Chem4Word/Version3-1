@@ -19,6 +19,7 @@ namespace Chem4Word.Library
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private LibraryViewModel _libraryViewModel;
+
         public LibraryHost()
         {
             InitializeComponent();
@@ -42,7 +43,10 @@ namespace Chem4Word.Library
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
     }

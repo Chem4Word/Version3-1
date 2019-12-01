@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System;
-using System.Linq;
 using System.Reflection;
 using Chem4Word.ACME;
 using Chem4Word.Core;
@@ -67,19 +66,7 @@ namespace Chem4Word.Helpers
                     {
                         if (Globals.Chem4WordV3.SystemOptions.RemoveExplicitHydrogensOnImportFromLibrary)
                         {
-                            var targets = model.GetHydrogenTargets();
-
-                            if (targets.Atoms.Any())
-                            {
-                                foreach (var bond in targets.Bonds)
-                                {
-                                    bond.Parent.RemoveBond(bond);
-                                }
-                                foreach (var atom in targets.Atoms)
-                                {
-                                    atom.Parent.RemoveAtom(atom);
-                                }
-                            }
+                            model.RemoveExplicitHydrogens();
                         }
 
                         var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength,
@@ -94,7 +81,10 @@ namespace Chem4Word.Helpers
                 }
                 catch (Exception ex)
                 {
-                    new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                    using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
                 }
                 finally
                 {

@@ -72,7 +72,10 @@ namespace Chem4Word.Library
             catch (Exception ex)
             {
                 Globals.Chem4WordV3.EventsEnabled = true;
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -94,24 +97,28 @@ namespace Chem4Word.Library
                 if (AskUserYesNo("Do you want to delete this structure from the Library?") == DialogResult.Yes)
                 {
                     var lib = new Database.Library();
-                    lib.DeleteChemistry(((LibraryViewModel.Chemistry)this.DataContext).ID);
+                    lib.DeleteChemistry(((Chemistry)this.DataContext).ID);
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
                     ParentControl.MainGrid.DataContext = new LibraryViewModel();
                 }
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
         private void DelTag_OnClick(object sender, RoutedEventArgs e)
         {
-            //throw new NotImplementedException();
+            // Do Nothing
         }
 
         private void NameBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // Do Nothing
         }
 
         private void LibraryControl_Unloaded(object sender, RoutedEventArgs e)

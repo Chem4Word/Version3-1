@@ -20,7 +20,6 @@ using Chem4Word.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
-using Chem4Word.WebServices;
 
 namespace Chem4Word.Database
 {
@@ -28,12 +27,17 @@ namespace Chem4Word.Database
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+        private readonly SdFileConverter _sdFileConverter;
+        private readonly CMLConverter _cmlConverter;
 
         public Library()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             string libraryTarget = Path.Combine(Globals.Chem4WordV3.AddInInfo.ProgramDataPath, Constants.LibraryFileName);
+
+            _sdFileConverter = new SdFileConverter();
+            _cmlConverter = new CMLConverter();
 
             if (!File.Exists(libraryTarget))
             {
@@ -86,7 +90,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
 
             sw.Stop();
@@ -102,7 +109,28 @@ namespace Chem4Word.Database
             }
         }
 
-        public bool ImportCml(string cmlFile, bool calculateProperties = false)
+        public SQLiteTransaction StartTransaction()
+        {
+            var conn = LibraryConnection();
+            return conn.BeginTransaction();
+        }
+
+        public void EndTransaction(SQLiteTransaction transaction, bool rollback)
+        {
+            var conn = transaction.Connection;
+            if (rollback)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+            }
+            conn.Close();
+            conn.Dispose();
+        }
+
+        public bool ImportCml(string cmlFile, SQLiteTransaction transaction, bool calculateProperties = false)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -110,65 +138,77 @@ namespace Chem4Word.Database
 
             try
             {
-                var cmlConverter = new CMLConverter();
-                Model model = cmlConverter.Import(cmlFile);
+                Model model = null;
 
-                var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
-                if (!string.IsNullOrEmpty(outcome))
+                if (cmlFile.StartsWith("<"))
                 {
-                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                    model = _cmlConverter.Import(cmlFile);
+                }
+                if (cmlFile.Contains("M  END"))
+                {
+                    model = _sdFileConverter.Import(cmlFile);
                 }
 
-                if (model.TotalAtomsCount > 0)
+                if (model != null)
                 {
-                    // Ensure each molecule has a Concise Formula set
-                    foreach (var molecule in model.Molecules.Values)
+                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                    if (!string.IsNullOrEmpty(outcome))
                     {
-                        if (string.IsNullOrEmpty(molecule.ConciseFormula))
-                        {
-                            molecule.ConciseFormula = molecule.CalculatedFormula();
-                        }
+                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
                     }
 
-                    if (calculateProperties)
+                    if (model.TotalAtomsCount > 0)
                     {
-                        var newMolecules = model.GetAllMolecules();
-                        ChemistryHelper.CalculateProperties(newMolecules);
-                    }
-
-                    model.CustomXmlPartGuid = "";
-                    var cml = cmlConverter.Export(model);
-
-                    string chemicalName = model.ConciseFormula;
-                    var mol = model.Molecules.Values.First();
-                    if (mol.Names.Count > 0)
-                    {
-                        foreach (var name in mol.Names)
+                        // Ensure each molecule has a Concise Formula set
+                        foreach (var molecule in model.Molecules.Values)
                         {
-                            long temp;
-                            if (!long.TryParse(name.Value, out temp))
+                            if (string.IsNullOrEmpty(molecule.ConciseFormula))
                             {
-                                chemicalName = name.Value;
-                                break;
+                                molecule.ConciseFormula = molecule.CalculatedFormula();
                             }
                         }
-                    }
 
-                    using (SQLiteConnection conn = LibraryConnection())
-                    {
-                        var id = AddChemistry(conn, cml, chemicalName, model.ConciseFormula);
+                        if (calculateProperties)
+                        {
+                            var newMolecules = model.GetAllMolecules();
+                            ChemistryHelper.CalculateProperties(newMolecules);
+                        }
+
+                        model.CustomXmlPartGuid = "";
+
+                        string chemicalName = model.ConciseFormula;
+                        var mol = model.Molecules.Values.First();
+                        if (mol.Names.Count > 0)
+                        {
+                            foreach (var name in mol.Names)
+                            {
+                                long temp;
+                                if (!long.TryParse(name.Value, out temp))
+                                {
+                                    chemicalName = name.Value;
+                                    break;
+                                }
+                            }
+                        }
+
+                        var conn = transaction.Connection;
+
+                        var id = AddChemistry(conn, model, chemicalName, model.ConciseFormula);
                         foreach (var name in mol.Names)
                         {
                             AddChemicalName(conn, id, name.Value, name.FullType);
                         }
-                    }
 
-                    result = true;
+                        result = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
 
             return result;
@@ -208,7 +248,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -249,20 +292,22 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
-        public string GetChemistryByID(long id)
+        public string GetChemistryById(long id)
         {
             string result = null;
             using (SQLiteConnection conn = LibraryConnection())
             {
-                SQLiteDataReader chemistry = GetChemistryByID(conn, id);
+                SQLiteDataReader chemistry = GetChemistryById(conn, id);
                 while (chemistry.Read())
                 {
-                    var byteArray = (Byte[])chemistry["Chemistry"];
-                    result = CmlFromBytes(byteArray);
+                    result = CmlFromBytes(chemistry["Chemistry"] as Byte[]);
                     break;
                 }
 
@@ -273,7 +318,7 @@ namespace Chem4Word.Database
             return result;
         }
 
-        private SQLiteDataReader GetChemistryByID(SQLiteConnection conn, long id)
+        private SQLiteDataReader GetChemistryById(SQLiteConnection conn, long id)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -290,23 +335,28 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
 
-        public long AddChemistry(string chemistryXml, string chemistryName, string formula)
+        // Called by LibraryVieModel.AddNewChemistry()
+        public long AddChemistry(Model model, string chemistryName, string formula)
         {
             long result;
             using (SQLiteConnection conn = LibraryConnection())
             {
-                result = AddChemistry(conn, chemistryXml, chemistryName, formula);
+                result = AddChemistry(conn, model, chemistryName, formula);
             }
 
             return result;
         }
 
-        private long AddChemistry(SQLiteConnection conn, string chemistryXml, string chemistryName, string formula)
+        // Called by ImportCml(), ImportCml()
+        private long AddChemistry(SQLiteConnection conn, Model model, string chemistryName, string formula)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -314,32 +364,34 @@ namespace Chem4Word.Database
                 long lastId;
                 StringBuilder sb = new StringBuilder();
 
-                Byte[] blob = Encoding.UTF8.GetBytes(chemistryXml);
+                model.RemoveExplicitHydrogens();
+
+                Byte[] blob = Encoding.UTF8.GetBytes(_cmlConverter.Export(model, true));
+                //Byte[] blob = Encoding.UTF8.GetBytes(_sdFileConverter.Export(model));
 
                 sb.AppendLine("INSERT INTO GALLERY");
                 sb.AppendLine(" (Chemistry, Name, Formula)");
                 sb.AppendLine("VALUES");
-                sb.AppendLine(" (@blob,@name, @formula)");
+                sb.AppendLine(" (@blob, @name, @formula)");
 
                 SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
                 command.Parameters.Add("@blob", DbType.Binary, blob.Length).Value = blob;
                 command.Parameters.Add("@name", DbType.String, chemistryName.Length).Value = chemistryName;
                 command.Parameters.Add("@formula", DbType.String, formula.Length).Value = formula;
 
-                using (SQLiteTransaction tr = conn.BeginTransaction())
-                {
-                    command.ExecuteNonQuery();
-                    string sql = "SELECT last_insert_rowid()";
-                    SQLiteCommand cmd = new SQLiteCommand(sql, conn);
-                    lastId = (Int64)cmd.ExecuteScalar();
-                    tr.Commit();
-                }
+                command.ExecuteNonQuery();
+                string sql = "SELECT last_insert_rowid()";
+                SQLiteCommand cmd = new SQLiteCommand(sql, conn);
+                lastId = (Int64)cmd.ExecuteScalar();
 
                 return lastId;
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return -1;
             }
         }
@@ -375,21 +427,20 @@ namespace Chem4Word.Database
                 insertCommand.Parameters.Add("@tag", DbType.String, refs[1].Length).Value = refs[1];
                 insertCommand.Parameters.Add("@chemID", DbType.Int32).Value = id;
 
-                using (SQLiteTransaction tr = conn.BeginTransaction())
-                {
-                    delcommand.ExecuteNonQuery();
-                    insertCommand.ExecuteNonQuery();
-                    string sql = "SELECT last_insert_rowid()";
-                    SQLiteCommand cmd = new SQLiteCommand(sql, conn);
-                    lastID = (Int64)cmd.ExecuteScalar();
-                    tr.Commit();
-                }
+                delcommand.ExecuteNonQuery();
+                insertCommand.ExecuteNonQuery();
+                string sql = "SELECT last_insert_rowid()";
+                SQLiteCommand cmd = new SQLiteCommand(sql, conn);
+                lastID = (Int64)cmd.ExecuteScalar();
 
                 return lastID;
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return -1;
             }
         }
@@ -403,6 +454,7 @@ namespace Chem4Word.Database
                 SQLiteCommand command2 = new SQLiteCommand("DELETE FROM Gallery", conn);
                 SQLiteCommand command3 = new SQLiteCommand("DELETE FROM ChemicalNames", conn);
                 SQLiteCommand command4 = new SQLiteCommand("UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='Gallery'", conn);
+                SQLiteCommand command5 = new SQLiteCommand("VACUUM", conn);
 
                 using (SQLiteTransaction tr = conn.BeginTransaction())
                 {
@@ -413,11 +465,15 @@ namespace Chem4Word.Database
                     command4.ExecuteNonQuery();
 #endif
                     tr.Commit();
+                    command5.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -439,7 +495,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
@@ -462,8 +521,7 @@ namespace Chem4Word.Database
                     var dto = new ChemistryDTO();
 
                     dto.Id = (long)chemistry["ID"];
-                    var byteArray = (Byte[])chemistry["Chemistry"];
-                    dto.Cml = CmlFromBytes(byteArray);
+                    dto.Cml = CmlFromBytes(chemistry["Chemistry"] as Byte[]);
                     dto.Name = chemistry["name"] as string;
                     dto.Formula = chemistry["formula"] as string;
 
@@ -482,7 +540,21 @@ namespace Chem4Word.Database
 
         private string CmlFromBytes(byte[] byteArray)
         {
-            return Encoding.UTF8.GetString(byteArray);
+            var data = Encoding.UTF8.GetString(byteArray);
+
+            if (data.StartsWith("<"))
+            {
+                // Looks like cml so return it as is
+                return data;
+            }
+
+            if (data.Contains("M  END"))
+            {
+                // Looks like a MOLFile, so convert it to CML
+                return _cmlConverter.Export(_sdFileConverter.Import(data), true);
+            }
+
+            return null;
         }
 
         public List<ChemistryTagDTO> GetChemistryByTags()
@@ -546,7 +618,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
@@ -589,7 +664,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
@@ -613,7 +691,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
@@ -629,7 +710,7 @@ namespace Chem4Word.Database
                 {
                     sb.AppendLine("SELECT Id, Chemistry, Name, Formula");
                     sb.AppendLine("FROM Gallery");
-                    sb.AppendLine("ORDER BY NAME");
+                    sb.AppendLine("ORDER BY Name");
 
                     SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
                     return command.ExecuteReader();
@@ -653,7 +734,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
@@ -673,7 +757,10 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
@@ -684,10 +771,10 @@ namespace Chem4Word.Database
             try
             {
                 StringBuilder sb = new StringBuilder();
-                sb.AppendLine("SELECT ChemicalNameID, Name, namespace, Tag");
+                sb.AppendLine("SELECT ChemicalNameID, Name, Namespace, Tag");
                 sb.AppendLine("FROM ChemicalNames");
                 sb.AppendLine("WHERE ChemistryID = @id");
-                sb.AppendLine("ORDER BY NAME");
+                sb.AppendLine("ORDER BY Name");
 
                 SQLiteCommand command = new SQLiteCommand(sb.ToString(), conn);
                 command.Parameters.Add("@id", DbType.Int64).Value = id;
@@ -695,31 +782,12 @@ namespace Chem4Word.Database
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
                 return null;
             }
         }
-    }
-
-    public class ChemistryDTO
-    {
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public string Formula { get; set; }
-        public string Cml { get; set; }
-    }
-
-    public class ChemistryTagDTO
-    {
-        public long Id { get; set; }
-        public long GalleryId { get; set; }
-        public long TagId { get; set; }
-    }
-
-    public class UserTagDTO
-    {
-        public long Id { get; set; }
-        public string Text { get; set; }
-        public long Lock { get; set; }
     }
 }

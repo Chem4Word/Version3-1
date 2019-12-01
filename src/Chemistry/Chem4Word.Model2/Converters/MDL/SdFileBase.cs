@@ -16,10 +16,5 @@ namespace Chem4Word.Model2.Converters.MDL
             message = null;
             return SdfState.Null;
         }
-
-        //public virtual void ExportToStream(Molecule molecule, StreamWriter writer, out string message)
-        //{
-        //    message = null;
-        //}
     }
 }

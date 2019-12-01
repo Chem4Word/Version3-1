@@ -1,9 +1,5 @@
 $pwd = Split-Path -Path $MyInvocation.MyCommand.Path
 
-# This does not work ???
-# Have to CD first ???
-# $certificate = """$($pwd)\Certificates\Developer\Chem4WordAddIn.pfx"""
-
 CD "$($pwd)\Certificates\Developer"
 
 $certificate = "Chem4WordAddIn.pfx"

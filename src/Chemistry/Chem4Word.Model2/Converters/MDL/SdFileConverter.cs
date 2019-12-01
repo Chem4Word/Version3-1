@@ -112,6 +112,8 @@ namespace Chem4Word.Model2.Converters.MDL
 
                     model.Relabel(true);
                     model.Refresh();
+
+                    model.CalculateFormula();
                 }
             }
 

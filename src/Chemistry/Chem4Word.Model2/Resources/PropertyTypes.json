@@ -2,11 +2,51 @@
     {
         "ExternalName": "> <CHEM4WORD_FORMULA>",
         "InternalName": "chem4word:Formula",
-        "IsFormula": false
+        "IsFormula": true
     },
     {
         "ExternalName": "> <CHEM4WORD_NAME>",
         "InternalName": "chem4word:Synonym",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_IDENTIFIER>",
+        "InternalName": "chem4word:cev_cid",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_ORIGINAL_NAME>",
+        "InternalName": "chem4word:cev_oname",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_CLEAN_NAME>",
+        "InternalName": "chem4word:cev_clean_name",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_NAME>",
+        "InternalName": "chem4word:cev_name",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_FREQUENCY>",
+        "InternalName": "chem4word:cev_freq",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_WIKIDATA_ID>",
+        "InternalName": "chem4word:cev_wikidata_id",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_DESCRIPTION>",
+        "InternalName": "chem4word:cev_description",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <CHEM4WORD_CEV_WIKIPEDIA_REF>",
+        "InternalName": "chem4word:cev_wikipedia_ref",
         "IsFormula": false
     },
     {
@@ -62,6 +102,11 @@
     {
         "ExternalName": "> <PUBCHEM_IUPAC_TRADITIONAL_NAME>",
         "InternalName": "pubchem:Traditional",
+        "IsFormula": false
+    },
+    {
+        "ExternalName": "> <PUBCHEM_IUPAC_INCHI>",
+        "InternalName": "pubchem:Inchi",
         "IsFormula": false
     },
     {

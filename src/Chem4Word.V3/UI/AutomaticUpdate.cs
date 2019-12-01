@@ -51,7 +51,10 @@ namespace Chem4Word.UI
             }
             catch (Exception ex)
             {
-                new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 
@@ -67,7 +70,7 @@ namespace Chem4Word.UI
             }
             catch (Exception ex)
             {
-                new ReportError(_telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex).ShowDialog();
+                new ReportError(_telemetry, TopLeft, module, ex).ShowDialog();
             }
         }
 
@@ -82,7 +85,10 @@ namespace Chem4Word.UI
             }
             catch (Exception ex)
             {
-                new ReportError(_telemetry, TopLeft, module, ex).ShowDialog();
+                using (var form = new ReportError(_telemetry, TopLeft, module, ex))
+                {
+                    form.ShowDialog();
+                }
             }
         }
 

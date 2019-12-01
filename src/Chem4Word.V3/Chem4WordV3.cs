@@ -73,9 +73,9 @@ namespace Chem4Word
         public Options SystemOptions;
         public TelemetryWriter Telemetry;
 
-        public List<IChem4WordEditor> Editors;
-        public List<IChem4WordRenderer> Renderers;
-        public List<IChem4WordSearcher> Searchers;
+        public List<IChem4WordEditor> Editors = new List<IChem4WordEditor>();
+        public List<IChem4WordRenderer> Renderers = new List<IChem4WordRenderer>();
+        public List<IChem4WordSearcher> Searchers = new List<IChem4WordSearcher>();
 
         public Dictionary<string, int> LibraryNames = null;
 
@@ -1142,7 +1142,7 @@ namespace Chem4Word
                     TargetWord tw = JsonConvert.DeserializeObject<TargetWord>(ctrl.Tag);
 
                     var lib = new Database.Library();
-                    string cml = lib.GetChemistryByID(tw.ChemistryId);
+                    string cml = lib.GetChemistryById(tw.ChemistryId);
 
                     if (cml == null)
                     {

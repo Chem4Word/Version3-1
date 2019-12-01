@@ -15,6 +15,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
@@ -344,7 +345,7 @@ namespace Chem4Word.UI.WPF
                 {
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
                 }
-                int fileCount = 0;
+
                 StringBuilder sb;
 
                 // Start with V2 Add-In data path
@@ -400,32 +401,43 @@ namespace Chem4Word.UI.WPF
 
                         if (dr == Forms.DialogResult.Yes)
                         {
-                            Progress pb = new Progress();
+                            int fileCount = 0;
+
+                            var lib = new Database.Library();
+                            var transaction = lib.StartTransaction();
 
                             try
                             {
-                                var xmlFiles = Directory.GetFiles(selectedFolder, "*.cml");
-
-                                pb.Maximum = xmlFiles.Length;
-                                pb.TopLeft = new Point(TopLeft.X + Constants.TopLeftOffset, TopLeft.Y + Constants.TopLeftOffset);
-                                pb.Show();
-
-                                foreach (string cmlFile in xmlFiles)
+                                var xmlFiles = Directory.GetFiles(selectedFolder, "*.cml").ToList();
+                                xmlFiles.AddRange(Directory.GetFiles(selectedFolder, "*.mol"));
+                                if (xmlFiles.Count > 0)
                                 {
-                                    pb.Message = cmlFile.Replace(selectedFolder, ".");
-                                    pb.Increment(1);
+                                    ProgressBar.Maximum = xmlFiles.Count;
+                                    ProgressBar.Minimum = 0;
+                                    ProgressBarHolder.Visibility = Visibility.Visible;
+                                    SetButtonState(false);
 
-                                    var cml = File.ReadAllText(cmlFile);
-                                    var lib = new Database.Library();
-                                    // Set second parameter to true if properties are to be calculated on import
-                                    if (lib.ImportCml(cml, false))
+                                    int progress = 0;
+                                    int total = xmlFiles.Count;
+
+                                    foreach (string cmlFile in xmlFiles)
                                     {
-                                        fileCount++;
+                                        progress++;
+                                        ShowProgress(progress, cmlFile.Replace($"{selectedFolder}\\", "") + $" [{progress}/{total}]");
+
+                                        var cml = File.ReadAllText(cmlFile);
+
+                                        // Set second parameter to true if properties are to be calculated on import
+                                        if (lib.ImportCml(cml, transaction, false))
+                                        {
+                                            fileCount++;
+                                        }
                                     }
+                                    lib.EndTransaction(transaction, false);
                                 }
 
-                                pb.Hide();
-                                pb.Close();
+                                ProgressBarHolder.Visibility = Visibility.Collapsed;
+                                SetButtonState(true);
 
                                 File.WriteAllText(doneFile, $"{fileCount} cml files imported into library");
                                 FileInfo fi = new FileInfo(doneFile);
@@ -437,8 +449,10 @@ namespace Chem4Word.UI.WPF
                             }
                             catch (Exception ex)
                             {
-                                pb.Hide();
-                                pb.Close();
+                                lib.EndTransaction(transaction, true);
+                                ProgressBarHolder.Visibility = Visibility.Collapsed;
+                                SetButtonState(true);
+
                                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
                             }
                         }
@@ -447,6 +461,9 @@ namespace Chem4Word.UI.WPF
             }
             catch (Exception ex)
             {
+                ProgressBarHolder.Visibility = Visibility.Collapsed;
+                SetButtonState(true);
+
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
         }
@@ -480,7 +497,7 @@ namespace Chem4Word.UI.WPF
                         {
                             StringBuilder sb = new StringBuilder();
                             sb.AppendLine($"This folder contains {existingCmlFiles.Length} cml files.");
-                            sb.AppendLine($"Do you wish to continue?");
+                            sb.AppendLine("Do you wish to continue?");
                             doExport = UserInteractions.AskUserYesNo(sb.ToString(), Forms.MessageBoxDefaultButton.Button2);
                         }
                         if (doExport == Forms.DialogResult.Yes)
@@ -488,24 +505,41 @@ namespace Chem4Word.UI.WPF
                             Database.Library lib = new Database.Library();
 
                             int exported = 0;
+                            int progress = 0;
 
                             List<ChemistryDTO> dto = lib.GetAllChemistry(null);
-                            foreach (var obj in dto)
+                            int total = dto.Count;
+                            if (total > 0)
                             {
-                                var filename = Path.Combine(browser.SelectedPath, $"Chem4Word-{obj.Id:000000000}.cml");
+                                ProgressBar.Maximum = dto.Count;
+                                ProgressBar.Minimum = 0;
+                                ProgressBarHolder.Visibility = Visibility.Visible;
+                                SetButtonState(false);
 
                                 var converter = new CMLConverter();
-                                Model model = converter.Import(obj.Cml);
 
-                                var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
-                                if (!string.IsNullOrEmpty(outcome))
+                                foreach (var obj in dto)
                                 {
-                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
-                                }
+                                    progress++;
+                                    ShowProgress(progress, $"Structure #{obj.Id} [{progress}/{total}]");
 
-                                File.WriteAllText(filename, converter.Export(model));
-                                exported++;
+                                    var filename = Path.Combine(browser.SelectedPath, $"Chem4Word-{obj.Id:000000000}.cml");
+
+                                    Model model = converter.Import(obj.Cml);
+
+                                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                                    if (!string.IsNullOrEmpty(outcome))
+                                    {
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
+                                    }
+
+                                    File.WriteAllText(filename, converter.Export(model));
+                                    exported++;
+                                }
                             }
+
+                            ProgressBarHolder.Visibility = Visibility.Collapsed;
+                            SetButtonState(true);
 
                             if (exported > 0)
                             {
@@ -517,6 +551,9 @@ namespace Chem4Word.UI.WPF
             }
             catch (Exception ex)
             {
+                ProgressBarHolder.Visibility = Visibility.Collapsed;
+                SetButtonState(true);
+
                 new ReportError(Globals.Chem4WordV3.Telemetry, TopLeft, module, ex).ShowDialog();
             }
         }
@@ -546,6 +583,7 @@ namespace Chem4Word.UI.WPF
                     var lib = new Database.Library();
                     lib.DeleteAllChemistry();
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
+                    UserInteractions.InformUser("Your library has been cleared.");
                 }
             }
             catch (Exception ex)
@@ -606,6 +644,26 @@ namespace Chem4Word.UI.WPF
         #endregion Maintenance Tab Events
 
         #region Private methods
+
+        private void SetButtonState(bool enabled)
+        {
+            Ok.IsEnabled = enabled;
+            Cancel.IsEnabled = enabled;
+            Defaults.IsEnabled = enabled;
+            ImportIntoLibrary.IsEnabled = enabled;
+            ImportIntoLibraryButtonImage.Opacity = enabled ? 1 : 0.25;
+            ExportFromLibrary.IsEnabled = enabled;
+            ExportFromLibraryButtonImage.Opacity = enabled ? 1 : 0.25;
+            EraseLibrary.IsEnabled = enabled;
+            EraseLibraryButtonImage.Opacity = enabled ? 1 : 0.25;
+            TabControl.IsEnabled = enabled;
+        }
+
+        private void ShowProgress(int value, string message)
+        {
+            ProgressBar.Dispatcher?.Invoke(() => ProgressBar.Value = value, DispatcherPriority.Background);
+            ProgressBarMessage.Dispatcher?.Invoke(() => ProgressBarMessage.Text = message, DispatcherPriority.Background);
+        }
 
         private void LoadSettings()
         {

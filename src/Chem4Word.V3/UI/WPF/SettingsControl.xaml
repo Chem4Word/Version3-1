@@ -23,6 +23,7 @@
             <RowDefinition Height="55" />
         </Grid.RowDefinitions>
         <TabControl
+            x:Name="TabControl"
             Grid.Row="0"
             Margin="10,10,10,0"
             Background="{DynamicResource {x:Static SystemColors.ControlColor}}">
@@ -303,7 +304,11 @@
             </TabItem>
             <TabItem Header="Library">
                 <Grid Margin="5">
-                    <StackPanel>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0">
                         <GroupBox BorderThickness="2" Header="Import">
                             <DockPanel>
                                 <Button
@@ -386,6 +391,17 @@
                             </DockPanel>
                         </GroupBox>
                     </StackPanel>
+                    <Grid
+                        x:Name="ProgressBarHolder"
+                        Grid.Row="1"
+                        Visibility="Collapsed">
+                        <ProgressBar x:Name="ProgressBar" Value="0" />
+                        <TextBlock
+                            x:Name="ProgressBarMessage"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="" />
+                    </Grid>
                 </Grid>
             </TabItem>
             <TabItem Header="Maintenance">
@@ -483,6 +499,7 @@
             HorizontalAlignment="Right"
             Orientation="Horizontal">
             <Button
+                x:Name="Defaults"
                 Width="80"
                 Height="32"
                 Margin="5,5,30,5"
@@ -490,6 +507,7 @@
                 Click="DefaultsButton_OnClick"
                 Content="Defaults" />
             <Button
+                x:Name="Ok"
                 Width="80"
                 Height="32"
                 Margin="5"
@@ -497,6 +515,7 @@
                 Click="OkButton_Click"
                 Content="OK" />
             <Button
+                x:Name="Cancel"
                 Width="80"
                 Height="32"
                 Margin="5"
