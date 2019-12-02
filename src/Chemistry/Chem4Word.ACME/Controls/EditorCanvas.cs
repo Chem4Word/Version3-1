@@ -198,16 +198,19 @@ namespace Chem4Word.ACME.Controls
         protected override Size MeasureOverride(Size constraint)
         {
             var tempSize = DesiredSize;
-            var modelWidth = Chemistry.Model.MaxX - Chemistry.Model.MinX;
-            var modelHeight = Chemistry.Model.MaxY - Chemistry.Model.MinY;
-            if (tempSize.Width < modelWidth)
+            if (Chemistry != null)
             {
-                tempSize.Width = modelWidth;
-            }
+                var modelWidth = Chemistry.Model.MaxX - Chemistry.Model.MinX;
+                var modelHeight = Chemistry.Model.MaxY - Chemistry.Model.MinY;
+                if (tempSize.Width < modelWidth)
+                {
+                    tempSize.Width = modelWidth;
+                }
 
-            if (tempSize.Height < modelHeight)
-            {
-                tempSize.Height = modelHeight;
+                if (tempSize.Height < modelHeight)
+                {
+                    tempSize.Height = modelHeight;
+                }
             }
             return tempSize;
         }

@@ -1763,6 +1763,7 @@ namespace Chem4Word.ACME
 
                               InvertPlacements(selMolecule);
                               selMolecule.UpdateVisual();
+                              InvertStereo(selMolecule);
                           };
 
             Action redo = () =>
@@ -1771,13 +1772,28 @@ namespace Chem4Word.ACME
 
                               InvertPlacements(selMolecule);
                               selMolecule.UpdateVisual();
+                              InvertStereo(selMolecule);
                           };
 
             UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
             redo();
 
             UndoManager.EndUndoBlock();
-
+            //local function
+            void InvertStereo(Molecule m)
+            {
+                foreach (Bond bond in m.Bonds)
+                {
+                    if (bond.Stereo == BondStereo.Wedge)
+                    {
+                        bond.Stereo = BondStereo.Hatch;
+                    }
+                    else if (bond.Stereo == BondStereo.Hatch)
+                    {
+                        bond.Stereo = BondStereo.Wedge;
+                    }
+                }
+            }
             //local function
             void InvertPlacements(Molecule m)
             {

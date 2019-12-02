@@ -290,8 +290,9 @@ namespace Chem4Word.Telemetry
         private void GetGitStatus()
         {
             var result = new List<string>();
+            result.Add("Git Origin");
+            result.AddRange(RunCommand("git.exe", "config --get remote.origin.url", AddInLocation));
             result.Add("Git Branch");
-            // git rev-parse --abbrev-ref HEAD == Current Branch
             result.AddRange(RunCommand("git.exe", "rev-parse --abbrev-ref HEAD", AddInLocation));
 
             // git status --porcelain == Get List of changed files
