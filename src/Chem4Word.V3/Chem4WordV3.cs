@@ -195,6 +195,7 @@ namespace Chem4Word
 
             sw.Stop();
             message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            StartUpTimings.Add(message);
             Debug.WriteLine(message);
         }
 
@@ -411,16 +412,19 @@ namespace Chem4Word
 
                     if (string.IsNullOrEmpty(SystemOptions.SelectedEditorPlugIn))
                     {
-                        SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
+                        SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
                     }
                     else
                     {
-                        var editor = GetEditorPlugIn(SystemOptions.SelectedEditorPlugIn);
-                        if (editor == null)
+                        if (Editors.Count > 0)
                         {
-                            SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
-                            Telemetry.Write(module, "Information", $"Setting editor to {SystemOptions.SelectedEditorPlugIn}");
-                            settingsChanged = true;
+                            var editor = GetEditorPlugIn(SystemOptions.SelectedEditorPlugIn);
+                            if (editor == null)
+                            {
+                                SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
+                                Telemetry.Write(module, "Information", $"Setting editor to {SystemOptions.SelectedEditorPlugIn}");
+                                settingsChanged = true;
+                            }
                         }
                     }
 
@@ -430,12 +434,15 @@ namespace Chem4Word
                     }
                     else
                     {
-                        var renderer = GetRendererPlugIn(SystemOptions.SelectedRendererPlugIn);
-                        if (renderer == null)
+                        if (Renderers.Count > 0)
                         {
-                            SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
-                            Telemetry.Write(module, "Information", $"Setting renderer to {SystemOptions.SelectedRendererPlugIn}");
-                            settingsChanged = true;
+                            var renderer = GetRendererPlugIn(SystemOptions.SelectedRendererPlugIn);
+                            if (renderer == null)
+                            {
+                                SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
+                                Telemetry.Write(module, "Information", $"Setting renderer to {SystemOptions.SelectedRendererPlugIn}");
+                                settingsChanged = true;
+                            }
                         }
                     }
 
@@ -510,6 +517,7 @@ namespace Chem4Word
         private void LoadPluginsOnThread()
         {
             LoadPlugIns(false);
+            Ribbon.ChangeOptions.Enabled = true;
         }
 
         private void LoadPlugIns(bool mustBeSigned)
@@ -904,10 +912,14 @@ namespace Chem4Word
         {
             if (Ribbon != null)
             {
-                //Debug.WriteLine(state.ToString());
-                // Not needed, just here for completeness
-                Ribbon.ChangeOptions.Enabled = true;
+                // Always enabled
                 Ribbon.HelpMenu.Enabled = true;
+
+                // Enabled once all PlugIns are loaded
+                bool plugInsLoaded = Editors.Count > 0
+                                    && Renderers.Count > 0
+                                    && Searchers.Count > 0;
+                Ribbon.ChangeOptions.Enabled = plugInsLoaded;
 
                 switch (state)
                 {
@@ -1804,19 +1816,6 @@ namespace Chem4Word
 
             try
             {
-                //try
-                //{
-                //    if (sel != null)
-                //    {
-                //        Debug.WriteLine($"{module.Replace("()", $"({sel.Document.Name})")}");
-                //        Debug.WriteLine($"  OnWindowSelectionChange() Selection from {sel.Range.Start} to {sel.Range.End} CC's {sel.ContentControls.Count}");
-                //    }
-                //}
-                //catch
-                //{
-                //    //
-                //}
-
                 if (EventsEnabled)
                 {
                     EventsEnabled = false;

@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.ACME.Utils;
 using Chem4Word.Model2;
 
 namespace Chem4Word.ACME.Commands
@@ -18,7 +19,8 @@ namespace Chem4Word.ACME.Commands
         public override void Execute(object parameter)
         {
             var selMolecule = EditViewModel.SelectedItems[0] as Molecule;
-            EditViewModel.FlipMolecule(selMolecule, false, false);
+            bool flipStereo = KeyboardUtils.HoldingDownShift();
+            EditViewModel.FlipMolecule(selMolecule, false, flipStereo);
         }
     }
 }

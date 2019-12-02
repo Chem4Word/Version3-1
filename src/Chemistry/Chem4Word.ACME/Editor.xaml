@@ -911,7 +911,7 @@
                     x:Name="FlipHorizontalButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipHorizontalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Flip Vertical">
+                    ToolTip="Mirror Vertical ([Shift-click] to Flip)">
                     <Viewbox Width="24" Height="24">
                         <Image Source="{StaticResource FlipHorizontalIcon}" />
                     </Viewbox>
@@ -920,7 +920,7 @@
                     x:Name="FlipVerticalButton"
                     Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.FlipVerticalCommand}"
                     Style="{StaticResource CommandButtonStyle}"
-                    ToolTip="Flip Horizontal">
+                    ToolTip="Mirror Horizontal ([Shift-click] to Flip)">
                     <Viewbox Width="24" Height="24">
                         <Image Source="{StaticResource FlipVerticalIcon}" />
                     </Viewbox>

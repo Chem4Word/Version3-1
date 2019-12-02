@@ -1763,7 +1763,10 @@ namespace Chem4Word.ACME
 
                               InvertPlacements(selMolecule);
                               selMolecule.UpdateVisual();
-                              InvertStereo(selMolecule);
+                              if (flipStereo)
+                              {
+                                  InvertStereo(selMolecule);
+                              }
                           };
 
             Action redo = () =>
@@ -1772,7 +1775,10 @@ namespace Chem4Word.ACME
 
                               InvertPlacements(selMolecule);
                               selMolecule.UpdateVisual();
-                              InvertStereo(selMolecule);
+                              if (flipStereo)
+                              {
+                                  InvertStereo(selMolecule);
+                              }
                           };
 
             UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
