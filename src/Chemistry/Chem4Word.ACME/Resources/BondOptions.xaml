@@ -248,7 +248,7 @@
                 <DrawingGroup>
                     <GeometryDrawing>
                         <GeometryDrawing.Geometry>
-                            <PathGeometry>M15,0 Q5,5 15,10 25,15 15,20 5,25 15,30</PathGeometry>
+                            <PathGeometry>M15,0 Q5,5 15,10 25,15 15,20 5,25 15,30, 25,35, 15,40</PathGeometry>
                         </GeometryDrawing.Geometry>
                         <GeometryDrawing.Pen>
                             <Pen

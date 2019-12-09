@@ -663,11 +663,7 @@ namespace Chem4Word.Model2
         //notification methods
         public void UpdateVisual()
         {
-            OnPropertyChanged(nameof(Degree));
-            OnPropertyChanged(nameof(ImplicitHydrogenCount));
-            OnPropertyChanged(nameof(BalancingVector));
-            OnPropertyChanged(nameof(ShowSymbol));
-            OnPropertyChanged(nameof(SymbolText));
+          OnPropertyChanged(nameof(SymbolText));
         }
 
         #endregion Methods
