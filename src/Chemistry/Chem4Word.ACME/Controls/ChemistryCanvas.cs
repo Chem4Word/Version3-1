@@ -778,7 +778,7 @@ namespace Chem4Word.ACME.Controls
             // If not successful try to get an AtomVisual (should only ever be one!)
             if (result == null)
             {
-                result = _visuals.FirstOrDefault(v => v is AtomVisual);
+                result = _visuals.FirstOrDefault(v => v is AtomVisual | v is FunctionalGroupVisual);
             }
 
             // Finally get first ChemicalVisual which ought to be a BondVisual

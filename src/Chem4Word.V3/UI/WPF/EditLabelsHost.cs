@@ -40,7 +40,7 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                MinimumSize = new Size(300, 200);
+                MinimumSize = new Size(900, 600);
 
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;

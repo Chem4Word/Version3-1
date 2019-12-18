@@ -20,6 +20,7 @@ using Chem4Word.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
+using Ionic.Zip;
 
 namespace Chem4Word.Database
 {
@@ -42,7 +43,11 @@ namespace Chem4Word.Database
             if (!File.Exists(libraryTarget))
             {
                 Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Copying initial Library database");
-                ResourceHelper.WriteResource(Assembly.GetExecutingAssembly(), "Data.Library.db", libraryTarget);
+                Stream stream = ResourceHelper.GetBinaryResource(Assembly.GetExecutingAssembly(), "Library.zip");
+                using (ZipFile zip = ZipFile.Read(stream))
+                {
+                    zip.ExtractAll(Globals.Chem4WordV3.AddInInfo.ProgramDataPath, ExtractExistingFileAction.OverwriteSilently);
+                }
             }
         }
 
@@ -152,6 +157,10 @@ namespace Chem4Word.Database
                 if (model != null)
                 {
                     var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                    if (Globals.Chem4WordV3.SystemOptions.RemoveExplicitHydrogensOnImportFromLibrary)
+                    {
+                        model.RemoveExplicitHydrogens();
+                    }
                     if (!string.IsNullOrEmpty(outcome))
                     {
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);

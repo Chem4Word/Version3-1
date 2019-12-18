@@ -87,7 +87,7 @@ namespace Chem4Word.Shared
             string servicePack = GetOfficeServicePack(fi.FileVersion);
             if (!string.IsNullOrEmpty(servicePack))
             {
-                officeProductName = officeProductName + " " + servicePack;
+                officeProductName = officeProductName + " " + servicePack.Trim();
             }
 
             // Get a bit more information about this version

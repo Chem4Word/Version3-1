@@ -589,6 +589,8 @@ namespace Chem4Word
             }
 
             Globals.Chem4WordV3.EvaluateChemistryAllowed();
+            Globals.Chem4WordV3.ShowOrHideUpdateShield();
+            Globals.Chem4WordV3.SelectChemistry(Globals.Chem4WordV3.Application.Selection);
         }
 
         public static void PerformEdit()
@@ -1444,8 +1446,6 @@ namespace Chem4Word
 
             try
             {
-                //Debug.WriteLine($"OnNavigatorPaneVisibleChanged() {ShowNavigator.Checked}");
-
                 CustomTaskPane taskPane = sender as CustomTaskPane;
                 Word.Application app = Globals.Chem4WordV3.Application;
 
@@ -1457,11 +1457,8 @@ namespace Chem4Word
                         if (window != null)
                         {
                             string taskdoc = window.Document.Name;
-                            //Debug.WriteLine(taskdoc);
-
                             if (taskdoc.Equals(app.ActiveDocument.Name))
                             {
-                                //Debug.WriteLine($"Navigator Visible: {taskPane.Visible}");
                                 if (ShowNavigator.Checked != taskPane.Visible)
                                 {
                                     ShowNavigator.Checked = taskPane.Visible;
@@ -1478,8 +1475,6 @@ namespace Chem4Word
                     form.ShowDialog();
                 }
             }
-
-            AfterButtonChecks(sender as RibbonButton);
         }
 
         private void OnShowLibraryClick(object sender, RibbonControlEventArgs e)
@@ -1500,8 +1495,6 @@ namespace Chem4Word
                 {
                     if (Globals.Chem4WordV3.EventsEnabled)
                     {
-                        //app.System.Cursor = Word.WdCursorType.wdCursorWait;
-
                         if (app.Documents.Count > 0)
                         {
                             CustomTaskPane custTaskPane = null;
@@ -1566,8 +1559,6 @@ namespace Chem4Word
 
             try
             {
-                //Debug.WriteLine($"OnLibraryPaneVisibleChanged() {ShowLibrary.Checked}");
-
                 Word.Application app = Globals.Chem4WordV3.Application;
                 CustomTaskPane taskPane = sender as CustomTaskPane;
 
@@ -1579,10 +1570,8 @@ namespace Chem4Word
                         if (window != null)
                         {
                             string taskdoc = window.Document.Name;
-                            //Debug.WriteLine(taskdoc);
                             if (taskdoc.Equals(app.ActiveDocument.Name))
                             {
-                                //Debug.WriteLine($"Library Visible: {taskPane.Visible}");
                                 if (ShowLibrary.Checked != taskPane.Visible)
                                 {
                                     ShowLibrary.Checked = taskPane.Visible;
@@ -1684,7 +1673,6 @@ namespace Chem4Word
 
                                         // Insert a new CC
                                         cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
-                                        //Debug.WriteLine("Inserted ContentControl " + cc.ID);
 
                                         cc.Title = Constants.ContentControlTitle;
                                         cc.Tag = fullTag;
@@ -1726,7 +1714,6 @@ namespace Chem4Word
                     {
                         // Move selection point into the Content Control which was just edited or added
                         app.Selection.SetRange(cc.Range.Start, cc.Range.End);
-                        //Globals.Chem4WordV3.SelectChemistry(app.Selection);
                     }
                 }
                 Globals.Chem4WordV3.EventsEnabled = true;
@@ -1792,14 +1779,13 @@ namespace Chem4Word
                     UpdateHelper.ReadThisVersion(assembly);
                     if (Globals.Chem4WordV3.ThisVersion != null)
                     {
-                        string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                         string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
-                        int idx = temp.IndexOf(" ");
+                        int idx = temp.IndexOf(" ", StringComparison.InvariantCulture);
                         ah.VersionString = $"Chem4Word 2020 {temp.Substring(idx + 1)}";
                     }
                     else
                     {
-                        ah.VersionString = $"Chem4Word Version {fvi.FileVersion}";
+                        ah.VersionString = $"Chem4Word 2020 {fvi.FileVersion}";
                     }
                     ah.ShowDialog();
                 }

@@ -11,4 +11,112 @@
         </Changes>
         <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
     </Version>
+    <Version>
+        <Number>3.1.1 Aplha 12</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Dec-2019</Released>
+        <Changes>
+            <Change>Alpha 12</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Aplha 11</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Nov-2019</Released>
+        <Changes>
+            <Change>Alpha 11</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Aplha 10</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Oct-2019</Released>
+        <Changes>
+            <Change>Alpha 10</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Alpha 09</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Sep-2019</Released>
+        <Changes>
+            <Change>Alpha 09</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Alpha 08</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Aug-2019</Released>
+        <Changes>
+            <Change>Aplha 08</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Aplha 07</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Jul-2019</Released>
+        <Changes>
+            <Change>Alpha 07</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Aplha 06</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Jun-2019</Released>
+        <Changes>
+            <Change>Alpha 06</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Aplha 05</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-May-2019</Released>
+        <Changes>
+            <Change>Aplha 05</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Alpha 04</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Apr-2019</Released>
+        <Changes>
+            <Change>Alpha 04</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Alpha 03</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Mar-2019</Released>
+        <Changes>
+            <Change>Alpha 03</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Alpha 02</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Feb-2019</Released>
+        <Changes>
+            <Change>Aplha 02</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
+    <Version>
+        <Number>3.1.1 Alpha 01</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Jan-2019</Released>
+        <Changes>
+            <Change>Alpha 01</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.1.Beta.1.msi</Url>
+    </Version>
 </ChangeLog>

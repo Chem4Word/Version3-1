@@ -193,6 +193,11 @@ namespace Chem4Word.ACME.Drawing
         public AtomVisual(Atom atom) : this()
         {
             ParentAtom = atom;
+            Position = atom.Position;
+            AtomSymbol = ParentAtom.SymbolText;
+            Charge = ParentAtom.FormalCharge;
+            ImplicitHydrogenCount = ParentAtom.ImplicitHydrogenCount;
+            Isotope = ParentAtom.IsotopeNumber;
         }
 
         public AtomVisual()
@@ -522,23 +527,15 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         public override void Render()
         {
-            Point centre = ParentAtom.Position;
+            
             SetTextParams();
 
             if (ParentAtom.Element is Element e)
             {
                 using (DrawingContext dc = RenderOpen())
                 {
-                    //Debug.WriteLine($"AtomVisual.OnRender() SymbolSize: {SymbolSize}");
-
-                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour));
-                    AtomSymbol = ParentAtom.SymbolText;
-                    Charge = ParentAtom.FormalCharge;
-                    ImplicitHydrogenCount = ParentAtom.ImplicitHydrogenCount;
-                    Isotope = ParentAtom.IsotopeNumber;
-                    Position = ParentAtom.Position;
-
-                    if (ParentAtom.SymbolText != "")
+                  Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour));
+                  if (ParentAtom.SymbolText != "")
                     {
                         RenderAtom(dc);
                         // Diag: Show the convex hull

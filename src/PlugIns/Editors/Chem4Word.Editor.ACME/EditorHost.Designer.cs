@@ -58,8 +58,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.Buttons);
-            this.splitContainer1.Size = new System.Drawing.Size(984, 702);
-            this.splitContainer1.SplitterDistance = 623;
+            this.splitContainer1.Size = new System.Drawing.Size(984, 711);
+            this.splitContainer1.SplitterDistance = 630;
             this.splitContainer1.SplitterWidth = 6;
             this.splitContainer1.TabIndex = 2;
             // 
@@ -69,7 +69,7 @@
             this.elementHost1.Location = new System.Drawing.Point(0, 0);
             this.elementHost1.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(984, 623);
+            this.elementHost1.Size = new System.Drawing.Size(984, 630);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = this.editor1;
@@ -83,18 +83,19 @@
             this.Buttons.Location = new System.Drawing.Point(0, 0);
             this.Buttons.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.Buttons.Name = "Buttons";
-            this.Buttons.Size = new System.Drawing.Size(984, 73);
+            this.Buttons.Size = new System.Drawing.Size(984, 75);
             this.Buttons.TabIndex = 3;
             // 
             // MessageFromWpf
             // 
-            this.MessageFromWpf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.MessageFromWpf.AutoSize = true;
+            this.MessageFromWpf.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MessageFromWpf.AutoEllipsis = true;
             this.MessageFromWpf.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MessageFromWpf.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.MessageFromWpf.Location = new System.Drawing.Point(12, 35);
+            this.MessageFromWpf.Location = new System.Drawing.Point(12, 33);
             this.MessageFromWpf.Name = "MessageFromWpf";
-            this.MessageFromWpf.Size = new System.Drawing.Size(17, 17);
+            this.MessageFromWpf.Size = new System.Drawing.Size(788, 27);
             this.MessageFromWpf.TabIndex = 4;
             this.MessageFromWpf.Text = "...";
             // 
@@ -102,7 +103,7 @@
             // 
             this.Save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Save.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.Save.Location = new System.Drawing.Point(816, 31);
+            this.Save.Location = new System.Drawing.Point(816, 33);
             this.Save.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.Save.Name = "Save";
             this.Save.Size = new System.Drawing.Size(75, 27);
@@ -115,7 +116,7 @@
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.Cancel.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.Cancel.Location = new System.Drawing.Point(897, 31);
+            this.Cancel.Location = new System.Drawing.Point(897, 33);
             this.Cancel.Margin = new System.Windows.Forms.Padding(3, 6, 3, 6);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(75, 27);
@@ -128,7 +129,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(984, 702);
+            this.ClientSize = new System.Drawing.Size(984, 711);
             this.Controls.Add(this.splitContainer1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -143,7 +144,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.Buttons.ResumeLayout(false);
-            this.Buttons.PerformLayout();
             this.ResumeLayout(false);
 
         }

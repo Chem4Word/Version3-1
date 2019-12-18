@@ -101,6 +101,7 @@ namespace Chem4Word
             // 
             this.WebSearchMenu.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
             this.WebSearchMenu.Dynamic = true;
+            this.WebSearchMenu.Enabled = false;
             this.WebSearchMenu.Image = global::Chem4Word.Properties.Resources.WebSearch;
             this.WebSearchMenu.Label = "Web Search";
             this.WebSearchMenu.Name = "WebSearchMenu";
@@ -129,6 +130,7 @@ namespace Chem4Word
             // ShowLibrary
             // 
             this.ShowLibrary.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.ShowLibrary.Enabled = false;
             this.ShowLibrary.Image = global::Chem4Word.Properties.Resources.Gallery_Find;
             this.ShowLibrary.Label = "Open";
             this.ShowLibrary.Name = "ShowLibrary";
@@ -139,6 +141,7 @@ namespace Chem4Word
             // SaveToLibrary
             // 
             this.SaveToLibrary.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.SaveToLibrary.Enabled = false;
             this.SaveToLibrary.Image = global::Chem4Word.Properties.Resources.Gallery_Save;
             this.SaveToLibrary.Label = "Save";
             this.SaveToLibrary.Name = "SaveToLibrary";
@@ -172,6 +175,7 @@ namespace Chem4Word
             // ArrangeMolecules
             // 
             this.ArrangeMolecules.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.ArrangeMolecules.Enabled = false;
             this.ArrangeMolecules.Image = global::Chem4Word.Properties.Resources.Seperate_Molecules;
             this.ArrangeMolecules.Label = "Arrange";
             this.ArrangeMolecules.Name = "ArrangeMolecules";
@@ -216,6 +220,7 @@ namespace Chem4Word
             // ShowNavigator
             // 
             this.ShowNavigator.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.ShowNavigator.Enabled = false;
             this.ShowNavigator.Image = global::Chem4Word.Properties.Resources.Navigator_Toggle;
             this.ShowNavigator.Label = "Navigate";
             this.ShowNavigator.Name = "ShowNavigator";
@@ -234,6 +239,7 @@ namespace Chem4Word
             // ChangeOptions
             // 
             this.ChangeOptions.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.ChangeOptions.Enabled = false;
             this.ChangeOptions.Image = global::Chem4Word.Properties.Resources.Options;
             this.ChangeOptions.Label = "Options";
             this.ChangeOptions.Name = "ChangeOptions";
@@ -244,6 +250,7 @@ namespace Chem4Word
             // HelpMenu
             // 
             this.HelpMenu.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.HelpMenu.Enabled = false;
             this.HelpMenu.Image = global::Chem4Word.Properties.Resources.Help;
             this.HelpMenu.Items.Add(this.ShowAbout);
             this.HelpMenu.Items.Add(this.ShowHome);
@@ -317,11 +324,13 @@ namespace Chem4Word
             // Update
             // 
             this.Update.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+            this.Update.Enabled = false;
             this.Update.Image = global::Chem4Word.Properties.Resources.Shield_Good;
             this.Update.Label = "Update";
             this.Update.Name = "Update";
             this.Update.ScreenTip = "About Chem4Word";
             this.Update.ShowImage = true;
+            this.Update.Visible = false;
             this.Update.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnUpdateClick);
             // 
             // CustomRibbon

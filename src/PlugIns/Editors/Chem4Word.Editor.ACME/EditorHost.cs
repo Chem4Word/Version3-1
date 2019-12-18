@@ -64,7 +64,7 @@ namespace Chem4Word.Editor.ACME
                 Top = (int)TopLeft.Y;
             }
 
-            MinimumSize = new Size(300, 200);
+            MinimumSize = new Size(800, 600);
 
             if (FormSize.Width != 0 && FormSize.Height != 0)
             {

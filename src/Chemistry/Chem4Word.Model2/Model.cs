@@ -129,7 +129,7 @@ namespace Chem4Word.Model2
         public bool InhibitEvents { get; set; }
 
         /// <summary>
-        /// True is this model has functional groups
+        /// True if this model has functional groups
         /// </summary>
         public bool HasFunctionalGroups
         {

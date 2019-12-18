@@ -217,6 +217,7 @@ namespace Chem4Word.Telemetry
 
         private void WritePrivate(string operation, string level, string message)
         {
+            Debug.WriteLine($"{operation} - {level} - {message}");
             ServiceBusMessage sbm = new ServiceBusMessage(_helper.UtcOffset, _helper.ProcessId);
             sbm.MachineId = _helper.MachineId;
             sbm.Operation = operation;

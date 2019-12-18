@@ -58,6 +58,9 @@ namespace Chem4Word.Helpers
                         }
                     }
 
+#if DEBUG
+                    doCheck = true;
+#endif
                     if (doCheck)
                     {
                         bool update = false;

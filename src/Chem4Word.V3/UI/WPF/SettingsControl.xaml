@@ -233,7 +233,7 @@
                             Grid.Column="0"
                             Margin="5"
                             Click="RemoveExplicitOnImportLibrary_OnClick">
-                            from library
+                            from library (also includes save to library)
                         </CheckBox>
                     </Grid>
                     <TextBlock
@@ -314,6 +314,7 @@
                                 <Button
                                     x:Name="ImportIntoLibrary"
                                     Width="120"
+                                    Height="50"
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Left"
@@ -332,7 +333,7 @@
                                 <TextBlock
                                     Margin="5"
                                     VerticalAlignment="Center"
-                                    Text="The Library replaces the Gallery from previous versions of Chem4Word. You can import structures from your old Gallery (or any other folder of cml files) into the Library."
+                                    Text="The Library replaces the Gallery from previous versions of Chem4Word. You can import structures from your old Gallery (or any other folder of cml files or MDL MOLFiles) into the Library."
                                     TextWrapping="Wrap" />
                             </DockPanel>
                         </GroupBox>
@@ -341,6 +342,7 @@
                                 <Button
                                     x:Name="ExportFromLibrary"
                                     Width="120"
+                                    Height="50"
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Left"
@@ -368,6 +370,7 @@
                                 <Button
                                     x:Name="EraseLibrary"
                                     Width="120"
+                                    Height="50"
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Left"
@@ -413,6 +416,7 @@
                                 <Button
                                     x:Name="SettingsFolder"
                                     Width="120"
+                                    Height="50"
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Left"
@@ -440,6 +444,7 @@
                                 <Button
                                     x:Name="LibraryFolder"
                                     Width="120"
+                                    Height="50"
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Left"
@@ -467,6 +472,7 @@
                                 <Button
                                     x:Name="PlugInsFolder"
                                     Width="120"
+                                    Height="50"
                                     Margin="5"
                                     VerticalAlignment="Center"
                                     HorizontalContentAlignment="Left"

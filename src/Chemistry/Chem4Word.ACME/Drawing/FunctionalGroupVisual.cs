@@ -23,14 +23,9 @@ namespace Chem4Word.ACME.Drawing
 
         public override List<Point> Hull { get; protected set; }
 
-        public FunctionalGroupVisual(Atom parent) : this((FunctionalGroup)parent.Element)
+        public FunctionalGroupVisual(Atom parent):base(parent)
         {
-            ParentAtom = parent;
-        }
-
-        public FunctionalGroupVisual(FunctionalGroup fg)
-        {
-            ParentGroup = fg;
+            ParentGroup = (FunctionalGroup) parent.Element;
         }
 
         public override void Render()
@@ -44,6 +39,7 @@ namespace Chem4Word.ACME.Drawing
             int textStorePosition = 0;
             bool flipped;
 
+            Position = location;
             if (ParentAtom == null)
             {
                 flipped = false;

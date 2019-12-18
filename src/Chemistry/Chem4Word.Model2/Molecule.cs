@@ -49,6 +49,27 @@ namespace Chem4Word.Model2
         #region Properties
 
         /// <summary>
+        /// True if this molecule has functional groups
+        /// </summary>
+        public bool HasFunctionalGroups
+        {
+            get
+            {
+                bool result = false;
+
+                foreach (var atom in Atoms.Values)
+                {
+                    if (atom.Element is FunctionalGroup)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+
+                return result;
+            }
+        }
+        /// <summary>
         /// Count of atoms in this and nested molecules
         /// </summary>
         public int AtomCount

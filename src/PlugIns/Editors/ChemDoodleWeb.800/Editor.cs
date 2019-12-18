@@ -22,7 +22,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        public string Name => "ChemDoodle Web Structure Editor V8.0.0";
+        public string Name => "ChemDoodle Web Structure Editor 8.0.0";
 
         public string Description => "This is a legacy editor using the ChemDoodle Web 8.0.0 (JavaScript) structure editor";
 

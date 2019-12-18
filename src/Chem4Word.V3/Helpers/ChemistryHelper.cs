@@ -469,12 +469,18 @@ namespace Chem4Word.Helpers
                 var calculatedNames = new List<TextualProperty>();
                 var calculatedFormulae = new List<TextualProperty>();
 
-                if (invalidBonds.Any() || minAtomicNumber < 1 || maxAtomicNumber > 118)
+                if (mol.HasFunctionalGroups || invalidBonds.Any() || minAtomicNumber < 1 || maxAtomicNumber > 118)
                 {
-                    // ChemSpider InChiKey (1.05) generator does not support Mdl Bond Types < 1 or > 4 or Elements < 1 or > 118
+                    // IUPAC InChi (1.05) generator does not support Mdl Bond Types < 1 or > 4 or Elements < 1 or > 118 or 'our' functional groups
 
                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
-                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = "Not Requested" });
+                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiName, Value = "Unable to calculate" });
+                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = "Unable to calculate" });
+                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = "Unable to calculate" });
+
+                    calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverFormulaName, Value = "Not requested" });
+                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverIupacName, Value = "Not requested" });
+                    calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverSmilesName, Value = "Not requested" });
                 }
                 else
                 {
@@ -495,7 +501,13 @@ namespace Chem4Word.Helpers
                             var first = csr.Properties[0];
                             if (first != null)
                             {
-                                var value = string.IsNullOrEmpty(first.InchiKey) ? "Not found" : first.InchiKey;
+                                var value = string.IsNullOrEmpty(first.Inchi) ? "Not found" : first.Inchi;
+                                calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiName, Value = value });
+
+                                value = string.IsNullOrEmpty(first.AuxInfo) ? "Not found" : first.AuxInfo;
+                                calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = value });
+
+                                value = string.IsNullOrEmpty(first.InchiKey) ? "Not found" : first.InchiKey;
                                 calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = value });
 
                                 value = string.IsNullOrEmpty(first.Formula) ? "Not found" : first.Formula;

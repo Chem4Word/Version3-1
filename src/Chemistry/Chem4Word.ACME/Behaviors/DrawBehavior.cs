@@ -275,32 +275,37 @@ namespace Chem4Word.ACME.Behaviors
                         }
                         else //we must have hit a different atom altogether
                         {
-                            //already has a bond to the target atom
-                            var existingBond = parentAtom.BondBetween(lastAtom);
-                            if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
+                            if (parentAtom != null)
                             {
-                                Core.UserInteractions.AlertUser(
-                                    "Unable to increase bond order:  either atom is saturated.");
-                            }
-                            else if (existingBond != null) //it must be in the same molecule
-                            {
-                                EditViewModel.IncreaseBondOrder(existingBond);
-                            }
-                            else //doesn't have a bond to the target atom
-                            {
+                                //already has a bond to the target atom
+                                var existingBond = parentAtom.BondBetween(lastAtom);
                                 if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
                                 {
-                                    Core.UserInteractions.AlertUser("Unable to add bond:  either atom is saturated.");
+                                    Core.UserInteractions.AlertUser(
+                                        "Unable to increase bond order:  either atom is saturated.");
                                 }
-                                else if (sameMolecule)
+                                else if (existingBond != null) //it must be in the same molecule
                                 {
-                                    EditViewModel.AddNewBond(parentAtom, lastAtom,
-                                                             parentAtom.Parent);
+                                    EditViewModel.IncreaseBondOrder(existingBond);
                                 }
-                                else
+                                else //doesn't have a bond to the target atom
                                 {
-                                    EditViewModel.JoinMolecules(parentAtom, lastAtom, EditViewModel.CurrentBondOrder,
-                                                                EditViewModel.CurrentStereo);
+                                    if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
+                                    {
+                                        Core.UserInteractions.AlertUser(
+                                            "Unable to add bond:  either atom is saturated.");
+                                    }
+                                    else if (sameMolecule)
+                                    {
+                                        EditViewModel.AddNewBond(parentAtom, lastAtom,
+                                                                 parentAtom.Parent);
+                                    }
+                                    else
+                                    {
+                                        EditViewModel.JoinMolecules(parentAtom, lastAtom,
+                                                                    EditViewModel.CurrentBondOrder,
+                                                                    EditViewModel.CurrentStereo);
+                                    }
                                 }
                             }
                         }

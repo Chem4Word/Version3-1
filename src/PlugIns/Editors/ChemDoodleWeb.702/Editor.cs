@@ -25,7 +25,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb702
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        public string Name => "ChemDoodle Web Structure Editor V7.0.2";
+        public string Name => "ChemDoodle Web Structure Editor 7.0.2";
 
         public string Description => "This is a legacy editor using the ChemDoodle Web 7.0.2 (JavaScript) structure editor";
 

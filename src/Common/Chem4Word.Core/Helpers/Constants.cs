@@ -9,25 +9,26 @@ namespace Chem4Word.Core.Helpers
 {
     public static class Constants
     {
-        public static string Chem4WordVersion = "3.1";
-        public static string Chem4WordVersionFiles = "files3-1";
-        public static string ContentControlTitle = "Chemistry";
-        public static string LegacyContentControlTitle = "chemistry";
-        public static string NavigatorTaskPaneTitle = "Navigator";
-        public static string LibraryTaskPaneTitle = "Library";
+        public const string Chem4WordVersion = "3.1";
+        public const string Chem4WordVersionFiles = "files3-1";
+        public const string ContentControlTitle = "Chemistry";
+        public const string LegacyContentControlTitle = "chemistry";
+        public const string NavigatorTaskPaneTitle = "Navigator";
+        public const string LibraryTaskPaneTitle = "Library";
 
-        public static double TopLeftOffset = 24;
-        public static string OoXmlBookmarkPrefix = "C4W_";
+        public const double TopLeftOffset = 24;
+        public const string OoXmlBookmarkPrefix = "C4W_";
         public const string LibraryFileName = "Library.db";
 
-        public static string Chem4WordWebServiceUri = "https://chemicalservices.azurewebsites.net/api/Resolve";
+        public const string Chem4WordWebServiceUri = "https://chemicalservices.azurewebsites.net/api/Resolve";
+        //public const string Chem4WordWebServiceUri = "http://localhost:7071/api/Resolve";
 
-        public static string DefaultEditorPlugIn = "ACME Structure Editor";
-        public static string DefaultEditorPlugIn800 = "ChemDoodle Web Structure Editor V8.0.0";
-        public static string DefaultEditorPlugIn702 = "ChemDoodle Web Structure Editor V7.0.2";
-        public static int ChemDoodleWeb800MinimumBrowserVersion = 11;
+        public const string DefaultEditorPlugIn = "ACME Structure Editor";
+        public const string DefaultEditorPlugIn800 = "ChemDoodle Web Structure Editor 8.0.0";
+        public const string DefaultEditorPlugIn702 = "ChemDoodle Web Structure Editor 7.0.2";
+        public const int ChemDoodleWeb800MinimumBrowserVersion = 11;
 
-        public static string DefaultRendererPlugIn = "Open Office Xml Renderer V4";
+        public const string DefaultRendererPlugIn = "Open Office Xml Renderer V4";
 
         // Registry Locations
         public const string Chem4WordRegistryKey = @"SOFTWARE\Chem4Word V3";
@@ -39,6 +40,7 @@ namespace Chem4Word.Core.Helpers
 
         // Update Checks
         public const int MaximunVersionsBehind = 7;
+        public static string Chem4WordTooOld = "Chem4Word is too many versions old.";
 
         // Bond length limits etc
         public const double MinimumBondLength = 5;
