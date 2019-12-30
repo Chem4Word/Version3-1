@@ -39,13 +39,13 @@ namespace Chem4Word.Navigator
 
                 string newFormula = (string)args.NewValue;
 
-                var parts = FormulaHelper.Parts(newFormula);
+                var parts = FormulaHelper.ParseFormulaIntoParts(newFormula);
 
-                foreach (FormulaPart formulaPart in parts)
+                foreach (MoleculeFormulaPart formulaPart in parts)
                 {
                     //add in the new element
 
-                    Run atom = new Run(formulaPart.Atom);
+                    Run atom = new Run(formulaPart.Element);
                     fb.Inlines.Add(atom);
 
                     if (formulaPart.Count > 1)

@@ -168,15 +168,6 @@ namespace Chem4Word.Database
 
                     if (model.TotalAtomsCount > 0)
                     {
-                        // Ensure each molecule has a Concise Formula set
-                        foreach (var molecule in model.Molecules.Values)
-                        {
-                            if (string.IsNullOrEmpty(molecule.ConciseFormula))
-                            {
-                                molecule.ConciseFormula = molecule.CalculatedFormula();
-                            }
-                        }
-
                         if (calculateProperties)
                         {
                             var newMolecules = model.GetAllMolecules();

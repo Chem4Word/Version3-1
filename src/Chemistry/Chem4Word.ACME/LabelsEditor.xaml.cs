@@ -56,17 +56,13 @@ namespace Chem4Word.ACME
 
         private void LabelsEditor_OnLoaded(object sender, RoutedEventArgs e)
         {
-            if (!DesignerProperties.GetIsInDesignMode(this))
+            if (!DesignerProperties.GetIsInDesignMode(this)
+                && !string.IsNullOrEmpty(_cml)
+                && !IsInitialised)
             {
-                if (!string.IsNullOrEmpty(_cml))
-                {
-                    if (!IsInitialised)
-                    {
-                        PopulateTreeView(_cml);
-                        TreeView_OnSelectedItemChanged(null, null);
-                        IsInitialised = true;
-                    }
-                }
+                PopulateTreeView(_cml);
+                TreeView_OnSelectedItemChanged(null, null);
+                IsInitialised = true;
             }
         }
 
@@ -82,24 +78,27 @@ namespace Chem4Word.ACME
 
             if (TreeView.SelectedItem is TreeViewItem item)
             {
-                if (item.Tag is Model m)
+                switch (item.Tag)
                 {
-                    Display.Chemistry = m.Copy();
-                }
+                    case Model m:
+                        Display.Chemistry = m.Copy();
+                        break;
 
-                if (item.Tag is Molecule thisMolecule)
-                {
-                    model = new Model();
-                    var copy = thisMolecule.Copy();
-                    model.AddMolecule(copy);
-                    copy.Parent = model;
-
-                    if (thisMolecule.Molecules.Count == 0)
+                    case Molecule thisMolecule:
                     {
-                        LoadNamesEditor(NamesGrid, thisMolecule.Names);
-                        LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
+                        model = new Model();
+                        var copy = thisMolecule.Copy();
+                        model.AddMolecule(copy);
+                        copy.Parent = model;
+
+                        if (thisMolecule.Molecules.Count == 0)
+                        {
+                            LoadNamesEditor(NamesGrid, thisMolecule.Names);
+                            LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
+                        }
+                        LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
+                        break;
                     }
-                    LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
                 }
             }
 
@@ -119,10 +118,10 @@ namespace Chem4Word.ACME
                 OverallConciseFormulaPanel.Children.Add(TextBlockFromFormula(EditedModel.ConciseFormula));
 
                 var root = new TreeViewItem
-                {
-                    Header = "Structure",
-                    Tag = EditedModel
-                };
+                           {
+                               Header = "Structure",
+                               Tag = EditedModel
+                           };
                 TreeView.Items.Add(root);
                 root.IsExpanded = true;
 
@@ -347,11 +346,11 @@ namespace Chem4Word.ACME
                 textBlock.Inlines.Add(run);
             }
 
-            var parts = FormulaHelper.Parts(formula);
-            foreach (FormulaPart formulaPart in parts)
+            var parts = FormulaHelper.ParseFormulaIntoParts(formula);
+            foreach (MoleculeFormulaPart formulaPart in parts)
             {
                 // Add in the new element
-                Run atom = new Run(formulaPart.Atom);
+                Run atom = new Run(formulaPart.Element);
                 textBlock.Inlines.Add(atom);
 
                 if (formulaPart.Count > 1)

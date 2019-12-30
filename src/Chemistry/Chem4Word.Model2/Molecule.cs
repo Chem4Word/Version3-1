@@ -269,6 +269,129 @@ namespace Chem4Word.Model2
 
         #region Chemical properties
 
+        private CalculatedFormula _calculatedFormula;
+
+        public string ConciseFormula
+        {
+            get
+            {
+                if (_calculatedFormula == null)
+                {
+                    _calculatedFormula = new CalculatedFormula(GetFormulaParts());
+                }
+
+                return _calculatedFormula.ToString();
+            }
+        }
+
+        public CalculatedFormula CalculatedFormula
+        {
+            get
+            {
+                if (_calculatedFormula == null)
+                {
+                    _calculatedFormula = new CalculatedFormula(GetFormulaParts());
+                }
+
+                return _calculatedFormula;
+            }
+        }
+
+        private List<MoleculeFormulaPart> GetFormulaParts()
+        {
+            var otherParts = new Dictionary<string, MoleculeFormulaPart>();
+            var cPart = new MoleculeFormulaPart("C", 0);
+            var hPart = new MoleculeFormulaPart("H", 0);
+
+            foreach (Atom atom in Atoms.Values)
+            {
+                if (atom.Element != null)
+                {
+                    if (atom.Element is Element e)
+                    {
+                        string symbol = e.Symbol;
+
+                        switch (symbol)
+                        {
+                            case "C":
+                                cPart.Count++;
+                                break;
+
+                            case "H":
+                                hPart.Count++;
+                                break;
+
+                            default:
+                                if (otherParts.ContainsKey(symbol))
+                                {
+                                    otherParts[symbol].Count++;
+                                }
+                                else
+                                {
+                                    otherParts.Add(symbol, new MoleculeFormulaPart(symbol, 1));
+                                }
+
+                                break;
+                        }
+
+                        int hCount = atom.ImplicitHydrogenCount;
+                        if (hCount > 0)
+                        {
+                            hPart.Count += hCount;
+                        }
+                    }
+
+                    if (atom.Element is FunctionalGroup fg)
+                    {
+                        var pp = fg.FormulaParts;
+                        foreach (var p in pp)
+                        {
+                            switch (p.Key)
+                            {
+                                case "C":
+                                    cPart.Count += p.Value;
+                                    break;
+
+                                case "H":
+                                    hPart.Count += p.Value;
+                                    break;
+
+                                default:
+                                    if (otherParts.ContainsKey(p.Key))
+                                    {
+                                        otherParts[p.Key].Count += p.Value;
+                                    }
+                                    else
+                                    {
+                                        otherParts.Add(p.Key, new MoleculeFormulaPart(p.Key, p.Value));
+                                    }
+
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            var sumOfParts = new List<MoleculeFormulaPart>();
+            if (cPart.Count > 0)
+            {
+                sumOfParts.Add(cPart);
+            }
+
+            if (hPart.Count > 0)
+            {
+                sumOfParts.Add(hPart);
+            }
+
+            if (otherParts.Any())
+            {
+                sumOfParts.AddRange(otherParts.Values);
+            }
+
+            return sumOfParts;
+        }
+
         private bool? _showMoleculeBrackets;
 
         public bool? ShowMoleculeBrackets
@@ -319,105 +442,9 @@ namespace Chem4Word.Model2
 
         #endregion Chemical properties
 
-        public string CalculatedFormula()
-        {
-            string result = "";
-
-            Dictionary<string, int> chParts = new Dictionary<string, int>();
-            SortedDictionary<string, int> otherParts = new SortedDictionary<string, int>();
-
-            chParts.Add("C", 0);
-            chParts.Add("H", 0);
-
-            foreach (Atom atom in Atoms.Values)
-            {
-                if (atom.Element != null)
-                {
-                    if (atom.Element is Element e)
-                    {
-                        string symbol = e.Symbol;
-
-                        switch (symbol)
-                        {
-                            case "C":
-                                chParts["C"]++;
-                                break;
-
-                            case "H":
-                                chParts["H"]++;
-                                break;
-
-                            default:
-                                if (!otherParts.ContainsKey(symbol))
-                                {
-                                    otherParts.Add(symbol, 1);
-                                }
-                                else
-                                {
-                                    otherParts[symbol]++;
-                                }
-
-                                break;
-                        }
-
-                        int hCount = atom.ImplicitHydrogenCount;
-                        if (hCount > 0)
-                        {
-                            chParts["H"] += hCount;
-                        }
-                    }
-
-                    if (atom.Element is FunctionalGroup fg)
-                    {
-                        var pp = fg.FormulaParts;
-                        foreach (var p in pp)
-                        {
-                            switch (p.Key)
-                            {
-                                case "C":
-                                    chParts["C"] += p.Value;
-                                    break;
-
-                                case "H":
-                                    chParts["H"] += p.Value;
-                                    break;
-
-                                default:
-                                    if (otherParts.ContainsKey(p.Key))
-                                    {
-                                        otherParts[p.Key] += p.Value;
-                                    }
-                                    else
-                                    {
-                                        otherParts.Add(p.Key, p.Value);
-                                    }
-
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<string, int> kvp in chParts)
-            {
-                if (kvp.Value > 0)
-                {
-                    result += $"{kvp.Key} {kvp.Value} ";
-                }
-            }
-
-            foreach (KeyValuePair<string, int> kvp in otherParts)
-            {
-                result += $"{kvp.Key} {kvp.Value} ";
-            }
-
-            return result.Trim();
-        }
-
         #endregion Properties
 
-        #region Constructors
+        #region Constructor
 
         public Molecule()
         {
@@ -439,6 +466,8 @@ namespace Chem4Word.Model2
             Warnings = new List<string>();
             Rings = new List<Ring>();
         }
+
+        #endregion Constructor
 
         public void AddBond(Bond newBond)
         {
@@ -482,7 +511,7 @@ namespace Chem4Word.Model2
         {
             bool bondsExist =
                 Bonds.Any(b =>
-                              b.StartAtomInternalId.Equals(toRemove.InternalId) |
+                              b.StartAtomInternalId.Equals(toRemove.InternalId) ||
                               b.EndAtomInternalId.Equals(toRemove.InternalId));
             if (bondsExist)
             {
@@ -546,7 +575,6 @@ namespace Chem4Word.Model2
             return newMol;
         }
 
-        public string ConciseFormula { get; set; }
 
         public List<TextualProperty> AllTextualProperties
         {
@@ -679,8 +707,6 @@ namespace Chem4Word.Model2
                 }
             }
         }
-
-        #endregion Constructors
 
         #region Events
 
@@ -1025,7 +1051,7 @@ namespace Chem4Word.Model2
 
             foreach (var child in Molecules.Values)
             {
-                result = result & child.CheckAtomRefs();
+                result = result && child.CheckAtomRefs();
             }
 
             return result;
@@ -1180,7 +1206,7 @@ namespace Chem4Word.Model2
             //now check to see that ever bond refers to a valid atom
             foreach (Bond b in Bonds)
             {
-                if (!Atoms.ContainsKey(b.StartAtomInternalId) | !Atoms.ContainsKey(b.EndAtomInternalId))
+                if (!Atoms.ContainsKey(b.StartAtomInternalId) || !Atoms.ContainsKey(b.EndAtomInternalId))
                 {
                     throw new Exception($"Bond {b} refers to a missing atom");
                 }
@@ -1330,7 +1356,7 @@ namespace Chem4Word.Model2
 #endif
                 Rings.Clear();
 
-                if (HasRings | force)
+                if (HasRings || force)
                 {
                     //working set of atoms
                     //it's a dictionary, because we initially store the degree of each atom against it

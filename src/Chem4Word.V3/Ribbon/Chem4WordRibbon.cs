@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
@@ -50,6 +51,10 @@ namespace Chem4Word
 
         private static object _missing = Type.Missing;
 
+        private Timer _warmUpTimer;
+
+        private bool _wpfWarmedUp;
+
         /*
             Notes :-
             Custom Ribbon Help for Office 2010 VSTO Add-Ins
@@ -69,14 +74,7 @@ namespace Chem4Word
 #if DEBUG
                 tabLabel += $" (Debug {Constants.Chem4WordVersion})";
 #endif
-                if (Globals.Chem4WordV3.WordVersion == 2013)
-                {
-                    tab.Label = tabLabel.ToUpper();
-                }
-                else
-                {
-                    tab.Label = tabLabel;
-                }
+                tab.Label = Globals.Chem4WordV3.WordVersion == 2013 ? tabLabel.ToUpper() : tabLabel;
             }
             catch (Exception ex)
             {
@@ -84,6 +82,67 @@ namespace Chem4Word
                 {
                     form.ShowDialog();
                 }
+            }
+        }
+
+        private void OnTimerTick(object sender, EventArgs e)
+        {
+            if (!_wpfWarmedUp)
+            {
+                _wpfWarmedUp = true;
+                WarmUpWpf();
+            }
+        }
+
+        public void StartWpfWarmUp()
+        {
+            if (!_wpfWarmedUp)
+            {
+                // Warm Up WPF Element Host
+                _warmUpTimer = new Timer
+                               {
+                                   Enabled = false,
+                                   Interval = 2000
+                               };
+                _warmUpTimer.Tick += OnTimerTick;
+                _warmUpTimer.Enabled = true;
+            }
+        }
+
+        private void WarmUpWpf()
+        {
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
+            var cmd = Environment.CommandLine.ToLower();
+
+            if (!cmd.Contains("-embedding"))
+            {
+                string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
+                Debug.WriteLine(message);
+                Globals.Chem4WordV3.StartUpTimings.Add(message);
+
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                var maxX = int.MinValue;
+                var maxY = int.MinValue;
+
+                foreach (var screen in Screen.AllScreens)
+                {
+                    maxX = Math.Max(maxX, screen.Bounds.Right);
+                    maxY = Math.Max(maxY, screen.Bounds.Bottom);
+                }
+
+                using (var ah = new AboutHost())
+                {
+                    ah.TopLeft = new Point(maxX + 100, maxY + 100);
+                    ah.AutoClose = true;
+                    ah.ShowDialog();
+                }
+
+                sw.Stop();
+                message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+                Debug.WriteLine(message);
+                Globals.Chem4WordV3.StartUpTimings.Add(message);
             }
         }
 
@@ -547,6 +606,10 @@ namespace Chem4Word
             try
             {
                 RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
+                if (!_wpfWarmedUp)
+                {
+                    _warmUpTimer.Enabled = true;
+                }
             }
             catch
             {

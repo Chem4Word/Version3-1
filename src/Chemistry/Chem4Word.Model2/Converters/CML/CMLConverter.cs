@@ -45,9 +45,6 @@ namespace Chem4Word.Model2.Converters.CML
                     newMol.Parent = (IChemistryContainer)newModel;
                 }
 
-                // Force all ConciseFormulas to be (re) calculated
-                newModel.CalculateFormula();
-
                 #region Handle 1D Labels
 
                 newModel.SetMissingIds();
@@ -492,12 +489,6 @@ namespace Chem4Word.Model2.Converters.CML
 
             foreach (XElement formulaElement in formulaElements)
             {
-                // Only import Concise Once
-                if (string.IsNullOrEmpty(molecule.ConciseFormula))
-                {
-                    molecule.ConciseFormula = formulaElement.Attribute(CMLConstants.AttributeConcise)?.Value;
-                }
-
                 var formula = GetFormula(formulaElement);
                 if (formula.IsValid)
                 {

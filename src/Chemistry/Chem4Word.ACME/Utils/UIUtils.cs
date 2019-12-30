@@ -56,7 +56,7 @@ namespace Chem4Word.ACME.Utils
                 maxY = Math.Max(maxY, screen.Bounds.Bottom);
             }
 
-            return new Point(maxX + 100, maxY);
+            return new Point(maxX + 100, maxY + 100);
         }
 
         public static Point GetOnScreenPoint(Point target, double width, double height)

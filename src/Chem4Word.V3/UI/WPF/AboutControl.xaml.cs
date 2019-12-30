@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms.VisualStyles;
 using Chem4Word.Core.UI.Forms;
 
 namespace Chem4Word.UI.WPF
@@ -24,6 +25,9 @@ namespace Chem4Word.UI.WPF
 
         public string VersionString { get; set; }
         public Point TopLeft { get; set; }
+        public bool AutoClose { get; set; }
+
+        public event EventHandler OnPreloadComplete;
 
         public AboutControl()
         {
@@ -35,7 +39,14 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Chem4WordVersion.Text = VersionString;
+                if (AutoClose)
+                {
+                    OnPreloadComplete?.Invoke(this, null);
+                }
+                else
+                {
+                    Chem4WordVersion.Text = VersionString;
+                }
             }
             catch (Exception ex)
             {

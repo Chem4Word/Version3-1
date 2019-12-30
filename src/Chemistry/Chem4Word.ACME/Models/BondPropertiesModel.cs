@@ -38,6 +38,8 @@ namespace Chem4Word.ACME.Models
         }
 
         public double Angle { get; set; }
+        public string AngleString => $"{Angle:N2}";
+
         public bool IsSingle { get; set; }
         public bool IsDouble { get; set; }
 

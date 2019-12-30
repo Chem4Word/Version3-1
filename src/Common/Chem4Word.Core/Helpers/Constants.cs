@@ -21,7 +21,6 @@ namespace Chem4Word.Core.Helpers
         public const string LibraryFileName = "Library.db";
 
         public const string Chem4WordWebServiceUri = "https://chemicalservices.azurewebsites.net/api/Resolve";
-        //public const string Chem4WordWebServiceUri = "http://localhost:7071/api/Resolve";
 
         public const string DefaultEditorPlugIn = "ACME Structure Editor";
         public const string DefaultEditorPlugIn800 = "ChemDoodle Web Structure Editor 8.0.0";

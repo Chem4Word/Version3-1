@@ -193,7 +193,7 @@ namespace Chem4Word.Helpers
             // Using $"{}" to coerce null to empty string
             List<Word.ContentControl> targets = (from Word.ContentControl ccs in doc.ContentControls
                                                  orderby ccs.Range.Start
-                                                 where $"{ccs.Title}" == Constants.ContentControlTitle & $"{ccs.Tag}".Contains(cxmlId)
+                                                 where $"{ccs.Title}" == Constants.ContentControlTitle && $"{ccs.Tag}".Contains(cxmlId)
                                                  select ccs).ToList();
 
             foreach (Word.ContentControl cc in targets)
@@ -367,25 +367,25 @@ namespace Chem4Word.Helpers
             if (isFormula)
             {
                 Word.Range r = cc.Range;
-                List<FormulaPart> parts = FormulaHelper.Parts(text);
+                List<MoleculeFormulaPart> parts = FormulaHelper.ParseFormulaIntoParts(text);
                 foreach (var part in parts)
                 {
                     switch (part.Count)
                     {
                         case 0: // Separator or multiplier
                         case 1: // No Subscript
-                            if (!string.IsNullOrEmpty(part.Atom))
+                            if (!string.IsNullOrEmpty(part.Element))
                             {
-                                r.InsertAfter(part.Atom);
+                                r.InsertAfter(part.Element);
                                 r.Font.Subscript = 0;
                                 r.Start = cc.Range.End;
                             }
                             break;
 
                         default: // With Subscript
-                            if (!string.IsNullOrEmpty(part.Atom))
+                            if (!string.IsNullOrEmpty(part.Element))
                             {
-                                r.InsertAfter(part.Atom);
+                                r.InsertAfter(part.Element);
                                 r.Font.Subscript = 0;
                                 r.Start = cc.Range.End;
                             }
@@ -473,7 +473,9 @@ namespace Chem4Word.Helpers
                 {
                     // IUPAC InChi (1.05) generator does not support Mdl Bond Types < 1 or > 4 or Elements < 1 or > 118 or 'our' functional groups
 
-                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
+                    #region Set Default properties
+
+                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; HasFunctionalGroups: {mol.HasFunctionalGroups} Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiName, Value = "Unable to calculate" });
                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = "Unable to calculate" });
                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = "Unable to calculate" });
@@ -481,6 +483,8 @@ namespace Chem4Word.Helpers
                     calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverFormulaName, Value = "Not requested" });
                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverIupacName, Value = "Not requested" });
                     calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverSmilesName, Value = "Not requested" });
+
+                    #endregion Set Default properties
                 }
                 else
                 {
@@ -488,10 +492,11 @@ namespace Chem4Word.Helpers
                     pb.Increment(1);
                     pb.Message = $"Calculating InChiKey and Resolving Names using Chem4Word Web Service for molecule {molecule.Id}";
 
+                    #region Obtain Calculated Properties
+
                     try
                     {
                         string afterMolFile = molConverter.Export(temp);
-                        mol.ConciseFormula = mol.CalculatedFormula();
 
                         ChemicalServices cs = new ChemicalServices(Globals.Chem4WordV3.Telemetry);
                         var csr = cs.GetChemicalServicesResult(afterMolFile);
@@ -519,49 +524,55 @@ namespace Chem4Word.Helpers
                                 value = string.IsNullOrEmpty(first.Smiles) ? "Not found" : first.Smiles;
                                 calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverSmilesName, Value = value });
                             }
-
-                            foreach (var formula in calculatedFormulae)
-                            {
-                                var target = molecule.Formulas.FirstOrDefault(f => f.FullType.Equals(formula.FullType));
-                                if (target == null)
-                                {
-                                    molecule.Formulas.Add(formula);
-                                    newProperties++;
-                                }
-                                else
-                                {
-                                    if (!target.Value.Equals(formula.Value))
-                                    {
-                                        target.Value = formula.Value;
-                                        changedProperties++;
-                                    }
-                                }
-                            }
-
-                            foreach (var name in calculatedNames)
-                            {
-                                var target = molecule.Names.FirstOrDefault(f => f.FullType.Equals(name.FullType));
-                                if (target == null)
-                                {
-                                    molecule.Names.Add(name);
-                                    newProperties++;
-                                }
-                                else
-                                {
-                                    if (!target.Value.Equals(name.Value))
-                                    {
-                                        target.Value = name.Value;
-                                        changedProperties++;
-                                    }
-                                }
-                            }
                         }
                     }
                     catch (Exception e)
                     {
                         Globals.Chem4WordV3.Telemetry.Write(module, "Exception", $"{e}");
                     }
+
+                    #endregion Obtain Calculated Properties
                 }
+
+                #region Merge in properties
+
+                foreach (var formula in calculatedFormulae)
+                {
+                    var target = molecule.Formulas.FirstOrDefault(f => f.FullType.Equals(formula.FullType));
+                    if (target == null)
+                    {
+                        molecule.Formulas.Add(formula);
+                        newProperties++;
+                    }
+                    else
+                    {
+                        if (!target.Value.Equals(formula.Value))
+                        {
+                            target.Value = formula.Value;
+                            changedProperties++;
+                        }
+                    }
+                }
+
+                foreach (var name in calculatedNames)
+                {
+                    var target = molecule.Names.FirstOrDefault(f => f.FullType.Equals(name.FullType));
+                    if (target == null)
+                    {
+                        molecule.Names.Add(name);
+                        newProperties++;
+                    }
+                    else
+                    {
+                        if (!target.Value.Equals(name.Value))
+                        {
+                            target.Value = name.Value;
+                            changedProperties++;
+                        }
+                    }
+                }
+
+                #endregion Merge in properties
             }
 
             pb.Value = 0;

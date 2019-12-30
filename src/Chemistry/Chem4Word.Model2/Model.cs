@@ -12,6 +12,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
@@ -461,78 +462,98 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void CalculateFormula()
-        {
-            // Phase #1 calculate and set each molecule's formula
-            var calculateFormulas = CalculateAllFormulas();
-
-            // Phase #2 - Collate the values
-            string result = "";
-            Dictionary<string, int> dictionary = new Dictionary<string, int>();
-            foreach (var formula in calculateFormulas)
-            {
-                if (dictionary.ContainsKey(formula))
-                {
-                    dictionary[formula]++;
-                }
-                else
-                {
-                    dictionary.Add(formula, 1);
-                }
-            }
-
-            foreach (KeyValuePair<string, int> kvp in dictionary)
-            {
-                if (kvp.Value == 1)
-                {
-                    result += $"{kvp.Key} . ";
-                }
-                else
-                {
-                    result += $"{kvp.Value} {kvp.Key} . ";
-                }
-            }
-
-            if (result.EndsWith(" . "))
-            {
-                result = result.Substring(0, result.Length - 3);
-            }
-
-            ConciseFormula = result;
-        }
-
-        private List<string> CalculateAllFormulas()
-        {
-            List<string> result = new List<string>();
-            SetFormulas(Molecules.Values.ToList(), result);
-            return result;
-
-            // Local function to support recursion
-            void SetFormulas(List<Molecule> molecules, List<string> data)
-            {
-                foreach (var molecule in molecules)
-                {
-                    if (molecule.Atoms.Count > 0)
-                    {
-                        var calculatedFormula = molecule.CalculatedFormula();
-                        if (!string.IsNullOrEmpty(calculatedFormula))
-                        {
-                            molecule.ConciseFormula = calculatedFormula;
-                            data.Add(calculatedFormula);
-                        }
-                    }
-                    else
-                    {
-                        SetFormulas(molecule.Molecules.Values.ToList(), data);
-                    }
-                }
-            }
-        }
+        private Dictionary<string, ModelFormulaPart> _calculatedFormulas;
 
         /// <summary>
         /// Concise formula for the model
         /// </summary>
-        public string ConciseFormula { get; private set; }
+        public string ConciseFormula
+        {
+            get
+            {
+                if (_calculatedFormulas == null)
+                {
+                    _calculatedFormulas = new Dictionary<string, ModelFormulaPart>();
+                    GatherFormulas(Molecules.Values.ToList());
+                }
+
+                return CalculatedFormulaAsString();
+            }
+        }
+
+        public string ConciseFormulaAsUniCode
+        {
+            get
+            {
+                if (_calculatedFormulas == null)
+                {
+                    _calculatedFormulas = new Dictionary<string, ModelFormulaPart>();
+                    GatherFormulas(Molecules.Values.ToList());
+                }
+
+                return CalculatedFormulaAsUnicode();
+            }
+        }
+
+        private string CalculatedFormulaAsUnicode()
+        {
+            var strings = new List<string>();
+            foreach (var calculatedFormula in _calculatedFormulas.Values)
+            {
+                if (calculatedFormula.Count > 1)
+                {
+                    strings.Add($"{calculatedFormula.Count} {FormulaHelper.FormulaPartsAsUnicode(calculatedFormula.Parts)}");
+                }
+                else
+                {
+                    strings.Add(FormulaHelper.FormulaPartsAsUnicode(calculatedFormula.Parts));
+                }
+            }
+
+            // Join using Bullet character <Alt>0183
+            return string.Join(" · ", strings);
+        }
+
+        private void GatherFormulas(List<Molecule> molecules)
+        {
+            foreach (var molecule in molecules)
+            {
+                if (molecule.Atoms.Count > 0)
+                {
+                    if (_calculatedFormulas.ContainsKey(molecule.ConciseFormula))
+                    {
+                        _calculatedFormulas[molecule.ConciseFormula].Count++;
+                    }
+                    else
+                    {
+                        _calculatedFormulas.Add(molecule.ConciseFormula, new ModelFormulaPart(molecule.CalculatedFormula.Parts, 1));
+                    }
+                }
+                else
+                {
+                    GatherFormulas(molecule.Molecules.Values.ToList());
+                }
+            }
+        }
+
+        private string CalculatedFormulaAsString()
+        {
+            var strings = new List<string>();
+            foreach (var calculatedFormula in _calculatedFormulas.Values)
+            {
+                if (calculatedFormula.Count > 1)
+                {
+                    strings.Add($"{calculatedFormula.Count} {FormulaHelper.FormulaPartsAsString(calculatedFormula.Parts)}");
+                }
+                else
+                {
+                    strings.Add(FormulaHelper.FormulaPartsAsString(calculatedFormula.Parts));
+                }
+            }
+
+            // Join using Bullet character <Alt>0183
+            return string.Join(" · ", strings);
+        }
 
         #endregion Properties
 

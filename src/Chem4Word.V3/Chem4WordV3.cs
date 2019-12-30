@@ -29,6 +29,7 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Navigator;
 using Chem4Word.Telemetry;
+using Chem4Word.UI.WPF;
 using IChem4Word.Contracts;
 using Microsoft.Office.Core;
 using Newtonsoft.Json;
@@ -232,6 +233,11 @@ namespace Chem4Word
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
 
+            // This works but get crash on exit !
+            //Thread thread1 = new Thread(WarmUpWpf);
+            //thread1.SetApartmentState(ApartmentState.STA);
+            //thread1.Start();
+
             Helper = new SystemHelper(StartUpTimings);
 
             ServicePointManager.DefaultConnectionLimit = 100;
@@ -256,10 +262,9 @@ namespace Chem4Word
 
             try
             {
-                // Handle slower startup stuff on thread
-                Thread thread = new Thread(SlowOperations);
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                Thread thread1 = new Thread(SlowOperations);
+                thread1.SetApartmentState(ApartmentState.STA);
+                thread1.Start();
 
                 UpdateHelper.ReadSavedValues();
                 UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
@@ -1060,62 +1065,65 @@ namespace Chem4Word
 
             try
             {
-                Word.Document doc = sel.Application.ActiveDocument;
-                int ccCount = sel.ContentControls.Count;
-
-                foreach (Word.ContentControl cc in doc.ContentControls)
+                if (sel != null)
                 {
-                    // Already Selected
-                    if (sel.Range.Start == cc.Range.Start - 1 && sel.Range.End == cc.Range.End + 1)
+                    Word.Document doc = sel.Application.ActiveDocument;
+                    int ccCount = sel.ContentControls.Count;
+
+                    foreach (Word.ContentControl cc in doc.ContentControls)
                     {
-                        if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                        // Already Selected
+                        if (sel.Range.Start == cc.Range.Start - 1 && sel.Range.End == cc.Range.End + 1)
                         {
-                            NavigatorSupport.SelectNavigatorItem(CustomXmlPartHelper.GuidFromTag(cc.Tag));
-                            chemistrySelected = true;
+                            if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                            {
+                                NavigatorSupport.SelectNavigatorItem(CustomXmlPartHelper.GuidFromTag(cc.Tag));
+                                chemistrySelected = true;
+                            }
+                            break;
                         }
-                        break;
+
+                        // Inside CC
+                        if (sel.Range.Start >= cc.Range.Start && sel.Range.End <= cc.Range.End)
+                        {
+                            if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                            {
+                                doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
+                                NavigatorSupport.SelectNavigatorItem(CustomXmlPartHelper.GuidFromTag(cc.Tag));
+                                chemistrySelected = true;
+                            }
+                            break;
+                        }
                     }
 
-                    // Inside CC
-                    if (sel.Range.Start >= cc.Range.Start && sel.Range.End <= cc.Range.End)
+                    if (VersionsBehind >= Constants.MaximunVersionsBehind)
                     {
-                        if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
-                        {
-                            doc.Application.Selection.SetRange(cc.Range.Start - 1, cc.Range.End + 1);
-                            NavigatorSupport.SelectNavigatorItem(CustomXmlPartHelper.GuidFromTag(cc.Tag));
-                            chemistrySelected = true;
-                        }
-                        break;
-                    }
-                }
-
-                if (VersionsBehind >= Constants.MaximunVersionsBehind)
-                {
-                    SetButtonStates(ButtonState.Disabled);
-                    ChemistryProhibitedReason = Constants.Chem4WordTooOld;
-                }
-                else
-                {
-                    if (chemistrySelected)
-                    {
-                        Ribbon.ActivateChemistryTab();
-                        SetButtonStates(ButtonState.CanEdit);
+                        SetButtonStates(ButtonState.Disabled);
+                        ChemistryProhibitedReason = Constants.Chem4WordTooOld;
                     }
                     else
                     {
-                        if (ccCount == 0)
+                        if (chemistrySelected)
                         {
-                            SetButtonStates(ButtonState.CanInsert);
+                            Ribbon.ActivateChemistryTab();
+                            SetButtonStates(ButtonState.CanEdit);
                         }
                         else
                         {
-                            SetButtonStates(ButtonState.NoDocument);
-                            ChemistryProhibitedReason = "more than a single content control selected";
+                            if (ccCount == 0)
+                            {
+                                SetButtonStates(ButtonState.CanInsert);
+                            }
+                            else
+                            {
+                                SetButtonStates(ButtonState.NoDocument);
+                                ChemistryProhibitedReason = "more than a single content control selected";
+                            }
                         }
                     }
-                }
 
-                _chemistrySelected = chemistrySelected;
+                    _chemistrySelected = chemistrySelected;
+                }
             }
             catch (Exception e)
             {
@@ -1472,7 +1480,13 @@ namespace Chem4Word
 
             try
             {
-                //Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
+                if (Ribbon != null)
+                {
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1522,6 +1536,8 @@ namespace Chem4Word
                             Ribbon.ShowNavigator.Checked = false;
                             Ribbon.ShowLibrary.Checked = LibraryState;
                             Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open ";
+                            Debug.WriteLine(module);
+                            Ribbon.StartWpfWarmUp();
                         }
 
                         foreach (Word.InlineShape inlineShape in doc.InlineShapes)
@@ -1680,9 +1696,14 @@ namespace Chem4Word
 
             try
             {
-                if (SystemOptions == null)
+                if (Ribbon != null)
                 {
-                    LoadOptions();
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
+                    Debug.WriteLine(module);
+                    Ribbon.StartWpfWarmUp();
                 }
             }
             catch (Exception ex)

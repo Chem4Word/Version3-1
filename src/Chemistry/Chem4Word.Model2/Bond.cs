@@ -99,6 +99,7 @@ namespace Chem4Word.Model2
                 if (value.Equals("0.5"))
                 {
                     value = Globals.OrderPartial01;
+                    ResetStereo();
                 }
                 if (value.Equals("1") || value.Equals("S"))
                 {
@@ -107,22 +108,37 @@ namespace Chem4Word.Model2
                 if (value.Equals("1.5"))
                 {
                     value = Globals.OrderPartial12;
+                    ResetStereo();
                 }
                 if (value.Equals("2") || value.Equals("D"))
                 {
                     value = Globals.OrderDouble;
+                    ResetStereo();
                 }
                 if (value.Equals("3") || value.Equals("T"))
                 {
                     value = Globals.OrderTriple;
+                    ResetStereo();
                 }
                 if (value.Equals("0"))
                 {
                     value = Globals.OrderZero;
+                    ResetStereo();
                 }
 
                 _order = value;
                 OnPropertyChanged();
+
+                // local function
+                void ResetStereo()
+                {
+                    if (Stereo == Globals.BondStereo.Wedge
+                        || Stereo == Globals.BondStereo.Hatch
+                        || Stereo == Globals.BondStereo.Indeterminate)
+                    {
+                        Stereo = Globals.BondStereo.None;
+                    }
+                }
             }
         }
 

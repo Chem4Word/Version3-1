@@ -199,7 +199,7 @@ namespace Chem4Word.Helpers
                     {
                         var thisVersionNumber = version.Element("Number").Value;
                         DateTime thisVersionDate = SafeDate.Parse(version.Element("Released").Value);
-                        Debug.WriteLine("New Version " + thisVersionNumber + " Released " + SafeDate.ToShortDate(thisVersionDate));
+                        Debug.WriteLine("Version " + thisVersionNumber + " Released " + SafeDate.ToShortDate(thisVersionDate));
                         if (thisVersionDate > currentReleaseDate)
                         {
                             Globals.Chem4WordV3.VersionsBehind++;

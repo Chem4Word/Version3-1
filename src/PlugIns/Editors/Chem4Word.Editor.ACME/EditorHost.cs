@@ -15,6 +15,7 @@ using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
+using Chem4Word.Model2.Helpers;
 using Size = System.Drawing.Size;
 
 namespace Chem4Word.Editor.ACME
@@ -85,6 +86,17 @@ namespace Chem4Word.Editor.ACME
                 editor.TopLeft = TopLeft;
                 editor.ShowFeedback = false;
                 editor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
+                var model = editor.ActiveViewModel.Model;
+                if (model == null || model.Molecules.Count == 0)
+                {
+                    Text = "ACME - New structure";
+                }
+                else
+                {
+                    List<MoleculeFormulaPart> parts = FormulaHelper.ParseFormulaIntoParts(editor.ActiveViewModel.Model.ConciseFormula);
+                    var x = FormulaHelper.FormulaPartsAsUnicode(parts);
+                    Text = "ACME - Editing " + x;
+                }
             }
 
             IsLoading = false;

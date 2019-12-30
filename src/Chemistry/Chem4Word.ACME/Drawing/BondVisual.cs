@@ -106,7 +106,8 @@ namespace Chem4Word.ACME.Drawing
                                                         double? parentOrderValue, Globals.BondDirection parentPlacement,
                                                         Point? centroid, Point? secondaryCentroid)
         {
-            if (parentStereo == Globals.BondStereo.Wedge || parentStereo == Globals.BondStereo.Hatch)
+            if ((parentStereo == Globals.BondStereo.Wedge || parentStereo == Globals.BondStereo.Hatch)
+                && parentOrderValue == 1)
             {
                 WedgeBondLayout wbd = new WedgeBondLayout()
                 {

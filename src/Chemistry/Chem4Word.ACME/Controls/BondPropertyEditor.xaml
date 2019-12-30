@@ -235,11 +235,22 @@
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="0"
+                Style="{StaticResource LabelTextBlock}"
+                Text="Bond Angle" />
+            <TextBlock
+                x:Name="BondAngle"
+                Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource LabelTextBlock}"
+                Text="{Binding Path=AngleString}" />
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
                 Style="{StaticResource LabelTextBlock}">
                 Order
             </TextBlock>
             <ComboBox
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 FontSize="12"
@@ -248,14 +259,14 @@
                 SelectedValuePath="Tag"
                 Style="{StaticResource StandardCombo}" />
             <TextBlock
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=IsSingle, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Stereo
             </TextBlock>
             <StackPanel
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Visibility="{Binding Path=IsSingle, Mode=OneWay, Converter={StaticResource VisConverter}}">

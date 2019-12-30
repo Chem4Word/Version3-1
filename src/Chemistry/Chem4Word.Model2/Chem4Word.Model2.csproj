@@ -93,8 +93,11 @@
     <Compile Include="Converters\CML\CMLHelper.cs" />
     <Compile Include="Converters\CML\CMLConverter.cs" />
     <Compile Include="Helpers\AtomHelpers.cs" />
+    <Compile Include="Helpers\CalculatedFormula.cs" />
     <Compile Include="Helpers\FormulaHelper.cs" />
+    <Compile Include="Helpers\MoleculeFormulaPart.cs" />
     <Compile Include="Helpers\Globals.cs" />
+    <Compile Include="Helpers\ModelFormulaPart.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="HydrogenTargets.cs" />
     <Compile Include="Interfaces\IChemistryContainer.cs" />
