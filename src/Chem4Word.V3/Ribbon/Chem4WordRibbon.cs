@@ -23,6 +23,7 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using Chem4Word.Navigator;
 using Chem4Word.Telemetry;
 using Chem4Word.UI;
@@ -51,9 +52,9 @@ namespace Chem4Word
 
         private static object _missing = Type.Missing;
 
-        private Timer _warmUpTimer;
-
-        private bool _wpfWarmedUp;
+        private static Timer _warmUpTimer;
+        private static bool _warmUpStarted;
+        private static bool _warmUpCompleted;
 
         /*
             Notes :-
@@ -87,17 +88,19 @@ namespace Chem4Word
 
         private void OnTimerTick(object sender, EventArgs e)
         {
-            if (!_wpfWarmedUp)
+            if (!_warmUpCompleted)
             {
-                _wpfWarmedUp = true;
+                _warmUpCompleted = true;
                 WarmUpWpf();
             }
         }
 
         public void StartWpfWarmUp()
         {
-            if (!_wpfWarmedUp)
+            if (!_warmUpStarted && !_warmUpCompleted)
             {
+                _warmUpStarted = true;
+
                 // Warm Up WPF Element Host
                 _warmUpTimer = new Timer
                                {
@@ -325,7 +328,7 @@ namespace Chem4Word
                             var list = model.AllTextualProperties;
                             foreach (var item in list)
                             {
-                                if (item.IsValid)
+                                if (item.IsValid && !item.FullType.ToLower().Contains("auxinfo"))
                                 {
                                     RibbonButton ribbonButton = Factory.CreateRibbonButton();
                                     ribbonButton.Tag = item.Id;
@@ -353,20 +356,19 @@ namespace Chem4Word
                                             break;
 
                                         case "F":
+                                            if (item.FullType.ToLower().Contains("formula"))
+                                            {
+                                                ribbonButton.Label =
+                                                    FormulaHelper.FormulaPartsAsUnicode(
+                                                        FormulaHelper.ParseFormulaIntoParts(ribbonButton.Label));
+                                            }
                                             if (item.Id.Equals("c0"))
                                             {
                                                 ribbonButton.SuperTip = "Render as overall concise formula";
                                             }
                                             else
                                             {
-                                                if (item.Id.EndsWith(".f0"))
-                                                {
-                                                    ribbonButton.SuperTip = "Render as concise formula";
-                                                }
-                                                else
-                                                {
-                                                    ribbonButton.SuperTip = "Render as formula";
-                                                }
+                                                ribbonButton.SuperTip = "Render as " + (item.Id.EndsWith(".f0") ? "concise" : "") + " formula";
                                             }
                                             ShowAsMenu.Items.Add(ribbonButton);
                                             break;
@@ -606,7 +608,7 @@ namespace Chem4Word
             try
             {
                 RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
-                if (!_wpfWarmedUp)
+                if (!_warmUpCompleted)
                 {
                     _warmUpTimer.Enabled = true;
                 }
@@ -799,7 +801,7 @@ namespace Chem4Word
                             }
                             else
                             {
-                                Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing structure {fullTag}");
+                                Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing existing structure {fullTag}");
                             }
 
                             // Copy back CustomXmlPartGuid which will get lost if edited via ChemDoodle Web
@@ -856,7 +858,6 @@ namespace Chem4Word
                                 {
                                     // Erase old CC
                                     cc.LockContents = false;
-                                    //Debug.WriteLine(cc.Type);
                                     if (cc.Type == Word.WdContentControlType.wdContentControlPicture)
                                     {
                                         cc.Range.InlineShapes[1].Delete();
@@ -899,7 +900,9 @@ namespace Chem4Word
                                     // Delete the temporary file now we are finished with it
                                     try
                                     {
+#if !DEBUG
                                         File.Delete(tempfileName);
+#endif
                                     }
                                     catch
                                     {

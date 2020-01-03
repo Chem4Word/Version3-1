@@ -189,9 +189,6 @@ namespace Chem4Word
             var cmd = Environment.CommandLine.ToLower();
             if (Ribbon != null && !cmd.Contains("-embedding"))
             {
-#if DEBUG
-                Ribbon.ActivateChemistryTab();
-#endif
                 string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
                 Debug.WriteLine(message);
                 StartUpTimings.Add(message);
@@ -233,11 +230,6 @@ namespace Chem4Word
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
 
-            // This works but get crash on exit !
-            //Thread thread1 = new Thread(WarmUpWpf);
-            //thread1.SetApartmentState(ApartmentState.STA);
-            //thread1.Start();
-
             Helper = new SystemHelper(StartUpTimings);
 
             ServicePointManager.DefaultConnectionLimit = 100;
@@ -262,9 +254,10 @@ namespace Chem4Word
 
             try
             {
-                Thread thread1 = new Thread(SlowOperations);
-                thread1.SetApartmentState(ApartmentState.STA);
-                thread1.Start();
+                // Handle slower startup stuff on thread
+                Thread thread = new Thread(SlowOperations);
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
 
                 UpdateHelper.ReadSavedValues();
                 UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
@@ -973,12 +966,12 @@ namespace Chem4Word
                         Ribbon.EditStructure.Label = "Edit";
                         Ribbon.EditLabels.Enabled = true;
                         Ribbon.ViewCml.Enabled = true;
-                        Ribbon.ImportFromFile.Enabled = plugInsLoaded;
+                        Ribbon.ImportFromFile.Enabled = false;
                         Ribbon.ExportToFile.Enabled = true;
                         Ribbon.ShowAsMenu.Enabled = true;
                         Ribbon.ShowNavigator.Enabled = true;
                         Ribbon.ShowLibrary.Enabled = true;
-                        Ribbon.WebSearchMenu.Enabled = Searchers.Count > 0;
+                        Ribbon.WebSearchMenu.Enabled = false;
                         Ribbon.SaveToLibrary.Enabled = true;
                         Ribbon.ArrangeMolecules.Enabled = true;
                         Ribbon.ButtonsDisabled.Enabled = false;
@@ -989,7 +982,7 @@ namespace Chem4Word
                         Ribbon.EditStructure.Label = "Draw";
                         Ribbon.EditLabels.Enabled = false;
                         Ribbon.ViewCml.Enabled = false;
-                        Ribbon.ImportFromFile.Enabled = true;
+                        Ribbon.ImportFromFile.Enabled = plugInsLoaded;
                         Ribbon.ExportToFile.Enabled = false;
                         Ribbon.ShowAsMenu.Enabled = false;
                         Ribbon.ShowNavigator.Enabled = true;

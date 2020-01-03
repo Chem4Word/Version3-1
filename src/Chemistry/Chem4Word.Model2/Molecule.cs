@@ -597,6 +597,7 @@ namespace Chem4Word.Model2
                         {
                             Id = $"{molecule.Id}.f0",
                             TypeCode = "F",
+                            FullType = "MoleculeConciseFormula",
                             Value = molecule.ConciseFormula
                         });
 
