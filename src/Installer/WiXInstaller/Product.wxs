@@ -236,6 +236,12 @@
       <Component Id="Ookii.Dialogs">
         <File Id="Ookii.Dialogs.dll" Source="$(var.Chem4Word.V3.TargetDir)Ookii.Dialogs.dll" />
       </Component>
+      <Component Id="NCDK">
+        <File Id="NCDK.dll" Source="$(var.Chem4Word.V3.TargetDir)NCDK.dll" />
+      </Component>
+      <Component Id="MathNet.Numerics">
+        <File Id="MathNet.Numerics.dll" Source="$(var.Chem4Word.V3.TargetDir)MathNet.Numerics.dll" />
+      </Component>
       <!-- Database -->
       <Component Id="EntityFramework">
         <File Id="EntityFramework.dll" Source="$(var.Chem4Word.V3.TargetDir)EntityFramework.dll" />

@@ -19,6 +19,7 @@ using Chem4Word.Model2.Helpers;
 using Chem4Word.WebServices;
 using IChem4Word.Contracts;
 using Microsoft.Office.Core;
+using NCDK;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Helpers
@@ -522,6 +523,16 @@ namespace Chem4Word.Helpers
                                 calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverIupacName, Value = value });
 
                                 value = string.IsNullOrEmpty(first.Smiles) ? "Not found" : first.Smiles;
+                                if (value == "Not found")
+                                {
+                                    try
+                                    {
+                                        var nmol = Chem.MolFromMolBlock(afterMolFile);
+                                        value = Chem.MolToSmiles(nmol);
+                                    }
+                                    catch (Exception)
+                                    { }
+                                }
                                 calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverSmilesName, Value = value });
                             }
                         }
