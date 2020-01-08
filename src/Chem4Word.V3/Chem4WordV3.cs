@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2019, The .NET Foundation.
+//  Copyright (c) 2020, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -29,7 +29,6 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Navigator;
 using Chem4Word.Telemetry;
-using Chem4Word.UI.WPF;
 using IChem4Word.Contracts;
 using Microsoft.Office.Core;
 using Newtonsoft.Json;
@@ -50,6 +49,8 @@ namespace Chem4Word
 
         public int VersionsBehind = 0;
         public DateTime VersionLastChecked = DateTime.MinValue;
+        public string VersionAvailable = string.Empty;
+        public bool VersionAvailableIsBeta = false;
 
         public XDocument AllVersions;
         public XDocument ThisVersion;
@@ -180,6 +181,11 @@ namespace Chem4Word
 
                 return version;
             }
+        }
+
+        public static void SetGlobalRibbon(CustomRibbon ribbon)
+        {
+            Ribbon = ribbon;
         }
 
         private void C4WAddIn_Startup(object sender, EventArgs e)
@@ -403,6 +409,14 @@ namespace Chem4Word
                     // Assume isBeta
                 }
 
+                // Belt and braces ...
+                if (SystemOptions == null)
+                {
+                    SystemOptions = new Options();
+                    SystemOptions.RestoreDefaults();
+                }
+
+                // ... as we are seeing some errors here ?
                 // Re-Initialize Telemetry with granted permissions
                 Telemetry = new TelemetryWriter(isBeta || SystemOptions.TelemetryEnabled, Helper);
 
@@ -962,7 +976,7 @@ namespace Chem4Word
                         break;
 
                     case ButtonState.CanEdit:
-                        Ribbon.EditStructure.Enabled = Editors.Count > 0;
+                        Ribbon.EditStructure.Enabled = plugInsLoaded && Editors.Count > 0;
                         Ribbon.EditStructure.Label = "Edit";
                         Ribbon.EditLabels.Enabled = true;
                         Ribbon.ViewCml.Enabled = true;
@@ -978,7 +992,7 @@ namespace Chem4Word
                         break;
 
                     case ButtonState.CanInsert:
-                        Ribbon.EditStructure.Enabled = Editors.Count > 0;
+                        Ribbon.EditStructure.Enabled = false;
                         Ribbon.EditStructure.Label = "Draw";
                         Ribbon.EditLabels.Enabled = false;
                         Ribbon.ViewCml.Enabled = false;
@@ -987,11 +1001,28 @@ namespace Chem4Word
                         Ribbon.ShowAsMenu.Enabled = false;
                         Ribbon.ShowNavigator.Enabled = true;
                         Ribbon.ShowLibrary.Enabled = true;
-                        Ribbon.WebSearchMenu.Enabled = Searchers.Count > 0;
+                        Ribbon.WebSearchMenu.Enabled = plugInsLoaded && Searchers.Count > 0;
                         Ribbon.SaveToLibrary.Enabled = false;
                         Ribbon.ArrangeMolecules.Enabled = false;
                         Ribbon.ButtonsDisabled.Enabled = false;
                         break;
+                }
+
+                if (VersionsBehind > 0 && !VersionAvailableIsBeta)
+                {
+                    Ribbon.EditStructure.Enabled = false;
+                    Ribbon.EditStructure.Label = "Draw";
+                    Ribbon.EditLabels.Enabled = false;
+                    Ribbon.ViewCml.Enabled = false;
+                    Ribbon.ImportFromFile.Enabled = false;
+                    Ribbon.ExportToFile.Enabled = false;
+                    Ribbon.ShowAsMenu.Enabled = false;
+                    Ribbon.ShowNavigator.Enabled = false;
+                    Ribbon.ShowLibrary.Enabled = false;
+                    Ribbon.WebSearchMenu.Enabled = false;
+                    Ribbon.SaveToLibrary.Enabled = false;
+                    Ribbon.ArrangeMolecules.Enabled = false;
+                    Ribbon.ButtonsDisabled.Enabled = true;
                 }
             }
         }
@@ -1043,6 +1074,18 @@ namespace Chem4Word
                         SetButtonStates(ButtonState.Disabled);
                         ChemistryProhibitedReason = Constants.Chem4WordTooOld;
                         break;
+                }
+
+                if (VersionsBehind > 0 && !VersionAvailableIsBeta)
+                {
+                    Ribbon.Update.Visible = true;
+                    Ribbon.Update.Enabled = true;
+                    Ribbon.Update.Image = Properties.Resources.Shield_Danger;
+                    Ribbon.Update.Label = "Update to use Chem4Word again";
+                    Ribbon.Update.ScreenTip = "You must update to continue using Chem4Word";
+                    Ribbon.Update.SuperTip = $"Your beta version has been disabled, because a production release '{VersionAvailable}' is available.";
+                    SetButtonStates(ButtonState.Disabled);
+                    ChemistryProhibitedReason = Constants.Chem4WordIsBeta;
                 }
             }
         }

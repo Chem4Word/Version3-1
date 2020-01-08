@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2019, The .NET Foundation.
+//  Copyright (c) 2020, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -34,12 +34,15 @@ namespace Chem4Word.Core.Helpers
 
         public const string RegistryValueNameLastCheck = "Last Update Check";
         public const string RegistryValueNameVersionsBehind = "Versions Behind";
+        public const string RegistryValueNameAvailableVersion = "Available Version";
+        public const string RegistryValueNameAvailableIsBeta = "Available Is Beta";
         public const string Chem4WordSetupRegistryKey = @"SOFTWARE\Chem4Word V3\Setup";
         public const string Chem4WordUpdateRegistryKey = @"SOFTWARE\Chem4Word V3\Update";
 
         // Update Checks
         public const int MaximunVersionsBehind = 7;
-        public static string Chem4WordTooOld = "Chem4Word is too many versions old.";
+        public const string Chem4WordTooOld = "Chem4Word is too many versions old.";
+        public const string Chem4WordIsBeta = "Chem4Word Beta testing is now closed.";
 
         // Bond length limits etc
         public const double MinimumBondLength = 5;

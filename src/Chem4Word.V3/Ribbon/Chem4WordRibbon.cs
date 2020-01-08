@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2019, The .NET Foundation.
+//  Copyright (c) 2020, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -68,7 +68,8 @@ namespace Chem4Word
 
             try
             {
-                Chem4Word.Chem4WordV3.Ribbon = this;
+                Chem4Word.Chem4WordV3.SetGlobalRibbon(this);
+
                 RibbonTab tab = this.Tabs[0];
 
                 string tabLabel = "Chemistry";
@@ -105,7 +106,7 @@ namespace Chem4Word
                 _warmUpTimer = new Timer
                                {
                                    Enabled = false,
-                                   Interval = 2000
+                                   Interval = 250
                                };
                 _warmUpTimer.Tick += OnTimerTick;
                 _warmUpTimer.Enabled = true;

@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2019, The .NET Foundation.
+//  Copyright (c) 2020, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -127,7 +127,7 @@ namespace Chem4Word.Helpers
                         Globals.Chem4WordV3.VersionLastChecked = DateTime.Now.AddDays(-30);
                     }
 
-                    if (names.Contains(Constants.RegistryValueNameLastCheck))
+                    if (names.Contains(Constants.RegistryValueNameVersionsBehind))
                     {
                         try
                         {
@@ -142,6 +142,39 @@ namespace Chem4Word.Helpers
                     else
                     {
                         Globals.Chem4WordV3.VersionsBehind = 0;
+                    }
+
+                    if (names.Contains(Constants.RegistryValueNameAvailableVersion))
+                    {
+                        try
+                        {
+                            Globals.Chem4WordV3.VersionAvailable = key.GetValue(Constants.RegistryValueNameAvailableVersion).ToString();
+                        }
+                        catch
+                        {
+                            Globals.Chem4WordV3.VersionAvailable = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        Globals.Chem4WordV3.VersionAvailable = string.Empty;
+                    }
+
+                    if (names.Contains(Constants.RegistryValueNameAvailableIsBeta))
+                    {
+                        try
+                        {
+                            var isBeta = key.GetValue(Constants.RegistryValueNameAvailableIsBeta).ToString();
+                            Globals.Chem4WordV3.VersionAvailableIsBeta = bool.Parse(isBeta);
+                        }
+                        catch
+                        {
+                            Globals.Chem4WordV3.VersionAvailableIsBeta = false;
+                        }
+                    }
+                    else
+                    {
+                        Globals.Chem4WordV3.VersionAvailableIsBeta = false;
                     }
                 }
                 else
@@ -195,6 +228,7 @@ namespace Chem4Word.Helpers
 
                     Globals.Chem4WordV3.AllVersions = XDocument.Parse(xml);
                     var versions = Globals.Chem4WordV3.AllVersions.XPathSelectElements("//Version");
+                    bool mostRecent = true;
                     foreach (var version in versions)
                     {
                         var thisVersionNumber = version.Element("Number").Value;
@@ -204,6 +238,19 @@ namespace Chem4Word.Helpers
                         {
                             Globals.Chem4WordV3.VersionsBehind++;
                             updateRequired = true;
+                        }
+
+                        if (mostRecent)
+                        {
+                            Globals.Chem4WordV3.VersionAvailable = thisVersionNumber;
+                            RegistryKey key2 = Registry.CurrentUser.CreateSubKey(Constants.Chem4WordRegistryKey);
+                            key2?.SetValue(Constants.RegistryValueNameAvailableVersion, thisVersionNumber);
+
+                            var isBeta = version.Element("IsBeta").Value;
+                            Globals.Chem4WordV3.VersionAvailableIsBeta = bool.Parse(isBeta);
+                            key2?.SetValue(Constants.RegistryValueNameAvailableIsBeta, isBeta.ToString());
+
+                            mostRecent = false;
                         }
                     }
 
