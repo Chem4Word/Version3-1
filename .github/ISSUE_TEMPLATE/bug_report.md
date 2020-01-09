@@ -26,6 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 7/8.1/10 Home/Professional]
  - Word Version [e.g. 2016/O365/2019 Home/Business/Professional]
+ - Please also gather system information from "Help" --> "System Info" in Chem4Word Ribbon
 
 **Additional context**
 Add any other context about the problem here.

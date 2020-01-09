@@ -1,20 +1,8 @@
 ﻿# Set Build Numbers
 
+.\SetAssemblyVersion.ps1 -version 3.1.3 -name "Beta 3" -released "09-Jan-2020" -path ..
+
 .\SetAssemblyVersion.ps1 -version 3.1.2 -name "Beta 2" -released "08-Jan-2020" -path ..
 .\SetAssemblyVersion.ps1 -version 3.1.2 -name "Beta 2" -released "02-Jan-2020" -path ..
 .\SetAssemblyVersion.ps1 -version 3.1.1 -name "Beta 1" -released "01-Jan-2020" -path ..
 .\SetAssemblyVersion.ps1 -version 3.1.0 -name "Alpha 1" -released "01-Jan-2019" -path ..
-
-# GetReady.cmd
-set release=Chem4Word-Setup.3.0.2.Beta.2.msi
-set working=C:\Temp
-
-pushd %working%
-
-copy Chem4Word.V3\Data\Chem4Word-Versions.xml %working%
-copy Chem4Word.V3\Data\index.html %working%
-
-copy Installer\Chem4WordSetup\bin\Setup\Chem4Word-Setup.exe %working%
-copy Installer\WiXInstaller\bin\Setup\%release% %working%
-
-popd

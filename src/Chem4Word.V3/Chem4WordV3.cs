@@ -992,7 +992,7 @@ namespace Chem4Word
                         break;
 
                     case ButtonState.CanInsert:
-                        Ribbon.EditStructure.Enabled = false;
+                        Ribbon.EditStructure.Enabled = plugInsLoaded && Editors.Count > 0;
                         Ribbon.EditStructure.Label = "Draw";
                         Ribbon.EditLabels.Enabled = false;
                         Ribbon.ViewCml.Enabled = false;

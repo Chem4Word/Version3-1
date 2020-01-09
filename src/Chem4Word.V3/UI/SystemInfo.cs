@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
@@ -45,13 +46,14 @@ namespace Chem4Word.UI
                 Assembly assembly = Assembly.GetExecutingAssembly();
                 FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
                 UpdateHelper.ReadThisVersion(assembly);
+
                 string version = string.Empty;
                 if (Globals.Chem4WordV3.ThisVersion != null)
                 {
                     string[] parts = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value.Split(' ');
                     string temp = Globals.Chem4WordV3.ThisVersion.Root.Element("Number").Value;
                     int idx = temp.IndexOf(" ");
-                    version = $"Chem4Word 2020 {temp.Substring(idx + 1)} [{fvi.FileVersion}]";
+                    version = $"Chem4Word 2020 {temp.Substring(idx + 1)} - [{fvi.FileVersion}]";
                 }
                 else
                 {
@@ -63,7 +65,7 @@ namespace Chem4Word.UI
                 #endregion Add In Version
 
                 sb.AppendLine("");
-                sb.AppendLine($"MachineId: {Globals.Chem4WordV3.Helper.MachineId}");
+                sb.AppendLine($"Installation Id: {Globals.Chem4WordV3.Helper.MachineId}");
                 sb.AppendLine($"Operating System: {Globals.Chem4WordV3.Helper.SystemOs}");
                 sb.AppendLine($"Word Product: {Globals.Chem4WordV3.Helper.WordProduct}");
                 sb.AppendLine($"Internet Explorer Version: {Globals.Chem4WordV3.Helper.BrowserVersion}");
@@ -73,8 +75,24 @@ namespace Chem4Word.UI
                 sb.AppendLine($"Settings Folder: {Globals.Chem4WordV3.AddInInfo.ProductAppDataPath}");
                 sb.AppendLine($"Library Folder: {Globals.Chem4WordV3.AddInInfo.ProgramDataPath}");
 
-                //sb.AppendLine("");
+                sb.AppendLine("");
+                string plugInPath = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, "PlugIns");
+                sb.AppendLine($"PlugIns Folder: {plugInPath}");
 
+                if (Directory.Exists(plugInPath))
+                {
+                    var files = Directory.GetFiles(plugInPath, "Chem4Word*.dll");
+                    if (files.Length > 0)
+                    {
+                        foreach (var file in files)
+                        {
+                            Version ver = Assembly.LoadFrom(file).GetName().Version;
+                            var shortName = file.Replace($@"{plugInPath}\", "");
+                            sb.AppendLine($"  {shortName} - [{ver}]");
+                        }
+                    }
+                }
+                
                 Information.Text = sb.ToString();
                 Information.SelectionStart = Information.Text.Length;
             }

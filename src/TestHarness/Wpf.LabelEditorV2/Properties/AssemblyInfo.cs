@@ -17,7 +17,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Chem4Word")]
 [assembly: AssemblyProduct("Wpf.LabelEditorV2")]
-[assembly: AssemblyCopyright("© Chem4Word 2019. All rights reserved.")]
+[assembly: AssemblyCopyright("© Chem4Word 2020. All rights reserved.")]
 [assembly: AssemblyTrademark("Chem4Word")]
 [assembly: AssemblyCulture("")]
 
@@ -53,6 +53,6 @@ using System.Windows;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("3.1.2.7312")]
-[assembly: AssemblyVersion("3.1.2.7312")]
-[assembly: AssemblyFileVersion("3.1.2.7312")]
+// [assembly: AssemblyVersion("3.1.3.7313")]
+[assembly: AssemblyVersion("3.1.3.7313")]
+[assembly: AssemblyFileVersion("3.1.3.7313")]
