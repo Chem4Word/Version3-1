@@ -111,8 +111,11 @@ namespace Chem4Word.Telemetry
             WritePrivate("StartUp", "Information", $"Browser Version: {_helper.BrowserVersion}");
 
             // Log IP Address
-            WritePrivate("StartUp", "Information", _helper.IpAddress); // ** Used by Andy's Knime protocol
-            WritePrivate("StartUp", "Information", _helper.IpObtainedFrom);
+            if (!_helper.IpAddress.Contains("8.8.8.8"))
+            {
+                WritePrivate("StartUp", "Information", _helper.IpAddress); // ** Used by Andy's Knime protocol
+                WritePrivate("StartUp", "Information", _helper.IpObtainedFrom);
+            }
 
             if (_helper.StartUpTimings != null)
             {
@@ -208,7 +211,10 @@ namespace Chem4Word.Telemetry
             WritePrivate("StartUp", "Information", _helper.SystemOs); // ** Used by Andy's Knime protocol
 
             // Log IP Address
-            WritePrivate("StartUp", "Information", _helper.IpAddress); // ** Used by Andy's Knime protocol
+            if (!_helper.IpAddress.Contains("8.8.8.8"))
+            {
+                WritePrivate("StartUp", "Information", _helper.IpAddress); // ** Used by Andy's Knime protocol
+            }
 
             #endregion Log critical System Info again to ensure we get it
 

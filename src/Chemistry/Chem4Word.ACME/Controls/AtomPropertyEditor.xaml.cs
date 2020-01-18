@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using Chem4Word.ACME.Annotations;
+using Chem4Word.ACME.Entities;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Resources;
 using Chem4Word.ACME.Utils;
@@ -159,11 +160,28 @@ namespace Chem4Word.ACME.Controls
 
         private void ChargeCombo_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            SetStateOfExplicitCarbonCheckbox();
             ShowPreview();
+        }
+
+        private void SetStateOfExplicitCarbonCheckbox()
+        {
+            var chargeValue = ChargeCombo.SelectedItem as ChargeValue;
+            var isotopeValue = IsotopePicker.SelectedItem as IsotopeValue;
+
+            if (chargeValue?.Value == 0 && isotopeValue?.Mass == null)
+            {
+                ExplicitCheckBox.IsEnabled = true;
+            }
+            else
+            {
+                ExplicitCheckBox.IsEnabled = false;
+            }
         }
 
         private void IsotopePicker_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            SetStateOfExplicitCarbonCheckbox();
             ShowPreview();
         }
 

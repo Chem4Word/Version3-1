@@ -3,6 +3,17 @@
 <ChangeLog>
     <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
     <Version>
+        <Number>3.1.4 Beta 4</Number>
+        <IsBeta>true</IsBeta>
+        <Released>18-Jan-2020</Released>
+        <Changes>
+            <Change>Further improvements to StartUp</Change>
+            <Change>Disable Explicit C when charge or isotope present https://github.com/Chem4Word/Version3-1/issues/18 </Change>
+            <Change>Fix joining of double bonds to rings https://github.com/Chem4Word/Version3-1/issues/12 </Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.4.Beta.4.msi</Url>
+    </Version>
+    <Version>
         <Number>3.1.3 Beta 3</Number>
         <IsBeta>true</IsBeta>
         <Released>09-Jan-2020</Released>

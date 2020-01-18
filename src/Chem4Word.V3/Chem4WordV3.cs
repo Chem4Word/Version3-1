@@ -564,6 +564,7 @@ namespace Chem4Word
                 {
                     OnWindowSelectionChange(Application.Selection);
                 }
+                LoadOptions();
             }
         }
 
@@ -617,10 +618,9 @@ namespace Chem4Word
                                 var certificate = mod.GetSignerCertificate();
                                 if (certificate != null)
                                 {
+                                    signedBy = certificate.Subject;
                                     // E=developer@chem4word.co.uk, CN="Open Source Developer, Mike Williams", O=Open Source Developer, C=GB
                                     Debug.WriteLine(certificate.Subject);
-                                    signedBy = certificate.Subject;
-                                    // CN=Certum Code Signing CA SHA2, OU=Certum Certification Authority, O=Unizeto Technologies S.A., C=PL
                                     Debug.WriteLine(certificate.Issuer);
                                 }
 

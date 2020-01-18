@@ -68,6 +68,7 @@ namespace Chem4Word.Telemetry
         public List<string> StartUpTimings { get; set; }
 
         private static int _retryCount;
+        private static Stopwatch _stopwatch;
 
         public static string GetMachineId()
         {
@@ -235,14 +236,21 @@ namespace Chem4Word.Telemetry
 
             #endregion Get Product Version and Location using reflection
 
-            #region Get IpAddress
+            #region Get IpAddress on Thread
+
+            message = $"GetIpAddress started at {SafeDate.ToLongDate(DateTime.Now)}";
+            StartUpTimings.Add(message);
+            Debug.WriteLine(message);
+
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
 
             ParameterizedThreadStart pts = GetExternalIpAddress;
             Thread thread = new Thread(pts);
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(null);
 
-            #endregion Get IpAddress
+            #endregion Get IpAddress on Thread
 
             GetDotNetVersionFromRegistry();
 
@@ -499,28 +507,29 @@ namespace Chem4Word.Telemetry
             }
         }
 
+        private static void IncrementRetryCount()
+        {
+            _retryCount++;
+        }
+
         private void GetExternalIpAddress(object o)
         {
             string module = $"{MethodBase.GetCurrentMethod().Name}()";
-
-            string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
-            StartUpTimings.Add(message);
-            Debug.WriteLine(message);
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
 
             // http://www.ipv6proxy.net/ --> "Your IP address : 2600:3c00::f03c:91ff:fe93:dcd4"
 
             try
             {
+                int idx = 0;
                 foreach (var domain in Domains)
                 {
                     try
                     {
                         string url = $"{domain}/{DetectionFile}";
 
-                        Debug.WriteLine("Fetching external IpAddress from " + url + " attempt " + _retryCount);
+                        string message = $"Fetching external IpAddress from {url} attempt {_retryCount}.{idx++}";
+                        Debug.WriteLine(message);
+                        StartUpTimings.Add(message);
                         IpAddress = "IpAddress 0.0.0.0";
 
                         HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
@@ -599,13 +608,12 @@ namespace Chem4Word.Telemetry
 
                                         #endregion Detect Php UTC Date
 
+                                        // Failure, try next one
                                         if (!IpAddress.Contains("0.0.0.0"))
                                         {
                                             break;
                                         }
                                     }
-
-                                    Debug.WriteLine(IpAddress);
                                 }
                             }
                         }
@@ -613,7 +621,7 @@ namespace Chem4Word.Telemetry
                     catch (Exception ex)
                     {
                         Debug.WriteLine(ex.Message);
-                        // Do Nothing
+                        StartUpTimings.Add($"GetExternalIpAddress {ex.Message}");
                     }
                     Thread.Sleep(500);
                 }
@@ -623,26 +631,42 @@ namespace Chem4Word.Telemetry
                 Debug.WriteLine(ex.Message);
                 // Something went wrong
                 IpAddress = "IpAddress 0.0.0.0 - " + ex.Message;
+                StartUpTimings.Add($"GetExternalIpAddress {ex.Message}");
             }
 
             if (string.IsNullOrEmpty(IpAddress) || IpAddress.Contains("0.0.0.0"))
             {
-                if (_retryCount < 5)
+                // Try 0..4 times from 0..2 domains
+                if (_retryCount < 4)
                 {
-                    _retryCount++;
+                    // Retry
+                    IncrementRetryCount();
                     Thread.Sleep(500);
                     ParameterizedThreadStart pts = GetExternalIpAddress;
                     Thread thread = new Thread(pts);
                     thread.SetApartmentState(ApartmentState.STA);
                     thread.Start(null);
                 }
+                else
+                {
+                    // Failure
+                    IpAddress = IpAddress.Replace("0.0.0.0", "8.8.8.8");
+                    _stopwatch.Stop();
+
+                    var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000")}ms";
+                    StartUpTimings.Add(message);
+                    Debug.WriteLine(message);
+                }
             }
+            else
+            {
+                // Success
+                _stopwatch.Stop();
 
-            sw.Stop();
-
-            message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
-            StartUpTimings.Add(message);
-            Debug.WriteLine(message);
+                var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000")}ms";
+                StartUpTimings.Add(message);
+                Debug.WriteLine(message);
+            }
         }
 
         private DateTime FromPhpDate(string line)
