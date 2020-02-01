@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -144,7 +145,7 @@ namespace Chem4Word
                 }
 
                 sw.Stop();
-                message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+                message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
                 Debug.WriteLine(message);
                 Globals.Chem4WordV3.StartUpTimings.Add(message);
             }

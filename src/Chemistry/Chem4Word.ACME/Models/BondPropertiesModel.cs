@@ -5,13 +5,16 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using Chem4Word.ACME.Controls;
 
 namespace Chem4Word.ACME.Models
 {
     public class BondPropertiesModel : BaseDialogModel
     {
-        public bool IsDirty { get; set; }
+        public bool IsDirty { get; private set; }
+
+        public bool PlacementChanged { get; private set; }
 
         private DoubleBondType _doubleBondChoice;
 
@@ -22,8 +25,12 @@ namespace Chem4Word.ACME.Models
             {
                 _doubleBondChoice = value;
                 IsDirty = true;
+                PlacementChanged = true;
+                OnPropertyChanged(nameof(PlacementChanged));
             }
         }
+
+        public bool StereoChanged { get; private set; }
 
         private SingleBondType _singleBondChoice;
 
@@ -34,11 +41,70 @@ namespace Chem4Word.ACME.Models
             {
                 _singleBondChoice = value;
                 IsDirty = true;
+                StereoChanged = true;
+                OnPropertyChanged(nameof(StereoChanged));
             }
+        }
+
+        public void ClearFlags()
+        {
+            IsDirty = false;
+            StereoChanged = false;
+            PlacementChanged = false;
+            BondOrderChanged = false;
+            BondAngleChanged = false;
+            BondAngleInvalid = false;
+        }
+
+        public bool BondAngleChanged { get; private set; }
+        public bool BondAngleInvalid { get; private set; }
+
+        private string _bondAngle;
+
+        public string BondAngle
+        {
+            get => _bondAngle;
+            set
+            {
+                _bondAngle = value;
+                ValidateBondAngle(value);
+                IsDirty = true;
+            }
+        }
+
+        public void ValidateBondAngle(string value)
+        {
+            bool invalid = true;
+
+            double angle;
+            if (double.TryParse(value, out angle))
+            {
+                if (angle >= -180 && angle <= 180)
+                {
+                    invalid = false;
+                    if (Math.Abs(Angle - angle) >= 0.005)
+                    {
+                        BondAngleChanged = true;
+                        OnPropertyChanged(nameof(BondAngleChanged));
+                    }
+                    else
+                    {
+                        BondAngleChanged = false;
+                        OnPropertyChanged(nameof(BondAngleChanged));
+                    }
+                }
+            }
+
+            BondAngleInvalid = invalid;
+            OnPropertyChanged(nameof(BondAngleInvalid));
+
+            IsDirty = true;
         }
 
         public double Angle { get; set; }
         public string AngleString => $"{Angle:N2}";
+        public double Length { get; set; }
+        public string LengthString => $"{Length:N2}";
 
         public bool IsSingle { get; set; }
         public bool IsDouble { get; set; }
@@ -46,6 +112,7 @@ namespace Chem4Word.ACME.Models
         public bool Is1Point5 { get; set; }
         public bool Is2Point5 { get; set; }
 
+        public bool BondOrderChanged { get; private set; }
         private double _bondOrderValue;
 
         public double BondOrderValue
@@ -81,6 +148,8 @@ namespace Chem4Word.ACME.Models
 
                     OnPropertyChanged();
                     IsDirty = true;
+                    BondOrderChanged = true;
+                    OnPropertyChanged(nameof(BondOrderChanged));
                 }
             }
         }

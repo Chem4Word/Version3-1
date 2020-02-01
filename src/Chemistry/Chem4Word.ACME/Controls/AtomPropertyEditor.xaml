@@ -153,7 +153,7 @@
                                 VerticalAlignment="Center"
                                 Click="ExplicitCheckBox_OnClick"
                                 Content="Explicit"
-                                IsChecked="{Binding ShowSymbol}"
+                                IsChecked="{Binding ExplicitC}"
                                 IsThreeState="True">
                                 <CheckBox.Style>
                                     <Style TargetType="{x:Type CheckBox}">
@@ -163,14 +163,14 @@
                                             <DataTrigger Binding="{Binding Element.Symbol}" Value="C">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding ShowSymbol}" Value="{x:Null}">
+                                            <DataTrigger Binding="{Binding ExplicitC}" Value="{x:Null}">
                                                 <Setter Property="ToolTip">
                                                     <Setter.Value>
                                                         <ToolTip Content="Auto: Carbon display is determined automatically." />
                                                     </Setter.Value>
                                                 </Setter>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding ShowSymbol}" Value="True">
+                                            <DataTrigger Binding="{Binding ExplicitC}" Value="True">
                                                 <Setter Property="ToolTip">
                                                     <Setter.Value>
                                                         <ToolTip>
@@ -181,7 +181,7 @@
                                                     </Setter.Value>
                                                 </Setter>
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding ShowSymbol}" Value="False">
+                                            <DataTrigger Binding="{Binding ExplicitC}" Value="False">
                                                 <Setter Property="ToolTip">
                                                     <Setter.Value>
                                                         <ToolTip>

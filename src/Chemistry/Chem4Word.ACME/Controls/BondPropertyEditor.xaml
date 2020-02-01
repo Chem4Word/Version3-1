@@ -25,6 +25,14 @@
                 x:Key="VisConverter"
                 FalseValue="Collapsed"
                 TrueValue="Visible" />
+            <converters:BoolToColorConverter
+                x:Key="ColorConverter"
+                FalseValue="Black"
+                TrueValue="ForestGreen" />
+            <converters:BoolToColorConverter
+                x:Key="InvalidConverter"
+                FalseValue="White"
+                TrueValue="{StaticResource PinkLace}" />
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
             <x:Array x:Key="BondItems" Type="{x:Type ComboBoxItem}">
 
@@ -222,6 +230,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock
@@ -236,21 +245,36 @@
                 Grid.Row="1"
                 Grid.Column="0"
                 Style="{StaticResource LabelTextBlock}"
-                Text="Bond Angle" />
+                Text="Length" />
             <TextBlock
-                x:Name="BondAngle"
                 Grid.Row="1"
                 Grid.Column="1"
                 Style="{StaticResource LabelTextBlock}"
-                Text="{Binding Path=AngleString}" />
+                Text="{Binding Path=LengthString}" />
             <TextBlock
                 Grid.Row="2"
                 Grid.Column="0"
+                Foreground="{Binding Path=BondAngleChanged, Mode=OneWay, Converter={StaticResource ColorConverter}}"
+                Style="{StaticResource LabelTextBlock}"
+                Text="Angle" />
+            <TextBox
+                x:Name="BondAngle"
+                Grid.Row="2"
+                Grid.Column="1"
+                VerticalContentAlignment="Center"
+                Background="{Binding Path=BondAngleInvalid, Mode=OneWay, Converter={StaticResource InvalidConverter}}"
+                Text="{Binding Path=BondAngle, Mode=TwoWay}"
+                TextChanged="BondAngle_OnTextChanged"
+                ToolTip="Angles are measured from Screen North" />
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="0"
+                Foreground="{Binding Path=BondOrderChanged, Mode=OneWay, Converter={StaticResource ColorConverter}}"
                 Style="{StaticResource LabelTextBlock}">
                 Order
             </TextBlock>
             <ComboBox
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 FontSize="12"
@@ -259,14 +283,15 @@
                 SelectedValuePath="Tag"
                 Style="{StaticResource StandardCombo}" />
             <TextBlock
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
+                Foreground="{Binding Path=StereoChanged, Mode=OneWay, Converter={StaticResource ColorConverter}}"
                 Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=IsSingle, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Stereo
             </TextBlock>
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Visibility="{Binding Path=IsSingle, Mode=OneWay, Converter={StaticResource VisConverter}}">
@@ -565,14 +590,15 @@
                 </StackPanel>
             </StackPanel>
             <TextBlock
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="0"
+                Foreground="{Binding Path=PlacementChanged, Mode=OneWay, Converter={StaticResource ColorConverter}}"
                 Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=IsDouble, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
             <StackPanel
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
@@ -748,14 +774,15 @@
                 </RadioButton>
             </StackPanel>
             <TextBlock
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="0"
+                Foreground="{Binding Path=PlacementChanged, Mode=OneWay, Converter={StaticResource ColorConverter}}"
                 Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=Is1Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
             <StackPanel
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
@@ -852,14 +879,15 @@
                 </RadioButton>
             </StackPanel>
             <TextBlock
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="0"
+                Foreground="{Binding Path=PlacementChanged, Mode=OneWay, Converter={StaticResource ColorConverter}}"
                 Style="{StaticResource LabelTextBlock}"
                 Visibility="{Binding Path=Is2Point5, Mode=OneWay, Converter={StaticResource VisConverter}}">
                 Placement
             </TextBlock>
             <StackPanel
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="1"
                 Margin="0,5,0,0"
                 Orientation="Horizontal"
@@ -970,7 +998,7 @@
                 </RadioButton>
             </StackPanel>
             <StackPanel
-                Grid.Row="7"
+                Grid.Row="8"
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">

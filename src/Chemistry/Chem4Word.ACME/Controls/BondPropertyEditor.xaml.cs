@@ -9,10 +9,12 @@ using System;
 using System.ComponentModel;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using Chem4Word.ACME.Models;
 using Chem4Word.ACME.Utils;
 using Chem4Word.Core;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace Chem4Word.ACME.Controls
 {
@@ -55,7 +57,7 @@ namespace Chem4Word.ACME.Controls
             Top = point.Y;
 
             InvalidateArrange();
-            _bondPropertiesModel.IsDirty = false;
+            _bondPropertiesModel.ClearFlags();
         }
 
         private void Cancel_OnClick(object sender, RoutedEventArgs e)
@@ -95,6 +97,14 @@ namespace Chem4Word.ACME.Controls
                         e.Cancel = true;
                         break;
                 }
+            }
+        }
+
+        private void BondAngle_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                _bondPropertiesModel.ValidateBondAngle(textBox.Text);
             }
         }
     }

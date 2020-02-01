@@ -23,10 +23,6 @@ namespace Chem4Word.Core.Helpers
         public const string Chem4WordWebServiceUri = "https://chemicalservices.azurewebsites.net/api/Resolve";
 
         public const string DefaultEditorPlugIn = "ACME Structure Editor";
-        public const string DefaultEditorPlugIn800 = "ChemDoodle Web Structure Editor 8.0.0";
-        public const string DefaultEditorPlugIn702 = "ChemDoodle Web Structure Editor 7.0.2";
-        public const int ChemDoodleWeb800MinimumBrowserVersion = 11;
-
         public const string DefaultRendererPlugIn = "Open Office Xml Renderer V4";
 
         // Registry Locations
@@ -40,7 +36,7 @@ namespace Chem4Word.Core.Helpers
         public const string Chem4WordUpdateRegistryKey = @"SOFTWARE\Chem4Word V3\Update";
 
         // Update Checks
-        public const int MaximunVersionsBehind = 7;
+        public const int MaximumVersionsBehind = 7;
         public const string Chem4WordTooOld = "Chem4Word is too many versions old.";
         public const string Chem4WordIsBeta = "Chem4Word Beta testing is now closed.";
 

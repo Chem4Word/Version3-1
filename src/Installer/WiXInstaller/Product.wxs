@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <!-- For automatic upgrade to work only first three parts of version number are used -->
-  <Product Id="*" Name="Chemistry Add-In for Microsoft Word 2020 Beta 4" Manufacturer="Chem4Word" Version="3.1.4.7322" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
+  <Product Id="*" Name="Chemistry Add-In for Microsoft Word 2020 Beta 5" Manufacturer="Chem4Word" Version="3.1.5.7336" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of Chem4Word is already installed." />
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high" />
@@ -166,10 +166,6 @@
         <File Id="Chem4Word.Editor.ACME.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ACME.dll" />
         <File Id="Chem4Word.Editor.ACME.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ACME.pdb" />
       </Component>
-      <Component Id="Chem4Word.Editor.ChemDoodleWeb.702">
-        <File Id="Chem4Word.Editor.ChemDoodleWeb702.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb702.dll" />
-        <File Id="Chem4Word.Editor.ChemDoodleWeb702.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb702.pdb" />
-      </Component>
       <Component Id="Chem4Word.Editor.ChemDoodleWeb.800">
         <File Id="Chem4Word.Editor.ChemDoodleWeb800.dll" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb800.dll" />
         <File Id="Chem4Word.Editor.ChemDoodleWeb800.pdb" Source="$(var.Chem4Word.V3.TargetDir)\PlugIns\Chem4Word.Editor.ChemDoodleWeb800.pdb" />
@@ -196,7 +192,7 @@
   <Fragment>
     <ComponentGroup Id="Manual" Directory="MANUAL">
       <Component Id="Chem4Word.Version3.User.Manual">
-        <File Id="Chem4Word.Version3.User.Manual.docx" Source="$(var.Chem4Word.V3.TargetDir)..\..\..\..\doc\Chem4Word-Version3-1-User-Manual.docx" />
+        <File Id="Chem4Word.Version3.User.Manual.docx" Source="$(var.Chem4Word.V3.TargetDir)..\..\..\..\docs\Chem4Word-Version3-1-User-Manual.docx" />
       </Component>
     </ComponentGroup>
   </Fragment>

@@ -271,7 +271,7 @@ namespace Chem4Word.Telemetry
 
             sw.Stop();
 
-            message = $"SystemHelper.Initialise() took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            message = $"SystemHelper.Initialise() took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
             timings.Add(message);
             Debug.WriteLine(message);
 
@@ -653,7 +653,7 @@ namespace Chem4Word.Telemetry
                     IpAddress = IpAddress.Replace("0.0.0.0", "8.8.8.8");
                     _stopwatch.Stop();
 
-                    var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000")}ms";
+                    var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
                     StartUpTimings.Add(message);
                     Debug.WriteLine(message);
                 }
@@ -663,7 +663,7 @@ namespace Chem4Word.Telemetry
                 // Success
                 _stopwatch.Stop();
 
-                var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000")}ms";
+                var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
                 StartUpTimings.Add(message);
                 Debug.WriteLine(message);
             }

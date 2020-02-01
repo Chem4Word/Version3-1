@@ -12,7 +12,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Documents;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Model2.Interfaces;
@@ -338,7 +337,7 @@ namespace Chem4Word.Model2
         /// <summary>
         /// Bond length used in Xaml
         /// </summary>
-        public double XamlBondLength { get; set; }
+        public double XamlBondLength { get; internal set; }
 
         /// <summary>
         /// Overall Cml bounding box for all atoms
@@ -427,6 +426,11 @@ namespace Chem4Word.Model2
         public string CustomXmlPartGuid { get; set; }
 
         public List<string> GeneralErrors { get; set; }
+
+        public void SetXamlBondLength(int bondLength)
+        {
+            XamlBondLength = bondLength;
+        }
 
         /// <summary>
         /// List of all warnings encountered during the import from external file format
@@ -871,6 +875,11 @@ namespace Chem4Word.Model2
                 RepositionAll(c.X - centre.X, c.Y - centre.Y);
                 _boundingBox = Rect.Empty;
             }
+
+            if (ScaledForXaml)
+            {
+                XamlBondLength = newLength;
+            }
         }
 
         public void ScaleToAverageBondLength(double newLength)
@@ -973,15 +982,19 @@ namespace Chem4Word.Model2
             }
         }
 
-        public void RescaleForXaml(bool forDisplay)
+        public void RescaleForXaml(bool forDisplay, double preferredBondLength)
         {
             if (!ScaledForXaml)
             {
-                double newLength = Constants.StandardBondLength * Globals.ScaleFactorForXaml;
+                double newLength;
 
                 if (TotalBondsCount > 0 && MeanBondLength > 0)
                 {
                     newLength = MeanBondLength * Globals.ScaleFactorForXaml;
+                }
+                else
+                {
+                    newLength = preferredBondLength * Globals.ScaleFactorForXaml;
                 }
 
                 ScaleToAverageBondLength(newLength);

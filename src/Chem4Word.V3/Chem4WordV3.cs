@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -191,33 +192,48 @@ namespace Chem4Word
         private void C4WAddIn_Startup(object sender, EventArgs e)
         {
             string module = $"{MethodBase.GetCurrentMethod().Name}()";
-
-            var cmd = Environment.CommandLine.ToLower();
-            if (Ribbon != null && !cmd.Contains("-embedding"))
+            try
             {
-                string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
-                Debug.WriteLine(message);
-                StartUpTimings.Add(message);
+                var cmd = Environment.CommandLine.ToLower();
+                if (Ribbon != null && !cmd.Contains("-embedding"))
+                {
+                    string message = $"{module} started at {SafeDate.ToLongDate(DateTime.Now)}";
+                    Debug.WriteLine(message);
+                    StartUpTimings.Add(message);
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
 
-                PerformStartUpActions();
+                    PerformStartUpActions();
 
-                sw.Stop();
-                message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
-                StartUpTimings.Add(message);
-                Debug.WriteLine(message);
+                    sw.Stop();
+                    message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                    StartUpTimings.Add(message);
+                    Debug.WriteLine(message);
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(module);
+                Debug.WriteLine(exception);
             }
         }
 
         private void C4WAddIn_Shutdown(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-
-            if (Ribbon != null)
+            try
             {
-                PerformShutDownActions();
+
+                if (Ribbon != null)
+                {
+                    PerformShutDownActions();
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(module);
+                Debug.WriteLine(exception);
             }
         }
 
@@ -249,7 +265,7 @@ namespace Chem4Word
             Telemetry = new TelemetryWriter(true, Helper);
 
             sw.Stop();
-            message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
             Debug.WriteLine(message);
             StartUpTimings.Add(message);
         }
@@ -269,7 +285,7 @@ namespace Chem4Word
                 UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
                 ShowOrHideUpdateShield();
 
-                if (VersionsBehind < Constants.MaximunVersionsBehind)
+                if (VersionsBehind < Constants.MaximumVersionsBehind)
                 {
                     Word.Application app = Application;
 
@@ -422,27 +438,6 @@ namespace Chem4Word
 
                 try
                 {
-                    if (SystemOptions.SelectedEditorPlugIn.Equals(Constants.DefaultEditorPlugIn800))
-                    {
-                        using (var browser = new WebBrowser())
-                        {
-                            if (browser.Version.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion)
-                            {
-                                Telemetry.Write(module, "Information", "IE 10+ not detected; Switching to ChemDoodle Web 7.0.2");
-                                SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
-                                string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
-                                File.WriteAllText(optionsFile, temp);
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    //
-                }
-
-                try
-                {
                     bool settingsChanged = false;
 
                     if (string.IsNullOrEmpty(SystemOptions.SelectedEditorPlugIn))
@@ -555,7 +550,7 @@ namespace Chem4Word
             if (Ribbon != null)
             {
                 _plugInsLoaded = true;
-                if (VersionsBehind >= Constants.MaximunVersionsBehind)
+                if (VersionsBehind >= Constants.MaximumVersionsBehind)
                 {
                     SetButtonStates(ButtonState.Disabled);
                     ChemistryProhibitedReason = Constants.Chem4WordTooOld;
@@ -760,7 +755,7 @@ namespace Chem4Word
 
             sw.Stop();
 
-            message = $"{module} examining {filesFound} files took {sw.ElapsedMilliseconds.ToString("#,000")}ms";
+            message = $"{module} examining {filesFound} files took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
             Debug.WriteLine(message);
             StartUpTimings.Add(message);
         }
@@ -1132,7 +1127,7 @@ namespace Chem4Word
                         }
                     }
 
-                    if (VersionsBehind >= Constants.MaximunVersionsBehind)
+                    if (VersionsBehind >= Constants.MaximumVersionsBehind)
                     {
                         SetButtonStates(ButtonState.Disabled);
                         ChemistryProhibitedReason = Constants.Chem4WordTooOld;
@@ -2360,7 +2355,7 @@ namespace Chem4Word
 
             try
             {
-                //Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
+                Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
 
                 EvaluateChemistryAllowed();
 

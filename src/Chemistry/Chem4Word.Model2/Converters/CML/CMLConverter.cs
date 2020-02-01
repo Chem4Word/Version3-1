@@ -390,9 +390,9 @@ namespace Chem4Word.Model2.Converters.CML
 
             if (atom.Element is Element element2)
             {
-                if (element2 == Globals.PeriodicTable.C && atom.ShowSymbol != null)
+                if (element2 == Globals.PeriodicTable.C && atom.ExplicitC != null)
                 {
-                    result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ShowSymbol));
+                    result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ExplicitC));
                 }
             }
 
@@ -523,6 +523,11 @@ namespace Chem4Word.Model2.Converters.CML
                 }
             }
 
+            if (molecule.Atoms.Count == 1)
+            {
+                molecule.Atoms.First().Value.ExplicitC = null;
+            }
+
             molecule.RebuildRings();
 
             return molecule;
@@ -556,7 +561,7 @@ namespace Chem4Word.Model2.Converters.CML
                 atom.Element = e;
                 atom.FormalCharge = CMLHelper.GetFormalCharge(cmlElement);
                 atom.IsotopeNumber = CMLHelper.GetIsotopeNumber(cmlElement);
-                atom.ShowSymbol = CMLHelper.GetExplicit(cmlElement);
+                atom.ExplicitC = CMLHelper.GetExplicit(cmlElement);
             }
 
             return atom;

@@ -3,6 +3,22 @@
 <ChangeLog>
     <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
     <Version>
+        <Number>3.1.5 Beta 5</Number>
+        <IsBeta>true</IsBeta>
+        <Released>01-Feb-2020</Released>
+        <Changes>
+            <Change>Fix Unable to add a bond to R atom https://github.com/Chem4Word/Version3-1/issues/20 </Change>
+            <Change>Add ability to rotate bond to specific values https://github.com/Chem4Word/Version3-1/issues/10 </Change>
+            <Change>Bond length incorrect for new drawings https://github.com/Chem4Word/Version3-1/issues/27 </Change>
+            <Change>Fix placement of Functional Groups https://github.com/Chem4Word/Version3-1/issues/29 </Change>
+            <Change>Fix deleting of bonds connected to explicitly hidden C atoms causing invisible C atoms</Change>
+            <Change>Remove c4w:Explicit on lone (Carbon) atoms on import, to prevent them from being invisible</Change>
+            <Change>Performance improvements</Change>
+            <Change>Fix doubling up of 2019 in Office detection</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.5.Beta.5.msi</Url>
+    </Version>
+    <Version>
         <Number>3.1.4 Beta 4</Number>
         <IsBeta>true</IsBeta>
         <Released>18-Jan-2020</Released>

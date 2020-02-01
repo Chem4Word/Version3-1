@@ -21,12 +21,29 @@ namespace Chem4Word.Model2
     {
         #region Fields
 
-        private bool? _explicitC;
         public List<string> Messages = new List<string>();
 
         #endregion Fields
 
         #region Properties
+
+        public CompassPoints FunctionalGroupPlacement
+        {
+            get
+            {
+                if (Element is FunctionalGroup fg)
+                {
+                    var centroid = Parent.Centroid;
+                    var vector = Position - centroid;
+                    var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, vector);
+                    return angle < 0 ? CompassPoints.West : CompassPoints.East;
+                }
+
+                return CompassPoints.East;
+            }
+        }
+
+        public bool? ExplicitC { get; set; }
 
         private ElementBase _element;
 
@@ -189,36 +206,60 @@ namespace Chem4Word.Model2
             }
         }
 
-        public bool? ShowSymbol
+        public bool ShowSymbol
         {
             get
             {
-                switch (Element)
+                bool result = true;
+
+                if (Element is FunctionalGroup)
                 {
-                    case Element e
-                        when (e == Globals.PeriodicTable.C & IsotopeNumber != null || (FormalCharge ?? 0) != 0):
-                        return true;
-
-                    case Element e when (e == Globals.PeriodicTable.C):
-                        return _explicitC;
-
-                    case FunctionalGroup fg:
-                        return true;
-
-                    default:
-                        return null;
+                    // Use initialised value of true
                 }
-            }
-            set
-            {
-                switch (Element)
+                else
                 {
-                    case Element e when (e == Globals.PeriodicTable.C):
-                        _explicitC = value;
-                        OnPropertyChanged();
-                        OnPropertyChanged(nameof(SymbolText));
-                        break;
+                    if (IsotopeNumber != null || (FormalCharge ?? 0) != 0)
+                    {
+                        // Use initialised value of true
+                    }
+                    else if (Element.Symbol == "C")
+                    {
+                        result = false;
+
+                        if (ExplicitC.HasValue)
+                        {
+                            result = ExplicitC.Value;
+                        }
+                        else
+                        {
+                            if (Degree <= 1)
+                            {
+                                result = true;
+                            }
+
+                            if (Degree == 2)
+                            {
+                                var bonds = Bonds.ToArray();
+                                // This code is triggered when adding the first Atom to a bond
+                                //  at this point one of the atoms is undefined
+                                Atom a1 = bonds[0].OtherAtom(this);
+                                Atom a2 = bonds[1].OtherAtom(this);
+                                if (a1 != null && a2 != null)
+                                {
+                                    double angle1 =
+                                        Vector.AngleBetween(-(this.Position - a1.Position),
+                                                            this.Position - a2.Position);
+                                    if (Math.Abs(angle1) < 8)
+                                    {
+                                        result = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+
+                return result;
             }
         }
 
@@ -276,65 +317,9 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (Element != null)
+                if (ShowSymbol)
                 {
-                    if (Element is FunctionalGroup)
-                    {
-                        return ((FunctionalGroup)Element).Symbol;
-                    }
-                    else
-                    {
-                        if (Element.Symbol.Equals("C"))
-                        {
-                            if (ShowSymbol != null)
-                            {
-                                if (ShowSymbol.Value)
-                                {
-                                    return "C";
-                                }
-                                else
-                                {
-                                    return "";
-                                }
-                            }
-                            //if it's null then we have to work it out ourselves
-                            if (Degree <= 1)
-                            {
-                                return "C";
-                            }
-
-                            if (Degree == 2)
-                            {
-                                var bonds = Bonds.ToArray();
-                                // This code is triggered when adding the first Atom to a bond
-                                //  at this point one of the atoms is undefined
-                                Atom a1 = bonds[0].OtherAtom(this);
-                                Atom a2 = bonds[1].OtherAtom(this);
-
-                                if (a1 != null && a2 != null)
-                                {
-                                    double angle1 =
-                                        Vector.AngleBetween(-(this.Position - a1.Position),
-                                                            this.Position - a2.Position);
-
-                                    if (Math.Abs(angle1) < 8)
-                                    {
-                                        return "C";
-                                    }
-                                }
-                                else
-                                {
-                                    //Debugger.Break();
-                                }
-                            }
-
-                            return "";
-                        }
-                        else
-                        {
-                            return Element.Symbol;
-                        }
-                    }
+                    return Element.Symbol;
                 }
                 else
                 {

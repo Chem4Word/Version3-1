@@ -151,51 +151,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
             int bondCount = atom.Bonds.ToList().Count;
 
-            #region Decide if atom label is to be displayed
-
-            bool showLabel = true;
-            if (atomLabel == "C")
-            {
-                if (atom.ShowSymbol.HasValue)
-                {
-                    showLabel = atom.ShowSymbol.Value;
-                }
-                else
-                {
-                    if (atom.IsInRing || bondCount > 1)
-                    {
-                        showLabel = false;
-                    }
-
-                    if (bondCount == 2)
-                    {
-                        Point p1 = atom.Bonds.ToList()[0].OtherAtom(atom).Position;
-                        Point p2 = atom.Bonds.ToList()[1].OtherAtom(atom).Position;
-
-                        double angle1 = Vector.AngleBetween(-(atom.Position - p1), atom.Position - p2);
-
-                        if (Math.Abs(angle1) < 8)
-                        {
-                            showLabel = true;
-                        }
-                    }
-                }
-
-                // Force on if atom has charge
-                if (iAbsCharge > 0)
-                {
-                    showLabel = true;
-                }
-                // Force on if atom has isotope value
-                if (isoValue > 0)
-                {
-                    showLabel = true;
-                }
-            }
-
-            #endregion Decide if atom label is to be displayed
-
-            if (showLabel)
+            if (atom.ShowSymbol)
             {
                 #region Set Up Atom Colours
 
@@ -585,10 +541,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         public void CreateFunctionalGroupCharacters(Atom atom, Options options)
         {
             FunctionalGroup fg = atom.Element as FunctionalGroup;
-            double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
-
-            CompassPoints nesw = BasicGeometry.SnapTo2EW(baFromNorth);
-            bool reverse = nesw == CompassPoints.West;
+            bool reverse = atom.FunctionalGroupPlacement == CompassPoints.West;
 
             #region Set Up Atom Colours
 

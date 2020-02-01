@@ -137,6 +137,8 @@ namespace Chem4Word.Model2.Geometry
             u = Determinant(segment1End - segment1Start, segment2Start - segment1Start) / det;
         }
 
+        public static Point GetCentroid(Rect rectangle) => rectangle.TopLeft + (rectangle.BottomRight - rectangle.TopLeft) * 0.5;
+
         // ReSharper disable once InconsistentNaming
         public static CompassPoints SnapTo2EW(double angleFromNorth)
         {

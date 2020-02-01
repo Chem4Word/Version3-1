@@ -16,7 +16,7 @@ namespace Chem4Word.ACME.Models
         private ElementBase _element;
         private int? _charge;
         private string _isotope;
-        private bool? _showSymbol;
+        private bool? _explicitC;
         private bool _isFunctionalGroup;
         private bool _isElement;
 
@@ -81,12 +81,12 @@ namespace Chem4Word.ACME.Models
             }
         }
 
-        public bool? ShowSymbol
+        public bool? ExplicitC
         {
-            get => _showSymbol;
+            get => _explicitC;
             set
             {
-                _showSymbol = value;
+                _explicitC = value;
                 OnPropertyChanged();
             }
         }

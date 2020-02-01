@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
@@ -185,7 +186,8 @@ namespace Chem4Word.ACME
             {
                 if (chemistryModel.TotalAtomsCount > 0)
                 {
-                    chemistryModel.RescaleForXaml(true);
+                    // ToDo: second parameter to come from DisplayOptions when implemented
+                    chemistryModel.RescaleForXaml(true, Constants.StandardBondLength);
 
                     CurrentViewModel = new ViewModel(chemistryModel);
                     DrawChemistry(CurrentViewModel);

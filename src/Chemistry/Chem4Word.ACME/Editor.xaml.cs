@@ -43,18 +43,11 @@ namespace Chem4Word.ACME
 
         public Point TopLeft { get; set; }
 
-        // This is used to store the cml until the editor is Loaded
-        //private string _cml;
         private Model _model;
 
         private List<string> _used1DProperties;
-        private Options _editorOptions;
 
-        public Options EditorOptions
-        {
-            get => _editorOptions;
-            set => _editorOptions = value;
-        }
+        public Options EditorOptions { get; set; }
 
         public IChem4WordTelemetry Telemetry { get; set; }
 
@@ -91,7 +84,7 @@ namespace Chem4Word.ACME
             _model = cc.Import(cml, used1DProperties);
 
             _used1DProperties = used1DProperties;
-            _editorOptions = options;
+            EditorOptions = options;
 
             InitialiseEditor();
         }
@@ -256,7 +249,7 @@ namespace Chem4Word.ACME
         {
             if (_model != null)
             {
-                _model.RescaleForXaml(false);
+                _model.RescaleForXaml(false, EditorOptions.BondLength);
 
                 ActiveViewModel = new EditViewModel(_model, ChemCanvas, _used1DProperties);
                 ActiveViewModel.EditorControl = this;
@@ -344,7 +337,8 @@ namespace Chem4Word.ACME
                         ActiveViewModel.Loading = true;
                         BondLengthSelector.SelectedItem = item;
                         ActiveViewModel.CurrentBondLength = EditorOptions.BondLength;
-                        ActiveViewModel.Model.XamlBondLength = EditorOptions.BondLength * Globals.ScaleFactorForXaml;
+                        // ToDo: Find way to avoid this as XamlBondLength ought to be read only
+                        ActiveViewModel.Model.SetXamlBondLength(EditorOptions.BondLength);
                         ActiveViewModel.Loading = false;
                     }
                 }

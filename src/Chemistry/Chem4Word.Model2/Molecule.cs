@@ -842,23 +842,19 @@ namespace Chem4Word.Model2
             return $"{prefix}.{suffix}{max + 1}";
         }
 
-        public List<Atom> GetAtomNeighbours(Atom atom)
+        public IEnumerable<Atom> GetAtomNeighbours(Atom atom)
         {
-            List<Atom> temps = new List<Atom>();
             foreach (Bond bond in Bonds)
             {
                 if (bond.StartAtomInternalId.Equals(atom.InternalId))
                 {
-                    temps.Add(Atoms[bond.EndAtomInternalId]);
+                    yield return Atoms[bond.EndAtomInternalId];
                 }
-
-                if (bond.EndAtomInternalId.Equals(atom.InternalId))
+                else if (bond.EndAtomInternalId.Equals(atom.InternalId))
                 {
-                    temps.Add(Atoms[bond.StartAtomInternalId]);
+                    yield return Atoms[bond.StartAtomInternalId];
                 }
             }
-
-            return temps.ToList();
         }
 
         public void ScaleBonds(double scale)
@@ -1060,12 +1056,13 @@ namespace Chem4Word.Model2
 
         public IEnumerable<Bond> GetBonds(string atomID)
         {
-            return (from startBond in Bonds
-                    where startBond.StartAtomInternalId.Equals(atomID)
-                    select startBond)
-                .Union(from endBond in Bonds
-                       where endBond.EndAtomInternalId.Equals(atomID)
-                       select endBond);
+            foreach (Bond bond in Bonds)
+            {
+                if (bond.StartAtomInternalId == atomID || bond.EndAtomInternalId == atomID)
+                {
+                    yield return bond;
+                }
+            }
         }
 
         public void Refresh()
@@ -1117,7 +1114,7 @@ namespace Chem4Word.Model2
                 a.Element = atom.Element;
                 a.FormalCharge = atom.FormalCharge;
                 a.IsotopeNumber = atom.IsotopeNumber;
-                a.ShowSymbol = atom.ShowSymbol;
+                a.ExplicitC = atom.ExplicitC;
 
                 copy.AddAtom(a);
                 a.Parent = copy;
@@ -1409,20 +1406,11 @@ namespace Chem4Word.Model2
         /// Sorts rings for double bond placement
         /// using Alex Clark's rules
         /// </summary>
-        public List<Ring> SortedRings
-        {
-            get { return SortRingsForDBPlacement(); }
-        }
+        public List<Ring> SortedRings => SortRingsForDBPlacement();
 
-        public Point Centroid { get; set; }
+        public Point Centroid => BasicGeometry.GetCentroid(BoundingBox);
 
-        public bool IsGrouped
-        {
-            get
-            {
-                return Molecules.Count > 0;
-            }
-        }
+        public bool IsGrouped => Molecules.Count > 0;
 
         /// <summary>
         /// Splits a molecule into child molecules and

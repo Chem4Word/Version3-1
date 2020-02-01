@@ -173,13 +173,8 @@ namespace Chem4Word.ACME.Adorners.Selectors
 
         private void SetCentroid()
         {
-            _centroid = GetCentroid(CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules));
+            _centroid = BasicGeometry.GetCentroid(CurrentEditor.GetMoleculeBoundingBox(AdornedMolecules));
             _rotateSnapper = new Snapper(_centroid, CurrentEditor.Chemistry as EditViewModel);
-        }
-
-        private Point GetCentroid(Rect mbb)
-        {
-            return mbb.TopLeft + (mbb.BottomRight - mbb.TopLeft) * 0.5;
         }
 
         public event DragCompletedEventHandler ResizeCompleted;

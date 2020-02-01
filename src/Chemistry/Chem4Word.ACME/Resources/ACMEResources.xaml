@@ -12,7 +12,8 @@
 
     <!--  standard livery for Chem4Word  -->
     <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
-    <SolidColorBrush x:Key="ACMEToolbarBackground" Color="#F1F1F1"/>
+    <SolidColorBrush x:Key="PinkLace" Color="#FFDDF4" />
+    <SolidColorBrush x:Key="ACMEToolbarBackground" Color="#F1F1F1" />
     <Style x:Key="WedgeBondStyle" TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
@@ -366,15 +367,15 @@
 
     <!--  control styles  -->
     <Style TargetType="ToolBar">
-       
-        <Setter Property="Background" Value="{StaticResource ACMEToolbarBackground}"/>
+
+        <Setter Property="Background" Value="{StaticResource ACMEToolbarBackground}" />
     </Style>
     <Style TargetType="ToolBarTray">
-       
-        <Setter Property="Background" Value="{StaticResource ACMEToolbarBackground}"/>
+
+        <Setter Property="Background" Value="{StaticResource ACMEToolbarBackground}" />
     </Style>
     <Style TargetType="ToolBarPanel">
-        <Setter Property="Background" Value="{StaticResource ACMEToolbarBackground}"/>
+        <Setter Property="Background" Value="{StaticResource ACMEToolbarBackground}" />
     </Style>
     <Style x:Key="StandardCombo" TargetType="{x:Type ComboBox}">
         <Setter Property="Background" Value="{x:Static SystemColors.WindowBrush}" />

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -102,7 +103,7 @@ namespace Chem4Word.Database
             }
 
             sw.Stop();
-            Globals.Chem4WordV3.Telemetry.Write(module, "Timing", $"Reading {allNames.Count} Chemical names took {sw.ElapsedMilliseconds.ToString("#,##0")}ms");
+            Globals.Chem4WordV3.Telemetry.Write(module, "Timing", $"Reading {allNames.Count} Chemical names took {sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture)}ms");
             return allNames;
         }
 
@@ -533,7 +534,7 @@ namespace Chem4Word.Database
             }
 
             sw.Stop();
-            Globals.Chem4WordV3.Telemetry.Write(module, "Timing", $"Reading {results.Count} structures took {sw.ElapsedMilliseconds.ToString("#,##0")}ms");
+            Globals.Chem4WordV3.Telemetry.Write(module, "Timing", $"Reading {results.Count} structures took {sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture)}ms");
 
             return results;
         }

@@ -19,7 +19,7 @@ namespace Chem4Word.ACME.Drawing
     {
         private List<Point> _sortedOutline;
         public FunctionalGroup ParentGroup { get; }
-        public bool Flipped => ParentAtom.BalancingVector().X < 0d;
+        public bool Flipped => ParentAtom.FunctionalGroupPlacement == CompassPoints.West;
 
         public override List<Point> Hull { get; protected set; }
 

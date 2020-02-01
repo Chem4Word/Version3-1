@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -278,7 +279,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             #endregion Step 8 - Append OoXml drawing objects to OoXml run object
 
             double abl = _medianBondLength;
-            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0")} ms; Average Bond Length: {abl.ToString("#0.00")}");
+            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0", CultureInfo.InvariantCulture)} ms; Average Bond Length: {abl.ToString("#0.00", CultureInfo.InvariantCulture)}");
 
             ShutDownProgress(pb);
 

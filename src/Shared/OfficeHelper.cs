@@ -96,6 +96,12 @@ namespace Chem4Word.Shared
                 officeProductName += Environment.NewLine + fi.ProductName;
             }
 
+            // Not sure how the heck this gets in here ...
+            if (officeProductName.Contains("2019 2019"))
+            {
+                officeProductName = officeProductName.Replace("2019 2019", "2019");
+            }
+
             result = officeProductName + " [" + wordVersionNumber + "]";
 
             int limiter = 32;
@@ -120,9 +126,7 @@ namespace Chem4Word.Shared
 
             if (!string.IsNullOrEmpty(c2r))
             {
-                var products = GetClick2RunProductIds()
-                               .Split(',')
-                               .Select(p => p.ToLower()).ToList();
+                var products = c2r.Split(',').Select(p => p.ToLower()).ToList();
 
                 // Loop backward so that we can remove products we don't care about
                 for (int i = products.Count - 1; i >= 0; i--)

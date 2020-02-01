@@ -678,46 +678,22 @@ namespace Chem4Word.UI.WPF
             SelectedRendererSettings.IsEnabled = false;
             SelectedSearcherSettings.IsEnabled = false;
 
-            Version browser = null;
-            try
-            {
-                browser = new Forms.WebBrowser().Version;
-            }
-            catch
-            {
-                browser = null;
-            }
-
-            if (SystemOptions.SelectedEditorPlugIn.Equals(Constants.DefaultEditorPlugIn800))
-            {
-                if (browser?.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion)
-                {
-                    SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn702;
-                }
-            }
-
             string selectedEditor = SystemOptions.SelectedEditorPlugIn;
 
             foreach (IChem4WordEditor editor in Globals.Chem4WordV3.Editors)
             {
-                bool add = !(editor.Name.Equals(Constants.DefaultEditorPlugIn800)
-                             && browser?.Major < Constants.ChemDoodleWeb800MinimumBrowserVersion);
+                PlugInComboItem pci = new PlugInComboItem()
+                                      {
+                                          Name = editor.Name,
+                                          Description = editor.Description
+                                      };
+                int item = SelectEditorPlugIn.Items.Add(pci);
 
-                if (add)
+                if (editor.Name.Equals(selectedEditor))
                 {
-                    PlugInComboItem pci = new PlugInComboItem()
-                    {
-                        Name = editor.Name,
-                        Description = editor.Description
-                    };
-                    int item = SelectEditorPlugIn.Items.Add(pci);
-
-                    if (editor.Name.Equals(selectedEditor))
-                    {
-                        SelectedEditorSettings.IsEnabled = editor.HasSettings;
-                        SelectedEditorPlugInDescription.Text = editor.Description;
-                        SelectEditorPlugIn.SelectedIndex = item;
-                    }
+                    SelectedEditorSettings.IsEnabled = editor.HasSettings;
+                    SelectedEditorPlugInDescription.Text = editor.Description;
+                    SelectEditorPlugIn.SelectedIndex = item;
                 }
             }
 

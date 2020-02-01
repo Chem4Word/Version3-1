@@ -8,6 +8,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
@@ -92,7 +93,25 @@ namespace Chem4Word.UI
                         }
                     }
                 }
-                
+
+                var dlls = AppDomain.CurrentDomain.GetAssemblies().Select(s => s.FullName).ToList();
+                dlls = dlls.OrderBy(s => s).ToList();
+
+                sb.AppendLine("");
+                sb.AppendLine(".Net Assemblies loaded in memory");
+                foreach (var dll in dlls)
+                {
+                    var idx = dll.IndexOf(", Culture", StringComparison.InvariantCulture);
+                    if (idx > 0)
+                    {
+                        sb.AppendLine($"  {dll.Substring(0, idx)}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"  {dll}");
+                    }
+                }
+
                 Information.Text = sb.ToString();
                 Information.SelectionStart = Information.Text.Length;
             }

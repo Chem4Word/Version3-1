@@ -127,17 +127,6 @@ namespace WinForms.TestHarness
             }
         }
 
-        private void SetCarbons(Model model, bool state)
-        {
-            foreach (var atom in model.GetAllAtoms())
-            {
-                if (atom.Element.Symbol.Equals("C"))
-                {
-                    atom.ShowSymbol = state;
-                }
-            }
-        }
-
         private Brush ColorToBrush(System.Drawing.Color colour)
         {
             string hex = $"#{colour.A:X2}{colour.R:X2}{colour.G:X2}{colour.B:X2}";

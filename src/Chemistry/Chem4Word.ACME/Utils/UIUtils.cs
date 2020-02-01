@@ -19,7 +19,6 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using IChem4Word.Contracts;
 using Application = System.Windows.Application;
-using Point = System.Windows.Point;
 
 namespace Chem4Word.ACME.Utils
 {
@@ -174,7 +173,7 @@ namespace Chem4Word.ACME.Utils
 
                             model.Charge = atom.FormalCharge ?? 0;
                             model.Isotope = atom.IsotopeNumber.ToString();
-                            model.ShowSymbol = atom.ShowSymbol;
+                            model.ExplicitC = atom.ExplicitC;
                         }
 
                         if (atom.Element is FunctionalGroup)
@@ -201,7 +200,7 @@ namespace Chem4Word.ACME.Utils
                         {
                             Atom ac = new Atom();
                             ac.Element = Globals.PeriodicTable.C;
-                            ac.ShowSymbol = false;
+                            ac.ExplicitC = false;
                             ac.Position = bond.OtherAtom(atom).Position;
                             m.AddAtom(ac);
                             ac.Parent = m;
@@ -256,18 +255,21 @@ namespace Chem4Word.ACME.Utils
                         Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
                         var bond = bv.ParentBond;
-                        var model = new BondPropertiesModel
-                        {
-                            Centre = screenPosition,
-                            Path = bond.Path,
-                            Angle = bond.Angle,
-                            BondOrderValue = bond.OrderValue.Value,
-                            IsSingle = bond.Order.Equals(Globals.OrderSingle),
-                            IsDouble = bond.Order.Equals(Globals.OrderDouble),
-                            Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
-                            Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
-                        };
 
+                        var model = new BondPropertiesModel
+                                    {
+                                        Centre = screenPosition,
+                                        Path = bond.Path,
+                                        Angle = bond.Angle,
+                                        Length = bond.BondLength / Globals.ScaleFactorForXaml,
+                                        BondOrderValue = bond.OrderValue.Value,
+                                        IsSingle = bond.Order.Equals(Globals.OrderSingle),
+                                        IsDouble = bond.Order.Equals(Globals.OrderDouble),
+                                        Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
+                                        Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
+                                    };
+
+                        model.BondAngle = model.AngleString;
                         model.DoubleBondChoice = DoubleBondType.Auto;
 
                         if (model.IsDouble | model.Is1Point5 | model.Is2Point5)
@@ -311,6 +313,8 @@ namespace Chem4Word.ACME.Utils
                                     break;
                             }
                         }
+
+                        model.ClearFlags();
 
                         var pe = new BondPropertyEditor(model);
                         ShowDialog(pe, currentEditor);

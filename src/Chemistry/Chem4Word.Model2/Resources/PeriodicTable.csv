@@ -1,11 +1,11 @@
 ﻿Symbol,Name,AtomicNumber,AddH,Colour,CovalentRadius,VdWRadius,Valency,Mass,Valences,Isotopes,Group,Row,PTRow,PTColumn,PTElementType,C# Property - Copy into PeriodicTable.cs
-Du,Dummy,0,FALSE,#808080,0,0,0,0,,,,,0,19,pseudo,public Element Du { get; private set; } // Dummy - Atomic Number 0
-M,Metal,0,FALSE,#808080,0,0,0,0,,,,,1,19,pseudo,public Element M { get; private set; } // Metal - Atomic Number 0
-R,Residue,0,FALSE,#808080,0,0,0,0,,,,,2,19,pseudo,public Element R { get; private set; } // Residue - Atomic Number 0
-X,Halogen,0,FALSE,#808080,0,0,0,0,,,,,3,19,pseudo,public Element X { get; private set; } // Halogen - Atomic Number 0
-D,Deuterium,1,FALSE,#808080,0,0,0,2,,,,,4,19,pseudo,public Element D { get; private set; } // Deuterium - Atomic Number 1
+Du,Dummy,0,FALSE,#808080,0,0,0,0,0|1|2|3|4|5|6|7|8|9|10,,,,0,19,pseudo,public Element Du { get; private set; } // Dummy - Atomic Number 0
+M,Metal,0,FALSE,#808080,0,0,0,0,0|1|2|3|4|5|6|7|8|9|10,,,,1,19,pseudo,public Element M { get; private set; } // Metal - Atomic Number 0
+R,Residue,0,FALSE,#808080,0,0,0,0,0|1|2|3|4|5|6|7|8|9|10,,,,2,19,pseudo,public Element R { get; private set; } // Residue - Atomic Number 0
+X,Halogen,0,FALSE,#808080,0,0,0,0,0|1|2|3|4|5|6|7|8|9|10,,,,3,19,pseudo,public Element X { get; private set; } // Halogen - Atomic Number 0
+D,Deuterium,1,FALSE,#808080,0,0,0,2,1,,,,4,19,pseudo,public Element D { get; private set; } // Deuterium - Atomic Number 1
 H,Hydrogen,1,FALSE,#808080,0.31,1.2,1,1.00794,1,1|2|3,1,1,0,0,non_metal,public Element H { get; private set; } // Hydrogen - Atomic Number 1
-T,Tritium,1,FALSE,#808080,0,0,1,3,,,,,5,19,pseudo,public Element T { get; private set; } // Tritium - Atomic Number 1
+T,Tritium,1,FALSE,#808080,0,0,1,3,1,,,,5,19,pseudo,public Element T { get; private set; } // Tritium - Atomic Number 1
 He,Helium,2,FALSE,#D9FFFF,0.28,1.4,0,4.002602,0,3|4,18,1,0,17,noble_gas,public Element He { get; private set; } // Helium - Atomic Number 2
 Li,Lithium,3,FALSE,#CC80FF,1.28,1.82,1,6.941,1,,1,2,1,0,alkali_metal,public Element Li { get; private set; } // Lithium - Atomic Number 3
 Be,Beryllium,4,FALSE,#C2FF00,0.96,0,2,9.012182,2,,2,2,1,1,alkaline_earth_metal,public Element Be { get; private set; } // Beryllium - Atomic Number 4

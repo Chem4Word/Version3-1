@@ -166,16 +166,25 @@ namespace Chem4Word.ACME.Controls
 
         private void SetStateOfExplicitCarbonCheckbox()
         {
-            var chargeValue = ChargeCombo.SelectedItem as ChargeValue;
-            var isotopeValue = IsotopePicker.SelectedItem as IsotopeValue;
-
-            if (chargeValue?.Value == 0 && isotopeValue?.Mass == null)
+            var atoms = AtomPropertiesModel.MicroModel.GetAllAtoms();
+            var atom = atoms[0];
+            if (atom.Parent.AtomCount == 1)
             {
-                ExplicitCheckBox.IsEnabled = true;
+                ExplicitCheckBox.IsEnabled = false;
             }
             else
             {
-                ExplicitCheckBox.IsEnabled = false;
+                var chargeValue = ChargeCombo.SelectedItem as ChargeValue;
+                var isotopeValue = IsotopePicker.SelectedItem as IsotopeValue;
+
+                if (chargeValue?.Value == 0 && isotopeValue?.Mass == null)
+                {
+                    ExplicitCheckBox.IsEnabled = true;
+                }
+                else
+                {
+                    ExplicitCheckBox.IsEnabled = false;
+                }
             }
         }
 
@@ -232,7 +241,7 @@ namespace Chem4Word.ACME.Controls
             {
                 atom.Element = AtomPropertiesModel.Element;
                 atom.FormalCharge = AtomPropertiesModel.Charge;
-                atom.ShowSymbol = AtomPropertiesModel.ShowSymbol;
+                atom.ExplicitC = AtomPropertiesModel.ExplicitC;
                 if (string.IsNullOrEmpty(AtomPropertiesModel.Isotope))
                 {
                     atom.IsotopeNumber = null;
@@ -247,7 +256,7 @@ namespace Chem4Word.ACME.Controls
             {
                 atom.Element = AtomPropertiesModel.Element;
                 atom.FormalCharge = null;
-                atom.ShowSymbol = null;
+                atom.ExplicitC = null;
                 atom.IsotopeNumber = null;
             }
 

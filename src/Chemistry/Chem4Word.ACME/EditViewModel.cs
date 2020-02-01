@@ -897,7 +897,6 @@ namespace Chem4Word.ACME
             Action redoAction = () =>
                                 {
                                     Model.ScaleToAverageBondLength(newLength, centre);
-                                    Model.XamlBondLength = newLength;
                                     RefreshMolecules(Model.Molecules.Values.ToList());
                                     Loading = true;
                                     CurrentBondLength = newLength / ScaleFactorForXaml;
@@ -906,7 +905,6 @@ namespace Chem4Word.ACME
             Action undoAction = () =>
                                 {
                                     Model.ScaleToAverageBondLength(currentLength, centre);
-                                    Model.XamlBondLength = currentLength;
                                     RefreshMolecules(Model.Molecules.Values.ToList());
                                     Loading = true;
                                     CurrentBondLength = currentLength / ScaleFactorForXaml;
@@ -978,7 +976,7 @@ namespace Chem4Word.ACME
                             Element = thisAtom.Element,
                             FormalCharge = thisAtom.FormalCharge,
                             IsotopeNumber = thisAtom.IsotopeNumber,
-                            ShowSymbol = thisAtom.ShowSymbol,
+                            ExplicitC = thisAtom.ExplicitC,
                             Parent = newMol
                         };
 
@@ -1355,7 +1353,6 @@ namespace Chem4Word.ACME
                 MakeRingUnsaturated(newAtomPlacements);
             }
 
-            //firstAtom.ParentMolecule.UpdateVisual();
             firstAtom.Parent.RebuildRings();
             Action undo = () =>
                           {
@@ -1419,7 +1416,7 @@ namespace Chem4Word.ACME
                                         stereo: BondStereo.None);
                 if (placement != placements.Last())
                 {
-                    lastAtom.ShowSymbol = null;
+                    lastAtom.ExplicitC = null;
                 }
             }
 
@@ -1450,9 +1447,6 @@ namespace Chem4Word.ACME
         public void DeleteMolecule(Molecule mol)
         {
             UndoManager.BeginUndoBlock();
-
-            var atomList = mol.Atoms.ToList();
-            var bondList = mol.Bonds.ToList();
 
             Action redo = () =>
                           {
@@ -1511,10 +1505,10 @@ namespace Chem4Word.ACME
                 Dictionary<string, Molecule> parents = new Dictionary<string, Molecule>();
                 foreach (var atom in targetAtoms)
                 {
-                    double seperation = 90.0;
+                    double separation = 90.0;
                     if (atom.Bonds.Count() > 1)
                     {
-                        seperation = 30.0;
+                        separation = 30.0;
                     }
 
                     int hydrogenCount = atom.ImplicitHydrogenCount;
@@ -1528,13 +1522,13 @@ namespace Chem4Word.ACME
 
                         case 2:
                             Matrix matrix1 = new Matrix();
-                            matrix1.Rotate(-seperation / 2);
+                            matrix1.Rotate(-separation / 2);
                             vector = vector * matrix1;
                             break;
 
                         case 3:
                             Matrix matrix2 = new Matrix();
-                            matrix2.Rotate(-seperation);
+                            matrix2.Rotate(-separation);
                             vector = vector * matrix2;
                             break;
 
@@ -1544,7 +1538,7 @@ namespace Chem4Word.ACME
                     }
 
                     Matrix matrix3 = new Matrix();
-                    matrix3.Rotate(seperation);
+                    matrix3.Rotate(separation);
 
                     for (int i = 0; i < hydrogenCount; i++)
                     {
@@ -2127,8 +2121,6 @@ namespace Chem4Word.ACME
 
             List<HashSet<Atom>> atomGroups = new List<HashSet<Atom>>();
             Molecule mol = null;
-            //take a copy of the neighbouring atoms
-            HashSet<Atom> neighboursCopy = new HashSet<Atom>(neighbours);
 
             //now, take groups of connected atoms from the remaining graph ignoring the excluded bonds
             while (neighbours.Count > 0)
@@ -2137,7 +2129,7 @@ namespace Chem4Word.ACME
 
                 //TODO: sort out the grouping of atoms
                 var firstAtom = neighbours.First();
-                mol = (Molecule)firstAtom.Parent;
+                mol = firstAtom.Parent;
                 mol.TraverseBFS(firstAtom, a1 => { atomGroup.Add(a1); }, a2 => !atomGroup.Contains(a2), deleteBonds);
                 atomGroups.Add(atomGroup);
                 //remove the list of atoms from the atom group
@@ -2150,6 +2142,19 @@ namespace Chem4Word.ACME
                 MoleculePropertyBag mpb = new MoleculePropertyBag();
                 mpb.Store(mol);
 
+                Dictionary<Atom, bool?> explicitFlags = new Dictionary<Atom, bool?>();
+                foreach (Bond deleteBond in deleteBonds)
+                {
+                    if (!explicitFlags.ContainsKey(deleteBond.StartAtom))
+                    {
+                        explicitFlags[deleteBond.StartAtom] = deleteBond.StartAtom.ExplicitC;
+                    }
+                    if (!explicitFlags.ContainsKey(deleteBond.EndAtom))
+                    {
+                        explicitFlags[deleteBond.EndAtom] = deleteBond.EndAtom.ExplicitC;
+                    }
+                }
+
                 UndoManager.BeginUndoBlock();
                 Action redo = () =>
                               {
@@ -2160,7 +2165,10 @@ namespace Chem4Word.ACME
                                       mol.RemoveBond(deleteBond);
                                       RefreshRingBonds(theoreticalRings, mol, deleteBond);
 
+                                      deleteBond.StartAtom.ExplicitC = null;
                                       deleteBond.StartAtom.UpdateVisual();
+
+                                      deleteBond.EndAtom.ExplicitC = null;
                                       deleteBond.EndAtom.UpdateVisual();
 
                                       foreach (Bond atomBond in deleteBond.StartAtom.Bonds)
@@ -2196,10 +2204,14 @@ namespace Chem4Word.ACME
                                   {
                                       int theoreticalRings = mol.TheoreticalRings;
                                       mol.AddBond(restoreBond);
+
+                                      restoreBond.StartAtom.ExplicitC = explicitFlags[restoreBond.StartAtom];
+                                      restoreBond.StartAtom.UpdateVisual();
+                                      restoreBond.EndAtom.ExplicitC = explicitFlags[restoreBond.EndAtom];
+                                      restoreBond.EndAtom.UpdateVisual();
+
                                       RefreshRingBonds(theoreticalRings, mol, restoreBond);
 
-                                      restoreBond.StartAtom.UpdateVisual();
-                                      restoreBond.EndAtom.UpdateVisual();
                                       foreach (Bond atomBond in restoreBond.StartAtom.Bonds)
                                       {
                                           atomBond.UpdateVisual();
@@ -2223,9 +2235,12 @@ namespace Chem4Word.ACME
             }
             else //we have multiple fragments
             {
-                List<Molecule> newMolList = new List<Molecule>();
-                List<Molecule> oldmolList = new List<Molecule>();
-                //add all the relevant atoms and bonds to a new molecule;
+                List<Molecule> newMolecules = new List<Molecule>();
+                List<Molecule> oldMolecules = new List<Molecule>();
+
+                Dictionary<Atom, bool?> explicitFlags = new Dictionary<Atom, bool?>();
+
+                //add all the relevant atoms and bonds to a new molecule
                 //grab the model for future reference
                 Model parentModel = null;
                 foreach (HashSet<Atom> atomGroup in atomGroups)
@@ -2237,9 +2252,9 @@ namespace Chem4Word.ACME
                         parentModel = parent.Model;
                     }
 
-                    if (!oldmolList.Contains(parent))
+                    if (!oldMolecules.Contains(parent))
                     {
-                        oldmolList.Add(parent);
+                        oldMolecules.Add(parent);
                     }
 
                     Molecule newMolecule = new Molecule();
@@ -2258,13 +2273,22 @@ namespace Chem4Word.ACME
 
                     newMolecule.Parent = parentModel;
                     newMolecule.Reparent();
-                    newMolList.Add(newMolecule);
+                    newMolecules.Add(newMolecule);
                     newMolecule.RebuildRings();
+
+                    // Clear explicit flag on a lone atom
+                    if (newMolecule.AtomCount == 1)
+                    {
+                        var loneAtom = newMolecule.Atoms.Values.First();
+                        explicitFlags[loneAtom] = loneAtom.ExplicitC;
+                        loneAtom.ExplicitC = null;
+                    }
+
                     //add the molecule to the model
                     parentModel.AddMolecule(newMolecule);
                 }
 
-                foreach (Molecule oldMolecule in oldmolList)
+                foreach (Molecule oldMolecule in oldMolecules)
                 {
                     parentModel.RemoveMolecule(oldMolecule);
                     oldMolecule.Parent = null;
@@ -2276,15 +2300,24 @@ namespace Chem4Word.ACME
                 Action undo = () =>
                               {
                                   _selectedItems.Clear();
-                                  foreach (Molecule oldMol in oldmolList)
+                                  foreach (Molecule oldMol in oldMolecules)
                                   {
                                       oldMol.Reparent();
                                       oldMol.Parent = parentModel;
+
+                                      foreach (var atom in oldMol.Atoms.Values)
+                                      {
+                                          if (explicitFlags.ContainsKey(atom))
+                                          {
+                                              atom.ExplicitC = explicitFlags[atom];
+                                          }
+                                      }
                                       parentModel.AddMolecule(oldMol);
+
                                       oldMol.UpdateVisual();
                                   }
 
-                                  foreach (Molecule newMol in newMolList)
+                                  foreach (Molecule newMol in newMolecules)
                                   {
                                       parentModel.RemoveMolecule(newMol);
                                       newMol.Parent = null;
@@ -2296,15 +2329,21 @@ namespace Chem4Word.ACME
                 Action redo = () =>
                               {
                                   _selectedItems.Clear();
-                                  foreach (Molecule newmol in newMolList)
+                                  foreach (Molecule newmol in newMolecules)
                                   {
                                       newmol.Reparent();
                                       newmol.Parent = parentModel;
+
+                                      if (newmol.AtomCount == 1)
+                                      {
+                                          newmol.Atoms.Values.First().ExplicitC = null;
+                                      }
+
                                       parentModel.AddMolecule(newmol);
                                       newmol.UpdateVisual();
                                   }
 
-                                  foreach (Molecule oldMol in oldmolList)
+                                  foreach (Molecule oldMol in oldMolecules)
                                   {
                                       parentModel.RemoveMolecule(oldMol);
                                       oldMol.Parent = null;
@@ -2341,17 +2380,17 @@ namespace Chem4Word.ACME
             ElementBase elementBaseBefore = atom.Element;
             int? chargeBefore = atom.FormalCharge;
             int? isotopeBefore = atom.IsotopeNumber;
-            bool? showSymbolBefore = atom.ShowSymbol;
+            bool? explicitCBefore = atom.ExplicitC;
 
             ElementBase elementBaseAfter = model.Element;
             int? chargeAfter = null;
             int? isotopeAfter = null;
-            bool? showSymbolAfter = null;
+            bool? explicitCAfter = null;
 
             if (elementBaseAfter is Element)
             {
                 chargeAfter = model.Charge;
-                showSymbolAfter = model.ShowSymbol;
+                explicitCAfter = model.ExplicitC;
                 if (!string.IsNullOrEmpty(model.Isotope))
                 {
                     isotopeAfter = int.Parse(model.Isotope);
@@ -2363,7 +2402,7 @@ namespace Chem4Word.ACME
                               atom.Element = elementBaseAfter;
                               atom.FormalCharge = chargeAfter;
                               atom.IsotopeNumber = isotopeAfter;
-                              atom.ShowSymbol = showSymbolAfter;
+                              atom.ExplicitC = explicitCAfter;
                               atom.Parent.UpdateVisual();
                           };
 
@@ -2374,7 +2413,7 @@ namespace Chem4Word.ACME
                               atom.Element = elementBaseBefore;
                               atom.FormalCharge = chargeBefore;
                               atom.IsotopeNumber = isotopeBefore;
-                              atom.ShowSymbol = showSymbolBefore;
+                              atom.ExplicitC = explicitCBefore;
                               atom.Parent.UpdateVisual();
                           };
 
@@ -2566,6 +2605,51 @@ namespace Chem4Word.ACME
                 }
             }
 
+            Molecule mol = bond.Parent;
+            RotateTransform transform = null;
+            GeneralTransform inverse = null;
+            bool singleBondTransform = false;
+            Atom rotatedAtom = null;
+
+            double angle;
+            if (double.TryParse(model.BondAngle, out angle))
+            {
+                if (angle >= -180 && angle <= 180)
+                {
+                    var rotateBy = angle - bond.Angle;
+
+                    if (Math.Abs(rotateBy) >= 0.005)
+                    {
+                        var startAtomBondCount = startAtom.Bonds.Count();
+                        var endAtomBondCount = endAtom.Bonds.Count();
+
+                        if (startAtomBondCount == 1 || endAtomBondCount == 1)
+                        {
+                            singleBondTransform = true;
+                            if (startAtomBondCount == 1)
+                            {
+                                transform = new RotateTransform(rotateBy, endAtom.Position.X, endAtom.Position.Y);
+                                rotatedAtom = startAtom;
+                                inverse = transform.Inverse;
+                            }
+
+                            if (endAtomBondCount == 1)
+                            {
+                                transform = new RotateTransform(rotateBy, startAtom.Position.X, startAtom.Position.Y);
+                                rotatedAtom = endAtom;
+                                inverse = transform.Inverse;
+                            }
+                        }
+                        else
+                        {
+                            var centroid = mol.Centroid;
+                            transform = new RotateTransform(rotateBy, centroid.X, centroid.Y);
+                            inverse = transform.Inverse;
+                        }
+                    }
+                }
+            }
+
             Action redo = () =>
                           {
                               bond.Order = OrderValueToOrder(bondOrderAfter);
@@ -2579,6 +2663,21 @@ namespace Chem4Word.ACME
                               }
 
                               bond.UpdateVisual();
+
+                              if (transform != null)
+                              {
+                                  if (singleBondTransform && rotatedAtom != null)
+                                  {
+                                      rotatedAtom.Position = transform.Transform(rotatedAtom.Position);
+                                      rotatedAtom.UpdateVisual();
+                                  }
+                                  else
+                                  {
+                                      mol.Transform((Transform)transform);
+                                      mol.UpdateVisual();
+                                  }
+                                  _selectedItems.Clear();
+                              }
                           };
 
             redo();
@@ -2596,6 +2695,21 @@ namespace Chem4Word.ACME
                               }
 
                               bond.UpdateVisual();
+
+                              if (inverse != null)
+                              {
+                                  if (singleBondTransform && rotatedAtom != null)
+                                  {
+                                      rotatedAtom.Position = inverse.Transform(rotatedAtom.Position);
+                                      rotatedAtom.UpdateVisual();
+                                  }
+                                  else
+                                  {
+                                      mol.Transform((Transform)inverse);
+                                      mol.UpdateVisual();
+                                  }
+                                  _selectedItems.Clear();
+                              }
                           };
 
             UndoManager.RecordAction(undo, redo);
