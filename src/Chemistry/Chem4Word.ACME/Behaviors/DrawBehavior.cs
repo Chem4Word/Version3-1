@@ -334,6 +334,7 @@ namespace Chem4Word.ACME.Behaviors
             IsDrawing = false;
             //clear this to prevent a weird bug in drawing
             CurrentEditor.ActiveChemistry = null;
+            CurrentEditor.Focus();
         }
 
         private bool CrowdingOut(Point p)
