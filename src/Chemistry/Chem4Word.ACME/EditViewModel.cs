@@ -689,12 +689,16 @@ namespace Chem4Word.ACME
                           {
                               parentBond.Order = order;
                               parentBond.Stereo = stereo;
+                              parentBond.StartAtom.UpdateVisual();
+                              parentBond.EndAtom.UpdateVisual();
                           };
 
             Action redo = () =>
                           {
                               parentBond.Order = newOrder ?? CurrentBondOrder;
                               parentBond.Stereo = newStereo ?? CurrentStereo;
+                              parentBond.StartAtom.UpdateVisual();
+                              parentBond.EndAtom.UpdateVisual();
                           };
             UndoManager.RecordAction(undo, redo);
 
@@ -820,20 +824,22 @@ namespace Chem4Word.ACME
                 Action undo = () =>
                               {
                                   lastAtom.Tag = oldDir;
-                                  currentMol.RemoveAtom(newAtom);
+                                  currentMol.RemoveAtom(newAtom); 
                                   newAtom.Parent = null;
+                                  lastAtom.UpdateVisual();
                               };
                 Action redo = () =>
                               {
                                   lastAtom.Tag = tag; //save the last sprouted direction in the tag object
                                   newAtom.Parent = currentMol;
                                   currentMol.AddAtom(newAtom);
+                                  lastAtom.UpdateVisual();
                                   newAtom.UpdateVisual();
                               };
                 UndoManager.RecordAction(undo, redo);
 
                 redo();
-
+                
                 AddNewBond(lastAtom, newAtom, currentMol, bondOrder, stereo);
                 lastAtom.UpdateVisual();
                 newAtom.UpdateVisual();

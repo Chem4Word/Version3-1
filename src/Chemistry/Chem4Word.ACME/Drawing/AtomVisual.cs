@@ -5,15 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using static Chem4Word.ACME.Drawing.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
@@ -389,7 +389,7 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
-        private void RenderAtom(DrawingContext drawingContext)
+        private void RenderAtomSymbol(DrawingContext drawingContext)
         {
             //renders the atom complete with charges, hydrogens and labels.
             //this code is *complex* - alter it at your own risk!
@@ -527,17 +527,27 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         public override void Render()
         {
-            
             SetTextParams();
 
             if (ParentAtom.Element is Element e)
             {
                 using (DrawingContext dc = RenderOpen())
                 {
-                  Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour));
-                  if (ParentAtom.SymbolText != "")
+                    //if it's overbonded draw the warning circle
+                    if (DisplayOverbonding && ParentAtom.Overbonded)
                     {
-                        RenderAtom(dc);
+                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, Globals.AtomRadius * 2.0, Globals.AtomRadius * 2.0);
+
+                        Brush warningFill = new SolidColorBrush(Colors.Salmon);
+                        warningFill.Opacity = 0.75;
+
+                        dc.DrawGeometry(warningFill, new Pen(new SolidColorBrush(Colors.OrangeRed), Globals.BondThickness), eg);
+                    }
+
+                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour));
+                    if (ParentAtom.SymbolText != "")
+                    {
+                        RenderAtomSymbol(dc);
                         // Diag: Show the convex hull
 #if DEBUG
 #if SHOWHULLS
@@ -627,6 +637,8 @@ namespace Chem4Word.ACME.Drawing
                 return null;
             }
         }
+
+        public bool DisplayOverbonding { get; set; }
 
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {

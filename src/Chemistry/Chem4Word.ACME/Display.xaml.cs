@@ -129,6 +129,19 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty ShowGroupsProperty =
             DependencyProperty.Register("ShowGroups", typeof(bool), typeof(Display), new PropertyMetadata(true));
 
+
+
+        public bool ShowOverbondedAtoms
+        {
+            get { return (bool)GetValue(ShowOverbondedAtomsProperty); }
+            set { SetValue(ShowOverbondedAtomsProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ShowOverbondedAtoms.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ShowOverbondedAtomsProperty =
+            DependencyProperty.Register("ShowOverbondedAtoms", typeof(bool), typeof(Display), new PropertyMetadata(default(bool)));
+
+
         #endregion Public Properties
 
         #region Public Methods

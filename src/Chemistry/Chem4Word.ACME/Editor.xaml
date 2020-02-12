@@ -1056,6 +1056,7 @@
                     x:Name="ChemCanvas"
                     MinWidth="2000"
                     MinHeight="1500"
+                    DisplayOverbondedAtoms="True"
                     Background="White" />
             </ScrollViewer>
             <control:ZoomBox

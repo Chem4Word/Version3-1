@@ -128,6 +128,20 @@ namespace Chem4Word.ACME.Controls
             DependencyProperty.Register("HighlightActive", typeof(bool), typeof(ChemistryCanvas),
                                         new PropertyMetadata(true));
 
+
+
+        public bool DisplayOverbondedAtoms
+        {
+            get { return (bool)GetValue(DisplayOverbondedAtomsProperty); }
+            set { SetValue(DisplayOverbondedAtomsProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for DisplayOverbondedAtoms.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DisplayOverbondedAtomsProperty =
+            DependencyProperty.Register("DisplayOverbondedAtoms", typeof(bool), typeof(ChemistryCanvas), new PropertyMetadata(default(bool)));
+
+
+
         #endregion Properties
 
         /// <summary>
@@ -681,7 +695,7 @@ namespace Chem4Word.ACME.Controls
                     av.ChemicalVisuals = chemicalVisuals;
 
                     av.BackgroundColor = Background;
-
+                    av.DisplayOverbonding = DisplayOverbondedAtoms;
                     av.Render();
 
                     AddVisual(av);
