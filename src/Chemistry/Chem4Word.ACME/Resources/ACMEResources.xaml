@@ -29,6 +29,7 @@
         <GradientStop Offset="0.1" Color="Transparent" />
         <GradientStop Offset="0.2" Color="Transparent" />
     </LinearGradientBrush>
+
     <Style
         x:Key="HatchBondStyle"
         BasedOn="{StaticResource WedgeBondStyle}"
@@ -62,6 +63,7 @@
         Tag="Benzene">
         <Path.Data>M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z M 5.50480947161671,8.24 L 12,4.5 M 18.4951905283833,8.24 L 18.4951905283833,15.75 M 12,19.5 L 5.50480947161671, 15.75</Path.Data>
     </Path>
+
     <Path
         x:Key="CyclohexanePath"
         Stroke="Black"
@@ -69,6 +71,7 @@
         Tag="Cyclohexane">
         <Path.Data>M 3.33974596215561,7 L 12,2 L 20.6602540378444,7 L 20.6602540378444,17 L 12,22 L 3.33974596215561, 17 Z</Path.Data>
     </Path>
+
     <Path
         x:Key="CyclopentanePath"
         Height="25"
@@ -86,6 +89,7 @@
         Tag="Cyclopentadiene">
         <Path.Data>M 12,24.5 L 1.88728757031316,17.1526843463441 L 5.75,5.26447789265467 L 18.25,5.26447789265467 L 22.1127124296868,17.1526843463441 Z M 12,20.5 M 5.52786404500042,15.7977179816602 L 8,8.18926585129899 M 16,8.18926585129899 L 18.4721359549996,15.7977179816602</Path.Data>
     </Path>
+
     <Path
         x:Key="CycloheptanePath"
         Stroke="Black"
@@ -96,6 +100,7 @@
             <TranslateTransform X="7.5" Y="5" />
         </Path.RenderTransform>
     </Path>
+
     <Path
         x:Key="CyclooctanePath"
         Stroke="Black"
@@ -106,6 +111,7 @@
             <TranslateTransform X="7.5" Y="5" />
         </Path.RenderTransform>
     </Path>
+
     <Path
         x:Key="ChainPath"
         Stroke="Black"
@@ -114,11 +120,13 @@
         Tag="Chain">
         <Path.Data>M 0, 12 L 8.66025403784439, 18 L 17.3205080756888, 12 L 25.9807621135332, 18</Path.Data>
     </Path>
+
     <graphics:RegularPolygon
         x:Key="Heptagon"
         PointCount="7"
         SideLength="8.0"
         Stroke="Black" />
+
     <graphics:RegularPolygon
         x:Key="Octagon"
         PointCount="8"

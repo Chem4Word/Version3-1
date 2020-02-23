@@ -421,16 +421,16 @@
     <Compile Include="UI\WPF\EditLabelsHost.Designer.cs">
       <DependentUpon>EditLabelsHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="UI\WPF\SettingsControl.xaml.cs">
-      <DependentUpon>SettingsControl.xaml</DependentUpon>
+    <Compile Include="UI\WPF\Chem4WordSettingsControl.xaml.cs">
+      <DependentUpon>Chem4WordSettingsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\WPF\SettingsHost.cs">
+    <Compile Include="UI\WPF\Chem4WordSettingsHost.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\WPF\SettingsHost.Designer.cs">
-      <DependentUpon>SettingsHost.cs</DependentUpon>
+    <Compile Include="UI\WPF\Chem4WordSettingsHost.Designer.cs">
+      <DependentUpon>Chem4WordSettingsHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options.cs" />
+    <Compile Include="Chem4WordOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -527,8 +527,8 @@
     <EmbeddedResource Include="UI\WPF\EditLabelsHost.resx">
       <DependentUpon>EditLabelsHost.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UI\WPF\SettingsHost.resx">
-      <DependentUpon>SettingsHost.cs</DependentUpon>
+    <EmbeddedResource Include="UI\WPF\Chem4WordSettingsHost.resx">
+      <DependentUpon>Chem4WordSettingsHost.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UI\XmlViewer.resx">
       <DependentUpon>XmlViewer.cs</DependentUpon>
@@ -670,7 +670,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\WPF\SettingsControl.xaml">
+    <Page Include="UI\WPF\Chem4WordSettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

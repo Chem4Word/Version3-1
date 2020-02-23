@@ -44,9 +44,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(IsArrowClosedProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for IsArrowClosed.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IsArrowClosedProperty =
-            DependencyProperty.Register("IsArrowClosed", typeof(bool), typeof(ArrowBase), new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("IsArrowClosed", typeof(bool), typeof(ArrowBase),
+                                        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public Point StartPoint
         {
@@ -54,9 +54,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(StartPointProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartPointProperty =
-            DependencyProperty.Register("StartPoint", typeof(Point), typeof(ArrowBase), new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsMeasure));
+            DependencyProperty.Register("StartPoint", typeof(Point), typeof(ArrowBase),
+                                        new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public Point EndPoint
         {
@@ -64,9 +64,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(EndPointProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndPointProperty =
-            DependencyProperty.Register("EndPoint", typeof(Point), typeof(ArrowBase), new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsMeasure));
+            DependencyProperty.Register("EndPoint", typeof(Point), typeof(ArrowBase),
+                                        new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         //readonly property for calculating arrow length
         public double ArrowLength
@@ -103,9 +103,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(ArrowHeadLengthProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ArrowHeadLength.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ArrowHeadLengthProperty =
-            DependencyProperty.Register("ArrowHeadLength", typeof(double), typeof(ArrowBase), new FrameworkPropertyMetadata(12.0,
+            DependencyProperty.Register("ArrowHeadLength", typeof(double), typeof(ArrowBase),
+                                        new FrameworkPropertyMetadata(12.0,
                         FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public double HeadAngle
@@ -114,9 +114,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(HeadAngleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for HeadAngle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HeadAngleProperty =
-            DependencyProperty.Register("HeadAngle", typeof(double), typeof(ArrowBase), new FrameworkPropertyMetadata(45.0,
+            DependencyProperty.Register("HeadAngle", typeof(double), typeof(ArrowBase),
+                                        new FrameworkPropertyMetadata(45.0,
                         FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         #endregion "Dependency Properties"

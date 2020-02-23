@@ -154,8 +154,20 @@ namespace Chem4Word.Telemetry
             lines.Add($"Physical Memory: {_wmiHelper.PhysicalMemory}");
             lines.Add($"Booted Up: {_wmiHelper.LastLastBootUpTime}");
 
+            lines.Add($"Type: {_wmiHelper.ProductType}");
+            if (!string.IsNullOrEmpty(_wmiHelper.AntiVirusStatus))
+            {
+                lines.Add("AntiVirus:");
+                var products = _wmiHelper.AntiVirusStatus.Split(';');
+                foreach (var product in products)
+                {
+                    lines.Add($"  {product}");
+                }
+            }
+
             // Log Screen Sizes
             lines.Add($"Screens: {_helper.Screens}");
+
             WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
 
 #if DEBUG

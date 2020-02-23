@@ -28,10 +28,19 @@ namespace Chem4Word.UI.WPF
         public List<string> Used1D { get; set; }
         public string Message { get; set; }
 
+        private AcmeOptions _options;
+
         private bool _closedInCode = false;
 
         public EditLabelsHost()
         {
+            _options = new AcmeOptions();
+            InitializeComponent();
+        }
+
+        public EditLabelsHost(AcmeOptions options)
+        {
+            _options = options;
             InitializeComponent();
         }
 
@@ -51,13 +60,13 @@ namespace Chem4Word.UI.WPF
                 splitContainer1.FixedPanel = FixedPanel.Panel2;
                 splitContainer1.IsSplitterFixed = true;
 
-                // Set Up WPF UC
-                if (elementHost1.Child is LabelsEditor editor)
-                {
-                    editor.TopLeft = TopLeft;
-                    editor.Used1D = Used1D;
-                    editor.PopulateTreeView(Cml);
-                }
+                var editor = new LabelsEditor(_options);
+                editor.InitializeComponent();
+                elementHost1.Child = editor;
+
+                editor.TopLeft = TopLeft;
+                editor.Used1D = Used1D;
+                editor.PopulateTreeView(Cml);
 
                 Warning.Text = Message;
             }

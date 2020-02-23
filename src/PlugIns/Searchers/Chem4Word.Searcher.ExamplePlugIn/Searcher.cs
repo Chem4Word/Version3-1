@@ -8,12 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using Chem4Word.Core.UI.Forms;
 using IChem4Word.Contracts;
-using Newtonsoft.Json;
 using Point = System.Windows.Point;
 
 namespace Chem4Word.Searcher.ExamplePlugIn
@@ -31,11 +29,12 @@ namespace Chem4Word.Searcher.ExamplePlugIn
         public bool HasSettings => true;
         public Point TopLeft { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
-        public string ProductAppDataPath { get; set; }
+
+        public string SettingsPath { get; set; }
+        private ExampleOptions _searcherOptions;
+
         public Dictionary<string, string> Properties { get; set; }
         public string Cml { get; set; }
-
-        private Options _searcherOptions = new Options();
 
         public Searcher()
         {
@@ -48,17 +47,14 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
+                _searcherOptions = new ExampleOptions(SettingsPath);
 
-                Settings settings = new Settings();
+                ExampleSettings settings = new ExampleSettings();
                 settings.Telemetry = Telemetry;
                 settings.TopLeft = topLeft;
 
-                Options tempOptions = _searcherOptions.Clone();
-                settings.SettingsPath = ProductAppDataPath;
+                var tempOptions = _searcherOptions.Clone();
+                settings.SettingsPath = SettingsPath;
                 settings.SearcherOptions = tempOptions;
 
                 DialogResult dr = settings.ShowDialog();
@@ -67,47 +63,12 @@ namespace Chem4Word.Searcher.ExamplePlugIn
                     _searcherOptions = tempOptions.Clone();
                 }
                 settings.Close();
-                settings = null;
             }
             catch (Exception ex)
             {
                 new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
             }
             return true;
-        }
-
-        public void LoadSettings()
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            try
-            {
-                if (!string.IsNullOrEmpty(ProductAppDataPath))
-                {
-                    // Load User Options
-                    string fileName = $"{_product}.json";
-                    string optionsFile = Path.Combine(ProductAppDataPath, fileName);
-                    if (File.Exists(optionsFile))
-                    {
-                        string json = File.ReadAllText(optionsFile);
-                        _searcherOptions = JsonConvert.DeserializeObject<Options>(json);
-                        string temp = JsonConvert.SerializeObject(_searcherOptions, Formatting.Indented);
-                        if (!json.Equals(temp))
-                        {
-                            File.WriteAllText(optionsFile, temp);
-                        }
-                    }
-                    else
-                    {
-                        _searcherOptions.RestoreDefaults();
-                        string json = JsonConvert.SerializeObject(_searcherOptions, Formatting.Indented);
-                        File.WriteAllText(optionsFile, json);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
-            }
         }
 
         public DialogResult Search()
@@ -120,6 +81,8 @@ namespace Chem4Word.Searcher.ExamplePlugIn
                 // ToDo: Set any (extra) Properties required before calling this function
                 // ToDo: Set Cml property with search result
                 // ToDo: Return DialogResult.OK if operation not cancelled
+
+                _searcherOptions = new ExampleOptions(SettingsPath);
             }
             catch (Exception ex)
             {

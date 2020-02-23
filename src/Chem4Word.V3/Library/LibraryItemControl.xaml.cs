@@ -85,7 +85,6 @@ namespace Chem4Word.Library
             set { SetValue(ActiveDocumentProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ActiveDocument.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ActiveDocumentProperty =
             DependencyProperty.Register("ActiveDocument", typeof(Document), typeof(LibraryItemControl), new PropertyMetadata(null));
 

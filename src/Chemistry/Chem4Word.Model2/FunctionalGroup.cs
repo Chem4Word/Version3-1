@@ -243,7 +243,7 @@ namespace Chem4Word.Model2
                 return expanded;
             }
 
-            List<FunctionalGroupPart> ExpandGroupV2(Group componentGroup)
+            List<FunctionalGroupPart> ExpandGroupV2(Group componentGroup, bool flipped=false)
             {
                 List<FunctionalGroupPart> expanded = new List<FunctionalGroupPart>();
 
@@ -291,7 +291,7 @@ namespace Chem4Word.Model2
                         }
                         else
                         {
-                            if (functionalGroup.Flippable && reverse)
+                            if (functionalGroup.Flippable && flipped)
                             {
                                 for (int ii = functionalGroup.Components.Count - 1; ii >= 0; ii--)
                                 {

@@ -15,6 +15,13 @@ namespace Chem4Word.ACME.Models
     {
         public Model Data { get; set; }
 
+        public AcmeOptions Options { get; set; }
+
+        public bool ShowAllCarbonAtoms => Options.ShowCarbons;
+        public bool ShowImplicitHydrogens => Options.ShowHydrogens;
+        public bool ShowAtomsInColour => Options.ColouredAtoms;
+        public bool ShowMoleculeGrouping => Options.ShowMoleculeGrouping;
+
         public List<string> Used1DProperties { get; set; }
 
         private bool? _showMoleculeBrackets;

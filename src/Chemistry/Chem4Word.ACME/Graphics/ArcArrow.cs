@@ -25,10 +25,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(CenterProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Center.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CenterProperty =
-            DependencyProperty.Register("Center", typeof(Point), typeof(Arc)
-            , new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("Center", typeof(Point), typeof(Arc),
+                                        new FrameworkPropertyMetadata(new Point(0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
 
         /// <summary>
         /// Measured relative to Compass East
@@ -39,10 +38,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(StartAngleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for StartAngle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartAngleProperty =
-            DependencyProperty.Register("StartAngle", typeof(double), typeof(Arc)
-            , new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("StartAngle", typeof(double), typeof(Arc),
+                                        new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
         /// <summary>
         /// Measured relative to Compass East
@@ -53,10 +51,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(EndAngleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for EndAngle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndAngleProperty =
-            DependencyProperty.Register("EndAngle", typeof(double), typeof(Arc)
-            , new FrameworkPropertyMetadata(Math.PI / 2.0, FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("EndAngle", typeof(double), typeof(Arc),
+                                        new FrameworkPropertyMetadata(Math.PI / 2.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public double Radius
         {
@@ -64,10 +61,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(RadiusProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Radius.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty RadiusProperty =
-            DependencyProperty.Register("Radius", typeof(double), typeof(Arc)
-            , new FrameworkPropertyMetadata(10.0, FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("Radius", typeof(double), typeof(Arc),
+                                        new FrameworkPropertyMetadata(10.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
         public bool SmallAngle
         {
@@ -75,10 +71,9 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(SmallAngleProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SmallAngle.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SmallAngleProperty =
-            DependencyProperty.Register("SmallAngle", typeof(bool), typeof(Arc)
-            , new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register("SmallAngle", typeof(bool), typeof(Arc),
+                                        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
 
         protected override PathFigure ArrowLineFigure()
         {

@@ -17,7 +17,6 @@ namespace Chem4Word.ACME.Controls
     {
         private const double SuperSubScriptSize = 0.8;
 
-        // Using a DependencyProperty as the backing store for ParentGroup.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ParentGroupProperty =
             DependencyProperty.Register("ParentGroup", typeof(FunctionalGroup), typeof(FunctionalGroupBlock),
                                         new FrameworkPropertyMetadata(FunctionalGroupChanged));

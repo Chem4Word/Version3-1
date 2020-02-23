@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows.Forms;
+using Chem4Word.ACME;
 using Microsoft.Office.Interop.Word;
 
 namespace Chem4Word.Navigator
@@ -13,14 +14,19 @@ namespace Chem4Word.Navigator
     public partial class NavigatorHost : UserControl
     {
         private Document _activeDoc;
+        private AcmeOptions _acmeOptions;
 
         public NavigatorHost()
         {
             InitializeComponent();
+            _acmeOptions = new AcmeOptions();
         }
 
         public NavigatorHost(Microsoft.Office.Interop.Word.Application app, Document doc) : this()
         {
+            _acmeOptions = new AcmeOptions(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath);
+            navigatorView1.SetOptions(_acmeOptions);
+
             ActiveApp = app;
             ActiveDoc = doc;
         }

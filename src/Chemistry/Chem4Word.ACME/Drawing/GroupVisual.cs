@@ -18,11 +18,13 @@ namespace Chem4Word.ACME.Drawing
 
         public Rect BoundingBox { get; }
         public Molecule ParentMolecule { get; }
+        public bool ShowInColour { get; set; }
 
-        public GroupVisual(Molecule parent, Rect? boundingBox = null)
+        public GroupVisual(Molecule parent, bool showInColour, Rect? boundingBox = null)
         {
             ParentMolecule = parent;
             BoundingBox = boundingBox ?? ParentMolecule.BoundingBox;
+            ShowInColour = showInColour;
             Render();
         }
 
@@ -34,7 +36,7 @@ namespace Chem4Word.ACME.Drawing
             //now work out the main area
             Brush mainArea = new SolidColorBrush(Colors.Gray);
             mainArea.Opacity = MainAreaOpacity;
-            Brush bracketBrush = new SolidColorBrush(Globals.GroupBracketColor);
+            Brush bracketBrush = ShowInColour ? new SolidColorBrush(Globals.GroupBracketColor) : new SolidColorBrush(Colors.Black);
             Pen bracketPen = new Pen(bracketBrush, Globals.BracketThickness);
             bracketPen.StartLineCap = PenLineCap.Round;
             bracketPen.EndLineCap = PenLineCap.Round;

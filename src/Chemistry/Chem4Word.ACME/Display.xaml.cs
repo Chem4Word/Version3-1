@@ -31,16 +31,7 @@ namespace Chem4Word.ACME
 
         #region Public Properties
 
-        public Brush BackgroundColor
-        {
-            get { return (Brush)GetValue(BackgroundColorProperty); }
-            set { SetValue(BackgroundColorProperty, value); }
-        }
-
-        public static readonly DependencyProperty BackgroundColorProperty =
-            DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display),
-                                        new FrameworkPropertyMetadata(SystemColors.WindowBrush,
-                                                                      FrameworkPropertyMetadataOptions.AffectsRender));
+        public ViewModel CurrentViewModel { get; set; }
 
         #region Chemistry (DependencyProperty)
 
@@ -50,65 +41,26 @@ namespace Chem4Word.ACME
             set { SetValue(ChemistryProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Chemistry.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ChemistryProperty =
             DependencyProperty.Register("Chemistry", typeof(object), typeof(Display),
                                         new FrameworkPropertyMetadata(null,
-                                                                      FrameworkPropertyMetadataOptions.AffectsRender |
-                                                                      FrameworkPropertyMetadataOptions.AffectsArrange |
-                                                                      FrameworkPropertyMetadataOptions.AffectsMeasure,
+                                                                      FrameworkPropertyMetadataOptions.AffectsRender
+                                                                      | FrameworkPropertyMetadataOptions.AffectsArrange
+                                                                      | FrameworkPropertyMetadataOptions.AffectsMeasure,
                                                                       ChemistryChanged));
-
-        private static void ChemistryChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
-        {
-            var view = source as Display;
-            if (view == null)
-            {
-                return;
-            }
-
-            view.HandleDataContextChanged();
-        }
 
         #endregion Chemistry (DependencyProperty)
 
-        #region ChemistryWidth (DependencyProperty)
-
-        public double ChemistryWidth
+        public Brush BackgroundColor
         {
-            get { return (double)GetValue(ChemistryWidthProperty); }
-            set { SetValue(ChemistryWidthProperty, value); }
+            get { return (Brush)GetValue(BackgroundColorProperty); }
+            set { SetValue(BackgroundColorProperty, value); }
         }
 
-        public static readonly DependencyProperty ChemistryWidthProperty = DependencyProperty.Register(
-            "ChemistryWidth", typeof(double), typeof(Display), new FrameworkPropertyMetadata(default(double),
-                                                                                             FrameworkPropertyMetadataOptions
-                                                                                                 .AffectsRender |
-                                                                                             FrameworkPropertyMetadataOptions
-                                                                                                 .AffectsArrange |
-                                                                                             FrameworkPropertyMetadataOptions
-                                                                                                 .AffectsMeasure));
-
-        #endregion ChemistryWidth (DependencyProperty)
-
-        #region ChemistryHeight (DependencyProperty)
-
-        public double ChemistryHeight
-        {
-            get { return (double)GetValue(ChemistryHeightProperty); }
-            set { SetValue(ChemistryHeightProperty, value); }
-        }
-
-        public static readonly DependencyProperty ChemistryHeightProperty = DependencyProperty.Register(
-            "ChemistryHeight", typeof(double), typeof(Display), new FrameworkPropertyMetadata(default(double),
-                                                                                              FrameworkPropertyMetadataOptions
-                                                                                                  .AffectsRender |
-                                                                                              FrameworkPropertyMetadataOptions
-                                                                                                  .AffectsArrange |
-                                                                                              FrameworkPropertyMetadataOptions
-                                                                                                  .AffectsMeasure));
-
-        #endregion ChemistryHeight (DependencyProperty)
+        public static readonly DependencyProperty BackgroundColorProperty =
+            DependencyProperty.Register("BackgroundColor", typeof(Brush), typeof(Display),
+                                        new FrameworkPropertyMetadata(SystemColors.WindowBrush,
+                                            FrameworkPropertyMetadataOptions.AffectsRender));
 
         public bool HighlightActive
         {
@@ -116,20 +68,62 @@ namespace Chem4Word.ACME
             set { SetValue(HighlightActiveProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for HighlightActive.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HighlightActiveProperty =
-            DependencyProperty.Register("HighlightActive", typeof(bool), typeof(Display), new PropertyMetadata(true));
+            DependencyProperty.Register("HighlightActive", typeof(bool), typeof(Display),
+                                        new FrameworkPropertyMetadata(true,
+                                            FrameworkPropertyMetadataOptions.AffectsRender
+                                            | FrameworkPropertyMetadataOptions.AffectsArrange
+                                            | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-        public bool ShowGroups
+        public bool ShowMoleculeGrouping
         {
-            get { return (bool)GetValue(ShowGroupsProperty); }
-            set { SetValue(ShowGroupsProperty, value); }
+            get { return (bool)GetValue(ShowMoleculeGroupingProperty); }
+            set { SetValue(ShowMoleculeGroupingProperty, value); }
         }
 
-        public static readonly DependencyProperty ShowGroupsProperty =
-            DependencyProperty.Register("ShowGroups", typeof(bool), typeof(Display), new PropertyMetadata(true));
+        public static readonly DependencyProperty ShowMoleculeGroupingProperty =
+            DependencyProperty.Register("ShowMoleculeGrouping", typeof(bool), typeof(Display),
+                                        new FrameworkPropertyMetadata(true,
+                                             FrameworkPropertyMetadataOptions.AffectsRender
+                                             | FrameworkPropertyMetadataOptions.AffectsArrange
+                                             | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
+        public bool ShowAtomsInColour
+        {
+            get { return (bool)GetValue(ShowAtomsInColourProperty); }
+            set { SetValue(ShowAtomsInColourProperty, value); }
+        }
 
+        public static readonly DependencyProperty ShowAtomsInColourProperty =
+            DependencyProperty.Register("ShowAtomsInColour", typeof(bool), typeof(Display),
+                                        new FrameworkPropertyMetadata(true,
+                                              FrameworkPropertyMetadataOptions.AffectsRender));
+
+        public bool ShowAllCarbonAtoms
+        {
+            get { return (bool)GetValue(ShowAllCarbonAtomsProperty); }
+            set { SetValue(ShowAllCarbonAtomsProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowAllCarbonAtomsProperty =
+            DependencyProperty.Register("ShowAllCarbonAtoms", typeof(bool), typeof(Display),
+                                        new FrameworkPropertyMetadata(false,
+                                           FrameworkPropertyMetadataOptions.AffectsRender
+                                           | FrameworkPropertyMetadataOptions.AffectsArrange
+                                           | FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+        public bool ShowImplicitHydrogens
+        {
+            get { return (bool)GetValue(ShowImplicitHydrogensProperty); }
+            set { SetValue(ShowImplicitHydrogensProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowImplicitHydrogensProperty =
+            DependencyProperty.Register("ShowImplicitHydrogens", typeof(bool), typeof(Display),
+                                        new FrameworkPropertyMetadata(true,
+                                          FrameworkPropertyMetadataOptions.AffectsRender
+                                          | FrameworkPropertyMetadataOptions.AffectsArrange
+                                          | FrameworkPropertyMetadataOptions.AffectsMeasure));
 
         public bool ShowOverbondedAtoms
         {
@@ -140,7 +134,6 @@ namespace Chem4Word.ACME
         // Using a DependencyProperty as the backing store for ShowOverbondedAtoms.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowOverbondedAtomsProperty =
             DependencyProperty.Register("ShowOverbondedAtoms", typeof(bool), typeof(Display), new PropertyMetadata(default(bool)));
-
 
         #endregion Public Properties
 
@@ -156,6 +149,14 @@ namespace Chem4Word.ACME
         #endregion Public Methods
 
         #region Private Methods
+
+        private static void ChemistryChanged(DependencyObject source, DependencyPropertyChangedEventArgs args)
+        {
+            if (source is Display display)
+            {
+                display.HandleDataContextChanged();
+            }
+        }
 
         private void HandleDataContextChanged()
         {
@@ -199,7 +200,6 @@ namespace Chem4Word.ACME
             {
                 if (chemistryModel.TotalAtomsCount > 0)
                 {
-                    // ToDo: second parameter to come from DisplayOptions when implemented
                     chemistryModel.RescaleForXaml(true, Constants.StandardBondLength);
 
                     CurrentViewModel = new ViewModel(chemistryModel);
@@ -212,8 +212,6 @@ namespace Chem4Word.ACME
         {
             ChemCanvas.Chemistry = currentViewModel;
         }
-
-        public ViewModel CurrentViewModel { get; set; }
 
         #endregion Private Methods
 

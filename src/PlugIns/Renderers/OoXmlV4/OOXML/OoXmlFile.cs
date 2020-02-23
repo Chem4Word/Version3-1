@@ -32,7 +32,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         /// <param name="telemetry"></param>
         /// <param name="topLeft"></param>
         /// <returns></returns>
-        public static string CreateFromCml(string cml, string guid, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        public static string CreateFromCml(string cml, string guid, OoXmlV4Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -89,7 +89,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         /// <param name="options"></param>
         /// <param name="telemetry"></param>
         /// <param name="topLeft"></param>
-        private static void AddPictureFromModel(Body docbody, Model model, string bookmarkName, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        private static void AddPictureFromModel(Body docbody, Model model, string bookmarkName, OoXmlV4Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             Paragraph paragraph1 = new Paragraph();
             if (!string.IsNullOrEmpty(bookmarkName))

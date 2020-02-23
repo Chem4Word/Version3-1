@@ -47,9 +47,13 @@ namespace Chem4Word.ACME
 
         private List<string> _used1DProperties;
 
-        public Options EditorOptions { get; set; }
+        public AcmeOptions EditorOptions { get; set; }
 
-        public IChem4WordTelemetry Telemetry { get; set; }
+        public IChem4WordTelemetry Telemetry
+        {
+            get { return Common.Telemetry; }
+            set { Common.Telemetry = value; }
+        }
 
         public bool ShowFeedback
         {
@@ -57,7 +61,6 @@ namespace Chem4Word.ACME
             set { SetValue(ShowFeedbackProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ShowFeedback.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowFeedbackProperty =
             DependencyProperty.Register("ShowFeedback", typeof(bool), typeof(Editor), new PropertyMetadata(true));
 
@@ -78,7 +81,7 @@ namespace Chem4Word.ACME
             InitialiseEditor();
         }
 
-        public void SetProperties(string cml, List<string> used1DProperties, Options options)
+        public void SetProperties(string cml, List<string> used1DProperties, AcmeOptions options)
         {
             CMLConverter cc = new CMLConverter();
             _model = cc.Import(cml, used1DProperties);
@@ -176,7 +179,6 @@ namespace Chem4Word.ACME
             set { SetValue(SelectedAtomOptionProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SelectedAtomOption.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedAtomOptionProperty =
             DependencyProperty.Register("SelectedAtomOption", typeof(AtomOption), typeof(Editor),
                                         new PropertyMetadata(default(AtomOption)));
@@ -254,19 +256,16 @@ namespace Chem4Word.ACME
                 ActiveViewModel = new EditViewModel(_model, ChemCanvas, _used1DProperties);
                 ActiveViewModel.EditorControl = this;
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
+                ActiveViewModel.EditorOptions = EditorOptions;
 
                 ChemCanvas.Chemistry = ActiveViewModel;
 
-                ActiveViewModel.Loading = true;
+                ChemCanvas.ShowMoleculeGrouping = true;
+                ChemCanvas.ShowAtomsInColour = EditorOptions.ColouredAtoms;
+                ChemCanvas.ShowImplicitHydrogens = EditorOptions.ShowHydrogens;
+                ChemCanvas.ShowAllCarbonAtoms = EditorOptions.ShowCarbons;
 
-                if (EditorOptions != null)
-                {
-                    EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
-                }
-                else
-                {
-                    EditorOptions = new Options();
-                }
+                ActiveViewModel.Loading = true;
 
                 if (ActiveViewModel.Model.TotalBondsCount == 0)
                 {
@@ -322,26 +321,38 @@ namespace Chem4Word.ACME
 
         private void SettingsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialogueTopLeft = new Point(TopLeft.X + Core.Helpers.Constants.TopLeftOffset,
-                                            TopLeft.Y + Core.Helpers.Constants.TopLeftOffset);
-            UIUtils.ShowAcmeSettings(ChemCanvas, EditorOptions.SettingsFile, Telemetry, dialogueTopLeft);
+            Point dialogueTopLeft = new Point(TopLeft.X + Core.Helpers.Constants.TopLeftOffset,
+                                              TopLeft.Y + Core.Helpers.Constants.TopLeftOffset);
+
+            UIUtils.ShowAcmeSettings(ChemCanvas, EditorOptions, Telemetry, dialogueTopLeft);
+
             // Re Load settings as they may have changed
-            EditorOptions = FileUtils.LoadAcmeSettings(EditorOptions.SettingsFile, Telemetry, TopLeft);
-            if (ActiveViewModel.Model.TotalBondsCount == 0)
+            EditorOptions = new AcmeOptions(EditorOptions.SettingsPath);
+
+            if (ActiveViewModel != null)
             {
-                // Change current selection if the model is empty
-                foreach (ComboBoxItem item in BondLengthSelector.Items)
+                if (ActiveViewModel.Model.TotalBondsCount == 0)
                 {
-                    if (int.Parse(item.Content.ToString()) == EditorOptions.BondLength)
+                    // Change current selection if the model is empty
+                    foreach (ComboBoxItem item in BondLengthSelector.Items)
                     {
-                        ActiveViewModel.Loading = true;
-                        BondLengthSelector.SelectedItem = item;
-                        ActiveViewModel.CurrentBondLength = EditorOptions.BondLength;
-                        // ToDo: Find way to avoid this as XamlBondLength ought to be read only
-                        ActiveViewModel.Model.SetXamlBondLength(EditorOptions.BondLength);
-                        ActiveViewModel.Loading = false;
+                        if (int.Parse(item.Content.ToString()) == EditorOptions.BondLength)
+                        {
+                            ActiveViewModel.Loading = true;
+                            BondLengthSelector.SelectedItem = item;
+
+                            ActiveViewModel.CurrentBondLength = EditorOptions.BondLength;
+
+                            // ToDo: Find way to avoid this as XamlBondLength ought to be read only
+                            ActiveViewModel.Model.SetXamlBondLength(EditorOptions.BondLength);
+                            ActiveViewModel.Loading = false;
+                        }
                     }
                 }
+
+                ActiveViewModel.CurrentEditor.ShowAtomsInColour = EditorOptions.ColouredAtoms;
+                ActiveViewModel.CurrentEditor.ShowImplicitHydrogens = EditorOptions.ShowHydrogens;
+                ActiveViewModel.CurrentEditor.ShowAllCarbonAtoms = EditorOptions.ShowCarbons;
             }
         }
 

@@ -1,5 +1,6 @@
 [
     {
+        "comment": "This functional group should ONLY be used when indicating attachment points during a functional group expansion",
         "Name": "*",
         "Symbol": "*",
         "Colour": "#ff0000",
@@ -282,6 +283,7 @@
     {
         "Name": "CH2",
         "Symbol": "CH2",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -296,6 +298,7 @@
     {
         "Name": "CH3",
         "Symbol": "CH3",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -536,6 +539,7 @@
     {
         "Name": "C2F5",
         "Symbol": "C2F5",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -588,6 +592,7 @@
     {
         "Name": "CO2H",
         "Symbol": "CO2H",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",

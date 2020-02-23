@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Media;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using DocumentFormat.OpenXml;
 using A = DocumentFormat.OpenXml.Drawing;
@@ -23,15 +24,17 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 {
     public class BondLineRenderer
     {
-        private Rect m_canvasExtents;
-        private long m_ooxmlId;
-        private double m_medianBondLength;
+        private Rect _canvasExtents;
+        private long _ooxmlId;
+        private double _medianBondLength;
+        private OoXmlV4Options _options;
 
-        public BondLineRenderer(Rect canvasExtents, ref long ooxmlId, double medianBondLength)
+        public BondLineRenderer(Rect canvasExtents, OoXmlV4Options options, ref long ooxmlId, double medianBondLength)
         {
-            m_canvasExtents = canvasExtents;
-            m_ooxmlId = ooxmlId;
-            m_medianBondLength = medianBondLength;
+            _canvasExtents = canvasExtents;
+            _ooxmlId = ooxmlId;
+            _medianBondLength = medianBondLength;
+            _options = options;
         }
 
         public void DrawWedgeBond(Wpg.WordprocessingGroup wordprocessingGroup, BondLine bl)
@@ -48,11 +51,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point wedgeStart = new Point(bl.Start.X, bl.Start.Y);
             Point wedgeEndLeft = new Point(leftBondLine.End.X, leftBondLine.End.Y);
             Point wedgeEndRight = new Point(rightBondLine.End.X, rightBondLine.End.Y);
-            Point wedgeEndMiddle = new Point(bl.End.X, bl.End.Y);
 
             Bond thisBond = bl.Bond;
             Atom endAtom = thisBond.EndAtom;
-            //Atom startAtom = thisBond.StartAtom;
 
             // EndAtom == C and Label is ""
             if (endAtom.Element as Element == Globals.PeriodicTable.C
@@ -90,7 +91,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                         Vector right = (wedgeEndRight - wedgeStart) * 2;
                         Point rightEnd = wedgeStart + right;
 
-                        bool canIntersect;
                         bool intersect;
                         Point intersection;
 
@@ -111,7 +111,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
                             CoordinateTool.FindIntersection(wedgeStart, leftEnd,
                                                             atom.Position, otherEnd,
-                                                            out canIntersect, out intersect, out intersection);
+                                                            out _, out intersect, out intersection);
                             if (intersect)
                             {
                                 Vector v = intersection - wedgeStart;
@@ -123,7 +123,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
                             CoordinateTool.FindIntersection(wedgeStart, rightEnd,
                                                             atom.Position, otherEnd,
-                                                            out canIntersect, out intersect, out intersection);
+                                                            out _, out intersect, out intersection);
                             if (intersect)
                             {
                                 Vector v = intersection - wedgeStart;
@@ -139,9 +139,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             points.Add(wedgeStart + shortestLeft);
                             points.Add(endAtom.Position);
                             points.Add(wedgeStart + shortestRight);
-
-                            //DrawBondLine(wordprocessingGroup, new BondLine(BondLineStyle.Solid, wedgeEndMiddle, wedgeEndLeft, "ff0000"));
-                            //DrawBondLine(wordprocessingGroup, new BondLine(BondLineStyle.Solid, wedgeEndMiddle, wedgeEndRight, "ff0000"));
                         }
                         else
                         {
@@ -149,7 +146,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             {
                                 CoordinateTool.FindIntersection(wedgeStart, leftEnd,
                                                                 bond.StartAtom.Position, bond.EndAtom.Position,
-                                                                out canIntersect, out intersect, out intersection);
+                                                                out _, out intersect, out intersection);
                                 if (intersect)
                                 {
                                     Vector v = intersection - wedgeStart;
@@ -161,7 +158,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
                                 CoordinateTool.FindIntersection(wedgeStart, rightEnd,
                                                                 bond.StartAtom.Position, bond.EndAtom.Position,
-                                                                out canIntersect, out intersect, out intersection);
+                                                                out _, out intersect, out intersection);
                                 if (intersect)
                                 {
                                     Vector v = intersection - wedgeStart;
@@ -178,9 +175,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                             points.Add(wedgeStart + shortestLeft);
                             points.Add(endAtom.Position);
                             points.Add(wedgeStart + shortestRight);
-
-                            //DrawBondLine(wordprocessingGroup, new BondLine(BondLineStyle.Solid, wedgeEndMiddle, wedgeEndLeft, "ff0000"));
-                            //DrawBondLine(wordprocessingGroup, new BondLine(BondLineStyle.Solid, wedgeEndMiddle, wedgeEndRight, "ff0000"));
                         }
                     }
                 }
@@ -209,9 +203,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Rect cmlExtents = bl.BoundingBox;
 
             // Move Bond Line Extents and Points to have 0,0 Top Left Reference
-            startPoint.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
-            endPoint.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
-            cmlExtents.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
+            startPoint.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
+            endPoint.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
+            cmlExtents.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
 
             // Move points into New Bond Line Extents
             startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
@@ -243,7 +237,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private void DrawWavyLine(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, Point bondStart, Point bondEnd)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "WavyLine" + id;
 
             Vector bondVector = bondEnd - bondStart;
@@ -321,7 +315,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(newExtents.Left);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -358,22 +352,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                 path.Append(cubicBezierCurveTo);
             }
 
-            // Render as Straight Lines
-            //foreach (var p in allpoints)
-            //{
-            //    A.LineTo lineTo = new A.LineTo();
-            //    A.Point point = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(p.X + xOffset).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(p.Y + yOffset).ToString() };
-            //    lineTo.Append(point);
-            //    path1.Append(lineTo);
-            //}
-
             pathList.Append(path);
 
             customGeometry.Append(adjustValueList);
             customGeometry.Append(rectangle);
             customGeometry.Append(pathList);
 
-            A.Outline outline = new A.Outline { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int) OoXmlHelper.ACS_LINE_WIDTH_EMUS) , CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
 
@@ -392,7 +377,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private void DrawWedgeBond(Wpg.WordprocessingGroup wordprocessingGroup, List<Point> points)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string atomLabelName = "WedgeBond" + id;
 
             Rect cmlExtents = new Rect(points[0], points[points.Count - 1]);
@@ -403,7 +388,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             }
 
             // Move Extents to have 0,0 Top Left Reference
-            cmlExtents.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
+            cmlExtents.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
 
             Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Y);
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.X);
@@ -411,7 +396,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = atomLabelName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = atomLabelName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -457,7 +442,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             solidFill1.Append(rgbColorModelHex);
 
             // Set shape outline colour
-            A.Outline outline = new A.Outline { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int)OoXmlHelper.ACS_LINE_WIDTH_EMUS), CapType = A.LineCapValues.Round };
             A.RgbColorModelHex rgbColorModelHex2 = new A.RgbColorModelHex { Val = "000000" };
             A.SolidFill solidFill2 = new A.SolidFill();
             solidFill2.Append(rgbColorModelHex2);
@@ -474,7 +459,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             // Local Function
             A.Point MakePoint(Point pp)
             {
-                pp.Offset(-m_canvasExtents.Left, -m_canvasExtents.Top);
+                pp.Offset(-_canvasExtents.Left, -_canvasExtents.Top);
                 pp.Offset(-cmlExtents.Left, -cmlExtents.Top);
                 return new A.Point
                 {
@@ -486,9 +471,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private void DrawHatchBond(Wpg.WordprocessingGroup wordprocessingGroup, List<Point> points, string colour = "000000")
         {
-            // To Store diagnostic lines
-            List<BondLine> diagnostics = new List<BondLine>();
-
             Point wedgeStart = points[0];
             Point wedgeEndMiddle = points[2];
 
@@ -516,10 +498,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Point p0 = wedgeStart + step;
             Point p1 = p0 + perpendicular;
             Point p2 = p0 - perpendicular;
-            //diagnostics.Add(new BondLine(BondLineStyle.Dotted, p1, p2));
 
-            bool outside;
-            var r = GeometryTool.ClipLineWithPolygon(p1, p2, points, out outside);
+            var r = GeometryTool.ClipLineWithPolygon(p1, p2, points, out _);
             while (r.Length > 2)
             {
                 if (r.Length == 4)
@@ -536,29 +516,18 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
                 p0 = p0 + step;
                 p1 = p0 + perpendicular;
                 p2 = p0 - perpendicular;
-                //diagnostics.Add(new BondLine(BondLineStyle.Dotted, p1, p2));
 
-                r = GeometryTool.ClipLineWithPolygon(p1, p2, points, out outside);
+                r = GeometryTool.ClipLineWithPolygon(p1, p2, points, out _);
             }
 
             // Draw Tail Lines
             DrawBondLine(wordprocessingGroup, new BondLine(BondLineStyle.Solid, wedgeEndMiddle, points[1]));
             DrawBondLine(wordprocessingGroup, new BondLine(BondLineStyle.Solid, wedgeEndMiddle, points[3]));
-
-            //diagnostics.Add(new BondLine(BondLineStyle.Dotted, points[0], points[1]));
-            //diagnostics.Add(new BondLine(BondLineStyle.Dotted, points[0], points[3]));
-            //diagnostics.Add(new BondLine(BondLineStyle.Dotted, points[2], points[1]));
-            //diagnostics.Add(new BondLine(BondLineStyle.Dotted, points[2], points[3]));
-            //diagnostics.Add(new BondLine(BondLineStyle.Dotted, points[0], points[2]));
-            foreach (var line in diagnostics)
-            {
-                DrawBondLine(wordprocessingGroup, line, "ff0000");
-            }
         }
 
         private void DrawSolidLine(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, Point bondStart, Point bondEnd, string colour = "000000")
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "BondLine" + id;
 
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
@@ -567,7 +536,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -606,12 +575,18 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry.Append(rectangle);
             customGeometry.Append(pathList);
 
-            A.Outline outline = new A.Outline { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int)OoXmlHelper.ACS_LINE_WIDTH_EMUS), CapType = A.LineCapValues.Round };
             A.SolidFill solidFill = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
             outline.Append(solidFill);
+
+            if (_options.ShowBondDirection)
+            {
+                A.TailEnd tailEnd = new A.TailEnd { Type = A.LineEndValues.Stealth };
+                outline.Append(tailEnd);
+            }
 
             shapeProperties.Append(transform2D);
             shapeProperties.Append(customGeometry);
@@ -623,7 +598,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private void DrawDottedLine(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, Point bondStart, Point bondEnd, string colour = "000000")
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "DottedBondLine" + id;
 
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
@@ -632,7 +607,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -671,10 +646,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry.Append(rectangle);
             customGeometry.Append(pathList);
 
-            A.Outline outline = new A.Outline { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int)OoXmlHelper.ACS_LINE_WIDTH_EMUS), CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
-            A.PresetDash presetDash = new A.PresetDash() { Val = A.PresetLineDashValues.SystemDot };
+            A.PresetDash presetDash = new A.PresetDash { Val = A.PresetLineDashValues.SystemDot };
 
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
@@ -692,7 +667,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private void DrawDashedLine(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, Point bondStart, Point bondEnd, string colour = "000000")
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "DashedBondLine" + id;
 
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
@@ -701,7 +676,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -740,10 +715,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
             customGeometry.Append(rectangle);
             customGeometry.Append(pathList);
 
-            A.Outline outline = new A.Outline { Width = OoXmlHelper.ACS_LINE_WIDTH_EMUS, CapType = A.LineCapValues.Round };
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int)OoXmlHelper.ACS_LINE_WIDTH_EMUS), CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
-            A.PresetDash presetDash = new A.PresetDash() { Val = A.PresetLineDashValues.SystemDash };
+            A.PresetDash presetDash = new A.PresetDash { Val = A.PresetLineDashValues.SystemDash };
 
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
             solidFill.Append(rgbColorModelHex);
@@ -761,7 +736,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private void DrawShape(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, A.ShapeTypeValues shape, string colour)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)m_ooxmlId++);
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
             string bondLineName = "shape" + id;
 
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
@@ -771,7 +746,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
             Point location = new Point(left, top);
             Size size = new Size(width, height);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-m_canvasExtents.Left), OoXmlHelper.ScaleCmlToEmu(-m_canvasExtents.Top));
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_canvasExtents.Left), OoXmlHelper.ScaleCmlToEmu(-_canvasExtents.Top));
             Rect boundingBox = new Rect(location, size);
 
             width = (Int64Value)boundingBox.Width;
@@ -781,10 +756,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
             A.PresetGeometry presetGeometry = null;
             A.Extents extents = new A.Extents { Cx = width, Cy = height };
-            presetGeometry = new A.PresetGeometry() { Preset = shape };
+            presetGeometry = new A.PresetGeometry { Preset = shape };
 
             Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties()
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties
             {
                 Id = id,
                 Name = bondLineName
@@ -832,7 +807,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Bonds
 
         private double BondOffset()
         {
-            return (m_medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
+            return (_medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
         }
     }
 }

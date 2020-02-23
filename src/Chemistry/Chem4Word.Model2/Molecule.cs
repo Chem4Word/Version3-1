@@ -1561,8 +1561,8 @@ namespace Chem4Word.Model2
             //shove the neigbours onto the queue to prime it
             foreach (Atom initialAtom in startAtom.Neighbours)
             {
-                AtomData node = new AtomData() { Source = startAtom, CurrentAtom = initialAtom };
-                path[initialAtom] = new HashSet<Atom>() { startAtom, initialAtom };
+                AtomData node = new AtomData { Source = startAtom, CurrentAtom = initialAtom };
+                path[initialAtom] = new HashSet<Atom> { startAtom, initialAtom };
                 atomsSoFar.Enqueue(node);
             }
 

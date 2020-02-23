@@ -27,9 +27,9 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         public IChem4WordTelemetry Telemetry { get; set; }
 
-        public string ProductAppDataPath { get; set; }
+        public string SettingsPath { get; set; }
 
-        public Options UserOptions { get; set; }
+        public Cdw800Options UserOptions { get; set; }
 
         private string _cml;
 
@@ -60,7 +60,7 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
             WpfChemDoodle editor = new WpfChemDoodle();
             editor.Telemetry = Telemetry;
-            editor.ProductAppDataPath = ProductAppDataPath;
+            editor.SettingsPath = SettingsPath;
             editor.UserOptions = UserOptions;
             editor.TopLeft = TopLeft;
 
@@ -100,7 +100,6 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             if (editor != null)
             {
                 editor.OnButtonClick -= OnWpfButtonClick;
-                editor = null;
             }
             Hide();
         }

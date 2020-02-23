@@ -78,7 +78,10 @@
                                 Margin="3"
                                 Background="White"
                                 HighlightActive="False"
-                                ShowGroups="false" />
+                                ShowAllCarbonAtoms="{Binding Path=ShowAllCarbonAtoms}"
+                                ShowAtomsInColour="{Binding Path=ShowAtomsInColour}"
+                                ShowImplicitHydrogens="{Binding Path=ShowImplicitHydrogens}"
+                                ShowMoleculeGrouping="{Binding Path=ShowMoleculeGrouping}" />
                         </Border>
                         <CheckBox
                             x:Name="ShowBracketsValue"

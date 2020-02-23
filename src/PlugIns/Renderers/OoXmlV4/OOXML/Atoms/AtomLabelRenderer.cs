@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows;
+using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using DocumentFormat.OpenXml;
 using A = DocumentFormat.OpenXml.Drawing;
@@ -19,14 +20,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
     {
         private Rect _canvasExtents;
         private long _ooxmlId;
-        private Options _options;
+        private OoXmlV4Options _options;
         private double _meanBondLength;
 
-        public AtomLabelRenderer(Rect canvasExtents, ref long ooxmlId, Options opts, double meanBondLength)
+        public AtomLabelRenderer(OoXmlV4Options options, Rect canvasExtents, double meanBondLength, ref long ooxmlId)
         {
             _canvasExtents = canvasExtents;
             _ooxmlId = ooxmlId;
-            _options = opts;
+            _options = options;
             _meanBondLength = meanBondLength;
         }
 
@@ -56,7 +57,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             }
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = atomLabelName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = atomLabelName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();

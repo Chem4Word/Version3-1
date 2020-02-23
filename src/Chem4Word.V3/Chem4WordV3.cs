@@ -74,7 +74,7 @@ namespace Chem4Word
         public List<string> StartUpTimings = new List<string>();
         public C4wAddInInfo AddInInfo = new C4wAddInInfo();
         public SystemHelper Helper;
-        public Options SystemOptions;
+        public Chem4WordOptions SystemOptions;
         public TelemetryWriter Telemetry;
 
         public List<IChem4WordEditor> Editors = new List<IChem4WordEditor>();
@@ -369,46 +369,15 @@ namespace Chem4Word
 
             try
             {
-                // Initialize Telemetry with send permission
+                // Initialise Telemetry with send permission
                 Telemetry = new TelemetryWriter(true, Helper);
 
                 // Read in options file
-                string padPath = AddInInfo.ProductAppDataPath;
-                string fileName = $"{AddInInfo.ProductName}.json";
-                string optionsFile = Path.Combine(padPath, fileName);
-
-                if (File.Exists(optionsFile))
+                SystemOptions = new Chem4WordOptions(AddInInfo.ProductAppDataPath);
+                if (SystemOptions.Errors.Any())
                 {
-                    try
-                    {
-                        string json = File.ReadAllText(optionsFile);
-                        SystemOptions = JsonConvert.DeserializeObject<Options>(json);
-                        string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
-                        if (!json.Equals(temp))
-                        {
-                            Telemetry.Write(module, "Information", "Patching Options file");
-                            File.WriteAllText(optionsFile, temp);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Telemetry.Write(module, "Exception", e.Message);
-                        Telemetry.Write(module, "Exception", e.StackTrace);
-                        SystemOptions = new Options();
-                        SystemOptions.RestoreDefaults();
-                    }
-                }
-                else
-                {
-                    SystemOptions = new Options();
-                    SystemOptions.RestoreDefaults();
-                    string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
-                    // Check again before writing just in case two versions of word started at the same time
-                    if (!File.Exists(optionsFile))
-                    {
-                        Telemetry.Write(module, "Information", "Writing initial Options file");
-                        File.WriteAllText(optionsFile, temp);
-                    }
+                    Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, SystemOptions.Errors));
+                    SystemOptions.Errors = new List<string>();
                 }
 
                 bool isBeta = true;
@@ -428,12 +397,14 @@ namespace Chem4Word
                 // Belt and braces ...
                 if (SystemOptions == null)
                 {
-                    SystemOptions = new Options();
-                    SystemOptions.RestoreDefaults();
+                    SystemOptions = new Chem4WordOptions
+                    {
+                        SettingsPath = AddInInfo.ProductAppDataPath
+                    };
                 }
 
                 // ... as we are seeing some errors here ?
-                // Re-Initialize Telemetry with granted permissions
+                // Re-Initialise Telemetry with granted permissions
                 Telemetry = new TelemetryWriter(isBeta || SystemOptions.TelemetryEnabled, Helper);
 
                 try
@@ -479,8 +450,12 @@ namespace Chem4Word
                     if (settingsChanged)
                     {
                         Telemetry.Write(module, "Information", "Saving revised settings");
-                        string temp = JsonConvert.SerializeObject(SystemOptions, Formatting.Indented);
-                        File.WriteAllText(optionsFile, temp);
+                        SystemOptions.Save();
+                        if (SystemOptions.Errors.Any())
+                        {
+                            Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, SystemOptions.Errors));
+                            SystemOptions.Errors = new List<string>();
+                        }
                     }
                 }
                 catch
@@ -772,7 +747,7 @@ namespace Chem4Word
                     {
                         plugin = ice;
                         plugin.Telemetry = Telemetry;
-                        plugin.ProductAppDataPath = AddInInfo.ProductAppDataPath;
+                        plugin.SettingsPath = AddInInfo.ProductAppDataPath;
                         plugin.TopLeft = WordTopLeft;
                         break;
                     }
@@ -794,7 +769,7 @@ namespace Chem4Word
                     {
                         plugin = ice;
                         plugin.Telemetry = Telemetry;
-                        plugin.ProductAppDataPath = AddInInfo.ProductAppDataPath;
+                        plugin.SettingsPath = AddInInfo.ProductAppDataPath;
                         plugin.TopLeft = WordTopLeft;
                         break;
                     }
@@ -816,7 +791,7 @@ namespace Chem4Word
                     {
                         plugin = ice;
                         plugin.Telemetry = Telemetry;
-                        plugin.ProductAppDataPath = AddInInfo.ProductAppDataPath;
+                        plugin.SettingsPath = AddInInfo.ProductAppDataPath;
                         plugin.TopLeft = WordTopLeft;
                         break;
                     }
@@ -1346,6 +1321,7 @@ namespace Chem4Word
                 {
                     LoadNamesFromLibrary();
                 }
+
                 if (LibraryNames != null && LibraryNames.Any())
                 {
                     // Limit to selections which have less than 5 sentences

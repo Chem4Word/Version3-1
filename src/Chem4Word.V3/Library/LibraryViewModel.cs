@@ -329,7 +329,6 @@ namespace Chem4Word.Library
             set { SetValue(SelectedItemProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SelectedItem.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(ListBoxItem), typeof(LibraryViewModel), new PropertyMetadata(null));
 

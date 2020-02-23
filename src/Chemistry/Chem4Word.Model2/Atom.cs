@@ -33,10 +33,31 @@ namespace Chem4Word.Model2
             {
                 if (Element is FunctionalGroup fg)
                 {
-                    var centroid = Parent.Centroid;
-                    var vector = Position - centroid;
-                    var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, vector);
-                    return angle < 0 ? CompassPoints.West : CompassPoints.East;
+                    if (Bonds.Count() == 1)
+                    {
+                        var centroid = Parent.Centroid;
+                        var vector = Position - centroid;
+                        var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, vector);
+                        return angle < 0 ? CompassPoints.West : CompassPoints.East;
+                    }
+                    else if (Bonds.Count()>1)
+                    {
+                        int leftBondCount = 0, rightBondCount = 0;
+                        foreach (Atom neighbour in Neighbours)
+                        {
+                            Vector tempBondVector = neighbour.Position - Position;
+                            double angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, tempBondVector);
+                            if (angle >= 5.0 && angle <= 175.0)
+                            {
+                                rightBondCount++;
+                            }
+                            else
+                            {
+                                leftBondCount++;
+                            }
+                        }
+                        return rightBondCount > leftBondCount ? CompassPoints.West : CompassPoints.East;
+                    }
                 }
 
                 return CompassPoints.East;

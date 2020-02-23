@@ -85,7 +85,7 @@ namespace Chem4WordSetup
 
             #region Detect Word
 
-            isWordInstalled = OfficeHelper.GetWinWordVersion() >= 2010;
+            isWordInstalled = OfficeHelper.GetWinWordVersionNumber() >= 2010;
 
             #endregion Detect Word
 

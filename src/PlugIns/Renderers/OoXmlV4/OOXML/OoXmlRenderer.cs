@@ -16,6 +16,7 @@ using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.OOXML.Atoms;
 using Chem4Word.Renderer.OoXmlV4.OOXML.Bonds;
@@ -43,7 +44,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private Options _options;
+        private OoXmlV4Options _options;
         private IChem4WordTelemetry _telemetry;
         private Point _topLeft;
 
@@ -69,7 +70,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private List<Point> _ringCentres = new List<Point>();
         private Dictionary<string, List<Point>> _convexHulls = new Dictionary<string, List<Point>>();
 
-        public OoXmlRenderer(Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        public OoXmlRenderer(Model model, OoXmlV4Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -147,6 +148,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             int moleculeNo = 0;
             foreach (Molecule mol in _chemistryModel.Molecules.Values)
             {
+                // Steps 1 .. 3
                 ProcessMolecule(mol, ref moleculeNo);
             }
 
@@ -177,7 +179,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             #region Step 5.1 - Show Molecule and Group Brackets
 
             // Render molecule grouping brackets
-            if (_options.ShowMoleculeGroups)
+            if (_options.ShowMoleculeGrouping)
             {
                 foreach (var group in _groupBrackets)
                 {
@@ -333,7 +335,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (boundingBox != Rect.Empty)
                     {
                         boundingBox.Union(thisMoleculeExtents.ExternalCharacterExtents);
-                        if (_options.ShowMoleculeGroups)
+                        if (_options.ShowMoleculeGrouping)
                         {
                             boundingBox = Inflate(boundingBox, OoXmlHelper.BracketOffset(_medianBondLength));
                             _groupBrackets.Add(boundingBox);
@@ -362,7 +364,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 }
                 thisMoleculeExtents.SetMoleculeBracketExtents(rect);
 
-                var alp = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
+                var atomLabelPositioner = new AtomLabelPositioner(_options, _TtfCharacterSet, _atomLabelCharacters, _convexHulls, _medianBondLength, _telemetry);
                 TtfCharacter hydrogenCharacter = _TtfCharacterSet['H'];
 
                 string characters = string.Empty;
@@ -410,7 +412,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                           + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
                                           thisMoleculeExtents.MoleculeBracketsExtents.Top
                                           + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
-                    alp.PlaceString(characters, point, mol.Path);
+                    atomLabelPositioner.PlaceString(characters, point, mol.Path);
                 }
 
                 if (mol.Count.HasValue && mol.Count.Value > 0)
@@ -420,7 +422,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                           + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
                                           thisMoleculeExtents.MoleculeBracketsExtents.Bottom
                                           + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
-                    alp.PlaceString($"{mol.Count}", point, mol.Path);
+                    atomLabelPositioner.PlaceString($"{mol.Count}", point, mol.Path);
                 }
 
                 if (mol.Count.HasValue
@@ -438,7 +440,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                           + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
                                           thisMoleculeExtents.ExternalCharacterExtents.Bottom
                                           + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
-                    alp.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
+                    atomLabelPositioner.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
 
                     // 4. ExternalCharacters
                     // Recalculate again as we have just added extra characters
@@ -525,7 +527,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void AppendAtomLabelOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup)
         {
-            AtomLabelRenderer alr = new AtomLabelRenderer(_boundingBoxOfEverything, ref _ooxmlId, _options, _medianBondLength);
+            AtomLabelRenderer alr = new AtomLabelRenderer(_options, _boundingBoxOfEverything, _medianBondLength, ref _ooxmlId);
 
             if (_chemistryModel.TotalAtomsCount > 1)
             {
@@ -544,7 +546,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void AppendBondOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup)
         {
-            BondLineRenderer blr = new BondLineRenderer(_boundingBoxOfEverything, ref _ooxmlId, _medianBondLength);
+            BondLineRenderer blr = new BondLineRenderer(_boundingBoxOfEverything, _options, ref _ooxmlId, _medianBondLength);
 
             if (_chemistryModel.TotalBondsCount > 1)
             {
@@ -573,12 +575,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void ShowRingCentres(Wpg.WordprocessingGroup wordprocessingGroup)
         {
-            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
+            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 8;
 
             foreach (var point in _ringCentres)
             {
                 Rect bb = new Rect(new Point(point.X - xx, point.Y - xx), new Point(point.X + xx, point.Y + xx));
-                DrawShape(wordprocessingGroup, bb, A.ShapeTypeValues.Ellipse, "0000ff");
+                DrawShape(wordprocessingGroup, bb, A.ShapeTypeValues.Ellipse, "00ff00");
             }
         }
 
@@ -774,7 +776,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void ProcessBonds(Molecule mol, Progress pb, int moleculeNo)
         {
-            BondLinePositioner br = new BondLinePositioner(_bondLines, _medianBondLength);
+            BondLinePositioner br = new BondLinePositioner(_bondLines, _options, _medianBondLength);
 
             if (mol.Bonds.Count > 0)
             {
@@ -906,7 +908,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void ProcessAtoms(Molecule mol, Progress pb, int moleculeNo)
         {
-            AtomLabelPositioner ar = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
+            var atomLabelPositioner = new AtomLabelPositioner(_options, _TtfCharacterSet, _atomLabelCharacters, _convexHulls, _medianBondLength, _telemetry);
 
             // Create Characters
             if (mol.Atoms.Count > 1)
@@ -922,12 +924,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 pb.Increment(1);
                 if (atom.Element is Element)
                 {
-                    ar.CreateElementCharacters(atom, _options);
+                    atomLabelPositioner.CreateElementCharacters(atom);
                 }
 
                 if (atom.Element is FunctionalGroup)
                 {
-                    ar.CreateFunctionalGroupCharacters(atom, _options);
+                    atomLabelPositioner.CreateFunctionalGroupCharacters(atom, _options);
                 }
             }
         }
@@ -947,7 +949,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private A.GraphicData CreateGraphicData()
         {
-            return new A.GraphicData() { Uri = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" };
+            return new A.GraphicData{ Uri = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" };
         }
 
         private Wp.Inline CreateInline(Wpg.WordprocessingGroup wordprocessingGroup)
@@ -957,11 +959,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value width = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Width);
             Int64Value height = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Height);
 
-            Wp.Inline inline = new Wp.Inline() { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U };
-            Wp.Extent extent = new Wp.Extent() { Cx = width, Cy = height };
+            Wp.Inline inline = new Wp.Inline { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U };
+            Wp.Extent extent = new Wp.Extent { Cx = width, Cy = height };
 
-            Wp.EffectExtent effectExtent = new Wp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L };
-            Wp.DocProperties docProperties = new Wp.DocProperties() { Id = inlineId, Name = "moleculeGroup" };
+            Wp.EffectExtent effectExtent = new Wp.EffectExtent { LeftEdge = 0L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L };
+            Wp.DocProperties docProperties = new Wp.DocProperties { Id = inlineId, Name = "moleculeGroup" };
 
             Wpg.NonVisualGroupDrawingShapeProperties nonVisualGroupDrawingShapeProperties = new Wpg.NonVisualGroupDrawingShapeProperties();
 
@@ -970,8 +972,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.TransformGroup transformGroup = new A.TransformGroup();
             A.Offset offset = new A.Offset { X = 0L, Y = 0L };
             A.Extents extents = new A.Extents { Cx = width, Cy = height };
-            A.ChildOffset childOffset = new A.ChildOffset() { X = 0L, Y = 0L };
-            A.ChildExtents childExtents = new A.ChildExtents() { Cx = width, Cy = height };
+            A.ChildOffset childOffset = new A.ChildOffset { X = 0L, Y = 0L };
+            A.ChildExtents childExtents = new A.ChildExtents { Cx = width, Cy = height };
 
             transformGroup.Append(offset);
             transformGroup.Append(extents);
@@ -1462,7 +1464,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = bondLineId, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = bondLineId, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -1520,7 +1522,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.SolidFill solidFill = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
+            A.Alpha alpha = new A.Alpha { Val = new Int32Value() { InnerText = "100%" } };
 
             rgbColorModelHex.Append(alpha);
 
@@ -1558,7 +1560,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
             Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = bondLineId, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = bondLineId, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -1601,7 +1603,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.SolidFill solidFill = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
+            A.Alpha alpha = new A.Alpha { Val = new Int32Value { InnerText = "100%" } };
 
             rgbColorModelHex.Append(alpha);
 
@@ -1657,7 +1659,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
             Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = bondLineName };
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id, Name = bondLineName };
             Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
@@ -1700,7 +1702,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             A.SolidFill solidFill = new A.SolidFill();
 
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
+            A.Alpha alpha = new A.Alpha { Val = new Int32Value { InnerText = "100%" } };
 
             rgbColorModelHex.Append(alpha);
 
@@ -1708,7 +1710,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             outline.Append(solidFill);
 
-            A.TailEnd tailEnd = new A.TailEnd() { Type = A.LineEndValues.Arrow };
+            A.TailEnd tailEnd = new A.TailEnd { Type = A.LineEndValues.Arrow };
             outline.Append(tailEnd);
 
             shapeProperties.Append(transform2D);
@@ -1759,7 +1761,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             A.PresetGeometry presetGeometry = null;
             A.Extents extents = new A.Extents { Cx = width, Cy = height };
-            presetGeometry = new A.PresetGeometry() { Preset = shape };
+            presetGeometry = new A.PresetGeometry { Preset = shape };
 
             Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
             Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties()

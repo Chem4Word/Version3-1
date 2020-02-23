@@ -10,7 +10,6 @@ using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
-using Chem4Word.ACME.Utils;
 using Chem4Word.Core;
 using Chem4Word.Core.UI.Wpf;
 using IChem4Word.Contracts;
@@ -29,11 +28,11 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public SettingsHost(Options options, IChem4WordTelemetry telemetry, Point topLeft) : this()
+        public SettingsHost(AcmeOptions options, IChem4WordTelemetry telemetry, Point topLeft) : this()
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                UcSettings.Options = options;
+                UcSettings.AcmeOptions = options;
                 UcSettings.Telemetry = telemetry;
                 UcSettings.OnButtonClick += UcSettingsOnOnButtonClick;
                 _topLeft = topLeft;
@@ -62,7 +61,7 @@ namespace Chem4Word.ACME.Controls
 
         private void SettingsHost_OnClosing(object sender, CancelEventArgs e)
         {
-            if (UcSettings.Options.Dirty)
+            if (UcSettings.AcmeOptions.Dirty)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("Do you wish to save your changes?");
@@ -74,7 +73,7 @@ namespace Chem4Word.ACME.Controls
                 switch (dr)
                 {
                     case System.Windows.Forms.DialogResult.Yes:
-                        FileUtils.SaveAcmeSettings(UcSettings.Options, UcSettings.Telemetry, UcSettings.TopLeft);
+                        UcSettings.AcmeOptions.Save();
                         break;
 
                     case System.Windows.Forms.DialogResult.No:
@@ -89,7 +88,7 @@ namespace Chem4Word.ACME.Controls
 
         private void SettingsHost_OnContentRendered(object sender, EventArgs e)
         {
-            UcSettings.Options.Dirty = false;
+            UcSettings.AcmeOptions.Dirty = false;
         }
     }
 }

@@ -33,11 +33,29 @@ namespace Chem4Word.ACME
         public Model EditedModel { get; private set; }
 
         private string _cml;
+        public AcmeOptions Options { get; set; }
 
         public LabelsEditor()
         {
+            Options = new AcmeOptions();
             InitializeComponent();
         }
+
+        public LabelsEditor(AcmeOptions options)
+        {
+            Options = options;
+            InitializeComponent();
+        }
+
+        public void SetOptions(AcmeOptions options)
+        {
+            Options = options;
+        }
+
+        public bool ShowAllCarbonAtoms => Options.ShowCarbons;
+        public bool ShowImplicitHydrogens => Options.ShowHydrogens;
+        public bool ShowAtomsInColour => Options.ColouredAtoms;
+        public bool ShowMoleculeGrouping => Options.ShowMoleculeGrouping;
 
         public bool ShowTopPanel
         {
@@ -45,7 +63,6 @@ namespace Chem4Word.ACME
             set { SetValue(ShowTopPanelProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ShowTopPanel.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ShowTopPanelProperty =
             DependencyProperty.Register("ShowTopPanel", typeof(bool),
                                         typeof(LabelsEditor),
@@ -85,20 +102,20 @@ namespace Chem4Word.ACME
                         break;
 
                     case Molecule thisMolecule:
-                    {
-                        model = new Model();
-                        var copy = thisMolecule.Copy();
-                        model.AddMolecule(copy);
-                        copy.Parent = model;
-
-                        if (thisMolecule.Molecules.Count == 0)
                         {
-                            LoadNamesEditor(NamesGrid, thisMolecule.Names);
-                            LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
+                            model = new Model();
+                            var copy = thisMolecule.Copy();
+                            model.AddMolecule(copy);
+                            copy.Parent = model;
+
+                            if (thisMolecule.Molecules.Count == 0)
+                            {
+                                LoadNamesEditor(NamesGrid, thisMolecule.Names);
+                                LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
+                            }
+                            LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
+                            break;
                         }
-                        LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
-                        break;
-                    }
                 }
             }
 
@@ -118,10 +135,10 @@ namespace Chem4Word.ACME
                 OverallConciseFormulaPanel.Children.Add(TextBlockFromFormula(EditedModel.ConciseFormula));
 
                 var root = new TreeViewItem
-                           {
-                               Header = "Structure",
-                               Tag = EditedModel
-                           };
+                {
+                    Header = "Structure",
+                    Tag = EditedModel
+                };
                 TreeView.Items.Add(root);
                 root.IsExpanded = true;
 
@@ -239,55 +256,49 @@ namespace Chem4Word.ACME
 
         private void OnAddFormulaClick(object sender, RoutedEventArgs e)
         {
-            if (TreeView.SelectedItem is TreeViewItem treeViewItem)
+            if (TreeView.SelectedItem is TreeViewItem treeViewItem
+                && treeViewItem.Tag is Molecule molecule)
             {
-                if (treeViewItem.Tag is Molecule molecule)
+                molecule.Formulas.Add(new TextualProperty
                 {
-                    molecule.Formulas.Add(new TextualProperty
-                    {
-                        Id = molecule.GetNextId(molecule.Formulas, "f"),
-                        FullType = CMLConstants.ValueChem4WordFormula,
-                        Value = "?",
-                        CanBeDeleted = true
-                    });
-                    FormulaGrid.ScrollViewer.ScrollToEnd();
-                }
+                    Id = molecule.GetNextId(molecule.Formulas, "f"),
+                    FullType = CMLConstants.ValueChem4WordFormula,
+                    Value = "?",
+                    CanBeDeleted = true
+                });
+                FormulaGrid.ScrollViewer.ScrollToEnd();
             }
         }
 
         private void OnAddNameClick(object sender, RoutedEventArgs e)
         {
-            if (TreeView.SelectedItem is TreeViewItem treeViewItem)
+            if (TreeView.SelectedItem is TreeViewItem treeViewItem
+                && treeViewItem.Tag is Molecule molecule)
             {
-                if (treeViewItem.Tag is Molecule molecule)
+                molecule.Names.Add(new TextualProperty
                 {
-                    molecule.Names.Add(new TextualProperty
-                    {
-                        Id = molecule.GetNextId(molecule.Names, "n"),
-                        FullType = CMLConstants.ValueChem4WordSynonym,
-                        Value = "?",
-                        CanBeDeleted = true
-                    });
-                    NamesGrid.ScrollViewer.ScrollToEnd();
-                }
+                    Id = molecule.GetNextId(molecule.Names, "n"),
+                    FullType = CMLConstants.ValueChem4WordSynonym,
+                    Value = "?",
+                    CanBeDeleted = true
+                });
+                NamesGrid.ScrollViewer.ScrollToEnd();
             }
         }
 
         private void OnAddLabelClick(object sender, RoutedEventArgs e)
         {
-            if (TreeView.SelectedItem is TreeViewItem treeViewItem)
+            if (TreeView.SelectedItem is TreeViewItem treeViewItem
+                && treeViewItem.Tag is Molecule molecule)
             {
-                if (treeViewItem.Tag is Molecule molecule)
+                molecule.Labels.Add(new TextualProperty
                 {
-                    molecule.Labels.Add(new TextualProperty
-                    {
-                        Id = molecule.GetNextId(molecule.Labels, "l"),
-                        FullType = CMLConstants.ValueChem4WordLabel,
-                        Value = "?",
-                        CanBeDeleted = true
-                    });
-                    LabelsGrid.ScrollViewer.ScrollToEnd();
-                }
+                    Id = molecule.GetNextId(molecule.Labels, "l"),
+                    FullType = CMLConstants.ValueChem4WordLabel,
+                    Value = "?",
+                    CanBeDeleted = true
+                });
+                LabelsGrid.ScrollViewer.ScrollToEnd();
             }
         }
 

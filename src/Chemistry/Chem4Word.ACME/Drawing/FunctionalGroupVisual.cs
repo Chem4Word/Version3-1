@@ -23,15 +23,16 @@ namespace Chem4Word.ACME.Drawing
 
         public override List<Point> Hull { get; protected set; }
 
-        public FunctionalGroupVisual(Atom parent):base(parent)
+        public FunctionalGroupVisual(Atom parent, bool showInColour)
+            : base(parent, showInColour, true, true)
         {
-            ParentGroup = (FunctionalGroup) parent.Element;
+            ParentGroup = (FunctionalGroup)parent.Element;
         }
 
         public override void Render()
         {
             SetTextParams();
-            Render(ParentAtom.Position, ParentGroup.Colour);
+            Render(ParentAtom.Position, ShowInColour ? ParentGroup.Colour : "#000000");
         }
 
         private void Render(Point location, string colour)

@@ -14,7 +14,6 @@ namespace Chem4Word.ACME.Models
     public class SettingsModel : INotifyPropertyChanged
     {
         private double _currentBondLength;
-        private bool _showMoleculeGroups;
 
         public double CurrentBondLength
         {
@@ -29,6 +28,44 @@ namespace Chem4Word.ACME.Models
             }
         }
 
+        private bool _showImplicitHydrogens;
+
+        public bool ShowImplicitHydrogens
+        {
+            get => _showImplicitHydrogens;
+            set
+            {
+                _showImplicitHydrogens = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _showAtomsInColour;
+
+        public bool ShowAtomsInColour
+        {
+            get => _showAtomsInColour;
+            set
+            {
+                _showAtomsInColour = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _showAllCarbonAtoms;
+
+        public bool ShowAllCarbonAtoms
+        {
+            get => _showAllCarbonAtoms;
+            set
+            {
+                _showAllCarbonAtoms = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _showMoleculeGroups;
+
         public bool ShowMoleculeGroups
         {
             get => _showMoleculeGroups;
@@ -38,6 +75,8 @@ namespace Chem4Word.ACME.Models
                 OnPropertyChanged();
             }
         }
+
+        public string SettingsPath { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

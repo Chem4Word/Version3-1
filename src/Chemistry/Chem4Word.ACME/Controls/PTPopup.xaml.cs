@@ -28,7 +28,6 @@ namespace Chem4Word.ACME
             set => SetValue(SelectedElementProperty, value);
         }
 
-        // Using a DependencyProperty as the backing store for SelectedElement.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedElementProperty =
             DependencyProperty.Register("SelectedElement", typeof(ElementBase), typeof(PTPopup),
                                         new PropertyMetadata(default(ElementBase)));

@@ -7,7 +7,6 @@
     xmlns:control="clr-namespace:Chem4Word.ACME.Controls"
     xmlns:converters="clr-namespace:Chem4Word.ACME.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:diag="clr-namespace:System.Diagnostics;assembly=System"
     xmlns:graphics="clr-namespace:Chem4Word.ACME.Graphics"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="AcmeControl"
@@ -281,7 +280,6 @@
             Key="Y"
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.RedoCommand}"
             Modifiers="Control" />
-        <KeyBinding Key="Delete" Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.DeleteCommand}" />
         <KeyBinding
             Key="C"
             Command="{Binding ElementName=AcmeControl, Path=ActiveViewModel.CopyCommand}"
@@ -1056,8 +1054,8 @@
                     x:Name="ChemCanvas"
                     MinWidth="2000"
                     MinHeight="1500"
-                    DisplayOverbondedAtoms="True"
-                    Background="White" />
+                    Background="White"
+                    DisplayOverbondedAtoms="True" />
             </ScrollViewer>
             <control:ZoomBox
                 x:Name="ZoomBox"

@@ -34,12 +34,12 @@ namespace Chem4Word.Searcher.PubChemPlugIn
 
         public System.Windows.Point TopLeft { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
-        public string ProductAppDataPath { get; set; }
+        public string SettingsPath { get; set; }
         public string PubChemId { get; set; }
 
         public string Cml { get; set; }
 
-        public Options UserOptions { get; set; }
+        public PubChemOptions UserOptions { get; set; }
 
         private int resultsCount;
         private string webEnv;

@@ -12,14 +12,17 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.ACME;
+using Chem4Word.Editor.ACME;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Telemetry;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace WinForms.TestHarness
 {
@@ -36,11 +39,14 @@ namespace WinForms.TestHarness
 
         private string _lastCml = null;
 
+        private AcmeOptions _editorOptions;
+
         public FlexForm()
         {
             InitializeComponent();
             _helper = new SystemHelper();
             _telemetry = new TelemetryWriter(true, _helper);
+            _editorOptions = new AcmeOptions(null);
         }
 
         private void LoadStructure_Click(object sender, EventArgs e)
@@ -142,7 +148,6 @@ namespace WinForms.TestHarness
                 if (Display.Chemistry is Model model)
                 {
                     Model copy = model.Copy();
-                    //SetCarbons(copy, ShowCarbons.Checked);
                     copy.Refresh();
                     Debug.WriteLine($"Old Model: ({model.MinX}, {model.MinY}):({model.MaxX}, {model.MaxY})");
                     Debug.WriteLine($"New Model: ({copy.MinX}, {copy.MinY}):({copy.MaxX}, {copy.MaxY})");
@@ -224,7 +229,7 @@ namespace WinForms.TestHarness
                         allAtoms[targetAtom].Element = x as ElementBase;
                         if (x.Symbol.Equals("C"))
                         {
-                            //allAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked;
+                            //allAtoms[targetAtom].ShowSymbol = ShowCarbons.Checked
                         }
 
                         allAtoms[targetAtom].UpdateVisual();
@@ -252,12 +257,13 @@ namespace WinForms.TestHarness
 
         private void EditLabels_Click(object sender, EventArgs e)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 #if !DEBUG
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
-#endif
             {
-                if (!string.IsNullOrEmpty(_lastCml))
+#endif
+
+            if (!string.IsNullOrEmpty(_lastCml))
                 {
                     using (EditorHost editorHost = new EditorHost(_lastCml, "LABELS"))
                     {
@@ -281,8 +287,8 @@ namespace WinForms.TestHarness
                     TopMost = false;
                     Activate();
                 }
-            }
 #if !DEBUG
+            }
             catch (Exception exception)
             {
                 _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
@@ -294,15 +300,15 @@ namespace WinForms.TestHarness
 
         private void EditWithAcme_Click(object sender, EventArgs e)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 #if !DEBUG
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
-#endif
             {
-                if (!string.IsNullOrEmpty(_lastCml))
+#endif
+            if (!string.IsNullOrEmpty(_lastCml))
                 {
                     using (EditorHost editorHost = new EditorHost(_lastCml, "ACME"))
-                    {
+                    { 
                         editorHost.ShowDialog(this);
                         if (editorHost.DialogResult == DialogResult.OK)
                         {
@@ -316,6 +322,12 @@ namespace WinForms.TestHarness
                             m.Relabel(true);
                             _lastCml = cc.Export(m);
 
+                            // Cause re-read of settings (in case they have changed)
+                            _editorOptions = new AcmeOptions(null);
+                            SetDisplayOptions();
+                            RedoStack.SetOptions(_editorOptions);
+                            UndoStack.SetOptions(_editorOptions);
+
                             ShowChemistry($"Edited {m.ConciseFormula}", m);
                         }
                     }
@@ -323,8 +335,8 @@ namespace WinForms.TestHarness
                     TopMost = false;
                     Activate();
                 }
-            }
 #if !DEBUG
+            }
             catch (Exception exception)
             {
                 _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
@@ -373,7 +385,7 @@ namespace WinForms.TestHarness
                     Debug.WriteLine($"FlexForm is displaying {model.ConciseFormula}");
 
                     EnableNormalButtons();
-                    EnableUndoRedoButtons();
+                    EnableUndoRedoButtonsAndShowStacks();
                 }
             }
         }
@@ -387,8 +399,6 @@ namespace WinForms.TestHarness
             ShowCml.Enabled = true;
             ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
-
-            ShowGroupsBox.Enabled = true;
 
             ListStacks();
         }
@@ -406,7 +416,7 @@ namespace WinForms.TestHarness
             return list;
         }
 
-        private void EnableUndoRedoButtons()
+        private void EnableUndoRedoButtonsAndShowStacks()
         {
             Redo.Enabled = _redoStack.Count > 0;
             Undo.Enabled = _undoStack.Count > 0;
@@ -615,27 +625,52 @@ namespace WinForms.TestHarness
             _lastCml = "<cml></cml>";
 
             Display.Clear();
-            EnableUndoRedoButtons();
+            EnableUndoRedoButtonsAndShowStacks();
         }
 
         private void FlexForm_Load(object sender, EventArgs e)
         {
-            ShowGroupsBox.Checked = Display.ShowGroups;
+            SetDisplayOptions();
+            Display.HighlightActive = false;
+
+            RedoStack = new StackViewer(_editorOptions);
+            RedoHost.Child = RedoStack;
+            UndoStack = new StackViewer(_editorOptions);
+            UndoHost.Child = UndoStack;
         }
 
-        private void ShowGroupsBox_CheckedChanged(object sender, EventArgs e)
+        private void ChangeSettings_Click(object sender, EventArgs e)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            try
+            AcmeSettingsHost settings = new AcmeSettingsHost();
+            settings.Telemetry = _telemetry;
+
+            AcmeOptions tempOptions = new AcmeOptions(null);
+
+            settings.TopLeft = new Point(Left, Top);
+            settings.EditorOptions = tempOptions;
+            settings.Telemetry = _telemetry;
+
+            DialogResult dr = settings.ShowDialog();
+            if (dr == DialogResult.OK)
             {
-                Display.ShowGroups = ShowGroupsBox.Checked;
+                _editorOptions = tempOptions.Clone();
+                SetDisplayOptions();
+                Display.Chemistry = _lastCml;
+                RedoStack.SetOptions(_editorOptions);
+                UndoStack.SetOptions(_editorOptions);
+                UndoStack.ListOfDisplays.ItemsSource = StackToList(_undoStack);
+                RedoStack.ListOfDisplays.ItemsSource = StackToList(_redoStack);
             }
-            catch (Exception exception)
-            {
-                _telemetry.Write(module, "Exception", $"Exception: {exception.Message}");
-                _telemetry.Write(module, "Exception(Data)", $"Exception: {exception}");
-                MessageBox.Show(exception.StackTrace, exception.Message);
-            }
+
+            settings.Close();
+        }
+
+        private void SetDisplayOptions()
+        {
+            Display.ShowAllCarbonAtoms = _editorOptions.ShowCarbons;
+            Display.ShowImplicitHydrogens = _editorOptions.ShowHydrogens;
+            Display.ShowAtomsInColour = _editorOptions.ColouredAtoms;
+            Display.ShowMoleculeGrouping = _editorOptions.ShowMoleculeGrouping;
         }
     }
 }

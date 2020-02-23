@@ -32,10 +32,10 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
             this.Buttons = new System.Windows.Forms.Panel();
+            this.MessageFromWpf = new System.Windows.Forms.Label();
             this.Save = new System.Windows.Forms.Button();
             this.Cancel = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.MessageFromWpf = new System.Windows.Forms.Label();
             this.Buttons.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -54,7 +54,7 @@
             this.elementHost1.Location = new System.Drawing.Point(0, 0);
             this.elementHost1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.elementHost1.Name = "elementHost1";
-            this.elementHost1.Size = new System.Drawing.Size(1066, 506);
+            this.elementHost1.Size = new System.Drawing.Size(884, 505);
             this.elementHost1.TabIndex = 1;
             this.elementHost1.Text = "elementHost1";
             this.elementHost1.Child = null;
@@ -68,13 +68,26 @@
             this.Buttons.Location = new System.Drawing.Point(0, 0);
             this.Buttons.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Buttons.Name = "Buttons";
-            this.Buttons.Size = new System.Drawing.Size(1066, 52);
+            this.Buttons.Size = new System.Drawing.Size(884, 52);
             this.Buttons.TabIndex = 2;
+            // 
+            // MessageFromWpf
+            // 
+            this.MessageFromWpf.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MessageFromWpf.AutoEllipsis = true;
+            this.MessageFromWpf.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MessageFromWpf.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.MessageFromWpf.Location = new System.Drawing.Point(12, 6);
+            this.MessageFromWpf.Name = "MessageFromWpf";
+            this.MessageFromWpf.Size = new System.Drawing.Size(698, 27);
+            this.MessageFromWpf.TabIndex = 3;
+            this.MessageFromWpf.Text = "...";
             // 
             // Save
             // 
             this.Save.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Save.Location = new System.Drawing.Point(898, 14);
+            this.Save.Location = new System.Drawing.Point(716, 14);
             this.Save.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Save.Name = "Save";
             this.Save.Size = new System.Drawing.Size(75, 25);
@@ -86,7 +99,7 @@
             // Cancel
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Cancel.Location = new System.Drawing.Point(979, 14);
+            this.Cancel.Location = new System.Drawing.Point(797, 14);
             this.Cancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(75, 25);
@@ -109,27 +122,15 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.Buttons);
-            this.splitContainer1.Size = new System.Drawing.Size(1066, 562);
-            this.splitContainer1.SplitterDistance = 506;
+            this.splitContainer1.Size = new System.Drawing.Size(884, 561);
+            this.splitContainer1.SplitterDistance = 505;
             this.splitContainer1.TabIndex = 3;
-            // 
-            // MessageFromWpf
-            // 
-            this.MessageFromWpf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.MessageFromWpf.AutoSize = true;
-            this.MessageFromWpf.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.MessageFromWpf.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.MessageFromWpf.Location = new System.Drawing.Point(12, 18);
-            this.MessageFromWpf.Name = "MessageFromWpf";
-            this.MessageFromWpf.Size = new System.Drawing.Size(20, 16);
-            this.MessageFromWpf.TabIndex = 3;
-            this.MessageFromWpf.Text = "...";
             // 
             // EditorHost
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1066, 562);
+            this.ClientSize = new System.Drawing.Size(884, 561);
             this.Controls.Add(this.splitContainer1);
             this.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -140,7 +141,6 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EditorHost_FormClosing);
             this.Load += new System.EventHandler(this.EditorHost_Load);
             this.Buttons.ResumeLayout(false);
-            this.Buttons.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();

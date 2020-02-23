@@ -5,15 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
-using Chem4Word.Model2.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using Chem4Word.Model2;
+using Chem4Word.Model2.Geometry;
+using Chem4Word.Model2.Helpers;
 using static Chem4Word.ACME.Drawing.GlyphUtils;
 
 namespace Chem4Word.ACME.Drawing
@@ -29,7 +29,11 @@ namespace Chem4Word.ACME.Drawing
 
         private static double MaskOffsetWidth = 0;
 
-        public double BondThickness { get; set; }
+        //public double BondThickness { get; set; }
+
+        public bool ShowInColour { get; set; }
+        public bool ShowImplicitHydrogens { get; set; }
+        public bool ShowAllCarbons { get; set; }
 
         #endregion private fields
 
@@ -190,14 +194,17 @@ namespace Chem4Word.ACME.Drawing
 
         #endregion Nested Classes
 
-        public AtomVisual(Atom atom) : this()
+        public AtomVisual(Atom atom, bool showInColour, bool showImplicitHydrogens, bool showAllCarbons) : this()
         {
             ParentAtom = atom;
             Position = atom.Position;
-            AtomSymbol = ParentAtom.SymbolText;
+            AtomSymbol = ShowAllCarbons ? ParentAtom.Element.Symbol : ParentAtom.SymbolText;
             Charge = ParentAtom.FormalCharge;
             ImplicitHydrogenCount = ParentAtom.ImplicitHydrogenCount;
             Isotope = ParentAtom.IsotopeNumber;
+            ShowInColour = showInColour;
+            ShowImplicitHydrogens = showImplicitHydrogens;
+            ShowAllCarbons = showAllCarbons;
         }
 
         public AtomVisual()
@@ -248,7 +255,6 @@ namespace Chem4Word.ACME.Drawing
             LabelMetrics isoMetrics,
             CompassPoints defaultHOrientation)
         {
-            Debug.Assert((Charge ?? 0) != 0);
             var chargeString = AtomHelpers.GetChargeString(Charge);
             var chargeText = DrawChargeOrRadical(drawingContext, mainAtomMetrics, hMetrics, isoMetrics, chargeString, Fill, defaultHOrientation);
             chargeText.TextMetrics.FlattenedPath = chargeText.TextRun.GetOutline();
@@ -371,10 +377,6 @@ namespace Chem4Word.ACME.Drawing
             {
                 //so draw a circle
                 double radiusX = GlyphText.SymbolSize / 3;
-                if (!measureOnly)
-                {
-                    //drawingContext.DrawEllipse(Fill, null, Position, radiusX, radiusX);
-                }
 
                 Rect boundingBox = new Rect(new Point(Position.X - radiusX, Position.Y - radiusX),
                     new Point(Position.X + radiusX, Position.Y + radiusX));
@@ -394,7 +396,6 @@ namespace Chem4Word.ACME.Drawing
             //renders the atom complete with charges, hydrogens and labels.
             //this code is *complex* - alter it at your own risk!
 
-            List<Point> symbolPoints = new List<Point>();
             List<Point> hydrogenPoints = new List<Point>();
 
             //private variables used to keep track of onscreen visuals
@@ -428,7 +429,7 @@ namespace Chem4Word.ACME.Drawing
 
             //stage 3:  measure up the hydrogens
             //if we have implicit hydrogens and we have an explicit label, draw them
-            if (ImplicitHydrogenCount > 0 && AtomSymbol != "")
+            if (ShowImplicitHydrogens && ImplicitHydrogenCount > 0 && AtomSymbol != "")
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
@@ -533,7 +534,18 @@ namespace Chem4Word.ACME.Drawing
             {
                 using (DrawingContext dc = RenderOpen())
                 {
-                    //if it's overbonded draw the warning circle
+                    Fill = ShowInColour
+                        ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour))
+                        : new SolidColorBrush(Colors.Black);
+
+                    var atomSymbol = ParentAtom.SymbolText;
+                    if (ShowAllCarbons)
+                    {
+                        atomSymbol = ParentAtom.Element.Symbol;
+                        AtomSymbol = ParentAtom.Element.Symbol;
+                    }
+
+                    //if it's over bonded draw the warning circle
                     if (DisplayOverbonding && ParentAtom.Overbonded)
                     {
                         EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, Globals.AtomRadius * 2.0, Globals.AtomRadius * 2.0);
@@ -544,24 +556,9 @@ namespace Chem4Word.ACME.Drawing
                         dc.DrawGeometry(warningFill, new Pen(new SolidColorBrush(Colors.OrangeRed), Globals.BondThickness), eg);
                     }
 
-                    Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(e.Colour));
-                    if (ParentAtom.SymbolText != "")
+                    if (atomSymbol == "")
                     {
-                        RenderAtomSymbol(dc);
-                        // Diag: Show the convex hull
-#if DEBUG
-#if SHOWHULLS
-                        if (AtomSymbol != "")
-                        {
-                            dc.DrawGeometry(null, new Pen(new SolidColorBrush(Colors.GreenYellow), 1.0), WidenedHullGeometry);
-                        }
-#endif
-#endif
-                        // End Diag
-                        dc.Close();
-                    }
-                    else //draw an empty circle for hit testing purposes
-                    {
+                        //draw an empty circle for hit testing purposes
                         EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, Globals.AtomRadius, Globals.AtomRadius);
 
                         dc.DrawGeometry(Brushes.Transparent, new Pen(Brushes.Transparent, 1.0), eg);
@@ -569,6 +566,22 @@ namespace Chem4Word.ACME.Drawing
                         Hull = new List<Point>();
 
                         Hull.AddRange(new[] { eg.Bounds.BottomLeft, eg.Bounds.TopLeft, eg.Bounds.TopRight, eg.Bounds.BottomRight });
+                        dc.Close();
+                    }
+                    else
+                    {
+                        RenderAtomSymbol(dc);
+#if DEBUG
+#if SHOWHULLS
+                        // Diag: Show the convex hull
+                        if (AtomSymbol != "")
+                        {
+                            dc.DrawGeometry(null, new Pen(new SolidColorBrush(Colors.GreenYellow), 1.0), WidenedHullGeometry);
+                        }
+                        // End Diag
+#endif
+#endif
+
                         dc.Close();
                     }
                 }

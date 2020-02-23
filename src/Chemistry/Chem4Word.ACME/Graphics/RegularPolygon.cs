@@ -21,7 +21,6 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(PointCountProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for PointCount.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PointCountProperty =
             DependencyProperty.Register("PointCount", typeof(int), typeof(RegularPolygon), new PropertyMetadata(4));
 
@@ -31,7 +30,6 @@ namespace Chem4Word.ACME.Graphics
             set { SetValue(SideLengthProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SideLength.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SideLengthProperty =
             DependencyProperty.Register("SideLength", typeof(double), typeof(RegularPolygon), new PropertyMetadata(25.0));
 

@@ -26,7 +26,6 @@ namespace Chem4Word.Navigator
             set { SetValue(FormulaProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for MyProperty.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty FormulaProperty =
             DependencyProperty.Register("Formula", typeof(string), typeof(FormulaBlock), new FrameworkPropertyMetadata("", FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure, FormulaChangedCallback));
 

@@ -65,14 +65,16 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public MoleculePropertyEditor(MoleculePropertiesModel model)
+        public MoleculePropertyEditor(MoleculePropertiesModel model, AcmeOptions options)
         {
             InitializeComponent();
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 MpeModel = model;
+                MpeModel.Options = options;
                 DataContext = model;
                 MoleculePath.Text = MpeModel.Path;
+                LabelsEditor.SetOptions(options);
             }
         }
 
@@ -148,6 +150,7 @@ namespace Chem4Word.ACME.Controls
             {
                 CMLConverter cc = new CMLConverter();
                 LabelsEditor.Used1D = _moleculePropertiesModel.Used1DProperties;
+                LabelsEditor.SetOptions(_moleculePropertiesModel.Options);
                 LabelsEditor.PopulateTreeView(cc.Export(_moleculePropertiesModel.Data));
             }
         }

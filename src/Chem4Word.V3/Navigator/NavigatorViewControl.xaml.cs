@@ -6,8 +6,8 @@
 // ---------------------------------------------------------------------------
 
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.ACME;
 using Microsoft.Office.Interop.Word;
 using Application = Microsoft.Office.Interop.Word.Application;
 
@@ -20,29 +20,30 @@ namespace Chem4Word.Navigator
     {
         private Application _activeApplication;
         private Document _activeDoc;
+        private AcmeOptions _options;
 
         public NavigatorView()
         {
             InitializeComponent();
+            _options = new AcmeOptions();
         }
 
-        private void NavigatorView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        public void SetOptions(AcmeOptions options)
         {
-            System.Diagnostics.Debug.WriteLine(nameof(sender), e.NewValue);
+            _options = options;
         }
+
+        public bool ShowAllCarbonAtoms => _options.ShowCarbons;
+        public bool ShowImplicitHydrogens => _options.ShowHydrogens;
+        public bool ShowAtomsInColour => _options.ColouredAtoms;
+        public bool ShowMoleculeGrouping => _options.ShowMoleculeGrouping;
 
         public Application ActiveApplication
         {
             get { return _activeApplication; }
             set
             {
-                if (_activeApplication != null)
-                {
-                    DisconnectAppEvents();
-                }
                 _activeApplication = value;
-                ConnectUpAppEvents();
-                //force a reload
             }
         }
 
@@ -69,14 +70,6 @@ namespace Chem4Word.Navigator
                     this.DataContext = null;
                 }
             }
-        }
-
-        private void DisconnectAppEvents()
-        {
-        }
-
-        private void ConnectUpAppEvents()
-        {
         }
     }
 }

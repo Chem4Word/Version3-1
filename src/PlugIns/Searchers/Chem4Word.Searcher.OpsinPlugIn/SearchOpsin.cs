@@ -24,11 +24,11 @@ namespace Chem4Word.Searcher.OpsinPlugIn
 
         public System.Windows.Point TopLeft { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
-        public string ProductAppDataPath { get; set; }
+        public string SettingsPath { get; set; }
 
         public string Cml { get; set; }
 
-        public Options UserOptions { get; set; }
+        public SearcherOptions UserOptions { get; set; }
 
         public SearchOpsin()
         {

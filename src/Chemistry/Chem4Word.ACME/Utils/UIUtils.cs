@@ -34,11 +34,10 @@ namespace Chem4Word.ACME.Utils
             return dialog.ShowDialog();
         }
 
-        public static void ShowAcmeSettings(EditorCanvas currentEditor, string settingsFile, IChem4WordTelemetry telemetry, Point topLeft)
+        public static void ShowAcmeSettings(EditorCanvas currentEditor, AcmeOptions options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             var mode = Application.Current.ShutdownMode;
             Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            var options = FileUtils.LoadAcmeSettings(settingsFile, telemetry, topLeft);
             var pe = new SettingsHost(options, telemetry, topLeft);
             ShowDialog(pe, currentEditor);
             Application.Current.ShutdownMode = mode;
@@ -131,7 +130,7 @@ namespace Chem4Word.ACME.Utils
                     model.SpinMultiplicity = mol.SpinMultiplicity;
                     model.ShowMoleculeBrackets = mol.ShowMoleculeBrackets;
 
-                    var pe = new MoleculePropertyEditor(model);
+                    var pe = new MoleculePropertyEditor(model, evm.EditorOptions);
                     ShowDialog(pe, currentEditor);
 
                     if (model.Save)
@@ -228,7 +227,8 @@ namespace Chem4Word.ACME.Utils
                         }
                         model.MicroModel.ScaleToAverageBondLength(20);
 
-                        var pe = new AtomPropertyEditor(model);
+                        var pe = new AtomPropertyEditor(model, evm.EditorOptions);
+
                         ShowDialog(pe, currentEditor);
                         Application.Current.ShutdownMode = mode;
 
@@ -245,6 +245,7 @@ namespace Chem4Word.ACME.Utils
                             }
                             evm.SelectedElement = model.Element;
                         }
+                        pe.Close();
                     }
 
                     // Did RightClick occur on a BondVisual?
@@ -257,22 +258,22 @@ namespace Chem4Word.ACME.Utils
                         var bond = bv.ParentBond;
 
                         var model = new BondPropertiesModel
-                                    {
-                                        Centre = screenPosition,
-                                        Path = bond.Path,
-                                        Angle = bond.Angle,
-                                        Length = bond.BondLength / Globals.ScaleFactorForXaml,
-                                        BondOrderValue = bond.OrderValue.Value,
-                                        IsSingle = bond.Order.Equals(Globals.OrderSingle),
-                                        IsDouble = bond.Order.Equals(Globals.OrderDouble),
-                                        Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
-                                        Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
-                                    };
+                        {
+                            Centre = screenPosition,
+                            Path = bond.Path,
+                            Angle = bond.Angle,
+                            Length = bond.BondLength / Globals.ScaleFactorForXaml,
+                            BondOrderValue = bond.OrderValue.Value,
+                            IsSingle = bond.Order.Equals(Globals.OrderSingle),
+                            IsDouble = bond.Order.Equals(Globals.OrderDouble),
+                            Is1Point5 = bond.Order.Equals(Globals.OrderPartial12),
+                            Is2Point5 = bond.Order.Equals(Globals.OrderPartial23)
+                        };
 
                         model.BondAngle = model.AngleString;
                         model.DoubleBondChoice = DoubleBondType.Auto;
 
-                        if (model.IsDouble | model.Is1Point5 | model.Is2Point5)
+                        if (model.IsDouble || model.Is1Point5 || model.Is2Point5)
                         {
                             if (bond.ExplicitPlacement != null)
                             {
@@ -280,12 +281,9 @@ namespace Chem4Word.ACME.Utils
                             }
                             else
                             {
-                                if (model.IsDouble)
+                                if (model.IsDouble && bond.Stereo == Globals.BondStereo.Indeterminate)
                                 {
-                                    if (bond.Stereo == Globals.BondStereo.Indeterminate)
-                                    {
-                                        model.DoubleBondChoice = DoubleBondType.Indeterminate;
-                                    }
+                                    model.DoubleBondChoice = DoubleBondType.Indeterminate;
                                 }
                             }
                         }

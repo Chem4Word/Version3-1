@@ -49,6 +49,8 @@ namespace Chem4Word.ACME
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
+        public AcmeOptions EditorOptions { get; set; }
+
         #endregion Fields
 
         #region Properties
@@ -170,16 +172,15 @@ namespace Chem4Word.ACME
             {
                 UndoManager.BeginUndoBlock();
 
-                Action undo, redo;
                 foreach (Atom selectedAtom in selAtoms)
                 {
                     if (selectedAtom.Element != value)
                     {
-                        redo = () => { selectedAtom.Element = value; };
                         var lastElement = selectedAtom.Element;
-
-                        undo = () => { selectedAtom.Element = lastElement; };
+                        Action redo = () => { selectedAtom.Element = value; };
+                        Action undo = () => { selectedAtom.Element = lastElement; };
                         UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol ?? "null"}");
+
                         selectedAtom.Element = value;
                         selectedAtom.UpdateVisual();
                         foreach (Bond bond in selectedAtom.Bonds)
@@ -220,15 +221,16 @@ namespace Chem4Word.ACME
         {
             get
             {
-                var btList = (from bt in SelectedBondOptions
-                              select bt.Id).Distinct();
+                var btList = (from bt
+                                  in SelectedBondOptions
+                              select bt.Id).Distinct().ToList();
 
-                if (btList.Count() == 1)
+                if (btList.Count == 1)
                 {
-                    return btList.ToList()[0];
+                    return btList[0];
                 }
 
-                if (btList.Count() == 0)
+                if (btList.Count == 0)
                 {
                     return _selectedBondOptionId;
                 }
@@ -824,7 +826,7 @@ namespace Chem4Word.ACME
                 Action undo = () =>
                               {
                                   lastAtom.Tag = oldDir;
-                                  currentMol.RemoveAtom(newAtom); 
+                                  currentMol.RemoveAtom(newAtom);
                                   newAtom.Parent = null;
                                   lastAtom.UpdateVisual();
                               };
@@ -839,7 +841,7 @@ namespace Chem4Word.ACME
                 UndoManager.RecordAction(undo, redo);
 
                 redo();
-                
+
                 AddNewBond(lastAtom, newAtom, currentMol, bondOrder, stereo);
                 lastAtom.UpdateVisual();
                 newAtom.UpdateVisual();
@@ -2896,10 +2898,9 @@ namespace Chem4Word.ACME
         /// <param name="selection">Observable collection of ChemistryBase objects</param>
         public void Group(IEnumerable<object> selection)
         {
-            List<Molecule> children;
             //grab just the grouped molecules first
-            children = (from Molecule mol in selection.OfType<Molecule>()
-                        select mol).ToList();
+            var children = (from Molecule mol in selection.OfType<Molecule>()
+                            select mol).ToList();
             Group(children);
         }
 

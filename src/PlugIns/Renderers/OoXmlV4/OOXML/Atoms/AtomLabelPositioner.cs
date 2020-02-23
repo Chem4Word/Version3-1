@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Windows;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
+using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using IChem4Word.Contracts;
 using Point = System.Windows.Point;
@@ -29,14 +30,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
         private Dictionary<string, List<Point>> _convexhHulls;
         private IChem4WordTelemetry _telemetry;
         private double _meanBondLength;
+        private OoXmlV4Options _options;
 
-        public AtomLabelPositioner(double meanBondLength, List<AtomLabelCharacter> atomLabelCharacters, Dictionary<string, List<Point>> convexHulls, Dictionary<char, TtfCharacter> characterset, IChem4WordTelemetry telemetry)
+        public AtomLabelPositioner(OoXmlV4Options options, Dictionary<char, TtfCharacter> characterset,
+                                   List<AtomLabelCharacter> atomLabelCharacters,
+                                   Dictionary<string, List<Point>> convexHulls, double meanBondLength,
+                                   IChem4WordTelemetry telemetry)
         {
             _AtomLabelCharacters = atomLabelCharacters;
             _TtfCharacterSet = characterset;
             _convexhHulls = convexHulls;
             _telemetry = telemetry;
             _meanBondLength = meanBondLength;
+            _options = options;
         }
 
         public void AddMoleculeLabels(List<TextualProperty> labels, Point centrePoint, string moleculePath)
@@ -127,11 +133,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             }
         }
 
-        public void CreateElementCharacters(Atom atom, Options options)
+        public void CreateElementCharacters(Atom atom)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            //Point atomCentre = new Point((double)atom.X2, (double)atom.Y2);
             string atomLabel = atom.Element.Symbol;
             Rect labelBounds;
 
@@ -144,19 +149,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             int implicitHCount = atom.ImplicitHydrogenCount;
 
             Point cursorPosition = atom.Position;
-            Point chargeCursorPosition = atom.Position;
-            Point isotopeCursorPosition = atom.Position;
-
-            double lastOffset = 0;
 
             int bondCount = atom.Bonds.ToList().Count;
 
-            if (atom.ShowSymbol)
+            if (atom.ShowSymbol || _options.ShowCarbons)
             {
-                #region Set Up Atom Colours
+                #region Set Up Atom Colour
 
                 string atomColour = "000000";
-                if (options.ColouredAtoms)
+                if (_options.ColouredAtoms)
                 {
                     if (atom.Element.Colour != null)
                     {
@@ -204,8 +205,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                 double width = xMax - xMin;
                 double height = yMax - yMin;
                 cursorPosition = new Point(atom.Position.X - width / 2, atom.Position.Y + height / 2);
-                chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
-                isotopeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
+                var chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
+                var isotopeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
                 labelBounds = new Rect(cursorPosition, new Size(width, height));
 
                 #endregion Step 2 - Reset Cursor such that the text is centered about the atom's co-ordinates
@@ -222,7 +223,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
                         _AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
-                        lastOffset = OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength);
                         cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, _meanBondLength), 0);
                         chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
                     }
@@ -308,7 +308,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
 
                 #region Step 5 - Add Implicit H if required
 
-                if (options.ShowHydrogens && implicitHCount > 0)
+                if (_options.ShowHydrogens && implicitHCount > 0)
                 {
                     TtfCharacter hydrogenCharacter = _TtfCharacterSet['H'];
                     string numbers = "012345";
@@ -538,12 +538,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML.Atoms
             return new Point(cursorPosition.X, cursorPosition.Y + OoXmlHelper.ScaleCsTtfToCml(character.OriginY, _meanBondLength));
         }
 
-        public void CreateFunctionalGroupCharacters(Atom atom, Options options)
+        public void CreateFunctionalGroupCharacters(Atom atom, OoXmlV4Options options)
         {
             FunctionalGroup fg = atom.Element as FunctionalGroup;
             bool reverse = atom.FunctionalGroupPlacement == CompassPoints.West;
 
-            #region Set Up Atom Colours
+            #region Set Up Functional Group Colour
 
             string atomColour = "000000";
             if (options.ColouredAtoms)

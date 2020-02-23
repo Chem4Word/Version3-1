@@ -68,6 +68,7 @@ namespace Chem4Word.ACME.Controls
         /// Useful in visual operations
         /// </summary>
         /// <param name="adornedMolecules">List of molecules to ghost</param>
+        /// <param name="operation"></param>
         /// <returns></returns>
         public Geometry GhostMolecule(List<Molecule> adornedMolecules, Transform operation = null)
         {
