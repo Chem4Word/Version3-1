@@ -202,7 +202,7 @@ namespace Chem4Word
                                         {
                                             // Stop Screen Updating and Disable Document Event Handlers
                                             app.ScreenUpdating = false;
-                                            Globals.Chem4WordV3.DisableContentControlEvents(doc);
+                                            Globals.Chem4WordV3.DisableContentControlEvents();
 
                                             // Erase old CC
                                             cc.LockContents = false;
@@ -279,7 +279,7 @@ namespace Chem4Word
                     {
                         // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
                         app.ScreenUpdating = true;
-                        Globals.Chem4WordV3.EnableContentControlEvents(doc);
+                        Globals.Chem4WordV3.EnableContentControlEvents();
 
                         if (cc != null)
                         {
@@ -638,12 +638,22 @@ namespace Chem4Word
 
         private void AfterButtonChecks(RibbonButton button)
         {
-            RegistryHelper.SendSetupActions();
-            RegistryHelper.SendUpdateActions();
+            if (Globals.Chem4WordV3.Telemetry != null)
+            {
+                RegistryHelper.SendSetupActions();
+                RegistryHelper.SendUpdateActions();
+                RegistryHelper.SendExceptions();
+            }
 
             if (Globals.Chem4WordV3.SystemOptions == null)
             {
                 Globals.Chem4WordV3.LoadOptions();
+            }
+
+            if (Globals.Chem4WordV3.OptionsReloadRequired)
+            {
+                Globals.Chem4WordV3.SystemOptions = new Chem4WordOptions(Globals.Chem4WordV3.SystemOptions.SettingsPath);
+                Globals.Chem4WordV3.OptionsReloadRequired = false;
             }
 
             // Only do update check if we are not coming from an update button
@@ -770,7 +780,7 @@ namespace Chem4Word
                         {
                             // Stop Screen Updating and Disable Document Event Handlers
                             app.ScreenUpdating = false;
-                            Globals.Chem4WordV3.DisableContentControlEvents(doc);
+                            Globals.Chem4WordV3.DisableContentControlEvents();
 
                             CMLConverter cmlConverter = new CMLConverter();
 
@@ -948,7 +958,7 @@ namespace Chem4Word
             {
                 // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
                 app.ScreenUpdating = true;
-                Globals.Chem4WordV3.EnableContentControlEvents(doc);
+                Globals.Chem4WordV3.EnableContentControlEvents();
 
                 if (cc != null)
                 {
@@ -1672,7 +1682,7 @@ namespace Chem4Word
 
                 // Stop Screen Updating and Disable Document Event Handlers
                 app.ScreenUpdating = false;
-                Globals.Chem4WordV3.DisableContentControlEvents(doc);
+                Globals.Chem4WordV3.DisableContentControlEvents();
 
                 try
                 {
@@ -1769,7 +1779,7 @@ namespace Chem4Word
                 {
                     // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
                     app.ScreenUpdating = true;
-                    Globals.Chem4WordV3.EnableContentControlEvents(doc);
+                    Globals.Chem4WordV3.EnableContentControlEvents();
 
                     if (cc != null)
                     {

@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Management;
 using Chem4Word.Core.Helpers;
 
@@ -264,7 +265,6 @@ namespace Chem4Word.Telemetry
                             _productType = Unknown + $" [{productType}]";
                             break;
                     }
-                    break;
                 }
             }
             catch
@@ -296,9 +296,13 @@ namespace Chem4Word.Telemetry
 
         private void GetAntiVirusStatus()
         {
+            // This is a combination of information from the following sources
+
             // http://neophob.com/2010/03/wmi-query-windows-securitycenter2/
             // https://mspscripts.com/get-installed-antivirus-information-2/
             // https://gallery.technet.microsoft.com/scriptcenter/Get-the-status-of-4b748f25
+            // https://stackoverflow.com/questions/4700897/wmi-security-center-productstate-clarification/4711211
+            // https://blogs.msdn.microsoft.com/alejacma/2008/05/12/how-to-get-antivirus-information-with-wmi-vbscript/#comment-442
 
             // Only works if not a server
             if (!string.IsNullOrEmpty(ProductType) && ProductType.Equals(Workstation))
@@ -313,49 +317,32 @@ namespace Chem4Word.Telemetry
                     {
                         var mgtObject = (ManagementObject)o;
                         var product = mgtObject["DisplayName"].ToString();
+
                         var status = int.Parse(mgtObject["ProductState"].ToString());
+
                         var hex = Hex(status);
-                        products.Add($"{product} {status} [{Hex(status)}] {ProductState(hex.Substring(2,2))} {DefinitionsState(hex.Substring(4, 2))}");
+                        var bin = Binary(status);
+                        var reversed = Reverse(bin);
+
+                        // https://blogs.msdn.microsoft.com/alejacma/2008/05/12/how-to-get-antivirus-information-with-wmi-vbscript/#comment-442
+                        // 19th bit = Not so sure but, AV is turned on (I wouldn't be sure it's enabled)
+                        // 13th bit = On Access Scanning (Memory Resident Scanning) is on, this tells you that the product is scanning every file that you open as opposed to just scanning at regular intervals.
+                        //  5th Bit = If this is true (==1) the virus scanner is out of date
+
+                        bool enabled = GetBit(reversed, 18);
+                        bool scanning = GetBit(reversed, 12);
+                        bool outdated = GetBit(reversed, 4);
+
+                        products.Add($"{product} Status: {status} [0x{hex}] --> Enabled: {enabled} Scanning: {scanning} Outdated: {outdated}");
                     }
-                    _antiVirusStatus = string.Join(";", products);
+
+                    // Return distinct list of products and states
+                    _antiVirusStatus = string.Join(";", products.Distinct());
                 }
                 catch (Exception exception)
                 {
                     _antiVirusStatus = $"{exception.Message}";
                 }
-            }
-
-            // Local Functions
-
-            string ProductState(string value)
-            {
-                switch (value)
-                {
-                    case "00":
-                        return "Off";
-                    case "01":
-                        return "Expired";
-                    case "10":
-                        return "On";
-                    case "11":
-                        return "Snoozed";
-                }
-
-                return Unknown;
-            }
-
-            string DefinitionsState(string value)
-            {
-                switch (value)
-                {
-                    case "00":
-                        return "Up to date";
-
-                    case "10":
-                        return "Outdated";
-                }
-
-                return Unknown;
             }
         }
 
@@ -363,11 +350,47 @@ namespace Chem4Word.Telemetry
         {
             try
             {
-                return value.ToString("X6");
+                return Convert.ToString(value, 16).PadLeft(6, '0');
             }
             catch
             {
                 return string.Empty;
+            }
+        }
+
+        private string Binary(int value)
+        {
+            try
+            {
+                return Convert.ToString(value, 2).PadLeft(24, '0');
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private string Reverse(string value)
+        {
+            try
+            {
+                return new string(value.Reverse().ToArray());
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private bool GetBit(string value, int index)
+        {
+            try
+            {
+                return value.Substring(index, 1).Equals("1");
+            }
+            catch
+            {
+                return false;
             }
         }
     }

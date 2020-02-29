@@ -37,26 +37,30 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             CMLConverter cc = new CMLConverter();
-            Model m = cc.Import(cml);
-            if (m.AllErrors.Count > 0 || m.AllWarnings.Count > 0)
+            Model model = cc.Import(cml);
+            if (model.AllErrors.Count > 0 || model.AllWarnings.Count > 0)
             {
-                if (m.AllErrors.Count > 0)
+                if (model.AllErrors.Count > 0)
                 {
-                    telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, m.AllErrors));
+                    telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, model.AllErrors));
                 }
 
-                if (m.AllWarnings.Count > 0)
+                if (model.AllWarnings.Count > 0)
                 {
-                    telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, m.AllWarnings));
+                    telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, model.AllWarnings));
                 }
             }
 
-            string fileName = Path.Combine(Path.GetTempPath(), $"Chem4Word-V3-{guid}.docx");
+            string fileName = string.Empty;
 
-            bool canRender = m.TotalAtomsCount > 0 && (m.MeanBondLength > Core.Helpers.Constants.BondLengthTolerance / 2 || m.TotalBondsCount == 0);
+            bool canRender = model.TotalAtomsCount > 0
+                             && (model.TotalBondsCount == 0
+                                 || model.MeanBondLength > Core.Helpers.Constants.BondLengthTolerance / 2);
 
             if (canRender)
             {
+                fileName = Path.Combine(Path.GetTempPath(), $"Chem4Word-V3-{guid}.docx");
+
                 string bookmarkName = Core.Helpers.Constants.OoXmlBookmarkPrefix + guid;
 
                 // Create a Wordprocessing document.
@@ -67,10 +71,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     mdp.Document = new Document(new Body());
                     Body docbody = package.MainDocumentPart.Document.Body;
 
-                    // This is for test
-                    //AddParagraph(docbody, "Hello World", bookmarkName);
                     // This will be live
-                    AddPictureFromModel(docbody, m, bookmarkName, options, telemetry, topLeft);
+                    AddPictureFromModel(docbody, model, bookmarkName, options, telemetry, topLeft);
 
                     // Save changes to the main document part.
                     package.MainDocumentPart.Document.Save();
@@ -100,9 +102,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 paragraph1.Append(bookmarkstart);
             }
 
-            // This is where the work gets done ...
-            OoXmlRenderer pic = new OoXmlRenderer(model, options, telemetry, topLeft);
-            paragraph1.Append(pic.GenerateRun());
+            OoXmlRenderer renderer = new OoXmlRenderer(model, options, telemetry, topLeft);
+            paragraph1.Append(renderer.GenerateRun());
 
             if (!string.IsNullOrEmpty(bookmarkName))
             {
@@ -113,35 +114,5 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             docbody.Append(paragraph1);
         }
-
-        #region For Test
-
-        private static void AddParagraph(Body docbody, string theText, string bookmarkName = null)
-        {
-            Paragraph paragraph = new Paragraph();
-            if (!string.IsNullOrEmpty(bookmarkName))
-            {
-                BookmarkStart bookmarkstart = new BookmarkStart();
-                bookmarkstart.Name = bookmarkName;
-                bookmarkstart.Id = "0";
-                paragraph.Append(bookmarkstart);
-            }
-
-            Run run = new Run();
-            Text text = new Text(theText);
-            run.Append(text);
-            paragraph.Append(run);
-
-            if (!string.IsNullOrEmpty(bookmarkName))
-            {
-                BookmarkEnd bookmarkend = new BookmarkEnd();
-                bookmarkend.Id = "0";
-                paragraph.Append(bookmarkend);
-            }
-
-            docbody.Append(paragraph);
-        }
-
-        #endregion For Test
     }
 }

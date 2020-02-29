@@ -137,6 +137,7 @@ namespace Chem4Word.Helpers
                                     if (write)
                                     {
                                         Debug.WriteLine($"Writing file {file}");
+                                        Globals.Chem4WordV3.OptionsReloadRequired = true;
                                         string json = JsonConvert.SerializeObject(jObject, Formatting.Indented);
                                         File.WriteAllText(file, json);
                                     }

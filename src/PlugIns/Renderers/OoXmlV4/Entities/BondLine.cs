@@ -86,9 +86,9 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
                                           (float)(End.Y + offset * xDifference / length));
 
             return new BondLine(Style, newStartPoint, newEndPoint, Bond)
-                   {
-                       Colour = Colour
-                   };
+            {
+                Colour = Colour
+            };
         }
 
         public void SetLineStyle(BondLineStyle style)

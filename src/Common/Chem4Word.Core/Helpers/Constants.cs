@@ -34,6 +34,7 @@ namespace Chem4Word.Core.Helpers
         public const string RegistryValueNameAvailableIsBeta = "Available Is Beta";
         public const string Chem4WordSetupRegistryKey = @"SOFTWARE\Chem4Word V3\Setup";
         public const string Chem4WordUpdateRegistryKey = @"SOFTWARE\Chem4Word V3\Update";
+        public const string Chem4WordExceptionsRegistryKey = @"SOFTWARE\Chem4Word V3\Exceptions";
 
         // Update Checks
         public const int MaximumVersionsBehind = 7;

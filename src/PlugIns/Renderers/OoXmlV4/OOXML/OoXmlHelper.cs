@@ -6,8 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using DocumentFormat.OpenXml;
-using A = DocumentFormat.OpenXml.Drawing;
-using Wps = DocumentFormat.OpenXml.Office2010.Word.DrawingShape;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
 {
@@ -38,6 +36,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         // V3 == 0.75 -> ACS == 0.6
         // This makes bond line width equal to ACS Guide of 0.6pt
         public const double ACS_LINE_WIDTH = 0.6;
+
         public const double ACS_LINE_WIDTH_EMUS = ACS_LINE_WIDTH * EMUS_PER_WORD_POINT;
 
         // V3 == 9500 -> ACS == 9144
@@ -58,31 +57,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         public static double BracketOffset(double bondLength)
         {
             return bondLength * BRACKET_OFFSET_PERCENTAGE;
-        }
-
-        public static void AppendShapeStyle(Wps.WordprocessingShape shape,
-                                            Wps.NonVisualDrawingProperties nonVisualDrawingProperties,
-                                            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties,
-                                            Wps.ShapeProperties shapeProperties)
-        {
-            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
-
-            shapeStyle.Append(lineReference);
-            shapeStyle.Append(fillReference);
-            shapeStyle.Append(effectReference);
-            shapeStyle.Append(fontReference);
-
-            shape.Append(nonVisualDrawingProperties);
-            shape.Append(nonVisualDrawingShapeProperties);
-            shape.Append(shapeProperties);
-            shape.Append(shapeStyle);
-
-            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            shape.Append(textBodyProperties);
         }
 
         #region C# TTF
