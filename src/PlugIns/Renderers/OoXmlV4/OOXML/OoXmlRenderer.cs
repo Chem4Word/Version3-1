@@ -231,7 +231,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 foreach (var hull in _convexHulls)
                 {
                     var points = hull.Value.ToList();
-                    //DrawPolygon(points, 0.25, "ff0000");
+                    DrawPolygon(points, "ff0000", 0.25);
                 }
             }
 
@@ -241,15 +241,15 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 switch (bondLine.Style)
                 {
                     case BondLineStyle.Wedge:
-                        DrawWedgeBond(CalculateWedgePoints(bondLine), bondLine.Bond.Path);
+                        DrawWedgeBond(CalculateWedgeOutline(bondLine), bondLine.BondPath, bondLine.Colour);
                         break;
 
                     case BondLineStyle.Hatch:
-                        DrawHatchBond(CalculateWedgePoints(bondLine), bondLine.Bond.Path);
+                        DrawHatchBond(CalculateWedgeOutline(bondLine), bondLine.BondPath, bondLine.Colour);
                         break;
 
                     default:
-                        DrawBondLine(bondLine.Start, bondLine.End, bondLine.Bond.Path, bondLine.Style);
+                        DrawBondLine(bondLine.Start, bondLine.End, bondLine.BondPath, bondLine.Style, bondLine.Colour);
                         break;
                 }
             }
@@ -454,7 +454,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             Vector step = direction;
             step.Normalize();
-            step *=  OoXmlHelper.ScaleCmlToEmu(15 * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
+            step *= OoXmlHelper.ScaleCmlToEmu(15 * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
 
             int steps = (int)Math.Ceiling(direction.Length / step.Length);
             double stepLength = direction.Length / steps;
@@ -1204,7 +1204,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             if (!string.IsNullOrEmpty(bondPath) && _options.ShowBondDirection)
             {
-                A.TailEnd tailEnd = new A.TailEnd { Type = A.LineEndValues.Stealth };
+                A.TailEnd tailEnd = new A.TailEnd
+                {
+                    Type = A.LineEndValues.Arrow,
+                    Width = A.LineEndWidthValues.Small,
+                    Length = A.LineEndLengthValues.Small
+                };
                 outline.Append(tailEnd);
             }
 
@@ -1236,7 +1241,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
 
             double wiggleLength = bondVector.Length / noOfWiggles;
-            Debug.WriteLine($"v.Length: {bondVector.Length} noOfWiggles: {noOfWiggles}");
 
             Vector originalWigglePortion = bondVector;
             originalWigglePortion.Normalize();
@@ -1446,20 +1450,21 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 RightEdge = 0L
             };
 
-            UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId);
+            inline.Append(extent);
+            inline.Append(effectExtent);
 
+            UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId);
             Wp.DocProperties docProperties = new Wp.DocProperties
             {
                 Id = inlineId,
-                Name = "moleculeGroup"
+                Name = "Chem4Word Structure"
             };
+
+            inline.Append(docProperties);
 
             A.Graphic graphic = new A.Graphic();
             graphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
 
-            inline.Append(extent);
-            inline.Append(effectExtent);
-            inline.Append(docProperties);
             inline.Append(graphic);
 
             A.GraphicData graphicData = new A.GraphicData
@@ -1514,7 +1519,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return (Start: startPoint, End: endPoint, Extents: extents);
         }
 
-        private List<Point> CalculateWedgePoints(BondLine bl)
+        private List<Point> CalculateWedgeOutline(BondLine bl)
         {
             BondLine leftBondLine = bl.GetParallel(BondOffset() / 2);
             BondLine rightBondLine = bl.GetParallel(-BondOffset() / 2);

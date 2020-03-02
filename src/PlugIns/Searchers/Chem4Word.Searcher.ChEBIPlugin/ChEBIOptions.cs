@@ -177,7 +177,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
         private string StripTrailingSlash(string uri)
         {
-            if (uri.EndsWith("/"))
+            if (!string.IsNullOrEmpty(uri) && uri.EndsWith("/"))
             {
                 uri = uri.Remove(uri.Length - 1);
             }

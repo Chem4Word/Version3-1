@@ -198,7 +198,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         {
                             // Only convert to two bond lines if not wedge or hatch
                             bool ignoreWedgeOrHatch = bl.Bond.Order == Globals.OrderSingle
-                                                      && bl.Bond.Stereo == Globals.BondStereo.Wedge || bl.Bond.Stereo == Globals.BondStereo.Hatch;
+                                                      && bl.Bond.Stereo == Globals.BondStereo.Wedge
+                                                        || bl.Bond.Stereo == Globals.BondStereo.Hatch;
                             if (!ignoreWedgeOrHatch)
                             {
                                 // Line was clipped at both ends
@@ -494,7 +495,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (atom.Bonds.ToList().Count == 3)
                     {
                         bool isInRing = atom.IsInRing;
-                        List<BondLine> lines = Outputs.BondLines.Where(bl => bl.ParentBond.Equals(bondPath)).ToList();
+                        List<BondLine> lines = Outputs.BondLines.Where(bl => bl.BondPath.Equals(bondPath)).ToList();
                         if (lines.Any())
                         {
                             List<Bond> otherLines;
@@ -509,8 +510,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                             if (lines.Count == 2 && otherLines.Count == 2)
                             {
-                                BondLine line1 = Outputs.BondLines.First(bl => bl.ParentBond.Equals(otherLines[0].Path));
-                                BondLine line2 = Outputs.BondLines.First(bl => bl.ParentBond.Equals(otherLines[1].Path));
+                                BondLine line1 = Outputs.BondLines.First(bl => bl.BondPath.Equals(otherLines[0].Path));
+                                BondLine line2 = Outputs.BondLines.First(bl => bl.BondPath.Equals(otherLines[1].Path));
                                 TrimLines(lines, line1, line2, isInRing);
                             }
                         }
@@ -1206,76 +1207,92 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     }
                     else
                     {
-                        Point outIntersectP1;
-                        Point outIntersectP2;
-                        Point centre;
-
                         switch (bond.Placement)
                         {
                             case Globals.BondDirection.Anticlockwise:
                                 BondLine da = new BondLine(BondLineStyle.Solid, bond);
                                 Outputs.BondLines.Add(da);
-
-                                BondLine bla = da.GetParallel(-BondOffset());
-                                Point startPointa = bla.Start;
-                                Point endPointa = bla.End;
-
-                                if (bond.PrimaryRing != null)
-                                {
-                                    centre = bond.PrimaryRing.Centroid.Value;
-
-                                    if (Inputs.Options.ShowBondClippingLines)
-                                    {
-                                        // Diagnostics
-                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.StartAtom.Position, centre));
-                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.EndAtom.Position, centre));
-                                    }
-
-                                    CoordinateTool.FindIntersection(startPointa, endPointa, bondStart, centre,
-                                        out _, out _, out outIntersectP1);
-                                    CoordinateTool.FindIntersection(startPointa, endPointa, bondEnd, centre,
-                                        out _, out _, out outIntersectP2);
-
-                                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, outIntersectP1, outIntersectP2, bond));
-                                }
-                                else
-                                {
-                                    CoordinateTool.AdjustLineAboutMidpoint(ref startPointa, ref endPointa, -(BondOffset() / 1.75));
-                                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, startPointa, endPointa, bond));
-                                }
+                                PlaceOtherLine(da, da.GetParallel(-BondOffset()));
                                 break;
 
                             case Globals.BondDirection.Clockwise:
                                 BondLine dc = new BondLine(BondLineStyle.Solid, bond);
                                 Outputs.BondLines.Add(dc);
+                                PlaceOtherLine(dc, dc.GetParallel(BondOffset()));
+                                break;
 
-                                BondLine blc = dc.GetParallel(BondOffset());
-                                Point startPointc = blc.Start;
-                                Point endPointc = blc.End;
-
-                                if (bond.PrimaryRing != null)
+                                // Local Function
+                                void PlaceOtherLine(BondLine primaryLine, BondLine secondaryLine)
                                 {
-                                    centre = bond.PrimaryRing.Centroid.Value;
-                                    if (Inputs.Options.ShowBondClippingLines)
+                                    var primaryMidpoint = CoordinateTool.GetMidPoint(primaryLine.Start, primaryLine.End);
+                                    var secondaryMidpoint = CoordinateTool.GetMidPoint(secondaryLine.Start, secondaryLine.End);
+
+                                    Point startPointa = secondaryLine.Start;
+                                    Point endPointa = secondaryLine.End;
+
+                                    Point? centre = null;
+
+                                    bool clip = false;
+
+                                    // Does bond have a primary ring?
+                                    if (bond.PrimaryRing != null && bond.PrimaryRing.Centroid != null)
                                     {
-                                        // Diagnostics
-                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.StartAtom.Position, centre));
-                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.EndAtom.Position, centre));
+                                        // Get angle between bond and vector to primary ring centre
+                                        centre = bond.PrimaryRing.Centroid.Value;
+                                        var primaryRingVector = primaryMidpoint - centre.Value;
+                                        var angle = CoordinateTool.AngleBetween(bond.BondVector, primaryRingVector);
+
+                                        // Does bond have a secondary ring?
+                                        if (bond.SubsidiaryRing != null && bond.SubsidiaryRing.Centroid != null)
+                                        {
+                                            // Get angle between bond and vector to secondary ring centre
+                                            var centre2 = bond.SubsidiaryRing.Centroid.Value;
+                                            var secondaryRingVector = primaryMidpoint - centre2;
+                                            var angle2 = CoordinateTool.AngleBetween(bond.BondVector, secondaryRingVector);
+
+                                            // Get angle in which the offset line has moved with respect to the bond line
+                                            var offsetVector = primaryMidpoint - secondaryMidpoint;
+                                            var offsetAngle = CoordinateTool.AngleBetween(bond.BondVector, offsetVector);
+
+                                            // If in the same direction as secondary ring centre, use it
+                                            if (Math.Sign(angle2) == Math.Sign(offsetAngle))
+                                            {
+                                                centre = centre2;
+                                            }
+                                        }
+
+                                        // Is projection to centre at right angles +/- 10 degrees
+                                        if (Math.Abs(angle) > 80 && Math.Abs(angle) < 100)
+                                        {
+                                            clip = true;
+                                        }
                                     }
 
-                                    CoordinateTool.FindIntersection(startPointc, endPointc, bondStart, centre,
-                                        out _, out _, out outIntersectP1);
-                                    CoordinateTool.FindIntersection(startPointc, endPointc, bondEnd, centre,
-                                        out _, out _, out outIntersectP2);
+                                    if (clip)
+                                    {
+                                        Point outIntersectP1;
+                                        Point outIntersectP2;
 
-                                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, outIntersectP1, outIntersectP2, bond));
+                                        CoordinateTool.FindIntersection(startPointa, endPointa, bondStart, centre.Value,
+                                                                        out _, out _, out outIntersectP1);
+                                        CoordinateTool.FindIntersection(startPointa, endPointa, bondEnd, centre.Value,
+                                                                        out _, out _, out outIntersectP2);
+
+                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, outIntersectP1, outIntersectP2, bond));
+
+                                        if (Inputs.Options.ShowBondClippingLines)
+                                        {
+                                            // Diagnostics
+                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.StartAtom.Position, centre.Value, "ff0000"));
+                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.EndAtom.Position, centre.Value, "ff0000"));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointa, ref endPointa, -(BondOffset() / 1.75));
+                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, startPointa, endPointa, bond));
+                                    }
                                 }
-                                else
-                                {
-                                    CoordinateTool.AdjustLineAboutMidpoint(ref startPointc, ref endPointc, -(BondOffset() / 1.75));
-                                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, startPointc, endPointc, bond));
-                                }
-                                break;
 
                             default:
                                 switch (bond.Stereo)

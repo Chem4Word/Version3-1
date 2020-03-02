@@ -262,24 +262,24 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (!Rings.Any()) //no rings
-                {
-                    return null;
-                }
-                else if (Rings.Count == 1)
-                {
-                    return Rings[0];
-                }
-                else
+                Ring ring = null;
+
+                if (Rings.Any())
                 {
                     List<Ring> ringList = Parent.SortedRings;
-                    var firstRing = (
+                    var sortedRings = (
                         from Ring r in ringList
                         where r.Atoms.Contains(StartAtom) && r.Atoms.Contains(EndAtom)
                         select r
-                    ).FirstOrDefault();
-                    return firstRing;
+                    ).ToList();
+
+                    if (sortedRings.Count >= 1)
+                    {
+                        ring = sortedRings[0];
+                    }
                 }
+
+                return ring;
             }
         }
 
@@ -287,24 +287,24 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (!Rings.Any()) //no rings
-                {
-                    return null;
-                }
-                else if (Rings.Count == 2)
-                {
-                    return Rings[1];
-                }
-                else
+                Ring ring = null;
+
+                if (Rings.Any())
                 {
                     List<Ring> ringList = Parent.SortedRings;
-                    var firstRing = (
+                    var sortedRings = (
                         from Ring r in ringList
                         where r.Atoms.Contains(StartAtom) && r.Atoms.Contains(EndAtom)
                         select r
-                    ).Take(1).FirstOrDefault();
-                    return firstRing;
+                    ).ToList();
+
+                    if (sortedRings.Count >= 2)
+                    {
+                        ring = sortedRings[1];
+                    }
                 }
+
+                return ring;
             }
         }
 

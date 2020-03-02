@@ -1479,8 +1479,6 @@ namespace Chem4Word.Model2
         // ReSharper disable once InconsistentNaming
         public List<Ring> SortRingsForDBPlacement()
         {
-            //Debug.Assert(HasRings); //no bloody point in running this unless it has rings
-            //Debug.Assert(RingsCalculated); //make sure that if the molecule contains rings that we have calculated them
             //1) All rings of sizes 6, 5, 7, 4 and 3 are discovered, in that order, and added to a list R.
             List<Ring> prioritisedRings = Rings.Where(x => x.Priority > 0).OrderBy(x => x.Priority).ToList();
 
@@ -1654,11 +1652,6 @@ namespace Chem4Word.Model2
             {
                 mol.BuildMolList(allMolecules);
             }
-        }
-
-        public void Move(Transform lastOperation)
-        {
-            throw new NotImplementedException();
         }
 
         public bool Overlaps(List<Point> placements, List<Atom> excludeAtoms = null)

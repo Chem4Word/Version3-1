@@ -16,9 +16,7 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
     {
         public Bond Bond { get; }
 
-        public string ParentMolecule => Bond != null ? Bond.Parent.Path : string.Empty;
-
-        public string ParentBond => Bond != null ? Bond.Path : string.Empty;
+        public string BondPath => Bond != null ? Bond.Path : string.Empty;
 
         public string StartAtomPath => Bond != null ? Bond.StartAtom.Path : string.Empty;
 
@@ -59,18 +57,22 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
             }
         }
 
-        public BondLine(BondLineStyle style, Point startPoint, Point endPoint)
+        private BondLine(BondLineStyle style, Point startPoint, Point endPoint)
         {
             Style = style;
             Start = startPoint;
             End = endPoint;
         }
 
-        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, Bond bond)
+        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, string colour)
+            : this(style, startPoint, endPoint)
         {
-            Style = style;
-            Start = startPoint;
-            End = endPoint;
+            Colour = colour;
+        }
+
+        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, Bond bond)
+            : this(style, startPoint, endPoint)
+        {
             Bond = bond;
         }
 
