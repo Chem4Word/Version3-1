@@ -210,20 +210,36 @@ namespace Chem4Word.ACME.Drawing
                 }
 
                 if (workingCentroid != null)
-
                 {
-                    //shorten the secondto fit neatly within the ring
-                    point3a = BasicGeometry.LineSegmentsIntersect(descriptor.Start, workingCentroid.Value,
-                                                                  descriptor.SecondaryStart,
-                                                                  descriptor.SecondaryEnd);
-                    point4a = BasicGeometry.LineSegmentsIntersect(descriptor.End, workingCentroid.Value,
-                                                                  descriptor.SecondaryStart,
-                                                                  descriptor.SecondaryEnd);
-                    var tempPoint3 = point3a ?? descriptor.SecondaryStart;
-                    var tempPoint4 = descriptor.SecondaryEnd = point4a ?? descriptor.SecondaryEnd;
+                    var bondVector = (descriptor.End - descriptor.Start);
+                    var midPoint = bondVector / 2 + descriptor.Start;
 
-                    descriptor.SecondaryStart = tempPoint3;
-                    descriptor.SecondaryEnd = tempPoint4;
+                    var perpAngle = Math.Abs( Vector.AngleBetween(workingCentroid.Value - midPoint, bondVector));
+                    
+                    if (perpAngle >= 80 && perpAngle <= 100) //probably convex ring
+                    {
+                        //shorten the second bond to fit neatly within the ring
+                        point3a = BasicGeometry.LineSegmentsIntersect(descriptor.Start, workingCentroid.Value,
+                                                                      descriptor.SecondaryStart,
+                                                                      descriptor.SecondaryEnd);
+                        point4a = BasicGeometry.LineSegmentsIntersect(descriptor.End, workingCentroid.Value,
+                                                                      descriptor.SecondaryStart,
+                                                                      descriptor.SecondaryEnd);
+                        var tempPoint3 = point3a ?? descriptor.SecondaryStart;
+                        var tempPoint4 = descriptor.SecondaryEnd = point4a ?? descriptor.SecondaryEnd;
+
+                        descriptor.SecondaryStart = tempPoint3;
+                        descriptor.SecondaryEnd = tempPoint4;
+                    }
+                    else //probably concave ring, so shorten by half the bond offset value
+                    {
+                        point3a = descriptor.SecondaryStart + bondVector * BondOffsetPercentage / 2;
+                        point4a = descriptor.SecondaryEnd - bondVector * BondOffsetPercentage / 2;
+                        
+
+                        descriptor.SecondaryStart = point3a.Value;
+                        descriptor.SecondaryEnd = point4a.Value;
+                    }
                 }
                 //get the boundary for hit testing purposes
                 descriptor.Boundary.Clear();

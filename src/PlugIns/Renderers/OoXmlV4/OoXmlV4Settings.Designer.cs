@@ -72,7 +72,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabRendering.BackColor = System.Drawing.SystemColors.Control;
             this.tabRendering.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabRendering.Controls.Add(this.ShowAllCarbonAtoms);
-            this.tabRendering.Controls.Add(this.ShowMoleculeLabels);
             this.tabRendering.Controls.Add(this.ShowMoleculeGrouping);
             this.tabRendering.Controls.Add(this.ShowHydrogens);
             this.tabRendering.Controls.Add(this.ColouredAtoms);
@@ -102,7 +101,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.ShowMoleculeLabels.AutoSize = true;
             this.ShowMoleculeLabels.Checked = true;
             this.ShowMoleculeLabels.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowMoleculeLabels.Location = new System.Drawing.Point(12, 144);
+            this.ShowMoleculeLabels.Location = new System.Drawing.Point(7, 144);
             this.ShowMoleculeLabels.Margin = new System.Windows.Forms.Padding(4);
             this.ShowMoleculeLabels.Name = "ShowMoleculeLabels";
             this.ShowMoleculeLabels.Size = new System.Drawing.Size(202, 17);
@@ -158,6 +157,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             this.tabDebug.BackColor = System.Drawing.SystemColors.Control;
             this.tabDebug.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.tabDebug.Controls.Add(this.ShowBondDirection);
+            this.tabDebug.Controls.Add(this.ShowMoleculeLabels);
             this.tabDebug.Controls.Add(this.ShowBondClippingLines);
             this.tabDebug.Controls.Add(this.ShowConvexHulls);
             this.tabDebug.Controls.Add(this.ShowAtomPositions);

@@ -21,14 +21,12 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
         public bool IsSmaller { get; set; }
         public bool IsSubScript { get; set; }
         public bool IsSuperScript { get; set; }
-        public char Ascii { get; set; }
 
-        public AtomLabelCharacter(Point position, TtfCharacter character, String colour, char ascii, string parentAtom, string parentMolecule)
+        public AtomLabelCharacter(Point position, TtfCharacter character, String colour, string parentAtom, string parentMolecule)
         {
             Position = position;
             Character = character;
             Colour = colour;
-            Ascii = ascii;
             ParentAtom = parentAtom;
             ParentMolecule = parentMolecule;
         }

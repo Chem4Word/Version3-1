@@ -282,7 +282,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(characterPosition.Y);
             Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(characterPosition.X);
 
-            string shapeName = "Atom " + alc.ParentAtom;
+            string parent = alc.ParentAtom.Equals(alc.ParentMolecule) ? alc.ParentMolecule : alc.ParentAtom;
+            string shapeName = $"Character {alc.Character.Character} of {parent}";
             Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId++, shapeName);
             Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 

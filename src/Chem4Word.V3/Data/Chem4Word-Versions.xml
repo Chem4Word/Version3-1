@@ -5,15 +5,17 @@
     <Version>
         <Number>3.1.6 Beta 6</Number>
         <IsBeta>true</IsBeta>
-        <Released>14-Feb-2020</Released>
+        <Released>05-Mar-2020</Released>
         <Changes>
             <Change>ACME displays warning circles when valence violations occur https://github.com/Chem4Word/Version3-1/issues/31 </Change>
             <Change>ACME keyboard focus now returns to the editor https://github.com/Chem4Word/Version3-1/issues/30 </Change>
             <Change>Add ACME Option to render in Monochrome https://github.com/Chem4Word/Version3-1/issues/11 </Change>
             <Change>Add ACME Option to show/hide Implicit Hydrogens https://github.com/Chem4Word/Version3-1/issues/17 </Change>
             <Change>Fix flipping of functional groups https://github.com/Chem4Word/Version3-1/issues/35 </Change>
-            <Change></Change>
-            <Change></Change>
+            <Change>Fix crash when using Create PDF button on Adobe Acrobat Word Add-In https://github.com/Chem4Word/Version3-1/issues/40 </Change>
+            <Change>Correct rendering of double bond of norbornene https://github.com/Chem4Word/Version3-1/issues/34 </Change>
+            <Change>Correct rendering of terminal double bonds https://github.com/Chem4Word/Version3-1/issues/25 </Change>
+            <Change>Silently handle COMException in OnDocumentBeforeSave https://github.com/Chem4Word/Version3-1/issues/42 </Change>
         </Changes>
         <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.6.Beta.6.msi</Url>
     </Version>

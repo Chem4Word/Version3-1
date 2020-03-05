@@ -417,13 +417,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             return existing;
         }
 
-        private Rect CharacterExtents(Molecule mol)
-        {
-            Rect result = mol.BoundingBox;
-
-            return CharacterExtents(mol, result);
-        }
-
         private void ProcessAtoms(Molecule mol, Progress pb, int moleculeNo)
         {
             // Create Characters
@@ -666,7 +659,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (c != null)
                     {
                         thisCharacterPosition = GetCharacterPosition(cursorPosition, c);
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Path, atom.Parent.Path);
+                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, atom.Path, atom.Parent.Path);
                         Outputs.AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
@@ -699,16 +692,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 {
                     TtfCharacter hydrogenCharacter = Inputs.TtfCharacterSet['H'];
 
-                    char sign = '.';
                     TtfCharacter chargeSignCharacter = null;
                     if (iCharge >= 1)
                     {
-                        sign = '+';
                         chargeSignCharacter = Inputs.TtfCharacterSet['+'];
                     }
                     else if (iCharge <= 1)
                     {
-                        sign = '-';
                         chargeSignCharacter = Inputs.TtfCharacterSet['-'];
                     }
 
@@ -724,7 +714,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             // Raise the superscript Character
                             thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
 
-                            AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, chargeValueCharacter, atomColour, chr, atom.Path, atom.Parent.Path);
+                            AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, chargeValueCharacter, atomColour, atom.Path, atom.Parent.Path);
                             alcc.IsSmaller = true;
                             alcc.IsSubScript = true;
                             Outputs.AtomLabelCharacters.Add(alcc);
@@ -740,7 +730,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
                     thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.Height / 2 * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
 
-                    AtomLabelCharacter alcs = new AtomLabelCharacter(thisCharacterPosition, chargeSignCharacter, atomColour, sign, atom.Path, atom.Parent.Path);
+                    AtomLabelCharacter alcs = new AtomLabelCharacter(thisCharacterPosition, chargeSignCharacter, atomColour, atom.Path, atom.Parent.Path);
                     alcs.IsSmaller = true;
                     alcs.IsSubScript = true;
                     Outputs.AtomLabelCharacters.Add(alcs);
@@ -832,7 +822,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         }
 
                         thisCharacterPosition = GetCharacterPosition(cursorPosition, hydrogenCharacter);
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, hydrogenCharacter, atomColour, 'H', atom.Path, atom.Parent.Path);
+                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, hydrogenCharacter, atomColour, atom.Path, atom.Parent.Path);
                         Outputs.AtomLabelCharacters.Add(alc);
 
                         // Move to next Character position
@@ -861,7 +851,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             // Drop the subscript Character
                             thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, Inputs.MeanBondLength));
 
-                            AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, numbers[implicitHCount], atom.Path, atom.Parent.Path);
+                            AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, atom.Path, atom.Parent.Path);
                             alc.IsSmaller = true;
                             alc.IsSubScript = true;
                             Outputs.AtomLabelCharacters.Add(alc);
@@ -920,7 +910,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         // Raise the superscript Character
                         thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
 
-                        AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, chr, atom.Path, atom.Parent.Path);
+                        AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, atom.Path, atom.Parent.Path);
                         alcc.IsSmaller = true;
                         alcc.IsSubScript = true;
                         Outputs.AtomLabelCharacters.Add(alcc);
@@ -1034,7 +1024,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 TtfCharacter ttf = Inputs.TtfCharacterSet[c];
                 var thisCharacterPosition = GetCharacterPosition(cursorPosition, ttf);
-                var alc = new AtomLabelCharacter(thisCharacterPosition, ttf, atomColour, c, atom.Path, atom.Parent.Path);
+                var alc = new AtomLabelCharacter(thisCharacterPosition, ttf, atomColour, atom.Path, atom.Parent.Path);
                 alc.IsSubScript = type == FunctionalGroupPartType.Subscript;
                 alc.IsSuperScript = type == FunctionalGroupPartType.Superscript;
                 alc.IsSmaller = alc.IsSubScript || alc.IsSuperScript;
@@ -1413,6 +1403,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             Rect boundingBox = Rect.Empty;
             Point cursor = new Point(startPoint.X, startPoint.Y);
+
             TtfCharacter i = Inputs.TtfCharacterSet['i'];
 
             for (int idx = 0; idx < text.Length; idx++)
@@ -1437,6 +1428,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (idx < text.Length - 1)
                     {
                         // Move to next Character position
+                        // We ought to be able to use c.IncrementX, but this does not work
                         cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.Width + i.Width, Inputs.MeanBondLength), 0);
                     }
                 }
@@ -1464,12 +1456,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 {
                     Point position = GetCharacterPosition(cursor, c);
 
-                    AtomLabelCharacter alc = new AtomLabelCharacter(position, c, "000000", chr, path, path);
+                    AtomLabelCharacter alc = new AtomLabelCharacter(position, c, "000000", path, path);
                     Outputs.AtomLabelCharacters.Add(alc);
 
                     if (idx < text.Length - 1)
                     {
                         // Move to next Character position
+                        // We ought to be able to use c.IncrementX, but this does not work
                         cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.Width + i.Width, Inputs.MeanBondLength), 0);
                     }
                 }
