@@ -5,6 +5,7 @@
     xmlns:controls="clr-namespace:Chem4Word.ACME;assembly=Chem4Word.ACME"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:testHarness="clr-namespace:WinForms.TestHarness"
     d:DesignHeight="150"
     d:DesignWidth="200"
     mc:Ignorable="d">
@@ -49,7 +50,11 @@
                             Background="White"
                             BackgroundColor="White"
                             Chemistry="{Binding Path=Model}"
-                            HighlightActive="False" />
+                            HighlightActive="False"
+                            ShowAllCarbonAtoms="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=testHarness:StackViewer}, Path=ShowAllCarbonAtoms}"
+                            ShowAtomsInColour="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=testHarness:StackViewer}, Path=ShowAtomsInColour}"
+                            ShowImplicitHydrogens="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=testHarness:StackViewer}, Path=ShowImplicitHydrogens}"
+                            ShowMoleculeGrouping="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=testHarness:StackViewer}, Path=ShowMoleculeGrouping}" />
                     </Border>
                 </DataTemplate>
             </ListBox.ItemTemplate>

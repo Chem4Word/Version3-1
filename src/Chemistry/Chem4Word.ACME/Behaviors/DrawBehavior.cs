@@ -206,17 +206,18 @@ namespace Chem4Word.ACME.Behaviors
                 if (landedBondVisual != null)
                 {
                     //clicking on a stereo bond should just invert it
-                    if (landedBondVisual.ParentBond.Stereo == BondStereo.Hatch &
+                    var parentBond = landedBondVisual.ParentBond;
+                    if (parentBond.Stereo == BondStereo.Hatch &
                         EditViewModel.CurrentStereo == BondStereo.Hatch |
-                        landedBondVisual.ParentBond.Stereo == BondStereo.Wedge &
+                        parentBond.Stereo == BondStereo.Wedge &
                         EditViewModel.CurrentStereo == BondStereo.Wedge)
                     {
-                        EditViewModel.SwapBondDirection(landedBondVisual.ParentBond);
+                        EditViewModel.SwapBondDirection(parentBond);
                     }
                     else
                     {
                         //modify the bond attribute (order, stereo, whatever's selected really)
-                        EditViewModel.SetBondAttributes(landedBondVisual.ParentBond);
+                        EditViewModel.SetBondAttributes(parentBond);
                     }
                 }
                 else //we clicked on empty space or an atom
@@ -226,12 +227,7 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         if (parentAtom != null)
                         {
-                            if (!parentAtom.CanAddAtoms)
-                            {
-                                Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
-                            }
-                            //but we went mouse-down on an atom
-                            else if (_currentAtomVisual != null)
+                            if (_currentAtomVisual != null)
                             {
                                 //so just sprout a chain off it at two-o-clock
                                 EditViewModel.AddAtomChain(
@@ -258,19 +254,13 @@ namespace Chem4Word.ACME.Behaviors
                         {
                             if (lastAtom.Element.Symbol != EditViewModel.SelectedElement.Symbol)
                             {
-                                EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom>() { lastAtom });
+                                EditViewModel.SetElement(EditViewModel.SelectedElement, new List<Atom> { lastAtom });
                             }
                             else
                             {
-                                if (!lastAtom.CanAddAtoms)
-                                {
-                                    Core.UserInteractions.AlertUser("Unable to add an atom chain:  atom is saturated.");
-                                }
-                                else
-                                {
-                                    var atomMetrics = GetNewChainEndPos(landedAtomVisual);
-                                    EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
-                                }
+                                var atomMetrics = GetNewChainEndPos(landedAtomVisual);
+                                EditViewModel.AddAtomChain(lastAtom, atomMetrics.NewPos, atomMetrics.sproutDir);
+                                parentAtom.UpdateVisual();
                             }
                         }
                         else //we must have hit a different atom altogether
@@ -279,26 +269,15 @@ namespace Chem4Word.ACME.Behaviors
                             {
                                 //already has a bond to the target atom
                                 var existingBond = parentAtom.BondBetween(lastAtom);
-                                if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
-                                {
-                                    Core.UserInteractions.AlertUser(
-                                        "Unable to increase bond order:  either atom is saturated.");
-                                }
-                                else if (existingBond != null) //it must be in the same molecule
+                                if (existingBond != null) //it must be in the same molecule
                                 {
                                     EditViewModel.IncreaseBondOrder(existingBond);
                                 }
                                 else //doesn't have a bond to the target atom
                                 {
-                                    if (!parentAtom.CanAddAtoms | !lastAtom.CanAddAtoms)
+                                    if (sameMolecule)
                                     {
-                                        Core.UserInteractions.AlertUser(
-                                            "Unable to add bond:  either atom is saturated.");
-                                    }
-                                    else if (sameMolecule)
-                                    {
-                                        EditViewModel.AddNewBond(parentAtom, lastAtom,
-                                                                 parentAtom.Parent);
+                                        EditViewModel.AddNewBond(parentAtom, lastAtom, parentAtom.Parent);
                                     }
                                     else
                                     {
@@ -306,6 +285,8 @@ namespace Chem4Word.ACME.Behaviors
                                                                     EditViewModel.CurrentBondOrder,
                                                                     EditViewModel.CurrentStereo);
                                     }
+                                    parentAtom.UpdateVisual();
+                                    lastAtom.UpdateVisual();
                                 }
                             }
                         }
@@ -334,6 +315,7 @@ namespace Chem4Word.ACME.Behaviors
             IsDrawing = false;
             //clear this to prevent a weird bug in drawing
             CurrentEditor.ActiveChemistry = null;
+            CurrentEditor.Focus();
         }
 
         private bool CrowdingOut(Point p)

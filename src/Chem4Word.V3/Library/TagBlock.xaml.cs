@@ -29,7 +29,6 @@ namespace Chem4Word.Library
             set { SetValue(TagIDProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for TagID.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TagIDProperty =
             DependencyProperty.Register("TagID", typeof(long), typeof(TagBlock), new PropertyMetadata(0L));
 
@@ -39,7 +38,6 @@ namespace Chem4Word.Library
             set { SetValue(TagNameProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for TagName.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TagNameProperty =
             DependencyProperty.Register("TagName", typeof(string), typeof(TagBlock), new PropertyMetadata(""));
 

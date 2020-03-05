@@ -30,11 +30,11 @@ namespace Chem4Word.Editor.ACME
 
         private readonly string _cml;
         private readonly List<string> _used1DProperties;
-        private readonly Options _options;
+        private readonly AcmeOptions _options;
 
         private bool IsLoading { get; set; } = true;
 
-        public EditorHost(string cml, List<string> used1DProperties, Options options)
+        public EditorHost(string cml, List<string> used1DProperties, AcmeOptions options)
         {
             InitializeComponent();
 
@@ -65,7 +65,7 @@ namespace Chem4Word.Editor.ACME
                 Top = (int)TopLeft.Y;
             }
 
-            MinimumSize = new Size(800, 600);
+            MinimumSize = new Size(900, 600);
 
             if (FormSize.Width != 0 && FormSize.Height != 0)
             {

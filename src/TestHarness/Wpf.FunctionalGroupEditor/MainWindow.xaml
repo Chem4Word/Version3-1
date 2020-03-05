@@ -12,6 +12,7 @@
     Closing="MainWindow_OnClosing"
     ContentRendered="MainWindow_OnContentRendered"
     Loaded="MainWindow_OnLoaded"
+    LocationChanged="MainWindow_OnLocationChanged"
     mc:Ignorable="d">
     <Grid>
         <Grid.ColumnDefinitions>

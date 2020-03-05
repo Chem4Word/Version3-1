@@ -33,10 +33,31 @@ namespace Chem4Word.Model2
             {
                 if (Element is FunctionalGroup fg)
                 {
-                    var centroid = Parent.Centroid;
-                    var vector = Position - centroid;
-                    var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, vector);
-                    return angle < 0 ? CompassPoints.West : CompassPoints.East;
+                    if (Bonds.Count() == 1)
+                    {
+                        var centroid = Parent.Centroid;
+                        var vector = Position - centroid;
+                        var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, vector);
+                        return angle < 0 ? CompassPoints.West : CompassPoints.East;
+                    }
+                    else if (Bonds.Count()>1)
+                    {
+                        int leftBondCount = 0, rightBondCount = 0;
+                        foreach (Atom neighbour in Neighbours)
+                        {
+                            Vector tempBondVector = neighbour.Position - Position;
+                            double angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, tempBondVector);
+                            if (angle >= 5.0 && angle <= 175.0)
+                            {
+                                rightBondCount++;
+                            }
+                            else
+                            {
+                                leftBondCount++;
+                            }
+                        }
+                        return rightBondCount > leftBondCount ? CompassPoints.West : CompassPoints.East;
+                    }
                 }
 
                 return CompassPoints.East;
@@ -399,29 +420,29 @@ namespace Chem4Word.Model2
         {
             get
             {
-                int iBondCount = (int)Math.Truncate(this.BondOrders);
-                int iCharge = 0;
-                iCharge = FormalCharge ?? 0;
-                int iValence = PeriodicTable.GetValence((Element as Element), iBondCount);
-                int iDiff = iValence - iBondCount;
-                if (iCharge > 0)
+                int bondCount = (int)Math.Truncate(this.BondOrders);
+                int charge = 0;
+                charge = FormalCharge ?? 0;
+                int valence = PeriodicTable.GetValence((Element as Element), bondCount);
+                int diff = valence - bondCount;
+                if (charge > 0)
                 {
-                    int iVdiff = 4 - iValence;
-                    if (iCharge <= iVdiff)
+                    int vdiff = 4 - valence;
+                    if (charge <= vdiff)
                     {
-                        iDiff += iCharge;
+                        diff += charge;
                     }
                     else
                     {
-                        iDiff = 4 - iBondCount - iCharge + iVdiff;
+                        diff = 4 - bondCount - charge + vdiff;
                     }
                 }
                 else
                 {
-                    iDiff += iCharge;
+                    diff += charge;
                 }
 
-                return iDiff;
+                return diff;
             }
         }
 
@@ -691,5 +712,23 @@ namespace Chem4Word.Model2
                          select a;
             return unproc.Count();
         }
+
+        /// <summary>
+        /// indicates whether an atom has exceeded its maximum valence count
+        /// </summary>
+        public bool Overbonded
+        {
+            get
+            {
+                int bondCount = (int)Math.Truncate(this.BondOrders);
+                int charge = 0;
+                charge = FormalCharge ?? 0;
+                int valence = PeriodicTable.GetValence((Element as Element),bondCount);
+                return bondCount > valence + charge;
+            }
+        }
+
+        
+        
     }
 }

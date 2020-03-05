@@ -15,6 +15,12 @@ namespace Chem4Word.Helpers
 {
     public static class CustomXmlPartHelper
     {
+        private static CustomXMLParts AllChemistryParts(Word.Document document)
+            => document.CustomXMLParts.SelectByNamespace("http://www.xml-cml.org/schema");
+
+        public static int ChemistryXmlParts(Word.Document doc)
+            => AllChemistryParts(doc).Count;
+
         public static CustomXMLPart FindCustomXmlPart(string id, Word.Document document)
         {
             CustomXMLPart result = null;
@@ -27,8 +33,7 @@ namespace Chem4Word.Helpers
                 if (!otherDocument.Name.Equals(activeDocumentName))
                 {
                     foreach (
-                        CustomXMLPart x in
-                            otherDocument.CustomXMLParts.SelectByNamespace("http://www.xml-cml.org/schema"))
+                        CustomXMLPart x in AllChemistryParts(otherDocument))
                     {
                         string molId = GetCmlId(x);
                         if (molId.Equals(id))
@@ -69,7 +74,7 @@ namespace Chem4Word.Helpers
             {
                 Word.Document doc = activeDocument;
 
-                foreach (CustomXMLPart xmlPart in doc.CustomXMLParts.SelectByNamespace("http://www.xml-cml.org/schema"))
+                foreach (CustomXMLPart xmlPart in AllChemistryParts(doc))
                 {
                     string cmlId = GetCmlId(xmlPart);
                     if (!string.IsNullOrEmpty(cmlId))
@@ -125,7 +130,7 @@ namespace Chem4Word.Helpers
                 }
             }
 
-            foreach (CustomXMLPart x in doc.CustomXMLParts.SelectByNamespace("http://www.xml-cml.org/schema"))
+            foreach (CustomXMLPart x in AllChemistryParts(doc))
             {
                 string molId = GetCmlId(x);
                 if (!referencedXmlParts.ContainsKey(molId))

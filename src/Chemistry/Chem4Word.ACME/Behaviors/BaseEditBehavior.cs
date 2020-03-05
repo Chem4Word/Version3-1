@@ -27,7 +27,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        // Using a DependencyProperty as the backing store for EditViewModel.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EditViewModelProperty =
             DependencyProperty.Register("EditViewModel", typeof(EditViewModel), typeof(BaseEditBehavior), new PropertyMetadata(null));
 

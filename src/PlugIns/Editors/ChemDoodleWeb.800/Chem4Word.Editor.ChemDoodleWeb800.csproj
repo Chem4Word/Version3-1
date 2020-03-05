@@ -95,18 +95,18 @@
     <Compile Include="EditorHost.Designer.cs">
       <DependentUpon>EditorHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options.cs" />
+    <Compile Include="Cdw800Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Settings.cs">
+    <Compile Include="Cdw800Settings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Settings.Designer.cs">
-      <DependentUpon>Settings.cs</DependentUpon>
+    <Compile Include="Cdw800Settings.Designer.cs">
+      <DependentUpon>Cdw800Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="WpfChemDoodle.xaml.cs">
       <DependentUpon>WpfChemDoodle.xaml</DependentUpon>
@@ -134,8 +134,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Settings.resx">
-      <DependentUpon>Settings.cs</DependentUpon>
+    <EmbeddedResource Include="Cdw800Settings.resx">
+      <DependentUpon>Cdw800Settings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

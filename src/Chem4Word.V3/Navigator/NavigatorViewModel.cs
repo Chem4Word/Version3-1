@@ -76,7 +76,7 @@ namespace Chem4Word.Navigator
                                      on CustomXmlPartHelper.GuidFromTag(ccs?.Tag) equals CustomXmlPartHelper.GetCmlId(part)
                                    orderby ccs.Range.Start
                                    let chemModel = converter.Import(part.XML)
-                                   select new NavigatorItem() { CMLId = ccs?.Tag, ChemicalStructure = part.XML, XMLPart = part, Name = chemModel.ConciseFormula };
+                                   select new NavigatorItem { CMLId = ccs?.Tag, ChemicalStructure = part.XML, XMLPart = part, Name = chemModel.ConciseFormula };
 
                     foreach (NavigatorItem navigatorItem in navItems)
                     {
@@ -200,7 +200,6 @@ namespace Chem4Word.Navigator
             set { SetValue(SelectedItemProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SelectedItem.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(ListBoxItem), typeof(NavigatorViewModel), new PropertyMetadata(null));
     }

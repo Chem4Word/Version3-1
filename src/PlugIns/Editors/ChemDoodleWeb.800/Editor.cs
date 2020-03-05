@@ -7,13 +7,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Forms;
 using Chem4Word.Core.UI.Forms;
 using IChem4Word.Contracts;
-using Newtonsoft.Json;
 
 namespace Chem4Word.Editor.ChemDoodleWeb800
 {
@@ -30,6 +28,9 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
         public bool CanEditNestedMolecules => false;
         public bool CanEditFunctionalGroups => false;
         public bool RequiresSeedAtom => true;
+
+        public string SettingsPath { get; set; }
+
         public List<string> Used1DProperties { get; set; }
 
         public Point TopLeft { get; set; }
@@ -40,42 +41,11 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         public IChem4WordTelemetry Telemetry { get; set; }
 
-        /// <summary>
-        /// Where to find the settings for this Plug In
-        /// </summary>
-        public string ProductAppDataPath { get; set; }
-
-        private Options _editorOptions = new Options();
+        private Cdw800Options _editorOptions;
 
         public Editor()
         {
             // Nothing to do here
-        }
-
-        public void LoadSettings()
-        {
-            if (!string.IsNullOrEmpty(ProductAppDataPath))
-            {
-                // Load User Options
-                string fileName = $"{_product}.json";
-                string optionsFile = Path.Combine(ProductAppDataPath, fileName);
-                if (File.Exists(optionsFile))
-                {
-                    string json = File.ReadAllText(optionsFile);
-                    _editorOptions = JsonConvert.DeserializeObject<Options>(json);
-                    string temp = JsonConvert.SerializeObject(_editorOptions, Formatting.Indented);
-                    if (!json.Equals(temp))
-                    {
-                        File.WriteAllText(optionsFile, temp);
-                    }
-                }
-                else
-                {
-                    _editorOptions.RestoreDefaults();
-                    string json = JsonConvert.SerializeObject(_editorOptions, Formatting.Indented);
-                    File.WriteAllText(optionsFile, json);
-                }
-            }
         }
 
         public bool ChangeSettings(Point topLeft)
@@ -84,17 +54,14 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
+                _editorOptions = new Cdw800Options(SettingsPath);
 
-                Settings settings = new Settings();
+                Cdw800Settings settings = new Cdw800Settings();
                 settings.Telemetry = Telemetry;
                 settings.TopLeft = topLeft;
 
-                Options tempOptions = _editorOptions.Clone();
-                settings.SettingsPath = ProductAppDataPath;
+                Cdw800Options tempOptions = _editorOptions.Clone();
+                settings.SettingsPath = SettingsPath;
                 settings.EditorOptions = tempOptions;
 
                 DialogResult dr = settings.ShowDialog();
@@ -103,7 +70,6 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                     _editorOptions = tempOptions.Clone();
                 }
                 settings.Close();
-                settings = null;
             }
             catch (Exception ex)
             {
@@ -120,15 +86,12 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
+                _editorOptions = new Cdw800Options(SettingsPath);
 
                 EditorHost host = new EditorHost(Cml);
                 host.TopLeft = TopLeft;
                 host.Telemetry = Telemetry;
-                host.ProductAppDataPath = ProductAppDataPath;
+                host.SettingsPath = SettingsPath;
                 host.UserOptions = _editorOptions;
 
                 result = host.ShowDialog();
@@ -137,7 +100,6 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
                     Properties = new Dictionary<string, string>();
                     Cml = host.OutputValue;
                     host.Close();
-                    host = null;
                 }
             }
             catch (Exception ex)

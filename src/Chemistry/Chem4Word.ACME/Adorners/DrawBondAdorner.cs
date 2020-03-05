@@ -34,7 +34,6 @@ namespace Chem4Word.ACME.Adorners
             set { SetValue(StartPointProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for StartPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartPointProperty =
             DependencyProperty.Register("StartPoint", typeof(Point), typeof(DrawBondAdorner),
                                         new FrameworkPropertyMetadata(new Point(0d, 0d),
@@ -48,7 +47,6 @@ namespace Chem4Word.ACME.Adorners
 
         public Bond ExistingBond { get; set; }
 
-        // Using a DependencyProperty as the backing store for EndPoint.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EndPointProperty =
             DependencyProperty.Register("EndPoint", typeof(Point), typeof(DrawBondAdorner),
                                         new FrameworkPropertyMetadata(new Point(0d, 0d),
@@ -198,7 +196,7 @@ namespace Chem4Word.ACME.Adorners
             //double bond
             if (ordervalue == 2 || ordervalue == 1.5)
             {
-                DoubleBondLayout dbd = new DoubleBondLayout() { Start = startPoint, End = endPoint };
+                DoubleBondLayout dbd = new DoubleBondLayout { Start = startPoint, End = endPoint };
                 if (stereo == Globals.BondStereo.Indeterminate)
                 {
                     BondGeometry.GetCrossedDoubleGeometry(dbd, bondLength);
@@ -216,7 +214,7 @@ namespace Chem4Word.ACME.Adorners
             //tripe bond
             if (ordervalue == 2.5 || ordervalue == 3)
             {
-                var tbd = new TripleBondLayout() { Start = startPoint, End = endPoint };
+                var tbd = new TripleBondLayout { Start = startPoint, End = endPoint };
                 BondGeometry.GetTripleBondGeometry(tbd, bondLength);
                 descriptor = tbd;
             }

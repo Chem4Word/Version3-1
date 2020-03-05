@@ -264,7 +264,6 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         public override void Render()
         {
-
             //set up the shared variables first
             Point startPoint = ParentBond.StartAtom.Position;
             Point endPoint = ParentBond.EndAtom.Position;
@@ -276,11 +275,10 @@ namespace Chem4Word.ACME.Drawing
             //bale out in case we have a null start or end or zero length bond
             if (startPoint != endPoint && firstVisualExists && secondVisualExists)
             {
-
                 //now get the geometry of start and end atoms
-                AtomVisual startVisual = (AtomVisual) ChemicalVisuals[ParentBond.StartAtom];
+                AtomVisual startVisual = (AtomVisual)ChemicalVisuals[ParentBond.StartAtom];
 
-                AtomVisual endVisual = (AtomVisual) ChemicalVisuals[ParentBond.EndAtom];
+                AtomVisual endVisual = (AtomVisual)ChemicalVisuals[ParentBond.EndAtom];
 
                 //first grab the main descriptor
                 BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength);
@@ -288,11 +286,11 @@ namespace Chem4Word.ACME.Drawing
                 _enclosingPoly = BondDescriptor.Boundary;
                 //set up the default pens for rendering
                 _mainBondPen = new Pen(Brushes.Black, BondThickness)
-                               {
-                                   StartLineCap = PenLineCap.Round,
-                                   EndLineCap = PenLineCap.Round,
-                                   LineJoin = PenLineJoin.Miter
-                               };
+                {
+                    StartLineCap = PenLineCap.Round,
+                    EndLineCap = PenLineCap.Round,
+                    LineJoin = PenLineJoin.Miter
+                };
 
                 _subsidiaryBondPen = _mainBondPen.Clone();
 
@@ -313,11 +311,11 @@ namespace Chem4Word.ACME.Drawing
                         }
 
                         DoubleBondLayout dbd = new DoubleBondLayout
-                                               {
-                                                   Start = startPoint,
-                                                   End = endPoint,
-                                                   Placement = ParentBond.Placement
-                                               };
+                        {
+                            Start = startPoint,
+                            End = endPoint,
+                            Placement = ParentBond.Placement
+                        };
 
                         BondGeometry.GetDoubleBondPoints(dbd, bondLength);
                         _enclosingPoly = dbd.Boundary;
@@ -336,11 +334,11 @@ namespace Chem4Word.ACME.Drawing
 
                         //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
                         DoubleBondLayout dbd2 = new DoubleBondLayout
-                                                {
-                                                    Start = startPoint,
-                                                    End = endPoint,
-                                                    Placement = ParentBond.Placement
-                                                };
+                        {
+                            Start = startPoint,
+                            End = endPoint,
+                            Placement = ParentBond.Placement
+                        };
 
                         BondGeometry.GetDoubleBondPoints(dbd2, bondLength);
                         _enclosingPoly = dbd2.Boundary;
@@ -384,7 +382,7 @@ namespace Chem4Word.ACME.Drawing
                     case Globals.OrderAromatic:
                     case "2":
                     case Globals.OrderDouble:
-                        DoubleBondLayout dbd3 = (DoubleBondLayout) BondDescriptor;
+                        DoubleBondLayout dbd3 = (DoubleBondLayout)BondDescriptor;
                         Point? centroid = ParentBond.Centroid;
                         dbd3.PrimaryCentroid = centroid;
 
@@ -447,7 +445,6 @@ namespace Chem4Word.ACME.Drawing
                         }
 
                         break;
-
                 }
             }
             //local function

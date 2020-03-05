@@ -53,7 +53,6 @@ namespace Chem4Word.ACME.Behaviors
             set { SetValue(RectModeProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for RectMode.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty RectModeProperty =
             DependencyProperty.Register("RectMode", typeof(bool), typeof(LassoBehaviour), new PropertyMetadata(default(bool)));
 

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Chem4Word.ACME;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.JSON;
 using Chem4Word.Model2.Helpers;
@@ -26,6 +27,8 @@ namespace Wpf.FunctionalGroupEditor
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
+            Editor.EditorOptions = new AcmeOptions(null);
+
             Groups.Items.Clear();
             foreach (var functionalGroup in Globals.FunctionalGroupsList)
             {
@@ -36,6 +39,11 @@ namespace Wpf.FunctionalGroupEditor
         private void MainWindow_OnContentRendered(object sender, EventArgs e)
         {
             InvalidateArrange();
+        }
+
+        private void MainWindow_OnLocationChanged(object sender, EventArgs e)
+        {
+            Editor.TopLeft = new Point(Left, Top);
         }
 
         private void Groups_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -65,7 +73,7 @@ namespace Wpf.FunctionalGroupEditor
                 }
                 else
                 {
-                    string groupJson = Newtonsoft.Json.JsonConvert.SerializeObject(fg.Expansion);
+                    string groupJson = JsonConvert.SerializeObject(fg.Expansion);
                     var model = jsonConvertor.Import(groupJson);
                     Editor.SetModel(model);
                 }

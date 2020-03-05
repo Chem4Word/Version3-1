@@ -89,193 +89,157 @@ namespace Chem4Word.Telemetry
 
         private List<string> Initialise()
         {
-            List<string> timings = new List<string>();
-
-            string message = $"SystemHelper.Initialise() started at {SafeDate.ToLongDate(DateTime.Now)}";
-            timings.Add(message);
-            Debug.WriteLine(message);
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            WordVersion = -1;
-
-            #region Get Machine Guid
-
-            MachineId = GetMachineId();
-
-            ProcessId = Process.GetCurrentProcess().Id;
-
-            #endregion Get Machine Guid
-
-            #region Get OS Version
-
-            // The current code returns 6.2.* for Windows 8.1 and Windows 10 on some systems
-            // https://msdn.microsoft.com/en-gb/library/windows/desktop/ms724832(v=vs.85).aspx
-            // https://msdn.microsoft.com/en-gb/library/windows/desktop/dn481241(v=vs.85).aspx
-            // However as we do not NEED the exact version number,
-            //  I am not going to implement the above as they are too risky
-
             try
             {
-                OperatingSystem operatingSystem = Environment.OSVersion;
+                List<string> timings = new List<string>();
 
-                string ProductName = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName");
-                string CsdVersion = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CSDVersion");
+                string message = $"SystemHelper.Initialise() started at {SafeDate.ToLongDate(DateTime.Now)}";
+                timings.Add(message);
+                Debug.WriteLine(message);
 
-                if (!string.IsNullOrEmpty(ProductName))
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                WordVersion = -1;
+
+                #region Get Machine Guid
+
+                MachineId = GetMachineId();
+
+                ProcessId = Process.GetCurrentProcess().Id;
+
+                #endregion Get Machine Guid
+
+                #region Get OS Version
+
+                // The current code returns 6.2.* for Windows 8.1 and Windows 10 on some systems
+                // https://msdn.microsoft.com/en-gb/library/windows/desktop/ms724832(v=vs.85).aspx
+                // https://msdn.microsoft.com/en-gb/library/windows/desktop/dn481241(v=vs.85).aspx
+                // However as we do not NEED the exact version number,
+                //  I am not going to implement the above as they are too risky
+
+                try
                 {
-                    StringBuilder sb = new StringBuilder();
-                    if (!ProductName.StartsWith("Microsoft"))
+                    OperatingSystem operatingSystem = Environment.OSVersion;
+
+                    string ProductName = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName");
+                    string CsdVersion = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CSDVersion");
+
+                    if (!string.IsNullOrEmpty(ProductName))
                     {
-                        sb.Append("Microsoft ");
-                    }
-                    sb.Append(ProductName);
-                    if (!string.IsNullOrEmpty(CsdVersion))
-                    {
-                        sb.AppendLine($" {CsdVersion}");
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(operatingSystem.ServicePack))
+                        StringBuilder sb = new StringBuilder();
+                        if (!ProductName.StartsWith("Microsoft"))
                         {
-                            sb.Append($" {operatingSystem.ServicePack}");
+                            sb.Append("Microsoft ");
                         }
-                    }
-
-                    sb.Append($" {OsBits}");
-                    sb.Append($" [{operatingSystem.Version}]");
-                    sb.Append($" {CultureInfo.CurrentCulture.Name}");
-
-                    SystemOs = sb.ToString().Replace(Environment.NewLine, "").Replace("Service Pack ", "SP");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                SystemOs = "Exception " + ex.Message;
-            }
-
-            #endregion Get OS Version
-
-            #region Get Office/Word Version
-
-            try
-            {
-                WordProduct = OfficeHelper.GetWordProduct();
-
-                Click2RunProductIds = OfficeHelper.GetClick2RunProductIds();
-
-                if (WordProduct.Contains("2010") || WordProduct.Contains("2013") || WordProduct.Contains("2016") || WordProduct.Contains("365"))
-                {
-                    // This is ok, leave as is
-                }
-                else
-                {
-                    // Use last of Click2RunProductIds which have a number in
-                    var ctrVersion = "";
-                    if (!string.IsNullOrEmpty(Click2RunProductIds))
-                    {
-                        ctrVersion = "2016";
-                        var parts = Click2RunProductIds.Split(',');
-                        foreach (var part in parts)
+                        sb.Append(ProductName);
+                        if (!string.IsNullOrEmpty(CsdVersion))
                         {
-                            string numberOnly = Regex.Replace(part, "[^0-9]", "");
-                            if (!string.IsNullOrEmpty(numberOnly))
-                            {
-                                int n = int.Parse(numberOnly);
-                                if (n == 2016 || n == 2019 || n == 365)
-                                {
-                                    ctrVersion = numberOnly;
-                                }
-                            }
-                        }
-                    }
-
-                    if (WordProduct.Contains("[16."))
-                    {
-                        if (string.IsNullOrEmpty(ctrVersion))
-                        {
-                            // Best guess as not ctr version found
-                            WordProduct = WordProduct.Replace("Office", $"Office 2016");
+                            sb.AppendLine($" {CsdVersion}");
                         }
                         else
                         {
-                            WordProduct = WordProduct.Replace("Office", $"Office {ctrVersion}");
+                            if (!string.IsNullOrEmpty(operatingSystem.ServicePack))
+                            {
+                                sb.Append($" {operatingSystem.ServicePack}");
+                            }
                         }
-                    }
 
-                    // Not 100% sure why we ever get this ???
-                    if (WordProduct.Contains("[11."))
-                    {
-                        WordProduct = $"Microsoft Office 2003 {WordVersion}";
+                        sb.Append($" {OsBits}");
+                        sb.Append($" [{operatingSystem.Version}]");
+                        sb.Append($" {CultureInfo.CurrentCulture.Name}");
+
+                        SystemOs = sb.ToString().Replace(Environment.NewLine, "").Replace("Service Pack ", "SP");
                     }
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    SystemOs = "Exception " + ex.Message;
+                }
 
-                WordVersion = OfficeHelper.GetWinWordVersion();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                WordProduct = "Exception " + ex.Message;
-            }
+                #endregion Get OS Version
 
-            #endregion Get Office/Word Version
+                #region Get Office/Word Version
 
-            #region Get Product Version and Location using reflection
+                try
+                {
+                    Click2RunProductIds = OfficeHelper.GetClick2RunProductIds();
 
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            // CodeBase is the location of the installed files
-            Uri uriCodeBase = new Uri(assembly.CodeBase);
-            AddInLocation = Path.GetDirectoryName(uriCodeBase.LocalPath);
+                    WordVersion = OfficeHelper.GetWinWordVersionNumber();
 
-            Version productVersion = assembly.GetName().Version;
-            AssemblyVersionNumber = productVersion.ToString();
+                    WordProduct = OfficeHelper.GetWordProduct(Click2RunProductIds);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    WordProduct = "Exception " + ex.Message;
+                }
 
-            AddInVersion = "Chem4Word V" + productVersion;
+                #endregion Get Office/Word Version
 
-            #endregion Get Product Version and Location using reflection
+                #region Get Product Version and Location using reflection
 
-            #region Get IpAddress on Thread
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                // CodeBase is the location of the installed files
+                Uri uriCodeBase = new Uri(assembly.CodeBase);
+                AddInLocation = Path.GetDirectoryName(uriCodeBase.LocalPath);
 
-            message = $"GetIpAddress started at {SafeDate.ToLongDate(DateTime.Now)}";
-            StartUpTimings.Add(message);
-            Debug.WriteLine(message);
+                Version productVersion = assembly.GetName().Version;
+                AssemblyVersionNumber = productVersion.ToString();
 
-            _stopwatch = new Stopwatch();
-            _stopwatch.Start();
+                AddInVersion = "Chem4Word V" + productVersion;
 
-            ParameterizedThreadStart pts = GetExternalIpAddress;
-            Thread thread = new Thread(pts);
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start(null);
+                #endregion Get Product Version and Location using reflection
 
-            #endregion Get IpAddress on Thread
+                #region Get IpAddress on Thread
 
-            GetDotNetVersionFromRegistry();
+                message = $"GetIpAddress started at {SafeDate.ToLongDate(DateTime.Now)}";
+                StartUpTimings.Add(message);
+                Debug.WriteLine(message);
 
-            try
-            {
-                BrowserVersion = new WebBrowser().Version.ToString();
-            }
-            catch
-            {
-                BrowserVersion = "?";
-            }
+                _stopwatch = new Stopwatch();
+                _stopwatch.Start();
 
-            GetScreens();
+                ParameterizedThreadStart pts = GetExternalIpAddress;
+                Thread thread = new Thread(pts);
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start(null);
+
+                #endregion Get IpAddress on Thread
+
+                GetDotNetVersionFromRegistry();
+
+                try
+                {
+                    BrowserVersion = new WebBrowser().Version.ToString();
+                }
+                catch
+                {
+                    BrowserVersion = "?";
+                }
+
+                GetScreens();
 
 #if DEBUG
-            GetGitStatus();
+                GetGitStatus();
 #endif
 
-            sw.Stop();
+                sw.Stop();
 
-            message = $"SystemHelper.Initialise() took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
-            timings.Add(message);
-            Debug.WriteLine(message);
+                message = $"SystemHelper.Initialise() took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                timings.Add(message);
+                Debug.WriteLine(message);
 
-            return timings;
+                return timings;
+            }
+            catch (ThreadAbortException threadAbortException)
+            {
+                // Do Nothing
+                Debug.WriteLine(threadAbortException.Message);
+            }
+
+            return null;
         }
 
         public SystemHelper(List<string> timings)
@@ -634,23 +598,35 @@ namespace Chem4Word.Telemetry
                 StartUpTimings.Add($"GetExternalIpAddress {ex.Message}");
             }
 
-            if (string.IsNullOrEmpty(IpAddress) || IpAddress.Contains("0.0.0.0"))
+            try
             {
-                // Try 0..4 times from 0..2 domains
-                if (_retryCount < 4)
+                if (string.IsNullOrEmpty(IpAddress) || IpAddress.Contains("0.0.0.0"))
                 {
-                    // Retry
-                    IncrementRetryCount();
-                    Thread.Sleep(500);
-                    ParameterizedThreadStart pts = GetExternalIpAddress;
-                    Thread thread = new Thread(pts);
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.Start(null);
+                    // Try 0..4 times from 0..2 domains
+                    if (_retryCount < 4)
+                    {
+                        // Retry
+                        IncrementRetryCount();
+                        Thread.Sleep(500);
+                        ParameterizedThreadStart pts = GetExternalIpAddress;
+                        Thread thread = new Thread(pts);
+                        thread.SetApartmentState(ApartmentState.STA);
+                        thread.Start(null);
+                    }
+                    else
+                    {
+                        // Failure
+                        IpAddress = IpAddress.Replace("0.0.0.0", "8.8.8.8");
+                        _stopwatch.Stop();
+
+                        var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                        StartUpTimings.Add(message);
+                        Debug.WriteLine(message);
+                    }
                 }
                 else
                 {
-                    // Failure
-                    IpAddress = IpAddress.Replace("0.0.0.0", "8.8.8.8");
+                    // Success
                     _stopwatch.Stop();
 
                     var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
@@ -658,15 +634,12 @@ namespace Chem4Word.Telemetry
                     Debug.WriteLine(message);
                 }
             }
-            else
+            catch (ThreadAbortException threadAbortException)
             {
-                // Success
-                _stopwatch.Stop();
-
-                var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
-                StartUpTimings.Add(message);
-                Debug.WriteLine(message);
+                // Do Nothing
+                Debug.WriteLine(threadAbortException.Message);
             }
+
         }
 
         private DateTime FromPhpDate(string line)

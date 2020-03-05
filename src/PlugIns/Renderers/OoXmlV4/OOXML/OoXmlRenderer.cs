@@ -12,13 +12,13 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
+using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.Enums;
-using Chem4Word.Renderer.OoXmlV4.OOXML.Atoms;
-using Chem4Word.Renderer.OoXmlV4.OOXML.Bonds;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using DocumentFormat.OpenXml;
 using IChem4Word.Contracts;
@@ -43,78 +43,45 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private Options _options;
-        private IChem4WordTelemetry _telemetry;
-        private Point _topLeft;
-
-        private Model _chemistryModel;
-        private Dictionary<char, TtfCharacter> _TtfCharacterSet;
-
-        private long _ooxmlId = 1;
+        private Wpg.WordprocessingGroup _wordprocessingGroup;
+        private long _ooxmlId;
         private Rect _boundingBoxOfEverything;
-
-        private double _medianBondLength;
         private Rect _boundingBoxOfAllAtoms;
 
-        private const double EPSILON = 1e-4;
+        // Inputs to positioner
+        private Dictionary<char, TtfCharacter> _TtfCharacterSet;
 
-        private List<AtomLabelCharacter> _atomLabelCharacters;
-        private List<BondLine> _bondLines;
+        private OoXmlV4Options _options;
+        private IChem4WordTelemetry _telemetry;
+        private Point _topLeft;
+        private Model _chemistryModel;
+        private double _medianBondLength;
 
+        // Outputs of positioner
+        private List<AtomLabelCharacter> _atomLabelCharacters = new List<AtomLabelCharacter>();
+
+        private List<BondLine> _bondLines = new List<BondLine>();
         private List<MoleculeExtents> _allMoleculeExtents = new List<MoleculeExtents>();
-
         private List<Rect> _moleculeBrackets = new List<Rect>();
         private List<Rect> _groupBrackets = new List<Rect>();
-
         private List<Point> _ringCentres = new List<Point>();
         private Dictionary<string, List<Point>> _convexHulls = new Dictionary<string, List<Point>>();
 
-        public OoXmlRenderer(Model model, Options options, IChem4WordTelemetry telemetry, Point topLeft)
+        public OoXmlRenderer(Model model, OoXmlV4Options options, IChem4WordTelemetry telemetry, Point topLeft)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            _options = options;
             _telemetry = telemetry;
-            _topLeft = topLeft;
-
             _telemetry.Write(module, "Verbose", "Called");
+
+            _options = options;
+            _topLeft = topLeft;
+            _chemistryModel = model;
+            _medianBondLength = model.MeanBondLength;
 
             LoadFont();
 
-            _chemistryModel = model;
-
-            _boundingBoxOfAllAtoms = model.BoundingBoxOfCmlPoints;
-        }
-
-        private Rect CharacterExtents(Molecule mol, Rect existing)
-        {
-            var chars = _atomLabelCharacters.Where(m => m.ParentMolecule.StartsWith(mol.Path)).ToList();
-            foreach (var c in chars)
-            {
-                if (c.IsSmaller)
-                {
-                    Rect r = new Rect(c.Position,
-                                      new Size(OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                               OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
-                    existing.Union(r);
-                }
-                else
-                {
-                    Rect r = new Rect(c.Position,
-                                      new Size(OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, _medianBondLength),
-                                               OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, _medianBondLength)));
-                    existing.Union(r);
-                }
-            }
-
-            return existing;
-        }
-
-        private Rect CharacterExtents(Molecule mol)
-        {
-            Rect result = mol.BoundingBox;
-
-            return CharacterExtents(mol, result);
+            _boundingBoxOfAllAtoms = _chemistryModel.BoundingBoxOfCmlPoints;
         }
 
         public Run GenerateRun()
@@ -122,20 +89,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             _telemetry.Write(module, "Verbose", "Called");
 
-            //start off progress monitoring
-            Progress pb = new Progress();
-            pb.TopLeft = _topLeft;
-
-            //lists of objects for drawing
-            _atomLabelCharacters = new List<AtomLabelCharacter>();
-            _bondLines = new List<BondLine>();
-
             Stopwatch swr = new Stopwatch();
-
-            //Create a run
-            Run run = new Run();
-
             swr.Start();
+
+            // Initialise OoXml Object counter
+            _ooxmlId = 1;
 
             //set the median bond length
             _medianBondLength = _chemistryModel.MeanBondLength;
@@ -144,75 +102,76 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 _medianBondLength = _options.BondLength;
             }
 
-            int moleculeNo = 0;
-            foreach (Molecule mol in _chemistryModel.Molecules.Values)
+            // Initialise progress monitoring
+            Progress progress = new Progress
             {
-                ProcessMolecule(mol, ref moleculeNo);
-            }
+                TopLeft = _topLeft
+            };
 
+            var positioner = new OoXmlPositioner(new PositionerInputs
+            {
+                Progress = progress,
+                Options = _options,
+                TtfCharacterSet = _TtfCharacterSet,
+                Telemetry = _telemetry,
+                MeanBondLength = _medianBondLength,
+                Model = _chemistryModel,
+            });
+
+            var positionerOutputs = positioner.Position();
+
+            _atomLabelCharacters = positionerOutputs.AtomLabelCharacters;
+            _bondLines = positionerOutputs.BondLines;
+            _convexHulls = positionerOutputs.ConvexHulls;
+            _ringCentres = positionerOutputs.RingCenters;
+            _allMoleculeExtents = positionerOutputs.AllMoleculeExtents;
+            _groupBrackets = positionerOutputs.GroupBrackets;
+            _moleculeBrackets = positionerOutputs.MoleculeBrackets;
+
+            // 6.1  Calculate canvas size
             SetCanvasSize();
 
-            if (_options.ClipLines)
-            {
-                #region Step 4 - Shrink bond lines
+            // 6.2  Create Base OoXml Objects
+            Run run = CreateRun();
 
-                ShrinkBondLinesPass1(pb);
-                ShrinkBondLinesPass2(pb);
-
-                #endregion Step 4 - Shrink bond lines
-            }
-
-            #region Step 5 - Create main OoXml drawing objects
-
-            Drawing drawing1 = new Drawing();
-            A.Graphic graphic1 = CreateGraphic();
-            A.GraphicData graphicData1 = CreateGraphicData();
-            Wpg.WordprocessingGroup wordprocessingGroup = new Wpg.WordprocessingGroup();
-
-            // Create Inline Drawing using canvas extents
-            Wp.Inline inline1 = CreateInline(wordprocessingGroup);
-
-            #endregion Step 5 - Create main OoXml drawing objects
-
-            #region Step 5.1 - Show Molecule and Group Brackets
-
+            // 7.   Render Brackets
             // Render molecule grouping brackets
-            if (_options.ShowMoleculeGroups)
+            if (_options.ShowMoleculeGrouping)
             {
                 foreach (var group in _groupBrackets)
                 {
                     string bracketColour = _options.ColouredAtoms ? "00bbff" : "000000";
-                    DrawGroupBrackets(wordprocessingGroup, group, _medianBondLength * 0.5, OoXmlHelper.ACS_LINE_WIDTH * 2, bracketColour);
+                    DrawGroupBrackets(group, _medianBondLength * 0.5, OoXmlHelper.ACS_LINE_WIDTH * 2, bracketColour);
                 }
             }
 
             // Render molecule brackets
             foreach (var moleculeBracket in _moleculeBrackets)
             {
-                DrawMoleculeBrackets(wordprocessingGroup, moleculeBracket, _medianBondLength * 0.2, OoXmlHelper.ACS_LINE_WIDTH, "000000");
+                DrawMoleculeBrackets(moleculeBracket, _medianBondLength * 0.2, OoXmlHelper.ACS_LINE_WIDTH, "000000");
             }
 
-            #endregion Step 5.1 - Show Molecule and Group Brackets
-
-            #region Step 5a - Diagnostics
-
+            // 8.   Render Diagnostic Markers
             if (_options.ShowMoleculeBoundingBoxes)
             {
                 foreach (var item in _allMoleculeExtents)
                 {
-                    DrawBox(wordprocessingGroup, item.AtomExtents, "ff0000", .25);
-                    DrawBox(wordprocessingGroup, item.InternalCharacterExtents, "00ff00", .25);
-                    DrawBox(wordprocessingGroup, item.ExternalCharacterExtents, "0000ff", .25);
+                    DrawBox(item.AtomExtents, "ff0000", .25);
+                    DrawBox(item.InternalCharacterExtents, "00ff00", .25);
+                    DrawBox(item.ExternalCharacterExtents, "0000ff", .25);
                 }
 
-                //DrawBox(wordprocessingGroup, _boundingBoxOfAllAtoms, "ff0000", .25);
-                //DrawBox(wordprocessingGroup, _boundingBoxOfEverything, "000000", .25);
+                DrawBox(_boundingBoxOfAllAtoms, "ff0000", .25);
+                DrawBox(_boundingBoxOfEverything, "000000", .25);
+            }
 
-                //Point centre = new Point(_boundingBoxOfAllAtoms.Left + _boundingBoxOfAllAtoms.Width / 2, _boundingBoxOfAllAtoms.Top + _boundingBoxOfAllAtoms.Height / 2);
-                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.TopLeft, "000000", 0.25);
-                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.TopRight, "000000", 0.25);
-                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.BottomLeft, "000000", 0.25);
-                //DrawArrow(wordprocessingGroup, centre, _boundingBoxOfAllAtoms.BottomRight, "000000", 0.25);
+            if (_options.ShowHulls)
+            {
+                foreach (var hull in _convexHulls)
+                {
+                    var points = hull.Value.ToList();
+                    DrawPolygon(points, "ff0000", 0.25);
+                }
             }
 
             if (_options.ShowCharacterBoundingBoxes)
@@ -224,930 +183,683 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     foreach (var alc in chars)
                     {
                         Rect thisBoundingBox = thisBoundingBox = new Rect(alc.Position,
-                            new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
-                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
+                                                                          new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
+                                                                                   OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
                         if (alc.IsSmaller)
                         {
                             thisBoundingBox = new Rect(alc.Position,
-                                new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                    OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                                                       new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
                         }
+
+                        DrawBox(thisBoundingBox, "00ff00", 0.25);
 
                         atomCharsRect.Union(thisBoundingBox);
                     }
 
                     if (!atomCharsRect.IsEmpty)
                     {
-                        DrawBox(wordprocessingGroup, atomCharsRect, "FFA500", 0.5);
+                        DrawBox(atomCharsRect, "ffa500", 0.5);
                     }
                 }
             }
 
+            double spotSize = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
+
             if (_options.ShowRingCentres)
             {
-                ShowRingCentres(wordprocessingGroup);
+                foreach (var point in _ringCentres)
+                {
+                    Rect extents = new Rect(new Point(point.X - spotSize, point.Y - spotSize),
+                                       new Point(point.X + spotSize, point.Y + spotSize));
+                    DrawShape(extents, A.ShapeTypeValues.Ellipse, "00ff00");
+                }
             }
 
             if (_options.ShowAtomPositions)
             {
-                ShowAtomCentres(wordprocessingGroup);
+                foreach (var atom in _chemistryModel.GetAllAtoms())
+                {
+                    Rect extents = new Rect(new Point(atom.Position.X - spotSize, atom.Position.Y - spotSize),
+                                            new Point(atom.Position.X + spotSize, atom.Position.Y + spotSize));
+                    DrawShape(extents, A.ShapeTypeValues.Ellipse, "ff0000");
+                }
             }
 
             if (_options.ShowHulls)
             {
-                ShowConvexHulls(wordprocessingGroup);
-            }
-
-            #endregion Step 5a - Diagnostics
-
-            #region Step 6 - Create and append OoXml objects for all Bond Lines
-
-            AppendBondOoxml(pb, wordprocessingGroup);
-
-            #endregion Step 6 - Create and append OoXml objects for all Bond Lines
-
-            #region Step 7 - Create and append OoXml objects for Atom Labels
-
-            AppendAtomLabelOoxml(pb, wordprocessingGroup);
-
-            #endregion Step 7 - Create and append OoXml objects for Atom Labels
-
-            #region Step 8 - Append OoXml drawing objects to OoXml run object
-
-            AppendAllOoXml(graphicData1, wordprocessingGroup, graphic1, inline1, drawing1, run);
-
-            #endregion Step 8 - Append OoXml drawing objects to OoXml run object
-
-            double abl = _medianBondLength;
-            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0", CultureInfo.InvariantCulture)} ms; Average Bond Length: {abl.ToString("#0.00", CultureInfo.InvariantCulture)}");
-
-            ShutDownProgress(pb);
-
-            return run;
-
-            // Local Function
-            void ProcessMolecule(Molecule mol, ref int molNumber)
-            {
-                molNumber++;
-                // Step 1- gather the atom information together
-
-                ProcessAtoms(mol, pb, molNumber);
-
-                // Step 2- gather the bond information together
-
-                ProcessBonds(mol, pb, molNumber);
-
-                // Populate diagnostic data
-                foreach (Ring ring in mol.Rings)
+                foreach (var hull in _convexHulls)
                 {
-                    if (ring.Centroid.HasValue)
-                    {
-                        _ringCentres.Add(ring.Centroid.Value);
-                    }
-                }
-
-                // Recurse into any child molecules
-                foreach (var child in mol.Molecules.Values)
-                {
-                    ProcessMolecule(child, ref molNumber);
-                }
-
-                // Atoms <= InternalCharacters <= GroupBrackets <= MoleculesBrackets <= ExternalCharacters
-
-                // 1. Atoms & InternalCharacters
-                var thisMoleculeExtents = new MoleculeExtents(mol.Path, mol.BoundingBox);
-                thisMoleculeExtents.SetInternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.AtomExtents));
-                _allMoleculeExtents.Add(thisMoleculeExtents);
-
-                // 2. Grouped
-                if (mol.IsGrouped)
-                {
-                    Rect boundingBox = Rect.Empty;
-
-                    var childGroups = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();
-                    foreach (var child in childGroups)
-                    {
-                        boundingBox.Union(child.ExternalCharacterExtents);
-                    }
-
-                    if (boundingBox != Rect.Empty)
-                    {
-                        boundingBox.Union(thisMoleculeExtents.ExternalCharacterExtents);
-                        if (_options.ShowMoleculeGroups)
-                        {
-                            boundingBox = Inflate(boundingBox, OoXmlHelper.BracketOffset(_medianBondLength));
-                            _groupBrackets.Add(boundingBox);
-                        }
-                        thisMoleculeExtents.SetGroupBracketExtents(boundingBox);
-                    }
-                }
-
-                // 3. Brackets
-                bool showBrackets = mol.ShowMoleculeBrackets.HasValue && mol.ShowMoleculeBrackets.Value
-                                    || mol.Count.HasValue && mol.Count.Value > 0
-                                    || mol.FormalCharge.HasValue && mol.FormalCharge.Value != 0
-                                    || mol.SpinMultiplicity.HasValue && mol.SpinMultiplicity.Value > 1;
-
-                var rect = thisMoleculeExtents.GroupBracketsExtents;
-                var children = _allMoleculeExtents.Where(g => g.Path.StartsWith($"{mol.Path}/")).ToList();
-                foreach (var child in children)
-                {
-                    rect.Union(child.GroupBracketsExtents);
-                }
-
-                if (showBrackets)
-                {
-                    rect = Inflate(rect, OoXmlHelper.BracketOffset(_medianBondLength));
-                    _moleculeBrackets.Add(rect);
-                }
-                thisMoleculeExtents.SetMoleculeBracketExtents(rect);
-
-                var alp = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
-                TtfCharacter hydrogenCharacter = _TtfCharacterSet['H'];
-
-                string characters = string.Empty;
-
-                if (mol.FormalCharge.HasValue && mol.FormalCharge.Value != 0)
-                {
-                    // Add FormalCharge at top right
-                    int charge = mol.FormalCharge.Value;
-                    int absCharge = Math.Abs(charge);
-
-                    if (absCharge > 1)
-                    {
-                        characters = absCharge.ToString();
-                    }
-
-                    if (charge >= 1)
-                    {
-                        characters += "+";
-                    }
-                    else if (charge <= 1)
-                    {
-                        characters += "-";
-                    }
-                }
-
-                if (mol.SpinMultiplicity.HasValue && mol.SpinMultiplicity.Value > 1)
-                {
-                    // Append SpinMultiplicity
-                    switch (mol.SpinMultiplicity.Value)
-                    {
-                        case 2:
-                            characters += "•";
-                            break;
-
-                        case 3:
-                            characters += "••";
-                            break;
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(characters))
-                {
-                    // Draw characters at top right (outside of any brackets)
-                    var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Right
-                                          + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
-                                          thisMoleculeExtents.MoleculeBracketsExtents.Top
-                                          + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
-                    alp.PlaceString(characters, point, mol.Path);
-                }
-
-                if (mol.Count.HasValue && mol.Count.Value > 0)
-                {
-                    // Draw Count at bottom right
-                    var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Right
-                                          + OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE * _medianBondLength,
-                                          thisMoleculeExtents.MoleculeBracketsExtents.Bottom
-                                          + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, _medianBondLength) / 2);
-                    alp.PlaceString($"{mol.Count}", point, mol.Path);
-                }
-
-                if (mol.Count.HasValue
-                    || mol.FormalCharge.HasValue
-                    || mol.SpinMultiplicity.HasValue)
-                {
-                    // Recalculate as we have just added extra characters
-                    thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
-                }
-
-                // Handle optional rendering of molecule labels centered on brackets (if any) and below any molecule property characters
-                if (_options.ShowMoleculeLabels && mol.Labels.Any())
-                {
-                    var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Left
-                                          + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
-                                          thisMoleculeExtents.ExternalCharacterExtents.Bottom
-                                          + _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
-                    alp.AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
-
-                    // 4. ExternalCharacters
-                    // Recalculate again as we have just added extra characters
-                    thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
-                }
-            }
-        }
-
-        // Helper function to create a new inflated Rect
-        private Rect Inflate(Rect r, double x)
-        {
-            Rect r1 = r;
-            r1.Inflate(x, x);
-            return r1;
-        }
-
-        private void ShowConvexHulls(Wpg.WordprocessingGroup wordprocessingGroup)
-        {
-            foreach (var hull in _convexHulls)
-            {
-                var points = hull.Value.ToList();
-                DrawPolygon(wordprocessingGroup, points, 0.25, "ff0000");
-            }
-        }
-
-        private void ShowAtomCentres(Wpg.WordprocessingGroup wordprocessingGroup)
-        {
-            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 6;
-
-            foreach (var molecule in _chemistryModel.Molecules.Values)
-            {
-                foreach (var atom in molecule.Atoms.Values)
-                {
-                    DrawAtomCentre(atom);
-                }
-
-                foreach (var childMolecule in molecule.Molecules.Values)
-                {
-                    DrawAtoms(childMolecule);
+                    var points = hull.Value.ToList();
+                    DrawPolygon(points, "ff0000", 0.25);
                 }
             }
 
-            //Local Function
-            void DrawAtoms(Molecule molecule)
+            // 9.   Render Bond Lines
+            foreach (var bondLine in _bondLines)
             {
-                foreach (var atom in molecule.Atoms.Values)
-                {
-                    DrawAtomCentre(atom);
-                }
-
-                foreach (var childMolecule in molecule.Molecules.Values)
-                {
-                    foreach (var atom in childMolecule.Atoms.Values)
-                    {
-                        DrawAtomCentre(atom);
-                    }
-                }
-            }
-
-            //Local Function
-            void DrawAtomCentre(Atom atom)
-            {
-                Rect bb = new Rect(new Point(atom.Position.X - xx, atom.Position.Y - xx), new Point(atom.Position.X + xx, atom.Position.Y + xx));
-                DrawShape(wordprocessingGroup, bb, A.ShapeTypeValues.Ellipse, "ff0000");
-            }
-        }
-
-        private static void ShutDownProgress(Progress pb)
-        {
-            pb.Value = 0;
-            pb.Hide();
-            pb.Close();
-        }
-
-        private static void AppendAllOoXml(A.GraphicData graphicData, Wpg.WordprocessingGroup wordprocessingGroup, A.Graphic graphic,
-            Wp.Inline inline, Drawing drawing, Run run)
-        {
-            graphicData.Append(wordprocessingGroup);
-            graphic.Append(graphicData);
-            inline.Append(graphic);
-            drawing.Append(inline);
-            run.Append(drawing);
-        }
-
-        private void AppendAtomLabelOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup)
-        {
-            AtomLabelRenderer alr = new AtomLabelRenderer(_boundingBoxOfEverything, ref _ooxmlId, _options, _medianBondLength);
-
-            if (_chemistryModel.TotalAtomsCount > 1)
-            {
-                pb.Show();
-            }
-            pb.Message = "Rendering Atoms";
-            pb.Value = 0;
-            pb.Maximum = _atomLabelCharacters.Count;
-
-            foreach (AtomLabelCharacter alc in _atomLabelCharacters)
-            {
-                pb.Increment(1);
-                alr.DrawCharacter(wordprocessingGroup, alc);
-            }
-        }
-
-        private void AppendBondOoxml(Progress pb, Wpg.WordprocessingGroup wordprocessingGroup)
-        {
-            BondLineRenderer blr = new BondLineRenderer(_boundingBoxOfEverything, ref _ooxmlId, _medianBondLength);
-
-            if (_chemistryModel.TotalBondsCount > 1)
-            {
-                pb.Show();
-            }
-            pb.Message = "Rendering Bonds";
-            pb.Value = 0;
-            pb.Maximum = _bondLines.Count;
-
-            foreach (BondLine bl in _bondLines)
-            {
-                pb.Increment(1);
-                switch (bl.Style)
+                switch (bondLine.Style)
                 {
                     case BondLineStyle.Wedge:
+                        DrawWedgeBond(CalculateWedgeOutline(bondLine), bondLine.BondPath, bondLine.Colour);
+                        break;
+
                     case BondLineStyle.Hatch:
-                        blr.DrawWedgeBond(wordprocessingGroup, bl);
+                        DrawHatchBond(CalculateWedgeOutline(bondLine), bondLine.BondPath, bondLine.Colour);
                         break;
 
                     default:
-                        blr.DrawBondLine(wordprocessingGroup, bl);
+                        DrawBondLine(bondLine.Start, bondLine.End, bondLine.BondPath, bondLine.Style, bondLine.Colour);
                         break;
                 }
             }
+
+            // 10.  Render Atom and Molecule Characters
+            foreach (var character in _atomLabelCharacters)
+            {
+                DrawCharacter(character);
+            }
+
+            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0", CultureInfo.InvariantCulture)} ms; Average Bond Length: {_chemistryModel.MeanBondLength.ToString("#0.00", CultureInfo.InvariantCulture)}");
+
+            ShutDownProgress(progress);
+
+            return run;
         }
 
-        private void ShowRingCentres(Wpg.WordprocessingGroup wordprocessingGroup)
+        public void DrawCharacter(AtomLabelCharacter alc)
         {
-            double xx = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
+            Point characterPosition = new Point(alc.Position.X, alc.Position.Y);
+            characterPosition.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
 
-            foreach (var point in _ringCentres)
+            Int64Value emuWidth = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Width, _medianBondLength);
+            Int64Value emuHeight = OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height, _medianBondLength);
+            if (alc.IsSmaller)
             {
-                Rect bb = new Rect(new Point(point.X - xx, point.Y - xx), new Point(point.X + xx, point.Y + xx));
-                DrawShape(wordprocessingGroup, bb, A.ShapeTypeValues.Ellipse, "0000ff");
+                emuWidth = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Width, _medianBondLength);
+                emuHeight = OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height, _medianBondLength);
             }
-        }
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(characterPosition.Y);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(characterPosition.X);
 
-        private void ShrinkBondLinesPass1(Progress pb)
-        {
-            // so that they do not overlap label characters
+            string parent = alc.ParentAtom.Equals(alc.ParentMolecule) ? alc.ParentMolecule : alc.ParentAtom;
+            string shapeName = $"Character {alc.Character.Character} of {parent}";
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId++, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 
-            if (_convexHulls.Count > 1)
+            // Start of the lines
+
+            A.PathList pathList = new A.PathList();
+
+            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
+
+            foreach (TtfContour contour in alc.Character.Contours)
             {
-                pb.Show();
-            }
-            pb.Message = "Clipping Bond Lines - Pass 1";
-            pb.Value = 0;
-            pb.Maximum = _convexHulls.Count;
+                int i = 0;
 
-            foreach (var hull in _convexHulls)
-            {
-                pb.Increment(1);
-
-                // select lines which start or end with this atom
-                var targeted = from l in _bondLines
-                               where (l.StartAtomPath == hull.Key | l.EndAtomPath == hull.Key)
-                               select l;
-
-                foreach (BondLine bl in targeted.ToList())
+                while (i < contour.Points.Count)
                 {
-                    Point start = new Point(bl.Start.X, bl.Start.Y);
-                    Point end = new Point(bl.End.X, bl.End.Y);
-
-                    bool outside;
-                    var r = GeometryTool.ClipLineWithPolygon(start, end, hull.Value, out outside);
-
-                    switch (r.Length)
+                    TtfPoint thisPoint = contour.Points[i];
+                    TtfPoint nextPoint = null;
+                    if (i < contour.Points.Count - 1)
                     {
-                        case 3:
-                            if (outside)
+                        nextPoint = contour.Points[i + 1];
+                    }
+
+                    switch (thisPoint.Type)
+                    {
+                        case TtfPoint.PointType.Start:
+                            A.MoveTo moveTo = new A.MoveTo();
+                            if (alc.IsSmaller)
                             {
-                                bl.Start = new Point(r[0].X, r[0].Y);
-                                bl.End = new Point(r[1].X, r[1].Y);
+                                A.Point point = MakeSubscriptPoint(thisPoint);
+                                moveTo.Append(point);
+                                path.Append(moveTo);
                             }
                             else
                             {
-                                bl.Start = new Point(r[1].X, r[1].Y);
-                                bl.End = new Point(r[2].X, r[2].Y);
+                                A.Point point = MakeNormalPoint(thisPoint);
+                                moveTo.Append(point);
+                                path.Append(moveTo);
                             }
+                            i++;
                             break;
 
-                        case 2:
-                            if (!outside)
+                        case TtfPoint.PointType.Line:
+                            A.LineTo lineTo = new A.LineTo();
+                            if (alc.IsSmaller)
                             {
-                                // This line is totally inside so remove it!
-                                _bondLines.Remove(bl);
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-
-        private void ShrinkBondLinesPass2(Progress pb)
-        {
-            // so that they do not overlap label characters
-
-            if (_atomLabelCharacters.Count > 1)
-            {
-                pb.Show();
-            }
-            pb.Message = "Clipping Bond Lines - Pass 2";
-            pb.Value = 0;
-            pb.Maximum = _atomLabelCharacters.Count;
-
-            foreach (AtomLabelCharacter alc in _atomLabelCharacters)
-            {
-                pb.Increment(1);
-
-                double width = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength);
-                double height = OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength);
-
-                if (alc.IsSubScript)
-                {
-                    // Shrink bounding box
-                    width = width * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR;
-                    height = height * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR;
-                }
-
-                // Create rectangle of the bounding box with a suitable clipping margin
-                Rect cbb = new Rect(alc.Position.X - OoXmlHelper.CHARACTER_CLIPPING_MARGIN,
-                    alc.Position.Y - OoXmlHelper.CHARACTER_CLIPPING_MARGIN,
-                    width + (OoXmlHelper.CHARACTER_CLIPPING_MARGIN * 2),
-                    height + (OoXmlHelper.CHARACTER_CLIPPING_MARGIN * 2));
-
-                // Just in case we end up splitting a line into two
-                List<BondLine> extraBondLines = new List<BondLine>();
-
-                // Select Lines which may require trimming
-                // By using LINQ to implement the following SQL
-                // Where (L.Right Between Cbb.Left And Cbb.Right)
-                //    Or (L.Left Between Cbb.Left And Cbb.Right)
-                //    Or (L.Top Between Cbb.Top And Cbb.Botton)
-                //    Or (L.Bottom Between Cbb.Top And Cbb.Botton)
-
-                var targeted = from l in _bondLines
-                               where (cbb.Left <= l.BoundingBox.Right & l.BoundingBox.Right <= cbb.Right)
-                                     | (cbb.Left <= l.BoundingBox.Left & l.BoundingBox.Left <= cbb.Right)
-                                     | (cbb.Top <= l.BoundingBox.Top & l.BoundingBox.Top <= cbb.Bottom)
-                                     | (cbb.Top <= l.BoundingBox.Bottom & l.BoundingBox.Bottom <= cbb.Bottom)
-                               select l;
-                targeted = targeted.ToList();
-
-                foreach (BondLine bl in targeted)
-                {
-                    Point start = new Point(bl.Start.X, bl.Start.Y);
-                    Point end = new Point(bl.End.X, bl.End.Y);
-
-                    int attempts = 0;
-                    if (CohenSutherland.ClipLine(cbb, ref start, ref end, out attempts))
-                    {
-                        bool bClipped = false;
-
-                        if (Math.Abs(bl.Start.X - start.X) < EPSILON && Math.Abs(bl.Start.Y - start.Y) < EPSILON)
-                        {
-                            bl.Start = new Point(end.X, end.Y);
-                            bClipped = true;
-                        }
-                        if (Math.Abs(bl.End.X - end.X) < EPSILON && Math.Abs(bl.End.Y - end.Y) < EPSILON)
-                        {
-                            bl.End = new Point(start.X, start.Y);
-                            bClipped = true;
-                        }
-
-                        if (!bClipped && bl.Bond != null)
-                        {
-                            // Only convert to two bond lines if not wedge or hatch
-                            bool ignoreWedgeOrHatch = bl.Bond.Order == Globals.OrderSingle
-                                                      && bl.Bond.Stereo == Globals.BondStereo.Wedge || bl.Bond.Stereo == Globals.BondStereo.Hatch;
-                            if (!ignoreWedgeOrHatch)
-                            {
-                                // Line was clipped at both ends
-                                // 1. Generate new line
-                                BondLine extraLine = new BondLine(bl.Style, new Point(end.X, end.Y), new Point(bl.End.X, bl.End.Y), bl.Bond);
-                                extraBondLines.Add(extraLine);
-                                // 2. Trim existing line
-                                bl.End = new Point(start.X, start.Y);
-                            }
-                        }
-                    }
-                    if (attempts >= 15)
-                    {
-                        Debug.WriteLine("Clipping failed !");
-                    }
-                }
-
-                // Add any extra lines generated by this character into the List of Bond Lines
-                foreach (BondLine bl in extraBondLines)
-                {
-                    _bondLines.Add(bl);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Sets the canvas size to accomodate any extra space required by label characters
-        /// </summary>
-        private void SetCanvasSize()
-        {
-            _boundingBoxOfEverything = _boundingBoxOfAllAtoms;
-
-            foreach (AtomLabelCharacter alc in _atomLabelCharacters)
-            {
-                if (alc.IsSubScript)
-                {
-                    Rect r = new Rect(alc.Position,
-                        new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                 OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
-                    _boundingBoxOfEverything.Union(r);
-                }
-                else
-                {
-                    Rect r = new Rect(alc.Position,
-                                      new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
-                                               OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
-                    _boundingBoxOfEverything.Union(r);
-                }
-            }
-
-            foreach (var group in _allMoleculeExtents)
-            {
-                _boundingBoxOfEverything.Union(group.ExternalCharacterExtents);
-            }
-
-            _boundingBoxOfEverything.Inflate(OoXmlHelper.DRAWING_MARGIN, OoXmlHelper.DRAWING_MARGIN);
-        }
-
-        private void ProcessBonds(Molecule mol, Progress pb, int moleculeNo)
-        {
-            BondLinePositioner br = new BondLinePositioner(_bondLines, _medianBondLength);
-
-            if (mol.Bonds.Count > 0)
-            {
-                pb.Show();
-            }
-            pb.Message = $"Processing Bonds in Molecule {moleculeNo}";
-            pb.Value = 0;
-            pb.Maximum = mol.Bonds.Count;
-
-            foreach (Bond bond in mol.Bonds)
-            {
-                pb.Increment(1);
-                br.CreateLines(bond);
-            }
-
-            // Rendering molecular sketches for publication quality output
-            // Alex M Clark
-            // Implement beautification of semi open double bonds and double bonds touching rings
-
-            // Obtain list of Double Bonds with Placement of BondDirection.None
-            List<Bond> doubleBonds = mol.Bonds.Where(b => b.OrderValue.Value == 2 && b.Placement == Globals.BondDirection.None).ToList();
-            if (doubleBonds.Count > 0)
-            {
-                pb.Message = $"Processing Double Bonds in Molecule {moleculeNo}";
-                pb.Value = 0;
-                pb.Maximum = doubleBonds.Count;
-
-                foreach (Bond bond in doubleBonds)
-                {
-                    BeautifyLines(bond.StartAtom, bond.Path);
-                    BeautifyLines(bond.EndAtom, bond.Path);
-                }
-            }
-        }
-
-        private void BeautifyLines(Atom atom, string bondPath)
-        {
-            if (atom.Element is Element element)
-            {
-                if (element == Globals.PeriodicTable.C)
-                {
-                    if (atom.Bonds.ToList().Count == 3)
-                    {
-                        bool isInRing = atom.IsInRing;
-                        List<BondLine> lines = _bondLines.Where(bl => bl.ParentBond.Equals(bondPath)).ToList();
-                        if (lines.Any())
-                        {
-                            List<Bond> otherLines;
-                            if (isInRing)
-                            {
-                                otherLines = atom.Bonds.Where(b => !b.Path.Equals(bondPath)).ToList();
+                                A.Point point = MakeSubscriptPoint(thisPoint);
+                                lineTo.Append(point);
+                                path.Append(lineTo);
                             }
                             else
                             {
-                                otherLines = atom.Bonds.Where(b => !b.Path.Equals(bondPath) && b.Order.Equals(Globals.OrderSingle)).ToList();
+                                A.Point point = MakeNormalPoint(thisPoint);
+                                lineTo.Append(point);
+                                path.Append(lineTo);
                             }
+                            i++;
+                            break;
 
-                            if (lines.Count == 2 && otherLines.Count == 2)
+                        case TtfPoint.PointType.CurveOff:
+                            A.QuadraticBezierCurveTo quadraticBezierCurveTo = new A.QuadraticBezierCurveTo();
+                            if (alc.IsSmaller)
                             {
-                                BondLine line1 = _bondLines.First(bl => bl.ParentBond.Equals(otherLines[0].Path));
-                                BondLine line2 = _bondLines.First(bl => bl.ParentBond.Equals(otherLines[1].Path));
-                                TrimLines(lines, line1, line2, isInRing);
+                                A.Point pointA = MakeSubscriptPoint(thisPoint);
+                                A.Point pointB = MakeSubscriptPoint(nextPoint);
+                                quadraticBezierCurveTo.Append(pointA);
+                                quadraticBezierCurveTo.Append(pointB);
+                                path.Append(quadraticBezierCurveTo);
                             }
-                        }
+                            else
+                            {
+                                A.Point pointA = MakeNormalPoint(thisPoint);
+                                A.Point pointB = MakeNormalPoint(nextPoint);
+                                quadraticBezierCurveTo.Append(pointA);
+                                quadraticBezierCurveTo.Append(pointB);
+                                path.Append(quadraticBezierCurveTo);
+                            }
+                            i++;
+                            i++;
+                            break;
+
+                        case TtfPoint.PointType.CurveOn:
+                            // Should never get here !
+                            i++;
+                            break;
                     }
                 }
-            }
-        }
 
-        private void TrimLines(List<BondLine> mainPair, BondLine line1, BondLine line2, bool isInRing)
-        {
-            // Only two of these calls are expected to do anything
-            if (!TrimLine(mainPair[0], line1, isInRing))
+                A.CloseShapePath closeShapePath = new A.CloseShapePath();
+                path.Append(closeShapePath);
+            }
+
+            pathList.Append(path);
+
+            // End of the lines
+
+            A.SolidFill solidFill = new A.SolidFill();
+
+            // Set Colour
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = alc.Colour };
+            solidFill.Append(rgbColorModelHex);
+
+            shapeProperties.Append(CreateCustomGeometry(pathList));
+            shapeProperties.Append(solidFill);
+
+            wordprocessingShape.Append(CreateShapeStyle());
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+
+            // Local Functions
+            A.Point MakeSubscriptPoint(TtfPoint ttfPoint)
             {
-                TrimLine(mainPair[0], line2, isInRing);
+                A.Point pp = new A.Point
+                {
+                    X = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(ttfPoint.X - alc.Character.OriginX, _medianBondLength)}",
+                    Y = $"{OoXmlHelper.ScaleCsTtfSubScriptToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _medianBondLength)}"
+                };
+                return pp;
             }
-            // Only two of these calls are expected to do anything
-            if (!TrimLine(mainPair[1], line1, isInRing))
+
+            A.Point MakeNormalPoint(TtfPoint ttfPoint)
             {
-                TrimLine(mainPair[1], line2, isInRing);
+                A.Point pp = new A.Point
+                {
+                    X = $"{OoXmlHelper.ScaleCsTtfToEmu(ttfPoint.X - alc.Character.OriginX, _medianBondLength)}",
+                    Y = $"{OoXmlHelper.ScaleCsTtfToEmu(alc.Character.Height + ttfPoint.Y - (alc.Character.Height + alc.Character.OriginY), _medianBondLength)}"
+                };
+                return pp;
             }
         }
 
-        private bool TrimLine(BondLine leftOrRight, BondLine line, bool isInRing)
+        private void DrawBondLine(Point bondStart, Point bondEnd, string bondPath,
+                                  BondLineStyle lineStyle = BondLineStyle.Solid,
+                                  string colour = "000000",
+                                  double lineWidth = OoXmlHelper.ACS_LINE_WIDTH)
         {
-            bool dummy;
-            bool intersect;
-            Point intersection;
-
-            // Make a longer version of the line
-            Point startLonger = new Point(leftOrRight.Start.X, leftOrRight.Start.Y);
-            Point endLonger = new Point(leftOrRight.End.X, leftOrRight.End.Y);
-            CoordinateTool.AdjustLineAboutMidpoint(ref startLonger, ref endLonger, _medianBondLength / 5);
-
-            // See if they intersect at one end
-            CoordinateTool.FindIntersection(startLonger, endLonger, line.Start, line.End,
-                out dummy, out intersect, out intersection);
-
-            // If they intersect update the main line
-            if (intersect)
+            switch (lineStyle)
             {
-                double l1 = CoordinateTool.DistanceBetween(intersection, leftOrRight.Start);
-                double l2 = CoordinateTool.DistanceBetween(intersection, leftOrRight.End);
-                if (l1 > l2)
-                {
-                    leftOrRight.End = new Point(intersection.X, intersection.Y);
-                }
-                else
-                {
-                    leftOrRight.Start = new Point(intersection.X, intersection.Y);
-                }
-                if (!isInRing)
-                {
-                    l1 = CoordinateTool.DistanceBetween(intersection, line.Start);
-                    l2 = CoordinateTool.DistanceBetween(intersection, line.End);
-                    if (l1 > l2)
-                    {
-                        line.End = new Point(intersection.X, intersection.Y);
-                    }
-                    else
-                    {
-                        line.Start = new Point(intersection.X, intersection.Y);
-                    }
-                }
-            }
+                case BondLineStyle.Solid:
+                case BondLineStyle.Dotted:
+                case BondLineStyle.Dashed:
+                    DrawStraightLine(bondStart, bondEnd, bondPath, lineStyle, colour, lineWidth);
+                    break;
 
-            return intersect;
+                case BondLineStyle.Wavy:
+                    DrawWavyLine(bondStart, bondEnd, bondPath, colour);
+                    break;
+
+                default:
+                    DrawStraightLine(bondStart, bondEnd, bondPath, BondLineStyle.Dotted, "00ff00", lineWidth);
+                    break;
+            }
         }
 
-        private void ProcessAtoms(Molecule mol, Progress pb, int moleculeNo)
+        private List<SimpleLine> CreateHatchLines(List<Point> points)
         {
-            AtomLabelPositioner ar = new AtomLabelPositioner(_medianBondLength, _atomLabelCharacters, _convexHulls, _TtfCharacterSet, _telemetry);
+            List<SimpleLine> lines = new List<SimpleLine>();
 
-            // Create Characters
-            if (mol.Atoms.Count > 1)
+            Point wedgeStart = points[0];
+            Point wedgeEndMiddle = points[2];
+
+            // Vector pointing from wedgeStart to wedgeEndMiddle
+            Vector direction = wedgeEndMiddle - wedgeStart;
+            Matrix rightAngles = new Matrix();
+            rightAngles.Rotate(90);
+            Vector perpendicular = direction * rightAngles;
+
+            Vector step = direction;
+            step.Normalize();
+            step *= OoXmlHelper.ScaleCmlToEmu(15 * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
+
+            int steps = (int)Math.Ceiling(direction.Length / step.Length);
+            double stepLength = direction.Length / steps;
+
+            step.Normalize();
+            step *= stepLength;
+
+            Point p0 = wedgeStart + step;
+            Point p1 = p0 + perpendicular;
+            Point p2 = p0 - perpendicular;
+
+            var r = GeometryTool.ClipLineWithPolygon(p1, p2, points, out _);
+            while (r.Length > 2)
             {
-                pb.Show();
-            }
-            pb.Message = $"Processing Atoms in Molecule {moleculeNo}";
-            pb.Value = 0;
-            pb.Maximum = mol.Atoms.Count;
-
-            foreach (Atom atom in mol.Atoms.Values)
-            {
-                pb.Increment(1);
-                if (atom.Element is Element)
+                if (r.Length == 4)
                 {
-                    ar.CreateElementCharacters(atom, _options);
+                    lines.Add(new SimpleLine(r[1], r[2]));
                 }
 
-                if (atom.Element is FunctionalGroup)
+                if (r.Length == 6)
                 {
-                    ar.CreateFunctionalGroupCharacters(atom, _options);
+                    lines.Add(new SimpleLine(r[1], r[2]));
+                    lines.Add(new SimpleLine(r[3], r[4]));
                 }
+
+                p0 = p0 + step;
+                p1 = p0 + perpendicular;
+                p2 = p0 - perpendicular;
+
+                r = GeometryTool.ClipLineWithPolygon(p1, p2, points, out _);
             }
+
+            // Define Tail Lines
+            lines.Add(new SimpleLine(wedgeEndMiddle, points[1]));
+            lines.Add(new SimpleLine(wedgeEndMiddle, points[3]));
+
+            return lines;
         }
 
-        private void LoadFont()
+        private void DrawShape(Rect cmlExtents, A.ShapeTypeValues shape, string colour)
         {
-            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "Arial.json");
-            _TtfCharacterSet = JsonConvert.DeserializeObject<Dictionary<char, TtfCharacter>>(json);
-        }
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
-        private A.Graphic CreateGraphic()
-        {
-            A.Graphic graphic = new A.Graphic();
-            graphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
-            return graphic;
-        }
-
-        private A.GraphicData CreateGraphicData()
-        {
-            return new A.GraphicData() { Uri = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" };
-        }
-
-        private Wp.Inline CreateInline(Wpg.WordprocessingGroup wordprocessingGroup)
-        {
-            UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
-
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Height);
-
-            Wp.Inline inline = new Wp.Inline() { DistanceFromTop = (UInt32Value)0U, DistanceFromBottom = (UInt32Value)0U, DistanceFromLeft = (UInt32Value)0U, DistanceFromRight = (UInt32Value)0U };
-            Wp.Extent extent = new Wp.Extent() { Cx = width, Cy = height };
-
-            Wp.EffectExtent effectExtent = new Wp.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L };
-            Wp.DocProperties docProperties = new Wp.DocProperties() { Id = inlineId, Name = "moleculeGroup" };
-
-            Wpg.NonVisualGroupDrawingShapeProperties nonVisualGroupDrawingShapeProperties = new Wpg.NonVisualGroupDrawingShapeProperties();
-
-            Wpg.GroupShapeProperties groupShapeProperties = new Wpg.GroupShapeProperties();
-
-            A.TransformGroup transformGroup = new A.TransformGroup();
-            A.Offset offset = new A.Offset { X = 0L, Y = 0L };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-            A.ChildOffset childOffset = new A.ChildOffset() { X = 0L, Y = 0L };
-            A.ChildExtents childExtents = new A.ChildExtents() { Cx = width, Cy = height };
-
-            transformGroup.Append(offset);
-            transformGroup.Append(extents);
-            transformGroup.Append(childOffset);
-            transformGroup.Append(childExtents);
-
-            groupShapeProperties.Append(transformGroup);
-            wordprocessingGroup.Append(nonVisualGroupDrawingShapeProperties);
-            wordprocessingGroup.Append(groupShapeProperties);
-
-            inline.Append(extent);
-            inline.Append(effectExtent);
-            inline.Append(docProperties);
-
-            return inline;
-        }
-
-        private void DrawBox(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, string colour, double points)
-        {
-            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "box" + bondLineId;
-
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
-
-            Point location = new Point(left, top);
-            Size size = new Size(width, height);
+            Point location = new Point(emuLeft, emuTop);
+            Size size = new Size(emuWidth, emuHeight);
             location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
 
-            width = (Int64Value)boundingBox.Width;
-            height = (Int64Value)boundingBox.Height;
-            top = (Int64Value)boundingBox.Top;
-            left = (Int64Value)boundingBox.Left;
+            emuWidth = (Int64Value)boundingBox.Width;
+            emuHeight = (Int64Value)boundingBox.Height;
+            emuTop = (Int64Value)boundingBox.Top;
+            emuLeft = (Int64Value)boundingBox.Left;
 
-            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties()
-            {
-                Id = bondLineId,
-                Name = bondLineName
-            };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string shapeName = "Shape" + id;
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(id, shapeName);
 
             Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
 
             A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-
+            A.Offset offset = new A.Offset { X = emuLeft, Y = emuTop };
+            A.Extents extents = new A.Extents { Cx = emuWidth, Cy = emuHeight };
             transform2D.Append(offset);
             transform2D.Append(extents);
+            shapeProperties.Append(transform2D);
 
-            A.CustomGeometry customGeometry = new A.CustomGeometry();
             A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            A.PresetGeometry presetGeometry = new A.PresetGeometry { Preset = shape };
+            presetGeometry.Append(adjustValueList);
+            shapeProperties.Append(presetGeometry);
+
+            A.SolidFill solidFill = new A.SolidFill();
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
+            solidFill.Append(rgbColorModelHex);
+            shapeProperties.Append(solidFill);
+
+            wordprocessingShape.Append(shapeProperties);
+            wordprocessingShape.Append(CreateShapeStyle());
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+        }
+
+        private void DrawHatchBond(List<Point> points, string bondPath,
+                                   string colour = "000000")
+        {
+            Rect cmlExtents = new Rect(points[0], points[points.Count - 1]);
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                cmlExtents.Union(new Rect(points[i], points[i + 1]));
+            }
+
+            // Move Extents to have 0,0 Top Left Reference
+            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+
+            string shapeName = "Hatch " + bondPath;
+
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId++, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
+
+            // Start of the lines
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path { Width = width, Height = height };
+            // Draw a small circle for the starting point
+            var xx = 0.5;
+            Rect extents = new Rect(new Point(points[0].X - xx, points[0].Y - xx), new Point(points[0].X + xx, points[0].Y + xx));
+            DrawShape(extents, A.ShapeTypeValues.Ellipse, colour);
 
-            // Starting Point
+            // Pre offset and scale the extents
+            var scaledPoints = new List<Point>();
+            foreach (var point in points)
+            {
+                point.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+                point.Offset(-cmlExtents.Left, -cmlExtents.Top);
+                scaledPoints.Add(new Point(OoXmlHelper.ScaleCmlToEmu(point.X), OoXmlHelper.ScaleCmlToEmu(point.Y)));
+            }
+
+            var lines = CreateHatchLines(scaledPoints);
+
+            foreach (var line in lines)
+            {
+                A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
+
+                A.MoveTo moveTo = new A.MoveTo();
+                A.Point startPoint = new A.Point
+                {
+                    X = line.Start.X.ToString("0"),
+                    Y = line.Start.Y.ToString("0")
+                };
+
+                moveTo.Append(startPoint);
+                path.Append(moveTo);
+
+                A.LineTo lineTo = new A.LineTo();
+                A.Point endPoint = new A.Point
+                {
+                    X = line.End.X.ToString("0"),
+                    Y = line.End.Y.ToString("0")
+                };
+                lineTo.Append(endPoint);
+                path.Append(lineTo);
+
+                pathList.Append(path);
+            }
+
+            // End of the lines
+
+            shapeProperties.Append(CreateCustomGeometry(pathList));
+
+            // Set shape fill colour
+            A.SolidFill insideFill = new A.SolidFill();
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
+            insideFill.Append(rgbColorModelHex);
+
+            shapeProperties.Append(insideFill);
+
+            // Set shape outline colour
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int)OoXmlHelper.ACS_LINE_WIDTH_EMUS), CapType = A.LineCapValues.Round };
+            A.RgbColorModelHex rgbColorModelHex2 = new A.RgbColorModelHex { Val = colour };
+            A.SolidFill outlineFill = new A.SolidFill();
+            outlineFill.Append(rgbColorModelHex2);
+            outline.Append(outlineFill);
+
+            shapeProperties.Append(outline);
+
+            wordprocessingShape.Append(CreateShapeStyle());
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+        }
+
+        private A.Point MakePoint(Point pp, Rect cmlExtents)
+        {
+            pp.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            pp.Offset(-cmlExtents.Left, -cmlExtents.Top);
+            return new A.Point
+            {
+                X = $"{OoXmlHelper.ScaleCmlToEmu(pp.X)}",
+                Y = $"{OoXmlHelper.ScaleCmlToEmu(pp.Y)}"
+            };
+        }
+
+        private void DrawWedgeBond(List<Point> points, string bondPath,
+                                   string colour = "000000")
+        {
+            Rect cmlExtents = new Rect(points[0], points[points.Count - 1]);
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                cmlExtents.Union(new Rect(points[i], points[i + 1]));
+            }
+
+            // Move Extents to have 0,0 Top Left Reference
+            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+
+            string shapeName = "Wedge " + bondPath;
+
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId++, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
+
+            // Start of the lines
+
+            A.PathList pathList = new A.PathList();
+
+            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
+
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point { X = "0", Y = "0" };
-            moveTo.Append(point1);
-
-            // Mid Point
-            A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
-            lineTo1.Append(point2);
-
-            // Mid Point
-            A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
-            lineTo2.Append(point3);
-
-            // Last Point
-            A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
-            lineTo3.Append(point4);
-
-            // Back to Start Point
-            A.LineTo lineTo4 = new A.LineTo();
-            A.Point point5 = new A.Point { X = "0", Y = "0" };
-            lineTo4.Append(point5);
-
+            moveTo.Append(MakePoint(points[0], cmlExtents));
             path.Append(moveTo);
-            path.Append(lineTo1);
-            path.Append(lineTo2);
-            path.Append(lineTo3);
-            path.Append(lineTo4);
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                A.LineTo lineTo = new A.LineTo();
+                lineTo.Append(MakePoint(points[i], cmlExtents));
+                path.Append(lineTo);
+            }
+
+            A.CloseShapePath closeShapePath = new A.CloseShapePath();
+            path.Append(closeShapePath);
 
             pathList.Append(path);
 
-            customGeometry.Append(adjustValueList);
-            customGeometry.Append(rectangle);
-            customGeometry.Append(pathList);
+            // End of the lines
 
-            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
+            shapeProperties.Append(CreateCustomGeometry(pathList));
 
-            A.SolidFill solidFill = new A.SolidFill();
-
+            // Set shape fill colour
+            A.SolidFill insideFill = new A.SolidFill();
             A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            solidFill.Append(rgbColorModelHex);
+            insideFill.Append(rgbColorModelHex);
 
-            outline.Append(solidFill);
+            shapeProperties.Append(insideFill);
 
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(customGeometry);
+            // Set shape outline colour
+            A.Outline outline = new A.Outline { Width = Int32Value.FromInt32((int)OoXmlHelper.ACS_LINE_WIDTH_EMUS), CapType = A.LineCapValues.Round };
+            A.RgbColorModelHex rgbColorModelHex2 = new A.RgbColorModelHex { Val = colour };
+            A.SolidFill outlineFill = new A.SolidFill();
+            outlineFill.Append(rgbColorModelHex2);
+            outline.Append(outlineFill);
+
             shapeProperties.Append(outline);
 
-            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
-
-            shapeStyle.Append(lineReference);
-            shapeStyle.Append(fillReference);
-            shapeStyle.Append(effectReference);
-            shapeStyle.Append(fontReference);
-
-            shape.Append(nonVisualDrawingProperties);
-            shape.Append(nonVisualDrawingShapeProperties);
-            shape.Append(shapeProperties);
-            shape.Append(shapeStyle);
+            wordprocessingShape.Append(CreateShapeStyle());
 
             Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            shape.Append(textBodyProperties);
+            wordprocessingShape.Append(textBodyProperties);
 
-            wordprocessingGroup.Append(shape);
+            _wordprocessingGroup.Append(wordprocessingShape);
         }
 
-        private void DrawGroupBrackets(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, double armLength, double points, string colour)
+        private void DrawMoleculeBrackets(Rect cmlExtents, double armLength, double lineWidth, string lineColour)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "bracket" + id;
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
-
-            Point location = new Point(left, top);
-            Size size = new Size(width, height);
+            Point location = new Point(emuLeft, emuTop);
+            Size size = new Size(emuWidth, emuHeight);
             location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
             Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
 
-            width = (Int64Value)boundingBox.Width;
-            height = (Int64Value)boundingBox.Height;
-            top = (Int64Value)boundingBox.Top;
-            left = (Int64Value)boundingBox.Left;
+            emuWidth = (Int64Value)boundingBox.Width;
+            emuHeight = (Int64Value)boundingBox.Height;
+            emuTop = (Int64Value)boundingBox.Top;
+            emuLeft = (Int64Value)boundingBox.Left;
 
-            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties
-            {
-                Id = id,
-                Name = bondLineName
-            };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+            string shapeName = "Box " + _ooxmlId++;
 
-            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 
-            A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
+            // Start of the lines
 
-            transform2D.Append(offset);
-            transform2D.Append(extents);
+            A.PathList pathList = new A.PathList();
 
-            A.CustomGeometry customGeometry = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            double gap = boundingBox.Width * 0.8;
+            double leftSide = (emuWidth - gap) / 2;
+            double rightSide = emuWidth - leftSide;
+
+            // Left Path
+            A.Path path1 = new A.Path { Width = emuWidth, Height = emuHeight };
+
+            A.MoveTo moveTo = new A.MoveTo();
+            A.Point point1 = new A.Point { X = leftSide.ToString("0"), Y = "0" };
+            moveTo.Append(point1);
+
+            // Mid Point
+            A.LineTo lineTo1 = new A.LineTo();
+            A.Point point2 = new A.Point { X = "0", Y = "0" };
+            lineTo1.Append(point2);
+
+            // Last Point
+            A.LineTo lineTo2 = new A.LineTo();
+            A.Point point3 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
+            lineTo2.Append(point3);
+
+            // Mid Point
+            A.LineTo lineTo3 = new A.LineTo();
+            A.Point point4 = new A.Point { X = leftSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            lineTo3.Append(point4);
+
+            path1.Append(moveTo);
+            path1.Append(lineTo1);
+            path1.Append(lineTo2);
+            path1.Append(lineTo3);
+
+            pathList.Append(path1);
+
+            // Right Path
+            A.Path path2 = new A.Path { Width = emuWidth, Height = emuHeight };
+
+            A.MoveTo moveTo2 = new A.MoveTo();
+            A.Point point5 = new A.Point { X = rightSide.ToString("0"), Y = "0" };
+            moveTo2.Append(point5);
+
+            // Mid Point
+            A.LineTo lineTo4 = new A.LineTo();
+            A.Point point6 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
+            lineTo4.Append(point6);
+
+            // Last Point
+            A.LineTo lineTo5 = new A.LineTo();
+            A.Point point7 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            lineTo5.Append(point7);
+
+            // Mid Point
+            A.LineTo lineTo6 = new A.LineTo();
+            A.Point point8 = new A.Point { X = rightSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            lineTo6.Append(point8);
+
+            path2.Append(moveTo2);
+            path2.Append(lineTo4);
+            path2.Append(lineTo5);
+            path2.Append(lineTo6);
+
+            pathList.Append(path2);
+
+            // End of the lines
+
+            shapeProperties.Append(CreateCustomGeometry(pathList));
+
+            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
+
+            A.SolidFill solidFill = new A.SolidFill();
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
+            solidFill.Append(rgbColorModelHex);
+            outline.Append(solidFill);
+
+            shapeProperties.Append(outline);
+
+            wordprocessingShape.Append(CreateShapeStyle());
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+        }
+
+        private void DrawGroupBrackets(Rect cmlExtents, double armLength, double lineWidth, string lineColour)
+        {
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+
+            Point location = new Point(emuLeft, emuTop);
+            Size size = new Size(emuWidth, emuHeight);
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
+            Rect boundingBox = new Rect(location, size);
+            Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
+
+            emuWidth = (Int64Value)boundingBox.Width;
+            emuHeight = (Int64Value)boundingBox.Height;
+            emuTop = (Int64Value)boundingBox.Top;
+            emuLeft = (Int64Value)boundingBox.Left;
+
+            string shapeName = "Box " + _ooxmlId++;
+
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
+
+            // Start of the lines
 
             A.PathList pathList = new A.PathList();
 
@@ -1156,44 +868,26 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             pathList.Append(MakeCorner(boundingBox, "BottomLeft", armLengthEmu));
             pathList.Append(MakeCorner(boundingBox, "BottomRight", armLengthEmu));
 
-            customGeometry.Append(adjustValueList);
-            customGeometry.Append(rectangle);
-            customGeometry.Append(pathList);
+            // End of the lines
 
-            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
+            shapeProperties.Append(CreateCustomGeometry(pathList));
+
+            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
-
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
             solidFill.Append(rgbColorModelHex);
-
             outline.Append(solidFill);
 
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(customGeometry);
             shapeProperties.Append(outline);
 
-            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
-
-            shapeStyle.Append(lineReference);
-            shapeStyle.Append(fillReference);
-            shapeStyle.Append(effectReference);
-            shapeStyle.Append(fontReference);
-
-            shape.Append(nonVisualDrawingProperties);
-            shape.Append(nonVisualDrawingShapeProperties);
-            shape.Append(shapeProperties);
-            shape.Append(shapeStyle);
+            wordprocessingShape.Append(CreateShapeStyle());
 
             Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            shape.Append(textBodyProperties);
+            wordprocessingShape.Append(textBodyProperties);
 
-            wordprocessingGroup.Append(shape);
+            _wordprocessingGroup.Append(wordprocessingShape);
 
             // Local function
             A.Path MakeCorner(Rect bbRect, string corner, double armsSize)
@@ -1295,212 +989,130 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
         }
 
-        private void DrawMoleculeBrackets(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, double armLength, double points, string colour)
+        private void DrawBox(Rect cmlExtents,
+                             string lineColour = "000000",
+                             double lineWidth = OoXmlHelper.ACS_LINE_WIDTH)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "bracket" + id;
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
-
-            Point location = new Point(left, top);
-            Size size = new Size(width, height);
+            Point location = new Point(emuLeft, emuTop);
+            Size size = new Size(emuWidth, emuHeight);
             location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
             Rect boundingBox = new Rect(location, size);
-            Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
 
-            width = (Int64Value)boundingBox.Width;
-            height = (Int64Value)boundingBox.Height;
-            top = (Int64Value)boundingBox.Top;
-            left = (Int64Value)boundingBox.Left;
+            emuWidth = (Int64Value)boundingBox.Width;
+            emuHeight = (Int64Value)boundingBox.Height;
+            emuTop = (Int64Value)boundingBox.Top;
+            emuLeft = (Int64Value)boundingBox.Left;
 
-            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties()
-            {
-                Id = id,
-                Name = bondLineName
-            };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+            string shapeName = "Box " + _ooxmlId++;
 
-            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 
-            A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-
-            transform2D.Append(offset);
-            transform2D.Append(extents);
-
-            A.CustomGeometry customGeometry = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            // Start of the lines
 
             A.PathList pathList = new A.PathList();
 
-            double gap = boundingBox.Width * 0.8;
-            double leftSide = (width - gap) / 2;
-            double rightSide = width - leftSide;
+            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
 
-            // Left Path
-            A.Path path1 = new A.Path { Width = width, Height = height };
-
+            // Starting Point
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point { X = leftSide.ToString("0"), Y = "0" };
+            A.Point point1 = new A.Point { X = "0", Y = "0" };
             moveTo.Append(point1);
 
             // Mid Point
             A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point { X = "0", Y = "0" };
+            A.Point point2 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
             lineTo1.Append(point2);
 
-            // Last Point
+            // Mid Point
             A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
+            A.Point point3 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
             lineTo2.Append(point3);
 
-            // Mid Point
+            // Last Point
             A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point { X = leftSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
+            A.Point point4 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
             lineTo3.Append(point4);
 
-            path1.Append(moveTo);
-            path1.Append(lineTo1);
-            path1.Append(lineTo2);
-            path1.Append(lineTo3);
-
-            pathList.Append(path1);
-
-            // Right Path
-            A.Path path2 = new A.Path { Width = width, Height = height };
-
-            A.MoveTo moveTo2 = new A.MoveTo();
-            A.Point point5 = new A.Point { X = rightSide.ToString("0"), Y = "0" };
-            moveTo2.Append(point5);
-
-            // Mid Point
+            // Back to Start Point
             A.LineTo lineTo4 = new A.LineTo();
-            A.Point point6 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
-            lineTo4.Append(point6);
+            A.Point point5 = new A.Point { X = "0", Y = "0" };
+            lineTo4.Append(point5);
 
-            // Last Point
-            A.LineTo lineTo5 = new A.LineTo();
-            A.Point point7 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
-            lineTo5.Append(point7);
+            path.Append(moveTo);
+            path.Append(lineTo1);
+            path.Append(lineTo2);
+            path.Append(lineTo3);
+            path.Append(lineTo4);
 
-            // Mid Point
-            A.LineTo lineTo6 = new A.LineTo();
-            A.Point point8 = new A.Point { X = rightSide.ToString("0"), Y = boundingBox.Height.ToString("0") };
-            lineTo6.Append(point8);
+            pathList.Append(path);
 
-            path2.Append(moveTo2);
-            path2.Append(lineTo4);
-            path2.Append(lineTo5);
-            path2.Append(lineTo6);
+            // End of the lines
 
-            pathList.Append(path2);
+            shapeProperties.Append(CreateCustomGeometry(pathList));
 
-            customGeometry.Append(adjustValueList);
-            customGeometry.Append(rectangle);
-            customGeometry.Append(pathList);
-
-            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
+            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
-
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
             solidFill.Append(rgbColorModelHex);
-
             outline.Append(solidFill);
 
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(customGeometry);
             shapeProperties.Append(outline);
 
-            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
-
-            shapeStyle.Append(lineReference);
-            shapeStyle.Append(fillReference);
-            shapeStyle.Append(effectReference);
-            shapeStyle.Append(fontReference);
-
-            shape.Append(nonVisualDrawingProperties);
-            shape.Append(nonVisualDrawingShapeProperties);
-            shape.Append(shapeProperties);
-            shape.Append(shapeStyle);
+            wordprocessingShape.Append(CreateShapeStyle());
 
             Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            shape.Append(textBodyProperties);
+            wordprocessingShape.Append(textBodyProperties);
 
-            wordprocessingGroup.Append(shape);
+            _wordprocessingGroup.Append(wordprocessingShape);
         }
 
-        private void DrawPolygon(Wpg.WordprocessingGroup wordprocessingGroup, List<Point> vertices, double points, string colour)
+        private void DrawPolygon(List<Point> points, string lineColour, double lineWidth)
         {
-            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "diag-polygon-" + bondLineId;
+            Rect cmlExtents = new Rect(points[0], points[points.Count - 1]);
 
-            Rect cmlExtents = new Rect(vertices[0], vertices[vertices.Count - 1]);
-
-            for (int i = 0; i < vertices.Count - 1; i++)
+            for (int i = 0; i < points.Count - 1; i++)
             {
-                cmlExtents.Union(new Rect(vertices[i], vertices[i + 1]));
+                cmlExtents.Union(new Rect(points[i], points[i + 1]));
             }
 
             // Move Extents to have 0,0 Top Left Reference
             cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
 
-            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = bondLineId, Name = bondLineName };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+            long id = _ooxmlId++;
+            string shapeName = "Polygon " + id;
 
-            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(id, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 
-            A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-
-            transform2D.Append(offset);
-            transform2D.Append(extents);
-
-            A.CustomGeometry customGeometry = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            // Start of the lines
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path { Width = width, Height = height };
-
-            // Local Function
-            A.Point MakePoint(Point point)
-            {
-                Point startPoint = point;
-                startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
-                startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
-                return new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
-            }
+            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
 
             // First point
             A.MoveTo moveTo = new A.MoveTo();
-            moveTo.Append(MakePoint(vertices[0]));
+            moveTo.Append(MakePoint(points[0], cmlExtents));
             path.Append(moveTo);
 
             // Remaining points
-            for (int i = 1; i < vertices.Count; i++)
+            for (int i = 1; i < points.Count; i++)
             {
                 A.LineTo lineTo = new A.LineTo();
-                lineTo.Append(MakePoint(vertices[i]));
+                lineTo.Append(MakePoint(points[i], cmlExtents));
                 path.Append(lineTo);
             }
 
@@ -1510,211 +1122,282 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             pathList.Append(path);
 
-            customGeometry.Append(adjustValueList);
-            customGeometry.Append(rectangle);
-            customGeometry.Append(pathList);
+            // End of the lines
 
-            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
+            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
-
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex.Append(alpha);
-
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
             solidFill.Append(rgbColorModelHex);
-
             outline.Append(solidFill);
 
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(customGeometry);
+            shapeProperties.Append(CreateCustomGeometry(pathList));
             shapeProperties.Append(outline);
 
-            OoXmlHelper.AppendShapeStyle(shape, nonVisualDrawingProperties, nonVisualDrawingShapeProperties, shapeProperties);
-            wordprocessingGroup.Append(shape);
-        }
-
-        private void DrawLine(Wpg.WordprocessingGroup wordprocessingGroup, Point startPoint, Point endPoint, string colour, double points)
-        {
-            UInt32Value bondLineId = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "diag-line-" + bondLineId;
-
-            Rect cmlExtents = new Rect(startPoint, endPoint);
-
-            // Move Bond Line Extents and Points to have 0,0 Top Left Reference
-            startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
-            endPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
-            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
-
-            // Move points into New Bond Line Extents
-            startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
-            endPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
-
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
-
-            Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = bondLineId, Name = bondLineName };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
-
-            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
-
-            A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-
-            transform2D.Append(offset);
-            transform2D.Append(extents);
-
-            A.CustomGeometry customGeometry = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
-
-            A.PathList pathList = new A.PathList();
-
-            A.Path path = new A.Path { Width = width, Height = height };
-
-            A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
-            moveTo.Append(point1);
-
-            A.LineTo lineTo = new A.LineTo();
-            A.Point point2 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(endPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(endPoint.Y).ToString() };
-            lineTo.Append(point2);
-
-            path.Append(moveTo);
-            path.Append(lineTo);
-
-            pathList.Append(path);
-
-            customGeometry.Append(adjustValueList);
-            customGeometry.Append(rectangle);
-            customGeometry.Append(pathList);
-
-            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
-
-            A.SolidFill solidFill = new A.SolidFill();
-
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex.Append(alpha);
-
-            solidFill.Append(rgbColorModelHex);
-
-            outline.Append(solidFill);
-
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(customGeometry);
-            shapeProperties.Append(outline);
-
-            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
-
-            shapeStyle.Append(lineReference);
-            shapeStyle.Append(fillReference);
-            shapeStyle.Append(effectReference);
-            shapeStyle.Append(fontReference);
-
-            wordprocessingShape.Append(nonVisualDrawingProperties);
-            wordprocessingShape.Append(nonVisualDrawingShapeProperties);
-            wordprocessingShape.Append(shapeProperties);
-            wordprocessingShape.Append(shapeStyle);
+            wordprocessingShape.Append(CreateShapeStyle());
 
             Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
             wordprocessingShape.Append(textBodyProperties);
 
-            wordprocessingGroup.Append(wordprocessingShape);
+            _wordprocessingGroup.Append(wordprocessingShape);
         }
 
-        private void DrawArrow(Wpg.WordprocessingGroup wordprocessingGroup, Point startPoint, Point endPoint, string colour, double points)
+        private void DrawStraightLine(Point bondStart, Point bondEnd, string bondPath, BondLineStyle lineStyle, string lineColour, double lineWidth)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "arrow-" + id;
+            var tuple = OffsetPoints(bondStart, bondEnd);
+            Point cmlStartPoint = tuple.Start;
+            Point cmlEndPoint = tuple.End;
+            Rect cmlLineExtents = tuple.Extents;
 
-            Rect cmlExtents = new Rect(startPoint, endPoint);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlLineExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlLineExtents.Left);
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlLineExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlLineExtents.Height);
 
-            // Move Bond Line Extents and Points to have 0,0 Top Left Reference
-            startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
-            endPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
-            cmlExtents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            long id = _ooxmlId++;
+            string suffix = string.IsNullOrEmpty(bondPath) ? id.ToString() : bondPath;
+            string shapeName = "Straight Line " + suffix;
 
-            // Move points into New Bond Line Extents
-            startPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
-            endPoint.Offset(-cmlExtents.Left, -cmlExtents.Top);
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(id, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
-
-            Wps.WordprocessingShape shape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties() { Id = id, Name = bondLineName };
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
-
-            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
-
-            A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-
-            transform2D.Append(offset);
-            transform2D.Append(extents);
-
-            A.CustomGeometry customGeometry = new A.CustomGeometry();
-            A.AdjustValueList adjustValueList = new A.AdjustValueList();
-            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            // Start of the lines
 
             A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path { Width = width, Height = height };
+            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
 
             A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(startPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(startPoint.Y).ToString() };
+            A.Point point1 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(cmlStartPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(cmlStartPoint.Y).ToString() };
             moveTo.Append(point1);
+            path.Append(moveTo);
 
             A.LineTo lineTo = new A.LineTo();
-            A.Point point2 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(endPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(endPoint.Y).ToString() };
+            A.Point point2 = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(cmlEndPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(cmlEndPoint.Y).ToString() };
             lineTo.Append(point2);
-
-            path.Append(moveTo);
             path.Append(lineTo);
 
             pathList.Append(path);
 
-            customGeometry.Append(adjustValueList);
-            customGeometry.Append(rectangle);
-            customGeometry.Append(pathList);
+            // End of the lines
 
-            Int32Value emus = (Int32Value)(points * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emus, CapType = A.LineCapValues.Round };
+            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
 
             A.SolidFill solidFill = new A.SolidFill();
-
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            A.Alpha alpha = new A.Alpha() { Val = new Int32Value() { InnerText = "100%" } };
-
-            rgbColorModelHex.Append(alpha);
-
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
             solidFill.Append(rgbColorModelHex);
-
             outline.Append(solidFill);
 
-            A.TailEnd tailEnd = new A.TailEnd() { Type = A.LineEndValues.Arrow };
-            outline.Append(tailEnd);
+            switch (lineStyle)
+            {
+                case BondLineStyle.Dashed:
+                    A.PresetDash dashed = new A.PresetDash { Val = A.PresetLineDashValues.SystemDash };
+                    outline.Append(dashed);
+                    break;
 
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(customGeometry);
+                case BondLineStyle.Dotted:
+                    A.PresetDash dotted = new A.PresetDash { Val = A.PresetLineDashValues.SystemDot };
+                    outline.Append(dotted);
+                    break;
+            }
+
+            if (!string.IsNullOrEmpty(bondPath) && _options.ShowBondDirection)
+            {
+                A.TailEnd tailEnd = new A.TailEnd
+                {
+                    Type = A.LineEndValues.Arrow,
+                    Width = A.LineEndWidthValues.Small,
+                    Length = A.LineEndLengthValues.Small
+                };
+                outline.Append(tailEnd);
+            }
+
+            shapeProperties.Append(CreateCustomGeometry(pathList));
             shapeProperties.Append(outline);
 
+            wordprocessingShape.Append(CreateShapeStyle());
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+        }
+
+        private void DrawWavyLine(Point bondStart, Point bondEnd, string bondPath, string lineColour)
+        {
+            var tuple = OffsetPoints(bondStart, bondEnd);
+            Point cmlStartPoint = tuple.Start;
+            Point cmlEndPoint = tuple.End;
+            Rect cmlLineExtents = tuple.Extents;
+
+            // Calculate wiggles
+
+            Vector bondVector = cmlEndPoint - cmlStartPoint;
+            int noOfWiggles = (int)Math.Ceiling(bondVector.Length / BondOffset());
+            if (noOfWiggles < 1)
+            {
+                noOfWiggles = 1;
+            }
+
+            double wiggleLength = bondVector.Length / noOfWiggles;
+
+            Vector originalWigglePortion = bondVector;
+            originalWigglePortion.Normalize();
+            originalWigglePortion *= wiggleLength / 2;
+
+            Matrix toLeft = new Matrix();
+            toLeft.Rotate(-60);
+            Matrix toRight = new Matrix();
+            toRight.Rotate(60);
+            Vector leftVector = originalWigglePortion * toLeft;
+            Vector rightVector = originalWigglePortion * toRight;
+
+            List<Point> allpoints = new List<Point>();
+            List<List<Point>> allTriangles = new List<List<Point>>();
+            List<Point> triangle = new List<Point>();
+
+            Point lastPoint = cmlStartPoint;
+            triangle.Add(lastPoint);
+            allpoints.Add(lastPoint);
+
+            for (int i = 0; i < noOfWiggles; i++)
+            {
+                Point leftPoint = lastPoint + leftVector;
+                triangle.Add(leftPoint);
+                allpoints.Add(leftPoint);
+
+                Point midPoint = lastPoint + originalWigglePortion;
+                allpoints.Add(midPoint);
+                triangle.Add(midPoint);
+                allTriangles.Add(triangle);
+                triangle = new List<Point>();
+                triangle.Add(midPoint);
+
+                Point rightPoint = lastPoint + originalWigglePortion + rightVector;
+                allpoints.Add(rightPoint);
+                triangle.Add(rightPoint);
+
+                lastPoint += originalWigglePortion * 2;
+                triangle.Add(lastPoint);
+                allpoints.Add(lastPoint);
+
+                allTriangles.Add(triangle);
+                triangle = new List<Point>();
+                triangle.Add(lastPoint);
+            }
+
+            double minX = double.MaxValue;
+            double maxX = double.MinValue;
+            double minY = double.MaxValue;
+            double maxY = double.MinValue;
+
+            foreach (Point p in allpoints)
+            {
+                maxX = Math.Max(p.X + cmlLineExtents.Left, maxX);
+                minX = Math.Min(p.X + cmlLineExtents.Left, minX);
+                maxY = Math.Max(p.Y + cmlLineExtents.Top, maxY);
+                minY = Math.Min(p.Y + cmlLineExtents.Top, minY);
+            }
+
+            Rect newExtents = new Rect(minX, minY, maxX - minX, maxY - minY);
+            double xOffset = cmlLineExtents.Left - newExtents.Left;
+            double yOffset = cmlLineExtents.Top - newExtents.Top;
+
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(newExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(newExtents.Left);
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(newExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(newExtents.Height);
+
+            string shapeName = "Wavy Line " + bondPath;
+
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId++, shapeName);
+            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
+
+            // Start of the lines
+
+            A.PathList pathList = new A.PathList();
+
+            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
+
+            A.MoveTo moveTo = new A.MoveTo();
+            A.Point firstPoint = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(cmlStartPoint.X).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(cmlStartPoint.Y).ToString() };
+            moveTo.Append(firstPoint);
+            path.Append(moveTo);
+
+            foreach (var tri in allTriangles)
+            {
+                A.CubicBezierCurveTo cubicBezierCurveTo = new A.CubicBezierCurveTo();
+                foreach (var p in tri)
+                {
+                    A.Point nextPoint = new A.Point { X = OoXmlHelper.ScaleCmlToEmu(p.X + xOffset).ToString(), Y = OoXmlHelper.ScaleCmlToEmu(p.Y + yOffset).ToString() };
+                    cubicBezierCurveTo.Append(nextPoint);
+                }
+                path.Append(cubicBezierCurveTo);
+            }
+
+            pathList.Append(path);
+
+            // End of the lines
+
+            double lineWidth = OoXmlHelper.ACS_LINE_WIDTH;
+            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
+
+            A.SolidFill solidFill = new A.SolidFill();
+            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
+            solidFill.Append(rgbColorModelHex);
+            outline.Append(solidFill);
+
+            if (_options.ShowBondDirection)
+            {
+                A.TailEnd tailEnd = new A.TailEnd { Type = A.LineEndValues.Stealth };
+                outline.Append(tailEnd);
+            }
+
+            shapeProperties.Append(CreateCustomGeometry(pathList));
+            shapeProperties.Append(outline);
+
+            wordprocessingShape.Append(CreateShapeStyle());
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+        }
+
+        private Wps.WordprocessingShape CreateShape(long id, string shapeName)
+        {
+            UInt32Value id32 = UInt32Value.FromUInt32((uint)id);
+            Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
+            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties { Id = id32, Name = shapeName };
+            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+
+            wordprocessingShape.Append(nonVisualDrawingProperties);
+            wordprocessingShape.Append(nonVisualDrawingShapeProperties);
+
+            return wordprocessingShape;
+        }
+
+        private Wps.ShapeProperties CreateShapeProperties(Wps.WordprocessingShape wordprocessingShape, Int64Value emuTop, Int64Value emuLeft, Int64Value emuWidth, Int64Value emuHeight)
+        {
+            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+
+            wordprocessingShape.Append(shapeProperties);
+
+            A.Transform2D transform2D = new A.Transform2D();
+            A.Offset offset = new A.Offset { X = emuLeft, Y = emuTop };
+            A.Extents extents = new A.Extents { Cx = emuWidth, Cy = emuHeight };
+            transform2D.Append(offset);
+            transform2D.Append(extents);
+            shapeProperties.Append(transform2D);
+
+            return shapeProperties;
+        }
+
+        private Wps.ShapeStyle CreateShapeStyle()
+        {
             Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
             A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
             A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
@@ -1726,90 +1409,312 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             shapeStyle.Append(effectReference);
             shapeStyle.Append(fontReference);
 
-            shape.Append(nonVisualDrawingProperties);
-            shape.Append(nonVisualDrawingShapeProperties);
-            shape.Append(shapeProperties);
-            shape.Append(shapeStyle);
-
-            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            shape.Append(textBodyProperties);
-
-            wordprocessingGroup.Append(shape);
+            return shapeStyle;
         }
 
-        private void DrawShape(Wpg.WordprocessingGroup wordprocessingGroup, Rect cmlExtents, A.ShapeTypeValues shape, string colour)
+        private A.CustomGeometry CreateCustomGeometry(A.PathList pathList)
         {
-            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
-            string bondLineName = "shape" + id;
+            A.CustomGeometry customGeometry = new A.CustomGeometry();
+            A.AdjustValueList adjustValueList = new A.AdjustValueList();
+            A.Rectangle rectangle = new A.Rectangle { Left = "l", Top = "t", Right = "r", Bottom = "b" };
+            customGeometry.Append(adjustValueList);
+            customGeometry.Append(rectangle);
+            customGeometry.Append(pathList);
+            return customGeometry;
+        }
 
-            Int64Value width = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value height = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value top = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value left = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+        private Run CreateRun()
+        {
+            Run run = new Run();
 
-            Point location = new Point(left, top);
-            Size size = new Size(width, height);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
-            Rect boundingBox = new Rect(location, size);
+            Drawing drawing = new Drawing();
+            run.Append(drawing);
 
-            width = (Int64Value)boundingBox.Width;
-            height = (Int64Value)boundingBox.Height;
-            top = (Int64Value)boundingBox.Top;
-            left = (Int64Value)boundingBox.Left;
-
-            A.PresetGeometry presetGeometry = null;
-            A.Extents extents = new A.Extents { Cx = width, Cy = height };
-            presetGeometry = new A.PresetGeometry() { Preset = shape };
-
-            Wps.WordprocessingShape wordprocessingShape = new Wps.WordprocessingShape();
-            Wps.NonVisualDrawingProperties nonVisualDrawingProperties = new Wps.NonVisualDrawingProperties()
+            Wp.Inline inline = new Wp.Inline
             {
-                Id = id,
-                Name = bondLineName
+                DistanceFromTop = (UInt32Value)0U,
+                DistanceFromLeft = (UInt32Value)0U,
+                DistanceFromBottom = (UInt32Value)0U,
+                DistanceFromRight = (UInt32Value)0U
+            };
+            drawing.Append(inline);
+
+            Int64Value width = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Width);
+            Int64Value height = OoXmlHelper.ScaleCmlToEmu(_boundingBoxOfEverything.Height);
+            Wp.Extent extent = new Wp.Extent { Cx = width, Cy = height };
+
+            Wp.EffectExtent effectExtent = new Wp.EffectExtent
+            {
+                TopEdge = 0L,
+                LeftEdge = 0L,
+                BottomEdge = 0L,
+                RightEdge = 0L
             };
 
-            Wps.NonVisualDrawingShapeProperties nonVisualDrawingShapeProperties = new Wps.NonVisualDrawingShapeProperties();
+            inline.Append(extent);
+            inline.Append(effectExtent);
 
-            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+            UInt32Value inlineId = UInt32Value.FromUInt32((uint)_ooxmlId);
+            Wp.DocProperties docProperties = new Wp.DocProperties
+            {
+                Id = inlineId,
+                Name = "Chem4Word Structure"
+            };
 
-            A.Transform2D transform2D = new A.Transform2D();
-            A.Offset offset = new A.Offset { X = left, Y = top };
+            inline.Append(docProperties);
 
-            transform2D.Append(offset);
-            transform2D.Append(extents);
+            A.Graphic graphic = new A.Graphic();
+            graphic.AddNamespaceDeclaration("a", "http://schemas.openxmlformats.org/drawingml/2006/main");
 
-            A.AdjustValueList adjustValueList = new A.AdjustValueList();
+            inline.Append(graphic);
 
-            presetGeometry.Append(adjustValueList);
-            A.SolidFill solidFill = new A.SolidFill();
+            A.GraphicData graphicData = new A.GraphicData
+            {
+                Uri = "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
+            };
 
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = colour };
-            solidFill.Append(rgbColorModelHex);
+            graphic.Append(graphicData);
 
-            shapeProperties.Append(transform2D);
-            shapeProperties.Append(presetGeometry);
-            shapeProperties.Append(solidFill);
+            _wordprocessingGroup = new Wpg.WordprocessingGroup();
+            graphicData.Append(_wordprocessingGroup);
 
-            Wps.ShapeStyle shapeStyle = new Wps.ShapeStyle();
-            A.LineReference lineReference = new A.LineReference { Index = (UInt32Value)0U };
-            A.FillReference fillReference = new A.FillReference { Index = (UInt32Value)0U };
-            A.EffectReference effectReference = new A.EffectReference { Index = (UInt32Value)0U };
-            A.FontReference fontReference = new A.FontReference { Index = A.FontCollectionIndexValues.Minor };
+            Wpg.NonVisualGroupDrawingShapeProperties nonVisualGroupDrawingShapeProperties = new Wpg.NonVisualGroupDrawingShapeProperties();
 
-            shapeStyle.Append(lineReference);
-            shapeStyle.Append(fillReference);
-            shapeStyle.Append(effectReference);
-            shapeStyle.Append(fontReference);
+            Wpg.GroupShapeProperties groupShapeProperties = new Wpg.GroupShapeProperties();
 
-            wordprocessingShape.Append(nonVisualDrawingProperties);
-            wordprocessingShape.Append(nonVisualDrawingShapeProperties);
-            wordprocessingShape.Append(shapeProperties);
-            wordprocessingShape.Append(shapeStyle);
+            A.TransformGroup transformGroup = new A.TransformGroup();
+            A.Offset offset = new A.Offset { X = 0L, Y = 0L };
+            A.Extents extents = new A.Extents { Cx = width, Cy = height };
+            A.ChildOffset childOffset = new A.ChildOffset { X = 0L, Y = 0L };
+            A.ChildExtents childExtents = new A.ChildExtents { Cx = width, Cy = height };
 
-            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            wordprocessingShape.Append(textBodyProperties);
+            transformGroup.Append(offset);
+            transformGroup.Append(extents);
+            transformGroup.Append(childOffset);
+            transformGroup.Append(childExtents);
 
-            wordprocessingGroup.Append(wordprocessingShape);
+            groupShapeProperties.Append(transformGroup);
+
+            _wordprocessingGroup.Append(nonVisualGroupDrawingShapeProperties);
+            _wordprocessingGroup.Append(groupShapeProperties);
+
+            return run;
+        }
+
+        private (Point Start, Point End, Rect Extents) OffsetPoints(Point start, Point end)
+        {
+            Point startPoint = new Point(start.X, start.Y);
+            Point endPoint = new Point(end.X, end.Y);
+            Rect extents = new Rect(startPoint, endPoint);
+
+            // Move Extents and Points to have 0,0 Top Left Reference
+            startPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            endPoint.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+            extents.Offset(-_boundingBoxOfEverything.Left, -_boundingBoxOfEverything.Top);
+
+            // Move points into New Extents
+            startPoint.Offset(-extents.Left, -extents.Top);
+            endPoint.Offset(-extents.Left, -extents.Top);
+
+            // Return a Tuple with the results
+            return (Start: startPoint, End: endPoint, Extents: extents);
+        }
+
+        private List<Point> CalculateWedgeOutline(BondLine bl)
+        {
+            BondLine leftBondLine = bl.GetParallel(BondOffset() / 2);
+            BondLine rightBondLine = bl.GetParallel(-BondOffset() / 2);
+
+            List<Point> points = new List<Point>();
+            points.Add(new Point(bl.Start.X, bl.Start.Y));
+            points.Add(new Point(leftBondLine.End.X, leftBondLine.End.Y));
+            points.Add(new Point(bl.End.X, bl.End.Y));
+            points.Add(new Point(rightBondLine.End.X, rightBondLine.End.Y));
+
+            Point wedgeStart = new Point(bl.Start.X, bl.Start.Y);
+            Point wedgeEndLeft = new Point(leftBondLine.End.X, leftBondLine.End.Y);
+            Point wedgeEndRight = new Point(rightBondLine.End.X, rightBondLine.End.Y);
+
+            Bond thisBond = bl.Bond;
+            Atom endAtom = thisBond.EndAtom;
+
+            // EndAtom == C and Label is ""
+            if (endAtom.Element as Element == Globals.PeriodicTable.C
+                && thisBond.Rings.Count == 0
+                && string.IsNullOrEmpty(endAtom.SymbolText))
+            {
+                // Has at least one other bond
+                if (endAtom.Bonds.Count() > 1)
+                {
+                    var otherBonds = endAtom.Bonds.Except(new[] { thisBond }).ToList();
+                    bool allSingle = true;
+                    List<Bond> nonHydrogenBonds = new List<Bond>();
+                    foreach (var otherBond in otherBonds)
+                    {
+                        if (!otherBond.Order.Equals(Globals.OrderSingle))
+                        {
+                            allSingle = false;
+                            //break;
+                        }
+
+                        var otherAtom = otherBond.OtherAtom(endAtom);
+                        if (otherAtom.Element as Element != Globals.PeriodicTable.H)
+                        {
+                            nonHydrogenBonds.Add(otherBond);
+                        }
+                    }
+
+                    // All other bonds are single
+                    if (allSingle)
+                    {
+                        // Determine chamfer shape
+                        Vector left = (wedgeEndLeft - wedgeStart) * 2;
+                        Point leftEnd = wedgeStart + left;
+
+                        Vector right = (wedgeEndRight - wedgeStart) * 2;
+                        Point rightEnd = wedgeStart + right;
+
+                        bool intersect;
+                        Point intersection;
+
+                        Vector shortestLeft = left;
+                        Vector shortestRight = right;
+
+                        if (otherBonds.Count - nonHydrogenBonds.Count == 1)
+                        {
+                            otherBonds = nonHydrogenBonds;
+                        }
+
+                        if (otherBonds.Count == 1)
+                        {
+                            Bond bond = otherBonds[0];
+                            Atom atom = bond.OtherAtom(endAtom);
+                            Vector vv = (endAtom.Position - atom.Position) * 2;
+                            Point otherEnd = atom.Position + vv;
+
+                            CoordinateTool.FindIntersection(wedgeStart, leftEnd,
+                                                            atom.Position, otherEnd,
+                                                            out _, out intersect, out intersection);
+                            if (intersect)
+                            {
+                                Vector v = intersection - wedgeStart;
+                                if (v.Length < shortestLeft.Length)
+                                {
+                                    shortestLeft = v;
+                                }
+                            }
+
+                            CoordinateTool.FindIntersection(wedgeStart, rightEnd,
+                                                            atom.Position, otherEnd,
+                                                            out _, out intersect, out intersection);
+                            if (intersect)
+                            {
+                                Vector v = intersection - wedgeStart;
+                                if (v.Length < shortestRight.Length)
+                                {
+                                    shortestRight = v;
+                                }
+                            }
+
+                            // Re-write list of points
+                            points = new List<Point>();
+                            points.Add(wedgeStart);
+                            points.Add(wedgeStart + shortestLeft);
+                            points.Add(endAtom.Position);
+                            points.Add(wedgeStart + shortestRight);
+                        }
+                        else
+                        {
+                            foreach (var bond in otherBonds)
+                            {
+                                CoordinateTool.FindIntersection(wedgeStart, leftEnd,
+                                                                bond.StartAtom.Position, bond.EndAtom.Position,
+                                                                out _, out intersect, out intersection);
+                                if (intersect)
+                                {
+                                    Vector v = intersection - wedgeStart;
+                                    if (v.Length < shortestLeft.Length)
+                                    {
+                                        shortestLeft = v;
+                                    }
+                                }
+
+                                CoordinateTool.FindIntersection(wedgeStart, rightEnd,
+                                                                bond.StartAtom.Position, bond.EndAtom.Position,
+                                                                out _, out intersect, out intersection);
+                                if (intersect)
+                                {
+                                    Vector v = intersection - wedgeStart;
+                                    if (v.Length < shortestRight.Length)
+                                    {
+                                        shortestRight = v;
+                                    }
+                                }
+                            }
+
+                            // Re-write list of points
+                            points = new List<Point>();
+                            points.Add(wedgeStart);
+                            points.Add(wedgeStart + shortestLeft);
+                            points.Add(endAtom.Position);
+                            points.Add(wedgeStart + shortestRight);
+                        }
+                    }
+                }
+            }
+
+            return points;
+        }
+
+        private void LoadFont()
+        {
+            string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "Arial.json");
+            _TtfCharacterSet = JsonConvert.DeserializeObject<Dictionary<char, TtfCharacter>>(json);
+        }
+
+        /// <summary>
+        /// Sets the canvas size to accomodate any extra space required by label characters
+        /// </summary>
+        private void SetCanvasSize()
+        {
+            _boundingBoxOfEverything = _boundingBoxOfAllAtoms;
+
+            foreach (AtomLabelCharacter alc in _atomLabelCharacters)
+            {
+                if (alc.IsSubScript)
+                {
+                    Rect r = new Rect(alc.Position,
+                                      new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
+                                               OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
+                    _boundingBoxOfEverything.Union(r);
+                }
+                else
+                {
+                    Rect r = new Rect(alc.Position,
+                                      new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, _medianBondLength),
+                                               OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, _medianBondLength)));
+                    _boundingBoxOfEverything.Union(r);
+                }
+            }
+
+            foreach (var group in _allMoleculeExtents)
+            {
+                _boundingBoxOfEverything.Union(group.ExternalCharacterExtents);
+            }
+
+            _boundingBoxOfEverything.Inflate(OoXmlHelper.DRAWING_MARGIN, OoXmlHelper.DRAWING_MARGIN);
+        }
+
+        private double BondOffset()
+        {
+            return _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE;
+        }
+
+        private static void ShutDownProgress(Progress pb)
+        {
+            pb.Value = 0;
+            pb.Hide();
+            pb.Close();
         }
     }
 }

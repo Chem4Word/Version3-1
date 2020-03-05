@@ -24,6 +24,7 @@ namespace Chem4Word.Helpers
         private Config[] _watchedConfigs = {
             new Config { Name = "ShowHydrogens", Type = "bool" },
             new Config { Name = "ShowCarbons", Type = "bool" },
+            new Config { Name = "ShowMoleculeGrouping", Type = "bool" },
             new Config { Name = "ColouredAtoms", Type = "bool" },
             new Config { Name = "BondLength", Type = "int" }
         };
@@ -136,6 +137,7 @@ namespace Chem4Word.Helpers
                                     if (write)
                                     {
                                         Debug.WriteLine($"Writing file {file}");
+                                        Globals.Chem4WordV3.OptionsReloadRequired = true;
                                         string json = JsonConvert.SerializeObject(jObject, Formatting.Indented);
                                         File.WriteAllText(file, json);
                                     }

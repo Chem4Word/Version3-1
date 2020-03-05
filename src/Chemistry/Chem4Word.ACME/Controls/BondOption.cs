@@ -23,7 +23,6 @@ namespace Chem4Word.ACME
             set { SetValue(IdProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Id.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty IdProperty =
             DependencyProperty.Register("Id", typeof(int), typeof(BondOption), new PropertyMetadata(default(int)));
 
@@ -33,7 +32,6 @@ namespace Chem4Word.ACME
             set { SetValue(OrderProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Order.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty OrderProperty =
             DependencyProperty.Register("Order", typeof(string), typeof(BondOption),
                                         new PropertyMetadata(Globals.OrderSingle));
@@ -44,7 +42,6 @@ namespace Chem4Word.ACME
             set { SetValue(BondStereoEnumsProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for BondStereoEnums.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BondStereoEnumsProperty =
             DependencyProperty.Register("Stereo", typeof(Globals.BondStereo?), typeof(BondOption),
                                         new PropertyMetadata(null));
@@ -55,7 +52,6 @@ namespace Chem4Word.ACME
             set { SetValue(BondGraphicProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for BondGraphic.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BondGraphicProperty =
             DependencyProperty.Register("BondGraphic", typeof(System.Windows.Media.Drawing), typeof(BondOption),
                                         new PropertyMetadata(default(System.Windows.Media.Drawing)));
@@ -126,18 +122,6 @@ namespace Chem4Word.ACME
                 }
             }
         }
-
-        /*
-        public Style DisplayStyle
-        {
-            get { return (Style)GetValue(DisplayStyleProperty); }
-            set { SetValue(DisplayStyleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for DisplayStyle.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DisplayStyleProperty =
-            DependencyProperty.Register("DisplayStyle", typeof(Style), typeof(BondOption), new PropertyMetadata(null));
-        */
 
         public override string ToString()
         {

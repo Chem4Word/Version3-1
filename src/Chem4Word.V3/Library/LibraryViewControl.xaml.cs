@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Chem4Word.ACME;
 using Chem4Word.Core.UI.Forms;
 
 namespace Chem4Word.Library
@@ -23,16 +24,27 @@ namespace Chem4Word.Library
     {
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+        private AcmeOptions _options;
 
         public LibraryViewControl()
         {
             InitializeComponent();
         }
 
+        public void SetOptions(AcmeOptions options)
+        {
+            _options = options;
+        }
+
+        public bool ShowAllCarbonAtoms => _options.ShowCarbons;
+        public bool ShowImplicitHydrogens => _options.ShowHydrogens;
+        public bool ShowAtomsInColour => _options.ColouredAtoms;
+        public bool ShowMoleculeGrouping => _options.ShowMoleculeGrouping;
+
         //load up an unfiltered model
         public void Refresh()
         {
-            this.MainGrid.DataContext = new LibraryViewModel();
+            MainGrid.DataContext = new LibraryViewModel();
         }
 
         /// <summary>

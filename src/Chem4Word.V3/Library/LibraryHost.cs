@@ -8,6 +8,7 @@
 using System;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.ACME;
 using Chem4Word.Core.UI.Forms;
 using Word = Microsoft.Office.Interop.Word;
 
@@ -19,6 +20,7 @@ namespace Chem4Word.Library
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         private LibraryViewModel _libraryViewModel;
+        private AcmeOptions _editorOptions;
 
         public LibraryHost()
         {
@@ -30,6 +32,9 @@ namespace Chem4Word.Library
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                _editorOptions = new AcmeOptions(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath);
+                libraryView1.SetOptions(_editorOptions);
+
                 Word.Application app = Globals.Chem4WordV3.Application;
                 using (new UI.WaitCursor())
                 {

@@ -49,6 +49,8 @@ namespace Chem4Word.ACME
         private Dictionary<int, BondOption> _bondOptions = new Dictionary<int, BondOption>();
         private int? _selectedBondOptionId;
 
+        public AcmeOptions EditorOptions { get; set; }
+
         #endregion Fields
 
         #region Properties
@@ -170,16 +172,15 @@ namespace Chem4Word.ACME
             {
                 UndoManager.BeginUndoBlock();
 
-                Action undo, redo;
                 foreach (Atom selectedAtom in selAtoms)
                 {
                     if (selectedAtom.Element != value)
                     {
-                        redo = () => { selectedAtom.Element = value; };
                         var lastElement = selectedAtom.Element;
-
-                        undo = () => { selectedAtom.Element = lastElement; };
+                        Action redo = () => { selectedAtom.Element = value; };
+                        Action undo = () => { selectedAtom.Element = lastElement; };
                         UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol ?? "null"}");
+
                         selectedAtom.Element = value;
                         selectedAtom.UpdateVisual();
                         foreach (Bond bond in selectedAtom.Bonds)
@@ -220,15 +221,16 @@ namespace Chem4Word.ACME
         {
             get
             {
-                var btList = (from bt in SelectedBondOptions
-                              select bt.Id).Distinct();
+                var btList = (from bt
+                                  in SelectedBondOptions
+                              select bt.Id).Distinct().ToList();
 
-                if (btList.Count() == 1)
+                if (btList.Count == 1)
                 {
-                    return btList.ToList()[0];
+                    return btList[0];
                 }
 
-                if (btList.Count() == 0)
+                if (btList.Count == 0)
                 {
                     return _selectedBondOptionId;
                 }
@@ -689,12 +691,16 @@ namespace Chem4Word.ACME
                           {
                               parentBond.Order = order;
                               parentBond.Stereo = stereo;
+                              parentBond.StartAtom.UpdateVisual();
+                              parentBond.EndAtom.UpdateVisual();
                           };
 
             Action redo = () =>
                           {
                               parentBond.Order = newOrder ?? CurrentBondOrder;
                               parentBond.Stereo = newStereo ?? CurrentStereo;
+                              parentBond.StartAtom.UpdateVisual();
+                              parentBond.EndAtom.UpdateVisual();
                           };
             UndoManager.RecordAction(undo, redo);
 
@@ -822,12 +828,14 @@ namespace Chem4Word.ACME
                                   lastAtom.Tag = oldDir;
                                   currentMol.RemoveAtom(newAtom);
                                   newAtom.Parent = null;
+                                  lastAtom.UpdateVisual();
                               };
                 Action redo = () =>
                               {
                                   lastAtom.Tag = tag; //save the last sprouted direction in the tag object
                                   newAtom.Parent = currentMol;
                                   currentMol.AddAtom(newAtom);
+                                  lastAtom.UpdateVisual();
                                   newAtom.UpdateVisual();
                               };
                 UndoManager.RecordAction(undo, redo);
@@ -2890,10 +2898,9 @@ namespace Chem4Word.ACME
         /// <param name="selection">Observable collection of ChemistryBase objects</param>
         public void Group(IEnumerable<object> selection)
         {
-            List<Molecule> children;
             //grab just the grouped molecules first
-            children = (from Molecule mol in selection.OfType<Molecule>()
-                        select mol).ToList();
+            var children = (from Molecule mol in selection.OfType<Molecule>()
+                            select mol).ToList();
             Group(children);
         }
 

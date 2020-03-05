@@ -24,7 +24,7 @@ namespace IChem4Word.Contracts
 
         IChem4WordTelemetry Telemetry { get; set; }
 
-        string ProductAppDataPath { get; set; }
+        string SettingsPath { get; set; }
 
         // I/O
         Dictionary<string, string> Properties { get; set; }
@@ -33,7 +33,5 @@ namespace IChem4Word.Contracts
 
         // Actions
         bool ChangeSettings(Point topLeft);
-
-        void LoadSettings();
     }
 }

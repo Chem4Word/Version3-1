@@ -219,7 +219,10 @@
                             Margin="3"
                             Background="White"
                             HighlightActive="False"
-                            ShowGroups="false" />
+                            ShowAllCarbonAtoms="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=acme:LabelsEditor}, Path=ShowAllCarbonAtoms}"
+                            ShowAtomsInColour="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=acme:LabelsEditor}, Path=ShowAtomsInColour}"
+                            ShowImplicitHydrogens="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=acme:LabelsEditor}, Path=ShowImplicitHydrogens}"
+                            ShowMoleculeGrouping="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=acme:LabelsEditor}, Path=ShowMoleculeGrouping}" />
                     </Border>
                     <GridSplitter
                         Grid.Row="1"

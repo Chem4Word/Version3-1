@@ -38,7 +38,6 @@ namespace Chem4Word.Library
             set { SetValue(TagStringProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for TagString.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TagStringProperty =
             DependencyProperty.Register("TagString", typeof(string), typeof(TagEditor), new FrameworkPropertyMetadata("", FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure, TagStringChanged));
 

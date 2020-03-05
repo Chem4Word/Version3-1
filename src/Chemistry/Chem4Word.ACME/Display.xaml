@@ -9,7 +9,10 @@
             x:Name="ChemCanvas"
             Margin="5"
             Background="White"
-            ShowGroups="{Binding ElementName=ACMEDisplay, Path=ShowGroups }"
-            HighlightActive="{Binding ElementName=ACMEDisplay, Path=HighlightActive}" />
+            HighlightActive="{Binding ElementName=ACMEDisplay, Path=HighlightActive}"
+            ShowAllCarbonAtoms="{Binding ElementName=ACMEDisplay, Path=ShowAllCarbonAtoms}"
+            ShowAtomsInColour="{Binding ElementName=ACMEDisplay, Path=ShowAtomsInColour}"
+            ShowImplicitHydrogens="{Binding ElementName=ACMEDisplay, Path=ShowImplicitHydrogens}"
+            ShowMoleculeGrouping="{Binding ElementName=ACMEDisplay, Path=ShowMoleculeGrouping}" />
     </Viewbox>
 </UserControl>

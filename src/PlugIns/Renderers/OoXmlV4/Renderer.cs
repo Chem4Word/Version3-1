@@ -15,7 +15,6 @@ using Chem4Word.Core;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Renderer.OoXmlV4.OOXML;
 using IChem4Word.Contracts;
-using Newtonsoft.Json;
 
 namespace Chem4Word.Renderer.OoXmlV4
 {
@@ -29,51 +28,17 @@ namespace Chem4Word.Renderer.OoXmlV4
         public bool HasSettings => true;
 
         public Point TopLeft { get; set; }
-        public string ProductAppDataPath { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
+        public string SettingsPath { get; set; }
 
         public string Cml { get; set; }
         public Dictionary<string, string> Properties { get; set; }
 
-        private Options _rendererOptions = new Options();
+        private OoXmlV4Options _rendererOptions;
 
         public Renderer()
         {
             // Nothing to do here
-        }
-
-        public void LoadSettings()
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            try
-            {
-                if (!string.IsNullOrEmpty(ProductAppDataPath))
-                {
-                    // Load User Options
-                    string fileName = $"{_product}.json";
-                    string optionsFile = Path.Combine(ProductAppDataPath, fileName);
-                    if (File.Exists(optionsFile))
-                    {
-                        string json = File.ReadAllText(optionsFile);
-                        _rendererOptions = JsonConvert.DeserializeObject<Options>(json);
-                        string temp = JsonConvert.SerializeObject(_rendererOptions, Formatting.Indented);
-                        if (!json.Equals(temp))
-                        {
-                            File.WriteAllText(optionsFile, temp);
-                        }
-                    }
-                    else
-                    {
-                        _rendererOptions.RestoreDefaults();
-                        string json = JsonConvert.SerializeObject(_rendererOptions, Formatting.Indented);
-                        File.WriteAllText(optionsFile, json);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
-            }
         }
 
         public bool ChangeSettings(Point topLeft)
@@ -83,17 +48,14 @@ namespace Chem4Word.Renderer.OoXmlV4
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
+                _rendererOptions = new OoXmlV4Options(SettingsPath);
 
-                Settings settings = new Settings();
+                OoXmlV4Settings settings = new OoXmlV4Settings();
                 settings.Telemetry = Telemetry;
                 settings.TopLeft = topLeft;
 
-                Options tempOptions = _rendererOptions.Clone();
-                settings.SettingsPath = ProductAppDataPath;
+                OoXmlV4Options tempOptions = _rendererOptions.Clone();
+                settings.SettingsPath = SettingsPath;
                 settings.RendererOptions = tempOptions;
 
                 DialogResult dr = settings.ShowDialog();
@@ -102,7 +64,6 @@ namespace Chem4Word.Renderer.OoXmlV4
                     _rendererOptions = tempOptions.Clone();
                 }
                 settings.Close();
-                settings = null;
             }
             catch (Exception ex)
             {
@@ -121,17 +82,13 @@ namespace Chem4Word.Renderer.OoXmlV4
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
+                _rendererOptions = new OoXmlV4Options(SettingsPath);
 
                 string guid = Properties["Guid"];
                 result = OoXmlFile.CreateFromCml(Cml, guid, _rendererOptions, Telemetry, TopLeft);
                 if (!File.Exists(result))
                 {
                     Telemetry.Write(module, "Exception", "Structure could not be rendered.");
-                    //Telemetry.Write(module, "Exception(Data)", Cml);
                     UserInteractions.WarnUser("Sorry this structure could not be rendered.");
                 }
 

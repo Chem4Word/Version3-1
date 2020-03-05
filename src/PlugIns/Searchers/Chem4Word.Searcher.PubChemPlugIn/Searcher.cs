@@ -8,13 +8,11 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Searcher.PubChemPlugIn.Properties;
 using IChem4Word.Contracts;
-using Newtonsoft.Json;
 using Point = System.Windows.Point;
 
 namespace Chem4Word.Searcher.PubChemPlugIn
@@ -24,7 +22,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private Options _searcherOptions = new Options();
+        private PubChemOptions _searcherOptions;
 
         public bool HasSettings => true;
 
@@ -37,14 +35,14 @@ namespace Chem4Word.Searcher.PubChemPlugIn
         {
             get
             {
-                LoadSettings();
+                _searcherOptions = new PubChemOptions(SettingsPath);
                 return _searcherOptions.DisplayOrder;
             }
         }
 
         public Point TopLeft { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
-        public string ProductAppDataPath { get; set; }
+        public string SettingsPath { get; set; }
         public Dictionary<string, string> Properties { get; set; }
 
         public string Cml { get; set; }
@@ -60,17 +58,14 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
+                _searcherOptions = new PubChemOptions(SettingsPath);
 
-                Settings settings = new Settings();
+                PubChemSettings settings = new PubChemSettings();
                 settings.Telemetry = Telemetry;
                 settings.TopLeft = topLeft;
 
-                Options tempOptions = _searcherOptions.Clone();
-                settings.SettingsPath = ProductAppDataPath;
+                PubChemOptions tempOptions = _searcherOptions.Clone();
+                settings.SettingsPath = SettingsPath;
                 settings.SearcherOptions = tempOptions;
 
                 DialogResult dr = settings.ShowDialog();
@@ -79,47 +74,12 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                     _searcherOptions = tempOptions.Clone();
                 }
                 settings.Close();
-                settings = null;
             }
             catch (Exception ex)
             {
                 new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
             }
             return true;
-        }
-
-        public void LoadSettings()
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            try
-            {
-                if (!string.IsNullOrEmpty(ProductAppDataPath))
-                {
-                    // Load User Options
-                    string fileName = $"{_product}.json";
-                    string optionsFile = Path.Combine(ProductAppDataPath, fileName);
-                    if (File.Exists(optionsFile))
-                    {
-                        string json = File.ReadAllText(optionsFile);
-                        _searcherOptions = JsonConvert.DeserializeObject<Options>(json);
-                        string temp = JsonConvert.SerializeObject(_searcherOptions, Formatting.Indented);
-                        if (!json.Equals(temp))
-                        {
-                            File.WriteAllText(optionsFile, temp);
-                        }
-                    }
-                    else
-                    {
-                        _searcherOptions.RestoreDefaults();
-                        string json = JsonConvert.SerializeObject(_searcherOptions, Formatting.Indented);
-                        File.WriteAllText(optionsFile, json);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
-            }
         }
 
         public DialogResult Search()
@@ -132,7 +92,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
 
                 searcher.TopLeft = TopLeft;
                 searcher.Telemetry = Telemetry;
-                searcher.ProductAppDataPath = ProductAppDataPath;
+                searcher.SettingsPath = SettingsPath;
                 searcher.UserOptions = _searcherOptions;
 
                 result = searcher.ShowDialog();

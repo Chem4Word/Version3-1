@@ -12,13 +12,13 @@
         <SolidColorBrush x:Key="Chem4WordBlue">
             <SolidColorBrush.Color>#2A579A</SolidColorBrush.Color>
         </SolidColorBrush>
-        <Style x:Key="SimpleListBoxItem"
-            TargetType="ListBoxItem">
+        <Style x:Key="SimpleListBoxItem" TargetType="ListBoxItem">
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Border Name="Border"
+                        <Border
+                            Name="Border"
                             Padding="3"
                             SnapsToDevicePixels="true">
                             <ContentPresenter />
@@ -32,8 +32,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="NavButtonStyle"
-            TargetType="{x:Type Button}">
+        <Style x:Key="NavButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="Background" Value="White" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Foreground" Value="Blue" />
@@ -63,13 +62,15 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="SearchBox"
+            <TextBox
+                x:Name="SearchBox"
                 Grid.Column="0"
                 BorderThickness="0"
                 FontSize="24"
                 Foreground="{StaticResource Chem4WordBlue}"
                 TextChanged="SearchBox_OnTextChanged" />
-            <Button x:Name="SearchButton"
+            <Button
+                x:Name="SearchButton"
                 Grid.Column="2"
                 Click="SearchButton_OnClick"
                 Style="{StaticResource NavButtonStyle}">
@@ -93,7 +94,8 @@
                     </Viewbox>
                 </Button.Content>
             </Button>
-            <Button x:Name="ClearButton"
+            <Button
+                x:Name="ClearButton"
                 Grid.Column="1"
                 Click="ClearButton_OnClick"
                 Style="{StaticResource NavButtonStyle}">
@@ -119,7 +121,8 @@
                 </Button.Content>
             </Button>
         </Grid>
-        <ListBox x:Name="LibraryList"
+        <ListBox
+            x:Name="LibraryList"
             Grid.Row="1"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
@@ -136,16 +139,15 @@
                         HorizontalAlignment="Stretch"
                         BorderBrush="{StaticResource Chem4WordBlue}"
                         BorderThickness="1">
-                        <local:LibraryItemControl x:Name="GalleryItemControl"
+                        <local:LibraryItemControl
+                            x:Name="GalleryItemControl"
                             HorizontalAlignment="Stretch"
                             HorizontalContentAlignment="Stretch"
                             DataContext="{Binding Mode=OneWay}">
                             <local:LibraryItemControl.Style>
                                 <Style TargetType="{x:Type local:LibraryItemControl}">
                                     <Style.Triggers>
-                                        <DataTrigger
-                                            Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}"
-                                            Value="true">
+                                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}}" Value="true">
                                             <Setter Property="Background" Value="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=Background}" />
                                         </DataTrigger>
                                     </Style.Triggers>

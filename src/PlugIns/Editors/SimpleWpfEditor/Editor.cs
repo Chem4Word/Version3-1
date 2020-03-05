@@ -30,6 +30,9 @@ namespace Chem4Word.Editor.SimpleWpfEditor
         public bool CanEditNestedMolecules => true;
         public bool CanEditFunctionalGroups => true;
         public bool RequiresSeedAtom => false;
+
+        public string SettingsPath { get; set; }
+
         public List<string> Used1DProperties { get; set; }
 
         public string Cml { get; set; }
@@ -38,23 +41,12 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
         public IChem4WordTelemetry Telemetry { get; set; }
 
-        public string ProductAppDataPath { get; set; }
-
         public Editor()
         {
             // Nothing to do here
         }
 
-        public void LoadSettings()
-        {
-            // This PlugIn has no settings
-        }
-
-        public bool ChangeSettings(Point topLeft)
-        {
-            // This PlugIn has no settings
-            return false;
-        }
+        public bool ChangeSettings(Point topLeft) => false;
 
         public DialogResult Edit()
         {
@@ -64,10 +56,6 @@ namespace Chem4Word.Editor.SimpleWpfEditor
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");
-                if (HasSettings)
-                {
-                    LoadSettings();
-                }
 
                 using (EditorHost host = new EditorHost(Cml))
                 {

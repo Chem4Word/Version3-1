@@ -32,38 +32,40 @@ namespace WinForms.TestHarness
             InitializeComponent();
             _editorType = type;
 
-            var appdata = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var settingsPath = Path.Combine(appdata, "Chem4Word.V3");
+            AcmeOptions acmeOptions = new AcmeOptions(null);
 
             var used1D = SimulateGetUsed1DLabels(cml);
 
             MessageFromWpf.Text = "";
 
+            SystemHelper helper = new SystemHelper();
+            var telemetry = new TelemetryWriter(true, helper);
+
             switch (_editorType)
             {
                 case "ACME":
-                    Options options = new Options();
-                    options.SettingsFile = Path.Combine(settingsPath, "Chem4Word.Editor.ACME.json");
-
                     Editor acmeEditor = new Editor();
+                    acmeEditor.EditorOptions = acmeOptions;
                     acmeEditor.InitializeComponent();
                     elementHost1.Child = acmeEditor;
 
                     // Configure Control
                     acmeEditor.ShowFeedback = false;
-                    SystemHelper helper = new SystemHelper();
-                    acmeEditor.Telemetry = new TelemetryWriter(true, helper);
-                    acmeEditor.SetProperties(cml, used1D, options);
+                    acmeEditor.TopLeft = new Point(Left, Top);
+                    acmeEditor.Telemetry = telemetry;
+                    acmeEditor.SetProperties(cml, used1D, acmeOptions);
+
                     acmeEditor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
 
                     break;
 
                 case "LABELS":
-                    LabelsEditor labelsEditor = new LabelsEditor();
+                    LabelsEditor labelsEditor = new LabelsEditor(acmeOptions);
                     labelsEditor.InitializeComponent();
                     elementHost1.Child = labelsEditor;
 
                     // Configure Control
+                    labelsEditor.TopLeft = new Point(Left, Top);
                     labelsEditor.Used1D = used1D;
                     labelsEditor.PopulateTreeView(cml);
 
@@ -95,14 +97,12 @@ namespace WinForms.TestHarness
 
             foreach (var property in model.AllTextualProperties)
             {
-                if (property.FullType != null)
+                if (property.FullType != null 
+                    && (property.FullType.Equals(CMLConstants.ValueChem4WordLabel)
+                      || property.FullType.Equals(CMLConstants.ValueChem4WordFormula)
+                      || property.FullType.Equals(CMLConstants.ValueChem4WordSynonym)))
                 {
-                    if (property.FullType.Equals(CMLConstants.ValueChem4WordLabel)
-                        || property.FullType.Equals(CMLConstants.ValueChem4WordFormula)
-                        || property.FullType.Equals(CMLConstants.ValueChem4WordSynonym))
-                    {
-                        used1D.Add($"{property.Id}:{model.CustomXmlPartGuid}");
-                    }
+                    used1D.Add($"{property.Id}:{model.CustomXmlPartGuid}");
                 }
             }
 
@@ -111,7 +111,7 @@ namespace WinForms.TestHarness
 
         private void EditorHost_Load(object sender, EventArgs e)
         {
-            MinimumSize = new Size(300, 200);
+            MinimumSize = new Size(900, 600);
 
             // Fix bottom panel
             int margin = Buttons.Height - Save.Bottom;

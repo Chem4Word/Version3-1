@@ -190,6 +190,10 @@
       <Project>{BDFEE6C1-3F34-4200-9100-C543BF4C3783}</Project>
       <Name>Chem4Word.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Editors\Chem4Word.Editor.ACME\Chem4Word.Editor.ACME.csproj">
+      <Project>{d81efa27-a4ef-4f75-b5d8-9bb06ab76091}</Project>
+      <Name>Chem4Word.Editor.ACME</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Page Include="StackViewer.xaml">

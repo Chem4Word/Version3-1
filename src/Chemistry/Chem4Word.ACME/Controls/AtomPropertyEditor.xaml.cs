@@ -33,6 +33,7 @@ namespace Chem4Word.ACME.Controls
         private bool IsDirty { get; set; }
 
         private AtomPropertiesModel _atomPropertiesModel;
+        private AcmeOptions _options;
 
         public AtomPropertiesModel AtomPropertiesModel
         {
@@ -52,13 +53,14 @@ namespace Chem4Word.ACME.Controls
             InitializeComponent();
         }
 
-        public AtomPropertyEditor(AtomPropertiesModel model) : this()
+        public AtomPropertyEditor(AtomPropertiesModel model, AcmeOptions options) : this()
         {
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 AtomPropertiesModel = model;
                 DataContext = AtomPropertiesModel;
                 AtomPath.Text = AtomPropertiesModel.Path;
+                _options = options;
             }
         }
 
@@ -69,6 +71,8 @@ namespace Chem4Word.ACME.Controls
             Left = point.X;
             Top = point.Y;
 
+            _options = new AcmeOptions(_options.SettingsPath);
+            SetPreviewProperties();
             LoadAtomItems();
             LoadFunctionalGroups();
             ShowPreview();
@@ -81,6 +85,7 @@ namespace Chem4Word.ACME.Controls
             Left = point.X;
             Top = point.Y;
 
+            SetPreviewProperties();
             InvalidateArrange();
             IsDirty = false;
         }
@@ -260,8 +265,18 @@ namespace Chem4Word.ACME.Controls
                 atom.IsotopeNumber = null;
             }
 
+            SetPreviewProperties();
+
             Preview.Chemistry = AtomPropertiesModel.MicroModel.Copy();
             IsDirty = true;
+        }
+
+        private void SetPreviewProperties()
+        {
+            Preview.ShowAtomsInColour = _options.ColouredAtoms;
+            Preview.ShowImplicitHydrogens = _options.ShowHydrogens;
+            Preview.ShowMoleculeGrouping = _options.ShowMoleculeGrouping;
+            Preview.ShowAllCarbonAtoms = _options.ShowCarbons;
         }
 
         private void AtomPropertyEditor_OnClosing(object sender, CancelEventArgs e)

@@ -100,21 +100,65 @@ namespace Chem4Word.ACME.Controls
             }
         }
 
-        public bool ShowGroups
+        public bool ShowMoleculeGrouping
         {
-            get { return (bool)GetValue(ShowGroupsProperty); }
-            set { SetValue(ShowGroupsProperty, value); }
+            get { return (bool)GetValue(ShowMoleculeGroupingProperty); }
+            set { SetValue(ShowMoleculeGroupingProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ShowGroups.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty ShowGroupsProperty =
-            DependencyProperty.Register("ShowGroups", typeof(bool), typeof(ChemistryCanvas), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure, ShowGroupsChanged));
+        public static readonly DependencyProperty ShowMoleculeGroupingProperty =
+            DependencyProperty.Register("ShowMoleculeGrouping", typeof(bool), typeof(ChemistryCanvas),
+                                        new FrameworkPropertyMetadata(true,
+                                            FrameworkPropertyMetadataOptions.AffectsParentArrange
+                                            | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                                            RepaintCanvas));
 
-        private static void ShowGroupsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public bool ShowAtomsInColour
         {
-            ChemistryCanvas cc = (ChemistryCanvas)d;
-            cc.Clear();
-            cc.DrawChemistry(cc.Chemistry);
+            get { return (bool)GetValue(ShowAtomsInColourProperty); }
+            set { SetValue(ShowAtomsInColourProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowAtomsInColourProperty =
+            DependencyProperty.Register("ShowAtomsInColour", typeof(bool), typeof(ChemistryCanvas),
+                                        new FrameworkPropertyMetadata(true,
+                                              FrameworkPropertyMetadataOptions.AffectsRender,
+                                              RepaintCanvas));
+
+        public bool ShowAllCarbonAtoms
+        {
+            get { return (bool)GetValue(ShowAllCarbonAtomsProperty); }
+            set { SetValue(ShowAllCarbonAtomsProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowAllCarbonAtomsProperty =
+            DependencyProperty.Register("ShowAllCarbonAtoms", typeof(bool), typeof(ChemistryCanvas),
+                                        new FrameworkPropertyMetadata(false,
+                                              FrameworkPropertyMetadataOptions.AffectsParentArrange
+                                              | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                                              RepaintCanvas));
+
+        public bool ShowImplicitHydrogens
+        {
+            get { return (bool)GetValue(ShowImplicitHydrogensProperty); }
+            set { SetValue(ShowImplicitHydrogensProperty, value); }
+        }
+
+        public static readonly DependencyProperty ShowImplicitHydrogensProperty =
+            DependencyProperty.Register("ShowImplicitHydrogens", typeof(bool), typeof(ChemistryCanvas),
+                                        new FrameworkPropertyMetadata(true,
+                                          FrameworkPropertyMetadataOptions.AffectsParentArrange
+                                          | FrameworkPropertyMetadataOptions.AffectsMeasure,
+                                          RepaintCanvas));
+
+        private static void RepaintCanvas(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs eventArgs)
+        {
+            Debug.WriteLine($"RepaintCanvas({dependencyObject.GetHashCode()}) - Trigger {eventArgs.Property.Name} -> {dependencyObject.GetValue(eventArgs.Property)}");
+            if (dependencyObject is ChemistryCanvas canvas)
+            {
+                canvas.Clear();
+                canvas.DrawChemistry(canvas.Chemistry);
+            }
         }
 
         public bool HighlightActive
@@ -123,10 +167,19 @@ namespace Chem4Word.ACME.Controls
             set { SetValue(HighlightActiveProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for HighlightActive.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HighlightActiveProperty =
             DependencyProperty.Register("HighlightActive", typeof(bool), typeof(ChemistryCanvas),
                                         new PropertyMetadata(true));
+
+        public bool DisplayOverbondedAtoms
+        {
+            get { return (bool)GetValue(DisplayOverbondedAtomsProperty); }
+            set { SetValue(DisplayOverbondedAtomsProperty, value); }
+        }
+
+        public static readonly DependencyProperty DisplayOverbondedAtomsProperty =
+            DependencyProperty.Register("DisplayOverbondedAtoms", typeof(bool), typeof(ChemistryCanvas),
+                                        new PropertyMetadata(default(bool)));
 
         #endregion Properties
 
@@ -137,6 +190,7 @@ namespace Chem4Word.ACME.Controls
         /// <returns></returns>
         protected override Size MeasureOverride(Size constraint)
         {
+            Debug.WriteLine($"MeasureOverride({GetHashCode()})");
             var size = GetBoundingBox();
 
             if (_mychemistry != null && _mychemistry.Model != null)
@@ -260,11 +314,11 @@ namespace Chem4Word.ACME.Controls
 
             var footprint = GetExtents(molecule);
 
-            if (molecule.IsGrouped && ShowGroups)
+            if (molecule.IsGrouped && ShowMoleculeGrouping)
             {
                 //we may be passing in a null bounding box here
 
-                chemicalVisuals[groupKey] = new GroupVisual(molecule, footprint);
+                chemicalVisuals[groupKey] = new GroupVisual(molecule, ShowAtomsInColour, footprint);
                 var gv = (GroupVisual)chemicalVisuals[groupKey];
                 gv.ChemicalVisuals = chemicalVisuals;
                 gv.Render();
@@ -419,7 +473,6 @@ namespace Chem4Word.ACME.Controls
             set { SetValue(FitToContentsProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for FitToContents.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty FitToContentsProperty =
             DependencyProperty.Register("FitToContents", typeof(bool), typeof(ChemistryCanvas),
                                         new PropertyMetadata(default(bool)));
@@ -510,6 +563,8 @@ namespace Chem4Word.ACME.Controls
 
             if (vm != null)
             {
+                Debug.WriteLine($"DrawChemistry({GetHashCode()} - {vm.Model.ConciseFormula})");
+
                 foreach (Molecule molecule in vm.Model.Molecules.Values)
                 {
                     MoleculeAdded(molecule);
@@ -647,13 +702,13 @@ namespace Chem4Word.ACME.Controls
         {
             if (!chemicalVisuals.ContainsKey(atom)) //it's not already in the list
             {
-                if (atom.Element is FunctionalGroup fg)
+                if (atom.Element is FunctionalGroup)
                 {
-                    chemicalVisuals[atom] = new FunctionalGroupVisual(atom);
+                    chemicalVisuals[atom] = new FunctionalGroupVisual(atom, ShowAtomsInColour);
                 }
                 else
                 {
-                    chemicalVisuals[atom] = new AtomVisual(atom);
+                    chemicalVisuals[atom] = new AtomVisual(atom, ShowAtomsInColour, ShowImplicitHydrogens, ShowAllCarbonAtoms);
                 }
             }
 
@@ -681,7 +736,7 @@ namespace Chem4Word.ACME.Controls
                     av.ChemicalVisuals = chemicalVisuals;
 
                     av.BackgroundColor = Background;
-
+                    av.DisplayOverbonding = DisplayOverbondedAtoms;
                     av.Render();
 
                     AddVisual(av);

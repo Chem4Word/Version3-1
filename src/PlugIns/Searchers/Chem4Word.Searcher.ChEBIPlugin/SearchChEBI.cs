@@ -44,10 +44,10 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
         public string Cml { get; set; }
         public string ChebiId { get; set; }
-        public string ProductAppDataPath { get; set; }
+        public string SettingsPath { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
         public System.Windows.Point TopLeft { get; set; }
-        public Options UserOptions { get; set; }
+        public ChEBIOptions UserOptions { get; set; }
 
         #endregion Properties
 

@@ -105,6 +105,7 @@ namespace Chem4Word.ACME.Behaviors
             MouseIsDown = false;
             IsDrawing = false;
             CurrentEditor.ReleaseMouseCapture();
+            CurrentEditor.Focus();
             CurrentAdorner = null;
             Placements = null;
             Clashing = false;
@@ -202,6 +203,7 @@ namespace Chem4Word.ACME.Behaviors
             MouseIsDown = false;
             IsDrawing = false;
             CurrentEditor.ReleaseMouseCapture();
+            CurrentEditor.Focus();
             CurrentAdorner = null;
             Placements = null;
         }

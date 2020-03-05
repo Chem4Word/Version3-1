@@ -70,7 +70,7 @@ namespace Chem4Word.ACME.Behaviors
         {
             _preferredPlacements = null;
             CurrentEditor.ReleaseMouseCapture();
-
+            CurrentEditor.Focus();
             CurrentAdorner = null;
             Target = null;
             MouseIsDown = false;
@@ -288,7 +288,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
             CurrentEditor.ReleaseMouseCapture();
-
+            CurrentEditor.Focus();
             CurrentAdorner = null;
             Target = null;
             MouseIsDown = false;

@@ -27,7 +27,6 @@ namespace Chem4Word.ACME.Controls
             var window = Window.GetWindow(this);
             Focusable = true;
             Focus();
-            //PreviewKeyDown += Window_PreviewKeyDown;
             ElementGrid.ItemContainerGenerator.StatusChanged += new EventHandler(ItemContainerGenerator_StatusChanged);
         }
 
@@ -37,7 +36,6 @@ namespace Chem4Word.ACME.Controls
             set { SetValue(SelectedElementProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for SelectedElement.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedElementProperty =
             DependencyProperty.Register("SelectedElement", typeof(Element), typeof(VisualPeriodicTable),
                                         new PropertyMetadata(null, SelectedElementChanged));
