@@ -153,50 +153,24 @@ namespace Chem4Word.Model2
 
         public Dictionary<string, Element> Elements { get; private set; }
 
-        public IEnumerable<Element> ElementsSource
-        {
-            get
-            {
-                return Elements.Values.ToList();
-            }
-        }
+        public IEnumerable<Element> ElementsSource => Elements.Values.ToList();
 
-        private string _validElements;
+        public string ValidElements { get; }
 
-        public string ValidElements
-        {
-            get { return _validElements; }
-        }
-
-        private string _implicitHydrogenTargets;
-
-        public string ImplicitHydrogenTargets
-        {
-            get { return _implicitHydrogenTargets; }
-        }
+        public string ImplicitHydrogenTargets { get; }
 
         public PeriodicTable()
         {
             LoadFromCsv();
-            _validElements = "(" + Elements.Values.Select(e => e.Symbol).Aggregate((start, next) => start + "|" + next) + ")";
-            _implicitHydrogenTargets = string.Join(",", Elements.Values.Where(e => e.AddHydrogens).Select(e => e.Symbol));
+            ValidElements = "(" + Elements.Values.Select(e => e.Symbol).Aggregate((start, next) => start + "|" + next) + ")";
+            ImplicitHydrogenTargets = string.Join(",", Elements.Values.Where(e => e.AddHydrogens).Select(e => e.Symbol));
         }
 
-        public bool HasElement(string symbol)
-        {
-            return Elements.ContainsKey(symbol);
-        }
+        public bool HasElement(string symbol) => Elements.ContainsKey(symbol);
 
-        public object this[string propertyName]
+        private object this[string propertyName]
         {
-            get
-            {
-                return this.GetType().GetProperty(propertyName).GetValue(this, null);
-            }
-            set
-            {
-                this.GetType().GetProperty(propertyName).SetValue(this, value, null);
-            }
+            set => GetType().GetProperty(propertyName)?.SetValue(this, value, null);
         }
 
         private void LoadFromCsv()
@@ -292,10 +266,9 @@ namespace Chem4Word.Model2
         {
             int result = -1;
 
-            if (element != null)
+            if (element != null && element.Valencies != null)
             {
-                var allowedValencies = element.Valencies;
-                foreach (var valency in allowedValencies.Where(valency => valency >= sumOfChargeAndBondOrder))
+                foreach (var valency in element.Valencies.Where(valency => valency >= sumOfChargeAndBondOrder))
                 {
                     result = valency;
                     break;

@@ -89,6 +89,8 @@ namespace Chem4Word.Searcher.OpsinPlugIn
             DialogResult result = DialogResult.Abort;
             try
             {
+                _searcherOptions = new SearcherOptions(SettingsPath);
+
                 SearchOpsin searcher = new SearchOpsin();
                 searcher.TopLeft = TopLeft;
                 searcher.Telemetry = Telemetry;

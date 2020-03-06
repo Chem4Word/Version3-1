@@ -88,6 +88,8 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             DialogResult result = DialogResult.Cancel;
             try
             {
+                _searcherOptions = new PubChemOptions(SettingsPath);
+
                 SearchPubChem searcher = new SearchPubChem();
 
                 searcher.TopLeft = TopLeft;

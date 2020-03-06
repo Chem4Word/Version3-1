@@ -116,7 +116,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
         private void SetValuesFromCopy(ChEBIOptions options)
         {
-            ChEBIWebServiceUri = options.StripTrailingSlash(ChEBIWebServiceUri);
+            ChEBIWebServiceUri = options.StripTrailingSlash(options.ChEBIWebServiceUri);
             DisplayOrder = options.DisplayOrder;
             MaximumResults = options.MaximumResults;
         }

@@ -3,6 +3,16 @@
 <ChangeLog>
     <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
     <Version>
+        <Number>3.1.7 Beta 7</Number>
+        <IsBeta>true</IsBeta>
+        <Released>06-Mar-2020</Released>
+        <Changes>
+            <Change>Fix invisible bonds when certain unusual elements used https://github.com/Chem4Word/Version3-1/issues/44 </Change>
+            <Change>Fix broken ChEBI search https://github.com/Chem4Word/Version3-1/issues/45 </Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.7.Beta.7.msi</Url>
+    </Version>
+    <Version>
         <Number>3.1.6 Beta 6</Number>
         <IsBeta>true</IsBeta>
         <Released>05-Mar-2020</Released>

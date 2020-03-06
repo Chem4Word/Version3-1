@@ -102,6 +102,8 @@ namespace Chem4Word.Searcher.ChEBIPlugin
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                _searcherOptions = new ChEBIOptions(SettingsPath);
+
                 using (new WaitCursor())
                 {
                     var searcher = new SearchChEBI();
