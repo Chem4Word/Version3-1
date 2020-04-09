@@ -33,7 +33,7 @@ namespace Chem4Word.Telemetry
 
             if (_helper == null)
             {
-                Debugger.Break();
+                //Debugger.Break();
             }
 
             if (_wmiHelper == null)
@@ -82,7 +82,7 @@ namespace Chem4Word.Telemetry
             {
                 WritePrivate(operation, level, message);
 
-                if (!_systemInfoSent)
+                if (!_systemInfoSent && _helper != null)
                 {
                     if (_helper.IpAddress != null && !_helper.IpAddress.Contains("0.0.0.0"))
                     {

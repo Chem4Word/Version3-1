@@ -132,48 +132,6 @@ namespace Chem4Word.Model2.Converters.CML
 
         #region Export Helpers
 
-        // <cml:formula id="m1.f1" convention="chemspider:Smiles" inline="m1.f1" concise="C 6 H 14 Li 1 N 1" />
-        private XElement GetXElement(TextualProperty f, string concise)
-        {
-            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagFormula);
-
-            if (f.Id != null)
-            {
-                result.Add(new XAttribute(CMLConstants.AttributeId, f.Id));
-            }
-
-            if (f.FullType != null)
-            {
-                result.Add(new XAttribute(CMLConstants.AttributeConvention, f.FullType));
-            }
-
-            if (f.Value != null)
-            {
-                result.Add(new XAttribute(CMLConstants.AttributeInline, f.Value));
-            }
-
-            if (concise != null)
-            {
-                result.Add(new XAttribute(CMLConstants.AttributeConcise, concise));
-            }
-
-            return result;
-        }
-
-        // <cml:formula id="m1.f0" concise="C 6 H 14 Li 1 N 1" />
-        private XElement GetXElement(string concise, string molId)
-        {
-            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagFormula);
-
-            if (concise != null)
-            {
-                result.Add(new XAttribute(CMLConstants.AttributeId, $"{molId}.f0"));
-                result.Add(new XAttribute(CMLConstants.AttributeConcise, concise));
-            }
-
-            return result;
-        }
-
         // <cml:label id="m1.l1" dictRef="chem4word:Label "value="C19"/>
         private XElement GetLabelXElement(TextualProperty label)
         {
@@ -388,12 +346,53 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeIsotopeNumber, atom.IsotopeNumber.Value));
             }
 
-            if (atom.Element is Element element2)
+            if (atom.Element is Element element2
+                && element2 == Globals.PeriodicTable.C
+                && atom.ExplicitC != null)
             {
-                if (element2 == Globals.PeriodicTable.C && atom.ExplicitC != null)
-                {
-                    result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ExplicitC));
-                }
+                result.Add(new XAttribute(CMLNamespaces.c4w + CMLConstants.AttributeExplicit, atom.ExplicitC));
+            }
+
+            return result;
+        }
+
+        // <cml:formula id="m1.f1" convention="chemspider:Smiles" inline="m1.f1" concise="C 6 H 14 Li 1 N 1" />
+        private XElement GetXElement(TextualProperty f, string concise)
+        {
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagFormula);
+
+            if (f.Id != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeId, f.Id));
+            }
+
+            if (f.FullType != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeConvention, f.FullType));
+            }
+
+            if (f.Value != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeInline, f.Value));
+            }
+
+            if (concise != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeConcise, concise));
+            }
+
+            return result;
+        }
+
+        // <cml:formula id="m1.f0" concise="C 6 H 14 Li 1 N 1" />
+        private XElement GetXElement(string concise, string molId)
+        {
+            XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagFormula);
+
+            if (concise != null)
+            {
+                result.Add(new XAttribute(CMLConstants.AttributeId, $"{molId}.f0"));
+                result.Add(new XAttribute(CMLConstants.AttributeConcise, concise));
             }
 
             return result;
@@ -403,9 +402,9 @@ namespace Chem4Word.Model2.Converters.CML
 
         #region Import Helpers
 
-        private static Molecule AddMolecule(Model newModel, Molecule newMol)
+        private static void AddMolecule(Model newModel, Molecule newMol)
         {
-            return newModel.AddMolecule(newMol);
+            newModel.AddMolecule(newMol);
         }
 
         public static Molecule GetMolecule(XElement cmlElement)
@@ -523,9 +522,17 @@ namespace Chem4Word.Model2.Converters.CML
                 }
             }
 
+            // Fix Invalid data; If only one atom
             if (molecule.Atoms.Count == 1)
             {
+                // Remove ExplicitC flag
                 molecule.Atoms.First().Value.ExplicitC = null;
+
+                // Remove invalid molecule properties
+                molecule.ShowMoleculeBrackets = false;
+                molecule.SpinMultiplicity = null;
+                molecule.FormalCharge = null;
+                molecule.Count = null;
             }
 
             molecule.RebuildRings();
@@ -550,7 +557,7 @@ namespace Chem4Word.Model2.Converters.CML
             atom.Id = atomLabel;
             atom.Position = p;
 
-            ElementBase e = CMLHelper.GetChemicalElement(cmlElement, out message);
+            ElementBase e = CMLHelper.GetElementOrFunctionalGroup(cmlElement, out message);
             if (!string.IsNullOrEmpty(message))
             {
                 atom.Messages.Add(message);

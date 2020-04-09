@@ -264,14 +264,15 @@ namespace Chem4Word.Telemetry
             var result = new List<string>();
             result.Add("Git Origin");
             result.AddRange(RunCommand("git.exe", "config --get remote.origin.url", AddInLocation));
-            result.Add("Git Branch");
-            result.AddRange(RunCommand("git.exe", "rev-parse --abbrev-ref HEAD", AddInLocation));
 
-            // git status --porcelain == Get List of changed files
-            var changedFiles = RunCommand("git.exe", "status --porcelain", AddInLocation);
+            // Ensure status is accurate
+            RunCommand("git.exe", "fetch", AddInLocation);
+
+            // git status -s -b --porcelain == Gets Branch, Status and a List of any changed files
+            var changedFiles = RunCommand("git.exe", "status -s -b --porcelain", AddInLocation);
             if (changedFiles.Any())
             {
-                result.Add("Changed Files");
+                result.Add("Git Branch, Status & Changed files");
                 result.AddRange(changedFiles);
             }
             GitStatus = string.Join(Environment.NewLine, result.ToArray());

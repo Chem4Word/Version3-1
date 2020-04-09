@@ -375,14 +375,23 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             if (Inputs.Options.ShowMoleculeLabels && mol.Labels.Any())
             {
                 var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Left
-                                      + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
+                                        + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
                                       thisMoleculeExtents.ExternalCharacterExtents.Bottom
-                                      + Inputs.MeanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
+                                        + Inputs.MeanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
 
                 AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
 
                 // Recalculate again as we have just added extra characters
                 thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
+
+                //AddMoleculeLabelsV2(mol.Labels.ToList(), point, mol.Path);
+                //var revisedExtents = thisMoleculeExtents.ExternalCharacterExtents;
+                //foreach (var ooXmlString in Outputs.MoleculeLabels.Where(p => p.ParentMolecule.Equals(mol.Path)))
+                //{
+                //    revisedExtents.Union(ooXmlString.Extents);
+                //}
+
+                //thisMoleculeExtents.SetExternalCharacterExtents(revisedExtents);
             }
         }
 
@@ -1085,6 +1094,27 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
         }
 
+        private void AddMoleculeLabelsV2(List<TextualProperty> labels, Point centrePoint, string moleculePath)
+        {
+            Point measure = new Point(centrePoint.X, centrePoint.Y);
+
+            foreach (var label in labels)
+            {
+                // 1. Measure string
+                var bb = MeasureString(label.Value, measure);
+
+                // 2. Place string such that they are hanging below the "line"
+                if (bb != Rect.Empty)
+                {
+                    Point place = new Point(measure.X - bb.Width / 2, measure.Y);
+                    Outputs.MoleculeLabels.Add(new OoXmlString(new Rect(place, bb.Size), label.Value, moleculePath));
+                }
+
+                // 3. Move to next line
+                measure.Offset(0, bb.Height + Inputs.MeanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
+            }
+        }
+
         /// <summary>
         /// Creates the lines for a bond
         /// </summary>
@@ -1428,7 +1458,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (idx < text.Length - 1)
                     {
                         // Move to next Character position
-                        // We ought to be able to use c.IncrementX, but this does not work
+                        // We ought to be able to use c.IncrementX, but this does not work with string such as "Bowl"
                         cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.Width + i.Width, Inputs.MeanBondLength), 0);
                     }
                 }
@@ -1462,7 +1492,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (idx < text.Length - 1)
                     {
                         // Move to next Character position
-                        // We ought to be able to use c.IncrementX, but this does not work
+                        // We ought to be able to use c.IncrementX, but this does not work with string such as "Bowl"
                         cursor.Offset(OoXmlHelper.ScaleCsTtfToCml(c.Width + i.Width, Inputs.MeanBondLength), 0);
                     }
                 }

@@ -894,7 +894,8 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e); Debug.WriteLine(e.Message);
+                        RegistryHelper.StoreException(module, e);
+                        Debug.WriteLine(e.Message);
                     }
                     // ContentControlBeforeDelete Event Handler
                     try
@@ -1327,14 +1328,13 @@ namespace Chem4Word
                         // This is benzene. This is not.
 
                         Word.ContentControl cc = null;
-                        bool previousState = app.Options.SmartCutPaste;
+                        var wordSettings = new WordSettings(app);
 
                         try
                         {
                             app.ScreenUpdating = false;
                             DisableContentControlEvents();
 
-                            app.Options.SmartCutPaste = false;
                             int insertionPoint = tw.Start;
                             doc.Range(tw.Start, tw.Start + tw.ChemicalName.Length).Delete();
 
@@ -1354,7 +1354,7 @@ namespace Chem4Word
                         {
                             EnableContentControlEvents();
                             app.ScreenUpdating = true;
-                            app.Options.SmartCutPaste = previousState;
+                            wordSettings.RestoreSettings(app);
                         }
 
                         if (cc != null)
@@ -1597,22 +1597,29 @@ namespace Chem4Word
             {
                 if (Ribbon != null)
                 {
-                    if (SystemOptions == null)
+                    if (SystemOptions == null && Helper != null)
                     {
                         LoadOptions();
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                if (SystemOptions == null)
+                if (SystemOptions == null && Helper != null)
                 {
                     LoadOptions();
                 }
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                if (Telemetry == null || Helper == null)
                 {
-                    form.ShowDialog();
+                    RegistryHelper.StoreException(module, exception);
+                }
+                else
+                {
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, exception))
+                    {
+                        form.ShowDialog();
+                    }
                 }
 
                 UpdateHelper.ClearSettings();
@@ -1776,9 +1783,13 @@ namespace Chem4Word
                             DisableContentControlEvents();
                             EnableContentControlEvents();
 
-                            SetButtonStates(ButtonState.NoDocument);
                             SelectChemistry(doc.Application.Selection);
                             EvaluateChemistryAllowed();
+
+                            if (!ChemistryAllowed)
+                            {
+                                SetButtonStates(ButtonState.NoDocument);
+                            }
                         }
                         else
                         {
@@ -1881,7 +1892,7 @@ namespace Chem4Word
                 {
                     case "0xE0041804":
                         Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
-                        Telemetry.Write(module, "Exception", cex.Message);
+                        Telemetry.Write(module, "Exception", $"Handled {cex.Message}");
                         Telemetry.Write(module, "Exception", cex.ToString());
                         break;
 
@@ -1891,19 +1902,22 @@ namespace Chem4Word
                         Telemetry.Write(module, "Exception", cex.Message);
                         Telemetry.Write(module, "Exception", cex.ToString());
                         break;
-                } 
+                }
             }
             catch (Exception ex)
             {
+                RegistryHelper.StoreException(module, ex);
+
                 if (SystemOptions == null)
                 {
                     LoadOptions();
                 }
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                {
-                    form.ShowDialog();
-                }
+                // Keep exception hidden from end user.
+                //using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                //{
+                //    form.ShowDialog();
+                //}
 
                 UpdateHelper.ClearSettings();
                 UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
@@ -1996,8 +2010,10 @@ namespace Chem4Word
                 if (EventsEnabled)
                 {
                     EventsEnabled = false;
+
                     SelectChemistry(sel);
                     EvaluateChemistryAllowed();
+
                     if (!ChemistryAllowed)
                     {
                         SetButtonStates(ButtonState.NoDocument);
@@ -2044,235 +2060,232 @@ namespace Chem4Word
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             bool allowed = true;
+            ChemistryProhibitedReason = "";
 
-            // Skip checks if ChemistryProhibitedReason is already set
-            if (string.IsNullOrEmpty(ChemistryProhibitedReason))
+            try
             {
-                ChemistryProhibitedReason = "";
-
-                try
+                if (Application.Documents.Count > 0)
                 {
-                    if (Application.Documents.Count > 0)
+                    Word.Document doc = null;
+                    try
                     {
-                        Word.Document doc = null;
+                        doc = Application.ActiveDocument;
+                    }
+                    catch
+                    {
+                        // This only happens when document is in protected mode
+                        allowed = false;
+                        ChemistryProhibitedReason = "document is readonly.";
+                    }
+
+                    if (allowed && doc != null)
+                    {
+                        if (doc.CompatibilityMode < (int)Word.WdCompatibilityMode.wdWord2010)
+                        {
+                            allowed = false;
+                            ChemistryProhibitedReason = "document is in compatibility mode.";
+                        }
+
                         try
                         {
-                            doc = Application.ActiveDocument;
+                            //if (doc.CoAuthoring.Conflicts.Count > 0) // <-- This clears current selection ???
+                            if (doc.CoAuthoring.Locks.Count > 0)
+                            {
+                                allowed = false;
+                                ChemistryProhibitedReason = "document is in co-authoring mode.";
+                            }
                         }
                         catch
                         {
-                            // This only happens when document is in protected mode
-                            allowed = false;
-                            ChemistryProhibitedReason = "document is readonly.";
+                            // CoAuthoring or Conflicts/Locks may not be initialised!
                         }
 
-                        if (allowed && doc != null)
+                        Word.Selection sel = Application.Selection;
+                        if (allowed && sel.OMaths.Count > 0)
                         {
-                            if (doc.CompatibilityMode < (int)Word.WdCompatibilityMode.wdWord2010)
-                            {
-                                allowed = false;
-                                ChemistryProhibitedReason = "document is in compatibility mode.";
-                            }
+                            ChemistryProhibitedReason = "selection is in an Equation.";
+                            allowed = false;
+                        }
 
+                        if (allowed && sel.Tables.Count > 0)
+                        {
                             try
                             {
-                                //if (doc.CoAuthoring.Conflicts.Count > 0) // <-- This clears current selection ???
-                                if (doc.CoAuthoring.Locks.Count > 0)
+                                if (sel.Cells.Count > 1)
                                 {
+                                    ChemistryProhibitedReason = "selection contains more than one cell of a table.";
                                     allowed = false;
-                                    ChemistryProhibitedReason = "document is in co-authoring mode.";
                                 }
                             }
                             catch
                             {
-                                // CoAuthoring or Conflicts/Locks may not be initialised!
+                                // Cells may not be initialised!
                             }
+                        }
 
-                            Word.Selection sel = Application.Selection;
-                            if (allowed && sel.OMaths.Count > 0)
-                            {
-                                ChemistryProhibitedReason = "selection is in an Equation.";
-                                allowed = false;
-                            }
+                        if (allowed && doc.IsSubdocument)
+                        {
+                            ChemistryProhibitedReason = "current document is a sub document.";
+                            allowed = false;
+                        }
 
-                            if (allowed && sel.Tables.Count > 0)
+                        if (allowed)
+                        {
+                            try
                             {
-                                try
+                                Word.WdStoryType story = sel.StoryType;
+                                if (story != Word.WdStoryType.wdMainTextStory)
                                 {
-                                    if (sel.Cells.Count > 1)
-                                    {
-                                        ChemistryProhibitedReason = "selection contains more than one cell of a table.";
-                                        allowed = false;
-                                    }
-                                }
-                                catch
-                                {
-                                    // Cells may not be initialised!
-                                }
-                            }
-
-                            if (allowed && doc.IsSubdocument)
-                            {
-                                ChemistryProhibitedReason = "current document is a sub document.";
-                                allowed = false;
-                            }
-
-                            if (allowed)
-                            {
-                                try
-                                {
-                                    Word.WdStoryType story = sel.StoryType;
-                                    if (story != Word.WdStoryType.wdMainTextStory)
-                                    {
-                                        ChemistryProhibitedReason = $"selection is in a '{DecodeStoryType(story)}' story.";
-                                        allowed = false;
-                                    }
-                                }
-                                catch
-                                {
-                                    // ComException 0x80004005
-                                    ChemistryProhibitedReason = $"can't determine which part of the story the selection point is.";
+                                    ChemistryProhibitedReason = $"selection is in a '{DecodeStoryType(story)}' story.";
                                     allowed = false;
                                 }
                             }
-
-                            if (allowed)
+                            catch
                             {
-                                int ccCount = sel.ContentControls.Count;
-                                if (ccCount > 1)
+                                // ComException 0x80004005
+                                ChemistryProhibitedReason = "can't determine which part of the story the selection point is.";
+                                allowed = false;
+                            }
+                        }
+
+                        if (allowed)
+                        {
+                            int ccCount = sel.ContentControls.Count;
+                            if (ccCount > 1)
+                            {
+                                allowed = false;
+                                ChemistryProhibitedReason = "more than one ContentControl is selected";
+                            }
+                        }
+
+                        if (allowed)
+                        {
+                            Word.WdContentControlType? contentControlType = null;
+                            string title = "";
+                            foreach (Word.ContentControl ccd in doc.ContentControls)
+                            {
+                                if (ccd.Range.Start <= sel.Range.Start && ccd.Range.End >= sel.Range.End)
                                 {
-                                    allowed = false;
-                                    ChemistryProhibitedReason = "more than one ContentControl is selected";
+                                    contentControlType = ccd.Type;
+                                    title = ccd.Title;
+                                    break;
                                 }
                             }
 
-                            if (allowed)
+                            if (contentControlType != null)
                             {
-                                Word.WdContentControlType? contentControlType = null;
-                                string title = "";
-                                foreach (Word.ContentControl ccd in doc.ContentControls)
+                                if (!string.IsNullOrEmpty(title) && title.Equals(Constants.ContentControlTitle))
                                 {
-                                    if (ccd.Range.Start <= sel.Range.Start && ccd.Range.End >= sel.Range.End)
+                                    // Handle old Word 2007 style
+                                    if (contentControlType != Word.WdContentControlType.wdContentControlRichText
+                                        && contentControlType != Word.WdContentControlType.wdContentControlPicture)
                                     {
-                                        contentControlType = ccd.Type;
-                                        title = ccd.Title;
-                                        break;
-                                    }
-                                }
-
-                                if (contentControlType != null)
-                                {
-                                    if (!string.IsNullOrEmpty(title) && title.Equals(Constants.ContentControlTitle))
-                                    {
-                                        // Handle old Word 2007 style
-                                        if (contentControlType != Word.WdContentControlType.wdContentControlRichText
-                                            && contentControlType != Word.WdContentControlType.wdContentControlPicture)
-                                        {
-                                            allowed = false;
-                                            ChemistryProhibitedReason =
-                                                $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control.";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (contentControlType != Word.WdContentControlType.wdContentControlRichText)
-                                        {
-                                            allowed = false;
-                                            ChemistryProhibitedReason =
-                                                $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control";
-                                        }
-
-                                        // Test for Shape inside CC which is not ours
-                                        if (allowed)
-                                        {
-                                            try
-                                            {
-                                                if (sel.ShapeRange.Count > 0)
-                                                {
-                                                    ChemistryProhibitedReason = "selection contains shape(s) inside Content Control.";
-                                                    allowed = false;
-                                                }
-                                            }
-                                            catch
-                                            {
-                                                // Shape may not evaluate
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Test for Shape in document body
-                            if (allowed)
-                            {
-                                try
-                                {
-                                    if (sel.ShapeRange.Count > 0)
-                                    {
-                                        ChemistryProhibitedReason = "selection contains shape(s).";
                                         allowed = false;
+                                        ChemistryProhibitedReason =
+                                            $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control.";
                                     }
                                 }
-                                catch
+                                else
                                 {
-                                    // Shape may not evaluate
+                                    if (contentControlType != Word.WdContentControlType.wdContentControlRichText)
+                                    {
+                                        allowed = false;
+                                        ChemistryProhibitedReason =
+                                            $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control";
+                                    }
+
+                                    // Test for Shape inside CC which is not ours
+                                    if (allowed)
+                                    {
+                                        try
+                                        {
+                                            if (sel.ShapeRange.Count > 0)
+                                            {
+                                                ChemistryProhibitedReason = "selection contains shape(s) inside Content Control.";
+                                                allowed = false;
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            // Shape may not evaluate
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        allowed = false;
-                        ChemistryProhibitedReason = "no document is open.";
+
+                        // Test for Shape in document body
+                        if (allowed)
+                        {
+                            try
+                            {
+                                if (sel.ShapeRange.Count > 0)
+                                {
+                                    ChemistryProhibitedReason = "selection contains shape(s).";
+                                    allowed = false;
+                                }
+                            }
+                            catch
+                            {
+                                // Shape may not evaluate
+                            }
+                        }
                     }
                 }
-                catch (COMException cex)
+                else
                 {
-                    string comCode = HexErrorCode(cex.ErrorCode);
-                    switch (comCode)
-                    {
-                        case "0x80004005":
-                            ChemistryAllowed = false;
-                            ChemistryProhibitedReason = "can't determine where the current selection is.";
-                            break;
-
-                        case "0x800A11FD":
-                            ChemistryAllowed = false;
-                            ChemistryProhibitedReason = "changes are not permitted in the current selection.";
-                            break;
-
-                        case "0x800A1759":
-                            ChemistryAllowed = false;
-                            ChemistryProhibitedReason = "can't create a selection when a dialogue is active.";
-                            break;
-
-                        default:
-                            if (Telemetry != null)
-                            {
-                                // Keep exception hidden from end user.
-                                Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
-                                Telemetry.Write(module, "Exception", cex.Message);
-                                Telemetry.Write(module, "Exception", cex.ToString());
-                            }
-                            else
-                            {
-                                RegistryHelper.StoreException(module, cex);
-                            }
-                            break;
-                    }
+                    allowed = false;
+                    ChemistryProhibitedReason = "no document is open.";
                 }
-                catch (Exception ex)
+            }
+            catch (COMException cex)
+            {
+                string comCode = HexErrorCode(cex.ErrorCode);
+                switch (comCode)
                 {
-                    if (Telemetry != null)
-                    {
-                        // Keep exception hidden from end user.
-                        Telemetry.Write(module, "Exception", ex.Message);
-                        Telemetry.Write(module, "Exception", ex.ToString());
-                    }
-                    else
-                    {
-                        RegistryHelper.StoreException(module, ex);
-                    }
+                    case "0x80004005":
+                        ChemistryAllowed = false;
+                        ChemistryProhibitedReason = "can't determine where the current selection is.";
+                        break;
+
+                    case "0x800A11FD":
+                        ChemistryAllowed = false;
+                        ChemistryProhibitedReason = "changes are not permitted in the current selection.";
+                        break;
+
+                    case "0x800A1759":
+                        ChemistryAllowed = false;
+                        ChemistryProhibitedReason = "can't create a selection when a dialogue is active.";
+                        break;
+
+                    default:
+                        ChemistryAllowed = false;
+                        ChemistryProhibitedReason = $"COMException {cex.Message} ErrorCode: {comCode}";
+                        if (Telemetry != null)
+                        {
+                            // Keep exception hidden from end user.
+                            Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
+                            Telemetry.Write(module, "Exception", cex.Message);
+                            Telemetry.Write(module, "Exception", cex.ToString());
+                        }
+                        else
+                        {
+                            RegistryHelper.StoreException(module, cex);
+                        }
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (Telemetry != null)
+                {
+                    // Keep exception hidden from end user.
+                    Telemetry.Write(module, "Exception", ex.Message);
+                    Telemetry.Write(module, "Exception", ex.ToString());
+                }
+                else
+                {
+                    RegistryHelper.StoreException(module, ex);
                 }
             }
 
@@ -2681,16 +2694,14 @@ namespace Chem4Word
                     LoadOptions();
                 }
 
-                //Debug.WriteLine($"{module.Replace("()", $"({contentControl.Application.ActiveDocument.Name})")}");
-
                 if (EventsEnabled)
                 {
                     EventsEnabled = false;
 #if DEBUG
-                    //Word.Document doc = contentControl.Application.ActiveDocument;
-                    //Word.Selection sel = doc.Application.Selection;
-                    //Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection from {sel.Range.Start} to {sel.Range.End}");
-                    //Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection has {sel.ContentControls.Count} CCs");
+                    Word.Document doc = contentControl.Application.ActiveDocument;
+                    Word.Selection sel = doc.Application.Selection;
+                    Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection from {sel.Range.Start} to {sel.Range.End}");
+                    Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection has {sel.ContentControls.Count} CCs");
 #endif
                     EvaluateChemistryAllowed();
                     EventsEnabled = true;

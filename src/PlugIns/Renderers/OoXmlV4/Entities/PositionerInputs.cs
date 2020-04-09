@@ -11,7 +11,7 @@ using Chem4Word.Model2;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using IChem4Word.Contracts;
 
-namespace Chem4Word.Renderer.OoXmlV4.OOXML
+namespace Chem4Word.Renderer.OoXmlV4.Entities
 {
     public class PositionerInputs
     {

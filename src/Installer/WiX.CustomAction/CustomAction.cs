@@ -67,14 +67,14 @@ namespace WiX.CustomAction
                     }
                     else
                     {
-                        session.Log("  Found Chem4Word Add-In Manifest File not found !!!");
+                        session.Log("  Error: Chem4Word Add-In Manifest File not found !!!");
                     }
 
                     ModifyFolderPermissions(session);
                 }
                 else
                 {
-                    session.Log("  Found Chem4Word installation folder not found !!!");
+                    session.Log("  Error: Chem4Word installation folder not found !!!");
                 }
             }
             catch (Exception ex)

@@ -7,9 +7,8 @@
 
 using System.Collections.Generic;
 using System.Windows;
-using Chem4Word.Renderer.OoXmlV4.Entities;
 
-namespace Chem4Word.Renderer.OoXmlV4.OOXML
+namespace Chem4Word.Renderer.OoXmlV4.Entities
 {
     public class PositionerOutputs
     {
@@ -20,5 +19,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         public List<MoleculeExtents> AllMoleculeExtents { get; set; } = new List<MoleculeExtents>();
         public List<Rect> GroupBrackets { get; set; } = new List<Rect>();
         public List<Rect> MoleculeBrackets { get; set; } = new List<Rect>();
+        public List<OoXmlString> MoleculeLabels { get; set; } = new List<OoXmlString>();
     }
 }

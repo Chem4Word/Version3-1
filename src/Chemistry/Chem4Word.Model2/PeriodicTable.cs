@@ -168,6 +168,42 @@ namespace Chem4Word.Model2
 
         public bool HasElement(string symbol) => Elements.ContainsKey(symbol);
 
+        public int AvailableElectrons(Element element, int sumOfBondOrder, int charge)
+        {
+            int result = 0;
+            var carbonGroup = Elements["C"].Group;
+            var thisGroup = element.Group;
+
+            bool isToTheLeft = thisGroup <= carbonGroup;
+
+            if (element.Valencies != null && element.Valencies.Length > 0)
+            {
+                int idx = 0;
+                while (idx < element.Valencies.Length)
+                {
+                    int valence = element.Valencies[idx];
+                    if (isToTheLeft)
+                    {
+                        valence -= charge;
+                    }
+                    else
+                    {
+                        valence += charge;
+                    }
+
+                    result = valence - sumOfBondOrder;
+                    if (result >= 0)
+                    {
+                        break;
+                    }
+
+                    idx++;
+                }
+            }
+
+            return result;
+        }
+
         private object this[string propertyName]
         {
             set => GetType().GetProperty(propertyName)?.SetValue(this, value, null);
@@ -211,6 +247,7 @@ namespace Chem4Word.Model2
                         x.PTRow = IntParser(data[13]);
                         x.PTColumn = IntParser(data[14]);
                         x.PTElementType = data[15];
+                        x.ElectronicConfiguration = data[16];
 
                         Elements.Add(symbol, x);
                         this[symbol] = x;
@@ -256,22 +293,6 @@ namespace Chem4Word.Model2
                 for (int i = 0; i < vv.Length; i++)
                 {
                     result[i] = int.Parse(vv[i]);
-                }
-            }
-
-            return result;
-        }
-
-        public static int GetValence(Element element, int sumOfChargeAndBondOrder)
-        {
-            int result = -1;
-
-            if (element != null && element.Valencies != null)
-            {
-                foreach (var valency in element.Valencies.Where(valency => valency >= sumOfChargeAndBondOrder))
-                {
-                    result = valency;
-                    break;
                 }
             }
 

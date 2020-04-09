@@ -415,7 +415,7 @@ namespace Chem4Word
             BeforeButtonChecks();
             Globals.Chem4WordV3.Telemetry.Write(module, "Action", "Triggered");
 
-            if (Globals.Chem4WordV3.EventsEnabled && Globals.Chem4WordV3.ChemistryAllowed)
+            if (Globals.Chem4WordV3.EventsEnabled)
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
                 Word.Application app = Globals.Chem4WordV3.Application;
@@ -671,9 +671,9 @@ namespace Chem4Word
                 }
             }
 
+            Globals.Chem4WordV3.SelectChemistry(Globals.Chem4WordV3.Application.Selection);
             Globals.Chem4WordV3.EvaluateChemistryAllowed();
             Globals.Chem4WordV3.ShowOrHideUpdateShield();
-            Globals.Chem4WordV3.SelectChemistry(Globals.Chem4WordV3.Application.Selection);
         }
 
         public static void PerformEdit()
@@ -685,6 +685,8 @@ namespace Chem4Word
             Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Started");
             Word.Document doc = app.ActiveDocument;
             Word.ContentControl cc = null;
+
+            var wordSettings = new WordSettings(app);
 
             try
             {
@@ -726,6 +728,7 @@ namespace Chem4Word
                                     beforeCml = customXmlPart.XML;
                                     CMLConverter cmlConverter = new CMLConverter();
                                     Model beforeModel = cmlConverter.Import(beforeCml);
+
                                     if (beforeModel.TotalAtomsCount == 0)
                                     {
                                         UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
@@ -745,6 +748,12 @@ namespace Chem4Word
 
                                     isNewDrawing = false;
                                 }
+                                else
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Exception", $"Can't find CML for {cc.Tag} in Active Document");
+                                    UserInteractions.WarnUser("The CML for this chemistry item can't be found!");
+                                    return;
+                                }
                             }
                             else
                             {
@@ -752,6 +761,7 @@ namespace Chem4Word
                                 return;
                             }
                         }
+
                         string guidString;
                         string fullTag;
 
@@ -932,13 +942,14 @@ namespace Chem4Word
                                 }
                                 else
                                 {
-                                    if (isNewDrawing)
-                                    {
-                                        cc.Delete();
-                                        cc = null;
-                                    }
+                                    cc.Delete();
+                                    cc = null;
                                 }
                             }
+                        }
+                        else
+                        {
+                            // Editing cancelled
                         }
                     }
                     else
@@ -970,6 +981,7 @@ namespace Chem4Word
                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Finished; No ContentControl was inserted");
                 }
 
+                wordSettings.RestoreSettings(app);
                 app.ActiveWindow.SetFocus();
                 app.Activate();
             }
@@ -1944,9 +1956,10 @@ namespace Chem4Word
             {
                 Globals.Chem4WordV3.EventsEnabled = false;
 
+                const string fileNameOfManual = "Chem4Word-Version3-1-User-Manual.docx";
                 try
                 {
-                    string userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, "Manual", "Chem4Word-Version3-1-User-Manual.docx");
+                    string userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, "Manual", fileNameOfManual);
                     if (File.Exists(userManual))
                     {
                         Globals.Chem4WordV3.Telemetry.Write(module, "ReadManual", userManual);
@@ -1954,7 +1967,8 @@ namespace Chem4Word
                     }
                     else
                     {
-                        userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, @"..\..\..\..\doc", "Chem4Word-Version3-1-User-Manual.docx");
+                        // This code is used when this is not an installed version of Chem4Word
+                        userManual = Path.Combine(Globals.Chem4WordV3.AddInInfo.DeploymentPath, @"..\..\..\..\docs", fileNameOfManual);
                         if (File.Exists(userManual))
                         {
                             Globals.Chem4WordV3.Telemetry.Write(module, "ReadManual", userManual);

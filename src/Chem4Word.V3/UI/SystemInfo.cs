@@ -87,9 +87,9 @@ namespace Chem4Word.UI
                     {
                         foreach (var file in files)
                         {
-                            Version ver = Assembly.LoadFrom(file).GetName().Version;
+                            var fileInfo = FileVersionInfo.GetVersionInfo(file);
                             var shortName = file.Replace($@"{plugInPath}\", "");
-                            sb.AppendLine($"  {shortName} - [{ver}]");
+                            sb.AppendLine($"  {shortName} - [{fileInfo.FileVersion}]");
                         }
                     }
                 }

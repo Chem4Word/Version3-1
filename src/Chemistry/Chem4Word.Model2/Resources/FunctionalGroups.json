@@ -267,8 +267,9 @@
     },
     {
         "Name": "OH",
-        "Flippable": true,
         "Symbol": "OH",
+        "Internal": "true",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "O",
@@ -283,6 +284,7 @@
     {
         "Name": "CH2",
         "Symbol": "CH2",
+        "Internal": "true",
         "Flippable": true,
         "Components": [
             {
@@ -298,6 +300,7 @@
     {
         "Name": "CH3",
         "Symbol": "CH3",
+        "Internal": "true",
         "Flippable": true,
         "Components": [
             {
@@ -478,8 +481,8 @@
     },
     {
         "Name": "t-Bu",
-        "Flippable": true,
         "Symbol": "t-Bu",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -508,8 +511,8 @@
     },
     {
         "Name": "CF3",
-        "Flippable": true,
         "Symbol": "CF3",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -523,8 +526,8 @@
     },
     {
         "Name": "CCl3",
-        "Flippable": true,
         "Symbol": "CCl3",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -553,8 +556,8 @@
     },
     {
         "Name": "TMS",
-        "Flippable": true,
         "Symbol": "TMS",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "Si",
@@ -568,8 +571,8 @@
     },
     {
         "Name": "COOH",
-        "Flippable": true,
         "Symbol": "COOH",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "C",
@@ -610,8 +613,8 @@
     },
     {
         "Name": "NO2",
-        "Flippable": true,
         "Symbol": "NO2",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "N",
@@ -625,8 +628,9 @@
     },
     {
         "Name": "NH2",
-        "Flippable": true,
         "Symbol": "NH2",
+        "Internal": "true",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "N",
@@ -640,8 +644,8 @@
     },
     {
         "Name": "CH2OH",
-        "Flippable": true,
         "Symbol": "CH2OH",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "CH2",
@@ -659,8 +663,8 @@
     },
     {
         "Name": "CH2CH2OH",
-        "Flippable": true,
         "Symbol": "CH2CH2OH",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "CH2",
@@ -682,8 +686,8 @@
     },
     {
         "Name": "CH2CH2CH2OH",
-        "Flippable": true,
         "Symbol": "CH2CH2CH2OH",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "CH2",
@@ -701,8 +705,8 @@
     },
     {
         "Name": "OMe",
-        "Flippable": true,
         "Symbol": "OMe",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "O",
@@ -716,8 +720,8 @@
     },
     {
         "Name": "OEt",
-        "Flippable": true,
         "Symbol": "OEt",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "O",
@@ -731,8 +735,8 @@
     },
     {
         "Name": "Bz",
-        "Flippable": true,
         "Symbol": "Bz",
+        "Flippable": true,
         "Components": [
             {
                 "Component": "Ph",

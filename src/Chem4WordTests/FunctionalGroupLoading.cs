@@ -6,9 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using Xunit;
@@ -68,14 +66,14 @@ namespace Chem4WordTests
             }
 
             actual = actual.Trim();
-            Assert.Equal(actual, expected);
+            Assert.Equal(expected, actual);
         }
 
         [Theory]
         [InlineData("R1", 0.00)]
         [InlineData("R9", 0.00)]
         [InlineData("CH2", 14.03)]
-        [InlineData("CH3", 15.03)]
+        [InlineData("CH3", 15.04)]
         [InlineData("CO2H", 45.02)]
         [InlineData("CH2CH2OH", 45.06)]
         [InlineData("Et", 29.06)]
@@ -141,18 +139,6 @@ namespace Chem4WordTests
             }
 
             return result;
-        }
-
-        private void ExpandAllFunctionalGroupsV2()
-        {
-            foreach (var fg in FunctionalGroups.ShortcutList)
-            {
-                Debug.WriteLine($"{fg}");
-                Debug.WriteLine($" Fwd: {Flatten(fg.ExpandIntoTerms())}");
-                Debug.WriteLine($" Rev: {Flatten(fg.ExpandIntoTerms(true))}");
-            }
-
-            //Debug.WriteLine("...");
         }
     }
 }

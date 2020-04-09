@@ -45,6 +45,7 @@ namespace Chem4Word.Model2
         public int PTRow { get; set; }
         public int PTColumn { get; set; }
         public string PTElementType { get; set; }
+        public string ElectronicConfiguration { get; set; }
 
         public override string ToString()
         {

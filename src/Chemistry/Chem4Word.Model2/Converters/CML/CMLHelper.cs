@@ -38,7 +38,7 @@ namespace Chem4Word.Model2.Converters.CML
             }
         }
 
-        internal static ElementBase GetChemicalElement(XElement cmlElement, out string message)
+        internal static ElementBase GetElementOrFunctionalGroup(XElement cmlElement, out string message)
         {
             message = "";
             XAttribute xa = cmlElement.Attribute(CMLConstants.AttributeElementType);
@@ -55,6 +55,15 @@ namespace Chem4Word.Model2.Converters.CML
 
                 if (eb is FunctionalGroup functionalGroup)
                 {
+                    // Fix Invalid data; Force internal FG to prime Element
+                    if (functionalGroup.Internal)
+                    {
+                        AtomHelpers.TryParse(functionalGroup.Components[0].Component, out eb);
+                        if (eb is Element chemicalElement)
+                        {
+                            return chemicalElement;
+                        }
+                    }
                     return functionalGroup;
                 }
 

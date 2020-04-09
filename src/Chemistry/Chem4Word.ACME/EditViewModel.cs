@@ -1394,12 +1394,14 @@ namespace Chem4Word.ACME
                     Atom thisAtom = list[firstIndex].ExistingAtom;
                     Atom otherAtom = list[secondIndex].ExistingAtom;
 
-                    if (!thisAtom.IsUnsaturated & thisAtom.AvailableValences > 0 & !otherAtom.IsUnsaturated &
-                        otherAtom.AvailableValences > 0)
+                    // ToDo: [DCD] to Check this still works
+                    if (!thisAtom.IsUnsaturated
+                        && thisAtom.ImplicitHydrogenCount > 0
+                        && !otherAtom.IsUnsaturated
+                        && otherAtom.ImplicitHydrogenCount > 0)
                     {
                         Bond bondBetween = thisAtom.BondBetween(otherAtom);
-                        SetBondAttributes(bondBetween,
-                                          OrderDouble, Globals.BondStereo.None);
+                        SetBondAttributes(bondBetween, OrderDouble, Globals.BondStereo.None);
                         bondBetween.ExplicitPlacement = null;
                         bondBetween.UpdateVisual();
                         thisAtom.UpdateVisual();

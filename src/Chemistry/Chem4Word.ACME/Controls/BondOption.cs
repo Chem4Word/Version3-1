@@ -26,7 +26,7 @@ namespace Chem4Word.ACME
         public static readonly DependencyProperty IdProperty =
             DependencyProperty.Register("Id", typeof(int), typeof(BondOption), new PropertyMetadata(default(int)));
 
-        public String Order
+        public string Order
         {
             get { return (string)GetValue(OrderProperty); }
             set { SetValue(OrderProperty, value); }

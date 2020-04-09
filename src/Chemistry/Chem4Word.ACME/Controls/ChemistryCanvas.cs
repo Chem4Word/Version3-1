@@ -193,34 +193,33 @@ namespace Chem4Word.ACME.Controls
             Debug.WriteLine($"MeasureOverride({GetHashCode()})");
             var size = GetBoundingBox();
 
-            if (_mychemistry != null && _mychemistry.Model != null)
+            if (_mychemistry != null
+                && _mychemistry.Model != null
+                && !_positionOffsetApplied)
             {
-                if (!_positionOffsetApplied)
+                // Only need to do this on "small" structures
+                if (_mychemistry.Model.TotalAtomsCount < 100)
                 {
-                    // Only need to do this on "small" structures
-                    if (_mychemistry.Model.TotalAtomsCount < 100)
+                    var abb = _mychemistry.Model.BoundingBoxOfCmlPoints;
+
+                    double leftPadding = 0;
+                    double topPadding = 0;
+
+                    if (size.Left < abb.Left)
                     {
-                        var abb = _mychemistry.Model.BoundingBoxOfCmlPoints;
-
-                        double leftPadding = 0;
-                        double topPadding = 0;
-
-                        if (size.Left < abb.Left)
-                        {
-                            leftPadding = abb.Left - size.Left;
-                        }
-
-                        if (size.Top < abb.Top)
-                        {
-                            topPadding = abb.Top - size.Top;
-                        }
-
-                        _mychemistry.Model.RepositionAll(-leftPadding, -topPadding);
-                        DrawChemistry(_mychemistry);
+                        leftPadding = abb.Left - size.Left;
                     }
 
-                    _positionOffsetApplied = true;
+                    if (size.Top < abb.Top)
+                    {
+                        topPadding = abb.Top - size.Top;
+                    }
+
+                    _mychemistry.Model.RepositionAll(-leftPadding, -topPadding);
+                    DrawChemistry(_mychemistry);
                 }
+
+                _positionOffsetApplied = true;
             }
 
             return size.Size;
@@ -493,7 +492,6 @@ namespace Chem4Word.ACME.Controls
                     currentbounds.Union(bounds);
                     var descBounds = element.DescendantBounds;
                     currentbounds.Union(descBounds);
-                    //Debug.WriteLine($"CB: {currentbounds}, B:{bounds}, D:{descBounds}");
                 }
             }
             catch (Exception e)
@@ -563,8 +561,6 @@ namespace Chem4Word.ACME.Controls
 
             if (vm != null)
             {
-                Debug.WriteLine($"DrawChemistry({GetHashCode()} - {vm.Model.ConciseFormula})");
-
                 foreach (Molecule molecule in vm.Model.Molecules.Values)
                 {
                     MoleculeAdded(molecule);
@@ -671,15 +667,13 @@ namespace Chem4Word.ACME.Controls
                 chemicalVisuals.Remove(molecule);
             }
             //do the group visual, if any
-            if (molecule.IsGrouped)
+            if (molecule.IsGrouped
+                && chemicalVisuals.TryGetValue(molecule.GetGroupKey(), out DrawingVisual dv))
             {
-                if (chemicalVisuals.TryGetValue(molecule.GetGroupKey(), out DrawingVisual dv))
-                {
-                    var gv = (GroupVisual)dv;
+                var gv = (GroupVisual)dv;
 
-                    DeleteVisual(gv);
-                    chemicalVisuals.Remove(molecule.GetGroupKey());
-                }
+                DeleteVisual(gv);
+                chemicalVisuals.Remove(molecule.GetGroupKey());
             }
 
             foreach (Atom moleculeAtom in molecule.Atoms.Values)
@@ -833,7 +827,7 @@ namespace Chem4Word.ACME.Controls
             // If not successful try to get an AtomVisual (should only ever be one!)
             if (result == null)
             {
-                result = _visuals.FirstOrDefault(v => v is AtomVisual | v is FunctionalGroupVisual);
+                result = _visuals.FirstOrDefault(v => v is AtomVisual || v is FunctionalGroupVisual);
             }
 
             // Finally get first ChemicalVisual which ought to be a BondVisual

@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoordinateTool.cs" />
+    <Compile Include="Entities\OoXmlString.cs" />
     <Compile Include="Entities\SimpleLine.cs" />
     <Compile Include="Enums\BondLineStyle.cs" />
     <Compile Include="GeometryTool.cs" />
@@ -81,8 +82,8 @@
     <Compile Include="OOXML\OoXmlPositioner.cs" />
     <Compile Include="OoXmlV4Options.cs" />
     <Compile Include="OOXML\OoXmlRenderer.cs" />
-    <Compile Include="OOXML\PositionerInputs.cs" />
-    <Compile Include="OOXML\PositionerOutputs.cs" />
+    <Compile Include="Entities\PositionerInputs.cs" />
+    <Compile Include="Entities\PositionerOutputs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderer.cs" />
     <Compile Include="OoXmlV4Settings.cs">

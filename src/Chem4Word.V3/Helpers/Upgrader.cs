@@ -167,6 +167,8 @@ namespace Chem4Word.Helpers
             int upgradedCCs = 0;
             int upgradedXml = 0;
 
+            var cmlConverter = new CMLConverter();
+
             foreach (var target in targets)
             {
                 if (target.ContentControls.Count > 0)
@@ -194,6 +196,8 @@ namespace Chem4Word.Helpers
                                     cc.Tag = target.Model.CustomXmlPartGuid;
                                     cc.LockContents = true;
 
+                                    target.Model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+
                                     // ToDo: Regenerate converted 2D structures
                                     break;
 
@@ -211,8 +215,7 @@ namespace Chem4Word.Helpers
                                     molecule.Parent = model;
                                     model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
 
-                                    var cmlConvertor = new CMLConverter();
-                                    doc.CustomXMLParts.Add(cmlConvertor.Export(model));
+                                    doc.CustomXMLParts.Add(cmlConverter.Export(model));
 
                                     Word.ContentControl ccn = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
                                     ChemistryHelper.Insert1D(ccn, cci.Text, false, $"m1.n1:{model.CustomXmlPartGuid}");
@@ -237,13 +240,12 @@ namespace Chem4Word.Helpers
                     }
                 }
 
-                CMLConverter converter = new CMLConverter();
                 CustomXMLPart cxml = doc.CustomXMLParts.SelectByID(target.CxmlPartId);
                 if (customXmlParts.ContainsKey(cxml.Id))
                 {
                     customXmlParts.Add(cxml.Id, cxml);
                 }
-                doc.CustomXMLParts.Add(converter.Export(target.Model));
+                doc.CustomXMLParts.Add(cmlConverter.Export(target.Model));
             }
 
             EraseChemistryZones(doc);

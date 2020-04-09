@@ -319,6 +319,7 @@
     <Compile Include="Helpers\TargetWord.cs" />
     <Compile Include="Helpers\TaskPaneHelper.cs" />
     <Compile Include="Helpers\UpdateHelper.cs" />
+    <Compile Include="Helpers\WordSettings.cs" />
     <Compile Include="Library\Chemistry.cs" />
     <Compile Include="Library\ChemistryByTag.cs" />
     <Compile Include="Library\LibraryValidation.cs" />

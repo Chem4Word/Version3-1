@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
 using DocumentFormat.OpenXml;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
@@ -56,7 +57,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         public static double BracketOffset(double bondLength)
         {
-            return bondLength * BRACKET_OFFSET_PERCENTAGE;
+            return Math.Round(bondLength) * BRACKET_OFFSET_PERCENTAGE;
         }
 
         #region C# TTF
@@ -71,7 +72,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             if (bondLength > 0.1)
             {
-                double scaled = XorY * EmusPerCsTtfPoint(bondLength);
+                double scaled = XorY * EmusPerCsTtfPoint(Math.Round(bondLength));
                 return Int64Value.FromInt64((long)scaled);
             }
             else
@@ -88,7 +89,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             if (bondLength > 0.1)
             {
-                double scaled = XorY * EmusPerCsTtfPointSubscript(bondLength);
+                double scaled = XorY * EmusPerCsTtfPointSubscript(Math.Round(bondLength));
                 return Int64Value.FromInt64((long)scaled);
             }
             else
@@ -107,7 +108,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             if (bondLength > 0.1)
             {
-                return XorY / CsTtfToCml(bondLength);
+                return XorY / CsTtfToCml(Math.Round(bondLength));
             }
             else
             {
@@ -116,16 +117,16 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         }
 
         // These calculations yield a font which has a point size of 8 at a bond length of 20
-        private static double EmusPerCsTtfPoint(double bondLength)
+        public static double EmusPerCsTtfPoint(double bondLength)
         {
-            return bondLength / 2.5;
+            return Math.Round(bondLength) / 2.5;
         }
 
         private static double EmusPerCsTtfPointSubscript(double bondLength)
         {
             if (bondLength > 0.1)
             {
-                return EmusPerCsTtfPoint(bondLength) * SUBSCRIPT_SCALE_FACTOR;
+                return EmusPerCsTtfPoint(Math.Round(bondLength)) * SUBSCRIPT_SCALE_FACTOR;
             }
             else
             {
@@ -137,7 +138,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             if (bondLength > 0.1)
             {
-                return EMUS_PER_CML_POINT / EmusPerCsTtfPoint(bondLength);
+                return EMUS_PER_CML_POINT / EmusPerCsTtfPoint(Math.Round(bondLength));
             }
             else
             {

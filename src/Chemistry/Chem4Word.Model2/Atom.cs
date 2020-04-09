@@ -40,7 +40,7 @@ namespace Chem4Word.Model2
                         var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth, vector);
                         return angle < 0 ? CompassPoints.West : CompassPoints.East;
                     }
-                    else if (Bonds.Count()>1)
+                    else if (Bonds.Count() > 1)
                     {
                         int leftBondCount = 0, rightBondCount = 0;
                         foreach (Atom neighbour in Neighbours)
@@ -391,61 +391,6 @@ namespace Chem4Word.Model2
         private bool _doubletRadical;
         private Point _position;
 
-        public bool CanAddAtoms
-        {
-            get
-            {
-                if (Element is FunctionalGroup)
-                {
-                    return true;
-                }
-
-                if (Element is Element e)
-                {
-                    int bondCount = (int)Math.Truncate(this.BondOrders);
-                    int charge = FormalCharge ?? 0;
-                    foreach (int valency in e.Valencies ?? new[] { 0 })
-                    {
-                        if (valency - bondCount + charge > 0)
-                        {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-        }
-
-        public int AvailableValences
-        {
-            get
-            {
-                int bondCount = (int)Math.Truncate(this.BondOrders);
-                int charge = 0;
-                charge = FormalCharge ?? 0;
-                int valence = PeriodicTable.GetValence((Element as Element), bondCount);
-                int diff = valence - bondCount;
-                if (charge > 0)
-                {
-                    int vdiff = 4 - valence;
-                    if (charge <= vdiff)
-                    {
-                        diff += charge;
-                    }
-                    else
-                    {
-                        diff = 4 - bondCount - charge + vdiff;
-                    }
-                }
-                else
-                {
-                    diff += charge;
-                }
-
-                return diff;
-            }
-        }
-
         public int ImplicitHydrogenCount
         {
             get
@@ -465,16 +410,10 @@ namespace Chem4Word.Model2
 
                     if (appliesTo.Contains(Element.Symbol))
                     {
-                        var iDiff = AvailableValences;
-                        // Ensure iHydrogenCount returned is never -ve
-                        if (iDiff >= 0)
-                        {
-                            iHydrogenCount = iDiff;
-                        }
-                        else
-                        {
-                            iHydrogenCount = 0;
-                        }
+                        int bondCount = (int)Math.Truncate(BondOrders);
+                        int charge = FormalCharge ?? 0;
+                        int availableElectrons = Globals.PeriodicTable.AvailableElectrons(Element as Element, bondCount, charge);
+                        iHydrogenCount = availableElectrons <= 0 ? 0 : availableElectrons;
                     }
                 }
                 return iHydrogenCount;
@@ -669,7 +608,7 @@ namespace Chem4Word.Model2
         //notification methods
         public void UpdateVisual()
         {
-          OnPropertyChanged(nameof(SymbolText));
+            OnPropertyChanged(nameof(SymbolText));
         }
 
         #endregion Methods
@@ -720,15 +659,12 @@ namespace Chem4Word.Model2
         {
             get
             {
-                int bondCount = (int)Math.Truncate(this.BondOrders);
-                int charge = 0;
-                charge = FormalCharge ?? 0;
-                int valence = PeriodicTable.GetValence((Element as Element),bondCount);
-                return bondCount > valence + charge;
+                int bondCount = (int)Math.Truncate(BondOrders);
+                int charge = FormalCharge ?? 0;
+                int availableElectrons = Globals.PeriodicTable.AvailableElectrons(Element as Element, bondCount, charge);
+                bool result = availableElectrons < 0;
+                return result;
             }
         }
-
-        
-        
     }
 }

@@ -87,17 +87,6 @@ namespace Chem4Word.Model2.Converters.MDL
             writer.WriteLine(MDLConstants.M_END);
         }
 
-        //public void ExportToStream(Molecule molecule, StreamWriter writer, out string message)
-        //{
-        //    _molecule = molecule;
-        //    atomByNumber = new Dictionary<int, Atom>();
-        //    bondByNumber = new Dictionary<int, Bond>();
-        //    numberByAtom = new Dictionary<Atom, int>();
-
-        //    message = null;
-        //    WriteCtab(writer);
-        //}
-
         #region Reading Into Model
 
         private MDLCounts ReadCtabHeader(StreamReader reader)
@@ -207,7 +196,7 @@ namespace Chem4Word.Model2.Converters.MDL
                     thisAtom.Position = new Point(x, 0 - y);
 
                     // element type
-                    String elType = GetSubString(line, 31, 3);
+                    string elType = GetSubString(line, 31, 3);
                     ElementBase eb;
                     var ok = AtomHelpers.TryParse(elType, out eb);
                     if (ok)
@@ -220,6 +209,16 @@ namespace Chem4Word.Model2.Converters.MDL
                         if (eb is FunctionalGroup functionalGroup)
                         {
                             thisAtom.Element = functionalGroup;
+
+                            // Fix Invalid data; Force internal FG to prime Element
+                            if (functionalGroup.Internal)
+                            {
+                                AtomHelpers.TryParse(functionalGroup.Components[0].Component, out eb);
+                                if (eb is Element chemicalElement)
+                                {
+                                    thisAtom.Element = chemicalElement;
+                                }
+                            }
                         }
                     }
                     else
@@ -315,7 +314,7 @@ namespace Chem4Word.Model2.Converters.MDL
                     thisBond.EndAtomInternalId = atom2?.InternalId;
 
                     // Bond Order
-                    String order = GetSubString(line, 6, 3);
+                    string order = GetSubString(line, 6, 3);
                     if (!string.IsNullOrEmpty(order))
                     {
                         int bondOrder = ParseInteger(order);
@@ -331,7 +330,7 @@ namespace Chem4Word.Model2.Converters.MDL
                     }
 
                     // stereo
-                    String stereo = GetSubString(line, 9, 3);
+                    string stereo = GetSubString(line, 9, 3);
                     if (!string.IsNullOrEmpty(stereo))
                     {
                         thisBond.Stereo = BondStereoFromMolfile(ParseInteger(stereo));
@@ -576,7 +575,7 @@ namespace Chem4Word.Model2.Converters.MDL
                 0 = uncharged or value other than these, 1 = +3, 2 = +2, 3 = +1,
                 4 = doublet radical, 5 = -1, 6 = -2, 7 = -3
              */
-            String chString = "  0";
+            string chString = "  0";
 
             if (atom.FormalCharge != null)
             {
@@ -714,8 +713,8 @@ namespace Chem4Word.Model2.Converters.MDL
                 output.Append(propertyType + "  " + thisLineCount);
                 for (int j = 0; j < thisLineCount; j++)
                 {
-                    String atomNumber = OutputMDLInt(atomNumbers[j + i * 8]);
-                    String value = OutputMDLInt(values[j + i * 8]);
+                    string atomNumber = OutputMDLInt(atomNumbers[j + i * 8]);
+                    string value = OutputMDLInt(values[j + i * 8]);
                     output.Append(" " + atomNumber + " " + value);
                 }
             }
@@ -723,70 +722,9 @@ namespace Chem4Word.Model2.Converters.MDL
             return output.ToString().TrimEnd();
         }
 
-        //private String CreateAtomPropertyLine(string propertyType)
-        //{
-        //    List<int> values = new List<int>();
-        //    List<int> atomNumbers = new List<int>();
-
-        //    foreach (Atom atom in _molecule.Atoms.Values)
-        //    {
-        //        int atomNumber = numberByAtom[atom];
-
-        //        int fCharge = 0;
-        //        if (atom.FormalCharge != null)
-        //        {
-        //            fCharge = atom.FormalCharge.Value;
-        //        }
-        //        double isotope = 0.0;
-        //        if (atom.IsotopeNumber != null)
-        //        {
-        //            isotope = atom.IsotopeNumber.Value;
-        //        }
-        //        int spin = 0;
-        //        if (atom.SpinMultiplicity != null)
-        //        {
-        //            spin = atom.SpinMultiplicity.Value;
-        //        }
-
-        //        if (propertyType == MDLConstants.M_CHG & fCharge != 0)
-        //        {
-        //            values.Add(atom.FormalCharge.Value);
-        //            atomNumbers.Add(atomNumber);
-        //        }
-        //        else if (propertyType == MDLConstants.M_ISO & isotope > 0.0001)
-        //        {
-        //            values.Add(atom.IsotopeNumber.Value);
-        //            atomNumbers.Add(atomNumber);
-        //        }
-        //        else if (propertyType == MDLConstants.M_RAD & spin > 0.0001)
-        //        {
-        //            values.Add(atom.SpinMultiplicity.Value);
-        //            atomNumbers.Add(atomNumber);
-        //        }
-        //    }
-
-        //    int count = atomNumbers.Count;
-
-        //    StringBuilder output = new StringBuilder();
-
-        //    for (int i = 0; i < (float)count / 8f; i++)
-        //    {
-        //        int thisLineCount = (count - i * 8) > 8 ? 8 : count - i * 8;
-        //        output.Append(propertyType + "  " + thisLineCount);
-        //        for (int j = 0; j < thisLineCount; j++)
-        //        {
-        //            String atomNumber = OutputMDLInt(atomNumbers[j + i * 8]);
-        //            String value = OutputMDLInt(values[j + i * 8]);
-        //            output.Append(" " + atomNumber + " " + value);
-        //        }
-        //    }
-
-        //    return output.ToString().TrimEnd();
-        //}
-
         private void ReadAtomPropertyLine(String line)
         {
-            String propertyType = line.Substring(0, 6);
+            string propertyType = line.Substring(0, 6);
 
             int nFields = ParseInteger(line, 7, 3);
 
@@ -871,16 +809,16 @@ namespace Chem4Word.Model2.Converters.MDL
             return result;
         }
 
-        private static String BondOrder(int molNumber)
+        private static string BondOrder(int molNumber)
         {
-            String order = string.Empty;
+            string order = string.Empty;
 
             return Globals.OrderValueToOrder(molNumber);
         }
 
-        private static String CmlStereoBond(int molNumber)
+        private static string CmlStereoBond(int molNumber)
         {
-            String stereo;
+            string stereo;
 
             if (molNumber == 1)
             {
@@ -978,9 +916,9 @@ namespace Chem4Word.Model2.Converters.MDL
             return molfileStereo;
         }
 
-        private static String OutputMDLFloat(double value)
+        private static string OutputMDLFloat(double value)
         {
-            String s = value.ToString("0.0000", CultureInfo.InvariantCulture);
+            string s = value.ToString("0.0000", CultureInfo.InvariantCulture);
             while (s.Length < 10)
             {
                 s = " " + s;
@@ -988,9 +926,9 @@ namespace Chem4Word.Model2.Converters.MDL
             return s;
         }
 
-        private static String OutputMDLInt(int intgr)
+        private static string OutputMDLInt(int intgr)
         {
-            String s = "" + intgr;
+            string s = "" + intgr;
             while (s.Length < 3)
             {
                 s = " " + s;

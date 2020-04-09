@@ -121,14 +121,12 @@ namespace Chem4Word.ACME.Controls
             foreach (var item in AtomPicker.Items)
             {
                 var option = (AtomOption)item;
-                if (option.Element is Element el)
+                if (option.Element is Element el
+                    && el == selElement)
                 {
-                    if (el == selElement)
-                    {
-                        found = true;
-                        newOption = option;
-                        break;
-                    }
+                    found = true;
+                    newOption = option;
+                    break;
                 }
 
                 if (option.Element is FunctionalGroup fg)
@@ -228,12 +226,15 @@ namespace Chem4Word.ACME.Controls
             FunctionalGroupPicker.Items.Clear();
             foreach (var item in Globals.FunctionalGroupsList)
             {
-                FunctionalGroupPicker.Items.Add(new AtomOption(item));
+                if (!item.Internal)
+                {
+                    FunctionalGroupPicker.Items.Add(new AtomOption(item));
+                }
             }
 
-            if (AtomPropertiesModel.IsFunctionalGroup)
+            if (AtomPropertiesModel.Element is FunctionalGroup functionalGroup && !functionalGroup.Internal)
             {
-                FunctionalGroupPicker.SelectedItem = new AtomOption(AtomPropertiesModel.Element as FunctionalGroup);
+                FunctionalGroupPicker.SelectedItem = new AtomOption(functionalGroup);
             }
         }
 

@@ -44,6 +44,8 @@ namespace Chem4Word.Helpers
             Word.ContentControl cc = null;
             Word.Application app = doc.Application;
 
+            var wordSettings = new WordSettings(app);
+
             IChem4WordRenderer renderer =
                 Globals.Chem4WordV3.GetRendererPlugIn(
                     Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
@@ -115,6 +117,8 @@ namespace Chem4Word.Helpers
                 }
             }
 
+            wordSettings.RestoreSettings(app);
+
             return cc;
         }
 
@@ -129,18 +133,13 @@ namespace Chem4Word.Helpers
 
             Word.Application app = Globals.Chem4WordV3.Application;
 
-            bool existingStateOfCorrectSentenceCaps = app.AutoCorrect.CorrectSentenceCaps;
-            bool existingStateOfSmartCutPaste = app.Options.SmartCutPaste;
+            var wordSettings = new WordSettings(app);
 
             Word.ContentControl cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
 
-            app.AutoCorrect.CorrectSentenceCaps = false;
-            app.Options.SmartCutPaste = false;
-
             SetRichText(cc, text, isFormula);
 
-            app.AutoCorrect.CorrectSentenceCaps = existingStateOfCorrectSentenceCaps;
-            app.Options.SmartCutPaste = existingStateOfSmartCutPaste;
+            wordSettings.RestoreSettings(app);
 
             cc.Tag = tag;
             cc.Title = Constants.ContentControlTitle;
@@ -239,6 +238,7 @@ namespace Chem4Word.Helpers
             Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Inserting 2D structure in ContentControl {cc.ID} Tag {guid}");
 
             Word.Document doc = cc.Application.ActiveDocument;
+            var wordSettings = new WordSettings(cc.Application);
 
             string bookmarkName = Constants.OoXmlBookmarkPrefix + guid;
 
@@ -247,6 +247,8 @@ namespace Chem4Word.Helpers
             {
                 doc.Bookmarks[bookmarkName].Delete();
             }
+
+            wordSettings.RestoreSettings(cc.Application);
 
             cc.Tag = guid;
             cc.Title = Constants.ContentControlTitle;
@@ -260,6 +262,7 @@ namespace Chem4Word.Helpers
             Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Updating 2D structure in ContentControl {cc.ID} Tag {guid}");
 
             Word.Document doc = cc.Application.ActiveDocument;
+            var wordSettings = new WordSettings(cc.Application);
 
             cc.LockContents = false;
             if (cc.Type == Word.WdContentControlType.wdContentControlPicture)
@@ -284,6 +287,8 @@ namespace Chem4Word.Helpers
                 doc.Bookmarks[bookmarkName].Delete();
             }
 
+            wordSettings.RestoreSettings(cc.Application);
+
             cc.Tag = guid;
             cc.Title = Constants.ContentControlTitle;
             cc.LockContents = true;
@@ -296,13 +301,12 @@ namespace Chem4Word.Helpers
             Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Inserting 1D label in ContentControl {cc.ID} Tag {tag}");
 
             Word.Application app = cc.Application;
-
-            bool existingState = app.AutoCorrect.CorrectSentenceCaps;
-            app.AutoCorrect.CorrectSentenceCaps = false;
+            var wordSettings = new WordSettings(app);
 
             SetRichText(cc, text, isFormula);
 
-            app.AutoCorrect.CorrectSentenceCaps = existingState;
+            wordSettings.RestoreSettings(app);
+
             cc.Tag = tag;
             cc.Title = Constants.ContentControlTitle;
             cc.LockContents = true;
@@ -315,16 +319,15 @@ namespace Chem4Word.Helpers
             Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Updating 1D label in ContentControl {cc.ID} Tag {tag}");
 
             Word.Application app = cc.Application;
+            var wordSettings = new WordSettings(app);
 
             cc.LockContents = false;
             cc.Range.Delete();
 
-            bool existingState = app.AutoCorrect.CorrectSentenceCaps;
-            app.AutoCorrect.CorrectSentenceCaps = false;
-
             SetRichText(cc, text, isFormula);
 
-            app.AutoCorrect.CorrectSentenceCaps = existingState;
+            wordSettings.RestoreSettings(app);
+
             cc.Tag = tag;
             cc.Title = Constants.ContentControlTitle;
             cc.LockContents = true;

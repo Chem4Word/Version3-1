@@ -27,6 +27,9 @@ namespace Chem4Word.Model2
         [JsonProperty]
         public override string Name { get; set; }
 
+        [JsonProperty]
+        public bool Internal { get; set; }
+
         /// <summary>
         /// Overall Atomic Weight of the Functional Group
         /// </summary>

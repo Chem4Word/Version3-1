@@ -548,7 +548,8 @@ namespace Chem4Word.ACME.Drawing
                     //if it's over bonded draw the warning circle
                     if (DisplayOverbonding && ParentAtom.Overbonded)
                     {
-                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, Globals.AtomRadius * 2.0, Globals.AtomRadius * 2.0);
+                        double radius = ParentAtom.Parent.Model.XamlBondLength * Globals.FontSizePercentageBond / 2;
+                        EllipseGeometry eg = new EllipseGeometry(ParentAtom.Position, radius, radius);
 
                         Brush warningFill = new SolidColorBrush(Colors.Salmon);
                         warningFill.Opacity = 0.75;

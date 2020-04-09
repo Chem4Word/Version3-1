@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using Chem4Word.Model2;
@@ -139,6 +140,73 @@ namespace Chem4WordTests
 
             molecule.Names[0].FullType = "dictref";
             Assert.Equal("dictref", molecule.Names[0].FullType);
+        }
+
+        [Theory]
+        // Single Valent Element
+        [InlineData("O", 0, 0, 2, false)]
+        [InlineData("O", 0, 1, 1, false)]
+        [InlineData("O", 0, 2, 0, false)]
+        [InlineData("O", 1, 2, 1, false)]
+        [InlineData("O", 1, 3, 0, false)]
+        [InlineData("O", 0, 3, 0, true)]
+        // Multi Valent Element: Valencies 1,3,5,7
+        [InlineData("Cl", 0, 0, 1, false)]
+        [InlineData("Cl", 0, 1, 0, false)]
+        [InlineData("Cl", 0, 2, 1, false)]
+        // Multi Valent Element: Valencies 3,5
+        [InlineData("N", 0, 0, 3, false)]
+        [InlineData("N", 0, 1, 2, false)]
+        [InlineData("N", 0, 5, 0, false)]
+        [InlineData("N", 0, 6, 0, true)]
+        public void CheckValencyCalculations(string element, int charge, int bonds,
+                      int expectedImplicitHCount, bool expectedOverbonding)
+        {
+            // Arrange
+            var model = new Model();
+
+            var molecule = new Molecule();
+            model.AddMolecule(molecule);
+            molecule.Parent = model;
+
+            var atom = new Atom();
+            molecule.AddAtom(atom);
+            atom.Parent = molecule;
+
+            atom.Element = Globals.PeriodicTable.Elements[element];
+            atom.FormalCharge = charge;
+
+            AddHBonds(molecule, atom, bonds);
+
+            var bondOrders = (int)Math.Truncate(atom.BondOrders);
+
+            // Act
+            var implicitHydrogen = atom.ImplicitHydrogenCount;
+            var over = atom.Overbonded;
+
+            // Assert
+            Assert.Equal(bondOrders, bonds);
+            Assert.Equal(expectedImplicitHCount, implicitHydrogen);
+            Assert.Equal(expectedOverbonding, over);
+
+            Debug.Write(".");
+        }
+
+        private void AddHBonds(Molecule molecule, Atom atom, int bonds)
+        {
+            for (int i = 0; i < bonds; i++)
+            {
+                Atom h = new Atom();
+                h.Element = Globals.PeriodicTable.H;
+
+                molecule.AddAtom(h);
+                h.Parent = molecule;
+
+                Bond bond = new Bond(atom, h);
+                bond.Order = "S";
+                molecule.AddBond(bond);
+                bond.Parent = molecule;
+            }
         }
     }
 }

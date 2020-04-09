@@ -16,7 +16,7 @@ namespace Chem4Word.Renderer.OoXmlV4
     /// <summary>
     /// Contains methods to calculate bounding boxes from molecules.
     /// </summary>
-    internal class CoordinateTool
+    internal static class CoordinateTool
     {
         /// <summary>
         /// Calculate the bounding box from a set of CMLAtoms (should be anything with 2D coords)
@@ -173,8 +173,6 @@ namespace Chem4Word.Renderer.OoXmlV4
                 canIntersect = false;
                 doIntersect = false;
                 intersection = new Point(double.NaN, double.NaN);
-                //close_p1 = new Point(double.NaN, double.NaN);
-                //close_p2 = new Point(double.NaN, double.NaN);
                 return;
             }
 
@@ -187,28 +185,6 @@ namespace Chem4Word.Renderer.OoXmlV4
 
             // The segments intersect if t1 and t2 are between 0 and 1.
             doIntersect = (t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1);
-
-            //// Find the closest points on the segments.
-            //if (t1 < 0)
-            //{
-            //    t1 = 0;
-            //}
-            //else if (t1 > 1)
-            //{
-            //    t1 = 1;
-            //}
-
-            //if (t2 < 0)
-            //{
-            //    t2 = 0;
-            //}
-            //else if (t2 > 1)
-            //{
-            //    t2 = 1;
-            //}
-
-            //close_p1 = new Point(line1Start.X + dx12 * t1, line1Start.Y + dy12 * t1);
-            //close_p2 = new Point(line2Start.X + dx34 * t2, line2Start.Y + dy34 * t2);
         }
 
         /// <summary>

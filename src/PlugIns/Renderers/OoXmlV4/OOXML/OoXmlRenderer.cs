@@ -21,10 +21,14 @@ using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Office.Drawing;
+using DocumentFormat.OpenXml.Office2010.Word;
+using DocumentFormat.OpenXml.Wordprocessing;
 using IChem4Word.Contracts;
 using Newtonsoft.Json;
 using A = DocumentFormat.OpenXml.Drawing;
 using Drawing = DocumentFormat.OpenXml.Wordprocessing.Drawing;
+using NonVisualDrawingProperties = DocumentFormat.OpenXml.Office2010.Word.NonVisualDrawingProperties;
 using Point = System.Windows.Point;
 using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
 using Wp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -59,9 +63,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         // Outputs of positioner
         private List<AtomLabelCharacter> _atomLabelCharacters = new List<AtomLabelCharacter>();
-
         private List<BondLine> _bondLines = new List<BondLine>();
         private List<MoleculeExtents> _allMoleculeExtents = new List<MoleculeExtents>();
+        private List<OoXmlString> _moleculeLabels = new List<OoXmlString>();
         private List<Rect> _moleculeBrackets = new List<Rect>();
         private List<Rect> _groupBrackets = new List<Rect>();
         private List<Point> _ringCentres = new List<Point>();
@@ -127,6 +131,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             _allMoleculeExtents = positionerOutputs.AllMoleculeExtents;
             _groupBrackets = positionerOutputs.GroupBrackets;
             _moleculeBrackets = positionerOutputs.MoleculeBrackets;
+            _moleculeLabels = positionerOutputs.MoleculeLabels;
 
             // 6.1  Calculate canvas size
             SetCanvasSize();
@@ -260,6 +265,13 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 DrawCharacter(character);
             }
 
+            // 11.  Render Molecule Labels - Experimental - Does not work well
+            //foreach (var moleculeLabel in _moleculeLabels)
+            //{
+            //    DrawBox(moleculeLabel.Extents, "ff0000", 0.25);
+            //    DrawTextBox(moleculeLabel.Extents, moleculeLabel.Value, moleculeLabel.Colour);
+            //}
+
             _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0", CultureInfo.InvariantCulture)} ms; Average Bond Length: {_chemistryModel.MeanBondLength.ToString("#0.00", CultureInfo.InvariantCulture)}");
 
             ShutDownProgress(progress);
@@ -281,6 +293,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
             Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(characterPosition.Y);
             Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(characterPosition.X);
+
+            //Debug.WriteLine($"Character {alc.Character.Character} T: {emuTop}, L: {emuLeft}, W: {emuWidth}, H: {emuHeight}");
 
             string parent = alc.ParentAtom.Equals(alc.ParentMolecule) ? alc.ParentMolecule : alc.ParentAtom;
             string shapeName = $"Character {alc.Character.Character} of {parent}";
@@ -494,6 +508,96 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             return lines;
         }
+
+        private void DrawTextBox(Rect cmlExtents, string value, string colour)
+        {
+            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+
+            Point location = new Point(emuLeft, emuTop);
+            Size size = new Size(emuWidth, emuHeight);
+            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
+            Rect boundingBox = new Rect(location, size);
+
+            emuWidth = (Int64Value)boundingBox.Width;
+            emuHeight = (Int64Value)boundingBox.Height;
+            emuTop = (Int64Value)boundingBox.Top;
+            emuLeft = (Int64Value)boundingBox.Left;
+
+            UInt32Value id = UInt32Value.FromUInt32((uint)_ooxmlId++);
+            string shapeName = "String " + id;
+            Wps.WordprocessingShape wordprocessingShape = CreateShape(id, shapeName);
+
+            Wps.ShapeProperties shapeProperties = new Wps.ShapeProperties();
+
+            A.Transform2D transform2D = new A.Transform2D();
+            A.Offset offset = new A.Offset { X = emuLeft, Y = emuTop };
+            A.Extents extents = new A.Extents { Cx = emuWidth, Cy = emuHeight };
+            transform2D.Append(offset);
+            transform2D.Append(extents);
+            shapeProperties.Append(transform2D);
+
+            A.AdjustValueList adjustValueList = new A.AdjustValueList();
+            A.PresetGeometry presetGeometry = new A.PresetGeometry { Preset = A.ShapeTypeValues.Rectangle };
+            presetGeometry.Append(adjustValueList);
+            shapeProperties.Append(presetGeometry);
+
+            // The TextBox
+
+            Wps.TextBoxInfo2 textBoxInfo2 = new Wps.TextBoxInfo2();
+            TextBoxContent textBoxContent = new TextBoxContent();
+            textBoxInfo2.Append(textBoxContent);
+
+            // The Paragrah
+            Paragraph paragraph = new Paragraph();
+            textBoxContent.Append(paragraph);
+
+            ParagraphProperties paragraphProperties = new ParagraphProperties();
+            Justification justification = new Justification { Val = JustificationValues.Center };
+            paragraphProperties.Append(justification);
+
+            paragraph.Append(paragraphProperties);
+
+            // Now for the text Run
+            Run run = new Run();
+            paragraph.Append(run);
+            RunProperties runProperties = new RunProperties();
+            runProperties.Append(CommonRunProperties());
+
+            run.Append(runProperties);
+
+            Text text = new Text(value);
+            run.Append(text);
+
+            wordprocessingShape.Append(shapeProperties);
+            wordprocessingShape.Append(textBoxInfo2);
+
+            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties { LeftInset = 0, TopInset = 0, RightInset = 0, BottomInset = 0 };
+            wordprocessingShape.Append(textBodyProperties);
+
+            _wordprocessingGroup.Append(wordprocessingShape);
+
+            OpenXmlElement[] CommonRunProperties()
+            {
+                var result = new List<OpenXmlElement>();
+
+                var pointSize = OoXmlHelper.EmusPerCsTtfPoint(_medianBondLength) * 2;
+
+                RunFonts runFonts = new RunFonts { Ascii = "Arial", HighAnsi = "Arial"};
+                result.Add(runFonts);
+
+                Color color = new Color { Val = colour };
+                result.Add(color);
+
+                FontSize fontSize1 = new FontSize { Val = pointSize.ToString("0") };
+                result.Add(fontSize1);
+
+                return result.ToArray();
+            }
+        }
+
 
         private void DrawShape(Rect cmlExtents, A.ShapeTypeValues shape, string colour)
         {
@@ -1670,6 +1774,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             string json = ResourceHelper.GetStringResource(Assembly.GetExecutingAssembly(), "Arial.json");
             _TtfCharacterSet = JsonConvert.DeserializeObject<Dictionary<char, TtfCharacter>>(json);
+
+            //foreach (var c in _TtfCharacterSet.Values)
+            //{
+            //    Debug.WriteLine($"{c.Character},{c.OriginX},{c.Width},{c.IncrementX}");
+            //}
+            //Debugger.Break();
         }
 
         /// <summary>
