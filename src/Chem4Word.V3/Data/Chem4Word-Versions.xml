@@ -3,6 +3,18 @@
 <ChangeLog>
   <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
   <Version>
+    <Number>3.1.10 Beta 10</Number>
+    <IsBeta>true</IsBeta>
+    <Released>15-May-2020</Released>
+    <Changes>
+      <Change>...</Change>
+      <Change>...</Change>
+      <Change>...</Change>
+      <Change>...</Change>
+    </Changes>
+    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.10.Beta.10.msi</Url>
+  </Version>
+  <Version>
     <Number>3.1.9 Beta 9</Number>
     <IsBeta>true</IsBeta>
     <Released>14-May-2020</Released>
@@ -15,7 +27,6 @@
       <Change>Improvements to EvaluateChemistryAllowed function</Change>
       <Change>Fix bug in MOLFile export of wavy (indeterminate) bond</Change>
     </Changes>
-    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.9.Beta.9.msi</Url>
   </Version>
   <Version>
     <Number>3.1.8 Beta 8</Number>
