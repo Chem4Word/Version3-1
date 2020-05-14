@@ -93,40 +93,40 @@ namespace Chem4Word.Model2.Converters.MDL
         {
             MDLCounts result = new MDLCounts();
 
-            // Title
-            string title = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+            // Read Line #1 - Title
+            string title = SdFileConverter.GetNextLine(reader);
             if (!string.IsNullOrEmpty(title))
             {
-                if (title.StartsWith("$MDL"))
+                if (title.ToUpper().StartsWith("$MDL"))
                 {
                     _molecule.Errors.Add("RGFiles are currently not supported");
-                    throw new Exception("RGFiles are currently not supported");
+                    throw new InvalidDataException("RGFiles are currently not supported");
                 }
-                if (title.StartsWith("$RXN"))
+                if (title.ToUpper().StartsWith("$RXN"))
                 {
                     _molecule.Errors.Add("RXNFiles are currently not supported");
-                    throw new Exception("RXNFiles are currently not supported");
+                    throw new InvalidDataException("RXNFiles are currently not supported");
                 }
-                if (title.StartsWith("$RDFILE"))
+                if (title.ToUpper().StartsWith("$RDFILE"))
                 {
                     _molecule.Errors.Add("RDFiles are currently not supported");
-                    throw new Exception("RDFiles are currently not supported");
+                    throw new InvalidDataException("RDFiles are currently not supported");
                 }
-                if (title.StartsWith("<XDfile>"))
+                if (title.ToUpper().StartsWith("<XDFILE>"))
                 {
                     _molecule.Errors.Add("XDFiles are currently not supported");
-                    throw new Exception("XDFiles are currently not supported");
+                    throw new InvalidDataException("XDFiles are currently not supported");
                 }
             }
 
-            // Header
-            string header = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+            // Read and discard Line #2 - Header
+            SdFileConverter.GetNextLine(reader);
 
-            // Comment
-            string comment = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+            // Read and discard Line #3 - Comment
+            SdFileConverter.GetNextLine(reader);
 
-            // Counts
-            string counts = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+            // Read Line #4 - Counts
+            string counts = SdFileConverter.GetNextLine(reader);
 
             if (counts.ToLower().Contains("v2000"))
             {
@@ -138,6 +138,7 @@ namespace Chem4Word.Model2.Converters.MDL
                 }
                 catch (Exception ex)
                 {
+                    _molecule.Errors.Add($"Exception {ex.Message}");
                     result.Message = $"Exception {ex.Message}";
                     Debug.WriteLine(ex.Message);
                 }
@@ -499,22 +500,25 @@ namespace Chem4Word.Model2.Converters.MDL
 
         private static int MdlBondStereo(Globals.BondStereo code)
         {
-            int stereo = 0;
-            if (code == Globals.BondStereo.None)
+            int stereo;
+
+            switch (code)
             {
-                stereo = 0;
-            }
-            else if (code == Globals.BondStereo.Wedge)
-            {
-                stereo = 1;
-            }
-            else if (code == Globals.BondStereo.Hatch)
-            {
-                stereo = 6;
-            }
-            else
-            {
-                stereo = 0;
+                case Globals.BondStereo.None:
+                    stereo = 0;
+                    break;
+                case Globals.BondStereo.Wedge:
+                    stereo = 1;
+                    break;
+                case Globals.BondStereo.Hatch:
+                    stereo = 6;
+                    break;
+                case Globals.BondStereo.Indeterminate:
+                    stereo = 4;
+                    break;
+                default:
+                    stereo = 0;
+                    break;
             }
             return stereo;
         }
@@ -523,7 +527,7 @@ namespace Chem4Word.Model2.Converters.MDL
         {
             // bond type; 1 = Single, 2 = Double, 3 = Triple, 4 = Aromatic, 5 = Single or Double, 6 = Single or Aromatic, 7 = Double or Aromatic, 8 = Any
 
-            int result = 0;
+            int result;
 
             switch (bondOrder)
             {

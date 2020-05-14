@@ -214,8 +214,8 @@ namespace Chem4Word.ACME.Drawing
                     var bondVector = (descriptor.End - descriptor.Start);
                     var midPoint = bondVector / 2 + descriptor.Start;
 
-                    var perpAngle = Math.Abs( Vector.AngleBetween(workingCentroid.Value - midPoint, bondVector));
-                    
+                    var perpAngle = Math.Abs(Vector.AngleBetween(workingCentroid.Value - midPoint, bondVector));
+
                     if (perpAngle >= 80 && perpAngle <= 100) //probably convex ring
                     {
                         //shorten the second bond to fit neatly within the ring
@@ -235,7 +235,6 @@ namespace Chem4Word.ACME.Drawing
                     {
                         point3a = descriptor.SecondaryStart + bondVector * BondOffsetPercentage / 2;
                         point4a = descriptor.SecondaryEnd - bondVector * BondOffsetPercentage / 2;
-                        
 
                         descriptor.SecondaryStart = point3a.Value;
                         descriptor.SecondaryEnd = point4a.Value;
@@ -268,15 +267,7 @@ namespace Chem4Word.ACME.Drawing
             //offset according to placement
             switch (descriptor.Placement)
             {
-                case BondDirection.None:
-
-                    descriptor.Start = tempStart + normal * distance;
-                    descriptor.End = descriptor.Start + v;
-
-                    descriptor.SecondaryStart = tempStart - normal * distance;
-                    descriptor.SecondaryEnd = descriptor.SecondaryStart + v;
-
-                    break;
+                //case BondDirection.None is covered by default
 
                 case BondDirection.Clockwise:
                     {
@@ -387,20 +378,19 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="av">AtomVisual to avoid</param>
         public static void AdjustTerminus(ref Point startPoint, Point endPoint, AtomVisual av)
         {
-            if (av != null && av.AtomSymbol != "")
+            if (av != null
+                && av.AtomSymbol != ""
+                && startPoint != endPoint)
             {
-                if (startPoint != endPoint)
-                {
-                    var displacement = endPoint - startPoint;
+                var displacement = endPoint - startPoint;
 
-                    var intersection = av.GetIntersection(startPoint, endPoint);
-                    if (intersection != null)
-                    {
-                        displacement.Normalize();
-                        displacement = displacement * AtomVisual.Standoff;
-                        var tempPoint = new Point(intersection.Value.X, intersection.Value.Y) + displacement;
-                        startPoint = new Point(tempPoint.X, tempPoint.Y);
-                    }
+                var intersection = av.GetIntersection(startPoint, endPoint);
+                if (intersection != null)
+                {
+                    displacement.Normalize();
+                    displacement = displacement * AtomVisual.Standoff;
+                    var tempPoint = new Point(intersection.Value.X, intersection.Value.Y) + displacement;
+                    startPoint = new Point(tempPoint.X, tempPoint.Y);
                 }
             }
         }
@@ -525,12 +515,13 @@ namespace Chem4Word.ACME.Drawing
 
             //get the two bonds with widest splay
 
-            var widestPoints = (from Point p in otherAtomPoints
-                                orderby Math.Abs(Vector.AngleBetween(bondVector, p - descriptor.End)) descending
-                                select p);
+            var widestPoints = from Point p in otherAtomPoints
+                               orderby Math.Abs(Vector.AngleBetween(bondVector, p - descriptor.End)) descending
+                               select p;
 
             //the scaling factors are what we multiply the bond edge vectors by
-            double firstScalingFactor = 0d, secondScalingFactor = 0d;
+            double firstScalingFactor = 0d;
+            double secondScalingFactor = 0d;
 
             //work out the biggest scaling factor for either long edge
             foreach (var point in widestPoints)
@@ -543,7 +534,7 @@ namespace Chem4Word.ACME.Drawing
                                              descriptor.SecondCorner,
                                              descriptor.End,
                                              point);
-                if (otherAtomPoints.Count() == 1)
+                if (otherAtomPoints.Count == 1)
                 {
                     if (firstEdgeCut > firstScalingFactor)
                     {
@@ -556,11 +547,11 @@ namespace Chem4Word.ACME.Drawing
                 }
                 else
                 {
-                    if (firstEdgeCut > firstScalingFactor & otherBond1Cut < 1d & otherBond1Cut > 0d)
+                    if (firstEdgeCut > firstScalingFactor && otherBond1Cut < 1d && otherBond1Cut > 0d)
                     {
                         firstScalingFactor = firstEdgeCut;
                     }
-                    if (secondEdgeCut > secondScalingFactor & otherBond2Cut < 1d & otherBond2Cut > 0d)
+                    if (secondEdgeCut > secondScalingFactor && otherBond2Cut < 1d && otherBond2Cut > 0d)
                     {
                         secondScalingFactor = secondEdgeCut;
                     }

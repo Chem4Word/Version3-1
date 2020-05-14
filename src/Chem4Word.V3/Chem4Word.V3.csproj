@@ -308,6 +308,7 @@
       <Link>Helpers\FolderHelper.cs</Link>
     </Compile>
     <Compile Include="AssemblyReflectionManager.cs" />
+    <Compile Include="AssemblyReflectionProxy.cs" />
     <Compile Include="Database\ChemistryDTO.cs" />
     <Compile Include="Database\ChemistryTagDTO.cs" />
     <Compile Include="Database\Library.cs" />

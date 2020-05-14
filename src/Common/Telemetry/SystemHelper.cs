@@ -14,7 +14,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Chem4Word.Core.Helpers;
@@ -68,23 +67,26 @@ namespace Chem4Word.Telemetry
         public List<string> StartUpTimings { get; set; }
 
         private static int _retryCount;
-        private static Stopwatch _stopwatch;
+        private static Stopwatch _ipStopwatch;
 
-        public static string GetMachineId()
+        private readonly List<string> _placesToTry = new List<string>();
+        private int _attempts;
+
+        public SystemHelper(List<string> timings)
         {
-            string result = "";
-            try
+            StartUpTimings = timings;
+
+            StartUpTimings.AddRange(Initialise());
+        }
+
+        public SystemHelper()
+        {
+            if (StartUpTimings == null)
             {
-                // Need special routine here as MachineGuid does not exist in the wow6432 path
-                result = RegistryWOW6432.GetRegKey64(RegHive.HKEY_LOCAL_MACHINE, CryptoRoot, "MachineGuid");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                result = "Exception " + ex.Message;
+                StartUpTimings = new List<string>();
             }
 
-            return result;
+            StartUpTimings.AddRange(Initialise());
         }
 
         private List<string> Initialise()
@@ -194,17 +196,31 @@ namespace Chem4Word.Telemetry
 
                 #region Get IpAddress on Thread
 
+                // These can be tested via http://www.ipv6proxy.net/
+
+                // Our locations
+                _placesToTry.Add($"https://www.chem4word.co.uk/{Constants.Chem4WordVersionFiles}/client-ip-date.php");
+                _placesToTry.Add($"http://www.chem4word.com/{Constants.Chem4WordVersionFiles}/client-ip-date.php");
+                _placesToTry.Add($"https://chem4word.azurewebsites.net/{Constants.Chem4WordVersionFiles}/client-ip-date.php");
+
+                // Other Locations
+                _placesToTry.Add("https://api.my-ip.io/ip");
+                _placesToTry.Add("https://ip.seeip.org");
+                _placesToTry.Add("https://ipapi.co/ip");
+                _placesToTry.Add("https://ident.me/");
+                _placesToTry.Add("https://api6.ipify.org/");
+                _placesToTry.Add("https://v4v6.ipv6-test.com/api/myip.php");
+
                 message = $"GetIpAddress started at {SafeDate.ToLongDate(DateTime.Now)}";
                 StartUpTimings.Add(message);
                 Debug.WriteLine(message);
 
-                _stopwatch = new Stopwatch();
-                _stopwatch.Start();
+                _ipStopwatch = new Stopwatch();
+                _ipStopwatch.Start();
 
-                ParameterizedThreadStart pts = GetExternalIpAddress;
-                Thread thread = new Thread(pts);
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start(null);
+                Thread thread1 = new Thread(GetExternalIpAddressV2);
+                thread1.SetApartmentState(ApartmentState.STA);
+                thread1.Start(null);
 
                 #endregion Get IpAddress on Thread
 
@@ -222,7 +238,11 @@ namespace Chem4Word.Telemetry
                 GetScreens();
 
 #if DEBUG
-                GetGitStatus();
+                Thread thread2 = new Thread(GetGitStatus);
+                thread2.SetApartmentState(ApartmentState.STA);
+                thread2.Start(null);
+
+                //GetGitStatus(null);
 #endif
 
                 sw.Stop();
@@ -239,27 +259,27 @@ namespace Chem4Word.Telemetry
                 Debug.WriteLine(threadAbortException.Message);
             }
 
-            return null;
+            return new List<string>();
         }
 
-        public SystemHelper(List<string> timings)
+        public static string GetMachineId()
         {
-            StartUpTimings = timings;
-
-            StartUpTimings.AddRange(Initialise());
-        }
-
-        public SystemHelper()
-        {
-            if (StartUpTimings == null)
+            string result = "";
+            try
             {
-                StartUpTimings = new List<string>();
+                // Need special routine here as MachineGuid does not exist in the wow6432 path
+                result = RegistryWOW6432.GetRegKey64(RegHive.HKEY_LOCAL_MACHINE, CryptoRoot, "MachineGuid");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                result = "Exception " + ex.Message;
             }
 
-            StartUpTimings.AddRange(Initialise());
+            return result;
         }
 
-        private void GetGitStatus()
+        private void GetGitStatus(object o)
         {
             var result = new List<string>();
             result.Add("Git Origin");
@@ -477,7 +497,206 @@ namespace Chem4Word.Telemetry
             _retryCount++;
         }
 
-        private void GetExternalIpAddress(object o)
+        private void GetExternalIpAddressV2(object o)
+        {
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                string message;
+                IpAddress = "0.0.0.0";
+
+                for (int i = 0; i < 2; i++)
+                {
+                    foreach (string place in _placesToTry)
+                    {
+                        _attempts++;
+
+                        try
+                        {
+                            message = $"Attempt #{_attempts} using '{place}'";
+                            StartUpTimings.Add(message);
+                            Debug.WriteLine(message);
+
+                            if (place.Contains("chem4word"))
+                            {
+                                GetInternalVersion(place);
+                            }
+                            else
+                            {
+                                GetExternalVersion(place);
+                            }
+
+                            // Exit out of inner loop
+                            if (!IpAddress.Contains("0.0.0.0"))
+                            {
+                                break;
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            Debug.WriteLine(exception.Message);
+                            StartUpTimings.Add(exception.Message);
+                        }
+                    }
+
+                    // Exit out of outer loop
+                    if (!IpAddress.Contains("0.0.0.0"))
+                    {
+                        break;
+                    }
+                }
+
+                if (IpAddress.Contains("0.0.0.0"))
+                {
+                    // Handle failure
+                    IpAddress = "8.8.8.8";
+                }
+
+                _ipStopwatch.Stop();
+
+                message = $"{module} took {_ipStopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                StartUpTimings.Add(message);
+                Debug.WriteLine(message);
+            }
+            catch (ThreadAbortException threadAbortException)
+            {
+                // Do Nothing
+                Debug.WriteLine(threadAbortException.Message);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+                StartUpTimings.Add(exception.Message);
+            }
+        }
+
+        private void GetInternalVersion(string url)
+        {
+            var data = GetData(url);
+
+            // Tidy Up the data
+            data = data.Replace("Your IP address : ", "");
+            data = data.Replace("UTC Date : ", "");
+            data = data.Replace("<br/>", "|");
+            data = data.Replace("<br />", "|");
+
+            string[] lines = data.Split('|');
+
+            if (lines[0].Contains(":"))
+            {
+                string[] ipV6Parts = lines[0].Split(':');
+                // Must have between 4 and 8 parts
+                if (ipV6Parts.Length >= 4 && ipV6Parts.Length <= 8)
+                {
+                    IpAddress = "IpAddress " + lines[0];
+                    IpObtainedFrom = $"IpAddress V6 obtained from '{url}' on attempt {_attempts}";
+                }
+            }
+
+            if (lines[0].Contains("."))
+            {
+                // Must have 4 parts
+                string[] ipV4Parts = lines[0].Split('.');
+                if (ipV4Parts.Length == 4)
+                {
+                    IpAddress = "IpAddress " + lines[0];
+                    IpObtainedFrom = $"IpAddress V4 obtained from '{url}' on attempt {_attempts}";
+                }
+            }
+
+            if (lines.Length > 1)
+            {
+                ServerUtcDateRaw = lines[1];
+                ServerUtcDateTime = FromPhpDate(lines[1]);
+                SystemUtcDateTime = DateTime.UtcNow;
+
+                UtcOffset = SystemUtcDateTime.Ticks - ServerUtcDateTime.Ticks;
+            }
+        }
+
+        private void GetExternalVersion(string url)
+        {
+            var data = GetData(url);
+
+            if (data.Contains(":"))
+            {
+                IpAddress = "IpAddress " + data;
+                IpObtainedFrom = $"IpAddress V6 obtained from '{url}' on attempt {_attempts}";
+
+                if (!string.IsNullOrEmpty(ServerDateHeader))
+                {
+                    ServerUtcDateTime = DateTime.Parse(ServerDateHeader).ToUniversalTime();
+                    SystemUtcDateTime = DateTime.UtcNow;
+                    UtcOffset = SystemUtcDateTime.Ticks - ServerUtcDateTime.Ticks;
+                }
+            }
+
+            if (data.Contains("."))
+            {
+                IpAddress = "IpAddress " + data;
+                IpObtainedFrom = $"IpAddress V4 obtained from '{url}' on attempt {_attempts}";
+
+                if (!string.IsNullOrEmpty(ServerDateHeader))
+                {
+                    ServerUtcDateTime = DateTime.Parse(ServerDateHeader).ToUniversalTime();
+                    SystemUtcDateTime = DateTime.UtcNow;
+                    UtcOffset = SystemUtcDateTime.Ticks - ServerUtcDateTime.Ticks;
+                }
+            }
+        }
+
+        private string GetData(string url)
+        {
+            string result = "0.0.0.0";
+
+            try
+            {
+                if (WebRequest.Create(url) is HttpWebRequest request)
+                {
+                    request.UserAgent = "Chem4Word Add-In";
+                    request.Timeout = url.Contains("chem4word") ? 2000 : 1000;
+
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+                    try
+                    {
+                        // Get Server Date header i.e. "Tue, 01 Jan 2019 19:52:46 GMT"
+                        ServerDateHeader = response.Headers["date"];
+                    }
+                    catch
+                    {
+                        // Do Nothing
+                        ServerDateHeader = null;
+                    }
+
+                    if (HttpStatusCode.OK.Equals(response.StatusCode))
+                    {
+                        var stream = response.GetResponseStream();
+                        if (stream != null)
+                        {
+                            using (var reader = new StreamReader(stream))
+                            {
+                                result = reader.ReadToEnd();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (WebException webException)
+            {
+                StartUpTimings.Add(webException.Status == WebExceptionStatus.Timeout
+                                       ? $"Timeout: '{url}'"
+                                       : webException.Message);
+            }
+            catch (Exception exception)
+            {
+                StartUpTimings.Add(exception.Message);
+            }
+
+            return result;
+        }
+
+        private void GetExternalIpAddressV1(object o)
         {
             string module = $"{MethodBase.GetCurrentMethod().Name}()";
 
@@ -609,7 +828,7 @@ namespace Chem4Word.Telemetry
                         // Retry
                         IncrementRetryCount();
                         Thread.Sleep(500);
-                        ParameterizedThreadStart pts = GetExternalIpAddress;
+                        ParameterizedThreadStart pts = GetExternalIpAddressV1;
                         Thread thread = new Thread(pts);
                         thread.SetApartmentState(ApartmentState.STA);
                         thread.Start(null);
@@ -618,9 +837,9 @@ namespace Chem4Word.Telemetry
                     {
                         // Failure
                         IpAddress = IpAddress.Replace("0.0.0.0", "8.8.8.8");
-                        _stopwatch.Stop();
+                        _ipStopwatch.Stop();
 
-                        var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                        var message = $"{module} took {_ipStopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
                         StartUpTimings.Add(message);
                         Debug.WriteLine(message);
                     }
@@ -628,9 +847,9 @@ namespace Chem4Word.Telemetry
                 else
                 {
                     // Success
-                    _stopwatch.Stop();
+                    _ipStopwatch.Stop();
 
-                    var message = $"{module} took {_stopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                    var message = $"{module} took {_ipStopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
                     StartUpTimings.Add(message);
                     Debug.WriteLine(message);
                 }
@@ -640,7 +859,6 @@ namespace Chem4Word.Telemetry
                 // Do Nothing
                 Debug.WriteLine(threadAbortException.Message);
             }
-
         }
 
         private DateTime FromPhpDate(string line)

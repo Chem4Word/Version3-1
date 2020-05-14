@@ -43,9 +43,7 @@ namespace Chem4Word
 {
     public partial class Chem4WordV3
     {
-        // Internal variables for class
         private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
-
         private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
         public static CustomRibbon Ribbon;
@@ -54,6 +52,7 @@ namespace Chem4Word
         public DateTime VersionLastChecked = DateTime.MinValue;
         public string VersionAvailable = string.Empty;
         public bool VersionAvailableIsBeta = false;
+        public bool IsEnabled;
 
         public XDocument AllVersions;
         public XDocument ThisVersion;
@@ -75,7 +74,7 @@ namespace Chem4Word
         public bool LibraryState = false;
 
         public List<string> StartUpTimings = new List<string>();
-        public C4wAddInInfo AddInInfo = new C4wAddInInfo();
+        public C4wAddInInfo AddInInfo;
         public SystemHelper Helper;
         public Chem4WordOptions SystemOptions;
         public TelemetryWriter Telemetry;
@@ -295,6 +294,8 @@ namespace Chem4Word
 
             try
             {
+                AddInInfo = new C4wAddInInfo();
+
                 // Handle slower startup stuff on thread
                 Thread thread = new Thread(SlowOperations);
                 thread.SetApartmentState(ApartmentState.STA);
@@ -577,7 +578,10 @@ namespace Chem4Word
                     }
                     else
                     {
-                        OnWindowSelectionChange(Application.Selection);
+                        if (Application.Selection != null)
+                        {
+                            OnWindowSelectionChange(Application.Selection);
+                        }
                     }
 
                     LoadOptions();
@@ -695,8 +699,7 @@ namespace Chem4Word
             foreach (string plugIn in plugInsFound)
             {
                 string[] parts = plugIn.Split('|');
-                Debug.WriteLine(
-                    $"Loading PlugIn {parts[0]} with Interface {parts[1]} from file {parts[2]} signed by {parts[3]}");
+                Debug.WriteLine($"Loading PlugIn {parts[0]} with Interface {parts[1]} from file {parts[2]} signed by {parts[3]}");
 
                 bool allowed = true;
                 if (mustBeSigned)
@@ -734,6 +737,7 @@ namespace Chem4Word
                                 if (type.GetInterface(editorType.FullName) != null)
                                 {
                                     IChem4WordEditor plugin = (IChem4WordEditor)Activator.CreateInstance(type);
+                                    plugin.SettingsPath = AddInInfo.ProductAppDataPath;
                                     Editors.Add(plugin);
                                     break;
                                 }
@@ -753,6 +757,7 @@ namespace Chem4Word
                                 if (type.GetInterface(rendererType.FullName) != null)
                                 {
                                     IChem4WordRenderer plugin = (IChem4WordRenderer)Activator.CreateInstance(type);
+                                    plugin.SettingsPath = AddInInfo.ProductAppDataPath;
                                     Renderers.Add(plugin);
                                     break;
                                 }
@@ -772,6 +777,7 @@ namespace Chem4Word
                                 if (type.GetInterface(searcherType.FullName) != null)
                                 {
                                     IChem4WordSearcher plugin = (IChem4WordSearcher)Activator.CreateInstance(type);
+                                    plugin.SettingsPath = AddInInfo.ProductAppDataPath;
                                     Searchers.Add(plugin);
                                     break;
                                 }
@@ -1008,6 +1014,7 @@ namespace Chem4Word
                 bool plugInsLoaded = Editors.Count + Renderers.Count + Searchers.Count > 0;
                 // Enabled once any PlugIns are loaded
                 Ribbon.ChangeOptions.Enabled = plugInsLoaded;
+                IsEnabled = true;
 
                 switch (state)
                 {
@@ -1076,6 +1083,8 @@ namespace Chem4Word
                     Ribbon.SaveToLibrary.Enabled = false;
                     Ribbon.ArrangeMolecules.Enabled = false;
                     Ribbon.ButtonsDisabled.Enabled = true;
+
+                    IsEnabled = false;
                 }
             }
         }
@@ -1150,7 +1159,6 @@ namespace Chem4Word
             EventsEnabled = false;
 
             bool chemistrySelected = false;
-            ChemistryProhibitedReason = "";
 
             try
             {
@@ -1231,31 +1239,34 @@ namespace Chem4Word
         private void OnWindowBeforeRightClick(Word.Selection sel, ref bool cancel)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                EvaluateChemistryAllowed();
-                if (ChemistryAllowed)
+                try
                 {
-                    if (sel.Start != sel.End)
+                    EvaluateChemistryAllowed();
+                    if (ChemistryAllowed)
                     {
-                        HandleRightClick(sel);
+                        if (sel.Start != sel.End)
+                        {
+                            HandleRightClick(sel);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
+                catch (Exception ex)
                 {
-                    LoadOptions();
-                }
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                {
-                    form.ShowDialog();
-                }
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -1593,37 +1604,40 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (Ribbon != null)
+                try
+                {
+                    if (Ribbon != null)
+                    {
+                        if (SystemOptions == null && Helper != null)
+                        {
+                            LoadOptions();
+                        }
+                    }
+                }
+                catch (Exception exception)
                 {
                     if (SystemOptions == null && Helper != null)
                     {
                         LoadOptions();
                     }
-                }
-            }
-            catch (Exception exception)
-            {
-                if (SystemOptions == null && Helper != null)
-                {
-                    LoadOptions();
-                }
 
-                if (Telemetry == null || Helper == null)
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
-                else
-                {
-                    using (var form = new ReportError(Telemetry, WordTopLeft, module, exception))
+                    if (Telemetry == null || Helper == null)
                     {
-                        form.ShowDialog();
+                        RegistryHelper.StoreException(module, exception);
                     }
-                }
+                    else
+                    {
+                        using (var form = new ReportError(Telemetry, WordTopLeft, module, exception))
+                        {
+                            form.ShowDialog();
+                        }
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -1631,187 +1645,190 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (Application.Documents.Count > 0)
+                try
                 {
-                    Word.Document doc = null;
-                    try
+                    if (Application.Documents.Count > 0)
                     {
-                        doc = Application.ActiveDocument;
-                    }
-                    catch (Exception ex1)
-                    {
-                        // This only happens when document is in protected mode
-                        Debug.WriteLine($"Module: {module}; Exception: {ex1.Message}");
-                    }
-
-                    if (doc != null)
-                    {
-                        bool docxMode = doc.CompatibilityMode >= (int)Word.WdCompatibilityMode.wdWord2010;
-
-                        if (Ribbon != null)
-                        {
-                            Ribbon.ShowNavigator.Checked = false;
-                            Ribbon.ShowLibrary.Checked = LibraryState;
-                            Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open ";
-                            Debug.WriteLine(module);
-                            Ribbon.StartWpfWarmUp();
-                        }
-
-                        foreach (Word.InlineShape inlineShape in doc.InlineShapes)
-                        {
-                            if (inlineShape.Type == Word.WdInlineShapeType.wdInlineShapeEmbeddedOLEObject)
-                            {
-                                Debug.WriteLine($"Found {inlineShape.OLEFormat.ClassType} @ {inlineShape.Range.Start} ");
-                            }
-                        }
-
-                        DialogResult answer = Upgrader.UpgradeIsRequired(doc);
-                        switch (answer)
-                        {
-                            case DialogResult.Yes:
-                                if (SystemOptions == null)
-                                {
-                                    LoadOptions();
-                                }
-
-                                Upgrader.DoUpgrade(doc);
-                                break;
-
-                            case DialogResult.No:
-                                Telemetry.Write(module, "Information", "User chose not to upgrade");
-                                break;
-
-                            case DialogResult.Cancel:
-                                // Returns Cancel if nothing to do
-                                break;
-                        }
-
-                        #region Handle Navigator Task Panes
-
+                        Word.Document doc = null;
                         try
                         {
-                            foreach (var taskPane in CustomTaskPanes)
+                            doc = Application.ActiveDocument;
+                        }
+                        catch (Exception ex1)
+                        {
+                            // This only happens when document is in protected mode
+                            Debug.WriteLine($"Module: {module}; Exception: {ex1.Message}");
+                        }
+
+                        if (doc != null)
+                        {
+                            bool docxMode = doc.CompatibilityMode >= (int)Word.WdCompatibilityMode.wdWord2010;
+
+                            if (Ribbon != null)
                             {
-                                if (taskPane.Window != null)
+                                Ribbon.ShowNavigator.Checked = false;
+                                Ribbon.ShowLibrary.Checked = LibraryState;
+                                Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open ";
+                                Debug.WriteLine(module);
+                                Ribbon.StartWpfWarmUp();
+                            }
+
+                            foreach (Word.InlineShape inlineShape in doc.InlineShapes)
+                            {
+                                if (inlineShape.Type == Word.WdInlineShapeType.wdInlineShapeEmbeddedOLEObject)
                                 {
-                                    string taskdoc = ((Word.Window)taskPane.Window).Document.Name;
-                                    if (doc.Name.Equals(taskdoc))
+                                    Debug.WriteLine($"Found {inlineShape.OLEFormat.ClassType} @ {inlineShape.Range.Start} ");
+                                }
+                            }
+
+                            DialogResult answer = Upgrader.UpgradeIsRequired(doc);
+                            switch (answer)
+                            {
+                                case DialogResult.Yes:
+                                    if (SystemOptions == null)
                                     {
-                                        if (taskPane.Title.Equals(Constants.NavigatorTaskPaneTitle))
-                                        {
-                                            //Debug.WriteLine($"Found Navigator Task Pane. Visible: {taskPane.Visible}");
-                                            if (Ribbon != null)
-                                            {
-                                                Ribbon.ShowNavigator.Checked = taskPane.Visible;
-                                            }
-                                            break;
-                                        }
+                                        LoadOptions();
                                     }
-                                }
+
+                                    Upgrader.DoUpgrade(doc);
+                                    break;
+
+                                case DialogResult.No:
+                                    Telemetry.Write(module, "Information", "User chose not to upgrade");
+                                    break;
+
+                                case DialogResult.Cancel:
+                                    // Returns Cancel if nothing to do
+                                    break;
                             }
-                        }
-                        catch
-                        {
-                            // Do Nothing
-                        }
 
-                        #endregion Handle Navigator Task Panes
+                            #region Handle Navigator Task Panes
 
-                        #region Handle Library Task Panes
-
-                        try
-                        {
-                            bool libraryFound = false;
-
-                            foreach (var taskPane in CustomTaskPanes)
+                            try
                             {
-                                if (taskPane.Window != null)
+                                foreach (var taskPane in CustomTaskPanes)
                                 {
-                                    string taskdoc = ((Word.Window)taskPane.Window).Document.Name;
-                                    if (doc.Name.Equals(taskdoc))
+                                    if (taskPane.Window != null)
                                     {
-                                        if (taskPane.Title.Equals(Constants.LibraryTaskPaneTitle))
+                                        string taskdoc = ((Word.Window)taskPane.Window).Document.Name;
+                                        if (doc.Name.Equals(taskdoc))
                                         {
-                                            //Debug.WriteLine($"Found Library Task Pane. Visible: {taskPane.Visible}");
-                                            if (Ribbon != null)
+                                            if (taskPane.Title.Equals(Constants.NavigatorTaskPaneTitle))
                                             {
-                                                if (!docxMode)
+                                                //Debug.WriteLine($"Found Navigator Task Pane. Visible: {taskPane.Visible}");
+                                                if (Ribbon != null)
                                                 {
-                                                    Ribbon.ShowLibrary.Checked = false;
+                                                    Ribbon.ShowNavigator.Checked = taskPane.Visible;
                                                 }
-                                                taskPane.Visible = Ribbon.ShowLibrary.Checked;
-                                                Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open";
+                                                break;
                                             }
-                                            libraryFound = true;
-                                            break;
                                         }
                                     }
                                 }
                             }
-
-                            if (!libraryFound)
+                            catch
                             {
-                                if (Ribbon != null && Ribbon.ShowLibrary.Checked)
+                                // Do Nothing
+                            }
+
+                            #endregion Handle Navigator Task Panes
+
+                            #region Handle Library Task Panes
+
+                            try
+                            {
+                                bool libraryFound = false;
+
+                                foreach (var taskPane in CustomTaskPanes)
                                 {
-                                    if (docxMode)
+                                    if (taskPane.Window != null)
                                     {
-                                        OfficeTools.CustomTaskPane custTaskPane =
-                                            CustomTaskPanes.Add(new LibraryHost(),
-                                                Constants.LibraryTaskPaneTitle, Application.ActiveWindow);
-                                        // Opposite side to Navigator's default placement
-                                        custTaskPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
-                                        custTaskPane.Width = WordWidth / 4;
-                                        custTaskPane.VisibleChanged += Ribbon.OnLibraryPaneVisibleChanged;
-                                        custTaskPane.Visible = true;
-                                        (custTaskPane.Control as LibraryHost)?.Refresh();
+                                        string taskdoc = ((Word.Window)taskPane.Window).Document.Name;
+                                        if (doc.Name.Equals(taskdoc))
+                                        {
+                                            if (taskPane.Title.Equals(Constants.LibraryTaskPaneTitle))
+                                            {
+                                                //Debug.WriteLine($"Found Library Task Pane. Visible: {taskPane.Visible}");
+                                                if (Ribbon != null)
+                                                {
+                                                    if (!docxMode)
+                                                    {
+                                                        Ribbon.ShowLibrary.Checked = false;
+                                                    }
+                                                    taskPane.Visible = Ribbon.ShowLibrary.Checked;
+                                                    Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open";
+                                                }
+                                                libraryFound = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!libraryFound)
+                                {
+                                    if (Ribbon != null && Ribbon.ShowLibrary.Checked)
+                                    {
+                                        if (docxMode)
+                                        {
+                                            OfficeTools.CustomTaskPane custTaskPane =
+                                                CustomTaskPanes.Add(new LibraryHost(),
+                                                    Constants.LibraryTaskPaneTitle, Application.ActiveWindow);
+                                            // Opposite side to Navigator's default placement
+                                            custTaskPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
+                                            custTaskPane.Width = WordWidth / 4;
+                                            custTaskPane.VisibleChanged += Ribbon.OnLibraryPaneVisibleChanged;
+                                            custTaskPane.Visible = true;
+                                            (custTaskPane.Control as LibraryHost)?.Refresh();
+                                        }
                                     }
                                 }
                             }
-                        }
-                        catch
-                        {
-                            // Do Nothing
-                        }
+                            catch
+                            {
+                                // Do Nothing
+                            }
 
-                        #endregion Handle Library Task Panes
+                            #endregion Handle Library Task Panes
 
-                        if (docxMode)
-                        {
-                            // Call disable first to ensure events not registered multiple times
-                            DisableContentControlEvents();
-                            EnableContentControlEvents();
+                            if (docxMode)
+                            {
+                                // Call disable first to ensure events not registered multiple times
+                                DisableContentControlEvents();
+                                EnableContentControlEvents();
 
-                            SelectChemistry(doc.Application.Selection);
-                            EvaluateChemistryAllowed();
+                                SelectChemistry(doc.Application.Selection);
+                                EvaluateChemistryAllowed();
 
-                            if (!ChemistryAllowed)
+                                if (!ChemistryAllowed)
+                                {
+                                    SetButtonStates(ButtonState.NoDocument);
+                                }
+                            }
+                            else
                             {
                                 SetButtonStates(ButtonState.NoDocument);
                             }
                         }
-                        else
-                        {
-                            SetButtonStates(ButtonState.NoDocument);
-                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
+                catch (Exception ex)
                 {
-                    LoadOptions();
-                }
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                {
-                    form.ShowDialog();
-                }
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -1819,32 +1836,35 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (Ribbon != null)
+                try
+                {
+                    if (Ribbon != null)
+                    {
+                        if (SystemOptions == null)
+                        {
+                            LoadOptions();
+                        }
+                        Debug.WriteLine(module);
+                        Ribbon.StartWpfWarmUp();
+                    }
+                }
+                catch (Exception ex)
                 {
                     if (SystemOptions == null)
                     {
                         LoadOptions();
                     }
-                    Debug.WriteLine(module);
-                    Ribbon.StartWpfWarmUp();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
-                {
-                    LoadOptions();
-                }
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                {
-                    form.ShowDialog();
-                }
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -1859,68 +1879,71 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (SystemOptions == null)
+                try
                 {
-                    LoadOptions();
-                }
-
-                if (!doc.ReadOnly)
-                {
-                    if (Upgrader.LegacyChemistryCount(doc) == 0)
+                    if (SystemOptions == null)
                     {
-                        // Handle Word 2013+ AutoSave
-                        if (WordVersion >= 2013)
+                        LoadOptions();
+                    }
+
+                    if (!doc.ReadOnly)
+                    {
+                        if (Upgrader.LegacyChemistryCount(doc) == 0)
                         {
-                            if (!doc.IsInAutosave)
+                            // Handle Word 2013+ AutoSave
+                            if (WordVersion >= 2013)
+                            {
+                                if (!doc.IsInAutosave)
+                                {
+                                    CustomXmlPartHelper.RemoveOrphanedXmlParts(doc);
+                                }
+                            }
+                            else
                             {
                                 CustomXmlPartHelper.RemoveOrphanedXmlParts(doc);
                             }
                         }
-                        else
-                        {
-                            CustomXmlPartHelper.RemoveOrphanedXmlParts(doc);
-                        }
                     }
                 }
-            }
-            catch (COMException cex)
-            {
-                string comCode = HexErrorCode(cex.ErrorCode);
-                switch (comCode)
+                catch (COMException cex)
                 {
-                    case "0xE0041804":
-                        Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
-                        Telemetry.Write(module, "Exception", $"Handled {cex.Message}");
-                        Telemetry.Write(module, "Exception", cex.ToString());
-                        break;
+                    string comCode = HexErrorCode(cex.ErrorCode);
+                    switch (comCode)
+                    {
+                        case "0xE0041804":
+                            Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
+                            Telemetry.Write(module, "Exception", $"Handled {cex.Message}");
+                            Telemetry.Write(module, "Exception", cex.ToString());
+                            break;
 
-                    default:
-                        // Keep exception hidden from end user.
-                        Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
-                        Telemetry.Write(module, "Exception", cex.Message);
-                        Telemetry.Write(module, "Exception", cex.ToString());
-                        break;
+                        default:
+                            // Keep exception hidden from end user.
+                            Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
+                            Telemetry.Write(module, "Exception", cex.Message);
+                            Telemetry.Write(module, "Exception", cex.ToString());
+                            break;
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                RegistryHelper.StoreException(module, ex);
-
-                if (SystemOptions == null)
+                catch (Exception ex)
                 {
-                    LoadOptions();
+                    RegistryHelper.StoreException(module, ex);
+
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
+
+                    // Keep exception hidden from end user.
+                    //using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    //{
+                    //    form.ShowDialog();
+                    //}
+
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
                 }
-
-                // Keep exception hidden from end user.
-                //using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                //{
-                //    form.ShowDialog();
-                //}
-
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
             }
         }
 
@@ -1934,61 +1957,64 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (SystemOptions == null)
+                try
                 {
-                    LoadOptions();
-                }
-
-                if (Ribbon != null)
-                {
-                    SetButtonStates(ButtonState.NoDocument);
-                }
-
-                Word.Application app = Application;
-                OfficeTools.CustomTaskPane custTaskPane = null;
-
-                foreach (OfficeTools.CustomTaskPane taskPane in CustomTaskPanes)
-                {
-                    try
+                    if (SystemOptions == null)
                     {
-                        if (app.ActiveWindow == taskPane.Window)
+                        LoadOptions();
+                    }
+
+                    if (Ribbon != null)
+                    {
+                        SetButtonStates(ButtonState.NoDocument);
+                    }
+
+                    Word.Application app = Application;
+                    OfficeTools.CustomTaskPane custTaskPane = null;
+
+                    foreach (OfficeTools.CustomTaskPane taskPane in CustomTaskPanes)
+                    {
+                        try
                         {
-                            custTaskPane = taskPane;
+                            if (app.ActiveWindow == taskPane.Window)
+                            {
+                                custTaskPane = taskPane;
+                            }
+                        }
+                        catch
+                        {
+                            // Nothing much we can do here!
                         }
                     }
-                    catch
+                    if (custTaskPane != null)
                     {
-                        // Nothing much we can do here!
+                        try
+                        {
+                            CustomTaskPanes.Remove(custTaskPane);
+                        }
+                        catch
+                        {
+                            // Nothing much we can do here!
+                        }
                     }
                 }
-                if (custTaskPane != null)
+                catch (Exception ex)
                 {
-                    try
+                    if (SystemOptions == null)
                     {
-                        CustomTaskPanes.Remove(custTaskPane);
+                        LoadOptions();
                     }
-                    catch
-                    {
-                        // Nothing much we can do here!
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
-                {
-                    LoadOptions();
-                }
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                {
-                    form.ShowDialog();
-                }
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -2005,53 +2031,56 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (EventsEnabled)
+                try
                 {
-                    EventsEnabled = false;
-
-                    SelectChemistry(sel);
-                    EvaluateChemistryAllowed();
-
-                    if (!ChemistryAllowed)
+                    if (EventsEnabled)
                     {
-                        SetButtonStates(ButtonState.NoDocument);
+                        EventsEnabled = false;
+
+                        SelectChemistry(sel);
+                        EvaluateChemistryAllowed();
+
+                        if (!ChemistryAllowed)
+                        {
+                            SetButtonStates(ButtonState.NoDocument);
+                        }
+
+                        EventsEnabled = true;
                     }
 
-                    EventsEnabled = true;
+                    // Deliberate crash to test Error Reporting
+                    //int ii = 2;
+                    //int dd = 0;
+                    //int bang = ii / dd;
                 }
-
-                // Deliberate crash to test Error Reporting
-                //int ii = 2;
-                //int dd = 0;
-                //int bang = ii / dd;
-            }
-            catch (ThreadAbortException tex)
-            {
-                RegistryHelper.StoreException(module, tex);
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
+                catch (ThreadAbortException tex)
                 {
-                    LoadOptions();
+                    RegistryHelper.StoreException(module, tex);
                 }
-
-                if (Telemetry != null)
+                catch (Exception ex)
                 {
-                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    if (SystemOptions == null)
                     {
-                        form.ShowDialog();
+                        LoadOptions();
                     }
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, ex);
-                }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    if (Telemetry != null)
+                    {
+                        using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                        {
+                            form.ShowDialog();
+                        }
+                    }
+                    else
+                    {
+                        RegistryHelper.StoreException(module, ex);
+                    }
+
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -2059,240 +2088,263 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            bool allowed = true;
-            ChemistryProhibitedReason = "";
-
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                if (Application.Documents.Count > 0)
+                bool allowed = true;
+                ChemistryProhibitedReason = VersionAvailableIsBeta ? "" : Constants.Chem4WordIsBeta;
+
+                try
                 {
-                    Word.Document doc = null;
-                    try
+                    if (Application.Documents != null && Application.Documents.Count > 0)
                     {
-                        doc = Application.ActiveDocument;
-                    }
-                    catch
-                    {
-                        // This only happens when document is in protected mode
-                        allowed = false;
-                        ChemistryProhibitedReason = "document is readonly.";
-                    }
-
-                    if (allowed && doc != null)
-                    {
-                        if (doc.CompatibilityMode < (int)Word.WdCompatibilityMode.wdWord2010)
-                        {
-                            allowed = false;
-                            ChemistryProhibitedReason = "document is in compatibility mode.";
-                        }
-
+                        Word.Document doc = null;
                         try
                         {
-                            //if (doc.CoAuthoring.Conflicts.Count > 0) // <-- This clears current selection ???
-                            if (doc.CoAuthoring.Locks.Count > 0)
-                            {
-                                allowed = false;
-                                ChemistryProhibitedReason = "document is in co-authoring mode.";
-                            }
+                            doc = Application.ActiveDocument;
                         }
                         catch
                         {
-                            // CoAuthoring or Conflicts/Locks may not be initialised!
-                        }
-
-                        Word.Selection sel = Application.Selection;
-                        if (allowed && sel.OMaths.Count > 0)
-                        {
-                            ChemistryProhibitedReason = "selection is in an Equation.";
+                            // This only happens when document is in protected mode
                             allowed = false;
+                            doc = null;
+                            ChemistryProhibitedReason = "document is readonly.";
                         }
 
-                        if (allowed && sel.Tables.Count > 0)
+                        if (allowed && doc != null)
                         {
                             try
                             {
-                                if (sel.Cells.Count > 1)
+                                if (doc.CompatibilityMode < (int)Word.WdCompatibilityMode.wdWord2010)
                                 {
-                                    ChemistryProhibitedReason = "selection contains more than one cell of a table.";
+                                    allowed = false;
+                                    ChemistryProhibitedReason = "document is in compatibility mode.";
+                                }
+                            }
+                            catch
+                            {
+                                allowed = false;
+                                ChemistryProhibitedReason = "can't determine if document is in compatibility mode.";
+                            }
+
+                            try
+                            {
+                                //if (doc.CoAuthoring.Conflicts.Count > 0) // <-- This clears current selection ???
+                                if (doc.CoAuthoring.Locks.Count > 0)
+                                {
+                                    allowed = false;
+                                    ChemistryProhibitedReason = "document is in co-authoring mode.";
+                                }
+                            }
+                            catch
+                            {
+                                // CoAuthoring or Conflicts/Locks may not be initialised!
+                            }
+
+                            try
+                            {
+                                if (allowed && doc.IsSubdocument)
+                                {
+                                    ChemistryProhibitedReason = "current document is a sub document.";
                                     allowed = false;
                                 }
                             }
                             catch
                             {
-                                // Cells may not be initialised!
+                                allowed = false;
+                                ChemistryProhibitedReason = "can't determine if document is a sub document.";
                             }
-                        }
 
-                        if (allowed && doc.IsSubdocument)
-                        {
-                            ChemistryProhibitedReason = "current document is a sub document.";
-                            allowed = false;
-                        }
-
-                        if (allowed)
-                        {
-                            try
+                            Word.Selection sel = Application.Selection;
+                            if (sel != null)
                             {
-                                Word.WdStoryType story = sel.StoryType;
-                                if (story != Word.WdStoryType.wdMainTextStory)
+                                if (allowed && sel.OMaths.Count > 0)
                                 {
-                                    ChemistryProhibitedReason = $"selection is in a '{DecodeStoryType(story)}' story.";
+                                    ChemistryProhibitedReason = "selection is in an Equation.";
                                     allowed = false;
                                 }
-                            }
-                            catch
-                            {
-                                // ComException 0x80004005
-                                ChemistryProhibitedReason = "can't determine which part of the story the selection point is.";
-                                allowed = false;
-                            }
-                        }
 
-                        if (allowed)
-                        {
-                            int ccCount = sel.ContentControls.Count;
-                            if (ccCount > 1)
-                            {
-                                allowed = false;
-                                ChemistryProhibitedReason = "more than one ContentControl is selected";
-                            }
-                        }
-
-                        if (allowed)
-                        {
-                            Word.WdContentControlType? contentControlType = null;
-                            string title = "";
-                            foreach (Word.ContentControl ccd in doc.ContentControls)
-                            {
-                                if (ccd.Range.Start <= sel.Range.Start && ccd.Range.End >= sel.Range.End)
+                                if (allowed && sel.Tables.Count > 0)
                                 {
-                                    contentControlType = ccd.Type;
-                                    title = ccd.Title;
-                                    break;
-                                }
-                            }
-
-                            if (contentControlType != null)
-                            {
-                                if (!string.IsNullOrEmpty(title) && title.Equals(Constants.ContentControlTitle))
-                                {
-                                    // Handle old Word 2007 style
-                                    if (contentControlType != Word.WdContentControlType.wdContentControlRichText
-                                        && contentControlType != Word.WdContentControlType.wdContentControlPicture)
+                                    try
                                     {
-                                        allowed = false;
-                                        ChemistryProhibitedReason =
-                                            $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control.";
-                                    }
-                                }
-                                else
-                                {
-                                    if (contentControlType != Word.WdContentControlType.wdContentControlRichText)
-                                    {
-                                        allowed = false;
-                                        ChemistryProhibitedReason =
-                                            $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control";
-                                    }
-
-                                    // Test for Shape inside CC which is not ours
-                                    if (allowed)
-                                    {
-                                        try
+                                        if (sel.Cells.Count > 1)
                                         {
-                                            if (sel.ShapeRange.Count > 0)
+                                            ChemistryProhibitedReason = "selection contains more than one cell of a table.";
+                                            allowed = false;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // Cells may not be initialised!
+                                    }
+                                }
+
+                                if (allowed)
+                                {
+                                    try
+                                    {
+                                        Word.WdStoryType story = sel.StoryType;
+                                        if (story != Word.WdStoryType.wdMainTextStory)
+                                        {
+                                            ChemistryProhibitedReason = $"selection is in a '{DecodeStoryType(story)}' story.";
+                                            allowed = false;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // ComException 0x80004005
+                                        ChemistryProhibitedReason = "can't determine which part of the story the selection point is.";
+                                        allowed = false;
+                                    }
+                                }
+
+                                if (allowed)
+                                {
+                                    int ccCount = sel.ContentControls.Count;
+                                    if (ccCount > 1)
+                                    {
+                                        allowed = false;
+                                        ChemistryProhibitedReason = "more than one ContentControl is selected";
+                                    }
+                                }
+
+                                if (allowed)
+                                {
+                                    Word.WdContentControlType? contentControlType = null;
+                                    string title = "";
+                                    foreach (Word.ContentControl ccd in doc.ContentControls)
+                                    {
+                                        if (ccd.Range.Start <= sel.Range.Start && ccd.Range.End >= sel.Range.End)
+                                        {
+                                            contentControlType = ccd.Type;
+                                            title = ccd.Title;
+                                            break;
+                                        }
+                                    }
+
+                                    if (contentControlType != null)
+                                    {
+                                        if (!string.IsNullOrEmpty(title) && title.Equals(Constants.ContentControlTitle))
+                                        {
+                                            // Handle old Word 2007 style
+                                            if (contentControlType != Word.WdContentControlType.wdContentControlRichText
+                                                && contentControlType != Word.WdContentControlType.wdContentControlPicture)
                                             {
-                                                ChemistryProhibitedReason = "selection contains shape(s) inside Content Control.";
                                                 allowed = false;
+                                                ChemistryProhibitedReason =
+                                                    $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control.";
                                             }
                                         }
-                                        catch
+                                        else
                                         {
-                                            // Shape may not evaluate
+                                            if (contentControlType != Word.WdContentControlType.wdContentControlRichText)
+                                            {
+                                                allowed = false;
+                                                ChemistryProhibitedReason =
+                                                    $"selection is in a '{DecodeContentControlType(contentControlType)}' Content Control";
+                                            }
+
+                                            // Test for Shape inside CC which is not ours
+                                            if (allowed)
+                                            {
+                                                try
+                                                {
+                                                    if (sel.ShapeRange.Count > 0)
+                                                    {
+                                                        ChemistryProhibitedReason = "selection contains shape(s) inside Content Control.";
+                                                        allowed = false;
+                                                    }
+                                                }
+                                                catch
+                                                {
+                                                    // Shape may not evaluate
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }
 
-                        // Test for Shape in document body
-                        if (allowed)
-                        {
-                            try
-                            {
-                                if (sel.ShapeRange.Count > 0)
+                                // Test for Shape in document body
+                                if (allowed)
                                 {
-                                    ChemistryProhibitedReason = "selection contains shape(s).";
-                                    allowed = false;
+                                    try
+                                    {
+                                        if (sel.ShapeRange.Count > 0)
+                                        {
+                                            ChemistryProhibitedReason = "selection contains shape(s).";
+                                            allowed = false;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // Shape may not evaluate
+                                    }
                                 }
-                            }
-                            catch
-                            {
-                                // Shape may not evaluate
                             }
                         }
                     }
+                    else
+                    {
+                        allowed = false;
+                        ChemistryProhibitedReason = "no document is open.";
+                    }
                 }
-                else
+                catch (COMException cex)
                 {
-                    allowed = false;
-                    ChemistryProhibitedReason = "no document is open.";
+                    string comCode = HexErrorCode(cex.ErrorCode);
+                    switch (comCode)
+                    {
+                        case "0x80004005":
+                            ChemistryAllowed = false;
+                            ChemistryProhibitedReason = "can't determine where the current selection is.";
+                            break;
+
+                        case "0x800A11FD":
+                            ChemistryAllowed = false;
+                            ChemistryProhibitedReason = "changes are not permitted in the current selection.";
+                            break;
+
+                        case "0x800A1759":
+                            ChemistryAllowed = false;
+                            ChemistryProhibitedReason = "can't create a selection when a dialogue is active.";
+                            break;
+
+                        default:
+                            ChemistryAllowed = false;
+                            ChemistryProhibitedReason = $"COMException {cex.Message} ErrorCode: {comCode}";
+                            if (Telemetry != null)
+                            {
+                                // Keep exception hidden from end user.
+                                Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
+                                Telemetry.Write(module, "Exception", cex.Message);
+                                Telemetry.Write(module, "Exception", cex.ToString());
+                            }
+                            else
+                            {
+                                RegistryHelper.StoreException(module, cex);
+                            }
+                            break;
+                    }
                 }
-            }
-            catch (COMException cex)
-            {
-                string comCode = HexErrorCode(cex.ErrorCode);
-                switch (comCode)
+                catch (Exception ex)
                 {
-                    case "0x80004005":
-                        ChemistryAllowed = false;
-                        ChemistryProhibitedReason = "can't determine where the current selection is.";
-                        break;
-
-                    case "0x800A11FD":
-                        ChemistryAllowed = false;
-                        ChemistryProhibitedReason = "changes are not permitted in the current selection.";
-                        break;
-
-                    case "0x800A1759":
-                        ChemistryAllowed = false;
-                        ChemistryProhibitedReason = "can't create a selection when a dialogue is active.";
-                        break;
-
-                    default:
-                        ChemistryAllowed = false;
-                        ChemistryProhibitedReason = $"COMException {cex.Message} ErrorCode: {comCode}";
-                        if (Telemetry != null)
-                        {
-                            // Keep exception hidden from end user.
-                            Telemetry.Write(module, "Exception", $"ErrorCode: {comCode}");
-                            Telemetry.Write(module, "Exception", cex.Message);
-                            Telemetry.Write(module, "Exception", cex.ToString());
-                        }
-                        else
-                        {
-                            RegistryHelper.StoreException(module, cex);
-                        }
-                        break;
+                    if (Telemetry != null)
+                    {
+                        // Keep exception hidden from end user.
+                        Telemetry.Write(module, "Exception", ex.Message);
+                        Telemetry.Write(module, "Exception", ex.ToString());
+                    }
+                    else
+                    {
+                        RegistryHelper.StoreException(module, ex);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                if (Telemetry != null)
+
+                ChemistryAllowed = allowed;
+                if (!allowed)
                 {
-                    // Keep exception hidden from end user.
-                    Telemetry.Write(module, "Exception", ex.Message);
-                    Telemetry.Write(module, "Exception", ex.ToString());
+                    Debug.WriteLine($"ChemistryProhibitedReason: {ChemistryProhibitedReason}");
                 }
-                else
-                {
-                    RegistryHelper.StoreException(module, ex);
-                }
-            }
-
-            ChemistryAllowed = allowed;
-            if (!allowed)
-            {
-                Debug.WriteLine($"ChemistryProhibitedReason: {ChemistryProhibitedReason}");
             }
         }
 
@@ -2457,30 +2509,33 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                //Debug.WriteLine($"{module.Replace("()", $"({sel.Document.Name})")}");
-                //Debug.WriteLine("  Selection: from " + sel.Range.Start + " to " + sel.Range.End);
-
-                if (EventsEnabled && _chemistrySelected)
+                try
                 {
-                    CustomRibbon.PerformEdit();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
-                {
-                    LoadOptions();
-                }
+                    //Debug.WriteLine($"{module.Replace("()", $"({sel.Document.Name})")}");
+                    //Debug.WriteLine("  Selection: from " + sel.Range.Start + " to " + sel.Range.End);
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
-                {
-                    form.ShowDialog();
+                    if (EventsEnabled && _chemistrySelected)
+                    {
+                        CustomRibbon.PerformEdit();
+                    }
                 }
+                catch (Exception ex)
+                {
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
+
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 
@@ -2493,31 +2548,34 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            try
+            if (VersionsBehind < Constants.MaximumVersionsBehind)
             {
-                Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
-
-                EvaluateChemistryAllowed();
-
-                // Deliberate crash to test Error Reporting
-                //int ii = 2;
-                //int dd = 0;
-                //int bang = ii / dd;
-            }
-            catch (Exception ex)
-            {
-                if (SystemOptions == null)
+                try
                 {
-                    LoadOptions();
-                }
+                    Debug.WriteLine($"{module.Replace("()", $"({doc.Name})")}");
 
-                using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    EvaluateChemistryAllowed();
+
+                    // Deliberate crash to test Error Reporting
+                    //int ii = 2;
+                    //int dd = 0;
+                    //int bang = ii / dd;
+                }
+                catch (Exception ex)
                 {
-                    form.ShowDialog();
-                }
+                    if (SystemOptions == null)
+                    {
+                        LoadOptions();
+                    }
 
-                UpdateHelper.ClearSettings();
-                UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                    using (var form = new ReportError(Telemetry, WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
+
+                    UpdateHelper.ClearSettings();
+                    UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
+                }
             }
         }
 

@@ -124,26 +124,29 @@ namespace Chem4Word.Telemetry
 
             List<string> lines = new List<string>();
 
-            // Log UtcOffsets
-            lines.Add($"Server UTC DateTime is {SafeDate.ToLongDate(_helper.ServerUtcDateTime)}");
-            lines.Add($"System UTC DateTime is {SafeDate.ToLongDate(_helper.SystemUtcDateTime)}");
-
-            lines.Add($"Server Header [Date] is {_helper.ServerDateHeader}");
-            lines.Add($"Server UTC DateTime raw is {_helper.ServerUtcDateRaw}");
-
-            lines.Add($"Calculated UTC Offset is {_helper.UtcOffset}");
-            if (_helper.UtcOffset > 0)
+            if (_helper.SystemUtcDateTime > DateTime.MinValue)
             {
-                TimeSpan delta = TimeSpan.FromTicks(_helper.UtcOffset);
-                lines.Add($"System UTC DateTime is {delta} ahead of Server time");
-            }
-            if (_helper.UtcOffset < 0)
-            {
-                TimeSpan delta = TimeSpan.FromTicks(0 - _helper.UtcOffset);
-                lines.Add($"System UTC DateTime is {delta} behind Server time");
-            }
+                // Log UtcOffsets
+                lines.Add($"Server UTC DateTime is {SafeDate.ToLongDate(_helper.ServerUtcDateTime)}");
+                lines.Add($"System UTC DateTime is {SafeDate.ToLongDate(_helper.SystemUtcDateTime)}");
 
-            WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
+                lines.Add($"Server Header [Date] is {_helper.ServerDateHeader}");
+                lines.Add($"Server UTC DateTime raw is {_helper.ServerUtcDateRaw}");
+
+                lines.Add($"Calculated UTC Offset is {_helper.UtcOffset}");
+                if (_helper.UtcOffset > 0)
+                {
+                    TimeSpan delta = TimeSpan.FromTicks(_helper.UtcOffset);
+                    lines.Add($"System UTC DateTime is {delta} ahead of Server time");
+                }
+                if (_helper.UtcOffset < 0)
+                {
+                    TimeSpan delta = TimeSpan.FromTicks(0 - _helper.UtcOffset);
+                    lines.Add($"System UTC DateTime is {delta} behind Server time");
+                }
+
+                WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
+            }
 
             // Log Wmi Gathered Data
             lines = new List<string>();

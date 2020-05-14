@@ -59,8 +59,6 @@ namespace Chem4Word.Shared
         /// <returns></returns>
         public static int GetWinWordVersionNumber(string path = null)
         {
-            string wordVersionNumber = String.Empty;
-
             if (path == null)
             {
                 path = GetWinWordPath();
@@ -106,6 +104,21 @@ namespace Chem4Word.Shared
             if (officeProductName.Contains("-0000000FF1CE}"))
             {
                 officeProductName += Environment.NewLine + fi.ProductName;
+            }
+
+            if (wordVersionNumber.StartsWith("16."))
+            {
+                if (officeProductName.Contains("2016")
+                    || officeProductName.Contains("2019")
+                    || officeProductName.Contains("365"))
+                {
+                    // Word version is set
+                }
+                else
+                {
+                    // Force word version to 2016
+                    officeProductName = officeProductName + " 2016";
+                }
             }
 
             string result = officeProductName + " [" + wordVersionNumber + "]";

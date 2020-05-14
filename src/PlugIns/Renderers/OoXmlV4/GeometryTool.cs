@@ -187,8 +187,8 @@ namespace Chem4Word.Renderer.OoXmlV4
             Point bestPt = points[0];
             foreach (Point pt in points)
             {
-                if ((pt.Y < bestPt.Y) ||
-                   ((pt.Y == bestPt.Y) && (pt.X < bestPt.X)))
+                if (pt.Y < bestPt.Y
+                    || pt.Y == bestPt.Y && pt.X < bestPt.X)
                 {
                     bestPt = pt;
                 }
@@ -201,21 +201,21 @@ namespace Chem4Word.Renderer.OoXmlV4
 
             // Start wrapping up the other points.
             double sweepAngle = 0;
-            for (; ; )
+            while (true)
             {
                 // Find the point with smallest AngleValue
                 // from the last point.
-                double X = hull[hull.Count - 1].X;
-                double Y = hull[hull.Count - 1].Y;
+                double x1 = hull[hull.Count - 1].X;
+                double y1 = hull[hull.Count - 1].Y;
                 bestPt = points[0];
                 double bestAngle = 3600;
 
                 // Search the rest of the points.
                 foreach (Point pt in points)
                 {
-                    double testAngle = AngleValue(X, Y, pt.X, pt.Y);
-                    if ((testAngle >= sweepAngle) &&
-                        (bestAngle > testAngle))
+                    double testAngle = AngleValue(x1, y1, pt.X, pt.Y);
+                    if (testAngle >= sweepAngle
+                        && bestAngle > testAngle)
                     {
                         bestAngle = testAngle;
                         bestPt = pt;
@@ -224,9 +224,9 @@ namespace Chem4Word.Renderer.OoXmlV4
 
                 // See if the first point is better.
                 // If so, we are done.
-                double firstAngle = AngleValue(X, Y, hull[0].X, hull[0].Y);
-                if ((firstAngle >= sweepAngle) &&
-                    (bestAngle >= firstAngle))
+                double firstAngle = AngleValue(x1, y1, hull[0].X, hull[0].Y);
+                if (firstAngle >= sweepAngle
+                    && bestAngle >= firstAngle)
                 {
                     // The first point is better. We're done.
                     break;
@@ -309,12 +309,12 @@ namespace Chem4Word.Renderer.OoXmlV4
                 int i2 = (i1 + 1) % points.Count;
 
                 // See where the edge intersects the segment.
-                bool linesIntersect, segmentsIntersect;
+                bool segmentsIntersect;
                 Point intersection;
 
                 CoordinateTool.FindIntersection(point1, point2,
                    points[i1], points[i2],
-                   out linesIntersect, out segmentsIntersect,
+                   out _, out segmentsIntersect,
                    out intersection);
 
                 // See if the segment intersects the edge.
@@ -365,7 +365,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             // the point is in the polygon and close to zero
             // if the point is outside the polygon.
             // The following statement was changed. See the comments.
-            //return (Math.Abs(total_angle) > 0.000001);
             return (Math.Abs(totalAngle) > 1);
         }
 

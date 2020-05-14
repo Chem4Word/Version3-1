@@ -5,21 +5,15 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Windows;
-using Chem4Word.Renderer.OoXmlV4.Enums;
 
-namespace Chem4Word.Renderer.OoXmlV4.Entities
+namespace Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic
 {
-    public class SimpleLine
+    public class Diagnostics
     {
-        public Point Start { get; set; }
-
-        public Point End { get; set; }
-
-        public SimpleLine(Point startPoint, Point endPoint)
-        {
-            Start = startPoint;
-            End = endPoint;
-        }
+        public List<DiagnosticLine> Lines { get; } = new List<DiagnosticLine>();
+        public List<List<Point>> Polygons { get; } = new List<List<Point>>();
+        public List<DiagnosticSpot> Points { get; } = new List<DiagnosticSpot>();
     }
 }

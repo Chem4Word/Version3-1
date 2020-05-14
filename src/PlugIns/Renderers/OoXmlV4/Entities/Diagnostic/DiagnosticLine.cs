@@ -8,18 +8,24 @@
 using System.Windows;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 
-namespace Chem4Word.Renderer.OoXmlV4.Entities
+namespace Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic
 {
-    public class SimpleLine
+    public class DiagnosticLine
     {
-        public Point Start { get; set; }
+        public Point Start { get; }
 
-        public Point End { get; set; }
+        public Point End { get; }
 
-        public SimpleLine(Point startPoint, Point endPoint)
+        public BondLineStyle Style { get; }
+
+        public string Colour { get; }
+
+        public DiagnosticLine(Point startPoint, Point endPoint, BondLineStyle style, string colour = "000000")
         {
             Start = startPoint;
             End = endPoint;
+            Style = style;
+            Colour = colour;
         }
     }
 }

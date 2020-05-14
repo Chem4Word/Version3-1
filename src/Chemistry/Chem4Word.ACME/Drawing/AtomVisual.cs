@@ -25,17 +25,9 @@ namespace Chem4Word.ACME.Drawing
     {
         #region Fields
 
-        #region private fields
-
-        private static double MaskOffsetWidth = 0;
-
-        //public double BondThickness { get; set; }
-
         public bool ShowInColour { get; set; }
         public bool ShowImplicitHydrogens { get; set; }
         public bool ShowAllCarbons { get; set; }
-
-        #endregion private fields
 
         #endregion Fields
 
@@ -528,8 +520,6 @@ namespace Chem4Word.ACME.Drawing
         /// </summary>
         public override void Render()
         {
-            SetTextParams();
-
             if (ParentAtom.Element is Element e)
             {
                 using (DrawingContext dc = RenderOpen())
@@ -587,14 +577,6 @@ namespace Chem4Word.ACME.Drawing
                     }
                 }
             }
-        }
-
-        protected void SetTextParams()
-        {
-            GlyphText.SymbolSize = ParentAtom.Parent.Model.XamlBondLength / 2.0d;
-            GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
-            GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
-            MaskOffsetWidth = GlyphText.SymbolSize * 0.1;
         }
 
         #endregion Rendering

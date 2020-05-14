@@ -15,8 +15,6 @@ namespace Chem4Word.Helpers
 {
     public class C4wAddInInfo
     {
-        //private readonly string _localAppDataPath;
-
         public string AssemblyVersionNumber { get; }
 
         /// <summary>
@@ -54,41 +52,42 @@ namespace Chem4Word.Helpers
             Version productVersion = assemblyInfo.GetName().Version;
             AssemblyVersionNumber = productVersion.ToString();
 
-            // Location is where the assembly is run from (in dl3 cache)
-            //string assemblyLocation = assemblyInfo.Location;
-
             // CodeBase is the location of the installed files
             Uri uriCodeBase = new Uri(assemblyInfo.CodeBase);
             DeploymentPath = Path.GetDirectoryName(uriCodeBase.LocalPath);
 
-            // Get the user's Local AppData Path i.e. "C:\Users\{User}\AppData\Local\" and ensure our user data folder exists
+            // Get the user's Local AppData Path i.e. "C:\Users\{User}\AppData\Local\" and ensure that the Chem4Word user data folders exist
             AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            ProductAppDataPath = Path.Combine(AppDataPath, ProductName);
 
+            ProductAppDataPath = Path.Combine(AppDataPath, ProductName);
             if (!Directory.Exists(ProductAppDataPath))
             {
                 Directory.CreateDirectory(ProductAppDataPath);
             }
-            if (!Directory.Exists($@"{ProductAppDataPath}\Backups"))
+
+            var backupsPath = Path.Combine(ProductAppDataPath, "Backups");
+            if (!Directory.Exists(backupsPath))
             {
-                Directory.CreateDirectory($@"{ProductAppDataPath}\Backups");
+                Directory.CreateDirectory(backupsPath);
             }
-            if (!Directory.Exists($@"{ProductAppDataPath}\Telemetry"))
+
+            var telemetryPath = Path.Combine(ProductAppDataPath, "Telemetry");
+            if (!Directory.Exists(telemetryPath))
             {
-                Directory.CreateDirectory($@"{ProductAppDataPath}\Telemetry");
+                Directory.CreateDirectory(telemetryPath);
             }
 
             // Get ProgramData Path i.e "C:\ProgramData\Chem4Word.V3" and ensure it exists
             string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             ProgramDataPath = Path.Combine(programData, ProductName);
 
-            if (!Directory.Exists(ProgramDataPath))
-            {
-                Directory.CreateDirectory(ProgramDataPath);
-            }
-
             try
             {
+                if (!Directory.Exists(ProgramDataPath))
+                {
+                    Directory.CreateDirectory(ProgramDataPath);
+                }
+
                 // Allow all users to Modify files in this folder
                 DirectorySecurity sec = Directory.GetAccessControl(ProgramDataPath);
                 SecurityIdentifier users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);

@@ -203,6 +203,7 @@ namespace Chem4Word.ACME
                     chemistryModel.RescaleForXaml(true, Constants.StandardBondLength);
 
                     CurrentViewModel = new ViewModel(chemistryModel);
+                    CurrentViewModel.SetTextParams(chemistryModel.XamlBondLength);
                     DrawChemistry(CurrentViewModel);
                 }
             }

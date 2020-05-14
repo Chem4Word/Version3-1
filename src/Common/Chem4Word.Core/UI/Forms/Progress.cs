@@ -17,7 +17,6 @@ namespace Chem4Word.Core.UI.Forms
 
         public int Value
         {
-            get { return customProgressBar1.Value; }
             set
             {
                 if (value >= customProgressBar1.Minimum && value <= customProgressBar1.Maximum)
@@ -30,7 +29,6 @@ namespace Chem4Word.Core.UI.Forms
 
         public int Minimum
         {
-            get { return customProgressBar1.Minimum; }
             set
             {
                 if (value >= 0)
@@ -42,7 +40,6 @@ namespace Chem4Word.Core.UI.Forms
 
         public int Maximum
         {
-            get { return customProgressBar1.Maximum; }
             set
             {
                 if (value > 0)
@@ -54,12 +51,18 @@ namespace Chem4Word.Core.UI.Forms
 
         public string Message
         {
-            get { return label1.Text; }
             set
             {
-                label1.Text = value;
-                Application.DoEvents();
-                this.Refresh();
+                try
+                {
+                    label1.Text = value;
+                    Application.DoEvents();
+                    Refresh();
+                }
+                catch
+                {
+                    //
+                }
             }
         }
 
@@ -93,7 +96,10 @@ namespace Chem4Word.Core.UI.Forms
             get
             {
                 CreateParams myCp = base.CreateParams;
+#if DEBUG
+#else
                 myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
+#endif
                 return myCp;
             }
         }

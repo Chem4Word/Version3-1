@@ -5,12 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Windows;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
@@ -19,6 +13,12 @@ using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.TTF;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
 using Point = System.Windows.Point;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
@@ -85,7 +85,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 // select lines which start or end with this atom
                 var targeted = from l in Outputs.BondLines
-                               where (l.StartAtomPath == hull.Key | l.EndAtomPath == hull.Key)
+                               where (l.StartAtomPath == hull.Key || l.EndAtomPath == hull.Key)
                                select l;
 
                 foreach (BondLine bl in targeted.ToList())
@@ -166,10 +166,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 //    Or (L.Bottom Between Cbb.Top And Cbb.Botton)
 
                 var targeted = from l in Outputs.BondLines
-                               where (cbb.Left <= l.BoundingBox.Right & l.BoundingBox.Right <= cbb.Right)
-                                     | (cbb.Left <= l.BoundingBox.Left & l.BoundingBox.Left <= cbb.Right)
-                                     | (cbb.Top <= l.BoundingBox.Top & l.BoundingBox.Top <= cbb.Bottom)
-                                     | (cbb.Top <= l.BoundingBox.Bottom & l.BoundingBox.Bottom <= cbb.Bottom)
+                               where (cbb.Left <= l.BoundingBox.Right && l.BoundingBox.Right <= cbb.Right)
+                                     || (cbb.Left <= l.BoundingBox.Left && l.BoundingBox.Left <= cbb.Right)
+                                     || (cbb.Top <= l.BoundingBox.Top && l.BoundingBox.Top <= cbb.Bottom)
+                                     || (cbb.Top <= l.BoundingBox.Bottom && l.BoundingBox.Bottom <= cbb.Bottom)
                                select l;
                 targeted = targeted.ToList();
 
@@ -384,6 +384,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 // Recalculate again as we have just added extra characters
                 thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
 
+                // MAW Keep this code as it may be possible to bring back use of OoXmlString later on
                 //AddMoleculeLabelsV2(mol.Labels.ToList(), point, mol.Path);
                 //var revisedExtents = thisMoleculeExtents.ExternalCharacterExtents;
                 //foreach (var ooXmlString in Outputs.MoleculeLabels.Where(p => p.ParentMolecule.Equals(mol.Path)))
@@ -473,7 +474,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             // Implement beautification of semi open double bonds and double bonds touching rings
 
             // Obtain list of Double Bonds with Placement of BondDirection.None
-            List<Bond> doubleBonds = mol.Bonds.Where(b => b.OrderValue.Value == 2 && b.Placement == Globals.BondDirection.None).ToList();
+            List<Bond> doubleBonds = mol.Bonds.Where(b => b.OrderValue.HasValue && b.OrderValue.Value == 2 && b.Placement == Globals.BondDirection.None).ToList();
             if (doubleBonds.Count > 0)
             {
                 pb.Message = $"Processing Double Bonds in Molecule {moleculeNo}";
@@ -490,33 +491,29 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void BeautifyLines(Atom atom, string bondPath)
         {
-            if (atom.Element is Element element)
+            if (atom.Element is Element element
+                && element == Globals.PeriodicTable.C
+                && atom.Bonds.ToList().Count == 3)
             {
-                if (element == Globals.PeriodicTable.C)
+                bool isInRing = atom.IsInRing;
+                List<BondLine> lines = Outputs.BondLines.Where(bl => bl.BondPath.Equals(bondPath)).ToList();
+                if (lines.Any())
                 {
-                    if (atom.Bonds.ToList().Count == 3)
+                    List<Bond> otherLines;
+                    if (isInRing)
                     {
-                        bool isInRing = atom.IsInRing;
-                        List<BondLine> lines = Outputs.BondLines.Where(bl => bl.BondPath.Equals(bondPath)).ToList();
-                        if (lines.Any())
-                        {
-                            List<Bond> otherLines;
-                            if (isInRing)
-                            {
-                                otherLines = atom.Bonds.Where(b => !b.Path.Equals(bondPath)).ToList();
-                            }
-                            else
-                            {
-                                otherLines = atom.Bonds.Where(b => !b.Path.Equals(bondPath) && b.Order.Equals(Globals.OrderSingle)).ToList();
-                            }
+                        otherLines = atom.Bonds.Where(b => !b.Path.Equals(bondPath)).ToList();
+                    }
+                    else
+                    {
+                        otherLines = atom.Bonds.Where(b => !b.Path.Equals(bondPath) && b.Order.Equals(Globals.OrderSingle)).ToList();
+                    }
 
-                            if (lines.Count == 2 && otherLines.Count == 2)
-                            {
-                                BondLine line1 = Outputs.BondLines.First(bl => bl.BondPath.Equals(otherLines[0].Path));
-                                BondLine line2 = Outputs.BondLines.First(bl => bl.BondPath.Equals(otherLines[1].Path));
-                                TrimLines(lines, line1, line2, isInRing);
-                            }
-                        }
+                    if (lines.Count == 2 && otherLines.Count == 2)
+                    {
+                        BondLine line1 = Outputs.BondLines.First(bl => bl.BondPath.Equals(otherLines[0].Path));
+                        BondLine line2 = Outputs.BondLines.First(bl => bl.BondPath.Equals(otherLines[1].Path));
+                        TrimLines(lines, line1, line2, isInRing);
                     }
                 }
             }
@@ -606,14 +603,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 #region Set Up Atom Colour
 
                 string atomColour = "000000";
-                if (Inputs.Options.ColouredAtoms)
+                if (Inputs.Options.ColouredAtoms
+                    && atom.Element.Colour != null)
                 {
-                    if (atom.Element.Colour != null)
-                    {
-                        atomColour = atom.Element.Colour;
-                        // Strip out # as OoXml does not use it
-                        atomColour = atomColour.Replace("#", "");
-                    }
+                    atomColour = atom.Element.Colour;
+                    // Strip out # as OoXml does not use it
+                    atomColour = atomColour.Replace("#", "");
                 }
 
                 #endregion Set Up Atom Colour
@@ -682,7 +677,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 #region Determine NESW
 
                 double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
-                CompassPoints nesw = CompassPoints.East;
+                CompassPoints nesw;
 
                 if (bondCount == 1)
                 {
@@ -775,16 +770,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     cursorPosition.Y = cursorPosition.Y
                                                        + OoXmlHelper.ScaleCsTtfToCml(-hydrogenCharacter.Height, Inputs.MeanBondLength)
                                                        - OoXmlHelper.CHARACTER_VERTICAL_SPACING;
-                                    if (iCharge > 0)
+                                    if (iCharge > 0
+                                        && implicitHCount > 1)
                                     {
-                                        if (implicitHCount > 1)
-                                        {
-                                            cursorPosition.Offset(0,
-                                                                  OoXmlHelper.ScaleCsTtfToCml(
-                                                                      -implicitValueCharacter.Height *
-                                                                      OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2, Inputs.MeanBondLength)
-                                                                - OoXmlHelper.CHARACTER_VERTICAL_SPACING);
-                                        }
+                                        cursorPosition.Offset(0,
+                                                              OoXmlHelper.ScaleCsTtfToCml(
+                                                                  -implicitValueCharacter.Height *
+                                                                  OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2, Inputs.MeanBondLength)
+                                                              - OoXmlHelper.CHARACTER_VERTICAL_SPACING);
                                     }
                                 }
                                 break;
@@ -813,7 +806,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     }
                                     else
                                     {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25)), Inputs.MeanBondLength), 0);
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25), Inputs.MeanBondLength), 0);
                                     }
                                 }
                                 else
@@ -824,7 +817,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     }
                                     else
                                     {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-((hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25)), Inputs.MeanBondLength), 0);
+                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25), Inputs.MeanBondLength), 0);
                                     }
                                 }
                                 break;
@@ -851,23 +844,21 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                     #region Add number
 
-                    if (implicitHCount > 1)
+                    if (implicitHCount > 1
+                        && implicitValueCharacter != null)
                     {
-                        if (implicitValueCharacter != null)
-                        {
-                            thisCharacterPosition = GetCharacterPosition(cursorPosition, implicitValueCharacter);
+                        thisCharacterPosition = GetCharacterPosition(cursorPosition, implicitValueCharacter);
 
-                            // Drop the subscript Character
-                            thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, Inputs.MeanBondLength));
+                        // Drop the subscript Character
+                        thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, Inputs.MeanBondLength));
 
-                            AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, atom.Path, atom.Parent.Path);
-                            alc.IsSmaller = true;
-                            alc.IsSubScript = true;
-                            Outputs.AtomLabelCharacters.Add(alc);
+                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, atom.Path, atom.Parent.Path);
+                        alc.IsSmaller = true;
+                        alc.IsSubScript = true;
+                        Outputs.AtomLabelCharacters.Add(alc);
 
-                            // Move to next Character position
-                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(implicitValueCharacter.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
-                        }
+                        // Move to next Character position
+                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(implicitValueCharacter.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
                     }
 
                     #endregion Add number
@@ -947,14 +938,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             #region Set Up Functional Group Colour
 
             string atomColour = "000000";
-            if (Inputs.Options.ColouredAtoms)
+            if (Inputs.Options.ColouredAtoms
+                && !string.IsNullOrEmpty(fg.Colour))
             {
-                if (!string.IsNullOrEmpty(fg.Colour))
-                {
-                    atomColour = fg.Colour;
-                    // Strip out # as OoXml does not use it
-                    atomColour = atomColour.Replace("#", "");
-                }
+                atomColour = fg.Colour;
+                // Strip out # as OoXml does not use it
+                atomColour = atomColour.Replace("#", "");
             }
 
             #endregion Set Up Functional Group Colour
@@ -1082,7 +1071,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 // 1. Measure string
                 var bb = MeasureString(label.Value, measure);
 
-                // 2. Place string such that they are hanging below the "line"
+                // 2. Place string characters such that they are hanging below the "line"
                 if (bb != Rect.Empty)
                 {
                     Point place = new Point(measure.X - bb.Width / 2, measure.Y + (measure.Y - bb.Top));
@@ -1094,6 +1083,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
         }
 
+        // MAW Keep this code as it may be possible to bring back use of OoXmlString later on
         private void AddMoleculeLabelsV2(List<TextualProperty> labels, Point centrePoint, string moleculePath)
         {
             Point measure = new Point(centrePoint.X, centrePoint.Y);
@@ -1103,7 +1093,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 // 1. Measure string
                 var bb = MeasureString(label.Value, measure);
 
-                // 2. Place string such that they are hanging below the "line"
+                // 2. Place string characters such that they are hanging below the "line"
                 if (bb != Rect.Empty)
                 {
                     Point place = new Point(measure.X - bb.Width / 2, measure.Y);
@@ -1138,11 +1128,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 case Globals.OrderZero:
                 case "unknown":
-                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond));
+                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Zero, bond));
                     break;
 
                 case Globals.OrderPartial01:
-                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Dashed, bond));
+                    Outputs.BondLines.Add(new BondLine(BondLineStyle.Half, bond));
                     break;
 
                 case "1":
@@ -1176,7 +1166,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 case Globals.OrderAromatic:
 
                     BondLine onePointFive;
-                    BondLine onePointFiveDotted;
+                    BondLine onePointFiveDashed;
                     Point onePointFiveStart;
                     Point onePointFiveEnd;
 
@@ -1185,31 +1175,31 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         case Globals.BondDirection.Clockwise:
                             onePointFive = new BondLine(BondLineStyle.Solid, bond);
                             Outputs.BondLines.Add(onePointFive);
-                            onePointFiveDotted = onePointFive.GetParallel(BondOffset());
-                            onePointFiveStart = new Point(onePointFiveDotted.Start.X, onePointFiveDotted.Start.Y);
-                            onePointFiveEnd = new Point(onePointFiveDotted.End.X, onePointFiveDotted.End.Y);
+                            onePointFiveDashed = onePointFive.GetParallel(BondOffset());
+                            onePointFiveStart = new Point(onePointFiveDashed.Start.X, onePointFiveDashed.Start.Y);
+                            onePointFiveEnd = new Point(onePointFiveDashed.End.X, onePointFiveDashed.End.Y);
                             CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / 1.75));
-                            onePointFiveDotted = new BondLine(BondLineStyle.Dotted, onePointFiveStart, onePointFiveEnd, bond);
-                            Outputs.BondLines.Add(onePointFiveDotted);
+                            onePointFiveDashed = new BondLine(BondLineStyle.Half, onePointFiveStart, onePointFiveEnd, bond);
+                            Outputs.BondLines.Add(onePointFiveDashed);
                             break;
 
                         case Globals.BondDirection.Anticlockwise:
                             onePointFive = new BondLine(BondLineStyle.Solid, bond);
                             Outputs.BondLines.Add(onePointFive);
-                            onePointFiveDotted = onePointFive.GetParallel(-BondOffset());
-                            onePointFiveStart = new Point(onePointFiveDotted.Start.X, onePointFiveDotted.Start.Y);
-                            onePointFiveEnd = new Point(onePointFiveDotted.End.X, onePointFiveDotted.End.Y);
+                            onePointFiveDashed = onePointFive.GetParallel(-BondOffset());
+                            onePointFiveStart = new Point(onePointFiveDashed.Start.X, onePointFiveDashed.Start.Y);
+                            onePointFiveEnd = new Point(onePointFiveDashed.End.X, onePointFiveDashed.End.Y);
                             CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / 1.75));
-                            onePointFiveDotted = new BondLine(BondLineStyle.Dotted, onePointFiveStart, onePointFiveEnd, bond);
-                            Outputs.BondLines.Add(onePointFiveDotted);
+                            onePointFiveDashed = new BondLine(BondLineStyle.Half, onePointFiveStart, onePointFiveEnd, bond);
+                            Outputs.BondLines.Add(onePointFiveDashed);
                             break;
 
                         case Globals.BondDirection.None:
                             onePointFive = new BondLine(BondLineStyle.Solid, bond);
                             Outputs.BondLines.Add(onePointFive.GetParallel(-(BondOffset() / 2)));
-                            onePointFiveDotted = onePointFive.GetParallel(BondOffset() / 2);
-                            onePointFiveDotted.SetLineStyle(BondLineStyle.Dotted);
-                            Outputs.BondLines.Add(onePointFiveDotted);
+                            onePointFiveDashed = onePointFive.GetParallel(BondOffset() / 2);
+                            onePointFiveDashed.SetLineStyle(BondLineStyle.Half);
+                            Outputs.BondLines.Add(onePointFiveDashed);
                             break;
                     }
                     break;
@@ -1286,6 +1276,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                         {
                                             clip = true;
                                         }
+
+                                        // Is secondary line outside of the "selected" ring
+                                        var distance1 = primaryRingVector.Length;
+                                        var distance2 = (secondaryMidpoint - centre.Value).Length;
+                                        if (distance2 > distance1)
+                                        {
+                                            clip = false;
+                                        }
                                     }
 
                                     if (clip)
@@ -1303,8 +1301,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                         if (Inputs.Options.ShowBondClippingLines)
                                         {
                                             // Diagnostics
-                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.StartAtom.Position, centre.Value, "ff0000"));
-                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Dotted, bond.EndAtom.Position, centre.Value, "ff0000"));
+                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Zero, bond.StartAtom.Position, centre.Value, "ff0000"));
+                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Zero, bond.EndAtom.Position, centre.Value, "ff0000"));
                                         }
                                     }
                                     else
@@ -1350,7 +1348,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 case Globals.OrderPartial23:
                     BondLine twoPointFive;
-                    BondLine twoPointFiveDotted;
+                    BondLine twoPointFiveDashed;
                     BondLine twoPointFiveParallel;
                     Point twoPointFiveStart;
                     Point twoPointFiveEnd;
@@ -1367,26 +1365,26 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
                             twoPointFiveParallel = new BondLine(BondLineStyle.Solid, twoPointFiveStart, twoPointFiveEnd, bond);
                             Outputs.BondLines.Add(twoPointFiveParallel);
-                            // Dotted bond line
-                            twoPointFiveDotted = twoPointFive.GetParallel(BondOffset());
-                            twoPointFiveStart = new Point(twoPointFiveDotted.Start.X, twoPointFiveDotted.Start.Y);
-                            twoPointFiveEnd = new Point(twoPointFiveDotted.End.X, twoPointFiveDotted.End.Y);
+                            // Dashed bond line
+                            twoPointFiveDashed = twoPointFive.GetParallel(BondOffset());
+                            twoPointFiveStart = new Point(twoPointFiveDashed.Start.X, twoPointFiveDashed.Start.Y);
+                            twoPointFiveEnd = new Point(twoPointFiveDashed.End.X, twoPointFiveDashed.End.Y);
                             CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
-                            twoPointFiveDotted = new BondLine(BondLineStyle.Dotted, twoPointFiveStart, twoPointFiveEnd, bond);
-                            Outputs.BondLines.Add(twoPointFiveDotted);
+                            twoPointFiveDashed = new BondLine(BondLineStyle.Half, twoPointFiveStart, twoPointFiveEnd, bond);
+                            Outputs.BondLines.Add(twoPointFiveDashed);
                             break;
 
                         case Globals.BondDirection.Anticlockwise:
                             // Central bond line
                             twoPointFive = new BondLine(BondLineStyle.Solid, bond);
                             Outputs.BondLines.Add(twoPointFive);
-                            // Dotted bond line
-                            twoPointFiveDotted = twoPointFive.GetParallel(-BondOffset());
-                            twoPointFiveStart = new Point(twoPointFiveDotted.Start.X, twoPointFiveDotted.Start.Y);
-                            twoPointFiveEnd = new Point(twoPointFiveDotted.End.X, twoPointFiveDotted.End.Y);
+                            // Dashed bond line
+                            twoPointFiveDashed = twoPointFive.GetParallel(-BondOffset());
+                            twoPointFiveStart = new Point(twoPointFiveDashed.Start.X, twoPointFiveDashed.Start.Y);
+                            twoPointFiveEnd = new Point(twoPointFiveDashed.End.X, twoPointFiveDashed.End.Y);
                             CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
-                            twoPointFiveDotted = new BondLine(BondLineStyle.Dotted, twoPointFiveStart, twoPointFiveEnd, bond);
-                            Outputs.BondLines.Add(twoPointFiveDotted);
+                            twoPointFiveDashed = new BondLine(BondLineStyle.Half, twoPointFiveStart, twoPointFiveEnd, bond);
+                            Outputs.BondLines.Add(twoPointFiveDashed);
                             // Solid bond line
                             twoPointFiveParallel = twoPointFive.GetParallel(BondOffset());
                             twoPointFiveStart = new Point(twoPointFiveParallel.Start.X, twoPointFiveParallel.Start.Y);
@@ -1400,9 +1398,9 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             twoPointFive = new BondLine(BondLineStyle.Solid, bond);
                             Outputs.BondLines.Add(twoPointFive);
                             Outputs.BondLines.Add(twoPointFive.GetParallel(-BondOffset()));
-                            twoPointFiveDotted = twoPointFive.GetParallel(BondOffset());
-                            twoPointFiveDotted.SetLineStyle(BondLineStyle.Dotted);
-                            Outputs.BondLines.Add(twoPointFiveDotted);
+                            twoPointFiveDashed = twoPointFive.GetParallel(BondOffset());
+                            twoPointFiveDashed.SetLineStyle(BondLineStyle.Half);
+                            Outputs.BondLines.Add(twoPointFiveDashed);
                             break;
                     }
                     break;
@@ -1511,25 +1509,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 points.Add(new Point(c.Position.X - margin, c.Position.Y - margin));
                 if (c.IsSmaller)
                 {
-                    // Top Right +-
                     points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
                                         c.Position.Y - margin));
-                    // Bottom Right ++
                     points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin,
                                         c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
-                    // Bottom Left -+
                     points.Add(new Point(c.Position.X - margin,
                                         c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR + margin));
                 }
                 else
                 {
-                    // Top Right +-
                     points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, Inputs.MeanBondLength) + margin,
                                         c.Position.Y - margin));
-                    // Bottom Right ++
                     points.Add(new Point(c.Position.X + OoXmlHelper.ScaleCsTtfToCml(c.Character.Width, Inputs.MeanBondLength) + margin,
                                         c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, Inputs.MeanBondLength) + margin));
-                    // Bottom Left -+
                     points.Add(new Point(c.Position.X - margin,
                                           c.Position.Y + OoXmlHelper.ScaleCsTtfToCml(c.Character.Height, Inputs.MeanBondLength) + margin));
                 }

@@ -289,17 +289,21 @@ namespace Chem4Word.Model2.Converters.JSON
                         s = Globals.BondStereo.None;
                     }
 
-                    var sa = atoms[b.b.Value];
-                    var ea = atoms[b.e.Value];
-                    Bond newBond = new Bond()
+                    // Azure DevOps #715
+                    if (b.b.HasValue && b.b.Value < atoms.Count && b.e.HasValue && b.e.Value < atoms.Count)
                     {
-                        StartAtomInternalId = sa,
-                        EndAtomInternalId = ea,
-                        Stereo = s,
-                        Order = o
-                    };
-                    newMol.AddBond(newBond);
-                    newBond.Parent = newMol;
+                        var sa = atoms[b.b.Value];
+                        var ea = atoms[b.e.Value];
+                        Bond newBond = new Bond()
+                                       {
+                                           StartAtomInternalId = sa,
+                                           EndAtomInternalId = ea,
+                                           Stereo = s,
+                                           Order = o
+                                       };
+                        newMol.AddBond(newBond);
+                        newBond.Parent = newMol;
+                    }
                 }
             }
 

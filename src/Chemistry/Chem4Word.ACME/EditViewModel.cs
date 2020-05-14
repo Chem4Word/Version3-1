@@ -264,6 +264,7 @@ namespace Chem4Word.ACME
 
                     var bondStereo = bond.Stereo;
                     var bondOrder = bond.Order;
+
                     Action undo = () =>
                                   {
                                       bond.Stereo = bondStereo;
@@ -510,27 +511,24 @@ namespace Chem4Word.ACME
                               if (existingBond.Order == OrderZero)
                               {
                                   existingBond.Order = OrderSingle;
-                                  existingBond.UpdateVisual();
                               }
 
                               if (existingBond.Order == OrderSingle)
                               {
                                   existingBond.Order = OrderDouble;
-                                  existingBond.UpdateVisual();
                               }
                               else if (existingBond.Order == OrderDouble)
                               {
                                   existingBond.Order = OrderTriple;
-                                  existingBond.UpdateVisual();
                               }
                               else if (existingBond.Order == OrderTriple)
                               {
                                   existingBond.Order = OrderSingle;
-                                  existingBond.UpdateVisual();
                               }
 
                               existingBond.StartAtom.UpdateVisual();
                               existingBond.EndAtom.UpdateVisual();
+                              existingBond.UpdateVisual();
                           };
             Action undo = () =>
                           {
@@ -539,11 +537,11 @@ namespace Chem4Word.ACME
 
                               existingBond.StartAtom.UpdateVisual();
                               existingBond.EndAtom.UpdateVisual();
+                              existingBond.UpdateVisual();
                           };
 
             UndoManager.RecordAction(undo, redo);
             redo();
-
             UndoManager.EndUndoBlock();
         }
 
@@ -589,9 +587,7 @@ namespace Chem4Word.ACME
                               };
 
                 UndoManager.RecordAction(undo, redo);
-
                 redo();
-
                 UndoManager.EndUndoBlock();
             }
         }
@@ -646,9 +642,7 @@ namespace Chem4Word.ACME
                           };
 
             UndoManager.RecordAction(undo, redo);
-
             redo();
-
             UndoManager.EndUndoBlock();
         }
 
@@ -674,8 +668,8 @@ namespace Chem4Word.ACME
                               parentBond.StartAtomInternalId = endAtom.InternalId;
                               parentBond.UpdateVisual();
                           };
-            UndoManager.RecordAction(undo, redo);
 
+            UndoManager.RecordAction(undo, redo);
             redo();
             UndoManager.EndUndoBlock();
         }
@@ -702,8 +696,8 @@ namespace Chem4Word.ACME
                               parentBond.StartAtom.UpdateVisual();
                               parentBond.EndAtom.UpdateVisual();
                           };
-            UndoManager.RecordAction(undo, redo);
 
+            UndoManager.RecordAction(undo, redo);
             redo();
             UndoManager.EndUndoBlock();
         }
@@ -783,10 +777,8 @@ namespace Chem4Word.ACME
                           };
 
             UndoManager.RecordAction(undo, redo);
-
-            UndoManager.EndUndoBlock();
-
             redo();
+            UndoManager.EndUndoBlock();
         }
 
         /// <summary>
@@ -838,8 +830,8 @@ namespace Chem4Word.ACME
                                   lastAtom.UpdateVisual();
                                   newAtom.UpdateVisual();
                               };
-                UndoManager.RecordAction(undo, redo);
 
+                UndoManager.RecordAction(undo, redo);
                 redo();
 
                 AddNewBond(lastAtom, newAtom, currentMol, bondOrder, stereo);
@@ -868,6 +860,7 @@ namespace Chem4Word.ACME
                                   _currentMol.Parent = Model;
                                   Model.AddMolecule(_currentMol);
                               };
+
                 redo();
 
                 UndoManager.RecordAction(undo, redo);
@@ -884,10 +877,9 @@ namespace Chem4Word.ACME
                                    _currentMol.AddAtom(newAtom);
                                    newAtom.Tag = tag;
                                };
+
                 UndoManager.RecordAction(undo2, redo2);
-
                 redo2();
-
                 UndoManager.EndUndoBlock();
             }
 
@@ -905,6 +897,7 @@ namespace Chem4Word.ACME
             Action redoAction = () =>
                                 {
                                     Model.ScaleToAverageBondLength(newLength, centre);
+                                    SetTextParams(newLength);
                                     RefreshMolecules(Model.Molecules.Values.ToList());
                                     Loading = true;
                                     CurrentBondLength = newLength / ScaleFactorForXaml;
@@ -913,6 +906,7 @@ namespace Chem4Word.ACME
             Action undoAction = () =>
                                 {
                                     Model.ScaleToAverageBondLength(currentLength, centre);
+                                    SetTextParams(currentLength);
                                     RefreshMolecules(Model.Molecules.Values.ToList());
                                     Loading = true;
                                     CurrentBondLength = currentLength / ScaleFactorForXaml;
@@ -920,9 +914,7 @@ namespace Chem4Word.ACME
                                 };
 
             UndoManager.RecordAction(undoAction, redoAction);
-
             redoAction();
-
             UndoManager.EndUndoBlock();
         }
 
@@ -1394,7 +1386,6 @@ namespace Chem4Word.ACME
                     Atom thisAtom = list[firstIndex].ExistingAtom;
                     Atom otherAtom = list[secondIndex].ExistingAtom;
 
-                    // ToDo: [DCD] to Check this still works
                     if (!thisAtom.IsUnsaturated
                         && thisAtom.ImplicitHydrogenCount > 0
                         && !otherAtom.IsUnsaturated
@@ -1641,9 +1632,7 @@ namespace Chem4Word.ACME
                                     };
 
                 UndoManager.RecordAction(undoAction, redoAction);
-
                 redoAction();
-
                 UndoManager.EndUndoBlock();
             }
         }
@@ -1728,7 +1717,6 @@ namespace Chem4Word.ACME
 
                 UndoManager.RecordAction(undoAction, redoAction);
                 redoAction();
-
                 UndoManager.EndUndoBlock();
             }
         }
@@ -1787,8 +1775,8 @@ namespace Chem4Word.ACME
 
             UndoManager.RecordAction(undo, redo, flipVertically ? "Flip Vertical" : "Flip Horizontal");
             redo();
-
             UndoManager.EndUndoBlock();
+
             //local function
             void InvertStereo(Molecule m)
             {
@@ -1804,6 +1792,7 @@ namespace Chem4Word.ACME
                     }
                 }
             }
+
             //local function
             void InvertPlacements(Molecule m)
             {
@@ -2058,6 +2047,7 @@ namespace Chem4Word.ACME
                 Model model = molecule.Model;
                 Action redo = () => { model.RemoveMolecule(molecule); };
                 Action undo = () => { model.AddMolecule(molecule); };
+
                 UndoManager.RecordAction(undo, redo);
                 redo();
                 UndoManager.EndUndoBlock();
@@ -2239,6 +2229,7 @@ namespace Chem4Word.ACME
 
                                   mpb.Restore(mol);
                               };
+
                 UndoManager.RecordAction(undo, redo);
                 redo();
                 UndoManager.EndUndoBlock();
@@ -2416,8 +2407,6 @@ namespace Chem4Word.ACME
                               atom.Parent.UpdateVisual();
                           };
 
-            redo();
-
             Action undo = () =>
                           {
                               atom.Element = elementBaseBefore;
@@ -2428,6 +2417,7 @@ namespace Chem4Word.ACME
                           };
 
             UndoManager.RecordAction(undo, redo);
+            redo();
             UndoManager.EndUndoBlock();
         }
 
@@ -2504,8 +2494,6 @@ namespace Chem4Word.ACME
                 }
             };
 
-            redo();
-
             Action undo = () =>
             {
                 molecule.ShowMoleculeBrackets = showBefore;
@@ -2521,6 +2509,7 @@ namespace Chem4Word.ACME
             };
 
             UndoManager.RecordAction(undo, redo);
+            redo();
             UndoManager.EndUndoBlock();
 
             // Local Function
@@ -2690,8 +2679,6 @@ namespace Chem4Word.ACME
                               }
                           };
 
-            redo();
-
             Action undo = () =>
                           {
                               bond.Order = OrderValueToOrder(bondOrderBefore);
@@ -2723,6 +2710,7 @@ namespace Chem4Word.ACME
                           };
 
             UndoManager.RecordAction(undo, redo);
+            redo();
             UndoManager.EndUndoBlock();
         }
 
@@ -2783,9 +2771,8 @@ namespace Chem4Word.ACME
                               }
                           };
 
-            redo();
             UndoManager.RecordAction(undo, redo);
-
+            redo();
             UndoManager.EndUndoBlock();
         }
 
@@ -2889,8 +2876,9 @@ namespace Chem4Word.ACME
 
                               ActiveMode.CurrentStatus = "Grouped.";
                           };
-            redo();
+
             UndoManager.RecordAction(undo, redo);
+            redo();
             UndoManager.EndUndoBlock();
         }
 
@@ -2954,8 +2942,8 @@ namespace Chem4Word.ACME
                                   }
                               }
                           };
-            redo();
             UndoManager.RecordAction(undo, redo);
+            redo();
             UndoManager.EndUndoBlock();
         }
 

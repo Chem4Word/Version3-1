@@ -100,18 +100,35 @@ namespace Chem4Word
 
         public void StartWpfWarmUp()
         {
+            Debug.WriteLine($"WpfWarmUp timer started at {SafeDate.ToLongDate(DateTime.Now)}");
             if (!_warmUpStarted && !_warmUpCompleted)
             {
                 _warmUpStarted = true;
 
                 // Warm Up WPF Element Host
                 _warmUpTimer = new Timer
-                               {
-                                   Enabled = false,
-                                   Interval = 250
-                               };
+                {
+                    Enabled = false,
+                    Interval = 250
+                };
                 _warmUpTimer.Tick += OnTimerTick;
                 _warmUpTimer.Enabled = true;
+            }
+        }
+
+        public void ActivateChemistryTab()
+        {
+            try
+            {
+                RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
+                if (!_warmUpCompleted)
+                {
+                    _warmUpTimer.Enabled = true;
+                }
+            }
+            catch
+            {
+                // Do Nothing
             }
         }
 
@@ -610,22 +627,6 @@ namespace Chem4Word
             }
         }
 
-        public void ActivateChemistryTab()
-        {
-            try
-            {
-                RibbonUI.ActivateTab(Chem4WordV3.ControlId.ToString());
-                if (!_warmUpCompleted)
-                {
-                    _warmUpTimer.Enabled = true;
-                }
-            }
-            catch
-            {
-                // Do Nothing
-            }
-        }
-
         private void BeforeButtonChecks()
         {
             if (Globals.Chem4WordV3.SystemOptions == null)
@@ -680,310 +681,313 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Word.Application app = Globals.Chem4WordV3.Application;
-
-            Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Started");
-            Word.Document doc = app.ActiveDocument;
-            Word.ContentControl cc = null;
-
-            var wordSettings = new WordSettings(app);
-
-            try
+            if (Globals.Chem4WordV3.IsEnabled)
             {
-                if (Globals.Chem4WordV3.SystemOptions == null)
-                {
-                    Globals.Chem4WordV3.LoadOptions();
-                }
+                Word.Application app = Globals.Chem4WordV3.Application;
 
-                IChem4WordEditor editor =
-                    Globals.Chem4WordV3.GetEditorPlugIn(Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn);
+                Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Started");
+                Word.Document doc = app.ActiveDocument;
+                Word.ContentControl cc = null;
 
-                if (editor == null)
+                var wordSettings = new WordSettings(app);
+
+                try
                 {
-                    UserInteractions.WarnUser("Unable to find an Editor Plug-In");
-                }
-                else
-                {
-                    Globals.Chem4WordV3.EvaluateChemistryAllowed();
-                    if (Globals.Chem4WordV3.ChemistryAllowed)
+                    if (Globals.Chem4WordV3.SystemOptions == null)
                     {
-                        CustomXMLPart customXmlPart = null;
-                        string beforeCml = editor.RequiresSeedAtom
-                            ? Properties.Resources.SingleCarbon_cml
-                            : Properties.Resources.EmptyStructure_cml;
+                        Globals.Chem4WordV3.LoadOptions();
+                    }
 
-                        bool isNewDrawing = true;
+                    IChem4WordEditor editor =
+                        Globals.Chem4WordV3.GetEditorPlugIn(Globals.Chem4WordV3.SystemOptions.SelectedEditorPlugIn);
 
-                        Word.Selection sel = app.Selection;
-
-                        if (sel.ContentControls.Count > 0)
-                        {
-                            cc = sel.ContentControls[1];
-                            if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
-                            {
-                                Word.Application app1 = Globals.Chem4WordV3.Application;
-                                customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
-                                if (customXmlPart != null)
-                                {
-                                    beforeCml = customXmlPart.XML;
-                                    CMLConverter cmlConverter = new CMLConverter();
-                                    Model beforeModel = cmlConverter.Import(beforeCml);
-
-                                    if (beforeModel.TotalAtomsCount == 0)
-                                    {
-                                        UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
-                                        return;
-                                    }
-
-                                    if (beforeModel.HasFunctionalGroups && !editor.CanEditFunctionalGroups)
-                                    {
-                                        UserInteractions.InformUser("This chemistry item has Functional Groups!\nPlease use ACME to edit this structure.");
-                                        return;
-                                    }
-                                    if (beforeModel.HasNestedMolecules && !editor.CanEditNestedMolecules)
-                                    {
-                                        UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
-                                        return;
-                                    }
-
-                                    isNewDrawing = false;
-                                }
-                                else
-                                {
-                                    Globals.Chem4WordV3.Telemetry.Write(module, "Exception", $"Can't find CML for {cc.Tag} in Active Document");
-                                    UserInteractions.WarnUser("The CML for this chemistry item can't be found!");
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                // Get out of here
-                                return;
-                            }
-                        }
-
-                        string guidString;
-                        string fullTag;
-
-                        if (isNewDrawing)
-                        {
-                            guidString = Guid.NewGuid().ToString("N"); // No dashes
-                            fullTag = guidString;
-                        }
-                        else
-                        {
-                            fullTag = cc?.Tag;
-                            guidString = CustomXmlPartHelper.GuidFromTag(cc?.Tag);
-                            if (string.IsNullOrEmpty(guidString))
-                            {
-                                guidString = Guid.NewGuid().ToString("N"); // No dashes
-                            }
-                        }
-
-                        var used1D = ChemistryHelper.GetUsed1D(doc, guidString);
-
-                        editor.Cml = beforeCml;
-                        editor.Used1DProperties = used1D;
-                        DialogResult chemEditorResult = editor.Edit();
-
-                        if (chemEditorResult == DialogResult.OK)
-                        {
-                            // Stop Screen Updating and Disable Document Event Handlers
-                            app.ScreenUpdating = false;
-                            Globals.Chem4WordV3.DisableContentControlEvents();
-
-                            CMLConverter cmlConverter = new CMLConverter();
-
-                            Model beforeModel = cmlConverter.Import(beforeCml, used1D);
-                            Model afterModel = cmlConverter.Import(editor.Cml, used1D);
-
-                            var oldMolecules = beforeModel.GetAllMolecules();
-                            var newMolecules = afterModel.GetAllMolecules();
-
-                            if (!editor.CanEditNestedMolecules)
-                            {
-                                foreach (var molecule in newMolecules)
-                                {
-                                    var mol = oldMolecules.FirstOrDefault(m => m.Path.Equals(molecule.Path));
-                                    if (mol != null)
-                                    {
-                                        // Copy over existing Formulae and Names if Paths match
-                                        foreach (var formula in mol.Formulas)
-                                        {
-                                            molecule.Formulas.Add(formula);
-                                        }
-                                        foreach (var name in mol.Names)
-                                        {
-                                            molecule.Names.Add(name);
-                                        }
-                                    }
-                                }
-                            }
-
-                            int changedProperties = ChemistryHelper.CalculateProperties(newMolecules);
-
-                            if (isNewDrawing)
-                            {
-                                Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Creating new structure {fullTag}");
-                            }
-                            else
-                            {
-                                Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing existing structure {fullTag}");
-                            }
-
-                            // Copy back CustomXmlPartGuid which will get lost if edited via ChemDoodle Web
-                            if (string.IsNullOrEmpty(afterModel.CustomXmlPartGuid))
-                            {
-                                afterModel.CustomXmlPartGuid = guidString;
-                            }
-
-                            #region Show Label Editor
-
-                            if (changedProperties > 0)
-                            {
-                                using (var host =
-                                    new EditLabelsHost(
-                                        new AcmeOptions(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath)))
-                                {
-                                    host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
-                                    host.Cml = cmlConverter.Export(afterModel);
-                                    host.Used1D = used1D;
-
-                                    host.Message = "Warning: At least one formula or name has changed; Please correct or delete any which are unnecessary or irrelevant !";
-
-                                    // Show Label Editor
-                                    DialogResult dr = host.ShowDialog();
-                                    if (dr == DialogResult.OK)
-                                    {
-                                        afterModel = cmlConverter.Import(host.Cml, used1D);
-                                    }
-
-                                    host.Close();
-                                }
-                            }
-
-                            #endregion Show Label Editor
-
-                            string afterCml = cmlConverter.Export(afterModel);
-
-                            Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
-                            IChem4WordRenderer renderer =
-                                Globals.Chem4WordV3.GetRendererPlugIn(
-                                    Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
-
-                            if (renderer == null)
-                            {
-                                UserInteractions.WarnUser("Unable to find a Renderer Plug-In");
-                            }
-                            else
-                            {
-                                // Always render the file.
-                                renderer.Properties = new Dictionary<string, string>();
-                                renderer.Properties.Add("Guid", guidString);
-                                renderer.Cml = afterCml;
-
-                                string tempfileName = renderer.Render();
-
-                                if (!isNewDrawing)
-                                {
-                                    // Erase old CC
-                                    cc.LockContents = false;
-                                    if (cc.Type == Word.WdContentControlType.wdContentControlPicture)
-                                    {
-                                        cc.Range.InlineShapes[1].Delete();
-                                    }
-                                    else
-                                    {
-                                        cc.Range.Delete();
-                                    }
-                                    cc.Delete();
-                                }
-
-                                // Insert a new CC
-                                cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
-
-                                cc.Title = Constants.ContentControlTitle;
-                                if (isNewDrawing)
-                                {
-                                    cc.Tag = guidString;
-                                }
-                                else
-                                {
-                                    cc.Tag = fullTag;
-                                }
-
-                                if (File.Exists(tempfileName))
-                                {
-                                    ChemistryHelper.UpdateThisStructure(doc, afterModel, guidString, tempfileName);
-
-                                    #region Replace CustomXMLPart with our new cml
-
-                                    if (customXmlPart != null)
-                                    {
-                                        customXmlPart.Delete();
-                                    }
-
-                                    doc.CustomXMLParts.Add(afterCml);
-
-                                    #endregion Replace CustomXMLPart with our new cml
-
-                                    // Delete the temporary file now we are finished with it
-                                    try
-                                    {
-                                        // Only delete file in release mode
-#if !DEBUG
-                                        File.Delete(tempfileName);
-#endif
-                                    }
-                                    catch
-                                    {
-                                        // Not much we can do here
-                                    }
-                                }
-                                else
-                                {
-                                    cc.Delete();
-                                    cc = null;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // Editing cancelled
-                        }
+                    if (editor == null)
+                    {
+                        UserInteractions.WarnUser("Unable to find an Editor Plug-In");
                     }
                     else
                     {
-                        UserInteractions.InformUser("Can't edit chemistry here because " + Globals.Chem4WordV3.ChemistryProhibitedReason);
+                        Globals.Chem4WordV3.EvaluateChemistryAllowed();
+                        if (Globals.Chem4WordV3.ChemistryAllowed)
+                        {
+                            CustomXMLPart customXmlPart = null;
+                            string beforeCml = editor.RequiresSeedAtom
+                                ? Properties.Resources.SingleCarbon_cml
+                                : Properties.Resources.EmptyStructure_cml;
+
+                            bool isNewDrawing = true;
+
+                            Word.Selection sel = app.Selection;
+
+                            if (sel.ContentControls.Count > 0)
+                            {
+                                cc = sel.ContentControls[1];
+                                if (cc.Title != null && cc.Title.Equals(Constants.ContentControlTitle))
+                                {
+                                    Word.Application app1 = Globals.Chem4WordV3.Application;
+                                    customXmlPart = CustomXmlPartHelper.GetCustomXmlPart(cc?.Tag, app1.ActiveDocument);
+                                    if (customXmlPart != null)
+                                    {
+                                        beforeCml = customXmlPart.XML;
+                                        CMLConverter cmlConverter = new CMLConverter();
+                                        Model beforeModel = cmlConverter.Import(beforeCml);
+
+                                        if (beforeModel.TotalAtomsCount == 0)
+                                        {
+                                            UserInteractions.InformUser("This chemistry item has no 2D data to edit!\nPlease use the 'Edit Labels' button.");
+                                            return;
+                                        }
+
+                                        if (beforeModel.HasFunctionalGroups && !editor.CanEditFunctionalGroups)
+                                        {
+                                            UserInteractions.InformUser("This chemistry item has Functional Groups!\nPlease use ACME to edit this structure.");
+                                            return;
+                                        }
+                                        if (beforeModel.HasNestedMolecules && !editor.CanEditNestedMolecules)
+                                        {
+                                            UserInteractions.InformUser("This chemistry item has Nested molecules!\nPlease use ACME to edit this structure.");
+                                            return;
+                                        }
+
+                                        isNewDrawing = false;
+                                    }
+                                    else
+                                    {
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Exception", $"Can't find CML for {cc.Tag} in Active Document");
+                                        UserInteractions.WarnUser("The CML for this chemistry item can't be found!");
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    // Get out of here
+                                    return;
+                                }
+                            }
+
+                            string guidString;
+                            string fullTag;
+
+                            if (isNewDrawing)
+                            {
+                                guidString = Guid.NewGuid().ToString("N"); // No dashes
+                                fullTag = guidString;
+                            }
+                            else
+                            {
+                                fullTag = cc?.Tag;
+                                guidString = CustomXmlPartHelper.GuidFromTag(cc?.Tag);
+                                if (string.IsNullOrEmpty(guidString))
+                                {
+                                    guidString = Guid.NewGuid().ToString("N"); // No dashes
+                                }
+                            }
+
+                            var used1D = ChemistryHelper.GetUsed1D(doc, guidString);
+
+                            editor.Cml = beforeCml;
+                            editor.Used1DProperties = used1D;
+                            DialogResult chemEditorResult = editor.Edit();
+
+                            if (chemEditorResult == DialogResult.OK)
+                            {
+                                // Stop Screen Updating and Disable Document Event Handlers
+                                app.ScreenUpdating = false;
+                                Globals.Chem4WordV3.DisableContentControlEvents();
+
+                                CMLConverter cmlConverter = new CMLConverter();
+
+                                Model beforeModel = cmlConverter.Import(beforeCml, used1D);
+                                Model afterModel = cmlConverter.Import(editor.Cml, used1D);
+
+                                var oldMolecules = beforeModel.GetAllMolecules();
+                                var newMolecules = afterModel.GetAllMolecules();
+
+                                if (!editor.CanEditNestedMolecules)
+                                {
+                                    foreach (var molecule in newMolecules)
+                                    {
+                                        var mol = oldMolecules.FirstOrDefault(m => m.Path.Equals(molecule.Path));
+                                        if (mol != null)
+                                        {
+                                            // Copy over existing Formulae and Names if Paths match
+                                            foreach (var formula in mol.Formulas)
+                                            {
+                                                molecule.Formulas.Add(formula);
+                                            }
+                                            foreach (var name in mol.Names)
+                                            {
+                                                molecule.Names.Add(name);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                int changedProperties = ChemistryHelper.CalculateProperties(newMolecules);
+
+                                if (isNewDrawing)
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Creating new structure {fullTag}");
+                                }
+                                else
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing existing structure {fullTag}");
+                                }
+
+                                // Copy back CustomXmlPartGuid which will get lost if edited via ChemDoodle Web
+                                if (string.IsNullOrEmpty(afterModel.CustomXmlPartGuid))
+                                {
+                                    afterModel.CustomXmlPartGuid = guidString;
+                                }
+
+                                #region Show Label Editor
+
+                                if (changedProperties > 0)
+                                {
+                                    using (var host =
+                                        new EditLabelsHost(
+                                            new AcmeOptions(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath)))
+                                    {
+                                        host.TopLeft = Globals.Chem4WordV3.WordTopLeft;
+                                        host.Cml = cmlConverter.Export(afterModel);
+                                        host.Used1D = used1D;
+
+                                        host.Message = "Warning: At least one formula or name has changed; Please correct or delete any which are unnecessary or irrelevant !";
+
+                                        // Show Label Editor
+                                        DialogResult dr = host.ShowDialog();
+                                        if (dr == DialogResult.OK)
+                                        {
+                                            afterModel = cmlConverter.Import(host.Cml, used1D);
+                                        }
+
+                                        host.Close();
+                                    }
+                                }
+
+                                #endregion Show Label Editor
+
+                                string afterCml = cmlConverter.Export(afterModel);
+
+                                Globals.Chem4WordV3.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
+                                IChem4WordRenderer renderer =
+                                    Globals.Chem4WordV3.GetRendererPlugIn(
+                                        Globals.Chem4WordV3.SystemOptions.SelectedRendererPlugIn);
+
+                                if (renderer == null)
+                                {
+                                    UserInteractions.WarnUser("Unable to find a Renderer Plug-In");
+                                }
+                                else
+                                {
+                                    // Always render the file.
+                                    renderer.Properties = new Dictionary<string, string>();
+                                    renderer.Properties.Add("Guid", guidString);
+                                    renderer.Cml = afterCml;
+
+                                    string tempfileName = renderer.Render();
+
+                                    if (!isNewDrawing)
+                                    {
+                                        // Erase old CC
+                                        cc.LockContents = false;
+                                        if (cc.Type == Word.WdContentControlType.wdContentControlPicture)
+                                        {
+                                            cc.Range.InlineShapes[1].Delete();
+                                        }
+                                        else
+                                        {
+                                            cc.Range.Delete();
+                                        }
+                                        cc.Delete();
+                                    }
+
+                                    // Insert a new CC
+                                    cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
+
+                                    cc.Title = Constants.ContentControlTitle;
+                                    if (isNewDrawing)
+                                    {
+                                        cc.Tag = guidString;
+                                    }
+                                    else
+                                    {
+                                        cc.Tag = fullTag;
+                                    }
+
+                                    if (File.Exists(tempfileName))
+                                    {
+                                        ChemistryHelper.UpdateThisStructure(doc, afterModel, guidString, tempfileName);
+
+                                        #region Replace CustomXMLPart with our new cml
+
+                                        if (customXmlPart != null)
+                                        {
+                                            customXmlPart.Delete();
+                                        }
+
+                                        doc.CustomXMLParts.Add(afterCml);
+
+                                        #endregion Replace CustomXMLPart with our new cml
+
+                                        // Delete the temporary file now we are finished with it
+                                        try
+                                        {
+                                            // Only delete file in release mode
+#if !DEBUG
+                                        File.Delete(tempfileName);
+#endif
+                                        }
+                                        catch
+                                        {
+                                            // Not much we can do here
+                                        }
+                                    }
+                                    else
+                                    {
+                                        cc.Delete();
+                                        cc = null;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Editing cancelled
+                            }
+                        }
+                        else
+                        {
+                            UserInteractions.InformUser("Can't edit chemistry here because " + Globals.Chem4WordV3.ChemistryProhibitedReason);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                catch (Exception ex)
                 {
-                    form.ShowDialog();
+                    using (var form = new ReportError(Globals.Chem4WordV3.Telemetry, Globals.Chem4WordV3.WordTopLeft, module, ex))
+                    {
+                        form.ShowDialog();
+                    }
                 }
-            }
-            finally
-            {
-                // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
-                app.ScreenUpdating = true;
-                Globals.Chem4WordV3.EnableContentControlEvents();
+                finally
+                {
+                    // Tidy Up - Resume Screen Updating and Enable Document Event Handlers
+                    app.ScreenUpdating = true;
+                    Globals.Chem4WordV3.EnableContentControlEvents();
 
-                if (cc != null)
-                {
-                    // Move selection point into the Content Control which was just edited or added
-                    app.Selection.SetRange(cc.Range.Start, cc.Range.End);
-                }
-                else
-                {
-                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Finished; No ContentControl was inserted");
-                }
+                    if (cc != null)
+                    {
+                        // Move selection point into the Content Control which was just edited or added
+                        app.Selection.SetRange(cc.Range.Start, cc.Range.End);
+                    }
+                    else
+                    {
+                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", "Finished; No ContentControl was inserted");
+                    }
 
-                wordSettings.RestoreSettings(app);
-                app.ActiveWindow.SetFocus();
-                app.Activate();
+                    wordSettings.RestoreSettings(app);
+                    app.ActiveWindow.SetFocus();
+                    app.Activate();
+                }
             }
         }
 

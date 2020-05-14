@@ -1,190 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- This file must be uploaded to https://www.chem4word.co.uk/files3-1/ folder as Chem4Word-Versions.xml -->
 <ChangeLog>
-    <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
-    <Version>
-        <Number>3.1.8 Beta 8</Number>
-        <IsBeta>true</IsBeta>
-        <Released>09-Apr-2020</Released>
-        <Changes>
-            <Change>Warn when attempting to edit structure with broken link https://github.com/Chem4Word/Version3-1/issues/47 </Change>
-            <Change>Fix upgrade of V2 structure to have user's preferred bond length</Change>
-            <Change>Fix glitch in compatibility mode detection</Change>
-            <Change>Improvement to valency warning indication</Change>
-            <Change>Deprecate internal Functional Groups [CH2, CH3, NH2, OH], they are converted to appropriate Element on import from CML or MOLFile</Change>
-            <Change>During saving of document, Save a copy of orphaned structures as cml to C:\Users\{User}\AppData\Local\Chem4Word.V3\Backups</Change>
-            <Change>Remove locked Content Control if edit operation removes structure https://github.com/Chem4Word/Version3-1/issues/56 </Change>
-        </Changes>
-        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.8.Beta.8.msi</Url>
-    </Version>
-    <Version>
-        <Number>3.1.7 Beta 7</Number>
-        <IsBeta>true</IsBeta>
-        <Released>06-Mar-2020</Released>
-        <Changes>
-            <Change>Fix invisible bonds when certain unusual elements used https://github.com/Chem4Word/Version3-1/issues/44 </Change>
-            <Change>Fix broken ChEBI search https://github.com/Chem4Word/Version3-1/issues/45 </Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.6 Beta 6</Number>
-        <IsBeta>true</IsBeta>
-        <Released>05-Mar-2020</Released>
-        <Changes>
-            <Change>ACME displays warning circles when valence violations occur https://github.com/Chem4Word/Version3-1/issues/31 </Change>
-            <Change>ACME keyboard focus now returns to the editor https://github.com/Chem4Word/Version3-1/issues/30 </Change>
-            <Change>Add ACME Option to render in Monochrome https://github.com/Chem4Word/Version3-1/issues/11 </Change>
-            <Change>Add ACME Option to show/hide Implicit Hydrogens https://github.com/Chem4Word/Version3-1/issues/17 </Change>
-            <Change>Fix flipping of functional groups https://github.com/Chem4Word/Version3-1/issues/35 </Change>
-            <Change>Fix crash when using Create PDF button on Adobe Acrobat Word Add-In https://github.com/Chem4Word/Version3-1/issues/40 </Change>
-            <Change>Correct rendering of double bond of norbornene https://github.com/Chem4Word/Version3-1/issues/34 </Change>
-            <Change>Correct rendering of terminal double bonds https://github.com/Chem4Word/Version3-1/issues/25 </Change>
-            <Change>Silently handle COMException in OnDocumentBeforeSave https://github.com/Chem4Word/Version3-1/issues/42 </Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.5 Beta 5</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Feb-2020</Released>
-        <Changes>
-            <Change>Fix Unable to add a bond to R atom https://github.com/Chem4Word/Version3-1/issues/20 </Change>
-            <Change>Add ability to rotate bond to specific values https://github.com/Chem4Word/Version3-1/issues/10 </Change>
-            <Change>Bond length incorrect for new drawings https://github.com/Chem4Word/Version3-1/issues/27 </Change>
-            <Change>Fix placement of Functional Groups https://github.com/Chem4Word/Version3-1/issues/29 </Change>
-            <Change>Fix deleting of bonds connected to explicitly hidden C atoms causing invisible C atoms</Change>
-            <Change>Remove c4w:Explicit on lone (Carbon) atoms on import, to prevent them from being invisible</Change>
-            <Change>Performance improvements</Change>
-            <Change>Fix doubling up of 2019 in Office detection</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.4 Beta 4</Number>
-        <IsBeta>true</IsBeta>
-        <Released>18-Jan-2020</Released>
-        <Changes>
-            <Change>Further improvements to StartUp</Change>
-            <Change>Disable Explicit C when charge or isotope present https://github.com/Chem4Word/Version3-1/issues/18 </Change>
-            <Change>Fix joining of double bonds to rings https://github.com/Chem4Word/Version3-1/issues/12 </Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.3 Beta 3</Number>
-        <IsBeta>true</IsBeta>
-        <Released>09-Jan-2020</Released>
-        <Changes>
-            <Change>Fix Draw button is disabled for new document</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.2 Beta 2</Number>
-        <IsBeta>true</IsBeta>
-        <Released>08-Jan-2020</Released>
-        <Changes>
-            <Change>First public Beta</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.1 Beta 1</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Jan-2020</Released>
-        <Changes>
-            <Change>Internal Beta</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 12</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Dec-2019</Released>
-        <Changes>
-            <Change>Alpha 12</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 11</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Nov-2019</Released>
-        <Changes>
-            <Change>Alpha 11</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 10</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Oct-2019</Released>
-        <Changes>
-            <Change>Alpha 10</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 09</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Sep-2019</Released>
-        <Changes>
-            <Change>Alpha 09</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 08</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Aug-2019</Released>
-        <Changes>
-            <Change>Alpha 08</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 07</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Jul-2019</Released>
-        <Changes>
-            <Change>Alpha 07</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 06</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Jun-2019</Released>
-        <Changes>
-            <Change>Alpha 06</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 05</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-May-2019</Released>
-        <Changes>
-            <Change>Alpha 05</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 04</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Apr-2019</Released>
-        <Changes>
-            <Change>Alpha 04</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 03</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Mar-2019</Released>
-        <Changes>
-            <Change>Alpha 03</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 02</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Feb-2019</Released>
-        <Changes>
-            <Change>Alpha 02</Change>
-        </Changes>
-    </Version>
-    <Version>
-        <Number>3.1.0 Alpha 01</Number>
-        <IsBeta>true</IsBeta>
-        <Released>01-Jan-2019</Released>
-        <Changes>
-            <Change>Alpha 01</Change>
-        </Changes>
-    </Version>
+  <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
+  <Version>
+    <Number>3.1.9 Beta 9</Number>
+    <IsBeta>true</IsBeta>
+    <Released>14-May-2020</Released>
+    <Changes>
+      <Change>Ensure that System.ValueTuple.dll gets deployed</Change>
+      <Change>https://github.com/Chem4Word/Version3-1/issues/59 - Double bond disappears when drawn vertically in the editor</Change>
+      <Change>https://github.com/Chem4Word/Version3-1/issues/65 - 1.5 bond is too dense</Change>
+      <Change>https://github.com/Chem4Word/Version3-1/issues/64 - Anticlockwise double bond drawing issue</Change>
+      <Change>https://github.com/Chem4Word/Version3-1/issues/23 - Variable ring mode does not indicate ring size on first drawing</Change>
+      <Change>Improvements to EvaluateChemistryAllowed function</Change>
+      <Change>Fix bug in MOLFile export of wavy (indeterminate) bond</Change>
+    </Changes>
+    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.9.Beta.9.msi</Url>
+  </Version>
+  <Version>
+    <Number>3.1.8 Beta 8</Number>
+    <IsBeta>true</IsBeta>
+    <Released>09-Apr-2020</Released>
+    <Changes>
+      <Change>Warn when attempting to edit structure with broken link https://github.com/Chem4Word/Version3-1/issues/47 </Change>
+      <Change>Fix upgrade of V2 structure to have user's preferred bond length</Change>
+      <Change>Fix glitch in compatibility mode detection</Change>
+      <Change>Improvement to valency warning indication</Change>
+      <Change>Deprecate internal Functional Groups [CH2, CH3, NH2, OH], they are converted to appropriate Element on import from CML or MOLFile</Change>
+      <Change>During saving of document, Save a copy of orphaned structures as cml to C:\Users\{User}\AppData\Local\Chem4Word.V3\Backups</Change>
+      <Change>Remove locked Content Control if edit operation removes structure https://github.com/Chem4Word/Version3-1/issues/56 </Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.7 Beta 7</Number>
+    <IsBeta>true</IsBeta>
+    <Released>06-Mar-2020</Released>
+    <Changes>
+      <Change>Fix invisible bonds when certain unusual elements used https://github.com/Chem4Word/Version3-1/issues/44 </Change>
+      <Change>Fix broken ChEBI search https://github.com/Chem4Word/Version3-1/issues/45 </Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.6 Beta 6</Number>
+    <IsBeta>true</IsBeta>
+    <Released>05-Mar-2020</Released>
+    <Changes>
+      <Change>ACME displays warning circles when valence violations occur https://github.com/Chem4Word/Version3-1/issues/31 </Change>
+      <Change>ACME keyboard focus now returns to the editor https://github.com/Chem4Word/Version3-1/issues/30 </Change>
+      <Change>Add ACME Option to render in Monochrome https://github.com/Chem4Word/Version3-1/issues/11 </Change>
+      <Change>Add ACME Option to show/hide Implicit Hydrogens https://github.com/Chem4Word/Version3-1/issues/17 </Change>
+      <Change>Fix flipping of functional groups https://github.com/Chem4Word/Version3-1/issues/35 </Change>
+      <Change>Fix crash when using Create PDF button on Adobe Acrobat Word Add-In https://github.com/Chem4Word/Version3-1/issues/40 </Change>
+      <Change>Correct rendering of double bond of norbornene https://github.com/Chem4Word/Version3-1/issues/34 </Change>
+      <Change>Correct rendering of terminal double bonds https://github.com/Chem4Word/Version3-1/issues/25 </Change>
+      <Change>Silently handle COMException in OnDocumentBeforeSave https://github.com/Chem4Word/Version3-1/issues/42 </Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.5 Beta 5</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Feb-2020</Released>
+    <Changes>
+      <Change>Fix Unable to add a bond to R atom https://github.com/Chem4Word/Version3-1/issues/20 </Change>
+      <Change>Add ability to rotate bond to specific values https://github.com/Chem4Word/Version3-1/issues/10 </Change>
+      <Change>Bond length incorrect for new drawings https://github.com/Chem4Word/Version3-1/issues/27 </Change>
+      <Change>Fix placement of Functional Groups https://github.com/Chem4Word/Version3-1/issues/29 </Change>
+      <Change>Fix deleting of bonds connected to explicitly hidden C atoms causing invisible C atoms</Change>
+      <Change>Remove c4w:Explicit on lone (Carbon) atoms on import, to prevent them from being invisible</Change>
+      <Change>Performance improvements</Change>
+      <Change>Fix doubling up of 2019 in Office detection</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.4 Beta 4</Number>
+    <IsBeta>true</IsBeta>
+    <Released>18-Jan-2020</Released>
+    <Changes>
+      <Change>Further improvements to StartUp</Change>
+      <Change>Disable Explicit C when charge or isotope present https://github.com/Chem4Word/Version3-1/issues/18 </Change>
+      <Change>Fix joining of double bonds to rings https://github.com/Chem4Word/Version3-1/issues/12 </Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.3 Beta 3</Number>
+    <IsBeta>true</IsBeta>
+    <Released>09-Jan-2020</Released>
+    <Changes>
+      <Change>Fix Draw button is disabled for new document</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.2 Beta 2</Number>
+    <IsBeta>true</IsBeta>
+    <Released>08-Jan-2020</Released>
+    <Changes>
+      <Change>First public Beta</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.1 Beta 1</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Jan-2020</Released>
+    <Changes>
+      <Change>Internal Beta</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 12</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Dec-2019</Released>
+    <Changes>
+      <Change>Alpha 12</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 11</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Nov-2019</Released>
+    <Changes>
+      <Change>Alpha 11</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 10</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Oct-2019</Released>
+    <Changes>
+      <Change>Alpha 10</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 09</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Sep-2019</Released>
+    <Changes>
+      <Change>Alpha 09</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 08</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Aug-2019</Released>
+    <Changes>
+      <Change>Alpha 08</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 07</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Jul-2019</Released>
+    <Changes>
+      <Change>Alpha 07</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 06</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Jun-2019</Released>
+    <Changes>
+      <Change>Alpha 06</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 05</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-May-2019</Released>
+    <Changes>
+      <Change>Alpha 05</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 04</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Apr-2019</Released>
+    <Changes>
+      <Change>Alpha 04</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 03</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Mar-2019</Released>
+    <Changes>
+      <Change>Alpha 03</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 02</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Feb-2019</Released>
+    <Changes>
+      <Change>Alpha 02</Change>
+    </Changes>
+  </Version>
+  <Version>
+    <Number>3.1.0 Alpha 01</Number>
+    <IsBeta>true</IsBeta>
+    <Released>01-Jan-2019</Released>
+    <Changes>
+      <Change>Alpha 01</Change>
+    </Changes>
+  </Version>
 </ChangeLog>

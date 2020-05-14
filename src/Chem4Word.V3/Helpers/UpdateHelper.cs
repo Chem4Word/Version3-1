@@ -287,6 +287,10 @@ namespace Chem4Word.Helpers
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             string VersionsFile = $"{Constants.Chem4WordVersionFiles}/Chem4Word-Versions.xml";
+#if DEBUG
+            //VersionsFile = $"{Constants.Chem4WordVersionFiles}/Chem4Word-Versions-Debug.xml";
+#endif
+
             string PrimaryDomain = "https://www.chem4word.co.uk";
             string[] Domains = { "https://www.chem4word.co.uk", "http://www.chem4word.com", "https://chem4word.azurewebsites.net" };
             string VersionsFileMarker = "<Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>";
@@ -308,7 +312,7 @@ namespace Chem4Word.Helpers
                         client.BaseAddress = new Uri(domain);
                         var response = client.GetAsync(VersionsFile).Result;
                         response.EnsureSuccessStatusCode();
-                        //Debug.WriteLine(response.StatusCode);
+
                         string result = response.Content.ReadAsStringAsync().Result;
                         if (result.Contains(VersionsFileMarker))
                         {

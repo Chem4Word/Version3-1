@@ -47,6 +47,7 @@
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
             this.ClearChemistry = new System.Windows.Forms.Button();
+            this.Layout = new System.Windows.Forms.Button();
             this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
             this.RedoStack = new WinForms.TestHarness.StackViewer();
             this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
@@ -74,7 +75,6 @@
             // 
             // EditWithAcme
             // 
-            this.EditWithAcme.Enabled = false;
             this.EditWithAcme.Location = new System.Drawing.Point(6, 19);
             this.EditWithAcme.Name = "EditWithAcme";
             this.EditWithAcme.Size = new System.Drawing.Size(75, 23);
@@ -88,7 +88,7 @@
             // 
             this.Undo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Undo.Enabled = false;
-            this.Undo.Location = new System.Drawing.Point(93, 530);
+            this.Undo.Location = new System.Drawing.Point(174, 501);
             this.Undo.Name = "Undo";
             this.Undo.Size = new System.Drawing.Size(75, 23);
             this.Undo.TabIndex = 11;
@@ -101,7 +101,7 @@
             // 
             this.Redo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Redo.Enabled = false;
-            this.Redo.Location = new System.Drawing.Point(93, 559);
+            this.Redo.Location = new System.Drawing.Point(174, 530);
             this.Redo.Name = "Redo";
             this.Redo.Size = new System.Drawing.Size(75, 23);
             this.Redo.TabIndex = 12;
@@ -192,9 +192,9 @@
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBox2.Controls.Add(this.ChangeSettings);
-            this.groupBox2.Location = new System.Drawing.Point(174, 501);
+            this.groupBox2.Location = new System.Drawing.Point(255, 501);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(170, 81);
+            this.groupBox2.Size = new System.Drawing.Size(108, 81);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Options ...";
@@ -215,7 +215,7 @@
             // 
             this.ShowCml.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ShowCml.Enabled = false;
-            this.ShowCml.Location = new System.Drawing.Point(93, 501);
+            this.ShowCml.Location = new System.Drawing.Point(174, 559);
             this.ShowCml.Name = "ShowCml";
             this.ShowCml.Size = new System.Drawing.Size(75, 23);
             this.ShowCml.TabIndex = 18;
@@ -249,6 +249,19 @@
             this.ClearChemistry.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ClearChemistry.Click += new System.EventHandler(this.ClearChemistry_Click);
             // 
+            // Layout
+            // 
+            this.Layout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Layout.Enabled = false;
+            this.Layout.Location = new System.Drawing.Point(93, 501);
+            this.Layout.Name = "Layout";
+            this.Layout.Size = new System.Drawing.Size(75, 23);
+            this.Layout.TabIndex = 20;
+            this.Layout.Text = "Layout";
+            this.Layout.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.Layout.UseVisualStyleBackColor = true;
+            this.Layout.Click += new System.EventHandler(this.Layout_Click);
+            // 
             // RedoHost
             // 
             this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -274,6 +287,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1137, 587);
+            this.Controls.Add(this.Layout);
             this.Controls.Add(this.ClearChemistry);
             this.Controls.Add(this.SaveStructure);
             this.Controls.Add(this.ShowCml);
@@ -321,6 +335,7 @@
         private StackViewer UndoStack;
         private StackViewer RedoStack;
         private System.Windows.Forms.Button ChangeSettings;
+        private System.Windows.Forms.Button Layout;
     }
 }
 

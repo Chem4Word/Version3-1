@@ -5,21 +5,14 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Windows;
-using Chem4Word.Renderer.OoXmlV4.Enums;
+using System.Collections.Generic;
 
-namespace Chem4Word.Renderer.OoXmlV4.Entities
+namespace WinForms.TestHarness
 {
-    public class SimpleLine
+    public class LayoutResult
     {
-        public Point Start { get; set; }
-
-        public Point End { get; set; }
-
-        public SimpleLine(Point startPoint, Point endPoint)
-        {
-            Start = startPoint;
-            End = endPoint;
-        }
+        public string Molecule { get; set; }
+        public List<string> Errors { get; set; } = new List<string>();
+        public List<string> Messages { get; set; } = new List<string>();
     }
 }

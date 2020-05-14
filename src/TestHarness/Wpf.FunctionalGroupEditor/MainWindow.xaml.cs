@@ -30,7 +30,7 @@ namespace Wpf.FunctionalGroupEditor
             Editor.EditorOptions = new AcmeOptions(null);
 
             Groups.Items.Clear();
-            foreach (var functionalGroup in Globals.FunctionalGroupsList)
+            foreach (var functionalGroup in Globals.FunctionalGroupsList.Where(i => i.Internal == false))
             {
                 Groups.Items.Add(functionalGroup);
             }

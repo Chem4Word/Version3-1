@@ -10,10 +10,12 @@ namespace Chem4Word.Renderer.OoXmlV4.Enums
     public enum BondLineStyle
     {
         Solid,
-        Dotted,
-        Dashed,
+        Zero,
+        Half,
         Wavy,
         Wedge,
-        Hatch
+        Hatch,
+        Dotted,
+        Dashed
     }
 }

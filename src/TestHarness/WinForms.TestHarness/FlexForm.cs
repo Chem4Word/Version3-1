@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -22,6 +23,7 @@ using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Telemetry;
+using Newtonsoft.Json;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace WinForms.TestHarness
@@ -37,7 +39,8 @@ namespace WinForms.TestHarness
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
 
-        private string _lastCml = null;
+        private const string EmptyCml = "<cml></cml>";
+        private string _lastCml = EmptyCml;
 
         private AcmeOptions _editorOptions;
 
@@ -101,10 +104,13 @@ namespace WinForms.TestHarness
 
                         if (!string.IsNullOrEmpty(_lastCml))
                         {
-                            var clone = cmlConvertor.Import(_lastCml);
-                            Debug.WriteLine(
-                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                            _undoStack.Push(clone);
+                            if (_lastCml != EmptyCml)
+                            {
+                                var clone = cmlConvertor.Import(_lastCml);
+                                Debug.WriteLine(
+                                    $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                                _undoStack.Push(clone);
+                            }
                         }
 
                         _lastCml = cmlConvertor.Export(model);
@@ -305,7 +311,7 @@ namespace WinForms.TestHarness
             try
             {
 #endif
-            if (!string.IsNullOrEmpty(_lastCml))
+                if (!string.IsNullOrEmpty(_lastCml))
                 {
                     using (EditorHost editorHost = new EditorHost(_lastCml, "ACME"))
                     { 
@@ -313,10 +319,13 @@ namespace WinForms.TestHarness
                         if (editorHost.DialogResult == DialogResult.OK)
                         {
                             CMLConverter cc = new CMLConverter();
-                            var clone = cc.Import(_lastCml);
-                            Debug.WriteLine(
-                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                            _undoStack.Push(clone);
+                            if (_lastCml != EmptyCml)
+                            {
+                                var clone = cc.Import(_lastCml);
+                                Debug.WriteLine(
+                                    $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                                _undoStack.Push(clone);
+                            }
 
                             Model m = cc.Import(editorHost.OutputValue);
                             m.Relabel(true);
@@ -399,6 +408,7 @@ namespace WinForms.TestHarness
             ShowCml.Enabled = true;
             ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
+            Layout.Enabled = true;
 
             ListStacks();
         }
@@ -622,7 +632,7 @@ namespace WinForms.TestHarness
         {
             var cc = new CMLConverter();
             _undoStack.Push(cc.Import(_lastCml));
-            _lastCml = "<cml></cml>";
+            _lastCml = EmptyCml;
 
             Display.Clear();
             EnableUndoRedoButtonsAndShowStacks();
@@ -671,6 +681,96 @@ namespace WinForms.TestHarness
             Display.ShowImplicitHydrogens = _editorOptions.ShowHydrogens;
             Display.ShowAtomsInColour = _editorOptions.ColouredAtoms;
             Display.ShowMoleculeGrouping = _editorOptions.ShowMoleculeGrouping;
+        }
+
+        private void Layout_Click(object sender, EventArgs e)
+        {
+            var data = new LayoutResult();
+
+            var cc = new CMLConverter();
+            var sc = new SdFileConverter();
+            string molfile = sc.Export(cc.Import(_lastCml));
+
+            try
+            {
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    var formData = new List<KeyValuePair<string, string>>();
+
+                    formData.Add(new KeyValuePair<string, string>("mol", molfile));
+                    formData.Add(new KeyValuePair<string, string>("machine", SystemHelper.GetMachineId()));
+                    formData.Add(new KeyValuePair<string, string>("version", "1.2.3.4"));
+#if DEBUG
+                    formData.Add(new KeyValuePair<string, string>("debug", "true"));
+#endif
+
+                    var content = new FormUrlEncodedContent(formData);
+
+                    httpClient.Timeout = TimeSpan.FromSeconds(15);
+                    httpClient.DefaultRequestHeaders.Add("user-agent", "Chem4Word");
+
+                    try
+                    {
+                        var response = httpClient.PostAsync("https://chemicalservices-staging.azurewebsites.net/api/Layout", content).Result;
+                        if (response.Content != null)
+                        {
+                            var responseContent = response.Content;
+                            var jsonContent = responseContent.ReadAsStringAsync().Result;
+
+                            try
+                            {
+                                data = JsonConvert.DeserializeObject<LayoutResult>(jsonContent);
+                            }
+                            catch (Exception e3)
+                            {
+                                //Telemetry.Write(module, "Exception", e3.Message);
+                                //Telemetry.Write(module, "Exception(Data)", jsonContent);
+                                Debug.WriteLine(e3.Message);
+                            }
+
+                            if (data != null)
+                            {
+                                if (data.Messages.Any())
+                                {
+                                    //Telemetry.Write(module, "Timing", string.Join(Environment.NewLine, data.Messages));
+                                }
+                                if (data.Errors.Any())
+                                {
+                                    //Telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, data.Errors));
+                                }
+
+                                if (!string.IsNullOrEmpty(data.Molecule))
+                                {
+                                    var model = sc.Import(data.Molecule);
+                                    model.EnsureBondLength(20, false);
+                                    if (string.IsNullOrEmpty(model.CustomXmlPartGuid))
+                                    {
+                                        model.CustomXmlPartGuid = Guid.NewGuid().ToString("N");
+                                    }
+
+                                    var clone = cc.Import(_lastCml);
+                                    _undoStack.Push(clone);
+
+                                    _lastCml = cc.Export(model);
+                                    ShowChemistry("", model);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e2)
+                    {
+                        //Telemetry.Write(module, "Exception", e2.Message);
+                        //Telemetry.Write(module, "Exception", e2.ToString());
+                        Debug.WriteLine(e2.Message);
+                    }
+                }
+            }
+            catch (Exception e1)
+            {
+                //Telemetry.Write(module, "Exception", e1.Message);
+                //Telemetry.Write(module, "Exception", e1.ToString());
+                Debug.WriteLine(e1.Message);
+            }
         }
     }
 }

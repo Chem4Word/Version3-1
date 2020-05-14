@@ -1,3 +1,5 @@
+# Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted
+
 cls
 
 $targets = Get-ChildItem ..\. -include bin,obj -Recurse

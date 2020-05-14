@@ -480,7 +480,7 @@ namespace Chem4Word.Helpers
 
                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Not sending structure to Web Service; HasFunctionalGroups: {mol.HasFunctionalGroups} Invalid Bonds: {invalidBonds?.Count} Min Atomic Number: {minAtomicNumber} Max Atomic Number: {maxAtomicNumber}");
                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiName, Value = "Unable to calculate" });
-                    calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = "Unable to calculate" });
+                    //calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = "Unable to calculate" });
                     calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = "Unable to calculate" });
 
                     calculatedFormulae.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordResolverFormulaName, Value = "Not requested" });
@@ -512,8 +512,8 @@ namespace Chem4Word.Helpers
                                 var value = string.IsNullOrEmpty(first.Inchi) ? "Not found" : first.Inchi;
                                 calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiName, Value = value });
 
-                                value = string.IsNullOrEmpty(first.AuxInfo) ? "Not found" : first.AuxInfo;
-                                calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = value });
+                                //value = string.IsNullOrEmpty(first.AuxInfo) ? "Not found" : first.AuxInfo;
+                                //calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordAuxInfoName, Value = value });
 
                                 value = string.IsNullOrEmpty(first.InchiKey) ? "Not found" : first.InchiKey;
                                 calculatedNames.Add(new TextualProperty { FullType = CMLConstants.ValueChem4WordInchiKeyName, Value = value });

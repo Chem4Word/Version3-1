@@ -6,20 +6,22 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows;
-using Chem4Word.Renderer.OoXmlV4.Enums;
 
-namespace Chem4Word.Renderer.OoXmlV4.Entities
+namespace Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic
 {
-    public class SimpleLine
+    public class DiagnosticSpot
     {
-        public Point Start { get; set; }
+        public Point Point { get; }
 
-        public Point End { get; set; }
+        public string Colour { get; }
 
-        public SimpleLine(Point startPoint, Point endPoint)
+        public double Diameter { get; }
+
+        public DiagnosticSpot(Point point, string colour, double diameter)
         {
-            Start = startPoint;
-            End = endPoint;
+            Point = point;
+            Colour = colour;
+            Diameter = diameter;
         }
     }
 }

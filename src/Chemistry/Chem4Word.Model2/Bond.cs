@@ -638,7 +638,15 @@ namespace Chem4Word.Model2
             }
             else
             {
-                dir = (Globals.BondDirection)Math.Sign(Vector.CrossProduct(vec.Value, BondVector));
+                // Azure DevOps #713
+                if (double.IsNaN(vec.Value.X) || double.IsNaN(vec.Value.Y))
+                {
+                    dir = Globals.BondDirection.None;
+                }
+                else
+                {
+                    dir = (Globals.BondDirection)Math.Sign(Vector.CrossProduct(vec.Value, BondVector));
+                }
             }
 
             return dir;

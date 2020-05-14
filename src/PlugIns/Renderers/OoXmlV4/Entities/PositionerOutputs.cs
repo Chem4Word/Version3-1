@@ -7,18 +7,20 @@
 
 using System.Collections.Generic;
 using System.Windows;
+using Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic;
 
 namespace Chem4Word.Renderer.OoXmlV4.Entities
 {
     public class PositionerOutputs
     {
-        public List<AtomLabelCharacter> AtomLabelCharacters { get; set; } = new List<AtomLabelCharacter>();
-        public Dictionary<string, List<Point>> ConvexHulls { get; set; } = new Dictionary<string, List<Point>>();
-        public List<BondLine> BondLines { get; set; } = new List<BondLine>();
-        public List<Point> RingCenters { get; set; } = new List<Point>();
-        public List<MoleculeExtents> AllMoleculeExtents { get; set; } = new List<MoleculeExtents>();
-        public List<Rect> GroupBrackets { get; set; } = new List<Rect>();
-        public List<Rect> MoleculeBrackets { get; set; } = new List<Rect>();
-        public List<OoXmlString> MoleculeLabels { get; set; } = new List<OoXmlString>();
+        public List<AtomLabelCharacter> AtomLabelCharacters { get; } = new List<AtomLabelCharacter>();
+        public Dictionary<string, List<Point>> ConvexHulls { get; } = new Dictionary<string, List<Point>>();
+        public List<BondLine> BondLines { get; } = new List<BondLine>();
+        public List<Point> RingCenters { get; } = new List<Point>();
+        public List<MoleculeExtents> AllMoleculeExtents { get; } = new List<MoleculeExtents>();
+        public List<Rect> GroupBrackets { get; } = new List<Rect>();
+        public List<Rect> MoleculeBrackets { get; } = new List<Rect>();
+        public List<OoXmlString> MoleculeLabels { get; } = new List<OoXmlString>();
+        public Diagnostics Diagnostics { get; } = new Diagnostics();
     }
 }

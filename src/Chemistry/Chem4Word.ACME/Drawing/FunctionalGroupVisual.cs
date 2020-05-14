@@ -31,7 +31,6 @@ namespace Chem4Word.ACME.Drawing
 
         public override void Render()
         {
-            SetTextParams();
             Render(ParentAtom.Position, ShowInColour ? ParentGroup.Colour : "#000000");
         }
 

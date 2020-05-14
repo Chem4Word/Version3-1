@@ -60,13 +60,13 @@ namespace Chem4Word.ACME.Adorners
         private void DrawRingSize(DrawingContext drawingContext)
         {
             Point pos = (EndPoint - StartPoint) * 0.5 + StartPoint;
-            int RingSize = Placements.Count;
-            DrawRingSize(drawingContext, RingSize, pos, PixelsPerDip(), BondPen.Brush.Clone());
+            int ringSize = Placements.Count;
+            DrawRingSize(drawingContext, ringSize, pos, PixelsPerDip(), BondPen.Brush.Clone());
         }
 
-        public static void DrawRingSize(DrawingContext drawingContext, int RingSize, Point pos, float pixelsPerDip, Brush fillBrush)
+        public static void DrawRingSize(DrawingContext drawingContext, int ringSize, Point pos, float pixelsPerDip, Brush fillBrush)
         {
-            string ringLabel = RingSize.ToString();
+            string ringLabel = ringSize.ToString();
             var symbolText = new GlyphText(ringLabel,
                                            GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, pixelsPerDip);
 
@@ -74,9 +74,9 @@ namespace Chem4Word.ACME.Adorners
 
             symbolText.MeasureAtCenter(pos);
             var textMetricsBoundingBox = symbolText.TextMetrics.BoundingBox;
-            double radius =
-                (textMetricsBoundingBox.BottomRight - textMetricsBoundingBox.TopLeft).Length /
-                2 * 1.1;
+
+            double radius = (textMetricsBoundingBox.BottomRight - textMetricsBoundingBox.TopLeft).Length / 2 * 1.1;
+
             drawingContext.DrawEllipse(new SolidColorBrush(SystemColors.WindowColor), boundaryPen, pos, radius, radius);
             symbolText.Fill = fillBrush;
             symbolText.DrawAtBottomLeft(textMetricsBoundingBox.BottomLeft, drawingContext);
