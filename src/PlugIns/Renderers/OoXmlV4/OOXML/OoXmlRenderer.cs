@@ -17,7 +17,6 @@ using System.Windows.Media;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Entities;
 using Chem4Word.Renderer.OoXmlV4.Enums;
@@ -1817,21 +1816,22 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 // All other bonds are single
                 if (allSingle)
                 {
-                    bool anglesAreGood = true;
+                    bool oblique = true;
 
                     var wedgeVector = endAtom.Position - bl.Bond.StartAtom.Position;
                     foreach (var bond in otherBonds)
                     {
                         var otherAtom = bond.OtherAtom(bl.Bond.EndAtom);
-                        var angle = Vector.AngleBetween(wedgeVector, endAtom.Position - otherAtom.Position);
+                        var angle = Math.Abs(Vector.AngleBetween(wedgeVector, endAtom.Position - otherAtom.Position));
 
-                        if (Math.Abs(angle) < 109.5 || Math.Abs(angle) > 130.5)
+                        if (angle < 109.5 || angle > 130.5)
                         {
-                            anglesAreGood = false;
+                            oblique = false;
+                            break;
                         }
                     }
 
-                    if (anglesAreGood)
+                    if (oblique)
                     {
                         // Determine chamfer shape
                         Vector left = (wedgeTailLeft - wedgeNose) * 2;
