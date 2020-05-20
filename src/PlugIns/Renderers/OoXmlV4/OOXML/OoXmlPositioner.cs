@@ -240,7 +240,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 if (ring.Centroid.HasValue)
                 {
-                    Outputs.RingCenters.Add(ring.Centroid.Value);
+                    var centre = ring.Centroid.Value;
+                    Outputs.RingCenters.Add(centre);
+
+                    var innerCircle = new InnerCircle();
+                    // Traverse() obtains list of atoms in anti-clockwise direction around ring
+                    innerCircle.Points.AddRange(ring.Traverse().Select(a => a.Position).ToList());
+                    innerCircle.Centre = centre;
+                    //Outputs.InnerCircles.Add(innerCircle);
                 }
             }
 

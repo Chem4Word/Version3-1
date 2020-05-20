@@ -38,6 +38,10 @@
             this.LayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.DisplayHost = new System.Windows.Forms.Integration.ElementHost();
             this.Display = new Chem4Word.ACME.Display();
+            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.RedoStack = new WinForms.TestHarness.StackViewer();
+            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.UndoStack = new WinForms.TestHarness.StackViewer();
             this.Information = new System.Windows.Forms.Label();
             this.EditCml = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
@@ -47,11 +51,7 @@
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
             this.ClearChemistry = new System.Windows.Forms.Button();
-            this.Layout = new System.Windows.Forms.Button();
-            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.RedoStack = new WinForms.TestHarness.StackViewer();
-            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.UndoStack = new WinForms.TestHarness.StackViewer();
+            this.LayoutStructure = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -140,6 +140,26 @@
             this.DisplayHost.TabIndex = 1;
             this.DisplayHost.Text = "centreHost";
             this.DisplayHost.Child = this.Display;
+            // 
+            // RedoHost
+            // 
+            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RedoHost.Location = new System.Drawing.Point(841, 3);
+            this.RedoHost.Name = "RedoHost";
+            this.RedoHost.Size = new System.Drawing.Size(269, 456);
+            this.RedoHost.TabIndex = 2;
+            this.RedoHost.Text = "rightHost";
+            this.RedoHost.Child = this.RedoStack;
+            // 
+            // UndoHost
+            // 
+            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UndoHost.Location = new System.Drawing.Point(3, 3);
+            this.UndoHost.Name = "UndoHost";
+            this.UndoHost.Size = new System.Drawing.Size(269, 456);
+            this.UndoHost.TabIndex = 3;
+            this.UndoHost.Text = "leftHost";
+            this.UndoHost.Child = this.UndoStack;
             // 
             // Information
             // 
@@ -249,45 +269,25 @@
             this.ClearChemistry.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ClearChemistry.Click += new System.EventHandler(this.ClearChemistry_Click);
             // 
-            // Layout
+            // LayoutStructure
             // 
-            this.Layout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Layout.Enabled = false;
-            this.Layout.Location = new System.Drawing.Point(93, 501);
-            this.Layout.Name = "Layout";
-            this.Layout.Size = new System.Drawing.Size(75, 23);
-            this.Layout.TabIndex = 20;
-            this.Layout.Text = "Layout";
-            this.Layout.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Layout.UseVisualStyleBackColor = true;
-            this.Layout.Click += new System.EventHandler(this.Layout_Click);
-            // 
-            // RedoHost
-            // 
-            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(841, 3);
-            this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(269, 456);
-            this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "rightHost";
-            this.RedoHost.Child = this.RedoStack;
-            // 
-            // UndoHost
-            // 
-            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UndoHost.Location = new System.Drawing.Point(3, 3);
-            this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(269, 456);
-            this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "leftHost";
-            this.UndoHost.Child = this.UndoStack;
+            this.LayoutStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.LayoutStructure.Enabled = false;
+            this.LayoutStructure.Location = new System.Drawing.Point(93, 501);
+            this.LayoutStructure.Name = "LayoutStructure";
+            this.LayoutStructure.Size = new System.Drawing.Size(75, 23);
+            this.LayoutStructure.TabIndex = 20;
+            this.LayoutStructure.Text = "Layout";
+            this.LayoutStructure.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LayoutStructure.UseVisualStyleBackColor = true;
+            this.LayoutStructure.Click += new System.EventHandler(this.LayoutStructure_Click);
             // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1137, 587);
-            this.Controls.Add(this.Layout);
+            this.Controls.Add(this.LayoutStructure);
             this.Controls.Add(this.ClearChemistry);
             this.Controls.Add(this.SaveStructure);
             this.Controls.Add(this.ShowCml);
@@ -335,7 +335,7 @@
         private StackViewer UndoStack;
         private StackViewer RedoStack;
         private System.Windows.Forms.Button ChangeSettings;
-        private System.Windows.Forms.Button Layout;
+        private System.Windows.Forms.Button LayoutStructure;
     }
 }
 

@@ -408,7 +408,7 @@ namespace WinForms.TestHarness
             ShowCml.Enabled = true;
             ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
-            Layout.Enabled = true;
+            LayoutStructure.Enabled = true;
 
             ListStacks();
         }
@@ -683,7 +683,7 @@ namespace WinForms.TestHarness
             Display.ShowMoleculeGrouping = _editorOptions.ShowMoleculeGrouping;
         }
 
-        private void Layout_Click(object sender, EventArgs e)
+        private void LayoutStructure_Click(object sender, EventArgs e)
         {
             var data = new LayoutResult();
 

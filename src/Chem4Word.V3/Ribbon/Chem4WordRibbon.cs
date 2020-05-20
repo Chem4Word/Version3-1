@@ -245,7 +245,7 @@ namespace Chem4Word
                                                 string tempfileName = renderer.Render();
                                                 if (File.Exists(tempfileName))
                                                 {
-                                                    ChemistryHelper.Insert2D(cc, tempfileName, guid);
+                                                    ChemistryHelper.Insert2D(cc.ID, tempfileName, guid);
                                                 }
                                                 else
                                                 {
@@ -272,7 +272,7 @@ namespace Chem4Word
                                                     text = ChemistryHelper.GetInlineText(model, chosenState, ref isFormula, out source);
                                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Render structure as {source}");
                                                 }
-                                                ChemistryHelper.Insert1D(cc, text, isFormula, chosenState + ":" + guid);
+                                                ChemistryHelper.Insert1D(cc.ID, text, isFormula, chosenState + ":" + guid);
                                             }
                                         }
                                     }

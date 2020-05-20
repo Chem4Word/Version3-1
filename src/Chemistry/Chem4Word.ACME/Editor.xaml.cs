@@ -343,7 +343,6 @@ namespace Chem4Word.ACME
 
                             ActiveViewModel.CurrentBondLength = EditorOptions.BondLength;
 
-                            // ToDo: Find way to avoid this as XamlBondLength ought to be read only
                             ActiveViewModel.Model.SetXamlBondLength(EditorOptions.BondLength);
                             ActiveViewModel.Loading = false;
                         }
