@@ -322,19 +322,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 int charge = mol.FormalCharge.Value;
                 int absCharge = Math.Abs(charge);
 
-                if (absCharge > 1)
-                {
-                    characters = absCharge.ToString();
-                }
-
-                if (charge >= 1)
-                {
-                    characters += "+";
-                }
-                else if (charge <= 1)
-                {
-                    characters += "-";
-                }
+                string chargeSign = Math.Sign(charge) > 0 ? "+" : "-";
+                characters = absCharge == 1 ? chargeSign : $"{absCharge}{chargeSign}";
             }
 
             if (mol.SpinMultiplicity.HasValue && mol.SpinMultiplicity.Value > 1)
@@ -630,17 +619,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 // 2.1 Determine position of implicit hydrogens
                 int bondCount = atom.Bonds.ToList().Count;
-                double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
-                CompassPoints nesw;
-
-                if (bondCount == 1)
-                {
-                    nesw = BasicGeometry.SnapTo2EW(baFromNorth);
-                }
-                else
-                {
-                    nesw = BasicGeometry.SnapTo4NESW(baFromNorth);
-                }
+                double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
+                CompassPoints orientation = bondCount == 1 ? BasicGeometry.SnapTo2EW(angleFromNorth) : BasicGeometry.SnapTo4NESW(angleFromNorth);
 
                 // 2.2 Implicit Hydrogens
                 GroupOfCharacters hydrogens = null;
@@ -655,12 +635,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     hydrogens.AddCharacter('H', atomColour);
                     if (implicitHCount > 1)
                     {
-                        string numbers = "012345";
-                        hydrogens.AddCharacter(numbers[implicitHCount], atomColour, true);
+                        foreach (var character in implicitHCount.ToString())
+                        {
+                            hydrogens.AddCharacter(character, atomColour, true);
+                        }
                     }
 
                     // Adjust position of block
-                    switch (nesw)
+                    switch (orientation)
                     {
                         case CompassPoints.North:
                             hydrogens.AdjustPosition(main.NorthCentre - hydrogens.SouthCentre);
@@ -678,7 +660,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             hydrogens.AdjustPosition(main.BoundingBox.TopLeft - hydrogens.BoundingBox.TopRight);
                             break;
                     }
-                    hydrogens.Nudge(nesw, OoXmlHelper.CML_CHARACTER_MARGIN);
+                    hydrogens.Nudge(orientation, OoXmlHelper.CML_CHARACTER_MARGIN);
                 }
 
                 // 2.3 Charge
@@ -686,6 +668,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 int chargeValue = atom.FormalCharge ?? 0;
                 int absCharge = Math.Abs(chargeValue);
+
                 if (absCharge > 0)
                 {
                     charge = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
@@ -700,37 +683,38 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         charge.AddCharacter(character, atomColour, true);
                     }
 
-                    // Adjust position
-                    var destination = main.BoundingBox.TopRight;
-                    switch (nesw)
+                    // Adjust position of charge
+                    if (hydrogens == null)
                     {
-                        case CompassPoints.North:
-                            if (hydrogens != null && hydrogens.BoundingBox.Right >= main.BoundingBox.Right)
-                            {
-                                destination.X = hydrogens.BoundingBox.Right;
-                            }
-                            charge.AdjustPosition(destination - charge.WestCentre);
-                            charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            break;
+                        charge.AdjustPosition(main.BoundingBox.TopRight - charge.WestCentre);
+                        charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                    }
+                    else
+                    {
+                        var destination = main.BoundingBox.TopRight;
 
-                        case CompassPoints.East:
-                            if (hydrogens != null)
-                            {
-                                charge.AdjustPosition(destination - charge.SouthCentre);
-                                charge.Nudge(CompassPoints.North, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            }
-                            else
-                            {
+                        switch (orientation)
+                        {
+                            case CompassPoints.North:
+                                if (hydrogens.BoundingBox.Right >= main.BoundingBox.Right)
+                                {
+                                    destination.X = hydrogens.BoundingBox.Right;
+                                }
                                 charge.AdjustPosition(destination - charge.WestCentre);
                                 charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            }
-                            break;
+                                break;
 
-                        case CompassPoints.South:
-                        case CompassPoints.West:
-                            charge.AdjustPosition(destination - charge.WestCentre);
-                            charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            break;
+                            case CompassPoints.East:
+                                charge.AdjustPosition(destination - charge.SouthCentre);
+                                charge.Nudge(CompassPoints.North, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                break;
+
+                            case CompassPoints.South:
+                            case CompassPoints.West:
+                                charge.AdjustPosition(destination - charge.WestCentre);
+                                charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                break;
+                        }
                     }
                 }
 
@@ -741,7 +725,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 if (isoValue > 0)
                 {
-
                     isotope = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
                                                     Inputs.TtfCharacterSet, Inputs.MeanBondLength);
 
@@ -750,38 +733,38 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         isotope.AddCharacter(character, atomColour, true);
                     }
 
-                    // Adjust position
-                    var destination = main.BoundingBox.TopLeft;
-
-                    switch (nesw)
+                    // Adjust position of isotope
+                    if (hydrogens == null)
                     {
-                        case CompassPoints.North:
-                            if (hydrogens != null && hydrogens.BoundingBox.Left <= main.BoundingBox.Left)
-                            {
-                                destination.X = hydrogens.BoundingBox.Left;
-                            }
-                            isotope.AdjustPosition(destination - isotope.EastCentre);
-                            isotope.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            break;
+                        isotope.AdjustPosition(main.BoundingBox.TopLeft - isotope.EastCentre);
+                        isotope.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                    }
+                    else
+                    {
+                        var destination = main.BoundingBox.TopLeft;
 
-                        case CompassPoints.East:
-                        case CompassPoints.South:
-                            isotope.AdjustPosition(destination - isotope.EastCentre);
-                            isotope.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            break;
+                        switch (orientation)
+                        {
+                            case CompassPoints.North:
+                                if (hydrogens.BoundingBox.Left <= main.BoundingBox.Left)
+                                {
+                                    destination.X = hydrogens.BoundingBox.Left;
+                                }
+                                isotope.AdjustPosition(destination - isotope.EastCentre);
+                                isotope.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                break;
 
-                        case CompassPoints.West:
-                            if (hydrogens != null)
-                            {
+                            case CompassPoints.East:
+                            case CompassPoints.South:
+                                isotope.AdjustPosition(destination - isotope.EastCentre);
+                                isotope.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                break;
+
+                            case CompassPoints.West:
                                 isotope.AdjustPosition(destination - isotope.SouthCentre);
                                 isotope.Nudge(CompassPoints.North, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            }
-                            else
-                            {
-                                isotope.AdjustPosition(destination - isotope.EastCentre);
-                                isotope.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
-                            }
-                            break;
+                                break;
+                        }
                     }
                 }
 
