@@ -47,11 +47,13 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.EditLabels = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.ChangeSettings = new System.Windows.Forms.Button();
+            this.ChangeAcmeSettings = new System.Windows.Forms.Button();
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
             this.ClearChemistry = new System.Windows.Forms.Button();
             this.LayoutStructure = new System.Windows.Forms.Button();
+            this.RenderOoXml = new System.Windows.Forms.Button();
+            this.ChangeOoXmlSettings = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -211,25 +213,26 @@
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox2.Controls.Add(this.ChangeSettings);
+            this.groupBox2.Controls.Add(this.ChangeOoXmlSettings);
+            this.groupBox2.Controls.Add(this.ChangeAcmeSettings);
             this.groupBox2.Location = new System.Drawing.Point(255, 501);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(108, 81);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Options ...";
+            this.groupBox2.Text = "Settings ...";
             // 
-            // ChangeSettings
+            // ChangeAcmeSettings
             // 
-            this.ChangeSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeSettings.Location = new System.Drawing.Point(15, 19);
-            this.ChangeSettings.Name = "ChangeSettings";
-            this.ChangeSettings.Size = new System.Drawing.Size(75, 23);
-            this.ChangeSettings.TabIndex = 12;
-            this.ChangeSettings.Text = "Settings";
-            this.ChangeSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ChangeSettings.UseVisualStyleBackColor = true;
-            this.ChangeSettings.Click += new System.EventHandler(this.ChangeSettings_Click);
+            this.ChangeAcmeSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ChangeAcmeSettings.Location = new System.Drawing.Point(15, 19);
+            this.ChangeAcmeSettings.Name = "ChangeAcmeSettings";
+            this.ChangeAcmeSettings.Size = new System.Drawing.Size(75, 23);
+            this.ChangeAcmeSettings.TabIndex = 12;
+            this.ChangeAcmeSettings.Text = "ACME";
+            this.ChangeAcmeSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ChangeAcmeSettings.UseVisualStyleBackColor = true;
+            this.ChangeAcmeSettings.Click += new System.EventHandler(this.ChangeAcmeSettings_Click);
             // 
             // ShowCml
             // 
@@ -277,16 +280,42 @@
             this.LayoutStructure.Name = "LayoutStructure";
             this.LayoutStructure.Size = new System.Drawing.Size(75, 23);
             this.LayoutStructure.TabIndex = 20;
-            this.LayoutStructure.Text = "Layout";
+            this.LayoutStructure.Text = "Layout (ws)";
             this.LayoutStructure.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.LayoutStructure.UseVisualStyleBackColor = true;
             this.LayoutStructure.Click += new System.EventHandler(this.LayoutStructure_Click);
+            // 
+            // RenderOoXml
+            // 
+            this.RenderOoXml.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RenderOoXml.Enabled = false;
+            this.RenderOoXml.Location = new System.Drawing.Point(93, 530);
+            this.RenderOoXml.Name = "RenderOoXml";
+            this.RenderOoXml.Size = new System.Drawing.Size(75, 23);
+            this.RenderOoXml.TabIndex = 21;
+            this.RenderOoXml.Text = "OoXml (raw)";
+            this.RenderOoXml.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.RenderOoXml.UseVisualStyleBackColor = true;
+            this.RenderOoXml.Click += new System.EventHandler(this.RenderOoXml_Click);
+            // 
+            // ChangeOoXmlSettings
+            // 
+            this.ChangeOoXmlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ChangeOoXmlSettings.Location = new System.Drawing.Point(15, 48);
+            this.ChangeOoXmlSettings.Name = "ChangeOoXmlSettings";
+            this.ChangeOoXmlSettings.Size = new System.Drawing.Size(75, 23);
+            this.ChangeOoXmlSettings.TabIndex = 13;
+            this.ChangeOoXmlSettings.Text = "OoXml";
+            this.ChangeOoXmlSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ChangeOoXmlSettings.UseVisualStyleBackColor = true;
+            this.ChangeOoXmlSettings.Click += new System.EventHandler(this.ChangeOoXmlSettings_Click);
             // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1137, 587);
+            this.Controls.Add(this.RenderOoXml);
             this.Controls.Add(this.LayoutStructure);
             this.Controls.Add(this.ClearChemistry);
             this.Controls.Add(this.SaveStructure);
@@ -334,8 +363,10 @@
         private System.Windows.Forms.Button EditLabels;
         private StackViewer UndoStack;
         private StackViewer RedoStack;
-        private System.Windows.Forms.Button ChangeSettings;
+        private System.Windows.Forms.Button ChangeAcmeSettings;
         private System.Windows.Forms.Button LayoutStructure;
+        private System.Windows.Forms.Button RenderOoXml;
+        private System.Windows.Forms.Button ChangeOoXmlSettings;
     }
 }
 

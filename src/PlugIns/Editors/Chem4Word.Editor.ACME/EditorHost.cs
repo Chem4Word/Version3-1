@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
 using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
@@ -36,11 +37,14 @@ namespace Chem4Word.Editor.ACME
 
         public EditorHost(string cml, List<string> used1DProperties, AcmeOptions options)
         {
-            InitializeComponent();
+            using (new WaitCursor())
+            {
+                InitializeComponent();
 
-            _cml = cml;
-            _used1DProperties = used1DProperties;
-            _options = options;
+                _cml = cml;
+                _used1DProperties = used1DProperties;
+                _options = options;
+            }
         }
 
         private void EditorHost_LocationChanged(object sender, EventArgs e)
@@ -57,49 +61,52 @@ namespace Chem4Word.Editor.ACME
 
         private void EditorHost_Load(object sender, EventArgs e)
         {
-            IsLoading = true;
-
-            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            using (new WaitCursor())
             {
-                Left = (int)TopLeft.X;
-                Top = (int)TopLeft.Y;
-            }
+                IsLoading = true;
 
-            MinimumSize = new Size(900, 600);
-
-            if (FormSize.Width != 0 && FormSize.Height != 0)
-            {
-                Width = FormSize.Width;
-                Height = FormSize.Height;
-            }
-
-            // Fix bottom panel
-            int margin = Buttons.Height - Save.Bottom;
-            splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
-            splitContainer1.FixedPanel = FixedPanel.Panel2;
-            splitContainer1.IsSplitterFixed = true;
-
-            // Set Up WPF UC
-            if (elementHost1.Child is Chem4Word.ACME.Editor editor)
-            {
-                editor.SetProperties(_cml, _used1DProperties, _options);
-                editor.TopLeft = TopLeft;
-                editor.ShowFeedback = false;
-                editor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
-                var model = editor.ActiveViewModel.Model;
-                if (model == null || model.Molecules.Count == 0)
+                if (!PointHelper.PointIsEmpty(TopLeft))
                 {
-                    Text = "ACME - New structure";
+                    Left = (int)TopLeft.X;
+                    Top = (int)TopLeft.Y;
                 }
-                else
-                {
-                    List<MoleculeFormulaPart> parts = FormulaHelper.ParseFormulaIntoParts(editor.ActiveViewModel.Model.ConciseFormula);
-                    var x = FormulaHelper.FormulaPartsAsUnicode(parts);
-                    Text = "ACME - Editing " + x;
-                }
-            }
 
-            IsLoading = false;
+                MinimumSize = new Size(900, 600);
+
+                if (FormSize.Width != 0 && FormSize.Height != 0)
+                {
+                    Width = FormSize.Width;
+                    Height = FormSize.Height;
+                }
+
+                // Fix bottom panel
+                int margin = Buttons.Height - Save.Bottom;
+                splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
+                splitContainer1.FixedPanel = FixedPanel.Panel2;
+                splitContainer1.IsSplitterFixed = true;
+
+                // Set Up WPF UC
+                if (elementHost1.Child is Chem4Word.ACME.Editor editor)
+                {
+                    editor.SetProperties(_cml, _used1DProperties, _options);
+                    editor.TopLeft = TopLeft;
+                    editor.ShowFeedback = false;
+                    editor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
+                    var model = editor.ActiveViewModel.Model;
+                    if (model == null || model.Molecules.Count == 0)
+                    {
+                        Text = "ACME - New structure";
+                    }
+                    else
+                    {
+                        List<MoleculeFormulaPart> parts = FormulaHelper.ParseFormulaIntoParts(editor.ActiveViewModel.Model.ConciseFormula);
+                        var x = FormulaHelper.FormulaPartsAsUnicode(parts);
+                        Text = "ACME - Editing " + x;
+                    }
+                }
+
+                IsLoading = false;
+            }
         }
 
         private void AcmeEditorOnFeedbackChange(object sender, WpfEventArgs e)

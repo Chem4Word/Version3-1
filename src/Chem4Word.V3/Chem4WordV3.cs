@@ -1672,7 +1672,6 @@ namespace Chem4Word
                                 Ribbon.ShowLibrary.Checked = LibraryState;
                                 Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open ";
                                 Debug.WriteLine(module);
-                                Ribbon.StartWpfWarmUp();
                             }
 
                             foreach (Word.InlineShape inlineShape in doc.InlineShapes)
@@ -1847,7 +1846,6 @@ namespace Chem4Word
                             LoadOptions();
                         }
                         Debug.WriteLine(module);
-                        Ribbon.StartWpfWarmUp();
                     }
                 }
                 catch (Exception ex)

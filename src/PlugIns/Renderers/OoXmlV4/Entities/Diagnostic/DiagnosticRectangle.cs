@@ -5,16 +5,20 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Windows;
 
 namespace Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic
 {
-    public class Diagnostics
+    public class DiagnosticRectangle
     {
-        public List<DiagnosticLine> Lines { get; } = new List<DiagnosticLine>();
-        public List<List<Point>> Polygons { get; } = new List<List<Point>>();
-        public List<DiagnosticSpot> Points { get; } = new List<DiagnosticSpot>();
-        public List<DiagnosticRectangle> Rectangles { get; } = new List<DiagnosticRectangle>();
+        public Rect BoundingBox { get; }
+
+        public string Colour { get; }
+
+        public DiagnosticRectangle(Rect boundingBox, string colour)
+        {
+            BoundingBox = boundingBox;
+            Colour = colour;
+        }
     }
 }

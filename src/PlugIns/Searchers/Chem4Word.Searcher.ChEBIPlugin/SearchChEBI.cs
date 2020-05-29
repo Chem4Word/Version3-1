@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
@@ -121,11 +123,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                             ? "Please try again later - the service has timed out"
                             : ex.Message;
                     }
-                    finally
-                    {
-                    }
                 }
             }
+
             EnableImport();
         }
 
@@ -259,7 +259,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
             ErrorsAndWarnings.Text = "";
 
-            using (new WaitCursor())
+            using (var cursor = new WaitCursor())
             {
                 try
                 {
@@ -272,6 +272,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 }
                 catch (Exception ex)
                 {
+                    cursor.Reset();
                     new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
                 }
             }
@@ -299,7 +300,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                if (!PointHelper.PointIsEmpty(TopLeft))
                 {
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;

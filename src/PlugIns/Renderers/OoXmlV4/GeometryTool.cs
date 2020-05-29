@@ -14,56 +14,90 @@ using Chem4Word.Model2;
 namespace Chem4Word.Renderer.OoXmlV4
 {
     /// <summary>
-    /// Methods to calulate various values derived from sets of atoms/bonds etc
+    /// Methods to calculate various values derived from sets of atoms/bonds etc
     /// </summary>
     internal class GeometryTool
     {
-        /// <summary>
-        /// Returns the median 2D bond length.
-        /// </summary>
-        /// <param name="bonds"></param>
-        /// <returns></returns>
-        public static double GetMedianBondLength2D(ICollection<Bond> bonds)
-        {
-            double result = -1;
-
-            if (bonds.Any())
-            {
-                int nbonds = bonds.Count;
-                double[] len = new double[nbonds];
-                for (int i = 0; i < nbonds; i++)
-                {
-                    Bond b = bonds.ElementAt(i);
-
-                    var p0 = b.StartAtom.Position;
-                    var p1 = b.EndAtom.Position;
-                    Vector v = p1 - p0;
-                    len[i] = v.LengthSquared;
-                }
-
-                Array.Sort(len);
-
-                // Division/cast to int rounds down
-                if (nbonds % 2 == 0)
-                {
-                    result = 0.5 * (Math.Sqrt(len[nbonds / 2]) + Math.Sqrt(len[nbonds / 2 - 1]));
-                }
-                else
-                {
-                    result = Math.Sqrt(len[nbonds / 2]);
-                }
-            }
-
-            return result;
-        }
-
-        // modified from http://csharphelper.com/blog/2014/07/find-the-convex-hull-of-a-set-of-points-in-c/
-
         // For debugging.
         private static Point[] _minMaxCorners;
 
         private static Rect _minMaxBox;
         private static Point[] _nonCulledPoints;
+
+        // modified from http://csharphelper.com/blog/2014/07/find-the-convex-hull-of-a-set-of-points-in-c/
+
+        // Return the points that make up a polygon's convex hull.
+        // This method leaves the points list unchanged.
+        public static List<Point> MakeConvexHull(List<Point> points)
+        {
+            // Cull.
+            points = HullCull(points);
+
+            // Find the remaining point with the smallest Y value.
+            // if (there's a tie, take the one with the smaller X value.
+            Point bestPt = points[0];
+            foreach (Point pt in points)
+            {
+                if (pt.Y < bestPt.Y
+                    || pt.Y == bestPt.Y && pt.X < bestPt.X)
+                {
+                    bestPt = pt;
+                }
+            }
+
+            // Move this point to the convex hull.
+            List<Point> hull = new List<Point>();
+            hull.Add(bestPt);
+            points.Remove(bestPt);
+
+            // Start wrapping up the other points.
+            double sweepAngle = 0;
+            while (true)
+            {
+                // Find the point with smallest AngleValue
+                // from the last point.
+                double x1 = hull[hull.Count - 1].X;
+                double y1 = hull[hull.Count - 1].Y;
+                bestPt = points[0];
+                double bestAngle = 3600;
+
+                // Search the rest of the points.
+                foreach (Point pt in points)
+                {
+                    double testAngle = AngleValue(x1, y1, pt.X, pt.Y);
+                    if (testAngle >= sweepAngle
+                        && bestAngle > testAngle)
+                    {
+                        bestAngle = testAngle;
+                        bestPt = pt;
+                    }
+                }
+
+                // See if the first point is better.
+                // If so, we are done.
+                double firstAngle = AngleValue(x1, y1, hull[0].X, hull[0].Y);
+                if (firstAngle >= sweepAngle
+                    && bestAngle >= firstAngle)
+                {
+                    // The first point is better. We're done.
+                    break;
+                }
+
+                // Add the best point to the convex hull.
+                hull.Add(bestPt);
+                points.Remove(bestPt);
+
+                sweepAngle = bestAngle;
+
+                // If all of the points are on the hull, we're done.
+                if (points.Count == 0)
+                {
+                    break;
+                }
+            }
+
+            return hull;
+        }
 
         // Find the points nearest the upper left, upper right,
         // lower left, and lower right corners.
@@ -173,79 +207,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             _nonCulledPoints = new Point[results.Count];   // For debugging.
             results.CopyTo(_nonCulledPoints);              // For debugging.
             return results;
-        }
-
-        // Return the points that make up a polygon's convex hull.
-        // This method leaves the points list unchanged.
-        public static List<Point> MakeConvexHull(List<Point> points)
-        {
-            // Cull.
-            points = HullCull(points);
-
-            // Find the remaining point with the smallest Y value.
-            // if (there's a tie, take the one with the smaller X value.
-            Point bestPt = points[0];
-            foreach (Point pt in points)
-            {
-                if (pt.Y < bestPt.Y
-                    || pt.Y == bestPt.Y && pt.X < bestPt.X)
-                {
-                    bestPt = pt;
-                }
-            }
-
-            // Move this point to the convex hull.
-            List<Point> hull = new List<Point>();
-            hull.Add(bestPt);
-            points.Remove(bestPt);
-
-            // Start wrapping up the other points.
-            double sweepAngle = 0;
-            while (true)
-            {
-                // Find the point with smallest AngleValue
-                // from the last point.
-                double x1 = hull[hull.Count - 1].X;
-                double y1 = hull[hull.Count - 1].Y;
-                bestPt = points[0];
-                double bestAngle = 3600;
-
-                // Search the rest of the points.
-                foreach (Point pt in points)
-                {
-                    double testAngle = AngleValue(x1, y1, pt.X, pt.Y);
-                    if (testAngle >= sweepAngle
-                        && bestAngle > testAngle)
-                    {
-                        bestAngle = testAngle;
-                        bestPt = pt;
-                    }
-                }
-
-                // See if the first point is better.
-                // If so, we are done.
-                double firstAngle = AngleValue(x1, y1, hull[0].X, hull[0].Y);
-                if (firstAngle >= sweepAngle
-                    && bestAngle >= firstAngle)
-                {
-                    // The first point is better. We're done.
-                    break;
-                }
-
-                // Add the best point to the convex hull.
-                hull.Add(bestPt);
-                points.Remove(bestPt);
-
-                sweepAngle = bestAngle;
-
-                // If all of the points are on the hull, we're done.
-                if (points.Count == 0)
-                {
-                    break;
-                }
-            }
-
-            return hull;
         }
 
         // Return a number that gives the ordering of angles
@@ -415,6 +376,24 @@ namespace Chem4Word.Renderer.OoXmlV4
 
             // Calculate the Z coordinate of the cross product.
             return (bax * bcy - bay * bcx);
+        }
+
+        public static double AngleBetween(Bond bond1, Bond bond2)
+        {
+            double result = double.NaN;
+
+            var set1 = bond1.GetAtoms().ToList();
+            var set2 = bond2.GetAtoms().ToList();
+            Atom sharedAtom = set1.Intersect(set2).FirstOrDefault();
+
+            if (sharedAtom != null)
+            {
+                var vector1 = sharedAtom.Position - bond1.OtherAtom(sharedAtom).Position;
+                var vector2 = sharedAtom.Position - bond2.OtherAtom(sharedAtom).Position;
+                result = Math.Abs(Vector.AngleBetween(vector1, vector2));
+            }
+
+            return result;
         }
     }
 }

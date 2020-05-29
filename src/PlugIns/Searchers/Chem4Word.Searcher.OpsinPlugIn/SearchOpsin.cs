@@ -11,6 +11,7 @@ using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Media;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using IChem4Word.Contracts;
@@ -122,7 +123,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
 
         private void SearchOpsin_Load(object sender, EventArgs e)
         {
-            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            if (!PointHelper.PointIsEmpty(TopLeft))
             {
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;

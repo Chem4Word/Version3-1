@@ -19,6 +19,7 @@ using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Entities;
+using Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using DocumentFormat.OpenXml;
@@ -191,6 +192,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                         DrawBox(atomCharsRect, "ffa500", 0.5);
                     }
                 }
+            }
+
+            foreach (var rectangle in _positionerOutputs.Diagnostics.Rectangles)
+            {
+                DrawBox(rectangle.BoundingBox, rectangle.Colour);
             }
 
             double spotSize = _medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 3;
@@ -976,154 +982,157 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
         private void DrawGroupBrackets(Rect cmlExtents, double armLength, double lineWidth, string lineColour)
         {
-            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
-
-            Point location = new Point(emuLeft, emuTop);
-            Size size = new Size(emuWidth, emuHeight);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
-            Rect boundingBox = new Rect(location, size);
-            Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
-
-            emuWidth = (Int64Value)boundingBox.Width;
-            emuHeight = (Int64Value)boundingBox.Height;
-            emuTop = (Int64Value)boundingBox.Top;
-            emuLeft = (Int64Value)boundingBox.Left;
-
-            string shapeName = "Box " + _ooxmlId++;
-
-            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
-            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
-
-            // Start of the lines
-
-            A.PathList pathList = new A.PathList();
-
-            pathList.Append(MakeCorner(boundingBox, "TopLeft", armLengthEmu));
-            pathList.Append(MakeCorner(boundingBox, "TopRight", armLengthEmu));
-            pathList.Append(MakeCorner(boundingBox, "BottomLeft", armLengthEmu));
-            pathList.Append(MakeCorner(boundingBox, "BottomRight", armLengthEmu));
-
-            // End of the lines
-
-            shapeProperties.Append(CreateCustomGeometry(pathList));
-
-            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
-
-            A.SolidFill solidFill = new A.SolidFill();
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
-            solidFill.Append(rgbColorModelHex);
-            outline.Append(solidFill);
-
-            shapeProperties.Append(outline);
-
-            wordprocessingShape.Append(CreateShapeStyle());
-
-            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            wordprocessingShape.Append(textBodyProperties);
-
-            _wordprocessingGroup.Append(wordprocessingShape);
-
-            // Local function
-            A.Path MakeCorner(Rect bbRect, string corner, double armsSize)
+            if (cmlExtents != Rect.Empty)
             {
-                var path = new A.Path { Width = (Int64Value)bbRect.Width, Height = (Int64Value)bbRect.Height };
+                Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+                Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+                Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+                Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
-                A.Point p0 = new A.Point();
-                A.Point p1 = new A.Point();
-                A.Point p2 = new A.Point();
+                Point location = new Point(emuLeft, emuTop);
+                Size size = new Size(emuWidth, emuHeight);
+                location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
+                Rect boundingBox = new Rect(location, size);
+                Int64Value armLengthEmu = OoXmlHelper.ScaleCmlToEmu(armLength);
 
-                switch (corner)
+                emuWidth = (Int64Value)boundingBox.Width;
+                emuHeight = (Int64Value)boundingBox.Height;
+                emuTop = (Int64Value)boundingBox.Top;
+                emuLeft = (Int64Value)boundingBox.Left;
+
+                string shapeName = "Box " + _ooxmlId++;
+
+                Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
+                Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
+
+                // Start of the lines
+
+                A.PathList pathList = new A.PathList();
+
+                pathList.Append(MakeCorner(boundingBox, "TopLeft", armLengthEmu));
+                pathList.Append(MakeCorner(boundingBox, "TopRight", armLengthEmu));
+                pathList.Append(MakeCorner(boundingBox, "BottomLeft", armLengthEmu));
+                pathList.Append(MakeCorner(boundingBox, "BottomRight", armLengthEmu));
+
+                // End of the lines
+
+                shapeProperties.Append(CreateCustomGeometry(pathList));
+
+                Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+                A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
+
+                A.SolidFill solidFill = new A.SolidFill();
+                A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
+                solidFill.Append(rgbColorModelHex);
+                outline.Append(solidFill);
+
+                shapeProperties.Append(outline);
+
+                wordprocessingShape.Append(CreateShapeStyle());
+
+                Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+                wordprocessingShape.Append(textBodyProperties);
+
+                _wordprocessingGroup.Append(wordprocessingShape);
+
+                // Local function
+                A.Path MakeCorner(Rect bbRect, string corner, double armsSize)
                 {
-                    case "TopLeft":
-                        p0 = new A.Point
-                        {
-                            X = armsSize.ToString("0"),
-                            Y = "0"
-                        };
-                        p1 = new A.Point
-                        {
-                            X = "0",
-                            Y = "0"
-                        };
-                        p2 = new A.Point
-                        {
-                            X = "0",
-                            Y = armsSize.ToString("0")
-                        };
-                        break;
+                    var path = new A.Path { Width = (Int64Value)bbRect.Width, Height = (Int64Value)bbRect.Height };
 
-                    case "TopRight":
-                        p0 = new A.Point
-                        {
-                            X = (bbRect.Width - armsSize).ToString("0"),
-                            Y = "0"
-                        };
-                        p1 = new A.Point
-                        {
-                            X = bbRect.Width.ToString("0"),
-                            Y = "0"
-                        };
-                        p2 = new A.Point
-                        {
-                            X = bbRect.Width.ToString("0"),
-                            Y = armsSize.ToString("0")
-                        };
-                        break;
+                    A.Point p0 = new A.Point();
+                    A.Point p1 = new A.Point();
+                    A.Point p2 = new A.Point();
 
-                    case "BottomLeft":
-                        p0 = new A.Point
-                        {
-                            X = "0",
-                            Y = (bbRect.Height - armsSize).ToString("0")
-                        };
-                        p1 = new A.Point
-                        {
-                            X = "0",
-                            Y = bbRect.Height.ToString("0")
-                        };
-                        p2 = new A.Point
-                        {
-                            X = armsSize.ToString("0"),
-                            Y = bbRect.Height.ToString("0")
-                        };
-                        break;
+                    switch (corner)
+                    {
+                        case "TopLeft":
+                            p0 = new A.Point
+                            {
+                                X = armsSize.ToString("0"),
+                                Y = "0"
+                            };
+                            p1 = new A.Point
+                            {
+                                X = "0",
+                                Y = "0"
+                            };
+                            p2 = new A.Point
+                            {
+                                X = "0",
+                                Y = armsSize.ToString("0")
+                            };
+                            break;
 
-                    case "BottomRight":
-                        p0 = new A.Point
-                        {
-                            X = bbRect.Width.ToString("0"),
-                            Y = (bbRect.Height - armsSize).ToString("0")
-                        };
-                        p1 = new A.Point
-                        {
-                            X = bbRect.Width.ToString("0"),
-                            Y = bbRect.Height.ToString("0")
-                        };
-                        p2 = new A.Point
-                        {
-                            X = (bbRect.Width - armsSize).ToString("0"),
-                            Y = bbRect.Height.ToString("0")
-                        };
-                        break;
+                        case "TopRight":
+                            p0 = new A.Point
+                            {
+                                X = (bbRect.Width - armsSize).ToString("0"),
+                                Y = "0"
+                            };
+                            p1 = new A.Point
+                            {
+                                X = bbRect.Width.ToString("0"),
+                                Y = "0"
+                            };
+                            p2 = new A.Point
+                            {
+                                X = bbRect.Width.ToString("0"),
+                                Y = armsSize.ToString("0")
+                            };
+                            break;
+
+                        case "BottomLeft":
+                            p0 = new A.Point
+                            {
+                                X = "0",
+                                Y = (bbRect.Height - armsSize).ToString("0")
+                            };
+                            p1 = new A.Point
+                            {
+                                X = "0",
+                                Y = bbRect.Height.ToString("0")
+                            };
+                            p2 = new A.Point
+                            {
+                                X = armsSize.ToString("0"),
+                                Y = bbRect.Height.ToString("0")
+                            };
+                            break;
+
+                        case "BottomRight":
+                            p0 = new A.Point
+                            {
+                                X = bbRect.Width.ToString("0"),
+                                Y = (bbRect.Height - armsSize).ToString("0")
+                            };
+                            p1 = new A.Point
+                            {
+                                X = bbRect.Width.ToString("0"),
+                                Y = bbRect.Height.ToString("0")
+                            };
+                            p2 = new A.Point
+                            {
+                                X = (bbRect.Width - armsSize).ToString("0"),
+                                Y = bbRect.Height.ToString("0")
+                            };
+                            break;
+                    }
+
+                    var moveTo = new A.MoveTo();
+                    moveTo.Append(p0);
+                    path.Append(moveTo);
+
+                    var lineTo1 = new A.LineTo();
+                    lineTo1.Append(p1);
+                    path.Append(lineTo1);
+
+                    var lineTo2 = new A.LineTo();
+                    lineTo2.Append(p2);
+                    path.Append(lineTo2);
+
+                    return path;
                 }
-
-                var moveTo = new A.MoveTo();
-                moveTo.Append(p0);
-                path.Append(moveTo);
-
-                var lineTo1 = new A.LineTo();
-                lineTo1.Append(p1);
-                path.Append(lineTo1);
-
-                var lineTo2 = new A.LineTo();
-                lineTo2.Append(p2);
-                path.Append(lineTo2);
-
-                return path;
             }
         }
 
@@ -1131,85 +1140,88 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                              string lineColour = "000000",
                              double lineWidth = OoXmlHelper.ACS_LINE_WIDTH)
         {
-            Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
-            Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
-            Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
-            Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
+            if (cmlExtents != Rect.Empty)
+            {
+                Int64Value emuWidth = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Width);
+                Int64Value emuHeight = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Height);
+                Int64Value emuTop = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Top);
+                Int64Value emuLeft = OoXmlHelper.ScaleCmlToEmu(cmlExtents.Left);
 
-            Point location = new Point(emuLeft, emuTop);
-            Size size = new Size(emuWidth, emuHeight);
-            location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
-            Rect boundingBox = new Rect(location, size);
+                Point location = new Point(emuLeft, emuTop);
+                Size size = new Size(emuWidth, emuHeight);
+                location.Offset(OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Left), OoXmlHelper.ScaleCmlToEmu(-_boundingBoxOfEverything.Top));
+                Rect boundingBox = new Rect(location, size);
 
-            emuWidth = (Int64Value)boundingBox.Width;
-            emuHeight = (Int64Value)boundingBox.Height;
-            emuTop = (Int64Value)boundingBox.Top;
-            emuLeft = (Int64Value)boundingBox.Left;
+                emuWidth = (Int64Value)boundingBox.Width;
+                emuHeight = (Int64Value)boundingBox.Height;
+                emuTop = (Int64Value)boundingBox.Top;
+                emuLeft = (Int64Value)boundingBox.Left;
 
-            string shapeName = "Box " + _ooxmlId++;
+                string shapeName = "Box " + _ooxmlId++;
 
-            Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
-            Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
+                Wps.WordprocessingShape wordprocessingShape = CreateShape(_ooxmlId, shapeName);
+                Wps.ShapeProperties shapeProperties = CreateShapeProperties(wordprocessingShape, emuTop, emuLeft, emuWidth, emuHeight);
 
-            // Start of the lines
+                // Start of the lines
 
-            A.PathList pathList = new A.PathList();
+                A.PathList pathList = new A.PathList();
 
-            A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
+                A.Path path = new A.Path { Width = emuWidth, Height = emuHeight };
 
-            // Starting Point
-            A.MoveTo moveTo = new A.MoveTo();
-            A.Point point1 = new A.Point { X = "0", Y = "0" };
-            moveTo.Append(point1);
+                // Starting Point
+                A.MoveTo moveTo = new A.MoveTo();
+                A.Point point1 = new A.Point { X = "0", Y = "0" };
+                moveTo.Append(point1);
 
-            // Mid Point
-            A.LineTo lineTo1 = new A.LineTo();
-            A.Point point2 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
-            lineTo1.Append(point2);
+                // Mid Point
+                A.LineTo lineTo1 = new A.LineTo();
+                A.Point point2 = new A.Point { X = boundingBox.Width.ToString("0"), Y = "0" };
+                lineTo1.Append(point2);
 
-            // Mid Point
-            A.LineTo lineTo2 = new A.LineTo();
-            A.Point point3 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
-            lineTo2.Append(point3);
+                // Mid Point
+                A.LineTo lineTo2 = new A.LineTo();
+                A.Point point3 = new A.Point { X = boundingBox.Width.ToString("0"), Y = boundingBox.Height.ToString("0") };
+                lineTo2.Append(point3);
 
-            // Last Point
-            A.LineTo lineTo3 = new A.LineTo();
-            A.Point point4 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
-            lineTo3.Append(point4);
+                // Last Point
+                A.LineTo lineTo3 = new A.LineTo();
+                A.Point point4 = new A.Point { X = "0", Y = boundingBox.Height.ToString("0") };
+                lineTo3.Append(point4);
 
-            // Back to Start Point
-            A.LineTo lineTo4 = new A.LineTo();
-            A.Point point5 = new A.Point { X = "0", Y = "0" };
-            lineTo4.Append(point5);
+                // Back to Start Point
+                A.LineTo lineTo4 = new A.LineTo();
+                A.Point point5 = new A.Point { X = "0", Y = "0" };
+                lineTo4.Append(point5);
 
-            path.Append(moveTo);
-            path.Append(lineTo1);
-            path.Append(lineTo2);
-            path.Append(lineTo3);
-            path.Append(lineTo4);
+                path.Append(moveTo);
+                path.Append(lineTo1);
+                path.Append(lineTo2);
+                path.Append(lineTo3);
+                path.Append(lineTo4);
 
-            pathList.Append(path);
+                pathList.Append(path);
 
-            // End of the lines
+                // End of the lines
 
-            shapeProperties.Append(CreateCustomGeometry(pathList));
+                shapeProperties.Append(CreateCustomGeometry(pathList));
 
-            Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
-            A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
+                Int32Value emuLineWidth = (Int32Value)(lineWidth * OoXmlHelper.EMUS_PER_WORD_POINT);
+                A.Outline outline = new A.Outline { Width = emuLineWidth, CapType = A.LineCapValues.Round };
 
-            A.SolidFill solidFill = new A.SolidFill();
-            A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
-            solidFill.Append(rgbColorModelHex);
-            outline.Append(solidFill);
+                A.SolidFill solidFill = new A.SolidFill();
+                A.RgbColorModelHex rgbColorModelHex = new A.RgbColorModelHex { Val = lineColour };
+                solidFill.Append(rgbColorModelHex);
+                outline.Append(solidFill);
 
-            shapeProperties.Append(outline);
+                shapeProperties.Append(outline);
 
-            wordprocessingShape.Append(CreateShapeStyle());
+                wordprocessingShape.Append(CreateShapeStyle());
 
-            Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
-            wordprocessingShape.Append(textBodyProperties);
+                Wps.TextBodyProperties textBodyProperties = new Wps.TextBodyProperties();
+                wordprocessingShape.Append(textBodyProperties);
 
-            _wordprocessingGroup.Append(wordprocessingShape);
+                _wordprocessingGroup.Append(wordprocessingShape);
+            }
         }
 
         private void DrawInnerCircle(InnerCircle innerCircle, string lineColour, double lineWidth)

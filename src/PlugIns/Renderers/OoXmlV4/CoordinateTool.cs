@@ -19,62 +19,6 @@ namespace Chem4Word.Renderer.OoXmlV4
     internal static class CoordinateTool
     {
         /// <summary>
-        /// Calculate the bounding box from a set of CMLAtoms (should be anything with 2D coords)
-        /// Calculation is performed in model coordinates.
-        /// </summary>
-        /// <param name="atoms"></param>
-        /// <returns></returns>
-        public static Rect GetBounds2D(IEnumerable<Atom> atoms)
-        {
-            Rect result = new Rect(0, 0, 0, 0);
-
-            if (atoms.Any())
-            {
-                double xmax = Double.NegativeInfinity;
-                double ymax = Double.NegativeInfinity;
-                double xmin = Double.PositiveInfinity;
-                double ymin = Double.PositiveInfinity;
-
-                foreach (Atom atom in atoms)
-                {
-                    Point p = atom.Position;
-                    xmax = Math.Max(xmax, p.X);
-                    xmin = Math.Min(xmin, p.X);
-                    ymax = Math.Max(ymax, p.Y);
-                    ymin = Math.Min(ymin, p.Y);
-                }
-
-                result = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Calculate the bounding box from a set of CmlBonds (should be anything with 2D coords)
-        /// Calculation is performed in model coordinates.
-        /// </summary>
-        /// <param name="bonds"></param>
-        /// <returns></returns>
-        public static Rect GetBounds2D(IEnumerable<Bond> bonds)
-        {
-            SortedDictionary<string, Atom> atoms = new SortedDictionary<string, Atom>();
-
-            foreach (Bond bond in bonds)
-            {
-                foreach (Atom atom in bond.GetAtoms())
-                {
-                    if (!atoms.ContainsKey(atom.Id))
-                    {
-                        atoms.Add(atom.Id, atom);
-                    }
-                }
-            }
-
-            return GetBounds2D(atoms.Values);
-        }
-
-        /// <summary>
         /// Gets the mid point between two points
         /// </summary>
         /// <param name="start"></param>
@@ -101,7 +45,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             AdjustLineEndPoint(midPoint, ref endPoint, pixelCount);
         }
 
-        private static void AdjustLineEndPoint(Point startPoint, ref Point endPoint, double pixelCount)
+        public static void AdjustLineEndPoint(Point startPoint, ref Point endPoint, double pixelCount)
         {
             double dx = endPoint.X - startPoint.X;
             double dy = endPoint.Y - startPoint.Y;

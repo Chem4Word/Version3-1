@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using IChem4Word.Contracts;
 
@@ -42,7 +43,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
             {
                 Telemetry.Write(module, "Verbose", "Called");
 
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                if (!PointHelper.PointIsEmpty(TopLeft))
                 {
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;

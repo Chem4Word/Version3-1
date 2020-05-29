@@ -77,6 +77,7 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DebugHelper.cs" />
     <Compile Include="Helpers\FileSystemHelper.cs" />
+    <Compile Include="Helpers\PointHelper.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Helpers\SafeDate.cs" />
     <Compile Include="Helpers\SafeDouble.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="UI\Forms\MolFileViewer.Designer.cs">
       <DependentUpon>MolFileViewer.cs</DependentUpon>
     </Compile>
+    <Compile Include="UI\WaitCursor.cs" />
     <Compile Include="UI\Wpf\WpfEventArgs.cs" />
     <Compile Include="UserInteractions.cs" />
   </ItemGroup>

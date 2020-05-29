@@ -21,8 +21,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         // Margins are in CML Points
         public const double DRAWING_MARGIN = 5; // 5 is a good value to use (Use 0 to compare with AMC diagrams)
 
-        public const double CHARACTER_CLIPPING_MARGIN = 1.25;   // cml pixels
-        public const double CHARACTER_VERTICAL_SPACING = 1.25;  // cml pixels
+        public const double CML_CHARACTER_MARGIN = 1.25; // margin in cml pixels
 
         public const double SUBSCRIPT_SCALE_FACTOR = 0.6;
         public const double SUBSCRIPT_DROP_FACTOR = 0.75;
@@ -33,6 +32,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         // Percentage of average (median) bond length
         // V3 == 0.2 -> ACS == 0.18
         public const double MULTIPLE_BOND_OFFSET_PERCENTAGE = 0.18;
+        public const double LINE_SHRINK_PIXELS = 1.75; // cml pixels
 
         // V3 == 0.75 -> ACS == 0.6
         // This makes bond line width equal to ACS Guide of 0.6pt

@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
@@ -60,7 +61,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                if (!PointHelper.PointIsEmpty(TopLeft))
                 {
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;

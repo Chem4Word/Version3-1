@@ -11,6 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Converters.CML;
 
 namespace Chem4Word.Editor.SimpleWpfEditor
@@ -32,7 +33,7 @@ namespace Chem4Word.Editor.SimpleWpfEditor
 
         private void EditorHost_Load(object sender, EventArgs e)
         {
-            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            if (!PointHelper.PointIsEmpty(TopLeft))
             {
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;

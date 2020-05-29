@@ -8,6 +8,8 @@
 using System;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
@@ -37,43 +39,47 @@ namespace Chem4Word.Editor.ChemDoodleWeb800
 
         public EditorHost(string cml)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            _cml = cml;
-            InitializeComponent();
+            using (new WaitCursor())
+            {
+                string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+                _cml = cml;
+                InitializeComponent();
+            }
         }
 
         private void EditorHost_Load(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Cursor.Current = Cursors.WaitCursor;
-
-            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            using (new WaitCursor())
             {
-                Left = (int)TopLeft.X;
-                Top = (int)TopLeft.Y;
+                if (!PointHelper.PointIsEmpty(TopLeft))
+                {
+                    Left = (int)TopLeft.X;
+                    Top = (int)TopLeft.Y;
+                }
+
+                CMLConverter cc = new CMLConverter();
+                JSONConverter jc = new JSONConverter();
+                Model model = cc.Import(_cml);
+
+                WpfChemDoodle editor = new WpfChemDoodle();
+                editor.Telemetry = Telemetry;
+                editor.SettingsPath = SettingsPath;
+                editor.UserOptions = UserOptions;
+                editor.TopLeft = TopLeft;
+
+                editor.StructureJson = jc.Export(model);
+                editor.IsSingleMolecule = model.Molecules.Count == 1;
+                editor.AverageBondLength = model.MeanBondLength;
+
+                editor.InitializeComponent();
+                elementHost1.Child = editor;
+                editor.OnButtonClick += OnWpfButtonClick;
+
+                this.Show();
+                Application.DoEvents();
             }
-
-            CMLConverter cc = new CMLConverter();
-            JSONConverter jc = new JSONConverter();
-            Model model = cc.Import(_cml);
-
-            WpfChemDoodle editor = new WpfChemDoodle();
-            editor.Telemetry = Telemetry;
-            editor.SettingsPath = SettingsPath;
-            editor.UserOptions = UserOptions;
-            editor.TopLeft = TopLeft;
-
-            editor.StructureJson = jc.Export(model);
-            editor.IsSingleMolecule = model.Molecules.Count == 1;
-            editor.AverageBondLength = model.MeanBondLength;
-
-            editor.InitializeComponent();
-            elementHost1.Child = editor;
-            editor.OnButtonClick += OnWpfButtonClick;
-
-            this.Show();
-            Application.DoEvents();
         }
 
         private void OnWpfButtonClick(object sender, EventArgs e)

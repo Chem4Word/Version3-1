@@ -13,6 +13,8 @@ using System.Text;
 using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2.Converters.CML;
 
@@ -40,8 +42,11 @@ namespace Chem4Word.UI.WPF
 
         public EditLabelsHost(AcmeOptions options)
         {
-            _options = options;
-            InitializeComponent();
+            using (new WaitCursor())
+            {
+                _options = options;
+                InitializeComponent();
+            }
         }
 
         private void EditLabelsHost_Load(object sender, EventArgs e)
@@ -49,26 +54,32 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                MinimumSize = new Size(900, 600);
+                using (new WaitCursor())
+                {
+                    MinimumSize = new Size(900, 600);
 
-                Left = (int)TopLeft.X;
-                Top = (int)TopLeft.Y;
+                    if (!PointHelper.PointIsEmpty(TopLeft))
+                    {
+                        Left = (int)TopLeft.X;
+                        Top = (int)TopLeft.Y;
+                    }
 
-                // Fix bottom panel
-                int margin = Buttons.Height - Save.Bottom;
-                splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
-                splitContainer1.FixedPanel = FixedPanel.Panel2;
-                splitContainer1.IsSplitterFixed = true;
+                    // Fix bottom panel
+                    int margin = Buttons.Height - Save.Bottom;
+                    splitContainer1.SplitterDistance = splitContainer1.Height - Save.Height - margin * 2;
+                    splitContainer1.FixedPanel = FixedPanel.Panel2;
+                    splitContainer1.IsSplitterFixed = true;
 
-                var editor = new LabelsEditor(_options);
-                editor.InitializeComponent();
-                elementHost1.Child = editor;
+                    var editor = new LabelsEditor(_options);
+                    editor.InitializeComponent();
+                    elementHost1.Child = editor;
 
-                editor.TopLeft = TopLeft;
-                editor.Used1D = Used1D;
-                editor.PopulateTreeView(Cml);
+                    editor.TopLeft = TopLeft;
+                    editor.Used1D = Used1D;
+                    editor.PopulateTreeView(Cml);
 
-                Warning.Text = Message;
+                    Warning.Text = Message;
+                }
             }
             catch (Exception ex)
             {
