@@ -660,7 +660,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             hydrogens.AdjustPosition(main.BoundingBox.TopLeft - hydrogens.BoundingBox.TopRight);
                             break;
                     }
-                    hydrogens.Nudge(orientation, OoXmlHelper.CML_CHARACTER_MARGIN);
+                    hydrogens.Nudge(orientation);
                 }
 
                 // 2.3 Charge
@@ -687,7 +687,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (hydrogens == null)
                     {
                         charge.AdjustPosition(main.BoundingBox.TopRight - charge.WestCentre);
-                        charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                        charge.Nudge(CompassPoints.East);
                     }
                     else
                     {
@@ -701,18 +701,18 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     destination.X = hydrogens.BoundingBox.Right;
                                 }
                                 charge.AdjustPosition(destination - charge.WestCentre);
-                                charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                charge.Nudge(CompassPoints.East);
                                 break;
 
                             case CompassPoints.East:
                                 charge.AdjustPosition(destination - charge.SouthCentre);
-                                charge.Nudge(CompassPoints.North, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                charge.Nudge(CompassPoints.North);
                                 break;
 
                             case CompassPoints.South:
                             case CompassPoints.West:
                                 charge.AdjustPosition(destination - charge.WestCentre);
-                                charge.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                charge.Nudge(CompassPoints.East);
                                 break;
                         }
                     }
@@ -737,7 +737,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     if (hydrogens == null)
                     {
                         isotope.AdjustPosition(main.BoundingBox.TopLeft - isotope.EastCentre);
-                        isotope.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                        isotope.Nudge(CompassPoints.East);
                     }
                     else
                     {
@@ -751,18 +751,18 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     destination.X = hydrogens.BoundingBox.Left;
                                 }
                                 isotope.AdjustPosition(destination - isotope.EastCentre);
-                                isotope.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                isotope.Nudge(CompassPoints.West);
                                 break;
 
                             case CompassPoints.East:
                             case CompassPoints.South:
                                 isotope.AdjustPosition(destination - isotope.EastCentre);
-                                isotope.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                isotope.Nudge(CompassPoints.West);
                                 break;
 
                             case CompassPoints.West:
                                 isotope.AdjustPosition(destination - isotope.SouthCentre);
-                                isotope.Nudge(CompassPoints.North, OoXmlHelper.CML_CHARACTER_MARGIN);
+                                isotope.Nudge(CompassPoints.North);
                                 break;
                         }
                     }
@@ -888,12 +888,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 {
                     case CompassPoints.East:
                         auxiliary.AdjustPosition(main.BoundingBox.TopRight - auxiliary.BoundingBox.TopLeft);
-                        auxiliary.Nudge(CompassPoints.East, OoXmlHelper.CML_CHARACTER_MARGIN);
+                        auxiliary.Nudge(CompassPoints.East);
                         break;
 
                     case CompassPoints.West:
                         auxiliary.AdjustPosition(main.BoundingBox.TopLeft - auxiliary.BoundingBox.TopRight);
-                        auxiliary.Nudge(CompassPoints.West, OoXmlHelper.CML_CHARACTER_MARGIN);
+                        auxiliary.Nudge(CompassPoints.West);
                         break;
                 }
 
