@@ -2421,119 +2421,72 @@ namespace Chem4Word.ACME
             UndoManager.EndUndoBlock();
         }
 
-        public void UpdateMolecule(Molecule molecule, Molecule changedMolecule)
+        public void UpdateMolecule(Molecule target, Molecule source)
         {
             UndoManager.BeginUndoBlock();
 
-            bool? showBefore = molecule.ShowMoleculeBrackets;
-            bool? showAfter = changedMolecule.ShowMoleculeBrackets;
-            int? chargeBefore = molecule.FormalCharge;
-            int? chargeAfter = changedMolecule.FormalCharge;
-            int? countBefore = molecule.Count;
-            int? countAfter = changedMolecule.Count;
-            int? spinBefore = molecule.SpinMultiplicity;
-            int? spinAfter = changedMolecule.SpinMultiplicity;
+            bool? showBefore = target.ShowMoleculeBrackets;
+            bool? showAfter = source.ShowMoleculeBrackets;
+            int? chargeBefore = target.FormalCharge;
+            int? chargeAfter = source.FormalCharge;
+            int? countBefore = target.Count;
+            int? countAfter = source.Count;
+            int? spinBefore = target.SpinMultiplicity;
+            int? spinAfter = source.SpinMultiplicity;
 
-            var beforeNames = molecule.Names.ToList();
-            var beforeFormulas = molecule.Formulas.ToList();
-            var beforeLabels = molecule.Labels.ToList();
-            var afterNames = changedMolecule.Names.ToList();
-            var afterFormulas = changedMolecule.Formulas.ToList();
-            var afterLabels = changedMolecule.Labels.ToList();
-
-            var childMolecules = molecule.GetChildMolecules();
-            var afterChildren = changedMolecule.GetChildMolecules();
-
-            var beforeChildNames = new Dictionary<string, List<TextualProperty>>();
-            foreach (var child in childMolecules)
-            {
-                beforeChildNames.Add(child.Path, child.Names.ToList());
-            }
-
-            var afterChildNames = new Dictionary<string, List<TextualProperty>>();
-            foreach (var child in afterChildren)
-            {
-                afterChildNames.Add(child.Path, child.Names.ToList());
-            }
-
-            var beforeChildFormulas = new Dictionary<string, List<TextualProperty>>();
-            foreach (var child in childMolecules)
-            {
-                beforeChildFormulas.Add(child.Path, child.Formulas.ToList());
-            }
-
-            var afterChildFormulas = new Dictionary<string, List<TextualProperty>>();
-            foreach (var child in afterChildren)
-            {
-                afterChildFormulas.Add(child.Path, child.Formulas.ToList());
-            }
-
-            var beforeChildLabels = new Dictionary<string, List<TextualProperty>>();
-            foreach (var child in childMolecules)
-            {
-                beforeChildLabels.Add(child.Path, child.Labels.ToList());
-            }
-
-            var afterChildLabels = new Dictionary<string, List<TextualProperty>>();
-            foreach (var child in afterChildren)
-            {
-                afterChildLabels.Add(child.Path, child.Labels.ToList());
-            }
+            //caches the properties for undo/redo
+            Dictionary<string, MoleculePropertyBag> sourceProps = new Dictionary<string, MoleculePropertyBag>();
 
             Action redo = () =>
-            {
-                molecule.ShowMoleculeBrackets = showAfter;
-                molecule.FormalCharge = chargeAfter;
-                molecule.Count = countAfter;
-                molecule.SpinMultiplicity = spinAfter;
-
-                UpdateLabels(molecule, afterNames, afterFormulas, afterLabels);
-                foreach (var child in childMolecules)
-                {
-                    UpdateLabels(child, afterChildNames[child.Path], afterChildFormulas[child.Path], afterChildLabels[child.Path]);
-                }
-            };
+                          {
+                              target.ShowMoleculeBrackets = showAfter;
+                              target.FormalCharge = chargeAfter;
+                              target.Count = countAfter;
+                              target.SpinMultiplicity = spinAfter;
+                
+                              StashProperties(source, sourceProps);
+                              UnstashProperties(target, sourceProps);
+                          };
 
             Action undo = () =>
             {
-                molecule.ShowMoleculeBrackets = showBefore;
-                molecule.FormalCharge = chargeBefore;
-                molecule.Count = countBefore;
-                molecule.SpinMultiplicity = spinBefore;
+                target.ShowMoleculeBrackets = showBefore;
+                target.FormalCharge = chargeBefore;
+                target.Count = countBefore;
+                target.SpinMultiplicity = spinBefore;
 
-                UpdateLabels(molecule, beforeNames, beforeFormulas, beforeLabels);
-                foreach (var child in childMolecules)
-                {
-                    UpdateLabels(child, beforeChildNames[child.Path], beforeChildFormulas[child.Path], beforeChildLabels[child.Path]);
-                }
+                UnstashProperties(target, sourceProps);
             };
 
             UndoManager.RecordAction(undo, redo);
             redo();
             UndoManager.EndUndoBlock();
 
-            // Local Function
-            void UpdateLabels(Molecule mol, List<TextualProperty> names, List<TextualProperty> formulas, List<TextualProperty> labels)
+            //local function
+            void StashProperties(Molecule mol, Dictionary<string, MoleculePropertyBag> propertyBags)
             {
-                mol.Names.Clear();
-                foreach (var property in names)
+                MoleculePropertyBag bag = new MoleculePropertyBag();
+                bag.Store(mol);
+                propertyBags[mol.Id] = bag;
+                foreach (Molecule child in mol.Molecules.Values)
                 {
-                    mol.Names.Add(property);
+                    StashProperties(child, propertyBags);
                 }
+            }
 
-                mol.Formulas.Clear();
-                foreach (var property in formulas)
+            //local function
+            void UnstashProperties(Molecule mol, Dictionary<string, MoleculePropertyBag> propertyBags)
+            {
+                MoleculePropertyBag bag = propertyBags[mol.Id];
+                bag.Restore(mol);
+                foreach (Molecule child in mol.Molecules.Values)
                 {
-                    mol.Formulas.Add(property);
-                }
-
-                mol.Labels.Clear();
-                foreach (var property in labels)
-                {
-                    mol.Labels.Add(property);
+                    UnstashProperties(child, propertyBags);
                 }
             }
         }
+
+      
 
         public void UpdateBond(Bond bond, BondPropertiesModel model)
         {

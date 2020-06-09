@@ -19,7 +19,7 @@ namespace Chem4Word.Model2.Converters.CML
     // ReSharper disable once InconsistentNaming
     public class CMLConverter
     {
-        public Model Import(object data, List<string> protectedLabels = null)
+        public Model Import(object data, List<string> protectedLabels = null, bool relabel = true)
         {
             Model newModel = new Model();
 
@@ -52,7 +52,7 @@ namespace Chem4Word.Model2.Converters.CML
                 {
                     newModel.SetProtectedLabels(protectedLabels);
                 }
-                else
+                else if (relabel)
                 {
                     newModel.Relabel(true);
                 }
