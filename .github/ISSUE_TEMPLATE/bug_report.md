@@ -20,6 +20,12 @@ Steps to reproduce the behaviour:
 **Expected behavior**
 A clear and concise description [in English] of what you expected to happen.
 
+**CML Data**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Please paste the cml of your structure here -->
+```
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 

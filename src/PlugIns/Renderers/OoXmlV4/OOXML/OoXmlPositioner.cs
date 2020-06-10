@@ -16,10 +16,13 @@ using Chem4Word.Renderer.OoXmlV4.TTF;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic;
 using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
 namespace Chem4Word.Renderer.OoXmlV4.OOXML
 {
@@ -150,10 +153,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 }
 
                 // Create rectangle of the bounding box with a suitable clipping margin
-                Rect cbb = new Rect(alc.Position.X - OoXmlHelper.CHARACTER_CLIPPING_MARGIN,
-                    alc.Position.Y - OoXmlHelper.CHARACTER_CLIPPING_MARGIN,
-                    width + (OoXmlHelper.CHARACTER_CLIPPING_MARGIN * 2),
-                    height + (OoXmlHelper.CHARACTER_CLIPPING_MARGIN * 2));
+                Rect cbb = new Rect(alc.Position.X - OoXmlHelper.CML_CHARACTER_MARGIN,
+                    alc.Position.Y - OoXmlHelper.CML_CHARACTER_MARGIN,
+                    width + (OoXmlHelper.CML_CHARACTER_MARGIN * 2),
+                    height + (OoXmlHelper.CML_CHARACTER_MARGIN * 2));
 
                 // Just in case we end up splitting a line into two
                 List<BondLine> extraBondLines = new List<BondLine>();
@@ -240,7 +243,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             {
                 if (ring.Centroid.HasValue)
                 {
-                    Outputs.RingCenters.Add(ring.Centroid.Value);
+                    var centre = ring.Centroid.Value;
+                    Outputs.RingCenters.Add(centre);
+
+                    var innerCircle = new InnerCircle();
+                    // Traverse() obtains list of atoms in anti-clockwise direction around ring
+                    innerCircle.Points.AddRange(ring.Traverse().Select(a => a.Position).ToList());
+                    innerCircle.Centre = centre;
+                    //Outputs.InnerCircles.Add(innerCircle);
                 }
             }
 
@@ -312,19 +322,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 int charge = mol.FormalCharge.Value;
                 int absCharge = Math.Abs(charge);
 
-                if (absCharge > 1)
-                {
-                    characters = absCharge.ToString();
-                }
-
-                if (charge >= 1)
-                {
-                    characters += "+";
-                }
-                else if (charge <= 1)
-                {
-                    characters += "-";
-                }
+                string chargeSign = Math.Sign(charge) > 0 ? "+" : "-";
+                characters = absCharge == 1 ? chargeSign : $"{absCharge}{chargeSign}";
             }
 
             if (mol.SpinMultiplicity.HasValue && mol.SpinMultiplicity.Value > 1)
@@ -583,22 +582,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            string atomLabel = atom.Element.Symbol;
-            Rect labelBounds;
+            string atomLabel = atom.SymbolText;
+            if (Inputs.Options.ShowCarbons)
+            {
+                if (atom.Element is Element e)
+                {
+                    if (e == Globals.PeriodicTable.C)
+                    {
+                        atomLabel = e.Symbol;
+                    }
+                }
+            }
 
-            // Get Charge and Isotope values for use later on
-            int iCharge = atom.FormalCharge ?? 0;
-            int iAbsCharge = Math.Abs(iCharge);
-            int isoValue = atom.IsotopeNumber ?? 0;
-
-            // Get Implicit Hydrogen Count for use later on
-            int implicitHCount = atom.ImplicitHydrogenCount;
-
-            Point cursorPosition = atom.Position;
-
-            int bondCount = atom.Bonds.ToList().Count;
-
-            if (atom.ShowSymbol || Inputs.Options.ShowCarbons)
+            if (!string.IsNullOrEmpty(atomLabel))
             {
                 #region Set Up Atom Colour
 
@@ -613,320 +609,201 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 #endregion Set Up Atom Colour
 
-                #region Step 1 - Measure Bounding Box for all Characters of label
+                // 1. Create main character group
+                GroupOfCharacters main = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
+                                                               Inputs.TtfCharacterSet, Inputs.MeanBondLength);
+                main.AddString(atomLabel, atomColour);
+                main.AdjustPosition(atom.Position - main.Centre);
 
-                double xMin = double.MaxValue;
-                double yMin = double.MaxValue;
-                double xMax = double.MinValue;
-                double yMax = double.MinValue;
+                // 2. Create other character groups
 
-                Point thisCharacterPosition;
-                for (int idx = 0; idx < atomLabel.Length; idx++)
+                // 2.1 Determine position of implicit hydrogens
+                int bondCount = atom.Bonds.ToList().Count;
+                double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
+                CompassPoints orientation = bondCount == 1 ? BasicGeometry.SnapTo2EW(angleFromNorth) : BasicGeometry.SnapTo4NESW(angleFromNorth);
+
+                // 2.2 Implicit Hydrogens
+                GroupOfCharacters hydrogens = null;
+
+                int implicitHCount = atom.ImplicitHydrogenCount;
+                if (implicitHCount > 0)
                 {
-                    char chr = atomLabel[idx];
-                    TtfCharacter c = Inputs.TtfCharacterSet[chr];
-                    if (c != null)
+                    hydrogens = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
+                                                      Inputs.TtfCharacterSet, Inputs.MeanBondLength);
+
+                    // Create characters
+                    hydrogens.AddCharacter('H', atomColour);
+                    if (implicitHCount > 1)
                     {
-                        thisCharacterPosition = GetCharacterPosition(cursorPosition, c);
-
-                        xMin = Math.Min(xMin, thisCharacterPosition.X);
-                        yMin = Math.Min(yMin, thisCharacterPosition.Y);
-                        xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width, Inputs.MeanBondLength));
-                        yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height, Inputs.MeanBondLength));
-
-                        if (idx < atomLabel.Length - 1)
+                        foreach (var character in implicitHCount.ToString())
                         {
-                            // Move to next Character position
-                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, Inputs.MeanBondLength), 0);
-                        }
-                    }
-                }
-
-                #endregion Step 1 - Measure Bounding Box for all Characters of label
-
-                #region Step 2 - Reset Cursor such that the text is centered about the atom's co-ordinates
-
-                double width = xMax - xMin;
-                double height = yMax - yMin;
-                cursorPosition = new Point(atom.Position.X - width / 2, atom.Position.Y + height / 2);
-                var chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
-                var isotopeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
-                labelBounds = new Rect(cursorPosition, new Size(width, height));
-
-                #endregion Step 2 - Reset Cursor such that the text is centered about the atom's co-ordinates
-
-                #region Step 3 - Place the characters
-
-                foreach (char chr in atomLabel)
-                {
-                    TtfCharacter c = Inputs.TtfCharacterSet[chr];
-                    if (c != null)
-                    {
-                        thisCharacterPosition = GetCharacterPosition(cursorPosition, c);
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, atom.Path, atom.Parent.Path);
-                        Outputs.AtomLabelCharacters.Add(alc);
-
-                        // Move to next Character position
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, Inputs.MeanBondLength), 0);
-                        chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
-                    }
-                }
-
-                #endregion Step 3 - Place the characters
-
-                #region Determine NESW
-
-                double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
-                CompassPoints nesw;
-
-                if (bondCount == 1)
-                {
-                    nesw = BasicGeometry.SnapTo2EW(baFromNorth);
-                }
-                else
-                {
-                    nesw = BasicGeometry.SnapTo4NESW(baFromNorth);
-                }
-
-                #endregion Determine NESW
-
-                #region Step 4 - Add Charge if required
-
-                if (iCharge != 0)
-                {
-                    TtfCharacter hydrogenCharacter = Inputs.TtfCharacterSet['H'];
-
-                    TtfCharacter chargeSignCharacter = null;
-                    if (iCharge >= 1)
-                    {
-                        chargeSignCharacter = Inputs.TtfCharacterSet['+'];
-                    }
-                    else if (iCharge <= 1)
-                    {
-                        chargeSignCharacter = Inputs.TtfCharacterSet['-'];
-                    }
-
-                    if (iAbsCharge > 1)
-                    {
-                        string digits = iAbsCharge.ToString();
-                        // Insert digits
-                        foreach (char chr in digits)
-                        {
-                            TtfCharacter chargeValueCharacter = Inputs.TtfCharacterSet[chr];
-                            thisCharacterPosition = GetCharacterPosition(chargeCursorPosition, chargeValueCharacter);
-
-                            // Raise the superscript Character
-                            thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
-
-                            AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, chargeValueCharacter, atomColour, atom.Path, atom.Parent.Path);
-                            alcc.IsSmaller = true;
-                            alcc.IsSubScript = true;
-                            Outputs.AtomLabelCharacters.Add(alcc);
-
-                            // Move to next Character position
-                            chargeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
-                            cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeValueCharacter.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                            hydrogens.AddCharacter(character, atomColour, true);
                         }
                     }
 
-                    // Insert sign at raised position
-                    thisCharacterPosition = GetCharacterPosition(chargeCursorPosition, chargeSignCharacter);
-                    thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
-                    thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.Height / 2 * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
-
-                    AtomLabelCharacter alcs = new AtomLabelCharacter(thisCharacterPosition, chargeSignCharacter, atomColour, atom.Path, atom.Parent.Path);
-                    alcs.IsSmaller = true;
-                    alcs.IsSubScript = true;
-                    Outputs.AtomLabelCharacters.Add(alcs);
-
-                    if (iAbsCharge != 0)
+                    // Adjust position of block
+                    switch (orientation)
                     {
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(chargeSignCharacter.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                        case CompassPoints.North:
+                            hydrogens.AdjustPosition(main.NorthCentre - hydrogens.SouthCentre);
+                            break;
+
+                        case CompassPoints.East:
+                            hydrogens.AdjustPosition(main.BoundingBox.TopRight - hydrogens.BoundingBox.TopLeft);
+                            break;
+
+                        case CompassPoints.South:
+                            hydrogens.AdjustPosition(main.SouthCentre - hydrogens.NorthCentre);
+                            break;
+
+                        case CompassPoints.West:
+                            hydrogens.AdjustPosition(main.BoundingBox.TopLeft - hydrogens.BoundingBox.TopRight);
+                            break;
                     }
+                    hydrogens.Nudge(orientation);
                 }
 
-                #endregion Step 4 - Add Charge if required
+                // 2.3 Charge
+                GroupOfCharacters charge = null;
 
-                #region Step 5 - Add Implicit H if required
+                int chargeValue = atom.FormalCharge ?? 0;
+                int absCharge = Math.Abs(chargeValue);
 
-                if (Inputs.Options.ShowHydrogens && implicitHCount > 0)
+                if (absCharge > 0)
                 {
-                    TtfCharacter hydrogenCharacter = Inputs.TtfCharacterSet['H'];
-                    string numbers = "012345";
-                    TtfCharacter implicitValueCharacter = Inputs.TtfCharacterSet[numbers[implicitHCount]];
+                    charge = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
+                                                      Inputs.TtfCharacterSet, Inputs.MeanBondLength);
 
-                    #region Add H
+                    // Create characters
+                    string chargeSign = Math.Sign(chargeValue) > 0 ? "+" : "-";
+                    string digits = absCharge == 1 ? chargeSign : $"{absCharge}{chargeSign}";
 
-                    if (hydrogenCharacter != null)
+                    foreach (var character in digits)
                     {
-                        switch (nesw)
+                        charge.AddCharacter(character, atomColour, true);
+                    }
+
+                    // Adjust position of charge
+                    if (hydrogens == null)
+                    {
+                        charge.AdjustPosition(main.BoundingBox.TopRight - charge.WestCentre);
+                        charge.Nudge(CompassPoints.East);
+                    }
+                    else
+                    {
+                        var destination = main.BoundingBox.TopRight;
+
+                        switch (orientation)
                         {
                             case CompassPoints.North:
-                                if (atom.Bonds.ToList().Count > 1)
+                                if (hydrogens.BoundingBox.Right >= main.BoundingBox.Right)
                                 {
-                                    cursorPosition.X = labelBounds.X
-                                                       + (labelBounds.Width / 2)
-                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width, Inputs.MeanBondLength) / 2);
-                                    cursorPosition.Y = cursorPosition.Y
-                                                       + OoXmlHelper.ScaleCsTtfToCml(-hydrogenCharacter.Height, Inputs.MeanBondLength)
-                                                       - OoXmlHelper.CHARACTER_VERTICAL_SPACING;
-                                    if (iCharge > 0
-                                        && implicitHCount > 1)
-                                    {
-                                        cursorPosition.Offset(0,
-                                                              OoXmlHelper.ScaleCsTtfToCml(
-                                                                  -implicitValueCharacter.Height *
-                                                                  OoXmlHelper.SUBSCRIPT_SCALE_FACTOR / 2, Inputs.MeanBondLength)
-                                                              - OoXmlHelper.CHARACTER_VERTICAL_SPACING);
-                                    }
+                                    destination.X = hydrogens.BoundingBox.Right;
                                 }
+                                charge.AdjustPosition(destination - charge.WestCentre);
+                                charge.Nudge(CompassPoints.East);
                                 break;
 
                             case CompassPoints.East:
-                                // Leave as is
+                                charge.AdjustPosition(destination - charge.SouthCentre);
+                                charge.Nudge(CompassPoints.North);
                                 break;
 
                             case CompassPoints.South:
-                                if (atom.Bonds.ToList().Count > 1)
-                                {
-                                    cursorPosition.X = labelBounds.X + (labelBounds.Width / 2)
-                                                       - (OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width, Inputs.MeanBondLength) / 2);
-                                    cursorPosition.Y = cursorPosition.Y
-                                                       + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, Inputs.MeanBondLength)
-                                                       + OoXmlHelper.CHARACTER_VERTICAL_SPACING;
-                                }
-                                break;
-
                             case CompassPoints.West:
-                                if (implicitHCount == 1)
-                                {
-                                    if (iAbsCharge == 0)
-                                    {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2), Inputs.MeanBondLength), 0);
-                                    }
-                                    else
-                                    {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25), Inputs.MeanBondLength), 0);
-                                    }
-                                }
-                                else
-                                {
-                                    if (iAbsCharge == 0)
-                                    {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2.5), Inputs.MeanBondLength), 0);
-                                    }
-                                    else
-                                    {
-                                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(-(hydrogenCharacter.IncrementX * 2 + implicitValueCharacter.IncrementX * 1.25), Inputs.MeanBondLength), 0);
-                                    }
-                                }
+                                charge.AdjustPosition(destination - charge.WestCentre);
+                                charge.Nudge(CompassPoints.East);
                                 break;
                         }
-
-                        thisCharacterPosition = GetCharacterPosition(cursorPosition, hydrogenCharacter);
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, hydrogenCharacter, atomColour, atom.Path, atom.Parent.Path);
-                        Outputs.AtomLabelCharacters.Add(alc);
-
-                        // Move to next Character position
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.IncrementX, Inputs.MeanBondLength), 0);
-
-                        if (nesw == CompassPoints.East)
-                        {
-                            chargeCursorPosition = new Point(cursorPosition.X, cursorPosition.Y);
-                        }
-                        if (nesw == CompassPoints.West)
-                        {
-                            isotopeCursorPosition = new Point(thisCharacterPosition.X, isotopeCursorPosition.Y);
-                        }
                     }
-
-                    #endregion Add H
-
-                    #region Add number
-
-                    if (implicitHCount > 1
-                        && implicitValueCharacter != null)
-                    {
-                        thisCharacterPosition = GetCharacterPosition(cursorPosition, implicitValueCharacter);
-
-                        // Drop the subscript Character
-                        thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, Inputs.MeanBondLength));
-
-                        AtomLabelCharacter alc = new AtomLabelCharacter(thisCharacterPosition, implicitValueCharacter, atomColour, atom.Path, atom.Parent.Path);
-                        alc.IsSmaller = true;
-                        alc.IsSubScript = true;
-                        Outputs.AtomLabelCharacters.Add(alc);
-
-                        // Move to next Character position
-                        cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(implicitValueCharacter.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
-                    }
-
-                    #endregion Add number
                 }
 
-                #endregion Step 5 - Add Implicit H if required
+                // 2.4 Isotope
+                GroupOfCharacters isotope = null;
 
-                #region Step 6 - Add IsoTope Number if required
+                int isoValue = atom.IsotopeNumber ?? 0;
 
                 if (isoValue > 0)
                 {
-                    string digits = isoValue.ToString();
+                    isotope = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
+                                                    Inputs.TtfCharacterSet, Inputs.MeanBondLength);
 
-                    xMin = double.MaxValue;
-                    yMin = double.MaxValue;
-                    xMax = double.MinValue;
-                    yMax = double.MinValue;
-
-                    Point isoOrigin = isotopeCursorPosition;
-
-                    // Calculate width of digits
-                    foreach (char chr in digits)
+                    foreach (var character in isoValue.ToString())
                     {
-                        TtfCharacter c = Inputs.TtfCharacterSet[chr];
-                        thisCharacterPosition = GetCharacterPosition(isotopeCursorPosition, c);
-
-                        // Raise the superscript Character
-                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
-
-                        xMin = Math.Min(xMin, thisCharacterPosition.X);
-                        yMin = Math.Min(yMin, thisCharacterPosition.Y);
-                        xMax = Math.Max(xMax, thisCharacterPosition.X + OoXmlHelper.ScaleCsTtfToCml(c.Width, Inputs.MeanBondLength));
-                        yMax = Math.Max(yMax, thisCharacterPosition.Y + OoXmlHelper.ScaleCsTtfToCml(c.Height, Inputs.MeanBondLength));
-
-                        // Move to next Character position
-                        isotopeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                        isotope.AddCharacter(character, atomColour, true);
                     }
 
-                    // Re-position Isotope Cursor
-                    width = xMax - xMin;
-                    isotopeCursorPosition = new Point(isoOrigin.X - width, isoOrigin.Y);
-
-                    // Insert digits
-                    foreach (char chr in digits)
+                    // Adjust position of isotope
+                    if (hydrogens == null)
                     {
-                        TtfCharacter c = Inputs.TtfCharacterSet[chr];
-                        thisCharacterPosition = GetCharacterPosition(isotopeCursorPosition, c);
+                        isotope.AdjustPosition(main.BoundingBox.TopLeft - isotope.EastCentre);
+                        isotope.Nudge(CompassPoints.East);
+                    }
+                    else
+                    {
+                        var destination = main.BoundingBox.TopLeft;
 
-                        // Raise the superscript Character
-                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(c.Height * OoXmlHelper.CS_SUPERSCRIPT_RAISE_FACTOR, Inputs.MeanBondLength));
+                        switch (orientation)
+                        {
+                            case CompassPoints.North:
+                                if (hydrogens.BoundingBox.Left <= main.BoundingBox.Left)
+                                {
+                                    destination.X = hydrogens.BoundingBox.Left;
+                                }
+                                isotope.AdjustPosition(destination - isotope.EastCentre);
+                                isotope.Nudge(CompassPoints.West);
+                                break;
 
-                        AtomLabelCharacter alcc = new AtomLabelCharacter(thisCharacterPosition, c, atomColour, atom.Path, atom.Parent.Path);
-                        alcc.IsSmaller = true;
-                        alcc.IsSubScript = true;
-                        Outputs.AtomLabelCharacters.Add(alcc);
+                            case CompassPoints.East:
+                            case CompassPoints.South:
+                                isotope.AdjustPosition(destination - isotope.EastCentre);
+                                isotope.Nudge(CompassPoints.West);
+                                break;
 
-                        // Move to next Character position
-                        isotopeCursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(c.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
+                            case CompassPoints.West:
+                                isotope.AdjustPosition(destination - isotope.SouthCentre);
+                                isotope.Nudge(CompassPoints.North);
+                                break;
+                        }
                     }
                 }
 
-                #endregion Step 6 - Add IsoTope Number if required
+                // 3 transfer to output
+                foreach (var character in main.Characters)
+                {
+                    Outputs.AtomLabelCharacters.Add(character);
+                }
+                //Outputs.Diagnostics.Rectangles.Add(new DiagnosticRectangle(main.BoundingBox, "00e050"))
 
-                #region Step 7 - Create Convex Hull
+                if (hydrogens != null)
+                {
+                    foreach (var character in hydrogens.Characters)
+                    {
+                        Outputs.AtomLabelCharacters.Add(character);
+                    }
+                    //Outputs.Diagnostics.Rectangles.Add(new DiagnosticRectangle(hydrogens.BoundingBox, "ff80ff"))
+                }
 
+                if (charge != null)
+                {
+                    foreach (var character in charge.Characters)
+                    {
+                        Outputs.AtomLabelCharacters.Add(character);
+                    }
+                    //Outputs.Diagnostics.Rectangles.Add(new DiagnosticRectangle(charge.BoundingBox, "ff0000"))
+                }
+
+                if (isotope != null)
+                {
+                    foreach (var character in isotope.Characters)
+                    {
+                        Outputs.AtomLabelCharacters.Add(character);
+                    }
+                    //Outputs.Diagnostics.Rectangles.Add(new DiagnosticRectangle(isotope.BoundingBox, "0070c0"))
+                }
+
+                // 4 Generate Convex Hull
                 Outputs.ConvexHulls.Add(atom.Path, ConvexHull(atom.Path));
-
-                #endregion Step 7 - Create Convex Hull
             }
         }
 
@@ -935,131 +812,110 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             FunctionalGroup fg = atom.Element as FunctionalGroup;
             bool reverse = atom.FunctionalGroupPlacement == CompassPoints.West;
 
-            #region Set Up Functional Group Colour
+            #region Set Up Atom Colour
 
             string atomColour = "000000";
             if (Inputs.Options.ColouredAtoms
-                && !string.IsNullOrEmpty(fg.Colour))
+                && fg?.Colour != null)
             {
                 atomColour = fg.Colour;
                 // Strip out # as OoXml does not use it
                 atomColour = atomColour.Replace("#", "");
             }
 
-            #endregion Set Up Functional Group Colour
+            #endregion Set Up Atom Colour
 
             List<FunctionalGroupTerm> terms = fg.ExpandIntoTerms(reverse);
 
-            #region Step 1 - Generate the characters and measure Bounding Boxes
+            GroupOfCharacters main = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
+                                                           Inputs.TtfCharacterSet, Inputs.MeanBondLength);
 
-            var cursorPosition = atom.Position;
+            GroupOfCharacters auxiliary = new GroupOfCharacters(atom.Position, atom.Path, atom.Parent.Path,
+                                                           Inputs.TtfCharacterSet, Inputs.MeanBondLength);
 
-            List<AtomLabelCharacter> fgCharacters = new List<AtomLabelCharacter>();
-            TtfCharacter hydrogenCharacter = Inputs.TtfCharacterSet['H'];
-
-            Rect fgBoundingBox = Rect.Empty;
-            Rect anchorBoundingBox = Rect.Empty;
-
+            // 1. Generate characters
             foreach (var term in terms)
             {
                 foreach (var part in term.Parts)
                 {
                     foreach (char c in part.Text)
                     {
-                        Rect bb = AddCharacter(c, part.Type);
-                        fgBoundingBox.Union(bb);
                         if (term.IsAnchor)
                         {
-                            anchorBoundingBox.Union(bb);
+                            switch (part.Type)
+                            {
+                                case FunctionalGroupPartType.Normal:
+                                    main.AddCharacter(c, atomColour);
+                                    break;
+
+                                case FunctionalGroupPartType.Subscript:
+                                    main.AddCharacter(c, atomColour, true);
+                                    break;
+
+                                case FunctionalGroupPartType.Superscript:
+                                    main.AddCharacter(c, atomColour, isSuperScript: true);
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            switch (part.Type)
+                            {
+                                case FunctionalGroupPartType.Normal:
+                                    auxiliary.AddCharacter(c, atomColour);
+                                    break;
+
+                                case FunctionalGroupPartType.Subscript:
+                                    auxiliary.AddCharacter(c, atomColour, true);
+                                    break;
+
+                                case FunctionalGroupPartType.Superscript:
+                                    auxiliary.AddCharacter(c, atomColour, isSuperScript: true);
+                                    break;
+                            }
                         }
                     }
                 }
             }
 
-            #endregion Step 1 - Generate the characters and measure Bounding Boxes
+            // 2. Position characters
+            main.AdjustPosition(atom.Position - main.Centre);
+            //Outputs.Diagnostics.Rectangles.Add(new DiagnosticRectangle(main.BoundingBox, "00ff00"))
 
-            #region Step 2 - Move all characters such that the anchor term is centered on the atom position
-
-            double offsetX;
-            double offsetY;
-            if (reverse)
+            if (auxiliary.Characters.Any())
             {
-                offsetX = fgBoundingBox.Width - anchorBoundingBox.Width / 2;
-                offsetY = anchorBoundingBox.Height / 2;
-            }
-            else
-            {
-                offsetX = anchorBoundingBox.Width / 2;
-                offsetY = anchorBoundingBox.Height / 2;
-            }
+                switch (atom.FunctionalGroupPlacement)
+                {
+                    case CompassPoints.East:
+                        auxiliary.AdjustPosition(main.BoundingBox.TopRight - auxiliary.BoundingBox.TopLeft);
+                        auxiliary.Nudge(CompassPoints.East);
+                        break;
 
-            offsetY = offsetY + anchorBoundingBox.Top - atom.Position.Y;
+                    case CompassPoints.West:
+                        auxiliary.AdjustPosition(main.BoundingBox.TopLeft - auxiliary.BoundingBox.TopRight);
+                        auxiliary.Nudge(CompassPoints.West);
+                        break;
+                }
 
-            foreach (var alc in fgCharacters)
-            {
-                alc.Position = new Point(alc.Position.X - offsetX, alc.Position.Y - offsetY);
+                //Outputs.Diagnostics.Rectangles.Add(new DiagnosticRectangle(auxiliary.BoundingBox, "ffff00"))
             }
 
-            #endregion Step 2 - Move all characters such that the anchor term is centered on the atom position
-
-            #region Step 3 - Transfer characters into main list
-
-            foreach (var alc in fgCharacters)
+            // 3. Transfer to output
+            foreach (var character in main.Characters)
             {
-                Outputs.AtomLabelCharacters.Add(alc);
+                Outputs.AtomLabelCharacters.Add(character);
             }
 
-            #endregion Step 3 - Transfer characters into main list
+            if (auxiliary.Characters.Any())
+            {
+                foreach (var character in auxiliary.Characters)
+                {
+                    Outputs.AtomLabelCharacters.Add(character);
+                }
+            }
 
-            #region Step 4 - Convex Hull
-
+            // 4. Generate Convex Hull
             Outputs.ConvexHulls.Add(atom.Path, ConvexHull(atom.Path));
-
-            #endregion Step 4 - Convex Hull
-
-            // Local Function
-            Rect AddCharacter(char c, FunctionalGroupPartType type)
-            {
-                TtfCharacter ttf = Inputs.TtfCharacterSet[c];
-                var thisCharacterPosition = GetCharacterPosition(cursorPosition, ttf);
-                var alc = new AtomLabelCharacter(thisCharacterPosition, ttf, atomColour, atom.Path, atom.Parent.Path);
-                alc.IsSubScript = type == FunctionalGroupPartType.Subscript;
-                alc.IsSuperScript = type == FunctionalGroupPartType.Superscript;
-                alc.IsSmaller = alc.IsSubScript || alc.IsSuperScript;
-
-                Rect thisBoundingBox;
-                if (alc.IsSmaller)
-                {
-                    // Start by assuming it's SubScript
-                    thisCharacterPosition.Offset(0, OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height * OoXmlHelper.SUBSCRIPT_DROP_FACTOR, Inputs.MeanBondLength));
-                    if (alc.IsSuperScript)
-                    {
-                        // Shift up by height of H to make it SuperScript
-                        thisCharacterPosition.Offset(0, -OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Height, Inputs.MeanBondLength));
-                    }
-
-                    // Reset the character's position
-                    alc.Position = thisCharacterPosition;
-
-                    thisBoundingBox = new Rect(alc.Position,
-                        new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR,
-                                OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR));
-
-                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, Inputs.MeanBondLength) * OoXmlHelper.SUBSCRIPT_SCALE_FACTOR, 0);
-                }
-                else
-                {
-                    thisBoundingBox = new Rect(alc.Position,
-                        new Size(OoXmlHelper.ScaleCsTtfToCml(alc.Character.Width, Inputs.MeanBondLength),
-                            OoXmlHelper.ScaleCsTtfToCml(alc.Character.Height, Inputs.MeanBondLength)));
-
-                    cursorPosition.Offset(OoXmlHelper.ScaleCsTtfToCml(alc.Character.IncrementX, Inputs.MeanBondLength), 0);
-                }
-
-                fgCharacters.Add(alc);
-
-                return thisBoundingBox;
-            }
         }
 
         private void AddMoleculeLabels(List<TextualProperty> labels, Point centrePoint, string moleculePath)
@@ -1178,7 +1034,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             onePointFiveDashed = onePointFive.GetParallel(BondOffset());
                             onePointFiveStart = new Point(onePointFiveDashed.Start.X, onePointFiveDashed.Start.Y);
                             onePointFiveEnd = new Point(onePointFiveDashed.End.X, onePointFiveDashed.End.Y);
-                            CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / 1.75));
+                            CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                             onePointFiveDashed = new BondLine(BondLineStyle.Half, onePointFiveStart, onePointFiveEnd, bond);
                             Outputs.BondLines.Add(onePointFiveDashed);
                             break;
@@ -1189,7 +1045,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             onePointFiveDashed = onePointFive.GetParallel(-BondOffset());
                             onePointFiveStart = new Point(onePointFiveDashed.Start.X, onePointFiveDashed.Start.Y);
                             onePointFiveEnd = new Point(onePointFiveDashed.End.X, onePointFiveDashed.End.Y);
-                            CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / 1.75));
+                            CoordinateTool.AdjustLineAboutMidpoint(ref onePointFiveStart, ref onePointFiveEnd, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                             onePointFiveDashed = new BondLine(BondLineStyle.Half, onePointFiveStart, onePointFiveEnd, bond);
                             Outputs.BondLines.Add(onePointFiveDashed);
                             break;
@@ -1222,17 +1078,64 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             case Globals.BondDirection.Anticlockwise:
                                 BondLine da = new BondLine(BondLineStyle.Solid, bond);
                                 Outputs.BondLines.Add(da);
-                                PlaceOtherLine(da, da.GetParallel(-BondOffset()));
+                                BondLine das = PlaceOtherLine(da, da.GetParallel(-BondOffset()));
+                                Outputs.BondLines.Add(TrimOtherLine(das));
                                 break;
 
                             case Globals.BondDirection.Clockwise:
                                 BondLine dc = new BondLine(BondLineStyle.Solid, bond);
                                 Outputs.BondLines.Add(dc);
-                                PlaceOtherLine(dc, dc.GetParallel(BondOffset()));
+                                BondLine dcs = PlaceOtherLine(dc, dc.GetParallel(BondOffset()));
+                                Outputs.BondLines.Add(TrimOtherLine(dcs));
                                 break;
 
                                 // Local Function
-                                void PlaceOtherLine(BondLine primaryLine, BondLine secondaryLine)
+                                BondLine TrimOtherLine(BondLine bondLine)
+                                {
+                                    var startBonds = bond.StartAtom.Bonds.Except(new [] {bond}).ToList();
+                                    var endBonds = bond.EndAtom.Bonds.Except(new[] {bond}).ToList();
+
+                                    foreach (var startBond in startBonds)
+                                    {
+                                        TrimBondLineAbout(startBond);
+                                    }
+
+                                    foreach (var endBond in endBonds)
+                                    {
+                                        TrimBondLineAbout(endBond);
+                                    }
+
+                                    // Nested LocalFunction
+                                    void TrimBondLineAbout(Bond thisBond)
+                                    {
+                                        bool intersect;
+                                        Point meetingPoint;
+                                        CoordinateTool.FindIntersection(bondLine.Start, bondLine.End,
+                                                                        thisBond.StartAtom.Position, thisBond.EndAtom.Position,
+                                                                        out _, out intersect, out meetingPoint);
+                                        if (intersect)
+                                        {
+                                            var length1 = (meetingPoint - bondLine.Start).Length;
+                                            var length2 = (meetingPoint - bondLine.End).Length;
+
+                                            if (length1 > length2)
+                                            {
+                                                CoordinateTool.AdjustLineEndPoint(bondLine.End, ref meetingPoint, (BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
+                                                bondLine.End = meetingPoint;
+                                            }
+                                            else
+                                            {
+                                                CoordinateTool.AdjustLineEndPoint(bondLine.Start, ref meetingPoint, (BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
+                                                bondLine.Start = meetingPoint;
+                                            }
+                                        }
+                                    }
+
+                                    return bondLine;
+                                }
+
+                                // Local Function
+                                BondLine PlaceOtherLine(BondLine primaryLine, BondLine secondaryLine)
                                 {
                                     var primaryMidpoint = CoordinateTool.GetMidPoint(primaryLine.Start, primaryLine.End);
                                     var secondaryMidpoint = CoordinateTool.GetMidPoint(secondaryLine.Start, secondaryLine.End);
@@ -1296,19 +1199,19 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                         CoordinateTool.FindIntersection(startPointa, endPointa, bondEnd, centre.Value,
                                                                         out _, out _, out outIntersectP2);
 
-                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, outIntersectP1, outIntersectP2, bond));
-
                                         if (Inputs.Options.ShowBondClippingLines)
                                         {
                                             // Diagnostics
-                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Zero, bond.StartAtom.Position, centre.Value, "ff0000"));
-                                            Outputs.BondLines.Add(new BondLine(BondLineStyle.Zero, bond.EndAtom.Position, centre.Value, "ff0000"));
+                                            Outputs.Diagnostics.Lines.Add(new DiagnosticLine(bond.StartAtom.Position, centre.Value, BondLineStyle.Dotted, "ff0000"));
+                                            Outputs.Diagnostics.Lines.Add(new DiagnosticLine(bond.EndAtom.Position, centre.Value, BondLineStyle.Dotted, "ff0000"));
                                         }
+
+                                        return new BondLine(BondLineStyle.Solid, outIntersectP1, outIntersectP2, bond);
                                     }
                                     else
                                     {
-                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointa, ref endPointa, -(BondOffset() / 1.75));
-                                        Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, startPointa, endPointa, bond));
+                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointa, ref endPointa, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
+                                        return new BondLine(BondLineStyle.Solid, startPointa, endPointa, bond);
                                     }
                                 }
 
@@ -1321,7 +1224,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                         BondLine blnewc = dcc.GetParallel(BondOffset());
                                         Point startPointn = blnewc.Start;
                                         Point endPointn = blnewc.End;
-                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointn, ref endPointn, -(BondOffset() / 1.75));
+                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointn, ref endPointn, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                                         Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, startPointn, endPointn, bond));
                                         break;
 
@@ -1331,7 +1234,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                         BondLine blnewt = dtt.GetParallel(BondOffset());
                                         Point startPointt = blnewt.Start;
                                         Point endPointt = blnewt.End;
-                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointt, ref endPointt, -(BondOffset() / 1.75));
+                                        CoordinateTool.AdjustLineAboutMidpoint(ref startPointt, ref endPointt, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                                         Outputs.BondLines.Add(new BondLine(BondLineStyle.Solid, startPointt, endPointt, bond));
                                         break;
 
@@ -1362,14 +1265,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             twoPointFiveParallel = twoPointFive.GetParallel(-BondOffset());
                             twoPointFiveStart = new Point(twoPointFiveParallel.Start.X, twoPointFiveParallel.Start.Y);
                             twoPointFiveEnd = new Point(twoPointFiveParallel.End.X, twoPointFiveParallel.End.Y);
-                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                             twoPointFiveParallel = new BondLine(BondLineStyle.Solid, twoPointFiveStart, twoPointFiveEnd, bond);
                             Outputs.BondLines.Add(twoPointFiveParallel);
                             // Dashed bond line
                             twoPointFiveDashed = twoPointFive.GetParallel(BondOffset());
                             twoPointFiveStart = new Point(twoPointFiveDashed.Start.X, twoPointFiveDashed.Start.Y);
                             twoPointFiveEnd = new Point(twoPointFiveDashed.End.X, twoPointFiveDashed.End.Y);
-                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                             twoPointFiveDashed = new BondLine(BondLineStyle.Half, twoPointFiveStart, twoPointFiveEnd, bond);
                             Outputs.BondLines.Add(twoPointFiveDashed);
                             break;
@@ -1382,14 +1285,14 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             twoPointFiveDashed = twoPointFive.GetParallel(-BondOffset());
                             twoPointFiveStart = new Point(twoPointFiveDashed.Start.X, twoPointFiveDashed.Start.Y);
                             twoPointFiveEnd = new Point(twoPointFiveDashed.End.X, twoPointFiveDashed.End.Y);
-                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                             twoPointFiveDashed = new BondLine(BondLineStyle.Half, twoPointFiveStart, twoPointFiveEnd, bond);
                             Outputs.BondLines.Add(twoPointFiveDashed);
                             // Solid bond line
                             twoPointFiveParallel = twoPointFive.GetParallel(BondOffset());
                             twoPointFiveStart = new Point(twoPointFiveParallel.Start.X, twoPointFiveParallel.Start.Y);
                             twoPointFiveEnd = new Point(twoPointFiveParallel.End.X, twoPointFiveParallel.End.Y);
-                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / 1.75));
+                            CoordinateTool.AdjustLineAboutMidpoint(ref twoPointFiveStart, ref twoPointFiveEnd, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
                             twoPointFiveParallel = new BondLine(BondLineStyle.Solid, twoPointFiveStart, twoPointFiveEnd, bond);
                             Outputs.BondLines.Add(twoPointFiveParallel);
                             break;
@@ -1407,10 +1310,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 case "3":
                 case Globals.OrderTriple:
-                    BondLine tripple = new BondLine(BondLineStyle.Solid, bond);
-                    Outputs.BondLines.Add(tripple);
-                    Outputs.BondLines.Add(tripple.GetParallel(BondOffset()));
-                    Outputs.BondLines.Add(tripple.GetParallel(-BondOffset()));
+                    BondLine triple = new BondLine(BondLineStyle.Solid, bond);
+                    Outputs.BondLines.Add(triple);
+                    Outputs.BondLines.Add(triple.GetParallel(BondOffset()));
+                    Outputs.BondLines.Add(triple.GetParallel(-BondOffset()));
                     break;
 
                 default:
@@ -1422,10 +1325,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             #endregion Create Bond Line objects
         }
 
-        private double BondOffset()
-        {
-            return (Inputs.MeanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE);
-        }
+        private double BondOffset() => Inputs.MeanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE;
 
         private Rect MeasureString(string text, Point startPoint)
         {
@@ -1502,7 +1402,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             List<Point> points = new List<Point>();
 
             var chars = Outputs.AtomLabelCharacters.Where(m => m.ParentAtom == atomPath);
-            double margin = OoXmlHelper.CHARACTER_CLIPPING_MARGIN;
+            double margin = OoXmlHelper.CML_CHARACTER_MARGIN;
             foreach (var c in chars)
             {
                 // Top Left --

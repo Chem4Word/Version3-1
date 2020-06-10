@@ -8,6 +8,8 @@
 using System;
 using System.Reflection;
 using System.Windows.Forms;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
 
 namespace Chem4Word.UI.WPF
@@ -19,7 +21,6 @@ namespace Chem4Word.UI.WPF
 
         public string VersionString { get; set; }
         public System.Windows.Point TopLeft { get; set; }
-        public bool AutoClose { get; set; }
 
         public AboutHost()
         {
@@ -31,17 +32,15 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Left = (int)TopLeft.X;
-                Top = (int)TopLeft.Y;
-                aboutControl1.TopLeft = TopLeft;
-                aboutControl1.AutoClose = AutoClose;
-                if (AutoClose)
+                using (new WaitCursor())
                 {
-                    ShowInTaskbar = false;
-                    aboutControl1.OnPreloadComplete += OnPreloadCompleted;
-                }
-                else
-                {
+                    if (!PointHelper.PointIsEmpty(TopLeft))
+                    {
+                        Left = (int)TopLeft.X;
+                        Top = (int)TopLeft.Y;
+                    }
+
+                    aboutControl1.TopLeft = TopLeft;
                     aboutControl1.VersionString = VersionString;
                 }
             }
@@ -52,11 +51,6 @@ namespace Chem4Word.UI.WPF
                     form.ShowDialog();
                 }
             }
-        }
-
-        private void OnPreloadCompleted(object sender, EventArgs e)
-        {
-            Close();
         }
     }
 }

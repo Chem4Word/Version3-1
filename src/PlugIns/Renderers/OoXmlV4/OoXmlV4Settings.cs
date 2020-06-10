@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using IChem4Word.Contracts;
 
@@ -38,7 +39,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ClipLines_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ClipLines = ClipLines.Checked;
@@ -53,6 +54,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowHydrogens_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 RendererOptions.ShowHydrogens = ShowHydrogens.Checked;
@@ -67,7 +69,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ColouredAtoms_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ColouredAtoms = ColouredAtoms.Checked;
@@ -82,6 +84,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowRingCentres_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 RendererOptions.ShowRingCentres = ShowRingCentres.Checked;
@@ -96,6 +99,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowMoleculeBox_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 RendererOptions.ShowMoleculeBoundingBoxes = ShowMoleculeBox.Checked;
@@ -110,6 +114,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowCharacterBox_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 RendererOptions.ShowCharacterBoundingBoxes = ShowCharacterBox.Checked;
@@ -126,9 +131,7 @@ namespace Chem4Word.Renderer.OoXmlV4
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Telemetry.Write(module, "Verbose", "Called");
-
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                if (!PointHelper.PointIsEmpty(TopLeft))
                 {
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;
@@ -150,7 +153,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void Ok_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 _dirty = false;
@@ -167,7 +170,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void SetDefaults_Click(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 DialogResult dr = UserInteractions.AskUserOkCancel("Restore default settings");
@@ -206,6 +209,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void Settings_FormClosing(object sender, FormClosingEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 // Nothing to do here ...
@@ -243,6 +247,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowAtomCentres_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 RendererOptions.ShowAtomPositions = ShowAtomPositions.Checked;
@@ -257,7 +262,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowConvexHulls_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ShowHulls = ShowConvexHulls.Checked;
@@ -272,7 +277,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowMoleculeGrouping_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ShowMoleculeGrouping = ShowMoleculeGrouping.Checked;
@@ -287,7 +292,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowMoleculeLabels_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ShowMoleculeLabels = ShowMoleculeLabels.Checked;
@@ -302,7 +307,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowAllCarbonAtoms_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ShowCarbons = ShowAllCarbonAtoms.Checked;
@@ -317,7 +322,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowBondClippingLines_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ShowBondClippingLines = ShowBondClippingLines.Checked;
@@ -332,7 +337,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         private void ShowBondDirection_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            Telemetry.Write(module, "Action", "Triggered");
+
             try
             {
                 RendererOptions.ShowBondDirection = ShowBondDirection.Checked;

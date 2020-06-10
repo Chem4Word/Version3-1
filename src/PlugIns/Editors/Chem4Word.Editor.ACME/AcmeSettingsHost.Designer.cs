@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AcmeSettingsHost));
             this.elementHost1 = new System.Windows.Forms.Integration.ElementHost();
-            this._acmeSettings1 = new Chem4Word.ACME.Controls.AcmeSettings();
+            
             this.SuspendLayout();
             // 
             // elementHost1
@@ -41,7 +41,7 @@
             this.elementHost1.Size = new System.Drawing.Size(384, 294);
             this.elementHost1.TabIndex = 0;
             this.elementHost1.Text = "elementHost1";
-            this.elementHost1.Child = this._acmeSettings1;
+            
             // 
             // AcmeSettingsHost
             // 
@@ -61,6 +61,5 @@
         #endregion
 
         private System.Windows.Forms.Integration.ElementHost elementHost1;
-        private Chem4Word.ACME.Controls.AcmeSettings _acmeSettings1;
     }
 }

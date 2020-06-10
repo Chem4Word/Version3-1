@@ -13,6 +13,8 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Core.UI.Wpf;
 
@@ -56,13 +58,16 @@ namespace Chem4Word.UI.WPF
 
         public Chem4WordSettingsHost(bool runtime)
         {
-            InitializeComponent();
-            if (runtime)
+            using (new WaitCursor())
             {
-                if (elementHost1.Child is SettingsControl sc)
+                InitializeComponent();
+                if (runtime)
                 {
-                    sc.TopLeft = TopLeft;
-                    sc.OnButtonClick += OnWpfButtonClick;
+                    if (elementHost1.Child is SettingsControl sc)
+                    {
+                        sc.TopLeft = TopLeft;
+                        sc.OnButtonClick += OnWpfButtonClick;
+                    }
                 }
             }
         }
@@ -96,13 +101,16 @@ namespace Chem4Word.UI.WPF
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                using (new WaitCursor())
                 {
-                    Left = (int)TopLeft.X;
-                    Top = (int)TopLeft.Y;
-                }
+                    if (!PointHelper.PointIsEmpty(TopLeft))
+                    {
+                        Left = (int)TopLeft.X;
+                        Top = (int)TopLeft.Y;
+                    }
 
-                MinimumSize = new Size(800, 600);
+                    MinimumSize = new Size(800, 600);
+                }
             }
             catch (Exception ex)
             {

@@ -12,6 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Xml;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 
 namespace Chem4Word.UI
@@ -45,7 +46,7 @@ namespace Chem4Word.UI
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                if (!PointHelper.PointIsEmpty(TopLeft))
                 {
                     Left = (int)TopLeft.X;
                     Top = (int)TopLeft.Y;

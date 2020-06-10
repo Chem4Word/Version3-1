@@ -185,7 +185,6 @@ namespace Chem4Word.Helpers
                         {
                             int start;
                             bool isFormula;
-                            string source;
                             string text;
 
                             switch (cci.Type)
@@ -218,7 +217,7 @@ namespace Chem4Word.Helpers
                                     doc.CustomXMLParts.Add(cmlConverter.Export(model));
 
                                     Word.ContentControl ccn = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
-                                    ChemistryHelper.Insert1D(ccn, cci.Text, false, $"m1.n1:{model.CustomXmlPartGuid}");
+                                    ChemistryHelper.Insert1D(ccn.ID, cci.Text, false, $"m1.n1:{model.CustomXmlPartGuid}");
                                     ccn.LockContents = true;
                                     break;
 
@@ -230,9 +229,9 @@ namespace Chem4Word.Helpers
 
                                     doc.Application.Selection.SetRange(start - 1, start - 1);
                                     isFormula = false;
-                                    text = ChemistryHelper.GetInlineText(target.Model, cci.Type, ref isFormula, out source);
+                                    text = ChemistryHelper.GetInlineText(target.Model, cci.Type, ref isFormula, out _);
                                     Word.ContentControl ccr = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
-                                    ChemistryHelper.Insert1D(ccr, text, isFormula, $"{cci.Type}:{target.Model.CustomXmlPartGuid}");
+                                    ChemistryHelper.Insert1D(ccr.ID, text, isFormula, $"{cci.Type}:{target.Model.CustomXmlPartGuid}");
                                     ccr.LockContents = true;
                                     break;
                             }

@@ -7,10 +7,12 @@
 
 using System;
 using System.Text;
+using System.Windows;
 using System.Windows.Forms;
 using Chem4Word.ACME;
 using Chem4Word.ACME.Controls;
 using Chem4Word.Core;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Wpf;
 using IChem4Word.Contracts;
 
@@ -18,11 +20,13 @@ namespace Chem4Word.Editor.ACME
 {
     public partial class AcmeSettingsHost : Form
     {
-        public System.Windows.Point TopLeft { get; set; }
+        public Point TopLeft { get; set; }
 
         public IChem4WordTelemetry Telemetry { get; set; }
 
         public AcmeOptions EditorOptions { get; set; }
+
+        private AcmeSettings _acmeSettings;
 
         public AcmeSettingsHost()
         {
@@ -31,19 +35,18 @@ namespace Chem4Word.Editor.ACME
 
         private void Settings_Load(object sender, EventArgs e)
         {
-            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            if (!PointHelper.PointIsEmpty(TopLeft))
             {
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;
             }
 
-            if (elementHost1.Child is AcmeSettings us)
-            {
-                us.AcmeOptions = EditorOptions;
-                us.Telemetry = Telemetry;
-                us.TopLeft = TopLeft;
-                us.OnButtonClick += UsOnOnButtonClick;
-            }
+            _acmeSettings = new AcmeSettings();
+            _acmeSettings.AcmeOptions = EditorOptions;
+            _acmeSettings.Telemetry = Telemetry;
+            _acmeSettings.TopLeft = TopLeft;
+            _acmeSettings.OnButtonClick += UsOnOnButtonClick;
+            elementHost1.Child = _acmeSettings;
 
             MinimumSize = Size;
         }

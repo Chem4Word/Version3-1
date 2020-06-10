@@ -126,7 +126,7 @@ namespace Chem4Word.ACME
         {
             _cml = cml;
             var cc = new CMLConverter();
-            EditedModel = cc.Import(_cml, Used1D);
+            EditedModel = cc.Import(_cml, Used1D, relabel:false);
             TreeView.Items.Clear();
             bool initialSelectionMade = false;
 

@@ -98,6 +98,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigWatcher.cs" />
     <Compile Include="Dumper.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,6 +198,10 @@
     <ProjectReference Include="..\..\PlugIns\Editors\Chem4Word.Editor.ACME\Chem4Word.Editor.ACME.csproj">
       <Project>{d81efa27-a4ef-4f75-b5d8-9bb06ab76091}</Project>
       <Name>Chem4Word.Editor.ACME</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Renderers\OoXmlV4\Chem4Word.Renderer.OoXmlV4.csproj">
+      <Project>{a73732b0-ff0a-488e-b353-c238a9085c63}</Project>
+      <Name>Chem4Word.Renderer.OoXmlV4</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

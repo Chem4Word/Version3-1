@@ -232,6 +232,7 @@ namespace Chem4Word.Model2
             get
             {
                 bool result = true;
+                _isAllenic = false;
 
                 if (Element is FunctionalGroup)
                 {
@@ -243,7 +244,7 @@ namespace Chem4Word.Model2
                     {
                         // Use initialised value of true
                     }
-                    else if (Element.Symbol == "C")
+                    else if (Element.Symbol == Globals.CarbonSymbol)
                     {
                         result = false;
 
@@ -268,11 +269,19 @@ namespace Chem4Word.Model2
                                 if (a1 != null && a2 != null)
                                 {
                                     double angle1 =
-                                        Vector.AngleBetween(-(this.Position - a1.Position),
-                                                            this.Position - a2.Position);
+                                        Vector.AngleBetween(-(Position - a1.Position),
+                                                            Position - a2.Position);
                                     if (Math.Abs(angle1) < 8)
                                     {
-                                        result = true;
+                                        if (bonds[0].OrderValue == 2
+                                            && bonds[1].OrderValue == 2)
+                                        {
+                                            _isAllenic = true;
+                                        }
+                                        else
+                                        {
+                                            result = true;
+                                        }
                                     }
                                 }
                             }
@@ -283,6 +292,8 @@ namespace Chem4Word.Model2
                 return result;
             }
         }
+
+        private bool _isAllenic;
 
         //tries to get an estimated bounding box for each atom symbol
         public Rect BoundingBox(double fontSize)
@@ -338,14 +349,19 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (ShowSymbol)
+                string result = Element.Symbol;
+
+                if (!ShowSymbol)
                 {
-                    return Element.Symbol;
+                    result = string.Empty;
                 }
-                else
+
+                if (_isAllenic)
                 {
-                    return "";
+                    result = Globals.AllenicCarbonSymbol;
                 }
+
+                return result;
             }
         }
 

@@ -15,6 +15,13 @@ namespace Chem4Word.Model2.Helpers
         public static PeriodicTable PeriodicTable = new PeriodicTable();
         public static List<FunctionalGroup> FunctionalGroupsList = FunctionalGroups.ShortcutList;
 
+        #region Strings
+
+        public static string CarbonSymbol = "C";
+        public static string AllenicCarbonSymbol = "•";
+
+        #endregion String
+
         #region Geometry Stuff
 
         public enum ClockDirections

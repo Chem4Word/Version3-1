@@ -7,6 +7,7 @@
 
 using System;
 using System.Windows.Forms;
+using Chem4Word.Core.Helpers;
 
 namespace Chem4Word.UI
 {
@@ -23,7 +24,7 @@ namespace Chem4Word.UI
 
         private void UpdateFailure_Load(object sender, EventArgs e)
         {
-            if (TopLeft.X != 0 && TopLeft.Y != 0)
+            if (!PointHelper.PointIsEmpty(TopLeft))
             {
                 Left = (int)TopLeft.X;
                 Top = (int)TopLeft.Y;

@@ -55,22 +55,6 @@ namespace Chem4Word.Model2.Geometry
             return angle;
         }
 
-        /// <summary>
-        /// AngleBetween - the angle between 2 vectors
-        /// </summary>
-        /// <returns>
-        /// Returns the the angle in degrees between vector1 and vector2
-        /// </returns>
-        /// <param name="vector1"> The first Vector </param>
-        /// <param name="vector2"> The second Vector </param>
-        public static double AngleBetween(Vector vector1, Vector vector2)
-        {
-            double sin = vector1.X * vector2.Y - vector2.X * vector1.Y;
-            double cos = vector1.X * vector2.X + vector1.Y * vector2.Y;
-
-            return Math.Atan2(sin, cos) * (180 / Math.PI);
-        }
-
         #region extension methods
 
         public static Vector Perpendicular(this Vector v)
@@ -106,12 +90,13 @@ namespace Chem4Word.Model2.Geometry
         {
             double t;
             double u;
-            IntersectLines(out t, out u, segment1Start, segment1End, segment2Start, segment2End);
-            if ((t >= 0) && (u >= 0) && (t <= 1) && (u <= 1)) //voila, we have an intersection
+            IntersectLines(segment1Start, segment1End, segment2Start, segment2End, out t, out u);
+            if (t >= 0 && u >= 0 && t <= 1 && u <= 1) //voila, we have an intersection
             {
                 Vector vIntersect = (segment1End - segment1Start) * t;
                 return segment1Start + vIntersect;
             }
+
             return null;
         }
 
@@ -122,15 +107,18 @@ namespace Chem4Word.Model2.Geometry
         /// Values between 0 and 1 for ONE segment indicates that the projection
         /// of the other segment intersects it
         /// </summary>
-        /// <param name="t">proportion along the line of the first segment</param>
-        /// <param name="u">proportion along the line of the second segment</param>
         /// <param name="segment1Start">what it says</param>
         /// <param name="segment1End">what it says</param>
         /// <param name="segment2Start">what it says</param>
         /// <param name="segment2End">what it says</param>
-        ///
-        public static void IntersectLines(out double t, out double u, Point segment1Start, Point segment1End, Point segment2Start,
-            Point segment2End)
+        /// <param name="t">proportion along the line of the first segment</param>
+        /// <param name="u">proportion along the line of the second segment</param>
+        public static void IntersectLines(Point segment1Start,
+                                          Point segment1End,
+                                          Point segment2Start,
+                                          Point segment2End,
+                                          out double t,
+                                          out double u)
         {
             double det = Determinant(segment1End - segment1Start, segment2Start - segment2End);
             t = Determinant(segment2Start - segment1Start, segment2Start - segment2End) / det;
@@ -180,7 +168,7 @@ namespace Chem4Word.Model2.Geometry
 
         public static Vector SnapVectorToClock(Vector vector)
         {
-            double angle = AngleBetween(vector, ScreenNorth);
+            double angle = Vector.AngleBetween(vector, ScreenNorth);
             angle = Math.Round(angle / 30.0) * 30;
 
             int clock = Convert.ToInt32(angle);

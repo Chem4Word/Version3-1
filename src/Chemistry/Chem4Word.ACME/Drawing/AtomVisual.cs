@@ -311,8 +311,8 @@ namespace Chem4Word.ACME.Drawing
             {
                 increment = 10;
             }
-            while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, bb,
-                bb2) & Math.Abs(angle - 30) > 0.001)
+            while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, bb, bb2)
+                   & Math.Abs(angle - 30) > 0.001)
             {
                 rotator = new Matrix();
 

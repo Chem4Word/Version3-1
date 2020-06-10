@@ -119,16 +119,32 @@ namespace Chem4Word.ACME.Drawing
 
                 var endAtom = endAtomVisual.ParentAtom;
                 var otherBonds = endAtom.Bonds.Except(new[] { startAtomVisual.ParentAtom.BondBetween(endAtom) }).ToList();
+
                 Bond bond = null;
+                bool oblique = true;
                 if (otherBonds.Any())
                 {
                     bond = otherBonds.ToArray()[0];
+                    Vector wedgevector = wbd.End - wbd.Start;
+                    foreach (Bond b in otherBonds)
+                    {
+                        Atom otherAtom = b.OtherAtom(endAtom);
+                        Vector v = wbd.End - otherAtom.Position;
+                        double angle = System.Math.Abs(Vector.AngleBetween(wedgevector, v));
+
+                        if (angle < 109.5 || angle > 130.5)
+                        {
+                            oblique = false;
+                            break;
+                        }
+                    }
                 }
 
-                bool chamferBond = (otherBonds.Any()
-                                    && (endAtom.Element as Element) == Globals.PeriodicTable.C
-                                    && endAtom.SymbolText == ""
-                                    && bond.Order == Globals.OrderSingle);
+                bool chamferBond = otherBonds.Any()
+                                   && oblique
+                                   && (endAtom.Element as Element) == Globals.PeriodicTable.C
+                                   && endAtom.SymbolText == ""
+                                   && bond.Order == Globals.OrderSingle;
                 if (!chamferBond)
                 {
                     wbd.CappedOff = false;

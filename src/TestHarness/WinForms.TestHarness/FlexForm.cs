@@ -13,7 +13,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using System.Windows;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media;
 using Chem4Word.ACME;
@@ -22,9 +22,10 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Model2.Helpers;
+using Chem4Word.Renderer.OoXmlV4;
+using Chem4Word.Renderer.OoXmlV4.OOXML;
 using Chem4Word.Telemetry;
 using Newtonsoft.Json;
-using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace WinForms.TestHarness
 {
@@ -43,13 +44,21 @@ namespace WinForms.TestHarness
         private string _lastCml = EmptyCml;
 
         private AcmeOptions _editorOptions;
+        private OoXmlV4Options _renderOptions;
+        private ConfigWatcher _configWatcher;
 
         public FlexForm()
         {
             InitializeComponent();
             _helper = new SystemHelper();
             _telemetry = new TelemetryWriter(true, _helper);
+
+            var location = Assembly.GetExecutingAssembly().Location;
+            var path = Path.GetDirectoryName(location);
+
+            // Use either path or null below
             _editorOptions = new AcmeOptions(null);
+            _renderOptions = new OoXmlV4Options(null);
         }
 
         private void LoadStructure_Click(object sender, EventArgs e)
@@ -269,7 +278,7 @@ namespace WinForms.TestHarness
             {
 #endif
 
-            if (!string.IsNullOrEmpty(_lastCml))
+                if (!string.IsNullOrEmpty(_lastCml))
                 {
                     using (EditorHost editorHost = new EditorHost(_lastCml, "LABELS"))
                     {
@@ -408,7 +417,8 @@ namespace WinForms.TestHarness
             ShowCml.Enabled = true;
             ClearChemistry.Enabled = true;
             SaveStructure.Enabled = true;
-            Layout.Enabled = true;
+            LayoutStructure.Enabled = true;
+            RenderOoXml.Enabled = true;
 
             ListStacks();
         }
@@ -647,32 +657,70 @@ namespace WinForms.TestHarness
             RedoHost.Child = RedoStack;
             UndoStack = new StackViewer(_editorOptions);
             UndoHost.Child = UndoStack;
+
+            var location = Assembly.GetExecutingAssembly().Location;
+            var path = Path.GetDirectoryName(location);
+            _configWatcher = new ConfigWatcher(path);
         }
 
-        private void ChangeSettings_Click(object sender, EventArgs e)
+        private void OptionsChanged()
+        {
+            // Allow time for FileSytemWatcher to fire
+            Thread.Sleep(250);
+
+            _renderOptions = new OoXmlV4Options(null);
+            _editorOptions = new AcmeOptions(null);
+            Debug.WriteLine($"ACME ColouredAtoms {_editorOptions.ColouredAtoms}");
+            Debug.WriteLine($"OoXml ColouredAtoms {_renderOptions.ColouredAtoms}");
+            UpdateControls();
+        }
+
+        private void ChangeOoXmlSettings_Click(object sender, EventArgs e)
+        {
+            OoXmlV4Settings settings = new OoXmlV4Settings();
+            settings.Telemetry = _telemetry;
+            settings.TopLeft = new System.Windows.Point(Left, Top);
+
+            var tempOptions = _renderOptions.Clone();
+            settings.RendererOptions = tempOptions;
+
+            DialogResult dr = settings.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                _renderOptions = tempOptions.Clone();
+                OptionsChanged();
+            }
+
+            settings.Close();
+        }
+
+        private void ChangeAcmeSettings_Click(object sender, EventArgs e)
         {
             AcmeSettingsHost settings = new AcmeSettingsHost();
             settings.Telemetry = _telemetry;
+            settings.TopLeft = new System.Windows.Point(Left, Top);
 
-            AcmeOptions tempOptions = new AcmeOptions(null);
-
-            settings.TopLeft = new Point(Left, Top);
+            var tempOptions = _editorOptions.Clone();
             settings.EditorOptions = tempOptions;
-            settings.Telemetry = _telemetry;
 
             DialogResult dr = settings.ShowDialog();
             if (dr == DialogResult.OK)
             {
                 _editorOptions = tempOptions.Clone();
-                SetDisplayOptions();
-                Display.Chemistry = _lastCml;
-                RedoStack.SetOptions(_editorOptions);
-                UndoStack.SetOptions(_editorOptions);
-                UndoStack.ListOfDisplays.ItemsSource = StackToList(_undoStack);
-                RedoStack.ListOfDisplays.ItemsSource = StackToList(_redoStack);
+                OptionsChanged();
             }
 
             settings.Close();
+        }
+
+        private void UpdateControls()
+        {
+            SetDisplayOptions();
+            Display.Chemistry = _lastCml;
+            RedoStack.SetOptions(_editorOptions);
+            UndoStack.SetOptions(_editorOptions);
+            UndoStack.ListOfDisplays.ItemsSource = StackToList(_undoStack);
+            RedoStack.ListOfDisplays.ItemsSource = StackToList(_redoStack);
         }
 
         private void SetDisplayOptions()
@@ -683,7 +731,7 @@ namespace WinForms.TestHarness
             Display.ShowMoleculeGrouping = _editorOptions.ShowMoleculeGrouping;
         }
 
-        private void Layout_Click(object sender, EventArgs e)
+        private void LayoutStructure_Click(object sender, EventArgs e)
         {
             var data = new LayoutResult();
 
@@ -770,6 +818,25 @@ namespace WinForms.TestHarness
                 //Telemetry.Write(module, "Exception", e1.Message);
                 //Telemetry.Write(module, "Exception", e1.ToString());
                 Debug.WriteLine(e1.Message);
+            }
+        }
+
+        private void RenderOoXml_Click(object sender, EventArgs e)
+        {
+            var renderer = new Renderer();
+            renderer.Telemetry = _telemetry;
+            renderer.TopLeft = new System.Windows.Point(Left, Top);
+            renderer.Cml = _lastCml;
+            renderer.Properties = new Dictionary<string, string>();
+            renderer.Properties.Add("Guid", Guid.NewGuid().ToString("N"));
+            string file = renderer.Render();
+            if (string.IsNullOrEmpty(file))
+            {
+                MessageBox.Show("Something went wrong!", "Error");
+            }
+            else
+            {
+                Process.Start(file);
             }
         }
     }

@@ -70,6 +70,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoordinateTool.cs" />
+    <Compile Include="Entities\Diagnostic\DiagnosticRectangle.cs" />
+    <Compile Include="Entities\GroupOfCharacters.cs" />
+    <Compile Include="Entities\InnerCircle.cs" />
     <Compile Include="Entities\Diagnostic\DiagnosticLine.cs" />
     <Compile Include="Entities\Diagnostic\Diagnostics.cs" />
     <Compile Include="Entities\Diagnostic\DiagnosticSpot.cs" />

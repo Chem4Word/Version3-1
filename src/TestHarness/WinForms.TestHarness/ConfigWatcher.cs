@@ -13,8 +13,12 @@ using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Chem4Word.Helpers
+namespace WinForms.TestHarness
 {
+    // -----------------------------------------------------------------------
+    // WARNING - This is a copy of $\src\Chem4Word.V3\Helpers\ConfigWatcher.cs
+    // -----------------------------------------------------------------------
+
     public class ConfigWatcher
     {
         // Files to watch for
@@ -137,7 +141,7 @@ namespace Chem4Word.Helpers
                                     if (write)
                                     {
                                         Debug.WriteLine($"Writing file {file}");
-                                        Globals.Chem4WordV3.OptionsReloadRequired = true;
+                                        // Globals.Chem4WordV3.OptionsReloadRequired = true;
                                         string json = JsonConvert.SerializeObject(jObject, Formatting.Indented);
                                         File.WriteAllText(file, json);
                                     }

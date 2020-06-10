@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Chem4Word.Core.Helpers;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Shared;
 using IChem4Word.Contracts;
@@ -185,45 +186,48 @@ namespace Chem4Word.UI
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                if (TopLeft.X != 0 && TopLeft.Y != 0)
+                using (new WaitCursor())
                 {
-                    Left = (int)TopLeft.X;
-                    Top = (int)TopLeft.Y;
-                }
-
-                string currentVersionNumber = CurrentVersion.Root.Element("Number").Value;
-                DateTime currentReleaseDate = SafeDate.Parse(CurrentVersion.Root.Element("Released").Value);
-
-                lblInfo.Text = "Your current version of Chem4Word is " + currentVersionNumber + "; Released " + SafeDate.ToShortDate(currentReleaseDate);
-                _telemetry.Write(module, "AutomaticUpdate", lblInfo.Text);
-
-                var versions = NewVersions.XPathSelectElements("//Version");
-                foreach (var version in versions)
-                {
-                    if (string.IsNullOrEmpty(_downloadUrl))
+                    if (!PointHelper.PointIsEmpty(TopLeft))
                     {
-                        _downloadUrl = version.Element("Url").Value;
+                        Left = (int)TopLeft.X;
+                        Top = (int)TopLeft.Y;
                     }
 
-                    var thisVersionNumber = version.Element("Number").Value;
-                    DateTime thisVersionDate = SafeDate.Parse(version.Element("Released").Value);
+                    string currentVersionNumber = CurrentVersion.Root.Element("Number").Value;
+                    DateTime currentReleaseDate = SafeDate.Parse(CurrentVersion.Root.Element("Released").Value);
 
-                    if (currentReleaseDate >= thisVersionDate)
-                    {
-                        break;
-                    }
+                    lblInfo.Text = "Your current version of Chem4Word is " + currentVersionNumber + "; Released " + SafeDate.ToShortDate(currentReleaseDate);
+                    _telemetry.Write(module, "AutomaticUpdate", lblInfo.Text);
 
-                    AddHeaderLine("Version " + thisVersionNumber + "; Released " + SafeDate.ToShortDate(thisVersionDate), Color.Blue);
-                    var changes = version.XPathSelectElements("Changes/Change");
-                    foreach (var change in changes)
+                    var versions = NewVersions.XPathSelectElements("//Version");
+                    foreach (var version in versions)
                     {
-                        if (change.Value.StartsWith("Note:"))
+                        if (string.IsNullOrEmpty(_downloadUrl))
                         {
-                            AddBulletItem(change.Value.Remove(0, 6), Color.Red);
+                            _downloadUrl = version.Element("Url").Value;
                         }
-                        else
+
+                        var thisVersionNumber = version.Element("Number").Value;
+                        DateTime thisVersionDate = SafeDate.Parse(version.Element("Released").Value);
+
+                        if (currentReleaseDate >= thisVersionDate)
                         {
-                            AddBulletItem(change.Value, Color.Black);
+                            break;
+                        }
+
+                        AddHeaderLine("Version " + thisVersionNumber + "; Released " + SafeDate.ToShortDate(thisVersionDate), Color.Blue);
+                        var changes = version.XPathSelectElements("Changes/Change");
+                        foreach (var change in changes)
+                        {
+                            if (change.Value.StartsWith("Note:"))
+                            {
+                                AddBulletItem(change.Value.Remove(0, 6), Color.Red);
+                            }
+                            else
+                            {
+                                AddBulletItem(change.Value, Color.Black);
+                            }
                         }
                     }
                 }

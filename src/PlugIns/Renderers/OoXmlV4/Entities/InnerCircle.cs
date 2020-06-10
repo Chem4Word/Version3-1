@@ -8,13 +8,11 @@
 using System.Collections.Generic;
 using System.Windows;
 
-namespace Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic
+namespace Chem4Word.Renderer.OoXmlV4.Entities
 {
-    public class Diagnostics
+    public class InnerCircle
     {
-        public List<DiagnosticLine> Lines { get; } = new List<DiagnosticLine>();
-        public List<List<Point>> Polygons { get; } = new List<List<Point>>();
-        public List<DiagnosticSpot> Points { get; } = new List<DiagnosticSpot>();
-        public List<DiagnosticRectangle> Rectangles { get; } = new List<DiagnosticRectangle>();
+        public List<Point> Points { get; set; } = new List<Point>();
+        public Point Centre { get; set; }
     }
 }

@@ -526,14 +526,14 @@ namespace Chem4Word.ACME.Drawing
             //work out the biggest scaling factor for either long edge
             foreach (var point in widestPoints)
             {
-                BasicGeometry.IntersectLines(out var firstEdgeCut, out var otherBond1Cut, descriptor.Start,
+                BasicGeometry.IntersectLines(descriptor.Start,
                                              descriptor.FirstCorner,
                                              descriptor.End,
-                                             point);
-                BasicGeometry.IntersectLines(out var secondEdgeCut, out var otherBond2Cut, descriptor.Start,
+                                             point, out var firstEdgeCut, out var otherBond1Cut);
+                BasicGeometry.IntersectLines(descriptor.Start,
                                              descriptor.SecondCorner,
                                              descriptor.End,
-                                             point);
+                                             point, out var secondEdgeCut, out var otherBond2Cut);
                 if (otherAtomPoints.Count == 1)
                 {
                     if (firstEdgeCut > firstScalingFactor)

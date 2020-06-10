@@ -407,7 +407,6 @@
     <Compile Include="UI\UpdateFailure.Designer.cs">
       <DependentUpon>UpdateFailure.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\WaitCursor.cs" />
     <Compile Include="UI\WPF\AboutControl.xaml.cs">
       <DependentUpon>AboutControl.xaml</DependentUpon>
     </Compile>

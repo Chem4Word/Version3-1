@@ -85,7 +85,7 @@ namespace Chem4Word.Helpers
                     if (File.Exists(tempfileName))
                     {
                         cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
-                        Insert2D(cc, tempfileName, guid);
+                        Insert2D(cc.ID, tempfileName, guid);
 
                         if (isCopy)
                         {
@@ -137,7 +137,7 @@ namespace Chem4Word.Helpers
 
             Word.ContentControl cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
 
-            SetRichText(cc, text, isFormula);
+            SetRichText(cc.ID, text, isFormula);
 
             wordSettings.RestoreSettings(app);
 
@@ -190,15 +190,16 @@ namespace Chem4Word.Helpers
 
             // Use LINQ to get a list of all our ContentControls
             // Using $"{}" to coerce null to empty string
-            List<Word.ContentControl> targets = (from Word.ContentControl ccs in doc.ContentControls
-                                                 orderby ccs.Range.Start
-                                                 where $"{ccs.Title}" == Constants.ContentControlTitle && $"{ccs.Tag}".Contains(cxmlId)
-                                                 select ccs).ToList();
+            var targets = (from Word.ContentControl ccs in doc.ContentControls
+                                     orderby ccs.Range.Start
+                                     where $"{ccs.Title}" == Constants.ContentControlTitle
+                                           && $"{ccs.Tag}".Contains(cxmlId)
+                                     select new KeyValuePair<string, string>(ccs.ID, ccs.Tag)).ToList();
 
-            foreach (Word.ContentControl cc in targets)
+            foreach (var target in targets)
             {
                 string prefix = "";
-                string ccTag = cc?.Tag;
+                string ccTag = target.Value;
 
                 if (ccTag != null && ccTag.Contains(":"))
                 {
@@ -210,7 +211,7 @@ namespace Chem4Word.Helpers
                     // Only 2D Structures if filename supplied
                     if (!string.IsNullOrEmpty(tempFilename))
                     {
-                        Update2D(cc, tempFilename, cxmlId);
+                        Update2D(target.Key, tempFilename, cxmlId);
                     }
                 }
                 else
@@ -218,27 +219,29 @@ namespace Chem4Word.Helpers
                     // 1D Structures
                     if (prefix.Equals("c0"))
                     {
-                        Update1D(cc, model.ConciseFormula, true, $"c0:{cxmlId}");
+                        Update1D(target.Key, model.ConciseFormula, true, $"c0:{cxmlId}");
                     }
                     else
                     {
                         bool isFormula = false;
-                        string source;
-                        string text = GetInlineText(model, prefix, ref isFormula, out source);
-                        Update1D(cc, text, isFormula, $"{prefix}:{cxmlId}");
+                        string text = GetInlineText(model, prefix, ref isFormula, out _);
+                        Update1D(target.Key, text, isFormula, $"{prefix}:{cxmlId}");
                     }
                 }
             }
         }
 
-        public static void Insert2D(Word.ContentControl cc, string tempfileName, string guid)
+        public static void Insert2D(string ccId, string tempfileName, string guid)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Inserting 2D structure in ContentControl {cc.ID} Tag {guid}");
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Inserting 2D structure in ContentControl {ccId} Tag {guid}");
 
-            Word.Document doc = cc.Application.ActiveDocument;
-            var wordSettings = new WordSettings(cc.Application);
+            Word.Application app = Globals.Chem4WordV3.Application;
+            Word.Document doc = app.ActiveDocument;
+            var wordSettings = new WordSettings(app);
+
+            var cc = GetContentControl(ccId);
 
             string bookmarkName = Constants.OoXmlBookmarkPrefix + guid;
 
@@ -248,21 +251,24 @@ namespace Chem4Word.Helpers
                 doc.Bookmarks[bookmarkName].Delete();
             }
 
-            wordSettings.RestoreSettings(cc.Application);
+            wordSettings.RestoreSettings(app);
 
             cc.Tag = guid;
             cc.Title = Constants.ContentControlTitle;
             cc.LockContents = true;
         }
 
-        public static void Update2D(Word.ContentControl cc, string tempfileName, string guid)
+        public static void Update2D(string ccId, string tempfileName, string guid)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Updating 2D structure in ContentControl {cc.ID} Tag {guid}");
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Updating 2D structure in ContentControl {ccId} Tag {guid}");
 
-            Word.Document doc = cc.Application.ActiveDocument;
-            var wordSettings = new WordSettings(cc.Application);
+            Word.Application app = Globals.Chem4WordV3.Application;
+            Word.Document doc = app.ActiveDocument;
+            var wordSettings = new WordSettings(app);
+
+            var cc = GetContentControl(ccId);
 
             cc.LockContents = false;
             if (cc.Type == Word.WdContentControlType.wdContentControlPicture)
@@ -287,23 +293,26 @@ namespace Chem4Word.Helpers
                 doc.Bookmarks[bookmarkName].Delete();
             }
 
-            wordSettings.RestoreSettings(cc.Application);
+            wordSettings.RestoreSettings(app);
 
             cc.Tag = guid;
             cc.Title = Constants.ContentControlTitle;
             cc.LockContents = true;
         }
 
-        public static void Insert1D(Word.ContentControl cc, string text, bool isFormula, string tag)
+        public static void Insert1D(string ccId, string text, bool isFormula, string tag)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Inserting 1D label in ContentControl {cc.ID} Tag {tag}");
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Inserting 1D label in ContentControl {ccId} Tag {tag}");
 
-            Word.Application app = cc.Application;
+            Word.Application app = Globals.Chem4WordV3.Application;
+            Word.Document doc = app.ActiveDocument;
             var wordSettings = new WordSettings(app);
 
-            SetRichText(cc, text, isFormula);
+            var cc = GetContentControl(ccId);
+
+            SetRichText(cc.ID, text, isFormula);
 
             wordSettings.RestoreSettings(app);
 
@@ -312,19 +321,22 @@ namespace Chem4Word.Helpers
             cc.LockContents = true;
         }
 
-        public static void Update1D(Word.ContentControl cc, string text, bool isFormula, string tag)
+        public static void Update1D(string ccId, string text, bool isFormula, string tag)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Updating 1D label in ContentControl {cc.ID} Tag {tag}");
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Updating 1D label in ContentControl {ccId} Tag {tag}");
 
-            Word.Application app = cc.Application;
+            Word.Application app = Globals.Chem4WordV3.Application;
+            Word.Document doc = app.ActiveDocument;
             var wordSettings = new WordSettings(app);
+
+            var cc = GetContentControl(ccId);
 
             cc.LockContents = false;
             cc.Range.Delete();
 
-            SetRichText(cc, text, isFormula);
+            SetRichText(cc.ID, text, isFormula);
 
             wordSettings.RestoreSettings(app);
 
@@ -363,9 +375,32 @@ namespace Chem4Word.Helpers
             return text;
         }
 
-        private static void SetRichText(Word.ContentControl cc, string text, bool isFormula)
+        private static Word.ContentControl GetContentControl(string Id)
+        {
+            Word.ContentControl result = null;
+
+            Word.Document d = Globals.Chem4WordV3.Application.ActiveDocument;
+            foreach (Word.ContentControl contentControl in d.ContentControls)
+            {
+                if (contentControl.ID.Equals(Id))
+                {
+                    result = contentControl;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        private static void SetRichText(string ccId, string text, bool isFormula)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            Word.Application app = Globals.Chem4WordV3.Application;
+            Word.Document doc = app.ActiveDocument;
+            var wordSettings = new WordSettings(app);
+
+            var cc = GetContentControl(ccId);
 
             if (isFormula)
             {

@@ -38,20 +38,22 @@
             this.LayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.DisplayHost = new System.Windows.Forms.Integration.ElementHost();
             this.Display = new Chem4Word.ACME.Display();
+            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.RedoStack = new WinForms.TestHarness.StackViewer();
+            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
+            this.UndoStack = new WinForms.TestHarness.StackViewer();
             this.Information = new System.Windows.Forms.Label();
             this.EditCml = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.EditLabels = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.ChangeSettings = new System.Windows.Forms.Button();
+            this.ChangeAcmeSettings = new System.Windows.Forms.Button();
             this.ShowCml = new System.Windows.Forms.Button();
             this.SaveStructure = new System.Windows.Forms.Button();
             this.ClearChemistry = new System.Windows.Forms.Button();
-            this.Layout = new System.Windows.Forms.Button();
-            this.RedoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.RedoStack = new WinForms.TestHarness.StackViewer();
-            this.UndoHost = new System.Windows.Forms.Integration.ElementHost();
-            this.UndoStack = new WinForms.TestHarness.StackViewer();
+            this.LayoutStructure = new System.Windows.Forms.Button();
+            this.RenderOoXml = new System.Windows.Forms.Button();
+            this.ChangeOoXmlSettings = new System.Windows.Forms.Button();
             this.LayoutPanel.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -141,6 +143,26 @@
             this.DisplayHost.Text = "centreHost";
             this.DisplayHost.Child = this.Display;
             // 
+            // RedoHost
+            // 
+            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RedoHost.Location = new System.Drawing.Point(841, 3);
+            this.RedoHost.Name = "RedoHost";
+            this.RedoHost.Size = new System.Drawing.Size(269, 456);
+            this.RedoHost.TabIndex = 2;
+            this.RedoHost.Text = "rightHost";
+            this.RedoHost.Child = this.RedoStack;
+            // 
+            // UndoHost
+            // 
+            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UndoHost.Location = new System.Drawing.Point(3, 3);
+            this.UndoHost.Name = "UndoHost";
+            this.UndoHost.Size = new System.Drawing.Size(269, 456);
+            this.UndoHost.TabIndex = 3;
+            this.UndoHost.Text = "leftHost";
+            this.UndoHost.Child = this.UndoStack;
+            // 
             // Information
             // 
             this.Information.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -191,25 +213,26 @@
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox2.Controls.Add(this.ChangeSettings);
+            this.groupBox2.Controls.Add(this.ChangeOoXmlSettings);
+            this.groupBox2.Controls.Add(this.ChangeAcmeSettings);
             this.groupBox2.Location = new System.Drawing.Point(255, 501);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(108, 81);
             this.groupBox2.TabIndex = 17;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Options ...";
+            this.groupBox2.Text = "Settings ...";
             // 
-            // ChangeSettings
+            // ChangeAcmeSettings
             // 
-            this.ChangeSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ChangeSettings.Location = new System.Drawing.Point(15, 19);
-            this.ChangeSettings.Name = "ChangeSettings";
-            this.ChangeSettings.Size = new System.Drawing.Size(75, 23);
-            this.ChangeSettings.TabIndex = 12;
-            this.ChangeSettings.Text = "Settings";
-            this.ChangeSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.ChangeSettings.UseVisualStyleBackColor = true;
-            this.ChangeSettings.Click += new System.EventHandler(this.ChangeSettings_Click);
+            this.ChangeAcmeSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ChangeAcmeSettings.Location = new System.Drawing.Point(15, 19);
+            this.ChangeAcmeSettings.Name = "ChangeAcmeSettings";
+            this.ChangeAcmeSettings.Size = new System.Drawing.Size(75, 23);
+            this.ChangeAcmeSettings.TabIndex = 12;
+            this.ChangeAcmeSettings.Text = "ACME";
+            this.ChangeAcmeSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ChangeAcmeSettings.UseVisualStyleBackColor = true;
+            this.ChangeAcmeSettings.Click += new System.EventHandler(this.ChangeAcmeSettings_Click);
             // 
             // ShowCml
             // 
@@ -249,45 +272,51 @@
             this.ClearChemistry.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.ClearChemistry.Click += new System.EventHandler(this.ClearChemistry_Click);
             // 
-            // Layout
+            // LayoutStructure
             // 
-            this.Layout.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.Layout.Enabled = false;
-            this.Layout.Location = new System.Drawing.Point(93, 501);
-            this.Layout.Name = "Layout";
-            this.Layout.Size = new System.Drawing.Size(75, 23);
-            this.Layout.TabIndex = 20;
-            this.Layout.Text = "Layout";
-            this.Layout.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.Layout.UseVisualStyleBackColor = true;
-            this.Layout.Click += new System.EventHandler(this.Layout_Click);
+            this.LayoutStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.LayoutStructure.Enabled = false;
+            this.LayoutStructure.Location = new System.Drawing.Point(93, 501);
+            this.LayoutStructure.Name = "LayoutStructure";
+            this.LayoutStructure.Size = new System.Drawing.Size(75, 23);
+            this.LayoutStructure.TabIndex = 20;
+            this.LayoutStructure.Text = "Layout (ws)";
+            this.LayoutStructure.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LayoutStructure.UseVisualStyleBackColor = true;
+            this.LayoutStructure.Click += new System.EventHandler(this.LayoutStructure_Click);
             // 
-            // RedoHost
+            // RenderOoXml
             // 
-            this.RedoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RedoHost.Location = new System.Drawing.Point(841, 3);
-            this.RedoHost.Name = "RedoHost";
-            this.RedoHost.Size = new System.Drawing.Size(269, 456);
-            this.RedoHost.TabIndex = 2;
-            this.RedoHost.Text = "rightHost";
-            this.RedoHost.Child = this.RedoStack;
+            this.RenderOoXml.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.RenderOoXml.Enabled = false;
+            this.RenderOoXml.Location = new System.Drawing.Point(93, 530);
+            this.RenderOoXml.Name = "RenderOoXml";
+            this.RenderOoXml.Size = new System.Drawing.Size(75, 23);
+            this.RenderOoXml.TabIndex = 21;
+            this.RenderOoXml.Text = "OoXml (raw)";
+            this.RenderOoXml.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.RenderOoXml.UseVisualStyleBackColor = true;
+            this.RenderOoXml.Click += new System.EventHandler(this.RenderOoXml_Click);
             // 
-            // UndoHost
+            // ChangeOoXmlSettings
             // 
-            this.UndoHost.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UndoHost.Location = new System.Drawing.Point(3, 3);
-            this.UndoHost.Name = "UndoHost";
-            this.UndoHost.Size = new System.Drawing.Size(269, 456);
-            this.UndoHost.TabIndex = 3;
-            this.UndoHost.Text = "leftHost";
-            this.UndoHost.Child = this.UndoStack;
+            this.ChangeOoXmlSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ChangeOoXmlSettings.Location = new System.Drawing.Point(15, 48);
+            this.ChangeOoXmlSettings.Name = "ChangeOoXmlSettings";
+            this.ChangeOoXmlSettings.Size = new System.Drawing.Size(75, 23);
+            this.ChangeOoXmlSettings.TabIndex = 13;
+            this.ChangeOoXmlSettings.Text = "OoXml";
+            this.ChangeOoXmlSettings.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.ChangeOoXmlSettings.UseVisualStyleBackColor = true;
+            this.ChangeOoXmlSettings.Click += new System.EventHandler(this.ChangeOoXmlSettings_Click);
             // 
             // FlexForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1137, 587);
-            this.Controls.Add(this.Layout);
+            this.Controls.Add(this.RenderOoXml);
+            this.Controls.Add(this.LayoutStructure);
             this.Controls.Add(this.ClearChemistry);
             this.Controls.Add(this.SaveStructure);
             this.Controls.Add(this.ShowCml);
@@ -334,8 +363,10 @@
         private System.Windows.Forms.Button EditLabels;
         private StackViewer UndoStack;
         private StackViewer RedoStack;
-        private System.Windows.Forms.Button ChangeSettings;
-        private System.Windows.Forms.Button Layout;
+        private System.Windows.Forms.Button ChangeAcmeSettings;
+        private System.Windows.Forms.Button LayoutStructure;
+        private System.Windows.Forms.Button RenderOoXml;
+        private System.Windows.Forms.Button ChangeOoXmlSettings;
     }
 }
 

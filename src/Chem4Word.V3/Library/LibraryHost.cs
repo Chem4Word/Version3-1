@@ -9,6 +9,7 @@ using System;
 using System.Reflection;
 using System.Windows.Forms;
 using Chem4Word.ACME;
+using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
 using Word = Microsoft.Office.Interop.Word;
 
@@ -36,7 +37,7 @@ namespace Chem4Word.Library
                 libraryView1.SetOptions(_editorOptions);
 
                 Word.Application app = Globals.Chem4WordV3.Application;
-                using (new UI.WaitCursor())
+                using (new WaitCursor())
                 {
                     if (_libraryViewModel == null)
                     {
