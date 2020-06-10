@@ -1,6 +1,6 @@
 ﻿# Set Build Numbers
 
-.\SetAssemblyVersion.ps1 -version 3.1.10 -name "Beta 10" -released "15-May-2020" -path ..
+.\SetAssemblyVersion.ps1 -version 3.1.10 -name "Beta 10" -released "10-Jun-2020" -path ..
 
 .\SetAssemblyVersion.ps1 -version 3.1.9 -name "Beta 9" -released "14-May-2020" -path ..
 .\SetAssemblyVersion.ps1 -version 3.1.8 -name "Beta 8" -released "09-Apr-2020" -path ..
