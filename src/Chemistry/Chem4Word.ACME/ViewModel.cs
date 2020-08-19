@@ -26,13 +26,16 @@ namespace Chem4Word.ACME
 
         public void SetTextParams(double bondLength)
         {
-            GlyphText.SymbolSize = bondLength / 2.0d;
-            GlyphText.ScriptSize = GlyphText.SymbolSize * 0.6;
-            GlyphText.IsotopeSize = GlyphText.SymbolSize * 0.8;
+            SymbolSize = bondLength / 2.0d;
+           
         }
 
         #region Properties
 
+        public double SymbolSize { get; set; }
+
+        public const double ScriptScalingFactor = 0.6;
+        public double Standoff => SymbolSize / 6;
         public Model Model { get; }
 
         #endregion Properties

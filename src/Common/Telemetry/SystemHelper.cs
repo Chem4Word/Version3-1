@@ -27,9 +27,6 @@ namespace Chem4Word.Telemetry
         private static string CryptoRoot = @"SOFTWARE\Microsoft\Cryptography";
         private string DotNetVersionKey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
 
-        private static readonly string DetectionFile = $"{Constants.Chem4WordVersionFiles}/client-ip-date.php";
-        private static readonly string[] Domains = { "https://www.chem4word.co.uk", "https://chem4word.azurewebsites.net", "http://www.chem4word.com" };
-
         public string MachineId { get; set; }
 
         public int ProcessId { get; set; }
@@ -66,7 +63,6 @@ namespace Chem4Word.Telemetry
         public string BrowserVersion { get; set; }
         public List<string> StartUpTimings { get; set; }
 
-        private static int _retryCount;
         private static Stopwatch _ipStopwatch;
 
         private readonly List<string> _placesToTry = new List<string>();
@@ -218,7 +214,7 @@ namespace Chem4Word.Telemetry
                 _ipStopwatch = new Stopwatch();
                 _ipStopwatch.Start();
 
-                Thread thread1 = new Thread(GetExternalIpAddressV2);
+                Thread thread1 = new Thread(GetExternalIpAddress);
                 thread1.SetApartmentState(ApartmentState.STA);
                 thread1.Start(null);
 
@@ -241,8 +237,6 @@ namespace Chem4Word.Telemetry
                 Thread thread2 = new Thread(GetGitStatus);
                 thread2.SetApartmentState(ApartmentState.STA);
                 thread2.Start(null);
-
-                //GetGitStatus(null);
 #endif
 
                 sw.Stop();
@@ -338,13 +332,7 @@ namespace Chem4Word.Telemetry
             Screens = string.Join("; ", screens);
         }
 
-        private string OsBits
-        {
-            get
-            {
-                return Environment.Is64BitOperatingSystem ? "64bit" : "32bit";
-            }
-        }
+        private static string OsBits => Environment.Is64BitOperatingSystem ? "64bit" : "32bit";
 
         private void GetDotNetVersionFromRegistry()
         {
@@ -358,6 +346,11 @@ namespace Chem4Word.Telemetry
                     int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
 
                     // .Net 4.8
+                    if (releaseKey >= 528372)
+                    {
+                        DotNetVersion = $".NET 4.8 (W10 2004) [{releaseKey}]";
+                        return;
+                    }
                     if (releaseKey >= 528049)
                     {
                         DotNetVersion = $".NET 4.8 [{releaseKey}]";
@@ -492,12 +485,7 @@ namespace Chem4Word.Telemetry
             }
         }
 
-        private static void IncrementRetryCount()
-        {
-            _retryCount++;
-        }
-
-        private void GetExternalIpAddressV2(object o)
+        private void GetExternalIpAddress(object o)
         {
             string module = $"{MethodBase.GetCurrentMethod().Name}()";
             try
@@ -694,171 +682,6 @@ namespace Chem4Word.Telemetry
             }
 
             return result;
-        }
-
-        private void GetExternalIpAddressV1(object o)
-        {
-            string module = $"{MethodBase.GetCurrentMethod().Name}()";
-
-            // http://www.ipv6proxy.net/ --> "Your IP address : 2600:3c00::f03c:91ff:fe93:dcd4"
-
-            try
-            {
-                int idx = 0;
-                foreach (var domain in Domains)
-                {
-                    try
-                    {
-                        string url = $"{domain}/{DetectionFile}";
-
-                        string message = $"Fetching external IpAddress from {url} attempt {_retryCount}.{idx++}";
-                        Debug.WriteLine(message);
-                        StartUpTimings.Add(message);
-                        IpAddress = "IpAddress 0.0.0.0";
-
-                        HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-                        if (request != null)
-                        {
-                            request.UserAgent = "Chem4Word Add-In";
-                            request.Timeout = 2000; // 2 seconds
-                            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                            try
-                            {
-                                // Get Server Date header i.e. "Tue, 01 Jan 2019 19:52:46 GMT"
-                                ServerDateHeader = response.Headers["date"];
-                            }
-                            catch
-                            {
-                                // Do Nothing
-                            }
-
-                            if (HttpStatusCode.OK.Equals(response.StatusCode))
-                            {
-                                using (var reader = new StreamReader(response.GetResponseStream()))
-                                {
-                                    string webPage = reader.ReadToEnd();
-
-                                    if (webPage.StartsWith("Your IP address : "))
-                                    {
-                                        // Tidy Up the data
-                                        webPage = webPage.Replace("Your IP address : ", "");
-                                        webPage = webPage.Replace("UTC Date : ", "");
-                                        webPage = webPage.Replace("<br/>", "|");
-                                        webPage = webPage.Replace("<br />", "|");
-
-                                        string[] lines = webPage.Split('|');
-
-                                        #region Detect IPv6
-
-                                        if (lines[0].Contains(":"))
-                                        {
-                                            string[] ipV6Parts = lines[0].Split(':');
-                                            // Must have between 4 and 8 parts
-                                            if (ipV6Parts.Length >= 4 && ipV6Parts.Length <= 8)
-                                            {
-                                                IpAddress = "IpAddress " + lines[0];
-                                                IpObtainedFrom = $"IpAddress V6 obtained from {url} on attempt {_retryCount + 1}";
-                                            }
-                                        }
-
-                                        #endregion Detect IPv6
-
-                                        #region Detect IPv4
-
-                                        if (lines[0].Contains("."))
-                                        {
-                                            // Must have 4 parts
-                                            string[] ipV4Parts = lines[0].Split('.');
-                                            if (ipV4Parts.Length == 4)
-                                            {
-                                                IpAddress = "IpAddress " + lines[0];
-                                                IpObtainedFrom = $"IpAddress V4 obtained from {url} on attempt {_retryCount + 1}";
-                                            }
-                                        }
-
-                                        #endregion Detect IPv4
-
-                                        #region Detect Php UTC Date
-
-                                        if (lines.Length > 1)
-                                        {
-                                            ServerUtcDateRaw = lines[1];
-                                            ServerUtcDateTime = FromPhpDate(lines[1]);
-                                            SystemUtcDateTime = DateTime.UtcNow;
-
-                                            UtcOffset = SystemUtcDateTime.Ticks - ServerUtcDateTime.Ticks;
-                                        }
-
-                                        #endregion Detect Php UTC Date
-
-                                        // Failure, try next one
-                                        if (!IpAddress.Contains("0.0.0.0"))
-                                        {
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                        StartUpTimings.Add($"GetExternalIpAddress {ex.Message}");
-                    }
-                    Thread.Sleep(500);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                // Something went wrong
-                IpAddress = "IpAddress 0.0.0.0 - " + ex.Message;
-                StartUpTimings.Add($"GetExternalIpAddress {ex.Message}");
-            }
-
-            try
-            {
-                if (string.IsNullOrEmpty(IpAddress) || IpAddress.Contains("0.0.0.0"))
-                {
-                    // Try 0..4 times from 0..2 domains
-                    if (_retryCount < 4)
-                    {
-                        // Retry
-                        IncrementRetryCount();
-                        Thread.Sleep(500);
-                        ParameterizedThreadStart pts = GetExternalIpAddressV1;
-                        Thread thread = new Thread(pts);
-                        thread.SetApartmentState(ApartmentState.STA);
-                        thread.Start(null);
-                    }
-                    else
-                    {
-                        // Failure
-                        IpAddress = IpAddress.Replace("0.0.0.0", "8.8.8.8");
-                        _ipStopwatch.Stop();
-
-                        var message = $"{module} took {_ipStopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
-                        StartUpTimings.Add(message);
-                        Debug.WriteLine(message);
-                    }
-                }
-                else
-                {
-                    // Success
-                    _ipStopwatch.Stop();
-
-                    var message = $"{module} took {_ipStopwatch.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
-                    StartUpTimings.Add(message);
-                    Debug.WriteLine(message);
-                }
-            }
-            catch (ThreadAbortException threadAbortException)
-            {
-                // Do Nothing
-                Debug.WriteLine(threadAbortException.Message);
-            }
         }
 
         private DateTime FromPhpDate(string line)

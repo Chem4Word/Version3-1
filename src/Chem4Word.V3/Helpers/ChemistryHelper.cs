@@ -191,10 +191,10 @@ namespace Chem4Word.Helpers
             // Use LINQ to get a list of all our ContentControls
             // Using $"{}" to coerce null to empty string
             var targets = (from Word.ContentControl ccs in doc.ContentControls
-                                     orderby ccs.Range.Start
-                                     where $"{ccs.Title}" == Constants.ContentControlTitle
-                                           && $"{ccs.Tag}".Contains(cxmlId)
-                                     select new KeyValuePair<string, string>(ccs.ID, ccs.Tag)).ToList();
+                           orderby ccs.Range.Start
+                           where $"{ccs.Title}" == Constants.ContentControlTitle
+                                 && $"{ccs.Tag}".Contains(cxmlId)
+                           select new KeyValuePair<string, string>(ccs.ID, ccs.Tag)).ToList();
 
             foreach (var target in targets)
             {

@@ -24,17 +24,15 @@ namespace Chem4WordSetup
     {
         private const string VersionsFile = "files3-1/Chem4Word-Versions.xml";
         private const string PrimaryDomain = "https://www.chem4word.co.uk";
-        private static readonly string[] Domains = { "https://www.chem4word.co.uk", "https://chem4word.azurewebsites.net", "http://www.chem4word.com", };
+        private static readonly string[] Domains = { "https://www.chem4word.co.uk", "http://www.chem4word.com", "https://chem4word.azurewebsites.net" };
         private const string VersionsFileMarker = "<Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>";
 
         private const string RegistryKeyName = @"SOFTWARE\Chem4Word V3";
-        private const string RegistryLastCheckValueName = "Last Update Check";
-        private const string RegistryVersionsBehindValueName = "Versions Behind";
 
         private const string DetectV2AddIn = @"Chemistry Add-in for Word\Chem4Word.AddIn.vsto";
         private const string DetectV3AddIn = @"Chem4Word V3\Chem4Word.V3.vsto";
 
-        private const string DefaultMsiFile = "https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.7.Beta.7.msi";
+        private const string DefaultMsiFile = "https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.11.Release.1.msi";
         private const string VstoInstaller = "https://www.chem4word.co.uk/files3-1/vstor_redist.exe";
 
         private WebClient _webClient;
@@ -490,18 +488,21 @@ namespace Chem4WordSetup
                         RegistryHelper.WriteAction($"Chem4Word ExitCode: {exitCode}");
                         if (exitCode == 0)
                         {
-                            // Erase previously stored Update Checks
                             RegistryKey key = Registry.CurrentUser.OpenSubKey(RegistryKeyName, true);
                             if (key == null)
                             {
                                 key = Registry.CurrentUser.CreateSubKey(RegistryKeyName);
                             }
+
                             if (key != null)
                             {
                                 try
                                 {
-                                    key.DeleteValue(RegistryLastCheckValueName);
-                                    key.DeleteValue(RegistryVersionsBehindValueName);
+                                    // Erase previously stored Update Checks etc
+                                    foreach (string keyName in key.GetSubKeyNames())
+                                    {
+                                        key.DeleteValue(keyName);
+                                    }
                                 }
                                 catch (Exception ex)
                                 {

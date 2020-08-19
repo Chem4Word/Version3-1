@@ -17,7 +17,6 @@ namespace Chem4WordTests
 {
     public class FunctionalGroupLoading
     {
-
         [Fact]
         public void ShortCutListHasNoDuplicates()
         {
@@ -43,7 +42,6 @@ namespace Chem4WordTests
 
             Assert.True(mixed.Count == 0);
         }
-
 
         [Theory]
         [InlineData("R1", "R 1")]

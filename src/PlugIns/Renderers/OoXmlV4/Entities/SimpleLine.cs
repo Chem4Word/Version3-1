@@ -6,7 +6,6 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows;
-using Chem4Word.Renderer.OoXmlV4.Enums;
 
 namespace Chem4Word.Renderer.OoXmlV4.Entities
 {

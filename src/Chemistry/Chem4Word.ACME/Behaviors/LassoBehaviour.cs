@@ -76,7 +76,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.Cursor = Cursors.Arrow;
 
             CurrentEditor.IsHitTestVisible = true;
-            _bondLength = CurrentEditor.Chemistry.Model.MeanBondLength;
+            _bondLength = CurrentEditor.ViewModel.Model.MeanBondLength;
             CurrentStatus = DefaultText;
         }
 

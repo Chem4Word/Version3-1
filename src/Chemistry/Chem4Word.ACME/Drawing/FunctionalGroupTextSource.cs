@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using System.Windows.Media.TextFormatting;
 using Chem4Word.Model2;
 
@@ -18,6 +19,13 @@ namespace Chem4Word.ACME.Drawing
 
         private readonly string _colour;
 
+        public double SymbolSize { get; set; }
+        public double SubscriptSize { get; set; }
+
+        public double SuperscriptSize { get; set; }
+
+        public double Standoff { get; set; }
+    
         public FunctionalGroupTextSource(FunctionalGroup parentGroup, string colour, bool isFlipped = false)
         {
             _colour = colour;
@@ -53,15 +61,15 @@ namespace Chem4Word.ACME.Drawing
                     TextRunProperties props;
                     if (currentRun.IsSubscript)
                     {
-                        props = new SubscriptTextRunProperties(_colour);
+                        props = new SubscriptTextRunProperties(_colour, SubscriptSize);
                     }
                     else if (currentRun.IsSuperscript)
                     {
-                        props = new SuperscriptTextRunProperties(_colour);
+                        props = new SuperscriptTextRunProperties(_colour, SuperscriptSize);
                     }
                     else
                     {
-                        props = new LabelTextRunProperties(_colour);
+                        props = new LabelTextRunProperties(_colour, SymbolSize );
                     }
 
                     return new TextCharacters(

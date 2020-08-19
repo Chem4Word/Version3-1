@@ -6,9 +6,13 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using Chem4Word.Model2;
+using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Enums;
+using Chem4Word.Renderer.OoXmlV4.OOXML;
 
 namespace Chem4Word.Renderer.OoXmlV4.Entities
 {
@@ -26,9 +30,28 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
 
         public string Colour { get; set; } = "000000";
 
+        /// <summary>
+        /// For a Wedge or Hatch bond this is the nose of the wedge
+        /// </summary>
         public Point Start { get; set; }
 
+        /// <summary>
+        /// For a Wedge or Hatch bond this is the centre of the "tail"
+        /// </summary>
         public Point End { get; set; }
+
+        public Point Nose => Start;
+        public Point Tail => End;
+
+        /// <summary>
+        /// Only relevant to Wedge or Hatch bond
+        /// </summary>
+        public Point LeftTail { get; set; }
+
+        /// <summary>
+        /// Only relevant to Wedge or Hatch bond
+        /// </summary>
+        public Point RightTail { get; set; }
 
         private Rect _boundingBox = Rect.Empty;
 
@@ -57,6 +80,12 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
             }
         }
 
+        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, Bond bond)
+            : this(style, startPoint, endPoint)
+        {
+            Bond = bond;
+        }
+
         private BondLine(BondLineStyle style, Point startPoint, Point endPoint)
         {
             Style = style;
@@ -64,16 +93,144 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
             End = endPoint;
         }
 
-        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, string colour)
-            : this(style, startPoint, endPoint)
+        private double BondOffset(double medianBondLength)
         {
-            Colour = colour;
+            return medianBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE;
         }
 
-        public BondLine(BondLineStyle style, Point startPoint, Point endPoint, Bond bond)
-            : this(style, startPoint, endPoint)
+        public List<Point> WedgeOutline()
         {
-            Bond = bond;
+            var outline = new List<Point>();
+
+            outline.Add(Nose);
+            outline.Add(LeftTail);
+            outline.Add(Tail);
+            outline.Add(RightTail);
+
+            return outline;
+        }
+
+        public void CalculateWedgeOutline(double medianBondLength)
+        {
+            var leftLine = GetParallel(BondOffset(medianBondLength) / 2);
+            var rightLine = GetParallel(-BondOffset(medianBondLength) / 2);
+
+            LeftTail = new Point(leftLine.End.X, leftLine.End.Y);
+            RightTail = new Point(rightLine.End.X, rightLine.End.Y);
+
+            Atom endAtom = Bond.EndAtom;
+            // EndAtom == C and Label is "" and has at least one other bond
+            if (endAtom.Element as Element == Globals.PeriodicTable.C
+                && string.IsNullOrEmpty(endAtom.SymbolText)
+                && endAtom.Bonds.Count() > 1)
+            {
+                var otherBonds = endAtom.Bonds.Except(new[] { Bond }).ToList();
+                bool allSingle = true;
+                List<Bond> nonHydrogenBonds = new List<Bond>();
+                foreach (var otherBond in otherBonds)
+                {
+                    if (!otherBond.Order.Equals(Globals.OrderSingle))
+                    {
+                        allSingle = false;
+                    }
+
+                    var otherAtom = otherBond.OtherAtom(endAtom);
+                    if (otherAtom.Element as Element != Globals.PeriodicTable.H)
+                    {
+                        nonHydrogenBonds.Add(otherBond);
+                    }
+                }
+
+                // All other bonds are single
+                if (allSingle)
+                {
+                    bool oblique = true;
+
+                    var wedgeVector = endAtom.Position - Bond.StartAtom.Position;
+                    foreach (var bond in otherBonds)
+                    {
+                        var otherAtom = bond.OtherAtom(Bond.EndAtom);
+                        var angle = Math.Abs(Vector.AngleBetween(wedgeVector, endAtom.Position - otherAtom.Position));
+
+                        if (angle < 109.5 || angle > 130.5)
+                        {
+                            oblique = false;
+                            break;
+                        }
+                    }
+
+                    if (oblique)
+                    {
+                        // Determine chamfer shape
+                        Vector left = (LeftTail - Nose) * 2;
+                        Point leftEnd = Nose + left;
+
+                        Vector right = (RightTail - Nose) * 2;
+                        Point rightEnd = Nose + right;
+
+                        Vector shortestLeft = left;
+                        Vector shortestRight = right;
+                        Point otherEnd;
+                        Point atomPosition;
+
+                        if (otherBonds.Count - nonHydrogenBonds.Count == 1)
+                        {
+                            otherBonds = nonHydrogenBonds;
+                        }
+
+                        if (otherBonds.Count == 1)
+                        {
+                            Bond bond = otherBonds[0];
+                            Atom atom = bond.OtherAtom(endAtom);
+                            Vector vv = (endAtom.Position - atom.Position) * 2;
+                            otherEnd = atom.Position + vv;
+                            atomPosition = atom.Position;
+
+                            TrimVector(Nose, leftEnd, atomPosition, otherEnd,
+                                       ref shortestLeft);
+                            TrimVector(Nose, rightEnd, atomPosition, otherEnd,
+                                       ref shortestRight);
+
+                            LeftTail = Nose + shortestLeft;
+                            RightTail = Nose + shortestRight;
+                        }
+                        else
+                        {
+                            foreach (var bond in otherBonds)
+                            {
+                                Vector bv = (bond.EndAtom.Position - bond.StartAtom.Position) * 2;
+                                otherEnd = bond.StartAtom.Position + bv;
+
+                                atomPosition = bond.StartAtom.Position;
+
+                                TrimVector(Nose, leftEnd, atomPosition, otherEnd,
+                                           ref shortestLeft);
+                                TrimVector(Nose, rightEnd, atomPosition, otherEnd,
+                                           ref shortestRight);
+                            }
+
+                            LeftTail = Nose + shortestLeft;
+                            RightTail = Nose + shortestRight;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void TrimVector(Point line1Start, Point line1End, Point line2Start, Point line2End, ref Vector vector)
+        {
+            bool intersect;
+            Point intersection;
+            CoordinateTool.FindIntersection(line1Start, line1End, line2Start, line2End,
+                                            out _, out intersect, out intersection);
+            if (intersect)
+            {
+                Vector v = intersection - line1Start;
+                if (v.Length < vector.Length)
+                {
+                    vector = v;
+                }
+            }
         }
 
         public BondLine GetParallel(double offset)

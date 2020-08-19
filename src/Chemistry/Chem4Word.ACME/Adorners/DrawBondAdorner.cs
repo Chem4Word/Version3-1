@@ -79,7 +79,7 @@ namespace Chem4Word.ACME.Adorners
             Pen pen = _dashPen;
             BondLayout layout;
 
-            var length = CurrentEditor.Chemistry.Model.XamlBondLength;
+            var length = CurrentEditor.ViewModel.Model.XamlBondLength;
             if (ExistingBond == null || !ExistingBond.IsCyclic())
             {
                 layout = GetBondLayout(StartPoint, EndPoint, length, Stereo, BondOrder);
@@ -164,23 +164,23 @@ namespace Chem4Word.ACME.Adorners
             }
         }
 
-        public static BondLayout GetBondLayout(Point startPoint, Point endPoint, double bondLength,
-                                                   Globals.BondStereo stereo, string order, Ring existingRing = null,
-                                                   Ring subsidiaryRing = null)
+        public  BondLayout GetBondLayout(Point startPoint, Point endPoint, double bondLength, 
+                                         Globals.BondStereo stereo, string order, Ring existingRing = null,
+                                         Ring subsidiaryRing = null)
         {
             BondLayout descriptor = null;
             //check to see if it's a wedge or a hatch yet
             if (stereo == Globals.BondStereo.Wedge || stereo == Globals.BondStereo.Hatch)
             {
                 var wbd = new WedgeBondLayout { Start = startPoint, End = endPoint };
-                BondGeometry.GetWedgeBondGeometry(wbd, bondLength);
+                BondGeometry.GetWedgeBondGeometry(wbd, bondLength, CurrentEditor.ViewModel.Standoff);
                 return wbd;
             }
 
             if (stereo == Globals.BondStereo.Indeterminate && (order == Globals.OrderSingle))
             {
                 descriptor = new BondLayout { Start = startPoint, End = endPoint };
-                BondGeometry.GetWavyBondGeometry(descriptor, bondLength);
+                BondGeometry.GetWavyBondGeometry(descriptor, bondLength, CurrentEditor.ViewModel.Standoff);
                 return descriptor;
             }
 
@@ -189,7 +189,7 @@ namespace Chem4Word.ACME.Adorners
             if (ordervalue <= 1)
             {
                 descriptor = new BondLayout { Start = startPoint, End = endPoint };
-                BondGeometry.GetSingleBondGeometry(descriptor);
+                BondGeometry.GetSingleBondGeometry(descriptor, CurrentEditor.ViewModel.Standoff);
             }
 
             List<Point> dummy = new List<Point>();
@@ -199,13 +199,13 @@ namespace Chem4Word.ACME.Adorners
                 DoubleBondLayout dbd = new DoubleBondLayout { Start = startPoint, End = endPoint };
                 if (stereo == Globals.BondStereo.Indeterminate)
                 {
-                    BondGeometry.GetCrossedDoubleGeometry(dbd, bondLength);
+                    BondGeometry.GetCrossedDoubleGeometry(dbd, bondLength, CurrentEditor.ViewModel.Standoff);
                 }
                 else
                 {
                     dbd.PrimaryCentroid = existingRing?.Centroid;
                     dbd.SecondaryCentroid = subsidiaryRing?.Centroid;
-                    BondGeometry.GetDoubleBondGeometry(dbd, bondLength);
+                    BondGeometry.GetDoubleBondGeometry(dbd, bondLength, CurrentEditor.ViewModel.Standoff);
                 }
 
                 descriptor = dbd;
@@ -215,7 +215,7 @@ namespace Chem4Word.ACME.Adorners
             if (ordervalue == 2.5 || ordervalue == 3)
             {
                 var tbd = new TripleBondLayout { Start = startPoint, End = endPoint };
-                BondGeometry.GetTripleBondGeometry(tbd, bondLength);
+                BondGeometry.GetTripleBondGeometry(tbd, bondLength, CurrentEditor.ViewModel.Standoff);
                 descriptor = tbd;
             }
 

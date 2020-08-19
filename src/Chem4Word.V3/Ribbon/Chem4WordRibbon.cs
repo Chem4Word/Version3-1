@@ -369,7 +369,9 @@ namespace Chem4Word
                     try
                     {
                         Chem4WordSettingsHost f = new Chem4WordSettingsHost(true);
-                        f.SystemOptions = Globals.Chem4WordV3.SystemOptions.Clone();
+                        var options = Globals.Chem4WordV3.SystemOptions.Clone();
+                        options.SettingsPath = Globals.Chem4WordV3.AddInInfo.ProductAppDataPath;
+                        f.SystemOptions = options;
                         f.TopLeft = Globals.Chem4WordV3.WordTopLeft;
                         f.SystemOptions.WordTopLeft = Globals.Chem4WordV3.WordTopLeft;
 
@@ -603,9 +605,12 @@ namespace Chem4Word
                 }
             }
 
-            Globals.Chem4WordV3.SelectChemistry(Globals.Chem4WordV3.Application.Selection);
             Globals.Chem4WordV3.EvaluateChemistryAllowed();
             Globals.Chem4WordV3.ShowOrHideUpdateShield();
+            if (Globals.Chem4WordV3.ChemistryAllowed)
+            {
+                Globals.Chem4WordV3.SelectChemistry(Globals.Chem4WordV3.Application.Selection);
+            }
         }
 
         public static void PerformEdit()
@@ -912,6 +917,7 @@ namespace Chem4Word
                         {
                             // Move selection point into the Content Control which was just edited or added
                             app.Selection.SetRange(cc.Range.Start, cc.Range.End);
+                            Globals.Chem4WordV3.SelectChemistry(app.Selection);
                         }
                         else
                         {
@@ -1369,7 +1375,6 @@ namespace Chem4Word
                                     // Re- Read the Library Names
                                     Globals.Chem4WordV3.LoadNamesFromLibrary();
 
-                                    // BUG: If Library is or has been shown it needs to be refreshed
                                     UserInteractions.InformUser($"Structure '{model.ConciseFormula}' added into Library");
                                     Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure '{model.ConciseFormula}' added into Library");
                                 }
@@ -1390,6 +1395,7 @@ namespace Chem4Word
 
                             if (custTaskPane != null)
                             {
+                                (custTaskPane.Control as LibraryHost)?.Clear();
                                 (custTaskPane.Control as LibraryHost)?.Refresh();
                             }
                         }
@@ -1885,9 +1891,16 @@ namespace Chem4Word
                 }
 
                 int behind = UpdateHelper.CheckForUpdates(Globals.Chem4WordV3.SystemOptions.AutoUpdateFrequency);
-                if (behind == 0)
+                if (Globals.Chem4WordV3.IsEndOfLife)
                 {
-                    UserInteractions.InformUser("Your version of Chem4Word is the latest");
+                    UserInteractions.InformUser("This version of Chem4Word is no longer supported");
+                }
+                else
+                {
+                    if (behind == 0)
+                    {
+                        UserInteractions.InformUser("Your version of Chem4Word is the latest");
+                    }
                 }
 
                 Globals.Chem4WordV3.EventsEnabled = true;

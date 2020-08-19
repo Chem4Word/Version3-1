@@ -40,7 +40,7 @@ namespace Chem4Word.Model2
         public List<string> Warnings { get; set; }
         public List<string> Errors { get; set; }
 
-        public ObservableCollection<TextualProperty> Labels { get; set; }
+        public ObservableCollection<TextualProperty> Captions { get; set; }
 
         #endregion Collections
 
@@ -69,6 +69,7 @@ namespace Chem4Word.Model2
                 return result;
             }
         }
+
         /// <summary>
         /// Count of atoms in this and nested molecules
         /// </summary>
@@ -460,7 +461,7 @@ namespace Chem4Word.Model2
 
             Formulas = new ObservableCollection<TextualProperty>();
             Names = new ObservableCollection<TextualProperty>();
-            Labels = new ObservableCollection<TextualProperty>();
+            Captions = new ObservableCollection<TextualProperty>();
 
             Errors = new List<string>();
             Warnings = new List<string>();
@@ -574,7 +575,6 @@ namespace Chem4Word.Model2
             UpdateMoleculeHandlers(e);
             return newMol;
         }
-
 
         public List<TextualProperty> AllTextualProperties
         {
@@ -922,11 +922,11 @@ namespace Chem4Word.Model2
                 }
             }
 
-            foreach (var label in Labels)
+            foreach (var label in Captions)
             {
                 if (string.IsNullOrEmpty(label.Id))
                 {
-                    label.Id = GetNextId(Labels, "l");
+                    label.Id = GetNextId(Captions, "l");
                 }
             }
 
@@ -950,7 +950,7 @@ namespace Chem4Word.Model2
                     name.CanBeDeleted = !protectedLabels.Any(s => s.StartsWith(name.Id));
                 }
 
-                foreach (var label in Labels)
+                foreach (var label in Captions)
                 {
                     label.CanBeDeleted = !protectedLabels.Any(s => s.StartsWith(label.Id));
                 }
@@ -1021,7 +1021,7 @@ namespace Chem4Word.Model2
                 }
 
                 count = 1;
-                foreach (var label in Labels)
+                foreach (var label in Captions)
                 {
                     label.Id = $"{Id}.l{count++}";
                 }
@@ -1160,9 +1160,9 @@ namespace Chem4Word.Model2
                 copy.Formulas.Add(f);
             }
 
-            foreach (var label in Labels)
+            foreach (var label in Captions)
             {
-                copy.Labels.Add(label);
+                copy.Captions.Add(label);
             }
 
             copy.Id = Id;
@@ -1728,7 +1728,7 @@ namespace Chem4Word.Model2
         {
             Names.Clear();
             Formulas.Clear();
-            Labels.Clear();
+            Captions.Clear();
         }
 
         /// <summary>

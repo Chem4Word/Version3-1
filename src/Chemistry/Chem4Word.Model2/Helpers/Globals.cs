@@ -20,7 +20,7 @@ namespace Chem4Word.Model2.Helpers
         public static string CarbonSymbol = "C";
         public static string AllenicCarbonSymbol = "•";
 
-        #endregion String
+        #endregion Strings
 
         #region Geometry Stuff
 

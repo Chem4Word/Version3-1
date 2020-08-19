@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.Windows;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 

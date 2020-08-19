@@ -10,7 +10,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using Chem4Word.ACME.Utils;
+using IChem4Word.Contracts;
 
 namespace Chem4Word.ACME
 {
@@ -24,6 +27,9 @@ namespace Chem4Word.ACME
     /// </summary>
     public class UndoHandler
     {
+        private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         private struct UndoRecord
         {
             public int Level;
@@ -62,6 +68,7 @@ namespace Chem4Word.ACME
         private readonly UndoRecord _startBracket, _endBracket;
 
         private EditViewModel _editViewModel;
+        private IChem4WordTelemetry _telemetry;
 
         private Stack<UndoRecord> _undoStack;
         private Stack<UndoRecord> _redoStack;
@@ -74,9 +81,10 @@ namespace Chem4Word.ACME
         public bool CanUndo => _undoStack.Any(ur => ur.Level != 0);
         public bool IsTopLevel => TransactionLevel == 1;
 
-        public UndoHandler(EditViewModel vm)
+        public UndoHandler(EditViewModel vm, IChem4WordTelemetry telemetry)
         {
             _editViewModel = vm;
+            _telemetry = telemetry;
 
             //set up the buffer record
             _startBracket = new UndoRecord
@@ -105,29 +113,61 @@ namespace Chem4Word.ACME
 
         public void BeginUndoBlock()
         {
-            //push a buffer record onto the stack
-            if (_transactionLevel == 0)
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                _undoStack.Push(_startBracket);
+                //push a buffer record onto the stack
+                if (_transactionLevel == 0)
+                {
+                    _undoStack.Push(_startBracket);
+                }
+                _transactionLevel++;
             }
-            _transactionLevel++;
+            catch (Exception exception)
+            {
+                if (_telemetry != null)
+                {
+                    _telemetry.Write(module, "Exception", exception.Message);
+                    _telemetry.Write(module, "Exception", exception.StackTrace);
+                }
+                else
+                {
+                    RegistryHelper.StoreException(module, exception);
+                }
+            }
         }
 
         public void RecordAction(Action undoAction, Action redoAction, [CallerMemberName] string desc = null)
         {
-            //performing a new action should clear the redo
-            if (_redoStack.Any())
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                _redoStack.Clear();
-            }
+                //performing a new action should clear the redo
+                if (_redoStack.Any())
+                {
+                    _redoStack.Clear();
+                }
 
-            _undoStack.Push(new UndoRecord
+                _undoStack.Push(new UndoRecord
+                                {
+                                    Level = _transactionLevel,
+                                    Description = desc,
+                                    UndoAction = undoAction,
+                                    RedoAction = redoAction
+                                });
+            }
+            catch (Exception exception)
             {
-                Level = _transactionLevel,
-                Description = desc,
-                UndoAction = undoAction,
-                RedoAction = redoAction
-            });
+                if (_telemetry != null)
+                {
+                    _telemetry.Write(module, "Exception", exception.Message);
+                    _telemetry.Write(module, "Exception", exception.StackTrace);
+                }
+                else
+                {
+                    RegistryHelper.StoreException(module, exception);
+                }
+            }
         }
 
         /// <summary>
@@ -135,30 +175,47 @@ namespace Chem4Word.ACME
         /// </summary>
         public void EndUndoBlock()
         {
-            _transactionLevel--;
-
-            if (_transactionLevel < 0)
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                Debugger.Break();
-                throw new IndexOutOfRangeException("Attempted to unwind empty undo stack.");
-            }
+                _transactionLevel--;
 
-            //we've concluded a transaction block so terminated it
-            if (_transactionLevel == 0)
-
-            {
-                if (_undoStack.Peek().Equals(_startBracket))
+                if (_transactionLevel < 0)
                 {
-                    _undoStack.Pop();//no point in committing an empty block so just remove it
+                    _telemetry.Write(module, "Exception", "Attempted to unwind empty undo stack.");
+                    return;
+                }
+
+                //we've concluded a transaction block so terminated it
+                if (_transactionLevel == 0)
+
+                {
+                    if (_undoStack.Peek().Equals(_startBracket))
+                    {
+                        _undoStack.Pop(); //no point in committing an empty block so just remove it
+                    }
+                    else
+                    {
+                        _undoStack.Push(_endBracket);
+                    }
+                }
+
+                //tell the parent viewmodel the command status has changed
+                _editViewModel.UndoCommand.RaiseCanExecChanged();
+                _editViewModel.RedoCommand.RaiseCanExecChanged();
+            }
+            catch (Exception exception)
+            {
+                if (_telemetry != null)
+                {
+                    _telemetry.Write(module, "Exception", exception.Message);
+                    _telemetry.Write(module, "Exception", exception.StackTrace);
                 }
                 else
                 {
-                    _undoStack.Push(_endBracket);
+                    RegistryHelper.StoreException(module, exception);
                 }
             }
-            //tell the parent viewmodel the command status has changed
-            _editViewModel.UndoCommand.RaiseCanExecChanged();
-            _editViewModel.RedoCommand.RaiseCanExecChanged();
         }
 
         /// <summary>
@@ -167,26 +224,58 @@ namespace Chem4Word.ACME
         /// </summary>
         public void RollbackUndoBlock()
         {
-            var br = _undoStack.Pop();
-            if (br.Equals(_endBracket))
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
             {
-                Debugger.Break();
-                throw new InvalidDataException("First rollback action is a buffer record.");
-            }
+                var br = _undoStack.Pop();
+                if (br.Equals(_endBracket))
+                {
+                    Debugger.Break();
+                    throw new InvalidDataException("First rollback action is a buffer record.");
+                }
 
-            while (!br.Equals(_startBracket))
-            {
-                br.Undo();
-                br = _undoStack.Pop();
+                while (!br.Equals(_startBracket))
+                {
+                    br.Undo();
+                    br = _undoStack.Pop();
+                }
+                _transactionLevel = 0;
             }
-            _transactionLevel = 0;
+            catch (Exception exception)
+            {
+                if (_telemetry != null)
+                {
+                    _telemetry.Write(module, "Exception", exception.Message);
+                    _telemetry.Write(module, "Exception", exception.StackTrace);
+                }
+                else
+                {
+                    RegistryHelper.StoreException(module, exception);
+                }
+            }
         }
 
         public void Undo()
         {
-            UndoActions();
-            _editViewModel.UndoCommand.RaiseCanExecChanged();
-            _editViewModel.RedoCommand.RaiseCanExecChanged();
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                UndoActions();
+                _editViewModel.UndoCommand.RaiseCanExecChanged();
+                _editViewModel.RedoCommand.RaiseCanExecChanged();
+            }
+            catch (Exception exception)
+            {
+                if (_telemetry != null)
+                {
+                    _telemetry.Write(module, "Exception", exception.Message);
+                    _telemetry.Write(module, "Exception", exception.StackTrace);
+                }
+                else
+                {
+                    RegistryHelper.StoreException(module, exception);
+                }
+            }
         }
 
         private void UndoActions()
@@ -214,9 +303,25 @@ namespace Chem4Word.ACME
 
         public void Redo()
         {
-            RedoActions();
-            _editViewModel.UndoCommand.RaiseCanExecChanged();
-            _editViewModel.RedoCommand.RaiseCanExecChanged();
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            try
+            {
+                RedoActions();
+                _editViewModel.UndoCommand.RaiseCanExecChanged();
+                _editViewModel.RedoCommand.RaiseCanExecChanged();
+            }
+            catch (Exception exception)
+            {
+                if (_telemetry != null)
+                {
+                    _telemetry.Write(module, "Exception", exception.Message);
+                    _telemetry.Write(module, "Exception", exception.StackTrace);
+                }
+                else
+                {
+                    RegistryHelper.StoreException(module, exception);
+                }
+            }
         }
 
         private void RedoActions()

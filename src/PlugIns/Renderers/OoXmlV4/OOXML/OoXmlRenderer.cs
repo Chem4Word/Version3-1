@@ -17,9 +17,7 @@ using System.Windows.Media;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
-using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Entities;
-using Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 using DocumentFormat.OpenXml;
@@ -224,11 +222,11 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                         Rect extents = new Rect(new Point(innerPoint.X - spotSize, innerPoint.Y - spotSize),
                                                 new Point(innerPoint.X + spotSize, innerPoint.Y + spotSize));
-                        //DrawShape(extents, A.ShapeTypeValues.Ellipse, false, "ff0000", 0.5);
+                        //DrawShape(extents, A.ShapeTypeValues.Ellipse, false, "ff0000", 0.5)
                     }
 
                     DrawInnerCircle(smallerCircle, "00ff00", 0.5);
-                    //DrawPolygon(smallerCircle.Points, "00ff00", 0.5);
+                    //DrawPolygon(smallerCircle.Points, "00ff00", 0.5)
                 }
             }
 
@@ -251,17 +249,66 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 }
             }
 
-            // 9.   Render Bond Lines
+            // 9.1  Calculate and tweak Wedge and Hatch bonds
+            var wedges =
+                _positionerOutputs.BondLines.Where(t => t.Style == BondLineStyle.Wedge
+                                                            || t.Style == BondLineStyle.Hatch).ToList();
+            if (wedges.Any())
+            {
+                // Pass 1 Calculate basic outline
+                foreach (var line in wedges)
+                {
+                    line.CalculateWedgeOutline(_medianBondLength);
+                }
+
+                // Pass 2 Adjust if touching another wedge or hatch
+                foreach (var wedge in wedges)
+                {
+                    var tailSharedWith = wedges.Where(t => !t.BondPath.Equals(wedge.BondPath)
+                                                           && t.Tail == wedge.Tail).ToList();
+                    if (tailSharedWith.Count == 1)
+                    {
+                        var shared = tailSharedWith[0];
+
+                        var angle = Math.Abs(Vector.AngleBetween(wedge.Nose - wedge.Tail, shared.Nose - shared.Tail));
+                        if (Math.Abs(angle) > 100)
+                        {
+                            Vector v1 = (wedge.Nose - wedge.LeftTail) * 2;
+                            Point p1 = wedge.Nose - v1;
+                            //_positionerOutputs.Diagnostics.Lines.Add(new DiagnosticLine(wedge.Nose, p1, BondLineStyle.Dotted, "ff0000"))
+
+                            Vector v2 = (shared.Nose - shared.RightTail) * 2;
+                            Point p2 = shared.Nose - v2;
+                            //_positionerOutputs.Diagnostics.Lines.Add(new DiagnosticLine(shared.Nose, p2, BondLineStyle.Dotted, "ff0000"))
+
+                            bool intersect;
+                            Point intersection;
+
+                            CoordinateTool.FindIntersection(wedge.Nose, p1, shared.Nose, p2,
+                                                            out _, out intersect, out intersection);
+                            if (intersect)
+                            {
+                                wedge.LeftTail = intersection;
+                                shared.RightTail = intersection;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 9.2  Render Bond Lines
             foreach (var bondLine in _positionerOutputs.BondLines)
             {
                 switch (bondLine.Style)
                 {
                     case BondLineStyle.Wedge:
-                        DrawWedgeBond(CalculateWedgeOutline(bondLine), bondLine.BondPath, bondLine.Colour);
+                        //_positionerOutputs.Diagnostics.Polygons.Add(bondLine.WedgeOutline())
+                        DrawWedgeBond(bondLine.WedgeOutline(), bondLine.BondPath, bondLine.Colour);
                         break;
 
                     case BondLineStyle.Hatch:
-                        DrawHatchBond(CalculateWedgeOutline(bondLine), bondLine.BondPath, bondLine.Colour);
+                        //_positionerOutputs.Diagnostics.Polygons.Add(bondLine.WedgeOutline())
+                        DrawHatchBond(bondLine.WedgeOutline(), bondLine.BondPath, bondLine.Colour);
                         break;
 
                     default:
@@ -276,22 +323,28 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 DrawCharacter(character);
             }
 
-            // 11.  Render Molecule Labels - Experimental - Does not work well
-            //foreach (var moleculeLabel in _moleculeLabels)
-            //{
-            //    DrawBox(moleculeLabel.Extents, "ff0000", 0.25);
-            //    DrawTextBox(moleculeLabel.Extents, moleculeLabel.Value, moleculeLabel.Colour);
-            //}
+            // 11.  Render Molecule Captions as TextBoxes
+            if (_options.ShowMoleculeCaptions && _options.RenderCaptionsAsTextBox)
+            {
+                foreach (var caption in _positionerOutputs.MoleculeCaptions)
+                {
+                    //DrawBox(moleculeCpation.Extents, "ff0000", 0.25)
+                    //caption.Colour = "ff0000"
+                    DrawTextBox(caption.Extents, caption.Value, caption.Colour);
+                }
+            }
 
             // Finally draw any debugging diagnostics
             foreach (var line in _positionerOutputs.Diagnostics.Lines)
             {
                 DrawBondLine(line.Start, line.End, "", line.Style, line.Colour, 0.5);
             }
+
             foreach (var polygon in _positionerOutputs.Diagnostics.Polygons)
             {
                 DrawPolygon(polygon, "00ff00", 0.25);
             }
+
             foreach (var spot in _positionerOutputs.Diagnostics.Points)
             {
                 double half = spot.Diameter / 2;
@@ -467,6 +520,8 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 case BondLineStyle.Solid:
                 case BondLineStyle.Zero:
                 case BondLineStyle.Half:
+                case BondLineStyle.Dotted: // Diagnostics
+                case BondLineStyle.Dashed: // Diagnostics
                     DrawStraightLine(bondStart, bondEnd, bondPath, lineStyle, colour, lineWidth);
                     break;
 
@@ -1782,177 +1837,6 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             // Return a Tuple with the results
             return (Start: startPoint, End: endPoint, Extents: extents);
-        }
-
-        private List<Point> CalculateWedgeOutline(BondLine bl)
-        {
-            BondLine leftBondLine = bl.GetParallel(BondOffset() / 2);
-            BondLine rightBondLine = bl.GetParallel(-BondOffset() / 2);
-
-            Point wedgeNose = new Point(bl.Start.X, bl.Start.Y);
-            Point wedgeTail = new Point(bl.End.X, bl.End.Y);
-            Point wedgeTailLeft = new Point(leftBondLine.End.X, leftBondLine.End.Y);
-            Point wedgeTailRight = new Point(rightBondLine.End.X, rightBondLine.End.Y);
-
-            List<Point> points = new List<Point>();
-            points.Add(wedgeNose);
-            points.Add(wedgeTailLeft);
-            points.Add(wedgeTail);
-            points.Add(wedgeTailRight);
-
-            Bond thisBond = bl.Bond;
-            Atom endAtom = thisBond.EndAtom;
-
-            // EndAtom == C and Label is "" and has at least one other bond
-            if (endAtom.Element as Element == Globals.PeriodicTable.C
-                && string.IsNullOrEmpty(endAtom.SymbolText)
-                && endAtom.Bonds.Count() > 1)
-            {
-                var otherBonds = endAtom.Bonds.Except(new[] { thisBond }).ToList();
-                bool allSingle = true;
-                List<Bond> nonHydrogenBonds = new List<Bond>();
-                foreach (var otherBond in otherBonds)
-                {
-                    if (!otherBond.Order.Equals(Globals.OrderSingle))
-                    {
-                        allSingle = false;
-                    }
-
-                    var otherAtom = otherBond.OtherAtom(endAtom);
-                    if (otherAtom.Element as Element != Globals.PeriodicTable.H)
-                    {
-                        nonHydrogenBonds.Add(otherBond);
-                    }
-                }
-
-                // All other bonds are single
-                if (allSingle)
-                {
-                    bool oblique = true;
-
-                    var wedgeVector = endAtom.Position - bl.Bond.StartAtom.Position;
-                    foreach (var bond in otherBonds)
-                    {
-                        var otherAtom = bond.OtherAtom(bl.Bond.EndAtom);
-                        var angle = Math.Abs(Vector.AngleBetween(wedgeVector, endAtom.Position - otherAtom.Position));
-
-                        if (angle < 109.5 || angle > 130.5)
-                        {
-                            oblique = false;
-                            break;
-                        }
-                    }
-
-                    if (oblique)
-                    {
-                        // Determine chamfer shape
-                        Vector left = (wedgeTailLeft - wedgeNose) * 2;
-                        Point leftEnd = wedgeNose + left;
-
-                        Vector right = (wedgeTailRight - wedgeNose) * 2;
-                        Point rightEnd = wedgeNose + right;
-
-                        bool intersect;
-                        Point intersection;
-
-                        Vector shortestLeft = left;
-                        Vector shortestRight = right;
-                        Point otherEnd;
-                        Point atomPosition;
-
-                        if (otherBonds.Count - nonHydrogenBonds.Count == 1)
-                        {
-                            otherBonds = nonHydrogenBonds;
-                        }
-
-                        if (otherBonds.Count == 1)
-                        {
-                            Bond bond = otherBonds[0];
-                            Atom atom = bond.OtherAtom(endAtom);
-                            Vector vv = (endAtom.Position - atom.Position) * 2;
-                            otherEnd = atom.Position + vv;
-                            atomPosition = atom.Position;
-
-                            TrimLeft();
-                            TrimRight();
-
-                            // Re-write list of points
-                            points = new List<Point>();
-                            points.Add(wedgeNose);
-                            points.Add(wedgeNose + shortestLeft);
-                            points.Add(wedgeTail);
-                            points.Add(wedgeNose + shortestRight);
-
-                            // ToDo: Remove diagnostic
-                            //_positionerOutputs.Diagnostics.Polygons.Add(points)
-                        }
-                        else
-                        {
-                            // ToDo: Remove diagnostic
-                            //_positionerOutputs.Diagnostics.Lines.Add(new DiagnosticLine(wedgeNose, leftEnd, BondLineStyle.Dotted, "ff0000"))
-                            //_positionerOutputs.Diagnostics.Lines.Add(new DiagnosticLine(wedgeNose, rightEnd, BondLineStyle.Dotted, "ff0000"))
-
-                            foreach (var bond in otherBonds)
-                            {
-                                Vector bv = (bond.EndAtom.Position - bond.StartAtom.Position) * 2;
-                                otherEnd = bond.StartAtom.Position + bv;
-
-                                // ToDo: Remove diagnostic
-                                //_positionerOutputs.Diagnostics.Lines.Add(new DiagnosticLine(bond.StartAtom.Position, bond.EndAtom.Position, BondLineStyle.Dotted, "ffff00"))
-                                //_positionerOutputs.Diagnostics.Lines.Add(new DiagnosticLine(bond.StartAtom.Position, otherEnd, BondLineStyle.Dotted, "ffff00"))
-
-                                atomPosition = bond.StartAtom.Position;
-
-                                TrimLeft();
-                                TrimRight();
-                            }
-
-                            // Re-write list of points
-                            points = new List<Point>();
-                            points.Add(wedgeNose);
-                            points.Add(wedgeNose + shortestLeft);
-                            points.Add(wedgeTail);
-                            points.Add(wedgeNose + shortestRight);
-
-                            // ToDo: Remove diagnostic
-                            //_positionerOutputs.Diagnostics.Polygons.Add(points)
-                        }
-
-                        // Local Functions
-                        void TrimLeft()
-                        {
-                            CoordinateTool.FindIntersection(wedgeNose, leftEnd,
-                                                            atomPosition, otherEnd,
-                                                            out _, out intersect, out intersection);
-                            if (intersect)
-                            {
-                                Vector v = intersection - wedgeNose;
-                                if (v.Length < shortestLeft.Length)
-                                {
-                                    shortestLeft = v;
-                                }
-                            }
-                        }
-
-                        void TrimRight()
-                        {
-                            CoordinateTool.FindIntersection(wedgeNose, rightEnd,
-                                                            atomPosition, otherEnd,
-                                                            out _, out intersect, out intersection);
-                            if (intersect)
-                            {
-                                Vector v = intersection - wedgeNose;
-                                if (v.Length < shortestRight.Length)
-                                {
-                                    shortestRight = v;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return points;
         }
 
         private void LoadFont()

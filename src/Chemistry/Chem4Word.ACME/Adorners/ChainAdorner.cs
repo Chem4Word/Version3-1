@@ -79,14 +79,14 @@ namespace Chem4Word.ACME.Adorners
             if (Unanchored)
             {
                 NRingAdorner.DrawRingSize(drawingContext, Placements.Count, Placements.Last(), PixelsPerDip(),
-                                          BondPen.Brush.Clone());
+                                          BondPen.Brush.Clone(), CurrentEditor.ViewModel.SymbolSize);
             }
             else
             {
                 if (Placements.Count > 1)
                 {
                     NRingAdorner.DrawRingSize(drawingContext, Placements.Count - 1, Placements.Last(), PixelsPerDip(),
-                                              BondPen.Brush.Clone());
+                                              BondPen.Brush.Clone(), CurrentEditor.ViewModel.SymbolSize);
                 }
             }
         }

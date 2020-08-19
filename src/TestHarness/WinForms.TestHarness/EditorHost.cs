@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
@@ -97,8 +96,8 @@ namespace WinForms.TestHarness
 
             foreach (var property in model.AllTextualProperties)
             {
-                if (property.FullType != null 
-                    && (property.FullType.Equals(CMLConstants.ValueChem4WordLabel)
+                if (property.FullType != null
+                    && (property.FullType.Equals(CMLConstants.ValueChem4WordCaption)
                       || property.FullType.Equals(CMLConstants.ValueChem4WordFormula)
                       || property.FullType.Equals(CMLConstants.ValueChem4WordSynonym)))
                 {

@@ -295,12 +295,12 @@ namespace Chem4Word.Model2.Converters.JSON
                         var sa = atoms[b.b.Value];
                         var ea = atoms[b.e.Value];
                         Bond newBond = new Bond()
-                                       {
-                                           StartAtomInternalId = sa,
-                                           EndAtomInternalId = ea,
-                                           Stereo = s,
-                                           Order = o
-                                       };
+                        {
+                            StartAtomInternalId = sa,
+                            EndAtomInternalId = ea,
+                            Stereo = s,
+                            Order = o
+                        };
                         newMol.AddBond(newBond);
                         newBond.Parent = newMol;
                     }

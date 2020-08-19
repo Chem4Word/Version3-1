@@ -26,7 +26,7 @@ namespace Chem4Word.Model2
         {
             Names = JsonConvert.SerializeObject(parent.Names, Formatting.None);
             Formulas = JsonConvert.SerializeObject(parent.Formulas, Formatting.None);
-            Labels = JsonConvert.SerializeObject(parent.Labels, Formatting.None);
+            Labels = JsonConvert.SerializeObject(parent.Captions, Formatting.None);
         }
 
         public void Restore(Molecule parent)
@@ -35,8 +35,8 @@ namespace Chem4Word.Model2
             parent.Names = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Names);
             parent.Formulas.Clear();
             parent.Formulas = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Formulas);
-            parent.Labels.Clear();
-            parent.Labels = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Labels);
+            parent.Captions.Clear();
+            parent.Captions = JsonConvert.DeserializeObject<ObservableCollection<TextualProperty>>(Labels);
         }
     }
 }

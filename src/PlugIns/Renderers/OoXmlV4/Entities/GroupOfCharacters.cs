@@ -8,7 +8,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
-using System.Windows.Forms;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Renderer.OoXmlV4.OOXML;
 using Chem4Word.Renderer.OoXmlV4.TTF;
@@ -146,12 +145,15 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
                 case CompassPoints.North:
                     destination = new Point(Centre.X, Centre.Y - _bondLength / 16);
                     break;
+
                 case CompassPoints.East:
                     destination = new Point(Centre.X + _bondLength / 16, Centre.Y);
                     break;
+
                 case CompassPoints.South:
                     destination = new Point(Centre.X, Centre.Y + _bondLength / 16);
                     break;
+
                 case CompassPoints.West:
                     destination = new Point(Centre.X - _bondLength / 16, Centre.Y);
                     break;

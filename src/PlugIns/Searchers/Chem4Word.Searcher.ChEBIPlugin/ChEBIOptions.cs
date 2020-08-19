@@ -125,7 +125,7 @@ namespace Chem4Word.Searcher.ChEBIPlugin
         {
             try
             {
-                Debug.WriteLine($"Saving Options to {optionsFile}");
+                Debug.WriteLine($"Saving ChEBI Options to {optionsFile}");
                 string contents = JsonConvert.SerializeObject(this, Formatting.Indented);
                 File.WriteAllText(optionsFile, contents);
             }

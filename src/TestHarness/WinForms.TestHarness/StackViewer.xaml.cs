@@ -47,6 +47,7 @@ namespace WinForms.TestHarness
                                                                                                                                  FrameworkPropertyMetadataOptions.AffectsRender
                                                                                                                                  | FrameworkPropertyMetadataOptions.AffectsArrange
                                                                                                                                  | FrameworkPropertyMetadataOptions.AffectsMeasure));
+
         public bool ShowAtomsInColour
         {
             get { return (bool)GetValue(ShowAtomsInColourProperty); }

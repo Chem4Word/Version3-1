@@ -24,11 +24,19 @@ namespace Chem4Word.ACME.Drawing
     /// </summary>
     public class BondLayout
     {
+        //start and end point of the bond
         public Point Start;
+
         public Point End;
-        public AtomVisual StartAtomVisual;
-        public AtomVisual EndAtomVisual;
+
+        //convex hulls of the start and end atom labels
+        public List<Point> StartAtomHull;
+
+        public List<Point> EndAtomHull;
+
+        //boundary of the bond
         public virtual List<System.Windows.Point> Boundary { get; }
+
         public Geometry DefiningGeometry { get; set; }
 
         public Vector PrincipleVector

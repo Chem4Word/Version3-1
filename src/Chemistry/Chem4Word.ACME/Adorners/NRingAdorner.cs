@@ -61,14 +61,16 @@ namespace Chem4Word.ACME.Adorners
         {
             Point pos = (EndPoint - StartPoint) * 0.5 + StartPoint;
             int ringSize = Placements.Count;
-            DrawRingSize(drawingContext, ringSize, pos, PixelsPerDip(), BondPen.Brush.Clone());
+            DrawRingSize(drawingContext, ringSize, pos, PixelsPerDip(), BondPen.Brush.Clone(), CurrentEditor.ViewModel.SymbolSize);
         }
 
-        public static void DrawRingSize(DrawingContext drawingContext, int ringSize, Point pos, float pixelsPerDip, Brush fillBrush)
+        public static void DrawRingSize(DrawingContext drawingContext, int ringSize, Point pos, float pixelsPerDip, Brush fillBrush, double chemistrySymbolSize)
         {
             string ringLabel = ringSize.ToString();
             var symbolText = new GlyphText(ringLabel,
-                                           GlyphUtils.SymbolTypeface, GlyphText.SymbolSize, pixelsPerDip);
+                                           GlyphUtils.SymbolTypeface, 
+                                           chemistrySymbolSize, 
+                                           pixelsPerDip);
 
             Pen boundaryPen = new Pen(fillBrush, 2.0);
 

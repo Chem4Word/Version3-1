@@ -232,6 +232,8 @@ namespace Chem4WordUpdater
                 else
                 {
                     _downloadCompleted = true;
+                    _webClient.Dispose();
+
                     UpdateNow.Enabled = false;
                     Information.Text = "Your update has been downloaded.  It will be automatically installed once all Microsoft Word processes are closed.";
                     RegistryHelper.WriteAction($"Downloading of {_downloadTarget} took {_sw.ElapsedMilliseconds.ToString("#,##0", CultureInfo.InvariantCulture)}ms");

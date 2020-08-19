@@ -253,12 +253,12 @@ namespace Chem4Word.ACME
             {
                 _model.RescaleForXaml(false, EditorOptions.BondLength);
 
-                ActiveViewModel = new EditViewModel(_model, ChemCanvas, _used1DProperties);
+                ActiveViewModel = new EditViewModel(_model, ChemCanvas, _used1DProperties, Telemetry);
                 ActiveViewModel.EditorControl = this;
                 ActiveViewModel.Model.CentreInCanvas(new Size(ChemCanvas.ActualWidth, ChemCanvas.ActualHeight));
                 ActiveViewModel.EditorOptions = EditorOptions;
 
-                ChemCanvas.Chemistry = ActiveViewModel;
+                ChemCanvas.ViewModel = ActiveViewModel;
 
                 ChemCanvas.ShowMoleculeGrouping = true;
                 ChemCanvas.ShowAtomsInColour = EditorOptions.ColouredAtoms;

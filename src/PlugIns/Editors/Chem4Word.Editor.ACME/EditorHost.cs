@@ -17,6 +17,7 @@ using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Wpf;
 using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Helpers;
+using IChem4Word.Contracts;
 using Size = System.Drawing.Size;
 
 namespace Chem4Word.Editor.ACME
@@ -24,6 +25,7 @@ namespace Chem4Word.Editor.ACME
     public partial class EditorHost : Form
     {
         public Point TopLeft { get; set; }
+        public IChem4WordTelemetry Telemetry { get; set; }
 
         public Size FormSize { get; set; }
 
@@ -88,10 +90,12 @@ namespace Chem4Word.Editor.ACME
                 // Set Up WPF UC
                 if (elementHost1.Child is Chem4Word.ACME.Editor editor)
                 {
-                    editor.SetProperties(_cml, _used1DProperties, _options);
-                    editor.TopLeft = TopLeft;
                     editor.ShowFeedback = false;
+                    editor.TopLeft = TopLeft;
+                    editor.Telemetry = Telemetry;
+                    editor.SetProperties(_cml, _used1DProperties, _options);
                     editor.OnFeedbackChange += AcmeEditorOnFeedbackChange;
+
                     var model = editor.ActiveViewModel.Model;
                     if (model == null || model.Molecules.Count == 0)
                     {

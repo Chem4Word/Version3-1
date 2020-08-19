@@ -125,7 +125,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
         {
             try
             {
-                Debug.WriteLine($"Saving Options to {optionsFile}");
+                Debug.WriteLine($"Saving Opsin Options to {optionsFile}");
                 string contents = JsonConvert.SerializeObject(this, Formatting.Indented);
                 File.WriteAllText(optionsFile, contents);
             }

@@ -26,7 +26,6 @@ using Chem4Word.Model2;
 using Chem4Word.Model2.Converters.JSON;
 using IChem4Word.Contracts;
 using Ionic.Zip;
-using Newtonsoft.Json;
 using Control = System.Windows.Forms.Control;
 using Path = System.IO.Path;
 using UserControl = System.Windows.Controls.UserControl;

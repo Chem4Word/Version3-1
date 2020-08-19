@@ -15,7 +15,7 @@ namespace Chem4Word.ACME.Controls
 {
     public class FunctionalGroupBlock : TextBlock
     {
-        private const double SuperSubScriptSize = 0.8;
+        private const double ScriptSize = 0.6;
 
         public static readonly DependencyProperty ParentGroupProperty =
             DependencyProperty.Register("ParentGroup", typeof(FunctionalGroup), typeof(FunctionalGroupBlock),
@@ -54,7 +54,7 @@ namespace Chem4Word.ACME.Controls
                             {
                                 Typography = { Variants = FontVariants.Superscript },
                                 BaselineAlignment = BaselineAlignment.Superscript,
-                                FontSize = FontSize * SuperSubScriptSize
+                                FontSize = FontSize * ScriptSize
                             });
                             break;
 
@@ -63,7 +63,7 @@ namespace Chem4Word.ACME.Controls
                             {
                                 Typography = { Variants = FontVariants.Subscript },
                                 BaselineAlignment = BaselineAlignment.Subscript,
-                                FontSize = FontSize * SuperSubScriptSize
+                                FontSize = FontSize * ScriptSize
                             });
                             break;
 

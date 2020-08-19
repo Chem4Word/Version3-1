@@ -211,7 +211,7 @@ namespace Chem4Word.ACME
 
         private void DrawChemistry(ViewModel currentViewModel)
         {
-            ChemCanvas.Chemistry = currentViewModel;
+            ChemCanvas.ViewModel = currentViewModel;
         }
 
         #endregion Private Methods

@@ -28,6 +28,11 @@ namespace Chem4Word.Library
             InitializeComponent();
         }
 
+        public void Clear()
+        {
+            _libraryViewModel = null;
+        }
+
         public override void Refresh()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -36,7 +41,6 @@ namespace Chem4Word.Library
                 _editorOptions = new AcmeOptions(Globals.Chem4WordV3.AddInInfo.ProductAppDataPath);
                 libraryView1.SetOptions(_editorOptions);
 
-                Word.Application app = Globals.Chem4WordV3.Application;
                 using (new WaitCursor())
                 {
                     if (_libraryViewModel == null)
@@ -45,7 +49,6 @@ namespace Chem4Word.Library
                     }
                     libraryView1.MainGrid.DataContext = _libraryViewModel;
                 }
-                app.System.Cursor = Word.WdCursorType.wdCursorNormal;
             }
             catch (Exception ex)
             {

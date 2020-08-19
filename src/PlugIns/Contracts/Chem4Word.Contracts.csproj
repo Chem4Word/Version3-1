@@ -82,6 +82,15 @@
     <PreBuildEvent>if "$(ConfigurationName)" == "Vso-Ci" (
 rem
 ) else (
+
+rem install AssemblyAttributes.cs files
+if EXIST "%25temp%25\.NETFramework,Version=v4.6.2.AssemblyAttributes.cs" (
+rem
+) else (
+copy "$(SolutionDir)\Snippets\*.cs" "%25temp%25"
+)
+
+rem remove old plug ins
 if EXIST "$(SolutionDir)\Chem4Word.V3\$(OutDir)\PlugIns" (
 del "$(SolutionDir)\Chem4Word.V3\$(OutDir)\PlugIns\*.dll" /q
 del "$(SolutionDir)\Chem4Word.V3\$(OutDir)\PlugIns\*.pdb" /q

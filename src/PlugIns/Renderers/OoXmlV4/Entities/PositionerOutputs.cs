@@ -21,7 +21,7 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
         public List<MoleculeExtents> AllMoleculeExtents { get; } = new List<MoleculeExtents>();
         public List<Rect> GroupBrackets { get; } = new List<Rect>();
         public List<Rect> MoleculeBrackets { get; } = new List<Rect>();
-        public List<OoXmlString> MoleculeLabels { get; } = new List<OoXmlString>();
+        public List<OoXmlString> MoleculeCaptions { get; } = new List<OoXmlString>();
         public Diagnostics Diagnostics { get; } = new Diagnostics();
     }
 }

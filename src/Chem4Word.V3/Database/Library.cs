@@ -157,7 +157,8 @@ namespace Chem4Word.Database
 
                 if (model != null)
                 {
-                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength, false);
+                    var outcome = model.EnsureBondLength(Globals.Chem4WordV3.SystemOptions.BondLength,
+                                                         Globals.Chem4WordV3.SystemOptions.SetBondLengthOnImportFromLibrary);
                     if (Globals.Chem4WordV3.SystemOptions.RemoveExplicitHydrogensOnImportFromLibrary)
                     {
                         model.RemoveExplicitHydrogens();
@@ -167,7 +168,8 @@ namespace Chem4Word.Database
                         Globals.Chem4WordV3.Telemetry.Write(module, "Information", outcome);
                     }
 
-                    if (model.TotalAtomsCount > 0)
+                    if (model.TotalAtomsCount > 0
+                        || model.TotalBondsCount > 0 && model.MeanBondLength > 0)
                     {
                         if (calculateProperties)
                         {
@@ -365,10 +367,8 @@ namespace Chem4Word.Database
                 long lastId;
                 StringBuilder sb = new StringBuilder();
 
-                model.RemoveExplicitHydrogens();
-
                 Byte[] blob = Encoding.UTF8.GetBytes(_cmlConverter.Export(model, true));
-                //Byte[] blob = Encoding.UTF8.GetBytes(_sdFileConverter.Export(model));
+                //Byte[] blob = Encoding.UTF8.GetBytes(_sdFileConverter.Export(model))
 
                 sb.AppendLine("INSERT INTO GALLERY");
                 sb.AppendLine(" (Chemistry, Name, Formula)");
@@ -420,7 +420,7 @@ namespace Chem4Word.Database
                 sb.AppendLine("INSERT INTO ChemicalNames");
                 sb.AppendLine(" (ChemistryID, Name, Namespace, tag)");
                 sb.AppendLine("VALUES");
-                sb.AppendLine("(@chemID, @name,@namespace, @tag)");
+                sb.AppendLine("(@chemID, @name, @namespace, @tag)");
 
                 SQLiteCommand insertCommand = new SQLiteCommand(sb.ToString(), conn);
                 insertCommand.Parameters.Add("@name", DbType.String, name.Length).Value = name;
@@ -504,10 +504,14 @@ namespace Chem4Word.Database
             }
         }
 
+        /// <summary>
+        /// This is called via Microsoft.Office.Tools.CustomTaskPanel.OnVisibleChanged and Chem4Word.CustomRibbon.OnShowLibraryClick
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
         public List<ChemistryDTO> GetAllChemistry(string filter)
         {
-            // This is called via Microsoft.Office.Tools.CustomTaskPaneImpl.OnVisibleChanged and Chem4Word.CustomRibbon.OnShowLibraryClick
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}({filter})";
 
             var results = new List<ChemistryDTO>();
 

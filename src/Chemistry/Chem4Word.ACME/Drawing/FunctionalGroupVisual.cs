@@ -49,7 +49,12 @@ namespace Chem4Word.ACME.Drawing
                 flipped = Flipped;
             }
 
-            var textStore = new FunctionalGroupTextSource(ParentGroup, colour, flipped);
+            var textStore = new FunctionalGroupTextSource(ParentGroup, colour, flipped)
+                            {
+                                SymbolSize = SymbolSize, SubscriptSize = SubscriptSize, SuperscriptSize = SuperscriptSize
+                            };
+
+
 
             //main textformatter - this does the writing of the visual
             using (TextFormatter textFormatter = TextFormatter.Create())
@@ -60,9 +65,9 @@ namespace Chem4Word.ACME.Drawing
                     TextAlignment.Left,
                     true,
                     false,
-                    new LabelTextRunProperties(colour),
+                    new LabelTextRunProperties(colour,SymbolSize),
                     TextWrapping.NoWrap,
-                    GlyphText.SymbolSize,
+                    SymbolSize,
                     0d);
 
                 var anchorRuns = textStore.Runs.Where(f => f.IsAnchor);

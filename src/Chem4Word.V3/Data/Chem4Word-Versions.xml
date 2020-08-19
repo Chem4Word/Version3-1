@@ -3,6 +3,20 @@
 <ChangeLog>
   <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
   <Version>
+    <Number>3.1.11 Release 1</Number>
+    <IsBeta>false</IsBeta>
+    <Released>19-Aug-2020</Released>
+    <Changes>
+      <Change>Improved code handling updating of Content Control(s)</Change>
+      <Change>https://github.com/Chem4Word/Version3-1/issues/70 - Improved look of Exterior Double Bond in ACME</Change>
+      <Change>Library now refreshes properly after add / remove without closing word</Change>
+      <Change>Isotope Labels clear on change of element</Change>
+      <Change>Improvements to double bond handling in ACME</Change>
+      <Change>Added telemetry to ACME</Change>
+    </Changes>
+    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.11.Release.1.msi</Url>
+  </Version>
+  <Version>
     <Number>3.1.10 Beta 10</Number>
     <IsBeta>true</IsBeta>
     <Released>10-Jun-2020</Released>
@@ -15,7 +29,6 @@
       <Change>Improved accuracy of atom label placement in Word document</Change>
       <Change>Safer code in Chemistry Helper class</Change>
     </Changes>
-    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.10.Beta.10.msi</Url>
   </Version>
   <Version>
     <Number>3.1.9 Beta 9</Number>
@@ -119,100 +132,5 @@
       <Change>Internal Beta</Change>
     </Changes>
   </Version>
-  <Version>
-    <Number>3.1.0 Alpha 12</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Dec-2019</Released>
-    <Changes>
-      <Change>Alpha 12</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 11</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Nov-2019</Released>
-    <Changes>
-      <Change>Alpha 11</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 10</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Oct-2019</Released>
-    <Changes>
-      <Change>Alpha 10</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 09</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Sep-2019</Released>
-    <Changes>
-      <Change>Alpha 09</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 08</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Aug-2019</Released>
-    <Changes>
-      <Change>Alpha 08</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 07</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Jul-2019</Released>
-    <Changes>
-      <Change>Alpha 07</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 06</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Jun-2019</Released>
-    <Changes>
-      <Change>Alpha 06</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 05</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-May-2019</Released>
-    <Changes>
-      <Change>Alpha 05</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 04</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Apr-2019</Released>
-    <Changes>
-      <Change>Alpha 04</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 03</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Mar-2019</Released>
-    <Changes>
-      <Change>Alpha 03</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 02</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Feb-2019</Released>
-    <Changes>
-      <Change>Alpha 02</Change>
-    </Changes>
-  </Version>
-  <Version>
-    <Number>3.1.0 Alpha 01</Number>
-    <IsBeta>true</IsBeta>
-    <Released>01-Jan-2019</Released>
-    <Changes>
-      <Change>Alpha 01</Change>
-    </Changes>
-  </Version>
+  <EndOfLife>31-Dec-2345</EndOfLife>
 </ChangeLog>

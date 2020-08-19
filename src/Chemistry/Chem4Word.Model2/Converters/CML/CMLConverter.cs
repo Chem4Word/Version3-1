@@ -132,8 +132,8 @@ namespace Chem4Word.Model2.Converters.CML
 
         #region Export Helpers
 
-        // <cml:label id="m1.l1" dictRef="chem4word:Label "value="C19"/>
-        private XElement GetLabelXElement(TextualProperty label)
+        // <cml:label id="m1.l1" dictRef="chem4word:Caption "value="C19"/>
+        private XElement GetCaptionXElement(TextualProperty label)
         {
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagLabel);
 
@@ -142,7 +142,7 @@ namespace Chem4Word.Model2.Converters.CML
                 result.Add(new XAttribute(CMLConstants.AttributeId, label.Id));
             }
 
-            result.Add(new XAttribute(CMLConstants.AttributeDictRef, CMLConstants.ValueChem4WordLabel));
+            result.Add(new XAttribute(CMLConstants.AttributeDictRef, CMLConstants.ValueChem4WordCaption));
 
             if (label.Value != null)
             {
@@ -242,9 +242,9 @@ namespace Chem4Word.Model2.Converters.CML
 
             if (mol.Molecules.Any())
             {
-                foreach (var label in mol.Labels)
+                foreach (var label in mol.Captions)
                 {
-                    molElement.Add(GetLabelXElement(label));
+                    molElement.Add(GetCaptionXElement(label));
                 }
 
                 foreach (var childMolecule in mol.Molecules.Values)
@@ -269,9 +269,9 @@ namespace Chem4Word.Model2.Converters.CML
                     molElement.Add(GetNameXElement(chemicalName));
                 }
 
-                foreach (var label in mol.Labels)
+                foreach (var label in mol.Captions)
                 {
-                    molElement.Add(GetLabelXElement(label));
+                    molElement.Add(GetCaptionXElement(label));
                 }
 
                 if (mol.Atoms.Count > 0)
@@ -450,7 +450,7 @@ namespace Chem4Word.Model2.Converters.CML
             List<XElement> bondElements = CMLHelper.GetBonds(cmlElement);
             List<XElement> nameElements = CMLHelper.GetNames(cmlElement);
             List<XElement> formulaElements = CMLHelper.GetFormulas(cmlElement);
-            List<XElement> labelElements = CMLHelper.GetLabels(cmlElement);
+            List<XElement> labelElements = CMLHelper.GetMoleculeLabels(cmlElement);
 
             foreach (XElement childElement in childMolecules)
             {
@@ -515,10 +515,10 @@ namespace Chem4Word.Model2.Converters.CML
 
             foreach (var labelElement in labelElements)
             {
-                var label = GetLabel(labelElement);
-                if (label.IsValid)
+                var label = GetCaption(labelElement);
+                if (label != null && label.IsValid)
                 {
-                    molecule.Labels.Add(label);
+                    molecule.Captions.Add(label);
                 }
             }
 
@@ -651,25 +651,34 @@ namespace Chem4Word.Model2.Converters.CML
             return formula;
         }
 
-        // <cml:label id="" dictRef="chem4word:Label" value="C19 />
-        private static TextualProperty GetLabel(XElement cmlElement)
+        // <cml:label id="" dictRef="chem4word:Caption" value="C19 />
+        private static TextualProperty GetCaption(XElement cmlElement)
         {
-            var result = new TextualProperty();
-
-            result.FullType = CMLConstants.ValueChem4WordLabel;
-
-            if (cmlElement.Attribute(CMLConstants.AttributeId) != null)
+            if (cmlElement.Attribute(CMLConstants.AttributeDictRef) != null)
             {
-                result.Id = cmlElement.Attribute(CMLConstants.AttributeId)?.Value;
+                var dictrefValue = cmlElement.Attribute(CMLConstants.AttributeDictRef)?.Value;
+                if (dictrefValue != null && dictrefValue.Equals(CMLConstants.ValueChem4WordCaption))
+                {
+                    var result = new TextualProperty();
+
+                    result.FullType = CMLConstants.ValueChem4WordCaption;
+
+                    if (cmlElement.Attribute(CMLConstants.AttributeId) != null)
+                    {
+                        result.Id = cmlElement.Attribute(CMLConstants.AttributeId)?.Value;
+                    }
+
+                    if (cmlElement.Attribute(CMLConstants.AttributeNameValue) != null)
+                    {
+                        result.Value = cmlElement.Attribute(CMLConstants.AttributeNameValue)?.Value;
+                    }
+                    result.CanBeDeleted = true;
+
+                    return result;
+                }
             }
 
-            if (cmlElement.Attribute(CMLConstants.AttributeNameValue) != null)
-            {
-                result.Value = cmlElement.Attribute(CMLConstants.AttributeNameValue)?.Value;
-            }
-            result.CanBeDeleted = true;
-
-            return result;
+            return null;
         }
 
         // <cml:name id="m1.n1" dictRef="chem4word:Synonym">m1.n1</cml:name>

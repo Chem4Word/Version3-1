@@ -16,7 +16,6 @@ namespace Chem4Word.Telemetry
 {
     public class WmiHelper
     {
-
         private const string QueryProcessor = "SELECT Name,NumberOfLogicalProcessors,CurrentClockSpeed FROM Win32_Processor";
         private const string QueryOperatingSystem = "SELECT ProductType,LastBootUpTime FROM Win32_OperatingSystem";
         private const string QueryPhysicalMemory = "SELECT Capacity FROM Win32_PhysicalMemory";
@@ -255,12 +254,15 @@ namespace Chem4Word.Telemetry
                         case 1:
                             _productType = Workstation;
                             break;
+
                         case 2:
                             _productType = DomainController;
                             break;
+
                         case 3:
                             _productType = Server;
                             break;
+
                         default:
                             _productType = Unknown + $" [{productType}]";
                             break;

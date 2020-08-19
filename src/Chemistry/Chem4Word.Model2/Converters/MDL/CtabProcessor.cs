@@ -507,15 +507,19 @@ namespace Chem4Word.Model2.Converters.MDL
                 case Globals.BondStereo.None:
                     stereo = 0;
                     break;
+
                 case Globals.BondStereo.Wedge:
                     stereo = 1;
                     break;
+
                 case Globals.BondStereo.Hatch:
                     stereo = 6;
                     break;
+
                 case Globals.BondStereo.Indeterminate:
                     stereo = 4;
                     break;
+
                 default:
                     stereo = 0;
                     break;

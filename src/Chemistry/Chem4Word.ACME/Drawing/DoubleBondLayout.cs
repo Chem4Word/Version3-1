@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Collections.Generic;
 using System.Windows;
 using Chem4Word.Model2.Helpers;
 
@@ -23,5 +24,8 @@ namespace Chem4Word.ACME.Drawing
         public Globals.BondDirection Placement; //which side of the line the subsidiary goes
         public Point? PrimaryCentroid;
         public Point? SecondaryCentroid;
+
+        public List<Point> StartNeigbourPositions;
+        public List<Point> EndNeighbourPositions;
     }
 }

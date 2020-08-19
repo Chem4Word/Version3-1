@@ -302,7 +302,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         }
 
         // Return True if the point is in the polygon.
-        public static bool PointIsInPolygon(double x, double y, Point[] points)
+        private static bool PointIsInPolygon(double x, double y, Point[] points)
         {
             // Get the angle between the point and the
             // first and last vertices.
@@ -333,7 +333,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         // Return a value between PI and -PI.
         // Note that the value is the opposite of what you might
         // expect because Y coordinates increase downward.
-        public static double GetAngle(double ax, double ay, double bx, double by, double cx, double cy)
+        private static double GetAngle(double ax, double ay, double bx, double by, double cx, double cy)
         {
             // Get the dot product.
             double dotProduct = DotProduct(ax, ay, bx, by, cx, cy);
@@ -366,7 +366,7 @@ namespace Chem4Word.Renderer.OoXmlV4
         // For two vectors in the X-Y plane, the result is a
         // vector with X and Y components 0 so the Z component
         // gives the vector's length and direction.
-        public static double CrossProductLength(double ax, double ay, double bx, double by, double cx, double cy)
+        private static double CrossProductLength(double ax, double ay, double bx, double by, double cx, double cy)
         {
             // Get the vectors' coordinates.
             double bax = ax - bx;
@@ -376,24 +376,6 @@ namespace Chem4Word.Renderer.OoXmlV4
 
             // Calculate the Z coordinate of the cross product.
             return (bax * bcy - bay * bcx);
-        }
-
-        public static double AngleBetween(Bond bond1, Bond bond2)
-        {
-            double result = double.NaN;
-
-            var set1 = bond1.GetAtoms().ToList();
-            var set2 = bond2.GetAtoms().ToList();
-            Atom sharedAtom = set1.Intersect(set2).FirstOrDefault();
-
-            if (sharedAtom != null)
-            {
-                var vector1 = sharedAtom.Position - bond1.OtherAtom(sharedAtom).Position;
-                var vector2 = sharedAtom.Position - bond2.OtherAtom(sharedAtom).Position;
-                result = Math.Abs(Vector.AngleBetween(vector1, vector2));
-            }
-
-            return result;
         }
     }
 }

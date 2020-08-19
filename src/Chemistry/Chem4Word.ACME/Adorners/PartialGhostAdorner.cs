@@ -133,7 +133,8 @@ namespace Chem4Word.ACME.Adorners
                                                                   bond.Stereo, startAtomPosition, endAtomPosition,
                                                                   bond.OrderValue,
                                                                   bond.Placement, bond.Centroid,
-                                                                  bond.SubsidiaryRing?.Centroid);
+                                                                  bond.SubsidiaryRing?.Centroid, 
+                                                                  CurrentEditor.ViewModel.Standoff);
                     descriptor.Start = startAtomPosition;
                     descriptor.End = endAtomPosition;
                     var bondgeom = descriptor.DefiningGeometry;

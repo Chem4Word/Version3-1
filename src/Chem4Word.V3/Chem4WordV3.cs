@@ -53,6 +53,7 @@ namespace Chem4Word
         public string VersionAvailable = string.Empty;
         public bool VersionAvailableIsBeta = false;
         public bool IsEnabled;
+        public bool IsEndOfLife;
 
         public XDocument AllVersions;
         public XDocument ThisVersion;
@@ -278,9 +279,9 @@ namespace Chem4Word
                 Debug.WriteLine(message);
                 StartUpTimings.Add(message);
             }
-            catch (ThreadAbortException threadAbortException)
+            catch (ThreadAbortException)
             {
-                RegistryHelper.StoreException(module, threadAbortException);
+                // Do Nothing
             }
             catch (Exception exception)
             {
@@ -357,9 +358,9 @@ namespace Chem4Word
                 //int dd = 0;
                 //int bang = ii / dd;
             }
-            catch (ThreadAbortException threadAbortException)
+            catch (ThreadAbortException)
             {
-                RegistryHelper.StoreException(module, threadAbortException);
+                // Do Nothing
             }
             catch (Exception exception)
             {
@@ -381,16 +382,16 @@ namespace Chem4Word
                 var lib = new Database.Library();
                 LibraryNames = lib.GetLibraryNames();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 if (Telemetry != null)
                 {
-                    Telemetry.Write(module, "Exception", ex.Message);
-                    Telemetry.Write(module, "Exception", ex.StackTrace);
+                    Telemetry.Write(module, "Exception", exception.Message);
+                    Telemetry.Write(module, "Exception", exception.StackTrace);
                 }
                 else
                 {
-                    RegistryHelper.StoreException(module, ex);
+                    RegistryHelper.StoreException(module, exception);
                 }
 
                 LibraryNames = null;
@@ -407,6 +408,10 @@ namespace Chem4Word
                 Telemetry = new TelemetryWriter(true, Helper);
 
                 // Read in options file
+                if (string.IsNullOrEmpty(AddInInfo.ProductAppDataPath))
+                {
+                    Debugger.Break();
+                }
                 SystemOptions = new Chem4WordOptions(AddInInfo.ProductAppDataPath);
                 if (SystemOptions.Errors.Any())
                 {
@@ -497,16 +502,16 @@ namespace Chem4Word
                     //
                 }
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
                 if (Telemetry != null)
                 {
-                    Telemetry.Write(module, "Exception", ex.Message);
-                    Telemetry.Write(module, "Exception", ex.StackTrace);
+                    Telemetry.Write(module, "Exception", exception.Message);
+                    Telemetry.Write(module, "Exception", exception.StackTrace);
                 }
                 else
                 {
-                    RegistryHelper.StoreException(module, ex);
+                    RegistryHelper.StoreException(module, exception);
                 }
 
                 SystemOptions = null;
@@ -516,12 +521,9 @@ namespace Chem4Word
         private void PerformShutDownActions()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            //Debug.WriteLine(module);
 
             try
             {
-                //RemoveRightClickButton(_targetedPopUps);
-
                 if (Editors != null)
                 {
                     for (int i = 0; i < Editors.Count; i++)
@@ -578,18 +580,25 @@ namespace Chem4Word
                     }
                     else
                     {
-                        if (Application.Selection != null)
+                        try
                         {
-                            OnWindowSelectionChange(Application.Selection);
+                            if (Application.Documents.Count > 0 && Application.Selection != null)
+                            {
+                                OnWindowSelectionChange(Application.Selection);
+                            }
+                        }
+                        catch
+                        {
+                            // Do Nothing
                         }
                     }
 
                     LoadOptions();
                 }
             }
-            catch (ThreadAbortException threadAbortException)
+            catch (ThreadAbortException)
             {
-                RegistryHelper.StoreException(module, threadAbortException);
+                // Do Nothing
             }
             catch (Exception exception)
             {
@@ -889,7 +898,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                     // ContentControlOnExit Event Handler
@@ -900,7 +908,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                     // ContentControlBeforeDelete Event Handler
@@ -911,7 +918,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                     // ContentControlAfterAdd Event Handler
@@ -922,7 +928,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
 
@@ -963,7 +968,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                     // ContentControlOnExit Event Handler
@@ -973,7 +977,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                     // ContentControlBeforeDelete Event Handler
@@ -983,7 +986,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                     // ContentControlAfterAdd Event Handler
@@ -993,7 +995,6 @@ namespace Chem4Word
                     }
                     catch (Exception e)
                     {
-                        RegistryHelper.StoreException(module, e);
                         Debug.WriteLine(e.Message);
                     }
                 }
@@ -1068,7 +1069,7 @@ namespace Chem4Word
                         break;
                 }
 
-                if (VersionsBehind > 0 && !VersionAvailableIsBeta)
+                if (IsEndOfLife || VersionsBehind > 0 && !VersionAvailableIsBeta)
                 {
                     Ribbon.EditStructure.Enabled = false;
                     Ribbon.EditStructure.Label = "Draw";
@@ -1149,6 +1150,18 @@ namespace Chem4Word
                     SetButtonStates(ButtonState.Disabled);
                     ChemistryProhibitedReason = Constants.Chem4WordIsBeta;
                 }
+
+                if (IsEndOfLife)
+                {
+                    Ribbon.Update.Visible = true;
+                    Ribbon.Update.Enabled = true;
+                    Ribbon.Update.Image = Properties.Resources.Shield_Danger;
+                    Ribbon.Update.Label = "End of Life";
+                    Ribbon.Update.ScreenTip = "This version of Chem4Word is no longer supported";
+                    Ribbon.Update.SuperTip = "Please see our website https://www.chem4word.co.uk for details of where to obtain a new version from.";
+                    SetButtonStates(ButtonState.Disabled);
+                    ChemistryProhibitedReason = Constants.Chem4WordTooOld;
+                }
             }
         }
 
@@ -1167,7 +1180,12 @@ namespace Chem4Word
                     Word.Document doc = sel.Application.ActiveDocument;
                     int ccCount = sel.ContentControls.Count;
 
-                    foreach (Word.ContentControl cc in doc.ContentControls)
+                    var targets = (from Word.ContentControl ccs in doc.ContentControls
+                                  orderby ccs.Range.Start
+                                  where $"{ccs.Title}" == Constants.ContentControlTitle
+                                  select ccs).ToList();
+
+                    foreach (Word.ContentControl cc in targets)
                     {
                         // Already Selected
                         if (sel.Range.Start == cc.Range.Start - 1 && sel.Range.End == cc.Range.End + 1)
@@ -1239,7 +1257,8 @@ namespace Chem4Word
         private void OnWindowBeforeRightClick(Word.Selection sel, ref bool cancel)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            if (VersionsBehind < Constants.MaximumVersionsBehind)
+
+            if (!IsEndOfLife && VersionsBehind < Constants.MaximumVersionsBehind)
             {
                 try
                 {
@@ -1273,6 +1292,7 @@ namespace Chem4Word
         private void OnCommandBarButtonClick(CommandBarButton ctrl, ref bool cancelDefault)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             try
             {
                 if (SystemOptions == null)
@@ -1641,6 +1661,16 @@ namespace Chem4Word
             }
         }
 
+        public void CloseLibrary()
+        {
+            LibraryState = false;
+            Ribbon.ShowLibrary.Checked = LibraryState;
+            if (Application.Documents.Count > 0)
+            {
+                HandleLibraryPane(Application.ActiveDocument, false, true);
+            }
+        }
+
         private void OnDocumentChange()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
@@ -1671,15 +1701,6 @@ namespace Chem4Word
                                 Ribbon.ShowNavigator.Checked = false;
                                 Ribbon.ShowLibrary.Checked = LibraryState;
                                 Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open ";
-                                Debug.WriteLine(module);
-                            }
-
-                            foreach (Word.InlineShape inlineShape in doc.InlineShapes)
-                            {
-                                if (inlineShape.Type == Word.WdInlineShapeType.wdInlineShapeEmbeddedOLEObject)
-                                {
-                                    Debug.WriteLine($"Found {inlineShape.OLEFormat.ClassType} @ {inlineShape.Range.Start} ");
-                                }
                             }
 
                             DialogResult answer = Upgrader.UpgradeIsRequired(doc);
@@ -1703,94 +1724,9 @@ namespace Chem4Word
                                     break;
                             }
 
-                            #region Handle Navigator Task Panes
+                            HandleNavigatorePane(doc);
 
-                            try
-                            {
-                                foreach (var taskPane in CustomTaskPanes)
-                                {
-                                    if (taskPane.Window != null)
-                                    {
-                                        string taskdoc = ((Word.Window)taskPane.Window).Document.Name;
-                                        if (doc.Name.Equals(taskdoc))
-                                        {
-                                            if (taskPane.Title.Equals(Constants.NavigatorTaskPaneTitle))
-                                            {
-                                                //Debug.WriteLine($"Found Navigator Task Pane. Visible: {taskPane.Visible}");
-                                                if (Ribbon != null)
-                                                {
-                                                    Ribbon.ShowNavigator.Checked = taskPane.Visible;
-                                                }
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                                // Do Nothing
-                            }
-
-                            #endregion Handle Navigator Task Panes
-
-                            #region Handle Library Task Panes
-
-                            try
-                            {
-                                bool libraryFound = false;
-
-                                foreach (var taskPane in CustomTaskPanes)
-                                {
-                                    if (taskPane.Window != null)
-                                    {
-                                        string taskdoc = ((Word.Window)taskPane.Window).Document.Name;
-                                        if (doc.Name.Equals(taskdoc))
-                                        {
-                                            if (taskPane.Title.Equals(Constants.LibraryTaskPaneTitle))
-                                            {
-                                                //Debug.WriteLine($"Found Library Task Pane. Visible: {taskPane.Visible}");
-                                                if (Ribbon != null)
-                                                {
-                                                    if (!docxMode)
-                                                    {
-                                                        Ribbon.ShowLibrary.Checked = false;
-                                                    }
-                                                    taskPane.Visible = Ribbon.ShowLibrary.Checked;
-                                                    Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open";
-                                                }
-                                                libraryFound = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (!libraryFound)
-                                {
-                                    if (Ribbon != null && Ribbon.ShowLibrary.Checked)
-                                    {
-                                        if (docxMode)
-                                        {
-                                            OfficeTools.CustomTaskPane custTaskPane =
-                                                CustomTaskPanes.Add(new LibraryHost(),
-                                                    Constants.LibraryTaskPaneTitle, Application.ActiveWindow);
-                                            // Opposite side to Navigator's default placement
-                                            custTaskPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
-                                            custTaskPane.Width = WordWidth / 4;
-                                            custTaskPane.VisibleChanged += Ribbon.OnLibraryPaneVisibleChanged;
-                                            custTaskPane.Visible = true;
-                                            (custTaskPane.Control as LibraryHost)?.Refresh();
-                                        }
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                                // Do Nothing
-                            }
-
-                            #endregion Handle Library Task Panes
+                            HandleLibraryPane(doc, docxMode);
 
                             if (docxMode)
                             {
@@ -1829,6 +1765,108 @@ namespace Chem4Word
                     UpdateHelper.CheckForUpdates(SystemOptions.AutoUpdateFrequency);
                 }
             }
+        }
+
+        private void HandleLibraryPane(Word.Document doc, bool showPane, bool clear = false)
+        {
+            #region Handle Library Task Panes
+
+            try
+            {
+                bool libraryFound = false;
+
+                foreach (var taskPane in CustomTaskPanes)
+                {
+                    if (taskPane.Window != null)
+                    {
+                        string taskdoc = ((Word.Window) taskPane.Window).Document.Name;
+                        if (doc.Name.Equals(taskdoc))
+                        {
+                            if (taskPane.Title.Equals(Constants.LibraryTaskPaneTitle))
+                            {
+                                //Debug.WriteLine($"Found Library Task Pane. Visible: {taskPane.Visible}");
+                                if (Ribbon != null)
+                                {
+                                    if (clear)
+                                    {
+                                        (taskPane.Control as LibraryHost)?.Clear();
+                                    }
+                                    if (!showPane)
+                                    {
+                                        Ribbon.ShowLibrary.Checked = false;
+                                    }
+
+                                    taskPane.Visible = Ribbon.ShowLibrary.Checked;
+                                    Ribbon.ShowLibrary.Label = Ribbon.ShowLibrary.Checked ? "Close" : "Open";
+                                }
+
+                                libraryFound = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!libraryFound)
+                {
+                    if (Ribbon != null && Ribbon.ShowLibrary.Checked)
+                    {
+                        if (showPane)
+                        {
+                            OfficeTools.CustomTaskPane custTaskPane =
+                                CustomTaskPanes.Add(new LibraryHost(),
+                                                    Constants.LibraryTaskPaneTitle, Application.ActiveWindow);
+                            // Opposite side to Navigator's default placement
+                            custTaskPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
+                            custTaskPane.Width = WordWidth / 4;
+                            custTaskPane.VisibleChanged += Ribbon.OnLibraryPaneVisibleChanged;
+                            custTaskPane.Visible = true;
+                            (custTaskPane.Control as LibraryHost)?.Refresh();
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Do Nothing
+            }
+
+            #endregion Handle Library Task Panes
+        }
+
+        private void HandleNavigatorePane(Word.Document doc)
+        {
+            #region Handle Navigator Task Panes
+
+            try
+            {
+                foreach (var taskPane in CustomTaskPanes)
+                {
+                    if (taskPane.Window != null)
+                    {
+                        string taskdoc = ((Word.Window) taskPane.Window).Document.Name;
+                        if (doc.Name.Equals(taskdoc))
+                        {
+                            if (taskPane.Title.Equals(Constants.NavigatorTaskPaneTitle))
+                            {
+                                //Debug.WriteLine($"Found Navigator Task Pane. Visible: {taskPane.Visible}");
+                                if (Ribbon != null)
+                                {
+                                    Ribbon.ShowNavigator.Checked = taskPane.Visible;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Do Nothing
+            }
+
+            #endregion Handle Navigator Task Panes
         }
 
         private void OnDocumentOpen(Word.Document doc)
@@ -2086,7 +2124,7 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            if (VersionsBehind < Constants.MaximumVersionsBehind)
+            if (!IsEndOfLife && VersionsBehind < Constants.MaximumVersionsBehind)
             {
                 bool allowed = true;
                 ChemistryProhibitedReason = VersionAvailableIsBeta ? "" : Constants.Chem4WordIsBeta;
@@ -2153,8 +2191,23 @@ namespace Chem4Word
                             }
 
                             Word.Selection sel = Application.Selection;
-                            if (sel != null)
+                            if (allowed && sel != null)
                             {
+                                if (allowed && sel.Start != sel.End)
+                                {
+                                    if (!string.IsNullOrEmpty(sel.Text) && sel.Text.Contains("\r"))
+                                    {
+                                        ChemistryProhibitedReason = "selection contains Line Ending";
+                                        allowed = false;
+                                    }
+                                }
+
+                                if (allowed && sel.Paragraphs.Count > 1)
+                                {
+                                    ChemistryProhibitedReason = $"selection contains {sel.Paragraphs.Count} paragraphs.";
+                                    allowed = false;
+                                }
+
                                 if (allowed && sel.OMaths.Count > 0)
                                 {
                                     ChemistryProhibitedReason = "selection is in an Equation.";
@@ -2754,10 +2807,11 @@ namespace Chem4Word
                 {
                     EventsEnabled = false;
 #if DEBUG
-                    Word.Document doc = contentControl.Application.ActiveDocument;
-                    Word.Selection sel = doc.Application.Selection;
-                    Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection from {sel.Range.Start} to {sel.Range.End}");
-                    Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection has {sel.ContentControls.Count} CCs");
+                    //Word.Document doc = contentControl.Application.ActiveDocument
+                    //Word.Selection sel = doc.Application.Selection
+                    //Debug.WriteLine($"  OnContentControlOnEnter() CC: {contentControl.Title}")
+                    //Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection from {sel.Range.Start} to {sel.Range.End}")
+                    //Debug.WriteLine($"  OnContentControlOnEnter() Document: {doc.Name} Selection has {sel.ContentControls.Count} CCs")
 #endif
                     EvaluateChemistryAllowed();
                     EventsEnabled = true;

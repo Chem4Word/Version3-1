@@ -99,7 +99,7 @@ namespace Chem4Word.ACME.Utils
 
         public static void DoPropertyEdit(MouseButtonEventArgs e, EditorCanvas currentEditor)
         {
-            EditViewModel evm = (EditViewModel)currentEditor.Chemistry;
+            EditViewModel evm = (EditViewModel)currentEditor.ViewModel;
 
             var position = e.GetPosition(currentEditor);
             var screenPosition = currentEditor.PointToScreen(position);

@@ -32,6 +32,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         // Percentage of average (median) bond length
         // V3 == 0.2 -> ACS == 0.18
         public const double MULTIPLE_BOND_OFFSET_PERCENTAGE = 0.18;
+
         public const double LINE_SHRINK_PIXELS = 1.75; // cml pixels
 
         // V3 == 0.75 -> ACS == 0.6

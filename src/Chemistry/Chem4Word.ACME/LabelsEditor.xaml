@@ -240,7 +240,7 @@
                     </Grid.RowDefinitions>
                     <local:NamesEditor x:Name="NamesGrid" Grid.Row="0" />
                     <local:NamesEditor x:Name="FormulaGrid" Grid.Row="2" />
-                    <local:NamesEditor x:Name="LabelsGrid" Grid.Row="4" />
+                    <local:NamesEditor x:Name="CaptionsGrid" Grid.Row="4" />
                     <GridSplitter
                         Grid.Row="1"
                         Height="5"

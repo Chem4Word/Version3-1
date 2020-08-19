@@ -5,22 +5,22 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Media;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI.Forms;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Entities;
+using Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic;
 using Chem4Word.Renderer.OoXmlV4.Enums;
 using Chem4Word.Renderer.OoXmlV4.TTF;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Windows;
-using Chem4Word.Renderer.OoXmlV4.Entities.Diagnostic;
 using Point = System.Windows.Point;
 using Size = System.Windows.Size;
 
@@ -50,6 +50,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
         public PositionerOutputs Position()
         {
             int moleculeNo = 0;
+
             foreach (Molecule mol in Inputs.Model.Molecules.Values)
             {
                 // Steps 1 .. 4
@@ -250,7 +251,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                     // Traverse() obtains list of atoms in anti-clockwise direction around ring
                     innerCircle.Points.AddRange(ring.Traverse().Select(a => a.Position).ToList());
                     innerCircle.Centre = centre;
-                    //Outputs.InnerCircles.Add(innerCircle);
+                    //Outputs.InnerCircles.Add(innerCircle)
                 }
             }
 
@@ -371,27 +372,29 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
             // 4. Position Molecule Label Characters
             // Handle optional rendering of molecule labels centered on brackets (if any) and below any molecule property characters
-            if (Inputs.Options.ShowMoleculeLabels && mol.Labels.Any())
+            if (Inputs.Options.ShowMoleculeCaptions && mol.Captions.Any())
             {
                 var point = new Point(thisMoleculeExtents.MoleculeBracketsExtents.Left
                                         + thisMoleculeExtents.MoleculeBracketsExtents.Width / 2,
                                       thisMoleculeExtents.ExternalCharacterExtents.Bottom
                                         + Inputs.MeanBondLength * OoXmlHelper.MULTIPLE_BOND_OFFSET_PERCENTAGE / 2);
 
-                AddMoleculeLabels(mol.Labels.ToList(), point, mol.Path);
-
-                // Recalculate again as we have just added extra characters
-                thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
-
-                // MAW Keep this code as it may be possible to bring back use of OoXmlString later on
-                //AddMoleculeLabelsV2(mol.Labels.ToList(), point, mol.Path);
-                //var revisedExtents = thisMoleculeExtents.ExternalCharacterExtents;
-                //foreach (var ooXmlString in Outputs.MoleculeLabels.Where(p => p.ParentMolecule.Equals(mol.Path)))
-                //{
-                //    revisedExtents.Union(ooXmlString.Extents);
-                //}
-
-                //thisMoleculeExtents.SetExternalCharacterExtents(revisedExtents);
+                if (Inputs.Options.RenderCaptionsAsTextBox)
+                {
+                    AddMoleculeCaptionsAsTextBox(mol.Captions.ToList(), point, mol.Path);
+                    var revisedExtents = thisMoleculeExtents.ExternalCharacterExtents;
+                    foreach (var ooXmlString in Outputs.MoleculeCaptions.Where(p => p.ParentMolecule.Equals(mol.Path)))
+                    {
+                        revisedExtents.Union(ooXmlString.Extents);
+                    }
+                    thisMoleculeExtents.SetExternalCharacterExtents(revisedExtents);
+                }
+                else
+                {
+                    AddMoleculeCaptionsAsCharacters(mol.Captions.ToList(), point, mol.Path);
+                    // Recalculate as we have just added extra characters
+                    thisMoleculeExtents.SetExternalCharacterExtents(CharacterExtents(mol, thisMoleculeExtents.MoleculeBracketsExtents));
+                }
             }
         }
 
@@ -918,7 +921,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             Outputs.ConvexHulls.Add(atom.Path, ConvexHull(atom.Path));
         }
 
-        private void AddMoleculeLabels(List<TextualProperty> labels, Point centrePoint, string moleculePath)
+        private void AddMoleculeCaptionsAsCharacters(List<TextualProperty> labels, Point centrePoint, string moleculePath)
         {
             Point measure = new Point(centrePoint.X, centrePoint.Y);
 
@@ -939,21 +942,27 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
             }
         }
 
-        // MAW Keep this code as it may be possible to bring back use of OoXmlString later on
-        private void AddMoleculeLabelsV2(List<TextualProperty> labels, Point centrePoint, string moleculePath)
+        private void AddMoleculeCaptionsAsTextBox(List<TextualProperty> labels, Point centrePoint, string moleculePath)
         {
             Point measure = new Point(centrePoint.X, centrePoint.Y);
+
+            // Adjust size to allow for text box to be bigger than the text
+            TtfCharacter hydrogenCharacter = Inputs.TtfCharacterSet['H'];
 
             foreach (var label in labels)
             {
                 // 1. Measure string
                 var bb = MeasureString(label.Value, measure);
 
+                // Adjustments to take into account text box margins
+                bb.Width = bb.Width + OoXmlHelper.ScaleCsTtfToCml(hydrogenCharacter.Width, Inputs.MeanBondLength) * 2.5;
+                bb.Height = bb.Height * 1.5;
+
                 // 2. Place string characters such that they are hanging below the "line"
                 if (bb != Rect.Empty)
                 {
                     Point place = new Point(measure.X - bb.Width / 2, measure.Y);
-                    Outputs.MoleculeLabels.Add(new OoXmlString(new Rect(place, bb.Size), label.Value, moleculePath));
+                    Outputs.MoleculeCaptions.Add(new OoXmlString(new Rect(place, bb.Size), label.Value, moleculePath));
                 }
 
                 // 3. Move to next line
@@ -1078,64 +1087,17 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                             case Globals.BondDirection.Anticlockwise:
                                 BondLine da = new BondLine(BondLineStyle.Solid, bond);
                                 Outputs.BondLines.Add(da);
-                                BondLine das = PlaceOtherLine(da, da.GetParallel(-BondOffset()));
-                                Outputs.BondLines.Add(TrimOtherLine(das));
+                                Outputs.BondLines.Add(PlaceSecondaryLine(da, da.GetParallel(-BondOffset())));
                                 break;
 
                             case Globals.BondDirection.Clockwise:
                                 BondLine dc = new BondLine(BondLineStyle.Solid, bond);
                                 Outputs.BondLines.Add(dc);
-                                BondLine dcs = PlaceOtherLine(dc, dc.GetParallel(BondOffset()));
-                                Outputs.BondLines.Add(TrimOtherLine(dcs));
+                                Outputs.BondLines.Add(PlaceSecondaryLine(dc, dc.GetParallel(BondOffset())));
                                 break;
 
                                 // Local Function
-                                BondLine TrimOtherLine(BondLine bondLine)
-                                {
-                                    var startBonds = bond.StartAtom.Bonds.Except(new [] {bond}).ToList();
-                                    var endBonds = bond.EndAtom.Bonds.Except(new[] {bond}).ToList();
-
-                                    foreach (var startBond in startBonds)
-                                    {
-                                        TrimBondLineAbout(startBond);
-                                    }
-
-                                    foreach (var endBond in endBonds)
-                                    {
-                                        TrimBondLineAbout(endBond);
-                                    }
-
-                                    // Nested LocalFunction
-                                    void TrimBondLineAbout(Bond thisBond)
-                                    {
-                                        bool intersect;
-                                        Point meetingPoint;
-                                        CoordinateTool.FindIntersection(bondLine.Start, bondLine.End,
-                                                                        thisBond.StartAtom.Position, thisBond.EndAtom.Position,
-                                                                        out _, out intersect, out meetingPoint);
-                                        if (intersect)
-                                        {
-                                            var length1 = (meetingPoint - bondLine.Start).Length;
-                                            var length2 = (meetingPoint - bondLine.End).Length;
-
-                                            if (length1 > length2)
-                                            {
-                                                CoordinateTool.AdjustLineEndPoint(bondLine.End, ref meetingPoint, (BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
-                                                bondLine.End = meetingPoint;
-                                            }
-                                            else
-                                            {
-                                                CoordinateTool.AdjustLineEndPoint(bondLine.Start, ref meetingPoint, (BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
-                                                bondLine.Start = meetingPoint;
-                                            }
-                                        }
-                                    }
-
-                                    return bondLine;
-                                }
-
-                                // Local Function
-                                BondLine PlaceOtherLine(BondLine primaryLine, BondLine secondaryLine)
+                                BondLine PlaceSecondaryLine(BondLine primaryLine, BondLine secondaryLine)
                                 {
                                     var primaryMidpoint = CoordinateTool.GetMidPoint(primaryLine.Start, primaryLine.End);
                                     var secondaryMidpoint = CoordinateTool.GetMidPoint(secondaryLine.Start, secondaryLine.End);
@@ -1211,8 +1173,60 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                                     else
                                     {
                                         CoordinateTool.AdjustLineAboutMidpoint(ref startPointa, ref endPointa, -(BondOffset() / OoXmlHelper.LINE_SHRINK_PIXELS));
-                                        return new BondLine(BondLineStyle.Solid, startPointa, endPointa, bond);
+                                        return TrimSecondaryLine(new BondLine(BondLineStyle.Solid, startPointa, endPointa, bond));
                                     }
+                                }
+
+                                // Local Function
+                                BondLine TrimSecondaryLine(BondLine bondLine)
+                                {
+                                    var otherStartBonds = bond.StartAtom.Bonds.Except(new[] { bond }).ToList();
+                                    var otherEndBonds = bond.EndAtom.Bonds.Except(new[] { bond }).ToList();
+
+                                    foreach (var otherBond in otherStartBonds)
+                                    {
+                                        TrimSecondaryBondLine(bond.StartAtom.Position, bond.EndAtom.Position,
+                                                              otherBond.OtherAtom(bond.StartAtom).Position);
+                                    }
+
+                                    foreach (var otherBond in otherEndBonds)
+                                    {
+                                        TrimSecondaryBondLine(bond.EndAtom.Position, bond.StartAtom.Position,
+                                                              otherBond.OtherAtom(bond.EndAtom).Position);
+                                    }
+
+                                    void TrimSecondaryBondLine(Point common, Point left, Point right)
+                                    {
+                                        Vector v1 = left - common;
+                                        Vector v2 = right - common;
+                                        var angle = CoordinateTool.AngleBetween(v1, v2);
+                                        Matrix matrix = new Matrix();
+                                        matrix.Rotate(angle / 2);
+                                        v1 = v1 * 2 * matrix;
+                                        if (Inputs.Options.ShowBondClippingLines)
+                                        {
+                                            Outputs.Diagnostics.Lines.Add(new DiagnosticLine(common, common + v1, BondLineStyle.Dotted, "0000ff"));
+                                        }
+
+                                        bool intersect;
+                                        Point meetingPoint;
+                                        CoordinateTool.FindIntersection(bondLine.Start, bondLine.End,
+                                                                        common, common + v1,
+                                                                        out _, out intersect, out meetingPoint);
+                                        if (intersect)
+                                        {
+                                            if (common == bondLine.Bond.StartAtom.Position)
+                                            {
+                                                bondLine.Start = meetingPoint;
+                                            }
+                                            if (common == bondLine.Bond.EndAtom.Position)
+                                            {
+                                                bondLine.End = meetingPoint;
+                                            }
+                                        }
+                                    }
+
+                                    return bondLine;
                                 }
 
                             default:

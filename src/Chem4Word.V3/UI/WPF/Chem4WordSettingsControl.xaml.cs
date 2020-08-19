@@ -382,14 +382,14 @@ namespace Chem4Word.UI.WPF
 
                         sb = new StringBuilder();
                         sb.AppendLine("Do you want to import the Gallery structures into the Library?");
-                        sb.AppendLine("(This cannot be undone.)");
+                        //sb.AppendLine("(This cannot be undone.)")
                         dr = UserInteractions.AskUserYesNo(sb.ToString());
                         if (dr == Forms.DialogResult.Yes)
                         {
                             if (File.Exists(doneFile))
                             {
                                 sb = new StringBuilder();
-                                sb.AppendLine($"All files have been imported already from '{selectedFolder}'");
+                                sb.AppendLine($"Files have been imported already from '{selectedFolder}'");
                                 sb.AppendLine("Do you want to rerun the import?");
                                 dr = UserInteractions.AskUserYesNo(sb.ToString());
                                 if (dr == Forms.DialogResult.Yes)
@@ -443,6 +443,7 @@ namespace Chem4Word.UI.WPF
                                 FileInfo fi = new FileInfo(doneFile);
                                 fi.Attributes = FileAttributes.Hidden;
 
+                                Globals.Chem4WordV3.CloseLibrary();
                                 Globals.Chem4WordV3.LoadNamesFromLibrary();
 
                                 UserInteractions.InformUser($"Successfully imported {fileCount} structures from '{selectedFolder}'.");
@@ -572,7 +573,7 @@ namespace Chem4Word.UI.WPF
 
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("This will delete all the structures from the Library");
-                sb.AppendLine("It will not delete any tags.");
+                //sb.AppendLine("It will not delete any tags.")
                 sb.AppendLine("");
                 sb.AppendLine("Do you want to proceed?");
                 sb.AppendLine("This cannot be undone.");
@@ -581,8 +582,11 @@ namespace Chem4Word.UI.WPF
                 if (dr == Forms.DialogResult.Yes)
                 {
                     var lib = new Database.Library();
+
                     lib.DeleteAllChemistry();
+                    Globals.Chem4WordV3.CloseLibrary();
                     Globals.Chem4WordV3.LoadNamesFromLibrary();
+
                     UserInteractions.InformUser("Your library has been cleared.");
                 }
             }
@@ -683,10 +687,10 @@ namespace Chem4Word.UI.WPF
             foreach (IChem4WordEditor editor in Globals.Chem4WordV3.Editors)
             {
                 PlugInComboItem pci = new PlugInComboItem()
-                                      {
-                                          Name = editor.Name,
-                                          Description = editor.Description
-                                      };
+                {
+                    Name = editor.Name,
+                    Description = editor.Description
+                };
                 int item = SelectEditorPlugIn.Items.Add(pci);
 
                 if (editor.Name.Equals(selectedEditor))

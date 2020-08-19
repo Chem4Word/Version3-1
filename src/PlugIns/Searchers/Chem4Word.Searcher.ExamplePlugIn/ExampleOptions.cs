@@ -36,7 +36,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
         /// </summary>
         public ExampleOptions()
         {
-			Errors = new List<string>();
+            Errors = new List<string>();
             RestoreDefaults();
         }
 
@@ -125,7 +125,7 @@ namespace Chem4Word.Searcher.ExamplePlugIn
         {
             try
             {
-                Debug.WriteLine($"Saving Options to {optionsFile}");
+                Debug.WriteLine($"Saving Example Options to {optionsFile}");
                 string contents = JsonConvert.SerializeObject(this, Formatting.Indented);
                 File.WriteAllText(optionsFile, contents);
             }

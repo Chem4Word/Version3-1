@@ -54,9 +54,9 @@ namespace Chem4Word.Editor.ACME
                 if (HasSettings)
                 {
                     _editorOptions = new AcmeOptions(SettingsPath)
-                                     {
-                                         Dirty = false
-                                     };
+                    {
+                        Dirty = false
+                    };
 
                     using (var settings = new AcmeSettingsHost())
                     {
@@ -93,14 +93,15 @@ namespace Chem4Word.Editor.ACME
                 if (HasSettings)
                 {
                     _editorOptions = new AcmeOptions(SettingsPath)
-                                     {
-                                         Dirty = false
-                                     };
+                    {
+                        Dirty = false
+                    };
                 }
 
                 using (EditorHost host = new EditorHost(Cml, Used1DProperties, _editorOptions))
                 {
                     host.TopLeft = TopLeft;
+                    host.Telemetry = Telemetry;
 
                     DialogResult showDialog = host.ShowDialog();
                     if (showDialog == DialogResult.OK)

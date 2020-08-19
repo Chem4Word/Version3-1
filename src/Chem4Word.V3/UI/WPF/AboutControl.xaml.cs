@@ -10,7 +10,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms.VisualStyles;
 using Chem4Word.Core.UI.Forms;
 
 namespace Chem4Word.UI.WPF

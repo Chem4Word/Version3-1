@@ -23,7 +23,6 @@ using Chem4Word.Model2.Converters.CML;
 using Chem4Word.Model2.Converters.MDL;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4;
-using Chem4Word.Renderer.OoXmlV4.OOXML;
 using Chem4Word.Telemetry;
 using Newtonsoft.Json;
 
@@ -278,30 +277,30 @@ namespace WinForms.TestHarness
             {
 #endif
 
-                if (!string.IsNullOrEmpty(_lastCml))
+            if (!string.IsNullOrEmpty(_lastCml))
+            {
+                using (EditorHost editorHost = new EditorHost(_lastCml, "LABELS"))
                 {
-                    using (EditorHost editorHost = new EditorHost(_lastCml, "LABELS"))
+                    editorHost.ShowDialog(this);
+                    if (editorHost.DialogResult == DialogResult.OK)
                     {
-                        editorHost.ShowDialog(this);
-                        if (editorHost.DialogResult == DialogResult.OK)
-                        {
-                            CMLConverter cc = new CMLConverter();
-                            var clone = cc.Import(_lastCml);
-                            Debug.WriteLine(
-                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                            _undoStack.Push(clone);
+                        CMLConverter cc = new CMLConverter();
+                        var clone = cc.Import(_lastCml);
+                        Debug.WriteLine(
+                            $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                        _undoStack.Push(clone);
 
-                            Model m = cc.Import(editorHost.OutputValue);
-                            m.Relabel(true);
-                            _lastCml = cc.Export(m);
+                        Model m = cc.Import(editorHost.OutputValue);
+                        m.Relabel(true);
+                        _lastCml = cc.Export(m);
 
-                            ShowChemistry($"Edited {m.ConciseFormula}", m);
-                        }
+                        ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
-                    TopMost = true;
-                    TopMost = false;
-                    Activate();
                 }
+                TopMost = true;
+                TopMost = false;
+                Activate();
+            }
 #if !DEBUG
             }
             catch (Exception exception)
@@ -320,39 +319,39 @@ namespace WinForms.TestHarness
             try
             {
 #endif
-                if (!string.IsNullOrEmpty(_lastCml))
+            if (!string.IsNullOrEmpty(_lastCml))
+            {
+                using (EditorHost editorHost = new EditorHost(_lastCml, "ACME"))
                 {
-                    using (EditorHost editorHost = new EditorHost(_lastCml, "ACME"))
-                    { 
-                        editorHost.ShowDialog(this);
-                        if (editorHost.DialogResult == DialogResult.OK)
+                    editorHost.ShowDialog(this);
+                    if (editorHost.DialogResult == DialogResult.OK)
+                    {
+                        CMLConverter cc = new CMLConverter();
+                        if (_lastCml != EmptyCml)
                         {
-                            CMLConverter cc = new CMLConverter();
-                            if (_lastCml != EmptyCml)
-                            {
-                                var clone = cc.Import(_lastCml);
-                                Debug.WriteLine(
-                                    $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
-                                _undoStack.Push(clone);
-                            }
-
-                            Model m = cc.Import(editorHost.OutputValue);
-                            m.Relabel(true);
-                            _lastCml = cc.Export(m);
-
-                            // Cause re-read of settings (in case they have changed)
-                            _editorOptions = new AcmeOptions(null);
-                            SetDisplayOptions();
-                            RedoStack.SetOptions(_editorOptions);
-                            UndoStack.SetOptions(_editorOptions);
-
-                            ShowChemistry($"Edited {m.ConciseFormula}", m);
+                            var clone = cc.Import(_lastCml);
+                            Debug.WriteLine(
+                                $"Pushing F: {clone.ConciseFormula} BL: {clone.MeanBondLength.ToString("#,##0.00")} onto Stack");
+                            _undoStack.Push(clone);
                         }
+
+                        Model m = cc.Import(editorHost.OutputValue);
+                        m.Relabel(true);
+                        _lastCml = cc.Export(m);
+
+                        // Cause re-read of settings (in case they have changed)
+                        _editorOptions = new AcmeOptions(null);
+                        SetDisplayOptions();
+                        RedoStack.SetOptions(_editorOptions);
+                        UndoStack.SetOptions(_editorOptions);
+
+                        ShowChemistry($"Edited {m.ConciseFormula}", m);
                     }
-                    TopMost = true;
-                    TopMost = false;
-                    Activate();
                 }
+                TopMost = true;
+                TopMost = false;
+                Activate();
+            }
 #if !DEBUG
             }
             catch (Exception exception)

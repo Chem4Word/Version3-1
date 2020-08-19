@@ -19,6 +19,9 @@ namespace Chem4Word
     [JsonObject(MemberSerialization.OptIn)]
     public class Chem4WordOptions
     {
+        private const int DefaultCheckInterval = 7;
+        private const bool DefaultCheckingEnabled = true;
+
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
 
         #region Telemetry
@@ -115,9 +118,9 @@ namespace Chem4Word
             RemoveExplicitHydrogensOnImportFromSearch = false;
             RemoveExplicitHydrogensOnImportFromLibrary = false;
 
-            // Non serialised
-            AutoUpdateEnabled = true;
-            AutoUpdateFrequency = 7;
+            // Non serialised settings
+            AutoUpdateEnabled = DefaultCheckingEnabled;
+            AutoUpdateFrequency = DefaultCheckInterval;
         }
 
         public Chem4WordOptions Clone()
@@ -126,12 +129,6 @@ namespace Chem4Word
 
             // Copy serialised properties
             clone.SetValuesFromCopy(this);
-
-            clone.AutoUpdateEnabled = AutoUpdateEnabled;
-            clone.AutoUpdateFrequency = AutoUpdateFrequency;
-
-            clone.SettingsPath = SettingsPath;
-            clone.WordTopLeft = WordTopLeft;
 
             return clone;
         }
@@ -198,6 +195,7 @@ namespace Chem4Word
 
         private void SetValuesFromCopy(Chem4WordOptions copy)
         {
+            // Serialised values
             TelemetryEnabled = copy.TelemetryEnabled;
 
             SelectedEditorPlugIn = copy.SelectedEditorPlugIn;
@@ -212,6 +210,10 @@ namespace Chem4Word
             RemoveExplicitHydrogensOnImportFromFile = copy.RemoveExplicitHydrogensOnImportFromFile;
             RemoveExplicitHydrogensOnImportFromSearch = copy.RemoveExplicitHydrogensOnImportFromSearch;
             RemoveExplicitHydrogensOnImportFromLibrary = copy.RemoveExplicitHydrogensOnImportFromLibrary;
+
+            // Non serialised settings
+            AutoUpdateEnabled = copy.AutoUpdateEnabled;
+            AutoUpdateFrequency = copy.AutoUpdateFrequency;
         }
 
         private void PersistOptions(string optionsFile)

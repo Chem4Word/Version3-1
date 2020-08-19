@@ -66,6 +66,7 @@ namespace Chem4Word.ACME.Drawing
             /// </summary>
             /// <param name="parentMetrics">Metrics of the parent atom</param>
             /// <param name="direction">Orientation of the group relative to the parent atom, i.e. NESW</param>
+            /// <param name="pixelsperDip">Display dependent parameter for  rendering text</param>
             /// <returns>AtomTextMetrics object describing placement</returns>
             public AtomTextMetrics Measure(AtomTextMetrics parentMetrics, CompassPoints direction, float pixelsPerDip)
             {
@@ -80,7 +81,7 @@ namespace Chem4Word.ACME.Drawing
                 string subscriptText = AtomHelpers.GetSubText(Count);
                 if (subscriptText != "")
                 {
-                    _subText = new SubLabelText(subscriptText, pixelsPerDip);
+                    _subText = new SubLabelText(subscriptText, pixelsPerDip, _fontSize * ViewModel.ScriptScalingFactor);
                     _subText.Premeasure();
                 }
 
@@ -209,6 +210,7 @@ namespace Chem4Word.ACME.Drawing
 
         #region Visual Properties
 
+        public double SymbolSize { get; set; }
         public Point Position { get; set; }
         public string AtomSymbol { get; set; }
         public Brush BackgroundColor { get; set; }
@@ -218,12 +220,6 @@ namespace Chem4Word.ACME.Drawing
         public int ImplicitHydrogenCount { get; set; }
 
         public virtual List<Point> Hull { get; protected set; }
-
-        /// <summary>
-        /// Distance between an atom visual and any bond ends
-        /// </summary>
-        public static double Standoff => GlyphText.SymbolSize / 6;
-
         #endregion Visual Properties
 
         #endregion Properties
@@ -270,10 +266,10 @@ namespace Chem4Word.ACME.Drawing
         /// <returns></returns>
         private ChargeLabelText DrawChargeOrRadical(DrawingContext drawingContext, AtomTextMetrics mainAtomMetrics, AtomTextMetrics hMetrics, LabelMetrics isoMetrics, string chargeString, Brush fill, CompassPoints defaultHOrientation)
         {
-            ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip());
+            ChargeLabelText chargeText = new ChargeLabelText(chargeString, PixelsPerDip(), SuperscriptSize);
 
             //try to place the charge at 2 o clock to the atom
-            Vector chargeOffset = BasicGeometry.ScreenNorth * GlyphText.SymbolSize * 0.9;
+            Vector chargeOffset = BasicGeometry.ScreenNorth * SymbolSize * 0.9;
             RotateUntilClear(mainAtomMetrics, hMetrics, isoMetrics, chargeOffset, chargeText, out var chargeCenter, defaultHOrientation);
             chargeText.MeasureAtCenter(chargeCenter);
             chargeText.Fill = fill;
@@ -330,9 +326,9 @@ namespace Chem4Word.ACME.Drawing
             Debug.Assert(Isotope != null);
 
             string isoLabel = Isotope.ToString();
-            var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip());
+            var isotopeText = new IsotopeLabelText(isoLabel, PixelsPerDip(), SuperscriptSize);
 
-            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * GlyphText.SymbolSize;
+            Vector isotopeOffsetVector = BasicGeometry.ScreenNorth * SymbolSize;
             Matrix rotator = new Matrix();
             double angle = -60;
             //avoid overlap of label and hydrogens
@@ -355,7 +351,7 @@ namespace Chem4Word.ACME.Drawing
         {
             if (AtomSymbol != "")
             {
-                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
+                var symbolText = new GlyphText(AtomSymbol, SymbolTypeface, SymbolSize, PixelsPerDip());
                 symbolText.Fill = Fill;
                 symbolText.MeasureAtCenter(Position);
                 if (!measureOnly)
@@ -368,7 +364,7 @@ namespace Chem4Word.ACME.Drawing
             else
             {
                 //so draw a circle
-                double radiusX = GlyphText.SymbolSize / 3;
+                double radiusX = SymbolSize / 3;
 
                 Rect boundingBox = new Rect(new Point(Position.X - radiusX, Position.Y - radiusX),
                     new Point(Position.X + radiusX, Position.Y + radiusX));
@@ -401,7 +397,7 @@ namespace Chem4Word.ACME.Drawing
             if (AtomSymbol != "")
             {
                 var symbolText = new GlyphText(AtomSymbol,
-                    SymbolTypeface, GlyphText.SymbolSize, PixelsPerDip());
+                    SymbolTypeface, SymbolSize, PixelsPerDip());
                 symbolText.MeasureAtCenter(Position);
                 //grab the hull for later
                 if (symbolText.FlattenedPath != null)
@@ -425,7 +421,7 @@ namespace Chem4Word.ACME.Drawing
             {
                 var defaultHOrientation = ParentAtom.GetDefaultHOrientation();
 
-                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", GlyphText.SymbolSize);
+                subscriptedGroup = new SubscriptedGroup(ImplicitHydrogenCount, "H", SymbolSize);
                 hydrogenMetrics = subscriptedGroup.Measure(mainAtomMetrics, defaultHOrientation, PixelsPerDip());
 
                 subscriptedGroup.DrawSelf(drawingContext, hydrogenMetrics, PixelsPerDip(), Fill);
@@ -635,6 +631,9 @@ namespace Chem4Word.ACME.Drawing
         }
 
         public bool DisplayOverbonding { get; set; }
+        public double Standoff { get; set; }
+        public double SubscriptSize { get; set; }
+        public double SuperscriptSize { get; set; }
 
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {

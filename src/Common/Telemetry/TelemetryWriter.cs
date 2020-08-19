@@ -92,12 +92,34 @@ namespace Chem4Word.Telemetry
             }
         }
 
+        /// <summary>
+        /// "Last chance" fix for missing word version number
+        /// </summary>
+        private void FixUpWordVersion()
+        {
+            var product = _helper.WordProduct;
+            if (product.Contains("[16."))
+            {
+                if (product.Contains("2016")
+                    || product.Contains("2019")
+                    || product.Contains("365"))
+                {
+                    // Word version is set
+                }
+                else
+                {
+                    _helper.WordProduct = product + " 2016";
+                }
+            }
+        }
+
         private void WriteStartUpInfo()
         {
             // Log Add-In Version
             WritePrivate("StartUp", "Information", _helper.AddInVersion); // ** Used by Andy's Knime protocol ?
 
-            // Log Word
+            // Log Word Version
+            FixUpWordVersion();
             WritePrivate("StartUp", "Information", _helper.WordProduct); // ** Used by Andy's Knime protocol
             if (!string.IsNullOrEmpty(_helper.Click2RunProductIds))
             {

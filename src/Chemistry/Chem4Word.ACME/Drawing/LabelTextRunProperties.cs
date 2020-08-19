@@ -9,6 +9,7 @@ using System;
 using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Drawing
@@ -17,9 +18,11 @@ namespace Chem4Word.ACME.Drawing
     {
         private string _colour;
 
-        public LabelTextRunProperties(string colour)
+        private double _symbolSize;
+        public LabelTextRunProperties(string colour, double symbolSize)
         {
             _colour = colour;
+            _symbolSize = symbolSize;
         }
 
         public override Brush BackgroundBrush
@@ -34,12 +37,12 @@ namespace Chem4Word.ACME.Drawing
 
         public override double FontHintingEmSize
         {
-            get { return GlyphText.SymbolSize; }
+            get { return _symbolSize; }
         }
 
         public override double FontRenderingEmSize
         {
-            get { return GlyphText.SymbolSize; }
+            get { return _symbolSize; }
         }
 
         public override Brush ForegroundBrush

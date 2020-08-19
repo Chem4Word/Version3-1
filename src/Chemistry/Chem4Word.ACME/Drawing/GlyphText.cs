@@ -26,31 +26,9 @@ namespace Chem4Word.ACME.Drawing
         public string Text { get; }
         public Typeface CurrentTypeface { get; }
 
+        //standard label font
         public double TypeSize { get; }
 
-        public static double SymbolSize { get; set; }
-
-        private static double? _scriptSize;
-
-        public static double ScriptSize
-        {
-            get
-            {
-                return _scriptSize.Value;
-            }
-            set { _scriptSize = value; }
-        }
-
-        private static double? _isotopeSize;
-
-        public static double IsotopeSize
-        {
-            get
-            {
-                return _isotopeSize.Value;
-            }
-            set { _isotopeSize = value; }
-        }
 
         public float PixelsPerDip { get; }
 
@@ -144,7 +122,7 @@ namespace Chem4Word.ACME.Drawing
             GlyphInfo = GlyphUtils.GetGlyphsAndInfo(Text, PixelsPerDip, out GlyphRun groupGlyphRun, center, _glyphTypeface, TypeSize);
             //compensate the main offset vector for any descenders
 
-            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, SymbolSize) +
+            Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, TypeSize) +
                                 new Vector(0.0, -MaxBaselineOffset);
             //removed because labels were being canted too much to the left
             //+ new Vector(-FirstBearing(groupGlyphRun), 0.0);
@@ -211,29 +189,29 @@ namespace Chem4Word.ACME.Drawing
 
     public class MainLabelText : GlyphText
     {
-        public MainLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, SymbolSize, pixelsPerDip)
+        public MainLabelText(string text, float pixelsPerDip, double typeSize)
+            : base(text, GlyphUtils.SymbolTypeface, typeSize, pixelsPerDip)
         { }
     }
 
     public class SubLabelText : GlyphText
     {
-        public SubLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, ScriptSize, pixelsPerDip)
+        public SubLabelText(string text, float pixelsPerDip, double SubscriptSize)
+            : base(text, GlyphUtils.SymbolTypeface, SubscriptSize, pixelsPerDip)
         { }
     }
 
     public class IsotopeLabelText : GlyphText
     {
-        public IsotopeLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, IsotopeSize, pixelsPerDip)
+        public IsotopeLabelText(string text, float pixelsPerDip, double superScriptSize)
+            : base(text, GlyphUtils.SymbolTypeface, superScriptSize, pixelsPerDip)
         { }
     }
 
     public class ChargeLabelText : GlyphText
     {
-        public ChargeLabelText(string text, float pixelsPerDip)
-            : base(text, GlyphUtils.SymbolTypeface, IsotopeSize, pixelsPerDip)
+        public ChargeLabelText(string text, float pixelsPerDip, double superScriptSize)
+            : base(text, GlyphUtils.SymbolTypeface, superScriptSize, pixelsPerDip)
         {
         }
     }

@@ -160,7 +160,7 @@ namespace Chem4Word.Model2.Converters.CML
             return formulae1.Union(formulae2).ToList();
         }
 
-        internal static List<XElement> GetLabels(XElement mol)
+        internal static List<XElement> GetMoleculeLabels(XElement mol)
         {
             var labels1 = from f1 in mol.Elements(CMLConstants.TagLabel) select f1;
             var labels2 = from f2 in mol.Elements(CMLNamespaces.cml + CMLConstants.TagLabel) select f2;

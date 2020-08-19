@@ -246,7 +246,7 @@ namespace Chem4Word.Model2
                 return expanded;
             }
 
-            List<FunctionalGroupPart> ExpandGroupV2(Group componentGroup, bool flipped=false)
+            List<FunctionalGroupPart> ExpandGroupV2(Group componentGroup, bool flipped = false)
             {
                 List<FunctionalGroupPart> expanded = new List<FunctionalGroupPart>();
 

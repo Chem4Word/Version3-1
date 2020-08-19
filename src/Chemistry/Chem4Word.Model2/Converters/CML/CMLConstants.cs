@@ -77,10 +77,11 @@ namespace Chem4Word.Model2.Converters.CML
         public const string TagLabel = "label";
 
         public const string AttributeNameValue = "value";
-        public const string ValueChem4WordLabel = "chem4word:Label";
+        public const string ValueChem4WordCaption = "chem4word:Caption";
 
         // Our DictRef values
         public const string ValueChem4WordInchiName = "chem4word:CalculatedInchi";
+
         //public const string ValueChem4WordAuxInfoName = "chem4word:CalculatedAuxInfo";
         public const string ValueChem4WordInchiKeyName = "chem4word:CalculatedInchikey";
 

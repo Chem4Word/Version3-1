@@ -65,7 +65,8 @@
             <TextBox
                 x:Name="SearchBox"
                 Grid.Column="0"
-                BorderThickness="0"
+                BorderThickness="2"
+                BorderBrush="{StaticResource Chem4WordBlue}"
                 FontSize="24"
                 Foreground="{StaticResource Chem4WordBlue}"
                 TextChanged="SearchBox_OnTextChanged" />

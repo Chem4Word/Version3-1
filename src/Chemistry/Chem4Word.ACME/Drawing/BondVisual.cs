@@ -22,6 +22,7 @@ namespace Chem4Word.ACME.Drawing
         public Bond ParentBond { get; }
         public double BondThickness { get; set; }
 
+        public double Standoff { get; set; }
         #endregion Properties
 
         #region Fields
@@ -68,9 +69,10 @@ namespace Chem4Word.ACME.Drawing
         /// <param name="startAtomVisual"></param>
         /// <param name="endAtomVisual"></param>
         /// <param name="modelXamlBondLength"></param>
+        /// <param name="standoff"></param>
         /// <param name="ignoreCentroid"></param>
         /// <returns></returns>
-        public static BondLayout GetBondDescriptor(Bond parent, AtomVisual startAtomVisual, AtomVisual endAtomVisual, double modelXamlBondLength, bool ignoreCentroid = false)
+        public static BondLayout GetBondDescriptor(Bond parent, AtomVisual startAtomVisual, AtomVisual endAtomVisual, double modelXamlBondLength, double standoff, bool ignoreCentroid = false)
         {
             //check to see if it's a wedge or a hatch yet
             var startAtomPosition = parent.StartAtom.Position;
@@ -97,15 +99,26 @@ namespace Chem4Word.ACME.Drawing
             var parentOrderValue = parent.OrderValue;
             var parentPlacement = parent.Placement;
 
-            return GetBondDescriptor(startAtomVisual, endAtomVisual, modelXamlBondLength, parentStereo, startAtomPosition, endAtomPosition, parentOrderValue, parentPlacement, centroid, secondaryCentroid);
+            return GetBondDescriptor(startAtomVisual, endAtomVisual, modelXamlBondLength, parentStereo, startAtomPosition, endAtomPosition, parentOrderValue, parentPlacement, centroid, secondaryCentroid, standoff);
         }
 
         public static BondLayout GetBondDescriptor(AtomVisual startAtomVisual, AtomVisual endAtomVisual,
                                                         double modelXamlBondLength, Globals.BondStereo parentStereo,
                                                         Point startAtomPosition, Point endAtomPosition,
                                                         double? parentOrderValue, Globals.BondDirection parentPlacement,
-                                                        Point? centroid, Point? secondaryCentroid)
+                                                        Point? centroid, Point? secondaryCentroid, double standoff)
         {
+            List<Point> startAtomHull = new List<Point>();
+            List<Point> endAtomHull = new List<Point>();
+
+            if (startAtomVisual.ParentAtom.SymbolText != "" || startAtomVisual.ShowAllCarbons)
+            {
+                startAtomHull = startAtomVisual?.Hull;
+            }
+            if (endAtomVisual.ParentAtom.SymbolText != "" || endAtomVisual.ShowAllCarbons)
+            {
+                endAtomHull = endAtomVisual?.Hull;
+            }
             if ((parentStereo == Globals.BondStereo.Wedge || parentStereo == Globals.BondStereo.Hatch)
                 && parentOrderValue == 1)
             {
@@ -113,8 +126,8 @@ namespace Chem4Word.ACME.Drawing
                 {
                     Start = startAtomPosition,
                     End = endAtomPosition,
-                    StartAtomVisual = startAtomVisual,
-                    EndAtomVisual = endAtomVisual
+                    StartAtomHull = startAtomHull,
+                    EndAtomHull = endAtomHull
                 };
 
                 var endAtom = endAtomVisual.ParentAtom;
@@ -148,7 +161,7 @@ namespace Chem4Word.ACME.Drawing
                 if (!chamferBond)
                 {
                     wbd.CappedOff = false;
-                    BondGeometry.GetWedgeBondGeometry(wbd, modelXamlBondLength);
+                    BondGeometry.GetWedgeBondGeometry(wbd, modelXamlBondLength, standoff);
                 }
                 else
                 {
@@ -157,12 +170,12 @@ namespace Chem4Word.ACME.Drawing
                     if (nonHPs.Any())
                     {
                         wbd.CappedOff = true;
-                        BondGeometry.GetChamferedWedgeGeometry(wbd, modelXamlBondLength, nonHPs);
+                        BondGeometry.GetChamferedWedgeGeometry(wbd, modelXamlBondLength, nonHPs, standoff);
                     }
                     else
                     {
                         wbd.CappedOff = false;
-                        BondGeometry.GetWedgeBondGeometry(wbd, modelXamlBondLength);
+                        BondGeometry.GetWedgeBondGeometry(wbd, modelXamlBondLength, standoff);
                     }
                 }
 
@@ -176,10 +189,10 @@ namespace Chem4Word.ACME.Drawing
                 {
                     Start = startAtomPosition,
                     End = endAtomPosition,
-                    StartAtomVisual = startAtomVisual,
-                    EndAtomVisual = endAtomVisual
+                    StartAtomHull = startAtomHull,
+                    EndAtomHull = endAtomHull
                 };
-                BondGeometry.GetWavyBondGeometry(sbd, modelXamlBondLength);
+                BondGeometry.GetWavyBondGeometry(sbd, modelXamlBondLength, standoff);
                 return sbd;
             }
 
@@ -189,12 +202,16 @@ namespace Chem4Word.ACME.Drawing
                 case 2 when parentStereo == Globals.BondStereo.Indeterminate:
                     DoubleBondLayout dbd = new DoubleBondLayout()
                     {
-                        StartAtomVisual = startAtomVisual,
-                        EndAtomVisual = endAtomVisual,
+                        StartAtomHull = startAtomHull,
+                        EndAtomHull = endAtomHull,
                         Start = startAtomPosition,
-                        End = endAtomPosition
+                        End = endAtomPosition,
+                        StartNeigbourPositions = (from Atom a in startAtomVisual.ParentAtom.NeighboursExcept(endAtomVisual.ParentAtom)
+                                                  select a.Position).ToList(),
+                        EndNeighbourPositions = (from Atom a in endAtomVisual.ParentAtom.NeighboursExcept(startAtomVisual.ParentAtom)
+                                                 select a.Position).ToList()
                     };
-                    BondGeometry.GetCrossedDoubleGeometry(dbd, modelXamlBondLength);
+                    BondGeometry.GetCrossedDoubleGeometry(dbd, modelXamlBondLength, standoff);
                     return dbd;
 
                 //partial or undefined bonds
@@ -205,11 +222,11 @@ namespace Chem4Word.ACME.Drawing
                     {
                         Start = startAtomPosition,
                         End = endAtomPosition,
-                        StartAtomVisual = startAtomVisual,
-                        EndAtomVisual = endAtomVisual
+                        StartAtomHull = startAtomHull,
+                        EndAtomHull = endAtomHull
                     };
 
-                    BondGeometry.GetSingleBondGeometry(sbd);
+                    BondGeometry.GetSingleBondGeometry(sbd, standoff);
                     return sbd;
 
                 //double bond & 1.5 bond
@@ -217,16 +234,20 @@ namespace Chem4Word.ACME.Drawing
                 case 2:
                     DoubleBondLayout dbd2 = new DoubleBondLayout()
                     {
-                        StartAtomVisual = startAtomVisual,
-                        EndAtomVisual = endAtomVisual,
+                        StartAtomHull = startAtomHull,
+                        EndAtomHull = endAtomHull,
                         Start = startAtomPosition,
                         End = endAtomPosition,
                         Placement = parentPlacement,
                         PrimaryCentroid = centroid,
-                        SecondaryCentroid = secondaryCentroid
+                        SecondaryCentroid = secondaryCentroid,
+                        StartNeigbourPositions = (from Atom a in startAtomVisual.ParentAtom.NeighboursExcept(endAtomVisual.ParentAtom)
+                                                  select a.Position).ToList(),
+                        EndNeighbourPositions = (from Atom a in endAtomVisual.ParentAtom.NeighboursExcept(startAtomVisual.ParentAtom)
+                                                 select a.Position).ToList()
                     };
 
-                    BondGeometry.GetDoubleBondGeometry(dbd2, modelXamlBondLength);
+                    BondGeometry.GetDoubleBondGeometry(dbd2, modelXamlBondLength, standoff);
                     return dbd2;
 
                 //triple and 2.5 bond
@@ -234,15 +255,15 @@ namespace Chem4Word.ACME.Drawing
                 case 3:
                     TripleBondLayout tbd = new TripleBondLayout()
                     {
-                        StartAtomVisual = startAtomVisual,
-                        EndAtomVisual = endAtomVisual,
+                        StartAtomHull = startAtomHull,
+                        EndAtomHull = endAtomHull,
                         Start = startAtomPosition,
                         End = endAtomPosition,
                         Placement = parentPlacement,
                         PrimaryCentroid = centroid,
                         SecondaryCentroid = secondaryCentroid
                     };
-                    BondGeometry.GetTripleBondGeometry(tbd, modelXamlBondLength);
+                    BondGeometry.GetTripleBondGeometry(tbd, modelXamlBondLength, standoff);
                     return tbd;
 
                 default:
@@ -297,7 +318,7 @@ namespace Chem4Word.ACME.Drawing
                 AtomVisual endVisual = (AtomVisual)ChemicalVisuals[ParentBond.EndAtom];
 
                 //first grab the main descriptor
-                BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength);
+                BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength, Standoff);
 
                 _enclosingPoly = BondDescriptor.Boundary;
                 //set up the default pens for rendering

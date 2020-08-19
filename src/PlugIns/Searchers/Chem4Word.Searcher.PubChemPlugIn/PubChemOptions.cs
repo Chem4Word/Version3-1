@@ -131,7 +131,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
         {
             try
             {
-                Debug.WriteLine($"Saving Options to {optionsFile}");
+                Debug.WriteLine($"Saving PubChem Options to {optionsFile}");
                 string contents = JsonConvert.SerializeObject(this, Formatting.Indented);
                 File.WriteAllText(optionsFile, contents);
             }

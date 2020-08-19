@@ -89,7 +89,7 @@ namespace Chem4Word.ACME
 
             LoadNamesEditor(NamesGrid, null);
             LoadNamesEditor(FormulaGrid, null);
-            LoadNamesEditor(LabelsGrid, null);
+            LoadNamesEditor(CaptionsGrid, null);
 
             var model = new Model();
 
@@ -113,7 +113,7 @@ namespace Chem4Word.ACME
                                 LoadNamesEditor(NamesGrid, thisMolecule.Names);
                                 LoadNamesEditor(FormulaGrid, thisMolecule.Formulas);
                             }
-                            LoadNamesEditor(LabelsGrid, thisMolecule.Labels);
+                            LoadNamesEditor(CaptionsGrid, thisMolecule.Captions);
                             break;
                         }
                 }
@@ -126,7 +126,7 @@ namespace Chem4Word.ACME
         {
             _cml = cml;
             var cc = new CMLConverter();
-            EditedModel = cc.Import(_cml, Used1D, relabel:false);
+            EditedModel = cc.Import(_cml, Used1D, relabel: false);
             TreeView.Items.Clear();
             bool initialSelectionMade = false;
 
@@ -145,9 +145,9 @@ namespace Chem4Word.ACME
                 AddNodes(root, EditedModel.Molecules.Values);
             }
 
-            SetupNamesEditor(NamesGrid, "Add new Name", OnAddNameClick, "Alternative name for molecule");
+            SetupNamesEditor(NamesGrid, "Add new Name", OnAddNameClick, "Alternative name(s) for molecule");
             SetupNamesEditor(FormulaGrid, "Add new Formula", OnAddFormulaClick, "Alternative formula for molecule");
-            SetupNamesEditor(LabelsGrid, "Add new Label", OnAddLabelClick, "Custom metadata");
+            SetupNamesEditor(CaptionsGrid, "Add new Caption", OnAddLabelClick, "Molecule Caption(s)");
 
             TreeView.Focus();
 
@@ -193,8 +193,8 @@ namespace Chem4Word.ACME
                         initialSelectionMade = true;
                     }
 
-                    molecule.Labels.CollectionChanged += OnCollectionChanged;
-                    foreach (var property in molecule.Labels)
+                    molecule.Captions.CollectionChanged += OnCollectionChanged;
+                    foreach (var property in molecule.Captions)
                     {
                         property.PropertyChanged += OnTextualPropertyChanged;
                     }
@@ -291,14 +291,14 @@ namespace Chem4Word.ACME
             if (TreeView.SelectedItem is TreeViewItem treeViewItem
                 && treeViewItem.Tag is Molecule molecule)
             {
-                molecule.Labels.Add(new TextualProperty
+                molecule.Captions.Add(new TextualProperty
                 {
-                    Id = molecule.GetNextId(molecule.Labels, "l"),
-                    FullType = CMLConstants.ValueChem4WordLabel,
+                    Id = molecule.GetNextId(molecule.Captions, "l"),
+                    FullType = CMLConstants.ValueChem4WordCaption,
                     Value = "?",
                     CanBeDeleted = true
                 });
-                LabelsGrid.ScrollViewer.ScrollToEnd();
+                CaptionsGrid.ScrollViewer.ScrollToEnd();
             }
         }
 

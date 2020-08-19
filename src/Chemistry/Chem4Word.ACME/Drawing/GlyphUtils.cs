@@ -33,15 +33,17 @@ namespace Chem4Word.ACME.Drawing
             }
         }
 
-        public static Typeface SymbolTypeface = new Typeface(new FontFamily("Arial"),
-            FontStyles.Normal,
-            FontWeights.Bold,
-            FontStretches.Normal);
+        public static Typeface SymbolTypeface { get; } = new Typeface(new FontFamily("Arial"),
+                                                                       FontStyles.Normal,
+                                                                       FontWeights.Bold,
+                                                                       FontStretches.Normal);
 
-        public static Typeface MoleculelabelTypeface = new Typeface(new FontFamily("Arial"),
-            FontStyles.Normal,
-            FontWeights.Normal,
-            FontStretches.Normal);
+
+
+        public static Typeface MoleculelabelTypeface { get; } = new Typeface(new FontFamily("Arial"),
+                                                                             FontStyles.Normal,
+                                                                             FontWeights.Normal,
+                                                                             FontStretches.Normal);
 
         static GlyphUtils()
         {

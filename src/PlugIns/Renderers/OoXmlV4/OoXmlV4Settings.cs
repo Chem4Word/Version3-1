@@ -191,7 +191,9 @@ namespace Chem4Word.Renderer.OoXmlV4
         {
             ColouredAtoms.Checked = RendererOptions.ColouredAtoms;
             ShowHydrogens.Checked = RendererOptions.ShowHydrogens;
-            ShowMoleculeLabels.Checked = RendererOptions.ShowMoleculeLabels;
+            ShowAllCarbonAtoms.Checked = RendererOptions.ShowCarbons;
+            ShowMoleculeCaptions.Checked = RendererOptions.ShowMoleculeCaptions;
+            RenderCaptionsAsTextBox.Checked = RendererOptions.RenderCaptionsAsTextBox;
 
             // Debugging Options
             ClipLines.Checked = RendererOptions.ClipLines;
@@ -201,7 +203,6 @@ namespace Chem4Word.Renderer.OoXmlV4
             ShowAtomPositions.Checked = RendererOptions.ShowAtomPositions;
             ShowConvexHulls.Checked = RendererOptions.ShowHulls;
             ShowMoleculeGrouping.Checked = RendererOptions.ShowMoleculeGrouping;
-            ShowAllCarbonAtoms.Checked = RendererOptions.ShowCarbons;
             ShowBondClippingLines.Checked = RendererOptions.ShowBondClippingLines;
             ShowBondDirection.Checked = RendererOptions.ShowBondDirection;
         }
@@ -289,13 +290,14 @@ namespace Chem4Word.Renderer.OoXmlV4
             }
         }
 
-        private void ShowMoleculeLabels_CheckedChanged(object sender, EventArgs e)
+        private void ShowMoleculeCaptions_CheckedChanged(object sender, EventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             try
             {
-                RendererOptions.ShowMoleculeLabels = ShowMoleculeLabels.Checked;
+                RendererOptions.ShowMoleculeCaptions = ShowMoleculeCaptions.Checked;
+                RenderCaptionsAsTextBox.Enabled = ShowMoleculeCaptions.Checked;
                 _dirty = true;
             }
             catch (Exception ex)
@@ -341,6 +343,21 @@ namespace Chem4Word.Renderer.OoXmlV4
             try
             {
                 RendererOptions.ShowBondDirection = ShowBondDirection.Checked;
+                _dirty = true;
+            }
+            catch (Exception ex)
+            {
+                new ReportError(Telemetry, TopLeft, module, ex).ShowDialog();
+            }
+        }
+
+        private void RenderCaptionsAsTextBox_CheckedChanged(object sender, EventArgs e)
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            try
+            {
+                RendererOptions.RenderCaptionsAsTextBox = RenderCaptionsAsTextBox.Checked;
                 _dirty = true;
             }
             catch (Exception ex)

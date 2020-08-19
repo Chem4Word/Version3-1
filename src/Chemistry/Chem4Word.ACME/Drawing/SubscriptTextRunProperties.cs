@@ -12,18 +12,20 @@ namespace Chem4Word.ACME.Drawing
 {
     public class SubscriptTextRunProperties : LabelTextRunProperties
     {
-        public SubscriptTextRunProperties(string colour) : base(colour)
+        private double _SubscriptSize = 0.0;
+        public SubscriptTextRunProperties(string colour, double SubscriptSize) : base(colour, SubscriptSize)
         {
+            _SubscriptSize = SubscriptSize;
         }
 
         public override double FontHintingEmSize
         {
-            get { return GlyphText.ScriptSize; }
+            get { return _SubscriptSize; }
         }
 
         public override double FontRenderingEmSize
         {
-            get { return GlyphText.ScriptSize; }
+            get { return _SubscriptSize; }
         }
 
         public override BaselineAlignment BaselineAlignment

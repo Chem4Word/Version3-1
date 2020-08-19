@@ -157,7 +157,7 @@ namespace Chem4Word.ACME.Controls
             if (dependencyObject is ChemistryCanvas canvas)
             {
                 canvas.Clear();
-                canvas.DrawChemistry(canvas.Chemistry);
+                canvas.DrawChemistry(canvas.ViewModel);
             }
         }
 
@@ -193,14 +193,14 @@ namespace Chem4Word.ACME.Controls
             Debug.WriteLine($"MeasureOverride({GetHashCode()})");
             var size = GetBoundingBox();
 
-            if (_mychemistry != null
-                && _mychemistry.Model != null
+            if (_viewModel != null
+                && _viewModel.Model != null
                 && !_positionOffsetApplied)
             {
                 // Only need to do this on "small" structures
-                if (_mychemistry.Model.TotalAtomsCount < 100)
+                if (_viewModel.Model.TotalAtomsCount < 100)
                 {
-                    var abb = _mychemistry.Model.BoundingBoxOfCmlPoints;
+                    var abb = _viewModel.Model.BoundingBoxOfCmlPoints;
 
                     double leftPadding = 0;
                     double topPadding = 0;
@@ -215,8 +215,8 @@ namespace Chem4Word.ACME.Controls
                         topPadding = abb.Top - size.Top;
                     }
 
-                    _mychemistry.Model.RepositionAll(-leftPadding, -topPadding);
-                    DrawChemistry(_mychemistry);
+                    _viewModel.Model.RepositionAll(-leftPadding, -topPadding);
+                    DrawChemistry(_viewModel);
                 }
 
                 _positionOffsetApplied = true;
@@ -230,34 +230,34 @@ namespace Chem4Word.ACME.Controls
         #region Properties
 
         //properties
-        private ViewModel _mychemistry;
+        private ViewModel _viewModel;
 
         public bool SuppressRedraw { get; set; }
 
-        public ViewModel Chemistry
+        public ViewModel ViewModel
         {
-            get { return _mychemistry; }
+            get { return _viewModel; }
             set
             {
-                if (_mychemistry != null && _mychemistry != value)
+                if (_viewModel != null && _viewModel != value)
                 {
                     DisconnectHandlers();
                 }
 
-                _mychemistry = value;
+                _viewModel = value;
                 _positionOffsetApplied = false;
-                DrawChemistry(_mychemistry);
+                DrawChemistry(_viewModel);
                 ConnectHandlers();
             }
         }
 
         private void ConnectHandlers()
         {
-            _mychemistry.Model.AtomsChanged += Model_AtomsChanged;
-            _mychemistry.Model.BondsChanged += Model_BondsChanged;
-            _mychemistry.Model.MoleculesChanged += Model_MoleculesChanged;
+            _viewModel.Model.AtomsChanged += Model_AtomsChanged;
+            _viewModel.Model.BondsChanged += Model_BondsChanged;
+            _viewModel.Model.MoleculesChanged += Model_MoleculesChanged;
 
-            _mychemistry.Model.PropertyChanged += Model_PropertyChanged;
+            _viewModel.Model.PropertyChanged += Model_PropertyChanged;
         }
 
         public bool AutoResize = true;
@@ -447,11 +447,11 @@ namespace Chem4Word.ACME.Controls
 
         private void DisconnectHandlers()
         {
-            _mychemistry.Model.AtomsChanged -= Model_AtomsChanged;
-            _mychemistry.Model.BondsChanged -= Model_BondsChanged;
-            _mychemistry.Model.MoleculesChanged -= Model_MoleculesChanged;
+            _viewModel.Model.AtomsChanged -= Model_AtomsChanged;
+            _viewModel.Model.BondsChanged -= Model_BondsChanged;
+            _viewModel.Model.MoleculesChanged -= Model_MoleculesChanged;
 
-            _mychemistry.Model.PropertyChanged -= Model_PropertyChanged;
+            _viewModel.Model.PropertyChanged -= Model_PropertyChanged;
         }
 
         #endregion Properties
@@ -715,7 +715,10 @@ namespace Chem4Word.ACME.Controls
                     fgv.ChemicalVisuals = chemicalVisuals;
 
                     fgv.BackgroundColor = Background;
-
+                    fgv.SymbolSize = ViewModel.SymbolSize;
+                    fgv.SubscriptSize = ViewModel.SymbolSize * ViewModel.ScriptScalingFactor;
+                    fgv.SuperscriptSize = ViewModel.SymbolSize * ViewModel.ScriptScalingFactor;
+                    fgv.Standoff = ViewModel.Standoff;
                     fgv.Render();
 
                     AddVisual(fgv);
@@ -728,7 +731,9 @@ namespace Chem4Word.ACME.Controls
                 if (av.RefCount == 0) // it hasn't been added before
                 {
                     av.ChemicalVisuals = chemicalVisuals;
-
+                    av.SymbolSize = ViewModel.SymbolSize;
+                    av.SubscriptSize = ViewModel.SymbolSize * ViewModel.ScriptScalingFactor;
+                    av.SuperscriptSize = ViewModel.SymbolSize * ViewModel.ScriptScalingFactor;
                     av.BackgroundColor = Background;
                     av.DisplayOverbonding = DisplayOverbondedAtoms;
                     av.Render();
@@ -771,7 +776,7 @@ namespace Chem4Word.ACME.Controls
             {
                 bv.ChemicalVisuals = chemicalVisuals;
                 bv.BondThickness = Globals.BondThickness;
-
+                bv.Standoff = ViewModel.Standoff;
                 bv.Render();
                 AddVisual(bv);
             }

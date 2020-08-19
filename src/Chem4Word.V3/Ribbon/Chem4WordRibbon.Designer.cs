@@ -143,7 +143,7 @@ namespace Chem4Word
             this.SaveToLibrary.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
             this.SaveToLibrary.Enabled = false;
             this.SaveToLibrary.Image = global::Chem4Word.Properties.Resources.Gallery_Save;
-            this.SaveToLibrary.Label = "Save";
+            this.SaveToLibrary.Label = "Add";
             this.SaveToLibrary.Name = "SaveToLibrary";
             this.SaveToLibrary.ScreenTip = "Add the selected structure to the Library";
             this.SaveToLibrary.ShowImage = true;

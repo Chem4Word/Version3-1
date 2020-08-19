@@ -60,7 +60,7 @@ namespace Chem4Word.Model2
         {
             if (!string.IsNullOrEmpty(_fullType))
             {
-                IsReadOnly = !(_fullType.Equals(CMLConstants.ValueChem4WordLabel)
+                IsReadOnly = !(_fullType.Equals(CMLConstants.ValueChem4WordCaption)
                                || _fullType.Equals(CMLConstants.ValueChem4WordFormula)
                                || _fullType.Equals(CMLConstants.ValueChem4WordSynonym));
             }
