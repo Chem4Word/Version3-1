@@ -18,12 +18,6 @@ namespace Chem4Word.Model2.Converters.CML
     // ReSharper disable once InconsistentNaming
     public static class CMLHelper
     {
-        // ReSharper disable once InconsistentNaming
-        public static XDocument LoadCML(string cml)
-        {
-            return XDocument.Parse(cml);
-        }
-
         public static int? GetIsotopeNumber(XElement cmlElement)
         {
             int isotopeNumber;
@@ -88,9 +82,21 @@ namespace Chem4Word.Model2.Converters.CML
         // ReSharper disable once InconsistentNaming
         internal static List<XElement> GetMolecules(XElement doc)
         {
-            var mols = from XElement xe in doc.Elements(CMLConstants.TagMolecule) select xe;
-            var mols2 = from XElement xe2 in doc.Elements(CMLNamespaces.cml + CMLConstants.TagMolecule) select xe2;
-            return mols.Union(mols2).ToList();
+            List<XElement> result = new List<XElement>();
+
+            // Task 736 - Handle ChemDraw 19.1 cml variant
+            if (doc.Document.Root.Name.LocalName == CMLConstants.TagMolecule)
+            {
+                result.Add(doc);
+            }
+            else
+            {
+                var mols = from XElement xe in doc.Elements(CMLConstants.TagMolecule) select xe;
+                var mols2 = from XElement xe2 in doc.Elements(CMLNamespaces.cml + CMLConstants.TagMolecule) select xe2;
+                result = mols.Union(mols2).ToList();
+            }
+
+            return result;
         }
 
         internal static List<XElement> GetAtoms(XElement mol)

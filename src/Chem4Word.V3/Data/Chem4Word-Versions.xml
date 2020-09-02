@@ -5,12 +5,12 @@
   <Version>
     <Number>3.1.11 Release 1</Number>
     <IsBeta>false</IsBeta>
-    <Released>19-Aug-2020</Released>
+    <Released>02-Sep-2020</Released>
     <Changes>
       <Change>Improved code handling updating of Content Control(s)</Change>
       <Change>https://github.com/Chem4Word/Version3-1/issues/70 - Improved look of Exterior Double Bond in ACME</Change>
-      <Change>Library now refreshes properly after add / remove without closing word</Change>
-      <Change>Isotope Labels clear on change of element</Change>
+      <Change>Library now refreshes properly after add / remove; No longer any need to close and open MS Word</Change>
+      <Change>Isotope Labels now clear on change of element</Change>
       <Change>Improvements to double bond handling in ACME</Change>
       <Change>Added telemetry to ACME</Change>
     </Changes>

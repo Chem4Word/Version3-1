@@ -172,6 +172,9 @@ namespace Chem4WordUpdater
 
                 _downloadedFile = Path.Combine(downloadPath, filename);
 
+                var securityProtocol = ServicePointManager.SecurityProtocol;
+                ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
                 _webClient = new WebClient();
                 _webClient.Headers.Add("user-agent", "Chem4Word Updater");
 

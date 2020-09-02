@@ -332,8 +332,8 @@ namespace Chem4Word.Model2.Converters.CML
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,
                 new XAttribute(CMLConstants.AttributeId, atom.Id),
                 new XAttribute(CMLConstants.AttributeElementType, elementType),
-                new XAttribute(CMLConstants.AttributeX2, atom.Position.X.ToString("0.####", CultureInfo.InvariantCulture)),
-                new XAttribute(CMLConstants.AttributeY2, atom.Position.Y.ToString("0.####", CultureInfo.InvariantCulture))
+                new XAttribute(CMLConstants.AttributeX2, atom.Position.X.ToString("0.0#####", CultureInfo.InvariantCulture)),
+                new XAttribute(CMLConstants.AttributeY2, atom.Position.Y.ToString("0.0#####", CultureInfo.InvariantCulture))
             );
 
             if (atom.FormalCharge != null && atom.FormalCharge.Value != 0)
@@ -444,7 +444,12 @@ namespace Chem4Word.Model2.Converters.CML
             molecule.Errors = new List<string>();
             molecule.Warnings = new List<string>();
 
-            List<XElement> childMolecules = CMLHelper.GetMolecules(cmlElement);
+            // Task 736 - Handle ChemDraw 19.1 cml variant
+            List<XElement> childMolecules = new List<XElement>();
+            if (cmlElement.Document.Root.Name.LocalName != CMLConstants.TagMolecule)
+            {
+                childMolecules = CMLHelper.GetMolecules(cmlElement);
+            }
 
             List<XElement> atomElements = CMLHelper.GetAtoms(cmlElement);
             List<XElement> bondElements = CMLHelper.GetBonds(cmlElement);

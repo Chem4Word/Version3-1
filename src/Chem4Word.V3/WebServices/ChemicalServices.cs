@@ -41,9 +41,12 @@ namespace Chem4Word.WebServices
             DateTime started = DateTime.Now;
 
             ChemicalServicesResult data = null;
+            var securityProtocol = ServicePointManager.SecurityProtocol;
 
             try
             {
+                ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
                 using (HttpClient httpClient = new HttpClient())
                 {
                     var formData = new List<KeyValuePair<string, string>>();
@@ -84,6 +87,7 @@ namespace Chem4Word.WebServices
                                 {
                                     Telemetry.Write(module, "Timing", string.Join(Environment.NewLine, data.Messages));
                                 }
+
                                 if (data.Errors.Any())
                                 {
                                     Telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, data.Errors));
@@ -102,6 +106,10 @@ namespace Chem4Word.WebServices
             {
                 Telemetry.Write(module, "Exception", e1.Message);
                 Telemetry.Write(module, "Exception", e1.ToString());
+            }
+            finally
+            {
+                ServicePointManager.SecurityProtocol = securityProtocol;
             }
 
             DateTime ended = DateTime.Now;

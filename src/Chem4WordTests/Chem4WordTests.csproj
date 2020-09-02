@@ -186,6 +186,18 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\NestedParafuchsinCarbol.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Trimethylamine-Normal.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Trimethylamine-MinusNamespace.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Trimethylamine-MinusArrays.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Trimethylamine-MoleculeRoot.xml" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

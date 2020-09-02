@@ -41,7 +41,7 @@ namespace Chem4WordSetup
         private State _state = State.Done;
         private State _previousState = State.Done;
         private string _latestVersion = string.Empty;
-        private int _retryCount = 0;
+        private int _retryCount;
         private string _domainUsed = string.Empty;
         private Stopwatch _sw = new Stopwatch();
 
@@ -61,9 +61,7 @@ namespace Chem4WordSetup
 
             bool isDesignTimeInstalled = false;
             bool isRuntimeInstalled = false;
-            bool isWordInstalled = false;
             bool isOperatingSystemWindows7Plus = false;
-            bool isChem4WordVersion2Installed = false;
             bool isChem4WordVersion3Installed = false;
 
             #region Detect Windows Version
@@ -83,7 +81,7 @@ namespace Chem4WordSetup
 
             #region Detect Word
 
-            isWordInstalled = OfficeHelper.GetWinWordVersionNumber() >= 2010;
+            bool isWordInstalled = OfficeHelper.GetWinWordVersionNumber() >= 2010;
 
             #endregion Detect Word
 
@@ -99,18 +97,7 @@ namespace Chem4WordSetup
 
             #region Detect Design Time VSTO
 
-            string feature = null;
-            try
-            {
-                feature =
-                    Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VSTO_DT\VS10\Feature", "", null)
-                        .ToString();
-            }
-            catch
-            {
-                // Do Nothing
-            }
-
+            string feature = GetRegistryValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VSTO_DT\VS10\Feature");
             if (!string.IsNullOrEmpty(feature))
             {
                 isDesignTimeInstalled = true;
@@ -120,30 +107,10 @@ namespace Chem4WordSetup
 
             #region Detect Runtime VSTO
 
-            string version = null;
-            try
-            {
-                version =
-                    Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VSTO Runtime Setup\v4R", "Version", null)
-                        .ToString();
-            }
-            catch
-            {
-                // Do Nothing
-            }
-
+            string version = GetRegistryValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VSTO Runtime Setup\v4R", "Version");
             if (string.IsNullOrEmpty(version))
             {
-                try
-                {
-                    version =
-                        Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VSTO Runtime Setup\v4R", "Version", null)
-                            .ToString();
-                }
-                catch
-                {
-                    // Do Nothing
-                }
+                version = GetRegistryValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VSTO Runtime Setup\v4R", "Version");
             }
 
             Version mimimumVersion = new Version("10.0.60724");
@@ -163,30 +130,11 @@ namespace Chem4WordSetup
             // SOFTWARE\Microsoft\VSTO_DT\VS10\Feature
             if (!isRuntimeInstalled)
             {
-                version = "";
-                try
-                {
-                    version =
-                        Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VSTO_DT\VS10\Feature", "", null)
-                            .ToString();
-                }
-                catch
-                {
-                    // Do Nothing
-                }
+                version = GetRegistryValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VSTO_DT\VS10\Feature");
 
                 if (string.IsNullOrEmpty(version))
                 {
-                    try
-                    {
-                        version =
-                            Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VSTO_DT\VS10\Feature", "", null)
-                                .ToString();
-                    }
-                    catch
-                    {
-                        // Do Nothing
-                    }
+                    version = GetRegistryValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\VSTO_DT\VS10\Feature");
                 }
 
                 if (!string.IsNullOrEmpty(version))
@@ -211,8 +159,7 @@ namespace Chem4WordSetup
 
             #region Is Chem4Word Installed
 
-            isChem4WordVersion2Installed = FindOldVersion();
-            //isChem4WordVersion3Installed = FindCurrentVersion();
+            bool isChem4WordVersion2Installed = FindOldVersion();
 
             #endregion Is Chem4Word Installed
 
@@ -285,6 +232,26 @@ namespace Chem4WordSetup
             }
         }
 
+        private string GetRegistryValue(string keyName, string valueName = "")
+        {
+            string result = "";
+
+            try
+            {
+                var value = Registry.GetValue(keyName, valueName, null);
+                if (value != null)
+                {
+                    result = value.ToString();
+                }
+            }
+            catch
+            {
+                // Just return empty string
+            }
+
+            return result;
+        }
+
         private string ChangeDomain(string input)
         {
             string output = input;
@@ -305,6 +272,10 @@ namespace Chem4WordSetup
             string contents = null;
 
             bool foundOurXmlFile = false;
+
+            var securityProtocol = ServicePointManager.SecurityProtocol;
+            ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
             foreach (var domain in Domains)
             {
                 using (HttpClient client = new HttpClient())
@@ -361,6 +332,7 @@ namespace Chem4WordSetup
                 }
             }
 
+            ServicePointManager.SecurityProtocol = securityProtocol;
             return contents;
         }
 
@@ -653,6 +625,9 @@ namespace Chem4WordSetup
                         // Do Nothing
                     }
                 }
+
+                var securityProtocol = ServicePointManager.SecurityProtocol;
+                ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
                 _webClient = new WebClient();
                 _webClient.Headers.Add("user-agent", "Chem4Word Bootstrapper");
