@@ -109,6 +109,49 @@ namespace WiX.CustomAction
         }
 
         [CustomAction]
+        public static ActionResult CleanUserRegistry(Session session)
+        {
+            session.Log("Begin CleanUserRegistry()");
+
+            session.Log($"  Running as {Environment.UserName}");
+
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Chem4Word V3", true);
+                if (key == null)
+                {
+                    key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Chem4Word V3");
+                }
+
+                if (key != null)
+                {
+                    try
+                    {
+                        var values = key.GetValueNames();
+                        // Erase previously stored Update Checks etc
+                        foreach (string value in values)
+                        {
+                            session.Log($"Deleting Value '{value}'");
+                            key.DeleteValue(value);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                session.Log($"** Exception: {ex.Message} **");
+            }
+
+            session.Log("End CleanUserRegistry()");
+
+            return ActionResult.Success;
+        }
+
+        [CustomAction]
         public static ActionResult RemoveChem4Word(Session session)
         {
             session.Log("Begin RemoveChem4Word()");
