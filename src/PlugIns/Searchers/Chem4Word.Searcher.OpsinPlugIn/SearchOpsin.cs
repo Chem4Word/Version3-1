@@ -45,6 +45,9 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 Telemetry.Write(module, "Information", $"User searched for '{SearchFor.Text}'");
                 Cursor = Cursors.WaitCursor;
 
+                var securityProtocol = ServicePointManager.SecurityProtocol;
+                ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
                 UriBuilder builder = new UriBuilder(UserOptions.OpsinWebServiceUri + SearchFor.Text);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(builder.Uri);
                 request.Timeout = 30000;
@@ -54,23 +57,25 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 HttpWebResponse response;
                 try
                 {
-                    response = (HttpWebResponse)request.GetResponse();
+                    response = (HttpWebResponse) request.GetResponse();
                     if (response.StatusCode.Equals(HttpStatusCode.OK))
                     {
                         ProcessResponse(response);
                     }
                     else
                     {
-                        ShowFailureMessage($"An unexpected status code of {response.StatusCode} was returned by the server");
+                        ShowFailureMessage(
+                            $"An unexpected status code of {response.StatusCode} was returned by the server");
                     }
                 }
                 catch (WebException ex)
                 {
-                    HttpWebResponse webResponse = (HttpWebResponse)ex.Response;
+                    HttpWebResponse webResponse = (HttpWebResponse) ex.Response;
                     switch (webResponse.StatusCode)
                     {
                         case HttpStatusCode.NotFound:
-                            ShowFailureMessage($"No valid representation of the name '{SearchFor.Text}' has been found");
+                            ShowFailureMessage(
+                                $"No valid representation of the name '{SearchFor.Text}' has been found");
                             break;
 
                         case HttpStatusCode.RequestTimeout:
@@ -82,7 +87,11 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 {
                     ShowFailureMessage($"An unexpected error has occurred: {ex.Message}");
                 }
-                Cursor = Cursors.Default;
+                finally
+                {
+                    ServicePointManager.SecurityProtocol = securityProtocol;
+                    Cursor = Cursors.Default;
+                }
             }
         }
 
@@ -129,6 +138,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 Top = (int)TopLeft.Y;
             }
             display1.Background = Brushes.White;
+            display1.HighlightActive = false;
             ImportButton.Enabled = false;
             LabelInfo.Text = "";
             AcceptButton = SearchButton;

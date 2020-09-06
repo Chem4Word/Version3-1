@@ -2,6 +2,17 @@
 <!-- This file must be uploaded to https://www.chem4word.co.uk/files3-1/ folder as Chem4Word-Versions.xml -->
 <ChangeLog>
   <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
+    <Version>
+        <Number>3.1.12 Release 2</Number>
+        <IsBeta>false</IsBeta>
+        <Released>06-Sep-2020</Released>
+        <Changes>
+            <Change>Fix Null Pointer Exceptions in ACME</Change>
+            <Change>Fix Error in ChEBI Search when atoms which are not elements are encountered</Change>
+            <Change>Please download Chem4Word-Setup.exe via https://www.chem4word.co.uk/download/ if you encounter any difficulties updating.</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.12.Release.2.msi</Url>
+    </Version>
   <Version>
     <Number>3.1.11 Release 1</Number>
     <IsBeta>false</IsBeta>
@@ -14,7 +25,6 @@
       <Change>Improvements to double bond handling in ACME</Change>
       <Change>Added telemetry to ACME</Change>
     </Changes>
-    <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.11.Release.1.msi</Url>
   </Version>
   <Version>
     <Number>3.1.10 Beta 10</Number>

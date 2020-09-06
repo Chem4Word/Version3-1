@@ -68,6 +68,8 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                 }
 
                 display1.Background = Brushes.White;
+                display1.HighlightActive = false;
+
                 NextButton.Enabled = false;
                 PreviousButton.Enabled = false;
                 ImportButton.Enabled = false;
@@ -199,6 +201,9 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                     }
                 }
 
+                var securityProtocol = ServicePointManager.SecurityProtocol;
+                ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
                 var request = (HttpWebRequest)WebRequest.Create(webCall);
 
                 request.Timeout = 30000;
@@ -286,6 +291,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                 }
                 finally
                 {
+                    ServicePointManager.SecurityProtocol = securityProtocol;
                     Cursor = Cursors.Default;
                 }
             }

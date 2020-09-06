@@ -28,12 +28,22 @@ namespace Chem4Word.Model2
 
         public Atom EndAtom
         {
-            get { return Parent.Atoms[EndAtomInternalId]; }
+            get
+            {
+                return Parent.Atoms.ContainsKey(EndAtomInternalId)
+                    ? Parent.Atoms[EndAtomInternalId]
+                    : null;
+            }
         }
 
         public Atom StartAtom
         {
-            get { return Parent.Atoms[StartAtomInternalId]; }
+            get
+            {
+                return Parent.Atoms.ContainsKey(StartAtomInternalId)
+                    ? Parent.Atoms[StartAtomInternalId]
+                    : null;
+            }
         }
 
         public List<Atom> GetAtoms()

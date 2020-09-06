@@ -234,53 +234,60 @@ namespace Chem4Word.Model2
                 bool result = true;
                 _isAllenic = false;
 
-                if (Element is FunctionalGroup)
+                if (Element == null)
                 {
-                    // Use initialised value of true
+                    result = false;
                 }
                 else
                 {
-                    if (IsotopeNumber != null || (FormalCharge ?? 0) != 0)
+                    if (Element is FunctionalGroup)
                     {
                         // Use initialised value of true
                     }
-                    else if (Element.Symbol == Globals.CarbonSymbol)
+                    else
                     {
-                        result = false;
-
-                        if (ExplicitC.HasValue)
+                        if (IsotopeNumber != null || (FormalCharge ?? 0) != 0)
                         {
-                            result = ExplicitC.Value;
+                            // Use initialised value of true
                         }
-                        else
+                        else if (Element.Symbol == Globals.CarbonSymbol)
                         {
-                            if (Degree <= 1)
-                            {
-                                result = true;
-                            }
+                            result = false;
 
-                            if (Degree == 2)
+                            if (ExplicitC.HasValue)
                             {
-                                var bonds = Bonds.ToArray();
-                                // This code is triggered when adding the first Atom to a bond
-                                //  at this point one of the atoms is undefined
-                                Atom a1 = bonds[0].OtherAtom(this);
-                                Atom a2 = bonds[1].OtherAtom(this);
-                                if (a1 != null && a2 != null)
+                                result = ExplicitC.Value;
+                            }
+                            else
+                            {
+                                if (Degree <= 1)
                                 {
-                                    double angle1 =
-                                        Vector.AngleBetween(-(Position - a1.Position),
-                                                            Position - a2.Position);
-                                    if (Math.Abs(angle1) < 8)
+                                    result = true;
+                                }
+
+                                if (Degree == 2)
+                                {
+                                    var bonds = Bonds.ToArray();
+                                    // This code is triggered when adding the first Atom to a bond
+                                    //  at this point one of the atoms is undefined
+                                    Atom a1 = bonds[0].OtherAtom(this);
+                                    Atom a2 = bonds[1].OtherAtom(this);
+                                    if (a1 != null && a2 != null)
                                     {
-                                        if (bonds[0].OrderValue == 2
-                                            && bonds[1].OrderValue == 2)
+                                        double angle1 =
+                                            Vector.AngleBetween(-(Position - a1.Position),
+                                                                Position - a2.Position);
+                                        if (Math.Abs(angle1) < 8)
                                         {
-                                            _isAllenic = true;
-                                        }
-                                        else
-                                        {
-                                            result = true;
+                                            if (bonds[0].OrderValue == 2
+                                                && bonds[1].OrderValue == 2)
+                                            {
+                                                _isAllenic = true;
+                                            }
+                                            else
+                                            {
+                                                result = true;
+                                            }
                                         }
                                     }
                                 }
@@ -349,16 +356,22 @@ namespace Chem4Word.Model2
         {
             get
             {
-                string result = Element.Symbol;
+                string result = string.Empty;
 
-                if (!ShowSymbol)
+                if (Element != null)
                 {
-                    result = string.Empty;
-                }
+                    result = Element.Symbol;
 
-                if (_isAllenic)
-                {
-                    result = Globals.AllenicCarbonSymbol;
+                    if (!ShowSymbol)
+                    {
+                        result = string.Empty;
+                    }
+
+                    if (_isAllenic)
+                    {
+                        result = Globals.AllenicCarbonSymbol;
+                    }
+
                 }
 
                 return result;

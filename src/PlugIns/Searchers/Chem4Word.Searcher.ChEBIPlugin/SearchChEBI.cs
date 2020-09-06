@@ -8,8 +8,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Windows.Media;
 using Chem4Word.Core.Helpers;
 using Chem4Word.Core.UI;
 using Chem4Word.Core.UI.Forms;
@@ -27,6 +29,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
         private static string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
         private static string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+
+        private const string EmptyCml = "<cml></cml>";
+
         private Entity _allResults;
         private Model _lastModel;
         private string _lastMolfile = string.Empty;
@@ -76,8 +81,12 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 display1.Chemistry = null;
                 if (!string.IsNullOrEmpty(SearchFor.Text))
                 {
+
                     ChebiWebServiceService ws = new ChebiWebServiceService();
                     getLiteEntityResponse results;
+
+                    var securityProtocol = ServicePointManager.SecurityProtocol;
+                    ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
                     ws.Url = UserOptions.ChEBIWebServiceUri;
                     ws.UserAgent = "Chem4Word";
@@ -102,10 +111,12 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                                 var li = new ListViewItem();
                                 li.Text = res.chebiId;
                                 li.Tag = res;
-                                ListViewItem.ListViewSubItem name = new ListViewItem.ListViewSubItem(li, res.chebiAsciiName);
+                                ListViewItem.ListViewSubItem name =
+                                    new ListViewItem.ListViewSubItem(li, res.chebiAsciiName);
                                 li.SubItems.Add(name);
 
-                                ListViewItem.ListViewSubItem score = new ListViewItem.ListViewSubItem(li, res.searchScore.ToString());
+                                ListViewItem.ListViewSubItem score =
+                                    new ListViewItem.ListViewSubItem(li, res.searchScore.ToString());
                                 li.SubItems.Add(score);
                                 ResultsListView.Items.Add(li);
                             }
@@ -123,6 +134,10 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                             ? "Please try again later - the service has timed out"
                             : ex.Message;
                     }
+                    finally
+                    {
+                        ServicePointManager.SecurityProtocol = securityProtocol;
+                    }
                 }
             }
 
@@ -133,6 +148,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
         {
             using (new WaitCursor())
             {
+                var securityProtocol = ServicePointManager.SecurityProtocol;
+                ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
                 ChebiWebServiceService ws = new ChebiWebServiceService();
                 getCompleteEntityResponse results;
 
@@ -147,6 +165,8 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 _allResults = results.@return;
 
                 var chemStructure = _allResults?.ChemicalStructures?[0]?.structure;
+
+                ServicePointManager.SecurityProtocol = securityProtocol;
                 return chemStructure;
             }
         }
@@ -311,6 +331,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
                 AcceptButton = SearchButton;
 
+                display1.Background = Brushes.White;
+                display1.HighlightActive = false;
+
                 EnableImport();
 
 #if DEBUG
@@ -370,7 +393,10 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 }
                 else
                 {
-                    display1.Chemistry = null;
+                    _lastMolfile = string.Empty;
+                    CMLConverter cmlConverter = new CMLConverter();
+                    _lastModel = cmlConverter.Import(EmptyCml);
+                    display1.Clear();
                     ErrorsAndWarnings.Text = "No structure available.";
                 }
 
