@@ -111,11 +111,33 @@ namespace Chem4Word.ACME
             _redoStack = new Stack<UndoRecord>();
         }
 
+        private void WriteTelemetry(string source, string level, string message)
+        {
+            if (_telemetry != null)
+            {
+                _telemetry.Write(source, level, message);
+            }
+        }
+
+        private void WriteTelemetryException(string source, Exception exception)
+        {
+            if (_telemetry != null)
+            {
+                _telemetry.Write(source, "Exception", exception.Message);
+                _telemetry.Write(source, "Exception", exception.StackTrace);
+            }
+            else
+            {
+                RegistryHelper.StoreException(source, exception);
+            }
+        }
+
         public void BeginUndoBlock()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                //WriteTelemetry(module, "Debug", $"TransactionLevel: {_transactionLevel}");
                 //push a buffer record onto the stack
                 if (_transactionLevel == 0)
                 {
@@ -125,15 +147,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (_telemetry != null)
-                {
-                    _telemetry.Write(module, "Exception", exception.Message);
-                    _telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -158,15 +172,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (_telemetry != null)
-                {
-                    _telemetry.Write(module, "Exception", exception.Message);
-                    _telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -178,6 +184,7 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                //WriteTelemetry(module, "Debug", $"TransactionLevel: {_transactionLevel}");
                 _transactionLevel--;
 
                 if (_transactionLevel < 0)
@@ -206,15 +213,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (_telemetry != null)
-                {
-                    _telemetry.Write(module, "Exception", exception.Message);
-                    _telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -243,15 +242,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (_telemetry != null)
-                {
-                    _telemetry.Write(module, "Exception", exception.Message);
-                    _telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -266,22 +257,18 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (_telemetry != null)
-                {
-                    _telemetry.Write(module, "Exception", exception.Message);
-                    _telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
         private void UndoActions()
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             //the very first record on the undo stack should be a buffer record
             var br = _undoStack.Pop();
+            WriteTelemetry(module, "Debug", $"{br.Level} - {br.Description}");
+
             if (!br.Equals(_endBracket))
             {
                 Debugger.Break();
@@ -292,6 +279,7 @@ namespace Chem4Word.ACME
             while (true)
             {
                 br = _undoStack.Pop();
+                WriteTelemetry(module, "Debug", $"{br.Level} - {br.Description}");
                 _redoStack.Push(br);
                 if (br.Equals(_startBracket))
                 {
@@ -312,22 +300,18 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (_telemetry != null)
-                {
-                    _telemetry.Write(module, "Exception", exception.Message);
-                    _telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
         private void RedoActions()
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             //the very first record on the redo stack should be a buffer record
             var br = _redoStack.Pop();
+            WriteTelemetry(module, "Debug", $"{br.Level} - {br.Description}");
+
             if (!br.Equals(_startBracket))
             {
                 Debugger.Break();
@@ -338,6 +322,8 @@ namespace Chem4Word.ACME
             while (true)
             {
                 br = _redoStack.Pop();
+                WriteTelemetry(module, "Debug", $"{br.Level} - {br.Description}");
+
                 _undoStack.Push(br);
                 if (br.Equals(_endBracket))
                 {

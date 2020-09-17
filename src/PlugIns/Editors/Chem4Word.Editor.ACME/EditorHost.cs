@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Forms;
@@ -24,6 +25,9 @@ namespace Chem4Word.Editor.ACME
 {
     public partial class EditorHost : Form
     {
+        private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         public Point TopLeft { get; set; }
         public IChem4WordTelemetry Telemetry { get; set; }
 
@@ -120,6 +124,8 @@ namespace Chem4Word.Editor.ACME
 
         private void Save_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             CMLConverter cc = new CMLConverter();
             DialogResult = DialogResult.Cancel;
 
@@ -129,17 +135,21 @@ namespace Chem4Word.Editor.ACME
                 DialogResult = DialogResult.OK;
                 OutputValue = cc.Export(editor.EditedModel);
             }
+            Telemetry.Write(module, "Verbose", $"Result: {DialogResult}");
             Hide();
         }
 
         private void Cancel_Click(object sender, EventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             DialogResult = DialogResult.Cancel;
+            Telemetry.Write(module, "Verbose", $"Result: {DialogResult}");
             Hide();
         }
 
         private void EditorHost_FormClosing(object sender, FormClosingEventArgs e)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             if (DialogResult != DialogResult.OK && e.CloseReason == CloseReason.UserClosing)
             {
                 if (elementHost1.Child is Chem4Word.ACME.Editor editor
@@ -165,11 +175,13 @@ namespace Chem4Word.Editor.ACME
                             model.ReLabelGuids();
                             CMLConverter cc = new CMLConverter();
                             OutputValue = cc.Export(model);
+                            Telemetry.Write(module, "Verbose", $"Result: {DialogResult}");
                             Hide();
                             editor = null;
                             break;
 
                         case DialogResult.No:
+                            Telemetry.Write(module, "Verbose", $"Result: {DialogResult}");
                             editor = null;
                             break;
                     }

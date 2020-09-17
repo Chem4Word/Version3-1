@@ -30,9 +30,10 @@ namespace Chem4Word.Model2
         {
             get
             {
-                return Parent.Atoms.ContainsKey(EndAtomInternalId)
-                    ? Parent.Atoms[EndAtomInternalId]
-                    : null;
+                return Parent.Atoms[EndAtomInternalId];
+                //return Parent.Atoms.ContainsKey(EndAtomInternalId)
+                //    ? Parent.Atoms[EndAtomInternalId]
+                //    : null;
             }
         }
 
@@ -40,9 +41,10 @@ namespace Chem4Word.Model2
         {
             get
             {
-                return Parent.Atoms.ContainsKey(StartAtomInternalId)
-                    ? Parent.Atoms[StartAtomInternalId]
-                    : null;
+                //return Parent.Atoms.ContainsKey(StartAtomInternalId)
+                //    ? Parent.Atoms[StartAtomInternalId]
+                //    : null;
+                return Parent.Atoms[StartAtomInternalId];
             }
         }
 

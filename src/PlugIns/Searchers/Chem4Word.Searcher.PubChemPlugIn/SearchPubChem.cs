@@ -308,6 +308,9 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             request.Timeout = 30000;
             request.UserAgent = "Chem4Word";
 
+            var securityProtocol = ServicePointManager.SecurityProtocol;
+            ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
             HttpWebResponse response;
             try
             {
@@ -355,8 +358,12 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             catch (Exception ex)
             {
                 ErrorsAndWarnings.Text = "The operation has timed out".Equals(ex.Message)
-                                    ? "Please try again later - the service has timed out"
-                                    : ex.Message;
+                    ? "Please try again later - the service has timed out"
+                    : ex.Message;
+            }
+            finally
+            {
+                ServicePointManager.SecurityProtocol = securityProtocol;
             }
         }
 
@@ -378,7 +385,10 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                 {
                     Cursor = Cursors.WaitCursor;
 
-                    // http://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/241/record/SDF
+                    // https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/241/record/SDF
+
+                    var securityProtocol = ServicePointManager.SecurityProtocol;
+                    ServicePointManager.SecurityProtocol = securityProtocol | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
                     try
                     {
@@ -449,6 +459,7 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                     }
                     finally
                     {
+                        ServicePointManager.SecurityProtocol = securityProtocol;
                         Cursor = Cursors.Default;
                     }
                 }

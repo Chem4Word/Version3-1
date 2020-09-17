@@ -305,18 +305,18 @@ namespace Chem4Word.ACME.Drawing
             Atom endAtom = ParentBond.EndAtom;
 
             // Only continue if we have both a start and end atom
-            if (startAtom != null && endAtom != null)
-            {
+            //if (startAtom != null && endAtom != null)
+            //{
                 //set up the shared variables first
                 Point startPoint = startAtom.Position;
                 Point endPoint = endAtom.Position;
 
                 double bondLength = ParentBond.Model.XamlBondLength;
-                bool firstVisualExists = ChemicalVisuals.ContainsKey(startAtom);
-                bool secondVisualExists = ChemicalVisuals.ContainsKey(endAtom);
+                //bool firstVisualExists = ChemicalVisuals.ContainsKey(startAtom);
+                //bool secondVisualExists = ChemicalVisuals.ContainsKey(endAtom);
 
                 // Only continue if bond length is not zero and we have both a startVisual and endVisual
-                if (startPoint != endPoint && firstVisualExists && secondVisualExists)
+                if (startPoint != endPoint ) // && firstVisualExists && secondVisualExists)
                 {
                     //now get the geometry of start and end atoms
                     AtomVisual startVisual = (AtomVisual)ChemicalVisuals[startAtom];
@@ -489,7 +489,7 @@ namespace Chem4Word.ACME.Drawing
                             break;
                     }
                 }
-            }
+            //}
 
             //local function
             void DrawHitTestOverlay(DrawingContext dc)

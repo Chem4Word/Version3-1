@@ -480,35 +480,25 @@ namespace Chem4Word.Model2
             UpdateBondsPropertyHandlers(e);
         }
 
-        public Bond AddBond(string newID)
+        public void RemoveBond(Bond toRemove)
         {
-            var newBond = new Bond();
-            newBond.Id = newID;
-            AddBond(newBond);
-            return newBond;
-        }
-
-        public bool RemoveBond(Bond toRemove)
-        {
-            bool result = _bonds.Remove(toRemove);
+            _bonds.Remove(toRemove);
             NotifyCollectionChangedEventArgs e =
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Bond> { toRemove });
             OnBondsChanged(this, e);
             UpdateBondsPropertyHandlers(e);
-            return result;
         }
 
-        public Atom AddAtom(Atom newAtom)
+        public void AddAtom(Atom newAtom)
         {
             _atoms[newAtom.InternalId] = newAtom;
             NotifyCollectionChangedEventArgs e =
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Atom> { newAtom });
             OnAtomsChanged(this, e);
             UpdateAtomPropertyHandlers(e);
-            return newAtom;
         }
 
-        public bool RemoveAtom(Atom toRemove)
+        public void RemoveAtom(Atom toRemove)
         {
             bool bondsExist =
                 Bonds.Any(b =>
@@ -528,8 +518,6 @@ namespace Chem4Word.Model2
                 OnAtomsChanged(this, e);
                 UpdateAtomPropertyHandlers(e);
             }
-
-            return result;
         }
 
         private void UpdateAtomPropertyHandlers(NotifyCollectionChangedEventArgs e)
@@ -1728,7 +1716,7 @@ namespace Chem4Word.Model2
         {
             Names.Clear();
             Formulas.Clear();
-            Captions.Clear();
+            //Captions.Clear();
         }
 
         /// <summary>

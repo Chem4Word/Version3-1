@@ -624,6 +624,10 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 int bondCount = atom.Bonds.ToList().Count;
                 double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
                 CompassPoints orientation = bondCount == 1 ? BasicGeometry.SnapTo2EW(angleFromNorth) : BasicGeometry.SnapTo4NESW(angleFromNorth);
+                if (atom.Singleton)
+                {
+                    orientation = CompassPoints.East;
+                }
 
                 // 2.2 Implicit Hydrogens
                 GroupOfCharacters hydrogens = null;

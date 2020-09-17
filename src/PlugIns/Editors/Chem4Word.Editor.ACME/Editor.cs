@@ -84,9 +84,9 @@ namespace Chem4Word.Editor.ACME
 
         public DialogResult Edit()
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             DialogResult dialogResult = DialogResult.Cancel;
 
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
                 Telemetry.Write(module, "Verbose", "Called");

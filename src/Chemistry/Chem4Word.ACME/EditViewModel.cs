@@ -85,9 +85,16 @@ namespace Chem4Word.ACME
 
         internal void SendStatus(string value)
         {
-            WpfEventArgs args = new WpfEventArgs();
-            args.OutputValue = value;
-            OnFeedbackChange?.Invoke(this, args);
+            try
+            {
+                var args = new WpfEventArgs();
+                args.OutputValue = value;
+                OnFeedbackChange?.Invoke(this, args);
+            }
+            catch
+            {
+                // We don't care if this fails
+            }
         }
 
         public SelectionTypeCode SelectionType
@@ -172,66 +179,82 @@ namespace Chem4Word.ACME
             }
         }
 
+        private void WriteTelemetry(string source, string level, string message)
+        {
+            if (Telemetry != null)
+            {
+                Telemetry.Write(source, level, message);
+            }
+        }
+
+        private void WriteTelemetryException(string source, Exception exception)
+        {
+            if (Telemetry != null)
+            {
+                Telemetry.Write(source, "Exception", exception.Message);
+                Telemetry.Write(source, "Exception", exception.StackTrace);
+            }
+            else
+            {
+                RegistryHelper.StoreException(source, exception);
+            }
+        }
+
         public void SetElement(ElementBase value, List<Atom> selAtoms)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var countString = selAtoms == null ? "{null}" : $"{selAtoms.Count}";
+                WriteTelemetry(module, "Debug", $"Atoms: {countString} Symbol: {value?.Symbol ?? "{null}"}");
+
                 if (selAtoms.Any())
                 {
                     UndoManager.BeginUndoBlock();
 
-                foreach (Atom selectedAtom in selAtoms)
-                {
-                    var lastAtom = selectedAtom;
-                    if (lastAtom.Element != value)
+                    foreach (Atom selectedAtom in selAtoms)
                     {
-                        var currentIsotope = lastAtom.IsotopeNumber;
-                        var lastElement = lastAtom.Element;
-                        Action redo = () =>
-                                      {
-                                          lastAtom.Element = value;
-                                          lastAtom.IsotopeNumber = null;
-                                          lastAtom.UpdateVisual();
-
-                                          //reselect the atom to clear the adorner
-                                          RemoveFromSelection(lastAtom);
-                                          AddToSelection(lastAtom);
-                                      };
-                        Action undo = () =>
-                                      {
-                                          lastAtom.Element = lastElement;
-                                          lastAtom.IsotopeNumber = currentIsotope;
-                                          lastAtom.UpdateVisual();
-
-                                          //reselect the atom to clear the adorner
-                                          RemoveFromSelection(lastAtom);
-                                          AddToSelection(lastAtom);
-                                      };
-                        UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol ?? "null"}");
-
-                        redo();
-                        foreach (Bond bond in lastAtom.Bonds)
+                        var lastAtom = selectedAtom;
+                        if (lastAtom.Element != value)
                         {
-                            bond.UpdateVisual();
+                            var currentIsotope = lastAtom.IsotopeNumber;
+                            var lastElement = lastAtom.Element;
+                            Action redo = () =>
+                                          {
+                                              lastAtom.Element = value;
+                                              lastAtom.IsotopeNumber = null;
+                                              lastAtom.UpdateVisual();
+
+                                          //reselect the atom to clear the adorner
+                                          RemoveFromSelection(lastAtom);
+                                              AddToSelection(lastAtom);
+                                          };
+                            Action undo = () =>
+                                          {
+                                              lastAtom.Element = lastElement;
+                                              lastAtom.IsotopeNumber = currentIsotope;
+                                              lastAtom.UpdateVisual();
+
+                                          //reselect the atom to clear the adorner
+                                          RemoveFromSelection(lastAtom);
+                                              AddToSelection(lastAtom);
+                                          };
+                            UndoManager.RecordAction(undo, redo, $"Set Element to {value?.Symbol ?? "null"}");
+
+                            redo();
+                            foreach (Bond bond in lastAtom.Bonds)
+                            {
+                                bond.UpdateVisual();
+                            }
                         }
                     }
-                }
 
                     UndoManager.EndUndoBlock();
                 }
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -263,7 +286,7 @@ namespace Chem4Word.ACME
             get
             {
                 var btList = (from bt
-                                  in SelectedBondOptions
+                                  in SelectedBondOptions()
                               select bt.Id).Distinct().ToList();
 
                 if (btList.Count == 1)
@@ -284,73 +307,73 @@ namespace Chem4Word.ACME
                 _selectedBondOptionId = value;
                 if (value != null)
                 {
-                    SetBondOption(value.Value);
+                    SetBondOption();
                 }
             }
         }
 
-        private void SetBondOption(int bondOptionId)
+        private void SetBondOption()
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                var bondOption = _bondOptions[_selectedBondOptionId.Value];
-                if (SelectedItems.OfType<Bond>().Any())
+                if (_selectedBondOptionId != null)
                 {
-                    UndoManager.BeginUndoBlock();
-                    foreach (Bond bond in SelectedItems.OfType<Bond>())
+                    var bondOption = _bondOptions[_selectedBondOptionId.Value];
+                    var stereoValue = bondOption.Stereo.HasValue ? bondOption.Stereo.Value.ToString() : "{null}";
+                    WriteTelemetry(module, "Debug", $"Order: {bondOption.Order} Stereo: {stereoValue}");
+
+                    if (SelectedItems.OfType<Bond>().Any())
                     {
-                        Action redo = () =>
-                                      {
-                                          bond.Stereo = bondOption.Stereo.Value;
-                                          bond.Order = bondOption.Order;
-                                      };
+                        UndoManager.BeginUndoBlock();
+                        foreach (Bond bond in SelectedItems.OfType<Bond>())
+                        {
+                            Action redo = () =>
+                                          {
+                                              bond.Stereo = bondOption.Stereo.Value;
+                                              bond.Order = bondOption.Order;
+                                          };
 
-                        var bondStereo = bond.Stereo;
-                        var bondOrder = bond.Order;
+                            var bondStereo = bond.Stereo;
+                            var bondOrder = bond.Order;
 
-                        Action undo = () =>
-                                      {
-                                          bond.Stereo = bondStereo;
-                                          bond.Order = bondOrder;
-                                      };
-                        UndoManager.RecordAction(undo, redo);
-                        bond.Order = bondOption.Order;
-                        bond.Stereo = bondOption.Stereo.Value;
+                            Action undo = () =>
+                                          {
+                                              bond.Stereo = bondStereo;
+                                              bond.Order = bondOrder;
+                                          };
+                            UndoManager.RecordAction(undo, redo);
+                            bond.Order = bondOption.Order;
+                            bond.Stereo = bondOption.Stereo.Value;
+                        }
+
+                        UndoManager.EndUndoBlock();
                     }
-
-                    UndoManager.EndUndoBlock();
+                }
+                else
+                {
+                    WriteTelemetry(module, "Exception", "_selectedBondOptionId is {null}");
                 }
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
-        public List<BondOption> SelectedBondOptions
+
+        private List<BondOption> SelectedBondOptions()
         {
-            get
-            {
-                var selectedBonds = SelectedItems.OfType<Bond>();
+            var selectedBonds = SelectedItems.OfType<Bond>();
 
-                var selbonds = (from Bond selbond in selectedBonds
-                                select new BondOption { Order = selbond.Order, Stereo = selbond.Stereo }).Distinct();
+            var selbonds = (from Bond selbond in selectedBonds
+                            select new BondOption { Order = selbond.Order, Stereo = selbond.Stereo }).Distinct();
 
-                var selOptions = from BondOption bo in _bondOptions.Values
-                                 join selbond1 in selbonds
-                                     on new { bo.Order, bo.Stereo } equals new { selbond1.Order, selbond1.Stereo }
-                                 select new BondOption { Id = bo.Id, Order = bo.Order, Stereo = bo.Stereo };
-                return selOptions.ToList();
-            }
+            var selOptions = from BondOption bo in _bondOptions.Values
+                             join selbond1 in selbonds
+                                 on new { bo.Order, bo.Stereo } equals new { selbond1.Order, selbond1.Stereo }
+                             select new BondOption { Id = bo.Id, Order = bo.Order, Stereo = bo.Stereo };
+            return selOptions.ToList();
         }
 
         public Editor EditorControl { get; set; }
@@ -462,7 +485,15 @@ namespace Chem4Word.ACME
             PasteCommand.RaiseCanExecChanged();
         }
 
-        public void LoadAtomOptions()
+        public void LoadAtomOptions(Element addition)
+        {
+            ClearAtomOptions();
+            LoadStandardAtomOptions();
+            LoadModelAtomOptions(addition);
+            LoadModelFGs();
+        }
+
+        private void LoadAtomOptions()
         {
             ClearAtomOptions();
             LoadStandardAtomOptions();
@@ -477,14 +508,6 @@ namespace Chem4Word.ACME
             {
                 AtomOptions.RemoveAt(i);
             }
-        }
-
-        public void LoadAtomOptions(Element addition)
-        {
-            ClearAtomOptions();
-            LoadStandardAtomOptions();
-            LoadModelAtomOptions(addition);
-            LoadModelFGs();
         }
 
         private void LoadModelFGs()
@@ -561,6 +584,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 var stereo = existingBond.Stereo;
@@ -607,15 +632,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -624,6 +641,9 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var countString = transformedAtoms == null ? "{null}" : $"{transformedAtoms.Count}";
+                WriteTelemetry(module, "Debug", $"Atoms: {countString}");
+
                 if (transformedAtoms.Any())
                 {
                     UndoManager.BeginUndoBlock();
@@ -670,15 +690,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -687,6 +699,9 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var countString = toList == null ? "{null}" : $"{toList.Count}";
+                WriteTelemetry(module, "Debug", $"Molecules: {countString}");
+
                 UndoManager.BeginUndoBlock();
                 var inverse = operation.Inverse;
                 var rootMolecules = from m in toList
@@ -714,6 +729,7 @@ namespace Chem4Word.ACME
                         AddToSelection(o);
                     }
                 };
+
                 Action redo = () =>
                 {
                     _selectedItems.Clear();
@@ -740,15 +756,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -757,6 +765,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 var startAtom = parentBond.StartAtom;
@@ -784,15 +794,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -801,6 +803,10 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var orderParameter = newOrder ?? CurrentBondOrder;
+                var stereoParameter = newStereo ?? CurrentStereo;
+                WriteTelemetry(module, "Debug", $"Order: {orderParameter}; Stereo: {stereoParameter}");
+
                 UndoManager.BeginUndoBlock();
 
                 var order = parentBond.Order;
@@ -828,15 +834,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -845,20 +843,48 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                void RefreshAtoms(Atom startAtom, Atom endAtom)
+                var startAtomInfo = "{null}";
+                if (a != null)
                 {
-                    startAtom.UpdateVisual();
-                    endAtom.UpdateVisual();
-                    foreach (Bond bond in startAtom.Bonds)
+                    if (mol.Atoms.ContainsKey(a.InternalId))
                     {
-                        bond.UpdateVisual();
+                        if (a.Element == null)
+                        {
+                            startAtomInfo = $"Null @ {a.Position.X:0.0000},{a.Position.Y:0.0000}";
+                        }
+                        else
+                        {
+                            startAtomInfo = $"{a.SymbolText} @ {a.Position.X:0.0000},{a.Position.Y:0.0000}";
+                        }
                     }
-
-                    foreach (Bond bond in endAtom.Bonds)
+                    else
                     {
-                        bond.UpdateVisual();
+                        startAtomInfo = $"{a.InternalId} not found";
                     }
                 }
+                var endAtomInfo = "{null}";
+                if (b != null)
+                {
+                    if (mol.Atoms.ContainsKey(b.InternalId))
+                    {
+                        if (b.Element == null)
+                        {
+                            endAtomInfo = $"Null @ {b.Position.X:0.0000},{b.Position.Y:0.0000}";
+                        }
+                        else
+                        {
+                            endAtomInfo = $"{b.SymbolText} @ {b.Position.X:0.0000},{b.Position.Y:0.0000}";
+                        }
+                    }
+                    else
+                    {
+                        endAtomInfo = $"{b.InternalId} not found";
+                    }
+                }
+
+                var orderInfo = order ?? CurrentBondOrder;
+                var stereoInfo = stereo == null ? $"{CurrentStereo}" : $"{stereo}";
+                WriteTelemetry(module, "Debug", $"StartAtom: {startAtomInfo}; EndAtom: {endAtomInfo}; BondOrder; {orderInfo} BondStereo {stereoInfo}");
 
                 //keep a handle on some current properties
                 int theoreticalRings = mol.TheoreticalRings;
@@ -900,6 +926,7 @@ namespace Chem4Word.ACME
 
                     mpb.Restore(mol);
                 };
+
                 Action redo = () =>
                 {
                     newbond.StartAtomInternalId = a.InternalId;
@@ -920,18 +947,25 @@ namespace Chem4Word.ACME
                 UndoManager.RecordAction(undo, redo);
                 redo();
                 UndoManager.EndUndoBlock();
+
+                void RefreshAtoms(Atom startAtom, Atom endAtom)
+                {
+                    startAtom.UpdateVisual();
+                    endAtom.UpdateVisual();
+                    foreach (Bond bond in startAtom.Bonds)
+                    {
+                        bond.UpdateVisual();
+                    }
+
+                    foreach (Bond bond in endAtom.Bonds)
+                    {
+                        bond.UpdateVisual();
+                    }
+                }
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -941,7 +975,7 @@ namespace Chem4Word.ACME
         /// <param name="lastAtom">previous atom to which the new one is bonded.  can be null</param>
         /// <param name="newAtomPos">Position of new atom</param>
         /// <param name="dir">ClockDirection in which to add the atom</param>
-        /// <param name="elem">Element of atom (can be a FunctionalGroup).  eefaults to current selection</param>
+        /// <param name="elem">Element of atom (can be a FunctionalGroup).  defaults to current selection</param>
         /// <param name="bondOrder"></param>
         /// <param name="stereo"></param>
         /// <returns></returns>
@@ -949,10 +983,14 @@ namespace Chem4Word.ACME
                                  string bondOrder = null, BondStereo? stereo = null)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            //create the new atom based on the current selection
-            Atom newAtom = new Atom { Element = elem ?? _selectedElement, Position = newAtomPos };
             try
             {
+                var atomInfo = lastAtom == null ? "{null}" : $"{lastAtom.SymbolText} @ {lastAtom.Position.X:0.0000},{lastAtom.Position.Y:0.0000}";
+                var eleInfo = elem == null ? $"{_selectedElement.Symbol}" : $"{elem.Symbol}";
+                WriteTelemetry(module, "Debug", $"LastAtom: {atomInfo}; NewAtom: {eleInfo} @ {newAtomPos.X:0.0000},{newAtomPos.Y:0.0000}");
+
+                //create the new atom based on the current selection
+                Atom newAtom = new Atom { Element = elem ?? _selectedElement, Position = newAtomPos };
 
                 //the tag stores sprout directions chosen for the chain
                 object tag = null;
@@ -972,22 +1010,22 @@ namespace Chem4Word.ACME
 
                     Molecule currentMol = lastAtom.Parent;
 
-                Action undo = () =>
-                              {
-                                  lastAtom.Tag = oldDir;
-                                  RemoveFromSelection(newAtom);
-                                  currentMol.RemoveAtom(newAtom);
-                                  newAtom.Parent = null;
-                                  lastAtom.UpdateVisual();
-                              };
-                Action redo = () =>
-                              {
-                                  lastAtom.Tag = tag; //save the last sprouted direction in the tag object
-                                  newAtom.Parent = currentMol;
-                                  currentMol.AddAtom(newAtom);
-                                  lastAtom.UpdateVisual();
-                                  newAtom.UpdateVisual();
-                              };
+                    Action undo = () =>
+                                  {
+                                      lastAtom.Tag = oldDir;
+                                      RemoveFromSelection(newAtom);
+                                      currentMol.RemoveAtom(newAtom);
+                                      newAtom.Parent = null;
+                                      lastAtom.UpdateVisual();
+                                  };
+                    Action redo = () =>
+                                  {
+                                      lastAtom.Tag = tag; //save the last sprouted direction in the tag object
+                                      newAtom.Parent = currentMol;
+                                      currentMol.AddAtom(newAtom);
+                                      lastAtom.UpdateVisual();
+                                      newAtom.UpdateVisual();
+                                  };
 
                     UndoManager.RecordAction(undo, redo);
                     redo();
@@ -1040,21 +1078,16 @@ namespace Chem4Word.ACME
                     redo2();
                     UndoManager.EndUndoBlock();
                 }
+
+                return newAtom;
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
 
-            return newAtom;
+            // This is an error!
+            return null;
         }
 
         public void SetAverageBondLength(double newLength)
@@ -1062,6 +1095,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", $"Length {newLength / ScaleFactorForXaml}");
+
                 UndoManager.BeginUndoBlock();
                 double currentLength = Model.MeanBondLength;
 
@@ -1093,15 +1128,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1110,6 +1137,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 CMLConverter converter = new CMLConverter();
                 Model tempModel = new Model();
                 //if selection isn't null
@@ -1214,15 +1243,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1231,6 +1252,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
                 CopySelection();
                 DeleteSelection();
@@ -1238,15 +1261,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1530,6 +1545,9 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var count = newAtomPlacements == null ? "{null}" : $"{newAtomPlacements.Count}";
+                WriteTelemetry(module, "Debug", $"Atoms: {count}; Unsaturated: {unsaturated}; StartAt: {startAt}");
+
                 UndoManager.BeginUndoBlock();
 
                 //work around the ring adding atoms
@@ -1623,15 +1641,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1640,18 +1650,30 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var atomInfo = startAtom == null ? "{null}" : $"{startAtom.SymbolText} @ {startAtom.Position.X:0.0000},{startAtom.Position.Y:0.0000}";
+                var count = placements == null ? "{null}" : $"{placements.Count}";
+                WriteTelemetry(module, "Debug", $"Atoms: {count}; StartAtom: {atomInfo}");
+
                 UndoManager.BeginUndoBlock();
                 Atom lastAtom = startAtom;
                 if (startAtom == null) //we're drawing an isolated chain
                 {
                     lastAtom = AddAtomChain(null, placements[0], ClockDirections.Nothing, bondOrder: OrderSingle,
                                             stereo: BondStereo.None);
+                    if (lastAtom == null)
+                    {
+                        Debugger.Break();
+                    }
                 }
 
                 foreach (Point placement in placements.Skip(1))
                 {
                     lastAtom = AddAtomChain(lastAtom, placement, ClockDirections.Nothing, bondOrder: OrderSingle,
                                             stereo: BondStereo.None);
+                    if (lastAtom == null)
+                    {
+                        Debugger.Break();
+                    }
                     if (placement != placements.Last())
                     {
                         lastAtom.ExplicitC = null;
@@ -1671,15 +1693,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1688,6 +1702,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 foreach (Molecule mol in mols)
@@ -1699,15 +1715,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1716,6 +1724,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 Action redo = () =>
@@ -1741,15 +1751,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1758,6 +1760,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 List<Atom> targetAtoms = new List<Atom>();
                 var mols = SelectedItems.OfType<Molecule>().ToList();
                 if (mols.Any())
@@ -1923,15 +1927,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -1948,6 +1944,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 HydrogenTargets targets;
                 var molecules = SelectedItems.OfType<Molecule>().ToList();
                 if (molecules.Any())
@@ -2023,15 +2021,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2045,6 +2035,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 int scaleX = 1;
                 int scaleY = 1;
 
@@ -2128,15 +2120,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2328,6 +2312,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 Molecule molA = a.Parent;
                 Molecule molB = b.Parent;
                 Molecule newMol = null;
@@ -2369,15 +2355,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2386,6 +2364,9 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var countString = atoms == null ? "{null}" : $"{atoms.Count()}";
+                WriteTelemetry(module, "Debug", $"Atoms: {countString}");
+
                 var atomList = atoms.ToArray();
                 //Add all the selected atoms to a set A
                 if (atomList.Count() == 1 && atomList[0].Singleton)
@@ -2408,15 +2389,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2431,6 +2404,11 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                var count1 = atomlist == null ? "{null}" : $"{atomlist.Count()}";
+                var count2 = bondList == null ? "{null}" : $"{bondList.Count()}";
+
+                WriteTelemetry(module, "Debug", $"Atoms: {count1}; Bonds: {count2}");
+
                 void RefreshRingBonds(int theoreticalRings, Molecule molecule, Bond deleteBond)
                 {
                     if (theoreticalRings != molecule.TheoreticalRings)
@@ -2723,15 +2701,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2749,6 +2719,10 @@ namespace Chem4Word.ACME
 
         public void DeleteBonds(IEnumerable<Bond> bonds)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            var countString = bonds == null ? "{null}" : $"{bonds.Count()}";
+            WriteTelemetry(module, "Debug", $"Bonds {countString}");
+
             DeleteAtomsAndBonds(bondList: bonds);
         }
 
@@ -2757,6 +2731,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 ElementBase elementBaseBefore = atom.Element;
@@ -2779,35 +2755,35 @@ namespace Chem4Word.ACME
                     }
                 }
 
-            Action redo = () =>
-                          {
-                              atom.Element = elementBaseAfter;
-                              atom.FormalCharge = chargeAfter;
-                              atom.IsotopeNumber = isotopeAfter;
-                              atom.ExplicitC = explicitCAfter;
-                              atom.Parent.UpdateVisual();
-                              //freshen any selection adorner
-                              if (SelectedItems.Contains(atom))
+                Action redo = () =>
                               {
-                                  RemoveFromSelection(atom);
-                                  AddToSelection(atom);
-                              }
-                          };
+                                  atom.Element = elementBaseAfter;
+                                  atom.FormalCharge = chargeAfter;
+                                  atom.IsotopeNumber = isotopeAfter;
+                                  atom.ExplicitC = explicitCAfter;
+                                  atom.Parent.UpdateVisual();
+                                  //freshen any selection adorner
+                                  if (SelectedItems.Contains(atom))
+                                  {
+                                      RemoveFromSelection(atom);
+                                      AddToSelection(atom);
+                                  }
+                              };
 
-            Action undo = () =>
-                          {
-                              atom.Element = elementBaseBefore;
-                              atom.FormalCharge = chargeBefore;
-                              atom.IsotopeNumber = isotopeBefore;
-                              atom.ExplicitC = explicitCBefore;
-                              atom.Parent.UpdateVisual();
-                              //freshen any selection adorner
-                              if (SelectedItems.Contains(atom))
+                Action undo = () =>
                               {
-                                  RemoveFromSelection(atom);
-                                  AddToSelection(atom);
-                              }
-                          };
+                                  atom.Element = elementBaseBefore;
+                                  atom.FormalCharge = chargeBefore;
+                                  atom.IsotopeNumber = isotopeBefore;
+                                  atom.ExplicitC = explicitCBefore;
+                                  atom.Parent.UpdateVisual();
+                                  //freshen any selection adorner
+                                  if (SelectedItems.Contains(atom))
+                                  {
+                                      RemoveFromSelection(atom);
+                                      AddToSelection(atom);
+                                  }
+                              };
 
                 UndoManager.RecordAction(undo, redo);
                 redo();
@@ -2815,15 +2791,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2832,6 +2800,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 bool? showBefore = target.ShowMoleculeBrackets;
@@ -2896,15 +2866,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -2913,6 +2875,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 double bondOrderBefore = bond.OrderValue.Value;
@@ -3091,20 +3055,15 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
         public void PasteCML(string pastedCml)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            WriteTelemetry(module, "Debug", "Called");
+
             CMLConverter cc = new CMLConverter();
             Model buffer = cc.Import(pastedCml);
             PasteModel(buffer);
@@ -3115,6 +3074,7 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
                 // Match to current model's settings
                 buffer.Relabel(true);
                 // above should be buffer.StripLabels(true)
@@ -3169,15 +3129,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -3186,6 +3138,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 var atoms = SelectedItems.OfType<Atom>().ToList();
                 var bonds = SelectedItems.OfType<Bond>().ToList();
                 var mols = SelectedItems.OfType<Molecule>().ToList();
@@ -3206,15 +3160,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -3227,6 +3173,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 List<Molecule> selGroups;
                 //grab just the grouped molecules first
                 selGroups = (from Molecule mol in selection.OfType<Molecule>()
@@ -3236,15 +3184,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -3323,15 +3263,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 
@@ -3356,6 +3288,8 @@ namespace Chem4Word.ACME
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
+                WriteTelemetry(module, "Debug", "Called");
+
                 UndoManager.BeginUndoBlock();
 
                 Molecule parent = new Molecule();
@@ -3404,15 +3338,7 @@ namespace Chem4Word.ACME
             }
             catch (Exception exception)
             {
-                if (Telemetry != null)
-                {
-                    Telemetry.Write(module, "Exception", exception.Message);
-                    Telemetry.Write(module, "Exception", exception.StackTrace);
-                }
-                else
-                {
-                    RegistryHelper.StoreException(module, exception);
-                }
+                WriteTelemetryException(module, exception);
             }
         }
 

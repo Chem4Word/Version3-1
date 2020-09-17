@@ -371,7 +371,6 @@ namespace Chem4Word.Model2
                     {
                         result = Globals.AllenicCarbonSymbol;
                     }
-
                 }
 
                 return result;
@@ -434,7 +433,7 @@ namespace Chem4Word.Model2
 
                 if (Element != null)
                 {
-                    // Applies to "B,C,N,O,F,Si,P,S,Cl,As,Se,Br,Te,I,At";
+                    // Applies to "B,C,N,O,F,Si,P,S,Cl,As,Se,Br,Te,I,At"
                     string appliesTo = Globals.PeriodicTable.ImplicitHydrogenTargets;
 
                     if (appliesTo.Contains(Element.Symbol))

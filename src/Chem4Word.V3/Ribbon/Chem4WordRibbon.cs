@@ -721,6 +721,15 @@ namespace Chem4Word
                                     }
                                 }
 
+                                if (isNewDrawing)
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Starting create new structure {fullTag}");
+                                }
+                                else
+                                {
+                                    Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Starting edit existing structure {fullTag}");
+                                }
+
                                 var used1D = ChemistryHelper.GetUsed1D(doc, guidString);
 
                                 editor.Cml = beforeCml;
@@ -765,11 +774,11 @@ namespace Chem4Word
 
                                     if (isNewDrawing)
                                     {
-                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Creating new structure {fullTag}");
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Finished creating new structure {fullTag}");
                                     }
                                     else
                                     {
-                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Editing existing structure {fullTag}");
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Finished editing existing structure {fullTag}");
                                     }
 
                                     // Copy back CustomXmlPartGuid which will get lost if edited via ChemDoodle Web
@@ -871,9 +880,9 @@ namespace Chem4Word
                                             // Delete the temporary file now we are finished with it
                                             try
                                             {
-                                                // Only delete file in release mode
 #if !DEBUG
-                                        File.Delete(tempfileName);
+                                                // Only delete file in release mode
+                                                File.Delete(tempfileName);
 #endif
                                             }
                                             catch

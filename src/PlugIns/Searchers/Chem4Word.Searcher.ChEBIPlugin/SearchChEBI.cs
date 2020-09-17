@@ -81,7 +81,6 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 display1.Chemistry = null;
                 if (!string.IsNullOrEmpty(SearchFor.Text))
                 {
-
                     ChebiWebServiceService ws = new ChebiWebServiceService();
                     getLiteEntityResponse results;
 

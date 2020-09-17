@@ -57,7 +57,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 HttpWebResponse response;
                 try
                 {
-                    response = (HttpWebResponse) request.GetResponse();
+                    response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode.Equals(HttpStatusCode.OK))
                     {
                         ProcessResponse(response);
@@ -70,7 +70,7 @@ namespace Chem4Word.Searcher.OpsinPlugIn
                 }
                 catch (WebException ex)
                 {
-                    HttpWebResponse webResponse = (HttpWebResponse) ex.Response;
+                    HttpWebResponse webResponse = (HttpWebResponse)ex.Response;
                     switch (webResponse.StatusCode)
                     {
                         case HttpStatusCode.NotFound:

@@ -79,7 +79,7 @@
             this.txtOpsinWsUri.Name = "txtOpsinWsUri";
             this.txtOpsinWsUri.Size = new System.Drawing.Size(343, 23);
             this.txtOpsinWsUri.TabIndex = 25;
-            this.txtOpsinWsUri.Text = "https://eutils.ncbi.nlm.nih.gov/";
+            this.txtOpsinWsUri.Text = "https://opsin.ch.cam.ac.uk/opsin/";
             this.txtOpsinWsUri.TextChanged += new System.EventHandler(this.txtOpsinWsUri_TextChanged);
             // 
             // nudDisplayOrder

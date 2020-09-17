@@ -233,7 +233,10 @@ namespace Chem4Word.Telemetry
 
             WritePrivate("StartUp", "Information", string.Join(Environment.NewLine, lines));
 
-            WritePrivate("StartUp", "Information", _helper.GitStatus);
+            if (!string.IsNullOrEmpty(_helper.GitStatus))
+            {
+                WritePrivate("StartUp", "Information", _helper.GitStatus);
+            }
 #endif
 
             #region Log critical System Info again to ensure we get it
