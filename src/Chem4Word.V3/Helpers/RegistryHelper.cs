@@ -128,7 +128,7 @@ namespace Chem4Word.Helpers
             }
         }
 
-        public static void StoreException(string module, Exception exception)
+        public static void StoreMessage(string module, string message)
         {
             RegistryKey key = Registry.CurrentUser.CreateSubKey(Constants.Chem4WordExceptionsRegistryKey);
             if (key != null)
@@ -144,8 +144,13 @@ namespace Chem4Word.Helpers
                 }
 
                 string timestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
-                key.SetValue($"{timestamp} [{procId}.{_counter++.ToString("000")}]", $"[{procId}] {module} {exception}");
+                key.SetValue($"{timestamp} [{procId}.{_counter++:000}]", $"[{procId}] {module} {message}");
             }
+        }
+
+        public static void StoreException(string module, Exception exception)
+        {
+            StoreMessage(module, exception.ToString());
         }
     }
 }

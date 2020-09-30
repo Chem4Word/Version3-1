@@ -15,6 +15,9 @@ namespace Chem4Word.Helpers
 {
     public class C4wAddInInfo
     {
+        private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         public string AssemblyVersionNumber { get; }
 
         /// <summary>
@@ -44,59 +47,68 @@ namespace Chem4Word.Helpers
 
         public C4wAddInInfo()
         {
-            // Get the assembly information
-            Assembly assemblyInfo = Assembly.GetExecutingAssembly();
-            ProductName = assemblyInfo.FullName.Split(',')[0];
-
-            // Get the assembly Version
-            Version productVersion = assemblyInfo.GetName().Version;
-            AssemblyVersionNumber = productVersion.ToString();
-
-            // CodeBase is the location of the installed files
-            Uri uriCodeBase = new Uri(assemblyInfo.CodeBase);
-            DeploymentPath = Path.GetDirectoryName(uriCodeBase.LocalPath);
-
-            // Get the user's Local AppData Path i.e. "C:\Users\{User}\AppData\Local\" and ensure that the Chem4Word user data folders exist
-            AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-            ProductAppDataPath = Path.Combine(AppDataPath, ProductName);
-            if (!Directory.Exists(ProductAppDataPath))
-            {
-                Directory.CreateDirectory(ProductAppDataPath);
-            }
-
-            var backupsPath = Path.Combine(ProductAppDataPath, "Backups");
-            if (!Directory.Exists(backupsPath))
-            {
-                Directory.CreateDirectory(backupsPath);
-            }
-
-            var telemetryPath = Path.Combine(ProductAppDataPath, "Telemetry");
-            if (!Directory.Exists(telemetryPath))
-            {
-                Directory.CreateDirectory(telemetryPath);
-            }
-
-            // Get ProgramData Path i.e "C:\ProgramData\Chem4Word.V3" and ensure it exists
-            string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            ProgramDataPath = Path.Combine(programData, ProductName);
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             try
             {
-                if (!Directory.Exists(ProgramDataPath))
+                // Get the assembly information
+                Assembly assemblyInfo = Assembly.GetExecutingAssembly();
+                ProductName = assemblyInfo.FullName.Split(',')[0];
+
+                // Get the assembly Version
+                Version productVersion = assemblyInfo.GetName().Version;
+                AssemblyVersionNumber = productVersion.ToString();
+
+                // CodeBase is the location of the installed files
+                Uri uriCodeBase = new Uri(assemblyInfo.CodeBase);
+                DeploymentPath = Path.GetDirectoryName(uriCodeBase.LocalPath);
+
+                // Get the user's Local AppData Path i.e. "C:\Users\{User}\AppData\Local\" and ensure that the Chem4Word user data folders exist
+                AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                ProductAppDataPath = Path.Combine(AppDataPath, ProductName);
+                if (!Directory.Exists(ProductAppDataPath))
                 {
-                    Directory.CreateDirectory(ProgramDataPath);
+                    Directory.CreateDirectory(ProductAppDataPath);
                 }
 
-                // Allow all users to Modify files in this folder
-                DirectorySecurity sec = Directory.GetAccessControl(ProgramDataPath);
-                SecurityIdentifier users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-                sec.AddAccessRule(new FileSystemAccessRule(users, FileSystemRights.Modify | FileSystemRights.Synchronize, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-                Directory.SetAccessControl(ProgramDataPath, sec);
+                var backupsPath = Path.Combine(ProductAppDataPath, "Backups");
+                if (!Directory.Exists(backupsPath))
+                {
+                    Directory.CreateDirectory(backupsPath);
+                }
+
+                var telemetryPath = Path.Combine(ProductAppDataPath, "Telemetry");
+                if (!Directory.Exists(telemetryPath))
+                {
+                    Directory.CreateDirectory(telemetryPath);
+                }
+
+                // Get ProgramData Path i.e "C:\ProgramData\Chem4Word.V3" and ensure it exists
+                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                ProgramDataPath = Path.Combine(programData, ProductName);
+
+                try
+                {
+                    if (!Directory.Exists(ProgramDataPath))
+                    {
+                        Directory.CreateDirectory(ProgramDataPath);
+                    }
+
+                    // Allow all users to Modify files in this folder
+                    DirectorySecurity sec = Directory.GetAccessControl(ProgramDataPath);
+                    SecurityIdentifier users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+                    sec.AddAccessRule(new FileSystemAccessRule(users, FileSystemRights.Modify | FileSystemRights.Synchronize, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+                    Directory.SetAccessControl(ProgramDataPath, sec);
+                }
+                catch
+                {
+                    // Do Nothing
+                }
             }
-            catch
+            catch (Exception exception)
             {
-                // Do Nothing
+                RegistryHelper.StoreException(module, exception);
             }
         }
     }

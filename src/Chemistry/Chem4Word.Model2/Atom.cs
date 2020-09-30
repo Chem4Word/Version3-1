@@ -11,13 +11,14 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Annotations;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
-    public class Atom : ChemistryBase, INotifyPropertyChanged
+    public class Atom : ChemistryBase, INotifyPropertyChanged, IEquatable<Atom>
     {
         #region Fields
 
@@ -561,7 +562,7 @@ namespace Chem4Word.Model2
         /// <summary>
         /// The internal ID is what is used to tie atoms and bonds together
         /// </summary>
-        public string InternalId { get; set; }
+        public string InternalId { get;}
 
         public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms.Values.First() == this;
 
@@ -646,7 +647,12 @@ namespace Chem4Word.Model2
         public override string ToString()
         {
             var symbol = Element != null ? Element.Symbol : "???";
-            return $"Atom {Id} - {Path}: {symbol} @ {Position.X.ToString("0.0000")}, {Position.Y.ToString("0.0000")}";
+            return $"Atom {Id} - {Path}: {symbol} @ {PointHelper.AsString(Position)}";
+        }
+
+        public override int GetHashCode()
+        {
+            return InternalId.GetHashCode();
         }
 
         #endregion Overrides
@@ -678,6 +684,15 @@ namespace Chem4Word.Model2
                          where !excludeBonds.Contains(this.BondBetween(a)) && unprocessedTest(a)
                          select a;
             return unproc.Count();
+        }
+
+        public bool Equals(Atom other)
+        {
+            if(other is null)
+            {
+                return false;
+            }
+            return other.InternalId == this.InternalId;
         }
 
         /// <summary>

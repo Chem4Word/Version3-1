@@ -192,35 +192,44 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 CMLConverter conv = new CMLConverter();
 
                 var expModel = _lastModel;
-                expModel.Relabel(true);
 
-                using (new WaitCursor())
+                if (_lastModel != null)
                 {
-                    expModel.Molecules.Values.First().Names.Clear();
+                    expModel.Relabel(true);
 
-                    if (_allResults.IupacNames != null)
+                    using (new WaitCursor())
                     {
-                        foreach (var di in _allResults.IupacNames)
+                        if (expModel.Molecules.Values.Any())
                         {
-                            var cn = new TextualProperty();
-                            cn.Value = di.data;
-                            cn.FullType = "chebi:Iupac";
-                            expModel.Molecules.Values.First().Names.Add(cn);
+                            var mol = expModel.Molecules.Values.First();
+
+                            mol.Names.Clear();
+
+                            if (_allResults.IupacNames != null)
+                            {
+                                foreach (var di in _allResults.IupacNames)
+                                {
+                                    var cn = new TextualProperty();
+                                    cn.Value = di.data;
+                                    cn.FullType = "chebi:Iupac";
+                                    mol.Names.Add(cn);
+                                }
+                            }
+
+                            if (_allResults.Synonyms != null)
+                            {
+                                foreach (var di in _allResults.Synonyms)
+                                {
+                                    var cn = new TextualProperty();
+                                    cn.Value = di.data;
+                                    cn.FullType = "chebi:Synonym";
+                                    mol.Names.Add(cn);
+                                }
+                            }
+
+                            Cml = conv.Export(expModel);
                         }
                     }
-
-                    if (_allResults.Synonyms != null)
-                    {
-                        foreach (var di in _allResults.Synonyms)
-                        {
-                            var cn = new TextualProperty();
-                            cn.Value = di.data;
-                            cn.FullType = "chebi:Synonym";
-                            expModel.Molecules.Values.First().Names.Add(cn);
-                        }
-                    }
-
-                    Cml = conv.Export(expModel);
                 }
             }
         }

@@ -319,7 +319,7 @@ namespace Chem4Word
             this.ButtonsDisabled.Label = "Buttons Disabled ...";
             this.ButtonsDisabled.Name = "ButtonsDisabled";
             this.ButtonsDisabled.ShowImage = true;
-            this.ButtonsDisabled.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ButtonsDisabled_Click);
+            this.ButtonsDisabled.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.OnButtonsDisabledClick);
             // 
             // Update
             // 

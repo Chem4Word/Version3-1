@@ -287,6 +287,14 @@ namespace Chem4Word.ACME
                 }
                 br.Undo();
             }
+
+#if DEBUG
+            var integrity = _editViewModel.Model.CheckIntegrity();
+            if (integrity.Count > 0)
+            {
+                WriteTelemetry(module, "Integrity", string.Join(Environment.NewLine, integrity));
+            }
+#endif
         }
 
         public void Redo()
@@ -331,6 +339,14 @@ namespace Chem4Word.ACME
                 }
                 br.Redo();
             }
+
+#if DEBUG
+            var integrity = _editViewModel.Model.CheckIntegrity();
+            if (integrity.Count > 0)
+            {
+                WriteTelemetry(module, "Integrity", string.Join(Environment.NewLine, integrity));
+            }
+#endif
         }
     }
 }

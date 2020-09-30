@@ -27,7 +27,6 @@ namespace Chem4Word.ACME
         public void SetTextParams(double bondLength)
         {
             SymbolSize = bondLength / 2.0d;
-           
         }
 
         #region Properties

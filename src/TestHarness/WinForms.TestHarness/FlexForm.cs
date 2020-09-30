@@ -449,7 +449,6 @@ namespace WinForms.TestHarness
             try
             {
                 Model m = _undoStack.Pop();
-                m.CheckIntegrity();
                 Debug.WriteLine(
                     $"Popped F: {m.ConciseFormula} BL: {m.MeanBondLength.ToString("#,##0.00")} from Undo Stack");
 

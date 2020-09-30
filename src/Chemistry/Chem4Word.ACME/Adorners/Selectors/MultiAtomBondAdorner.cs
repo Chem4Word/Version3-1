@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using Chem4Word.ACME.Controls;
@@ -31,7 +32,11 @@ namespace Chem4Word.ACME.Adorners.Selectors
                         break;
 
                     case Bond b:
-                        OverallGeometry = new CombinedGeometry(GeometryCombineMode.Union, OverallGeometry, GetBondAdornerGeometry(b));
+                        Debug.Assert(b.Parent != null);
+                        if (b != null)
+                        {
+                            OverallGeometry = new CombinedGeometry(GeometryCombineMode.Union, OverallGeometry, GetBondAdornerGeometry(b));
+                        }
                         break;
                 }
             }

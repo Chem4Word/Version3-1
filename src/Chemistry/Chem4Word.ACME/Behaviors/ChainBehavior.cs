@@ -109,11 +109,12 @@ namespace Chem4Word.ACME.Behaviors
             CurrentAdorner = null;
             Placements = null;
             Clashing = false;
-            SetCursor();
+            CurrentEditor.Cursor = CursorUtils.Pencil;
         }
 
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
         {
+            Clashing = false;
             if (MouseIsDown)
             {
                 IsDrawing = true;
@@ -127,7 +128,6 @@ namespace Chem4Word.ACME.Behaviors
                 }
                 else
                 {
-                    Clashing = false;
                     CurrentStatus = "Drag to start sizing chain: [Esc] to cancel.";
                     var endPoint = e.GetPosition(EditViewModel.CurrentEditor);
 
@@ -141,6 +141,7 @@ namespace Chem4Word.ACME.Behaviors
                     bool overWritingSelf = false;
                     if (CurrentAdorner.Geometry != null)
                     {
+                        //first test to see if the user is drawing over the adorner
                         overWritingSelf =
                             CurrentAdorner.Geometry.StrokeContains(new Pen(Brushes.Black, Globals.AtomRadius * 2),
                                                                    endPoint);
@@ -149,21 +150,45 @@ namespace Chem4Word.ACME.Behaviors
                     Clashing =
                         (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) |
                         overWritingSelf;
-                    //set the cursor appropriately
-                    SetCursor();
-                }
-            }
-        }
+                    //do an extra check to see whether we're overwriting existing chemistry
+                    if(!Clashing)
+                    {
+                        var currentPos = (e.GetPosition(CurrentEditor));
+                        for (int i = 1; i < Placements.Count; i++) //ignore the first atom as it will always clash
+                        {
+                            ChemicalVisual cv = CurrentEditor.GetTargetedVisual(Placements[i]);
+                            if(cv!=null)
+                            {
+                                //user is trying to overwrite
+                                Clashing = true;
+                                break;
+                            }
+                        }
+                    }
+                    //check to see if we're overwriting the existing adorner
+                    for (int i = 0; i < Placements.Count; i++)
+                    {
+                        for (int j = 0; j < Placements.Count; j++)
+                        {
+                            if( i!=j && (Placements[j] -Placements[i] ).Length < 0.01)
+                            {
+                                Clashing = true;
+                                break;
+                            }
+                        }
+                    }
 
-        private void SetCursor()
-        {
-            if (Clashing)
-            {
-                CurrentEditor.Cursor = System.Windows.Input.Cursors.No;
-            }
-            else
-            {
-                CurrentEditor.Cursor = CursorUtils.Pencil;
+                    CurrentAdorner =  new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements,
+                                                       endPoint, Target, Clashing);
+                    if (!Clashing)
+                    {
+                        CurrentStatus = "Click to draw chain";
+                    }
+                    else
+                    {
+                        CurrentStatus = "Can't draw over existing atoms";
+                    }
+                }
             }
         }
 

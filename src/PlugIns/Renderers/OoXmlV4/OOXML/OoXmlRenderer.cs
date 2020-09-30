@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -353,7 +352,7 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
                 DrawShape(extents, A.ShapeTypeValues.Ellipse, true, spot.Colour);
             }
 
-            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {swr.ElapsedMilliseconds.ToString("##,##0", CultureInfo.InvariantCulture)} ms; Average Bond Length: {_chemistryModel.MeanBondLength.ToString("#0.00", CultureInfo.InvariantCulture)}");
+            _telemetry.Write(module, "Timing", $"Rendering {_chemistryModel.Molecules.Count} molecules with {_chemistryModel.TotalAtomsCount} atoms and {_chemistryModel.TotalBondsCount} bonds took {SafeDouble.AsString0(swr.ElapsedMilliseconds)} ms; Average Bond Length: {SafeDouble.AsString(_chemistryModel.MeanBondLength)}");
 
             ShutDownProgress(progress);
 

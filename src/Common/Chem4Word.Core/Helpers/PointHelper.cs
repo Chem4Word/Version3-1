@@ -5,6 +5,7 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
+using System.Globalization;
 using System.Windows;
 
 namespace Chem4Word.Core.Helpers
@@ -14,6 +15,11 @@ namespace Chem4Word.Core.Helpers
         public static bool PointIsEmpty(Point point)
         {
             return point.Equals(new Point(0, 0));
+        }
+
+        public static string AsString(Point p)
+        {
+            return $"{p.X.ToString("#,##0.0000", CultureInfo.InvariantCulture)},{p.Y.ToString("#,##0.0000", CultureInfo.InvariantCulture)}";
         }
     }
 }

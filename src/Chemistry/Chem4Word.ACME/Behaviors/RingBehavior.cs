@@ -29,6 +29,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private Window _parent;
         private Cursor _lastCursor;
+        public bool Clashing { get; private set; } = false;
 
         public RingBehavior()
         {
@@ -103,8 +104,9 @@ namespace Chem4Word.ACME.Behaviors
             List<Point> altPlacements;
             List<Point> preferredPlacements;
 
-            CurrentAdorner = null;
+            Clashing = false;
 
+            CurrentAdorner = null;
             var xamlBondSize = EditViewModel.Model.XamlBondLength;
 
             switch (CurrentEditor.ActiveVisual)
@@ -117,14 +119,13 @@ namespace Chem4Word.ACME.Behaviors
                                                               preferredPlacements, Unsaturated);
                         if (av.ParentAtom.Degree >= 2)
                         {
-                            CurrentStatus = "Click to spiro-fuse.";
+                            CurrentStatus = "Click atom to spiro-fuse.";
                         }
                         else
                         {
-                            CurrentStatus = "Click to draw a terminating ring.";
+                            CurrentStatus = "Click atom to draw a terminating ring.";
                         }
                     }
-
                     break;
 
                 case BondVisual bv:
@@ -133,17 +134,38 @@ namespace Chem4Word.ACME.Behaviors
                     {
                         CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
                                                               preferredPlacements ?? altPlacements, Unsaturated);
-                        CurrentStatus = "Click to fuse a ring";
+                        CurrentStatus = "Click bond to fuse a ring";
                     }
-
                     break;
 
                 default:
                     preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth,
                                                        xamlBondSize, RingSize);
-                    CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
-                                                          preferredPlacements, Unsaturated);
-                    CurrentStatus = "Click to draw a standalone ring";
+                    //need to check whether the user is trying to fuse without
+                    //having the pencil directly over the object!
+                    foreach (Point p in preferredPlacements)
+                    {
+                        ChemicalVisual cv = CurrentEditor.GetTargetedVisual(p);
+                        if(cv!=null)
+                        {
+                            //user is trying to fuse wrongly
+                            Clashing = true;
+                            break;
+                        }
+                    }
+
+                    if (!Clashing)
+                    {
+                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
+                                                            preferredPlacements, Unsaturated);
+                        CurrentStatus = "Click to draw a standalone ring";
+                    }
+                    else
+                    {
+                        CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
+                                                              preferredPlacements, Unsaturated, greyedOut: true);
+                        CurrentStatus = "Can't fuse ring here - hover pencil over atom or bond to place ring";
+                    }
                     break;
             }
         }
@@ -161,55 +183,57 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
-            var hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
-            var position = e.GetPosition(CurrentEditor);
-
-            List<Point> altPlacements = null;
-            var startAt = 0; //used to change double bond positions in isolated odd numbered rings
-            var newAtomPlacements = new List<NewAtomPlacement>();
-
-            List<Point> preferredPlacements;
-            var xamlBondSize = EditViewModel.Model.XamlBondLength;
-
-            if (hitAtom != null)
+            if (!Clashing)
             {
-                IdentifyPlacements(hitAtom, xamlBondSize, out preferredPlacements, RingSize);
-                if (preferredPlacements == null)
+                var hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
+                var hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
+                var position = e.GetPosition(CurrentEditor);
+
+                List<Point> altPlacements = null;
+                var startAt = 0; //used to change double bond positions in isolated odd numbered rings
+                var newAtomPlacements = new List<NewAtomPlacement>();
+
+                List<Point> preferredPlacements;
+                var xamlBondSize = EditViewModel.Model.XamlBondLength;
+
+                if (hitAtom != null)
                 {
-                    UserInteractions.AlertUser("No room left to draw any more rings!");
+                    IdentifyPlacements(hitAtom, xamlBondSize, out preferredPlacements, RingSize);
+                    if (preferredPlacements == null)
+                    {
+                        UserInteractions.AlertUser("No room left to draw any more rings!");
+                    }
+                    else if (preferredPlacements.Count % 2 == 1)
+                    {
+                        startAt = 1;
+                    }
                 }
-                else if (preferredPlacements.Count % 2 == 1)
+                else if (hitBond != null)
                 {
-                    startAt = 1;
+                    IdentifyPlacements(hitBond, out altPlacements, out preferredPlacements, RingSize, position);
+                    if ((altPlacements == null) & (preferredPlacements == null))
+                    {
+                        UserInteractions.AlertUser("No room left to draw any more rings!");
+                    }
+                }
+                else //clicked on empty space
+                {
+                    preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth,
+                                                       xamlBondSize, RingSize);
+                    //al4tPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenSouth, xamlBondSize, RingSize);
+                    if (preferredPlacements.Count % 2 == 1)
+                    {
+                        startAt = 1;
+                    }
+                }
+
+                if ((preferredPlacements ?? altPlacements) != null)
+                {
+                    FillExistingAtoms(preferredPlacements, altPlacements, newAtomPlacements, CurrentEditor);
+
+                    EditViewModel.DrawRing(newAtomPlacements, Unsaturated, startAt);
                 }
             }
-            else if (hitBond != null)
-            {
-                IdentifyPlacements(hitBond, out altPlacements, out preferredPlacements, RingSize, position);
-                if ((altPlacements == null) & (preferredPlacements == null))
-                {
-                    UserInteractions.AlertUser("No room left to draw any more rings!");
-                }
-            }
-            else //clicked on empty space
-            {
-                preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth,
-                                                   xamlBondSize, RingSize);
-                //al4tPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenSouth, xamlBondSize, RingSize);
-                if (preferredPlacements.Count % 2 == 1)
-                {
-                    startAt = 1;
-                }
-            }
-
-            if ((preferredPlacements ?? altPlacements) != null)
-            {
-                FillExistingAtoms(preferredPlacements, altPlacements, newAtomPlacements, CurrentEditor);
-
-                EditViewModel.DrawRing(newAtomPlacements, Unsaturated, startAt);
-            }
-
             CurrentAdorner = null;
         }
 

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2;
 using Chem4Word.Model2.Helpers;
 using Chem4Word.Renderer.OoXmlV4.Enums;
@@ -255,14 +256,9 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
             Style = style;
         }
 
-        private string PointAsString(Point p)
-        {
-            return $"{p.X.ToString("#,##0.0000")},{p.Y.ToString("#,##0.0000")}";
-        }
-
         public override string ToString()
         {
-            string result = $"{Style} from {PointAsString(Start)} to {PointAsString(End)}";
+            string result = $"{Style} from {PointHelper.AsString(Start)} to {PointHelper.AsString(End)}";
             if (Bond != null)
             {
                 result += $" [{Bond}]";

@@ -836,7 +836,7 @@ namespace Chem4Word.Model2
                 {
                     if (force)
                     {
-                        result = $"Forced BondLength from {Stringify(MeanBondLength)} to {Stringify(target)}";
+                        result = $"Forced BondLength from {SafeDouble.AsString(MeanBondLength)} to {SafeDouble.AsString(target)}";
                         ScaleToAverageBondLength(target);
                     }
                     else
@@ -844,24 +844,18 @@ namespace Chem4Word.Model2
                         if (MeanBondLength < Constants.MinimumBondLength - Constants.BondLengthTolerance
                             || MeanBondLength > Constants.MaximumBondLength + Constants.BondLengthTolerance)
                         {
-                            result = $"Adjusted BondLength from {Stringify(MeanBondLength)} to {Stringify(target)}";
+                            result = $"Adjusted BondLength from {SafeDouble.AsString(MeanBondLength)} to {SafeDouble.AsString(target)}";
                             ScaleToAverageBondLength(target);
                         }
                         else
                         {
-                            result = $"BondLength of {Stringify(MeanBondLength)} is within tolerance";
+                            result = $"BondLength of {SafeDouble.AsString(MeanBondLength)} is within tolerance";
                         }
                     }
                 }
             }
 
             return result;
-
-            // Local Function
-            string Stringify(double value)
-            {
-                return value.ToString("#,##0.00");
-            }
         }
 
         public void ScaleToAverageBondLength(double newLength, Point centre)
@@ -1016,15 +1010,48 @@ namespace Chem4Word.Model2
 
         /// <summary>
         /// Checks to make sure the internals of the molecule haven't become busted up.
-        /// This will throw an Exception if something is wrong. You should be ready to catch it...
         /// </summary>
-        public void CheckIntegrity()
+        public List<string> CheckIntegrity()
         {
             var mols = GetAllMolecules();
+            var result = new List<string>();
+
             foreach (Molecule mol in mols)
             {
-                mol.CheckIntegrity();
+                result.AddRange(mol.CheckIntegrity());
             }
+
+            var atoms = GetAllAtoms().ToList();
+            foreach (var atom in atoms)
+            {
+                var matches = atoms.Where(a => a.Id != atom.Id && SamePoint(atom.Position, a.Position, MeanBondLength * Globals.BondOffsetPercentage)).ToList();
+                if (matches.Any())
+                {
+                    var plural = matches.Count > 1 ? "s" : "";
+                    var clashes = matches.Select(a => a.Id);
+                    result.Add($"Atom {atom.Id} - {atom.Element.Symbol} @ {PointHelper.AsString(atom.Position)} clashes with atom{plural} {string.Join(",", clashes)}");
+                }
+            }
+
+            // Local Function
+            bool SamePoint(Point a, Point b, double tolerance)
+            {
+                bool samePoint;
+
+                if (a.Equals(b))
+                {
+                    samePoint = true;
+                }
+                else
+                {
+                    Vector v = a - b;
+                    samePoint = v.Length <= tolerance;
+                }
+
+                return samePoint;
+            }
+
+            return result;
         }
 
         public void CentreInCanvas(Size size)

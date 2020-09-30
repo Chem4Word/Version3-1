@@ -26,6 +26,7 @@ namespace Chem4Word.ACME.Behaviors
     public class NRingBehavior : BaseEditBehavior
     {
         public int RingSize { get; set; }
+        public bool Clashing { get; set; }
 
         private Window _parent;
         private NRingAdorner _currentAdorner;
@@ -105,6 +106,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseMove(object sender, MouseEventArgs e)
         {
+            Clashing = false;
             CurrentPoint = e.GetPosition(CurrentEditor);
             //check to see whether we've dragged off the target first
             if (MouseIsDown & IsDrawing)
@@ -168,8 +170,25 @@ namespace Chem4Word.ACME.Behaviors
                     RingSize = GetRingSize(FirstPoint, CurrentPoint, xamlBondSize);
                     _preferredPlacements = MarkOutAtoms(FirstPoint, CurrentPoint - FirstPoint,
                                                         xamlBondSize, RingSize);
+                    //need to check whether the user is trying to fuse without
+                    //having the pencil directly over the object!
+                    foreach (Point p in _preferredPlacements)
+                    {
+                        ChemicalVisual cv = CurrentEditor.GetTargetedVisual(p);
+                        if(cv!=null)
+                        {
+                            //user is trying to fuse wrongly
+                            Clashing = true;
+                            break;
+                        }
+                    }
+
+                    if(Clashing)
+                    {
+                        CurrentStatus = "Can't draw ring here - drag over atom or bond to draw fused ring";
+                    }
                     CurrentAdorner = new NRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
-                                                      _preferredPlacements, FirstPoint, CurrentPoint);
+                                                      _preferredPlacements, FirstPoint, CurrentPoint, Clashing);
                 }
                 else
                 {
@@ -190,6 +209,7 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
         }
+
 
         /// <summary>
         /// Gets a vector projected onto the line connecting the start and end points
@@ -278,7 +298,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (MouseIsDown)
+            if (!Clashing && MouseIsDown)
             {
                 if (_preferredPlacements != null)
                 {

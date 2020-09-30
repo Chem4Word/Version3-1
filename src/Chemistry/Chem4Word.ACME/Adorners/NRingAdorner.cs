@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Media;
 using Chem4Word.ACME.Drawing;
 using Chem4Word.Model2.Annotations;
+using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.ACME.Adorners
 {
@@ -17,14 +18,16 @@ namespace Chem4Word.ACME.Adorners
     {
         public Point EndPoint { get; }
         public Point StartPoint { get; }
+        public bool GreyedOut { get; }
 
-        public NRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, Point startPoint, Point endPoint) : base(adornedElement, bondThickness, placements)
+        public NRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, Point startPoint, Point endPoint, bool greyedOut= false) : base(adornedElement, bondThickness, placements,greyedOut:greyedOut)
         {
             PreviewMouseUp += NRingAdorner_PreviewMouseUp;
             PreviewKeyDown += NRingAdorner_PreviewKeyDown;
             MouseUp += NRingAdorner_MouseUp;
             StartPoint = startPoint;
             EndPoint = endPoint;
+            GreyedOut = greyedOut;
             Focusable = true;
             Focus();
         }
@@ -61,7 +64,16 @@ namespace Chem4Word.ACME.Adorners
         {
             Point pos = (EndPoint - StartPoint) * 0.5 + StartPoint;
             int ringSize = Placements.Count;
-            DrawRingSize(drawingContext, ringSize, pos, PixelsPerDip(), BondPen.Brush.Clone(), CurrentEditor.ViewModel.SymbolSize);
+            Brush fillBrush;
+            if (GreyedOut)
+            {
+                fillBrush = (Brush)FindResource(Globals.BlockedAdornerBrush);
+            }
+            else
+            {
+                fillBrush = BondPen.Brush.Clone();
+            }
+            DrawRingSize(drawingContext, ringSize, pos, PixelsPerDip(), fillBrush, CurrentEditor.ViewModel.SymbolSize);
         }
 
         public static void DrawRingSize(DrawingContext drawingContext, int ringSize, Point pos, float pixelsPerDip, Brush fillBrush, double chemistrySymbolSize)
@@ -86,7 +98,15 @@ namespace Chem4Word.ACME.Adorners
 
         private void DrawPlacementArrow(DrawingContext dc)
         {
-            Brush fillBrush = BondPen.Brush.Clone();
+            Brush fillBrush;
+            if (GreyedOut)
+            {
+                fillBrush = (Brush)FindResource(Globals.BlockedAdornerBrush);
+            }
+            else
+            {
+                fillBrush = BondPen.Brush.Clone();
+            }
 
             var fatArrow = FatArrowGeometry.GetArrowGeometry(StartPoint, EndPoint);
             dc.DrawGeometry(fillBrush, null, fatArrow);

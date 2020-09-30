@@ -19,6 +19,7 @@ namespace Chem4Word.Model2.Helpers
 
         public static string CarbonSymbol = "C";
         public static string AllenicCarbonSymbol = "•";
+        
 
         #endregion Strings
 
@@ -289,6 +290,8 @@ namespace Chem4Word.Model2.Helpers
         public const string AdornerFillBrush = "ThumbFillBrush";
 
         public const string AtomBondSelectorBrush = "AtomBondSelectorBrush";
+
+        public const string BlockedAdornerBrush= "BlockedAdornerBrush";
 
         #endregion Layout Constants
 

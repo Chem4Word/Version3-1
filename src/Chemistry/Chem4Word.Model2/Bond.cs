@@ -18,7 +18,7 @@ using Chem4Word.Model2.Helpers;
 
 namespace Chem4Word.Model2
 {
-    public class Bond : ChemistryBase, INotifyPropertyChanged
+    public class Bond : ChemistryBase, INotifyPropertyChanged, IEquatable<Bond>
     {
         #region Properties
 
@@ -82,7 +82,7 @@ namespace Chem4Word.Model2
 
         public string Id { get; set; }
 
-        public string InternalId { get; set; }
+        public string InternalId { get; }
 
         public override string Path
         {
@@ -770,6 +770,10 @@ namespace Chem4Word.Model2
             return $"Bond {Id} - {Path}: From {StartAtom.Path} to {EndAtom.Path}";
         }
 
+        public override int GetHashCode()
+        {
+            return InternalId.GetHashCode();
+        }
         #endregion Overrides
 
         /// <summary>
@@ -797,6 +801,15 @@ namespace Chem4Word.Model2
             {
                 return (Angle + 180d) % 360d;
             }
+        }
+
+        public bool Equals(Bond other)
+        {
+            if(other is null)
+            {
+                return false;
+            }
+            return other.InternalId == this.InternalId;
         }
     }
 }

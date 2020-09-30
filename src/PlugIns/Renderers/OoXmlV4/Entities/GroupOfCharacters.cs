@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Model2.Geometry;
 using Chem4Word.Renderer.OoXmlV4.OOXML;
 using Chem4Word.Renderer.OoXmlV4.TTF;
@@ -166,9 +167,9 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
             StringBuilder sb = new StringBuilder();
             sb.Append($"{Text}");
             sb.Append(" ");
-            sb.Append($"at {BoundingBox.Location.X:#,##0.000},{BoundingBox.Location.Y:#,##0.000}");
+            sb.Append($"at {PointHelper.AsString(BoundingBox.Location)}");
             sb.Append(" ");
-            sb.Append($"size {BoundingBox.Size.Width:#,##0.000}x{BoundingBox.Size.Height:#,##0.000}");
+            sb.Append($"size {SafeDouble.AsString4(BoundingBox.Size.Width)}x{SafeDouble.AsString4(BoundingBox.Size.Height)}");
             return sb.ToString();
         }
 

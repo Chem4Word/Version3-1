@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System.Windows;
+using Chem4Word.Core.Helpers;
 using Chem4Word.Renderer.OoXmlV4.TTF;
 
 namespace Chem4Word.Renderer.OoXmlV4.Entities
@@ -32,7 +33,7 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
 
         public override string ToString()
         {
-            return $"{Character.Character} of {ParentAtom} @ {Position.X:#,##0.000},{Position.Y:#,##0.000}";
+            return $"{Character.Character} of {ParentAtom} @ {PointHelper.AsString(Position)}";
         }
     }
 }

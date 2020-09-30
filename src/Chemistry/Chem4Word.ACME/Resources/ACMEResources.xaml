@@ -14,6 +14,7 @@
     <SolidColorBrush x:Key="Chem4WordBrush" Color="#2A579A" />
     <SolidColorBrush x:Key="PinkLace" Color="#FFDDF4" />
     <SolidColorBrush x:Key="ACMEToolbarBackground" Color="#F1F1F1" />
+
     <Style x:Key="WedgeBondStyle" TargetType="Path">
         <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <Setter Property="Height" Value="14" />
@@ -23,6 +24,8 @@
     </Style>
 
     <!--  styles for bond fills  -->
+    <SolidColorBrush x:Key="BlockedAdornerBrush" Color="LightGray"/>
+
     <LinearGradientBrush x:Key="HatchBondBrush" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="50,0" EndPoint="50,5">
         <GradientStop Offset="0" Color="{StaticResource {x:Static SystemColors.WindowTextBrushKey}}" />
         <GradientStop Offset="0.1" Color="{StaticResource {x:Static SystemColors.WindowTextBrushKey}}" />

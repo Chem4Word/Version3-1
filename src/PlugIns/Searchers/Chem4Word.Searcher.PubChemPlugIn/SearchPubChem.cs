@@ -330,12 +330,12 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                             {
                                 var id = compound.XPathSelectElement("./Id");
                                 var name = compound.XPathSelectElement("./Item[@Name='IUPACName']");
-                                //var smiles = compound.XPathSelectElement("./Item[@Name='CanonicalSmile']");
+                                //var smiles = compound.XPathSelectElement("./Item[@Name='CanonicalSmile']")
                                 var formula = compound.XPathSelectElement("./Item[@Name='MolecularFormula']");
                                 ListViewItem lvi = new ListViewItem(id.Value);
 
                                 lvi.SubItems.Add(new ListViewItem.ListViewSubItem(lvi, name.Value));
-                                //lvi.SubItems.Add(new ListViewItem.ListViewSubItem(lvi, smiles.ToString()));
+                                //lvi.SubItems.Add(new ListViewItem.ListViewSubItem(lvi, smiles.ToString()))
                                 lvi.SubItems.Add(new ListViewItem.ListViewSubItem(lvi, formula.Value));
 
                                 Results.Items.Add(lvi);

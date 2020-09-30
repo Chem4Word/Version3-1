@@ -26,19 +26,22 @@ namespace Chem4Word.Core.Helpers
 
         public static string Duration(double duration)
         {
-            return duration.ToString("#,##0.00", CultureInfo.InvariantCulture);
+            return AsString(duration);
         }
 
-        public static string AsString(double? source, string format)
+        public static string AsString(double value)
         {
-            string result = "{null}";
+            return value.ToString("#,##0.00", CultureInfo.InvariantCulture);
+        }
 
-            if (source != null)
-            {
-                result = source.Value.ToString(format);
-            }
+        public static string AsString4(double value)
+        {
+            return value.ToString("#,##0.0000", CultureInfo.InvariantCulture);
+        }
 
-            return result;
+        public static string AsString0(double value)
+        {
+            return value.ToString("#,##0", CultureInfo.InvariantCulture);
         }
     }
 }

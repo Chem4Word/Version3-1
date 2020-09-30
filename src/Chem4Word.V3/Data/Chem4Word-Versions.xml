@@ -3,6 +3,19 @@
 <ChangeLog>
     <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
     <Version>
+        <Number>3.1.14 Release 4</Number>
+        <IsBeta>false</IsBeta>
+        <Released>30-Sep-2020</Released>
+        <Changes>
+            <Change>ACME: Fix Undo of SetBondLength not restoring drop down</Change>
+	        <Change>ACME: Fix Undo crash when atoms being reverted are selected</Change>
+            <Change>ChEBI Search: Fix bug in import</Change>
+	        <Change>ACME: Fix crash on improperly fusing fixed or variable rings</Change>
+	        <Change>Please download Chem4Word-Setup.exe via https://www.chem4word.co.uk/download/ if you encounter any difficulties updating.</Change>
+        </Changes>
+        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.14.Release.4.msi</Url>
+    </Version>
+    <Version>
         <Number>3.1.13 Release 3</Number>
         <IsBeta>false</IsBeta>
         <Released>17-Sep-2020</Released>
@@ -11,7 +24,6 @@
             <Change>Fix incorrect position of implicit Hydrogen for a lone atom (as seen in Microsoft Word)</Change>
             <Change>Please download Chem4Word-Setup.exe via https://www.chem4word.co.uk/download/ if you encounter any difficulties updating.</Change>
         </Changes>
-        <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.13.Release.3.msi</Url>
     </Version>
     <Version>
         <Number>3.1.12 Release 2</Number>

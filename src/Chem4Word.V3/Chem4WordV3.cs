@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -194,7 +193,7 @@ namespace Chem4Word
 
         private void C4WAddIn_Startup(object sender, EventArgs e)
         {
-            string module = $"{MethodBase.GetCurrentMethod().Name}()";
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
                 // Deliberate crash to test Error Reporting
@@ -215,9 +214,17 @@ namespace Chem4Word
                     PerformStartUpActions();
 
                     sw.Stop();
-                    message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                    message = $"{module} took {SafeDouble.AsString(sw.ElapsedMilliseconds)}ms";
                     StartUpTimings.Add(message);
                     Debug.WriteLine(message);
+                }
+                else
+                {
+                    if (Ribbon == null)
+                    {
+                        RegistryHelper.StoreMessage(module, "Ribbon is null");
+                    }
+                    RegistryHelper.StoreMessage(module, $"Command line {cmd}");
                 }
             }
             catch (Exception exception)
@@ -275,13 +282,13 @@ namespace Chem4Word
                 Telemetry = new TelemetryWriter(true, Helper);
 
                 sw.Stop();
-                message = $"{module} took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+                message = $"{module} took {SafeDouble.AsString(sw.ElapsedMilliseconds)}ms";
                 Debug.WriteLine(message);
                 StartUpTimings.Add(message);
             }
-            catch (ThreadAbortException)
+            catch (ThreadAbortException threadAbortException)
             {
-                // Do Nothing
+                RegistryHelper.StoreException(module, threadAbortException);
             }
             catch (Exception exception)
             {
@@ -297,14 +304,14 @@ namespace Chem4Word
             {
                 AddInInfo = new C4wAddInInfo();
 
+                UpdateHelper.ReadSavedValues();
+                UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
+                ShowOrHideUpdateShield();
+
                 // Handle slower startup stuff on thread
                 Thread thread = new Thread(SlowOperations);
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
-
-                UpdateHelper.ReadSavedValues();
-                UpdateHelper.ReadThisVersion(Assembly.GetExecutingAssembly());
-                ShowOrHideUpdateShield();
 
                 if (VersionsBehind < Constants.MaximumVersionsBehind)
                 {
@@ -349,8 +356,10 @@ namespace Chem4Word
                 }
                 else
                 {
+                    SetButtonStates(ButtonState.Disabled);
                     StartUpTimings.Add(
                         $"{module} chemistry operations disabled because Chem4Word is {VersionsBehind} versions behind!");
+                    RegistryHelper.StoreMessage(module, $"Chem4Word is disabled because it is {VersionsBehind} versions behind!");
                 }
 
                 // Deliberate crash to test Error Reporting
@@ -358,9 +367,9 @@ namespace Chem4Word
                 //int dd = 0;
                 //int bang = ii / dd;
             }
-            catch (ThreadAbortException)
+            catch (ThreadAbortException threadAbortException)
             {
-                // Do Nothing
+                RegistryHelper.StoreException(module, threadAbortException);
             }
             catch (Exception exception)
             {
@@ -407,99 +416,98 @@ namespace Chem4Word
                 // Initialise Telemetry with send permission
                 Telemetry = new TelemetryWriter(true, Helper);
 
-                // Read in options file
-                if (string.IsNullOrEmpty(AddInInfo.ProductAppDataPath))
+                if (AddInInfo != null)
                 {
-                    Debugger.Break();
-                }
-                SystemOptions = new Chem4WordOptions(AddInInfo.ProductAppDataPath);
-                if (SystemOptions.Errors.Any())
-                {
-                    Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, SystemOptions.Errors));
-                    SystemOptions.Errors = new List<string>();
-                }
-
-                bool isBeta = true;
-                try
-                {
-                    if (ThisVersion != null)
+                    // Read in options file
+                    SystemOptions = new Chem4WordOptions(AddInInfo.ProductAppDataPath);
+                    if (SystemOptions.Errors.Any())
                     {
-                        string betaValue = ThisVersion.Root?.Element("IsBeta")?.Value;
-                        isBeta = betaValue != null && bool.Parse(betaValue);
+                        Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, SystemOptions.Errors));
+                        SystemOptions.Errors = new List<string>();
                     }
-                }
-                catch
-                {
-                    // Assume isBeta
-                }
 
-                // Belt and braces ...
-                if (SystemOptions == null)
-                {
-                    SystemOptions = new Chem4WordOptions
+                    bool isBeta = true;
+                    try
                     {
-                        SettingsPath = AddInInfo.ProductAppDataPath
-                    };
-                }
-
-                // ... as we are seeing some errors here ?
-                // Re-Initialise Telemetry with granted permissions
-                Telemetry = new TelemetryWriter(isBeta || SystemOptions.TelemetryEnabled, Helper);
-
-                try
-                {
-                    bool settingsChanged = false;
-
-                    if (string.IsNullOrEmpty(SystemOptions.SelectedEditorPlugIn))
-                    {
-                        SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
-                    }
-                    else
-                    {
-                        if (Editors.Count > 0)
+                        if (ThisVersion != null)
                         {
-                            var editor = GetEditorPlugIn(SystemOptions.SelectedEditorPlugIn);
-                            if (editor == null)
+                            string betaValue = ThisVersion.Root?.Element("IsBeta")?.Value;
+                            isBeta = betaValue != null && bool.Parse(betaValue);
+                        }
+                    }
+                    catch
+                    {
+                        // Assume isBeta
+                    }
+
+                    // Belt and braces ...
+                    if (SystemOptions == null)
+                    {
+                        SystemOptions = new Chem4WordOptions
+                        {
+                            SettingsPath = AddInInfo.ProductAppDataPath
+                        };
+                    }
+
+                    // ... as we are seeing some errors here ?
+                    // Re-Initialise Telemetry with granted permissions
+                    Telemetry = new TelemetryWriter(isBeta || SystemOptions.TelemetryEnabled, Helper);
+
+                    try
+                    {
+                        bool settingsChanged = false;
+
+                        if (string.IsNullOrEmpty(SystemOptions.SelectedEditorPlugIn))
+                        {
+                            SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
+                        }
+                        else
+                        {
+                            if (Editors.Count > 0)
                             {
-                                SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
-                                Telemetry.Write(module, "Information", $"Setting editor to {SystemOptions.SelectedEditorPlugIn}");
-                                settingsChanged = true;
+                                var editor = GetEditorPlugIn(SystemOptions.SelectedEditorPlugIn);
+                                if (editor == null)
+                                {
+                                    SystemOptions.SelectedEditorPlugIn = Constants.DefaultEditorPlugIn;
+                                    Telemetry.Write(module, "Information", $"Setting editor to {SystemOptions.SelectedEditorPlugIn}");
+                                    settingsChanged = true;
+                                }
+                            }
+                        }
+
+                        if (string.IsNullOrEmpty(SystemOptions.SelectedRendererPlugIn))
+                        {
+                            SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
+                        }
+                        else
+                        {
+                            if (Renderers.Count > 0)
+                            {
+                                var renderer = GetRendererPlugIn(SystemOptions.SelectedRendererPlugIn);
+                                if (renderer == null)
+                                {
+                                    SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
+                                    Telemetry.Write(module, "Information", $"Setting renderer to {SystemOptions.SelectedRendererPlugIn}");
+                                    settingsChanged = true;
+                                }
+                            }
+                        }
+
+                        if (settingsChanged)
+                        {
+                            Telemetry.Write(module, "Information", "Saving revised settings");
+                            SystemOptions.Save();
+                            if (SystemOptions.Errors.Any())
+                            {
+                                Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, SystemOptions.Errors));
+                                SystemOptions.Errors = new List<string>();
                             }
                         }
                     }
-
-                    if (string.IsNullOrEmpty(SystemOptions.SelectedRendererPlugIn))
+                    catch
                     {
-                        SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
+                        //
                     }
-                    else
-                    {
-                        if (Renderers.Count > 0)
-                        {
-                            var renderer = GetRendererPlugIn(SystemOptions.SelectedRendererPlugIn);
-                            if (renderer == null)
-                            {
-                                SystemOptions.SelectedRendererPlugIn = Constants.DefaultRendererPlugIn;
-                                Telemetry.Write(module, "Information", $"Setting renderer to {SystemOptions.SelectedRendererPlugIn}");
-                                settingsChanged = true;
-                            }
-                        }
-                    }
-
-                    if (settingsChanged)
-                    {
-                        Telemetry.Write(module, "Information", "Saving revised settings");
-                        SystemOptions.Save();
-                        if (SystemOptions.Errors.Any())
-                        {
-                            Telemetry.Write(module, "Exception", string.Join(Environment.NewLine, SystemOptions.Errors));
-                            SystemOptions.Errors = new List<string>();
-                        }
-                    }
-                }
-                catch
-                {
-                    //
                 }
             }
             catch (Exception exception)
@@ -800,7 +808,7 @@ namespace Chem4Word
 
             sw.Stop();
 
-            message = $"{module} examining {filesFound} files took {sw.ElapsedMilliseconds.ToString("#,000", CultureInfo.InvariantCulture)}ms";
+            message = $"{module} examining {filesFound} files took {SafeDouble.AsString(sw.ElapsedMilliseconds)}ms";
             Debug.WriteLine(message);
             StartUpTimings.Add(message);
         }
@@ -1133,13 +1141,16 @@ namespace Chem4Word
                         Ribbon.Update.Image = Properties.Resources.Shield_Danger;
                         Ribbon.Update.Label = "Update to use Chem4Word again";
                         Ribbon.Update.ScreenTip = "You must update to continue using Chem4Word";
-                        Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind and Chem4Word has been disabled because it is too many versions old.";
+                        Ribbon.Update.SuperTip = $"You are {VersionsBehind} versions behind therefore Chem4Word has been disabled as it is too many versions old.";
                         SetButtonStates(ButtonState.Disabled);
                         ChemistryProhibitedReason = Constants.Chem4WordTooOld;
                         break;
                 }
 
-                if (VersionsBehind > 0 && !VersionAvailableIsBeta)
+                string betaValue = Globals.Chem4WordV3.ThisVersion.Root?.Element("IsBeta")?.Value;
+                bool isBeta = betaValue != null && bool.Parse(betaValue);
+
+                if (isBeta && VersionsBehind > 0 && !VersionAvailableIsBeta)
                 {
                     Ribbon.Update.Visible = true;
                     Ribbon.Update.Enabled = true;

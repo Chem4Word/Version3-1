@@ -157,7 +157,7 @@ namespace Chem4Word.Model2.Converters.MDL
 
             while (!reader.EndOfStream)
             {
-                string line = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+                string line = SdFileConverter.GetNextLine(reader);
                 if (!string.IsNullOrEmpty(line))
                 {
                     if (line.StartsWith(MDLConstants.M_CHG)
@@ -183,7 +183,7 @@ namespace Chem4Word.Model2.Converters.MDL
             int idx = 0;
             while (!reader.EndOfStream && idx < atoms)
             {
-                string line = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+                string line = SdFileConverter.GetNextLine(reader);
                 if (!string.IsNullOrEmpty(line))
                 {
                     // create atom
@@ -241,19 +241,19 @@ namespace Chem4Word.Model2.Converters.MDL
                     thisAtom.DoubletRadical = DoubletRadicalFromMolfile(ch);
 
                     // field 3 is atom parity (a *write-only* field, so not used)
-                    // int parity = ParseInteger(line, 39, 3);
+                    // int parity = ParseInteger(line, 39, 3)
 
                     // field 4 hydrogen count
-                    // int hCount = ParseInteger(line, 42, 3);
+                    // int hCount = ParseInteger(line, 42, 3)
 
                     // field 5 stereoCareBox
-                    // int field5 = ParseInteger(line, 45, 3);
+                    // int field5 = ParseInteger(line, 45, 3)
 
                     // field 6 valency/oxidation state
-                    // int oxState = ParseInteger(line, 48, 3);
+                    // int oxState = ParseInteger(line, 48, 3)
 
                     // field 7 H0 designator
-                    // int hZero = ParseInteger(line, 51, 3);
+                    // int hZero = ParseInteger(line, 51, 3)
 
                     // atom-atom mapping
                     int atomMap = ParseInteger(line, 60, 3);
@@ -263,10 +263,10 @@ namespace Chem4Word.Model2.Converters.MDL
                     }
 
                     // inversion/retention flag
-                    // int hZero = ParseInteger(line, 63, 3);
+                    // int hZero = ParseInteger(line, 63, 3)
 
                     // exact change flag
-                    // int hZero = ParseInteger(line, 66, 3);
+                    // int hZero = ParseInteger(line, 66, 3)
 
                     idx++;
 
@@ -284,7 +284,7 @@ namespace Chem4Word.Model2.Converters.MDL
             int idx = 0;
             while (!reader.EndOfStream && idx < bonds)
             {
-                string line = SdFileConverter.GetNextLine(reader); //reader.ReadLine();
+                string line = SdFileConverter.GetNextLine(reader);
                 if (!string.IsNullOrEmpty(line))
                 {
                     // create bond
@@ -294,7 +294,6 @@ namespace Chem4Word.Model2.Converters.MDL
 
                     if (atom1 == null)
                     {
-                        //throw new Exception("Cannot resolve atomNumber :" + atomNumber1 + ": in " + line);
                         _molecule.Warnings.Add($"Cannot resolve atomNumber {atomNumber1} at line {SdFileConverter.LineNumber}");
                         _molecule.Warnings.Add($"{line}");
                     }
@@ -304,7 +303,6 @@ namespace Chem4Word.Model2.Converters.MDL
 
                     if (atom2 == null)
                     {
-                        //throw new Exception("Cannot resolve atomNumber :" + atomNumber2 + ": in " + line);
                         _molecule.Warnings.Add($"Cannot resolve atomNumber {atomNumber2} at line {SdFileConverter.LineNumber}");
                         _molecule.Warnings.Add($"{line}");
                     }

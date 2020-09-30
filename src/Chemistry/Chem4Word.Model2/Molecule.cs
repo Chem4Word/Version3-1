@@ -1179,29 +1179,59 @@ namespace Chem4Word.Model2
 
         /// <summary>
         /// Checks to make sure the internals of the molecule haven't become busted up.
-        /// This will throw an Exception if something is wrong. You should be ready to catch it...
         /// </summary>
-        public void CheckIntegrity()
+        public List<string> CheckIntegrity()
         {
+            var result = new List<string>();
+
             //first, check to see whether there aren't more than one region
             if (TheoreticalRings < 0) //we have a disconnected graph!
             {
-                //throw new Exception($"Molecule {Path} is disconnected.");
+                result.Add($"Molecule {Path} is disconnected.");
+            }
+
+            foreach (var atomObject in Atoms)
+            {
+                var key = atomObject.Key;
+                var atom = atomObject.Value;
+
+                if (atom.Parent == null)
+                {
+                    result.Add($"Atom {atom} is disconnected!");
+                }
+
+                if (key != atom.InternalId)
+                {
+                    result.Add($"Atom {atom} Key != InternalId");
+                }
+
             }
 
             //now check to see that ever bond refers to a valid atom
-            foreach (Bond b in Bonds)
+            foreach (Bond bond in Bonds)
             {
-                if (!Atoms.ContainsKey(b.StartAtomInternalId) || !Atoms.ContainsKey(b.EndAtomInternalId))
+                if (bond.Parent == null)
                 {
-                    throw new Exception($"Bond {b} refers to a missing atom");
+                    result.Add($"Bond {bond} is disconnected");
+                }
+
+                if (!Atoms.ContainsKey(bond.StartAtomInternalId))
+                {
+                    result.Add($"Bond {bond} refers to a missing start atom {bond.StartAtomInternalId}");
+                }
+
+                if (!Atoms.ContainsKey(bond.EndAtomInternalId))
+                {
+                    result.Add($"Bond {bond} refers to a missing end atom {bond.EndAtomInternalId}");
                 }
             }
 
             foreach (var child in Molecules.Values)
             {
-                child.CheckIntegrity();
+                result.AddRange(child.CheckIntegrity());
             }
+
+            return result;
         }
 
         #endregion Methods

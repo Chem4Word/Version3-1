@@ -332,8 +332,9 @@ namespace Chem4Word.Model2.Converters.CML
             XElement result = new XElement(CMLNamespaces.cml + CMLConstants.TagAtom,
                 new XAttribute(CMLConstants.AttributeId, atom.Id),
                 new XAttribute(CMLConstants.AttributeElementType, elementType),
-                new XAttribute(CMLConstants.AttributeX2, atom.Position.X.ToString("0.0#####", CultureInfo.InvariantCulture)),
-                new XAttribute(CMLConstants.AttributeY2, atom.Position.Y.ToString("0.0#####", CultureInfo.InvariantCulture))
+                // We are writing co-ordinates with 4 decimal places to be consistent with industry standard MDL format
+                new XAttribute(CMLConstants.AttributeX2, atom.Position.X.ToString("0.0###", CultureInfo.InvariantCulture)),
+                new XAttribute(CMLConstants.AttributeY2, atom.Position.Y.ToString("0.0###", CultureInfo.InvariantCulture))
             );
 
             if (atom.FormalCharge != null && atom.FormalCharge.Value != 0)

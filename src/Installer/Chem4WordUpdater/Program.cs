@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -26,7 +27,9 @@ namespace Chem4WordUpdater
                 {
                     if (created)
                     {
-                        RegistryHelper.WriteAction("Starting Updater");
+                        Version version = Assembly.GetExecutingAssembly().GetName().Version;
+
+                        RegistryHelper.WriteAction($"Starting Updater V{version}");
 
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);

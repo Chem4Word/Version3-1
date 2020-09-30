@@ -1077,7 +1077,7 @@ namespace Chem4Word
                                         // Set bond length to 1.54 angstroms (Å)
                                         model.ScaleToAverageBondLength(1.54);
                                         double after = model.MeanBondLength;
-                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
+                                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"Structure rescaled from {SafeDouble.AsString(before)} to {SafeDouble.AsString(after)}");
                                         SdFileConverter converter = new SdFileConverter();
                                         File.WriteAllText(sfd.FileName, converter.Export(model));
                                         break;
@@ -1990,7 +1990,7 @@ namespace Chem4Word
             AfterButtonChecks(sender as RibbonButton);
         }
 
-        private void ButtonsDisabled_Click(object sender, RibbonControlEventArgs e)
+        private void OnButtonsDisabledClick(object sender, RibbonControlEventArgs e)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             BeforeButtonChecks();

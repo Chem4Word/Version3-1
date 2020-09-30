@@ -26,12 +26,21 @@ namespace Chem4Word.ACME.Adorners
         public EditorCanvas CurrentEditor { get; }
         private readonly RingDrawer _ringDrawer;
 
-        public FixedRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, bool unsaturated = false) : base(adornedElement)
+        public FixedRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements,
+                                bool unsaturated = false, bool greyedOut = false) : base(adornedElement)
         {
             _solidColorBrush = (SolidColorBrush)FindResource(Globals.AdornerFillBrush);
 
             Cursor = CursorUtils.Pencil;
-            BondPen = new Pen((SolidColorBrush)FindResource(Globals.DrawAdornerBrush), bondThickness);
+            if (!greyedOut)
+            {
+                BondPen = new Pen((SolidColorBrush) FindResource(Globals.DrawAdornerBrush), bondThickness);
+            }
+            else
+            {
+                BondPen = new Pen((SolidColorBrush) FindResource(Globals.BlockedAdornerBrush), bondThickness);
+            }
+
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);

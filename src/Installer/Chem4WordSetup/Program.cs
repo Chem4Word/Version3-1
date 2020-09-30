@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -24,7 +25,9 @@ namespace Chem4WordSetup
             {
                 if (created)
                 {
-                    RegistryHelper.WriteAction("Starting Setup");
+                    Version version = Assembly.GetExecutingAssembly().GetName().Version;
+
+                    RegistryHelper.WriteAction($"Starting Setup V{version}");
 
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);

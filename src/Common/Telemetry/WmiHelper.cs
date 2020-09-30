@@ -226,7 +226,7 @@ namespace Chem4Word.Telemetry
                 try
                 {
                     double speed = double.Parse(mgtObject["CurrentClockSpeed"].ToString()) / 1024;
-                    _cpuSpeed = speed.ToString("#,##0.00", CultureInfo.InvariantCulture) + "GHz";
+                    _cpuSpeed = SafeDouble.AsString(speed) + "GHz";
                 }
                 catch
                 {
@@ -288,7 +288,7 @@ namespace Chem4Word.Telemetry
                     var mgtObject = (ManagementObject)o;
                     capacity += (UInt64)mgtObject["Capacity"];
                 }
-                _physicalMemory = (capacity / (1024 * 1024 * 1024)).ToString("#,##0") + "GB";
+                _physicalMemory = SafeDouble.AsString0((double)capacity / (1024 * 1024 * 1024)) + "GB";
             }
             catch
             {
