@@ -13,6 +13,7 @@ namespace Chem4Word.ACME.Drawing
     public class SuperscriptTextRunProperties : LabelTextRunProperties
     {
         private double _SubscriptSize = 0.0;
+
         public SuperscriptTextRunProperties(string colour, double subScriptSize) : base(colour, subScriptSize)
         {
             _SubscriptSize = subScriptSize;

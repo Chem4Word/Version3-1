@@ -26,18 +26,17 @@ namespace Chem4Word.ACME.Adorners
         public PathGeometry Geometry { get; private set; }
 
         public ChainAdorner(Point firstPoint, [NotNull] UIElement adornedElement, double bondThickness,
-                            List<Point> placements, Point currentPoint, Atom target, bool greyedOut=false) : base(adornedElement)
+                            List<Point> placements, Point currentPoint, Atom target, bool greyedOut = false) : base(adornedElement)
         {
             SolidColorBrush bondBrush;
             if (greyedOut)
             {
-                bondBrush = (SolidColorBrush) FindResource(Globals.BlockedAdornerBrush);
+                bondBrush = (SolidColorBrush)FindResource(Globals.BlockedAdornerBrush);
             }
             else
             {
-                bondBrush = (SolidColorBrush) FindResource(Globals.DrawAdornerBrush); 
+                bondBrush = (SolidColorBrush)FindResource(Globals.DrawAdornerBrush);
             }
-
 
             BondPen = new Pen(bondBrush, bondThickness);
             DashedPen = BondPen.Clone();

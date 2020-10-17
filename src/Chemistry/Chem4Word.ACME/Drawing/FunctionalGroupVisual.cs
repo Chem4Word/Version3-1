@@ -50,11 +50,11 @@ namespace Chem4Word.ACME.Drawing
             }
 
             var textStore = new FunctionalGroupTextSource(ParentGroup, colour, flipped)
-                            {
-                                SymbolSize = SymbolSize, SubscriptSize = SubscriptSize, SuperscriptSize = SuperscriptSize
-                            };
-
-
+            {
+                SymbolSize = SymbolSize,
+                SubscriptSize = SubscriptSize,
+                SuperscriptSize = SuperscriptSize
+            };
 
             //main textformatter - this does the writing of the visual
             using (TextFormatter textFormatter = TextFormatter.Create())
@@ -65,7 +65,7 @@ namespace Chem4Word.ACME.Drawing
                     TextAlignment.Left,
                     true,
                     false,
-                    new LabelTextRunProperties(colour,SymbolSize),
+                    new LabelTextRunProperties(colour, SymbolSize),
                     TextWrapping.NoWrap,
                     SymbolSize,
                     0d);

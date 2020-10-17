@@ -34,13 +34,12 @@ namespace Chem4Word.ACME.Adorners
             Cursor = CursorUtils.Pencil;
             if (!greyedOut)
             {
-                BondPen = new Pen((SolidColorBrush) FindResource(Globals.DrawAdornerBrush), bondThickness);
+                BondPen = new Pen((SolidColorBrush)FindResource(Globals.DrawAdornerBrush), bondThickness);
             }
             else
             {
-                BondPen = new Pen((SolidColorBrush) FindResource(Globals.BlockedAdornerBrush), bondThickness);
+                BondPen = new Pen((SolidColorBrush)FindResource(Globals.BlockedAdornerBrush), bondThickness);
             }
-
 
             var myAdornerLayer = AdornerLayer.GetAdornerLayer(adornedElement);
             myAdornerLayer.Add(this);
@@ -52,9 +51,7 @@ namespace Chem4Word.ACME.Adorners
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            // ToDo: This may not be accurate
-
-            List<NewAtomPlacement> newPlacements = new List<NewAtomPlacement>();
+            var newPlacements = new List<NewAtomPlacement>();
 
             RingBehavior.FillExistingAtoms(Placements, Placements, newPlacements, CurrentEditor);
 

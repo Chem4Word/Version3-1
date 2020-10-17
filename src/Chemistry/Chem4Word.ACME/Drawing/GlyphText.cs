@@ -29,7 +29,6 @@ namespace Chem4Word.ACME.Drawing
         //standard label font
         public double TypeSize { get; }
 
-
         public float PixelsPerDip { get; }
 
         protected GlyphTypeface _glyphTypeface;
@@ -124,8 +123,6 @@ namespace Chem4Word.ACME.Drawing
 
             Vector mainOffset = GlyphUtils.GetOffsetVector(groupGlyphRun, TypeSize) +
                                 new Vector(0.0, -MaxBaselineOffset);
-            //removed because labels were being canted too much to the left
-            //+ new Vector(-FirstBearing(groupGlyphRun), 0.0);
             var bb = groupGlyphRun.GetBoundingBox(center + mainOffset);
             Vector textFormatterOffset = new Vector(mainOffset.X, -FirstBearing(groupGlyphRun) - bb.Height / 2);
 

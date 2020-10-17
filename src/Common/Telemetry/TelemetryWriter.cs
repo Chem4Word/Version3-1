@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 using Chem4Word.Core.Helpers;
 using IChem4Word.Contracts;
 
@@ -82,11 +84,38 @@ namespace Chem4Word.Telemetry
             {
                 WritePrivate(operation, level, message);
 
-                if (!_systemInfoSent && _helper != null)
+                if (!_systemInfoSent
+                    && _helper?.IpAddress != null
+                    && !_helper.IpAddress.Contains("0.0.0.0"))
                 {
-                    if (_helper.IpAddress != null && !_helper.IpAddress.Contains("0.0.0.0"))
+                    WriteStartUpInfo();
+
+                    if (!string.IsNullOrEmpty(_helper.GitStatus))
                     {
-                        WriteStartUpInfo();
+                        var tracking = _helper.GitStatus
+                                              .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                                              .FirstOrDefault(l => l.StartsWith("##"));
+
+                        if (!string.IsNullOrEmpty(tracking))
+                        {
+                            var idxStart = tracking.IndexOf('[');
+                            var idxEnd = tracking.IndexOf(']');
+                            if (idxStart > 0 && idxEnd > 0)
+                            {
+                                var info = tracking.Substring(idxStart, idxEnd - idxStart + 1);
+
+                                if (info.Contains("behind"))
+                                {
+                                    MessageBox.Show("Your local source code is behind origin!", "WARNING",
+                                                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                }
+                                if (info.Contains("gone"))
+                                {
+                                    MessageBox.Show("Your local source code is gone from origin!", "WARNING",
+                                                    MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                }
+                            }
+                        }
                     }
                 }
             }

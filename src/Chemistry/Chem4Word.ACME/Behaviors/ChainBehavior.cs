@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -97,7 +96,7 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (IsDrawing & !Clashing)
+            if (IsDrawing && !Clashing)
             {
                 EditViewModel.DrawChain(Placements, Target);
             }
@@ -147,17 +146,19 @@ namespace Chem4Word.ACME.Behaviors
                                                                    endPoint);
                     }
 
-                    Clashing =
-                        (targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target) |
-                        overWritingSelf;
-                    //do an extra check to see whether we're overwriting existing chemistry
-                    if(!Clashing)
+                    if (targetedVisual != null)
                     {
-                        var currentPos = (e.GetPosition(CurrentEditor));
+                        Clashing = targetedVisual is ChemicalVisual && (targetedVisual as AtomVisual)?.ParentAtom != Target
+                                   || overWritingSelf;
+                    }
+
+                    //do an extra check to see whether we're overwriting existing chemistry
+                    if (!Clashing)
+                    {
                         for (int i = 1; i < Placements.Count; i++) //ignore the first atom as it will always clash
                         {
                             ChemicalVisual cv = CurrentEditor.GetTargetedVisual(Placements[i]);
-                            if(cv!=null)
+                            if (cv != null)
                             {
                                 //user is trying to overwrite
                                 Clashing = true;
@@ -165,12 +166,13 @@ namespace Chem4Word.ACME.Behaviors
                             }
                         }
                     }
+
                     //check to see if we're overwriting the existing adorner
                     for (int i = 0; i < Placements.Count; i++)
                     {
                         for (int j = 0; j < Placements.Count; j++)
                         {
-                            if( i!=j && (Placements[j] -Placements[i] ).Length < 0.01)
+                            if (i != j && (Placements[j] - Placements[i]).Length < 0.01)
                             {
                                 Clashing = true;
                                 break;
@@ -178,7 +180,7 @@ namespace Chem4Word.ACME.Behaviors
                         }
                     }
 
-                    CurrentAdorner =  new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements,
+                    CurrentAdorner = new ChainAdorner(FirstPoint, CurrentEditor, EditViewModel.EditBondThickness, Placements,
                                                        endPoint, Target, Clashing);
                     if (!Clashing)
                     {
@@ -312,73 +314,6 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        public List<Point> MarkOutAtoms(Atom startAtom, Point endPoint)
-        {
-            var bondSize = EditViewModel.Model.XamlBondLength;
-            var placements = new List<Point>();
-            var startAtomPos = startAtom.Position;
-
-            Snapper snapper = new Snapper(startAtomPos, EditViewModel);
-            var dragVector = endPoint - startAtomPos;
-
-            if (startAtom.Singleton)
-            {
-                dragVector.Normalize();
-                dragVector = dragVector * bondSize;
-                dragVector = snapper.SnapVector(0, dragVector);
-
-                Point firstPos = startAtomPos + dragVector;
-                placements.Add(startAtomPos);
-                placements.Add(firstPos);
-                placements.AddRange(MarkOutAtoms(startAtomPos, endPoint, dragVector));
-            }
-            else
-            {
-                Vector initialDisplacement;
-                initialDisplacement = startAtom.BalancingVector() * bondSize;
-                Point firstPos;
-
-                if (startAtom.Degree == 1) //it's a terminal atom of a chain
-                {
-                    Matrix rotator = new Matrix();
-                    //so guess where we're going to draw it
-                    int altSign = Math.Sign(Vector.CrossProduct(startAtom.BalancingVector(), dragVector));
-                    rotator.Rotate(altSign * 60);
-                    initialDisplacement = initialDisplacement * rotator;
-                }
-
-                firstPos = startAtomPos + initialDisplacement;
-                placements.Add(firstPos);
-                placements.AddRange(MarkOutAtoms(firstPos, endPoint, initialDisplacement));
-            }
-
-            return placements;
-        }
-
-        public List<Point> MarkOutAtoms(Point start, Point endPoint, Vector initialDisplacement)
-        {
-            var bondSize = EditViewModel.Model.XamlBondLength;
-            var placements = new List<Point>();
-            Point branchPoint = start;
-            placements.Add(branchPoint);
-
-            var displacement = endPoint - start;
-            var alternationSign = Math.Sign(Vector.CrossProduct(initialDisplacement, displacement));
-
-            Matrix rotator = new Matrix();
-
-            double angle = 60;
-            while ((branchPoint - start).LengthSquared < (endPoint - start).LengthSquared)
-            {
-                rotator.Rotate(angle * alternationSign);
-                branchPoint = branchPoint + initialDisplacement * rotator;
-                placements.Add(branchPoint);
-                alternationSign = -alternationSign;
-            }
-
-            return placements;
-        }
-
         protected override void OnDetaching()
         {
             CurrentAdorner = null;
@@ -386,7 +321,7 @@ namespace Chem4Word.ACME.Behaviors
             CurrentEditor.MouseMove -= CurrentEditor_MouseMove;
             CurrentEditor.MouseLeftButtonUp -= CurrentEditor_MouseLeftButtonUp;
             CurrentEditor.PreviewKeyDown -= CurrentEditor_PreviewKeyDown;
-            //CurrentEditor = null;
+
             if (_parent != null)
             {
                 _parent.MouseLeftButtonDown -= CurrentEditor_MouseLeftButtonDown;

@@ -5,7 +5,6 @@
 //  at the root directory of the distribution.
 // ---------------------------------------------------------------------------
 
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -164,7 +163,7 @@ namespace Chem4Word.ACME.Adorners
             }
         }
 
-        public  BondLayout GetBondLayout(Point startPoint, Point endPoint, double bondLength, 
+        public BondLayout GetBondLayout(Point startPoint, Point endPoint, double bondLength,
                                          Globals.BondStereo stereo, string order, Ring existingRing = null,
                                          Ring subsidiaryRing = null)
         {
@@ -192,7 +191,6 @@ namespace Chem4Word.ACME.Adorners
                 BondGeometry.GetSingleBondGeometry(descriptor, CurrentEditor.ViewModel.Standoff);
             }
 
-            List<Point> dummy = new List<Point>();
             //double bond
             if (ordervalue == 2 || ordervalue == 1.5)
             {

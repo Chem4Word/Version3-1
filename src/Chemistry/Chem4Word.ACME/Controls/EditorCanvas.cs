@@ -73,7 +73,6 @@ namespace Chem4Word.ACME.Controls
         public Geometry GhostMolecule(List<Molecule> adornedMolecules, Transform operation = null)
         {
             var atomList = new List<Atom>();
-            List<Bond> bondList = new List<Bond>();
             foreach (Molecule mol in adornedMolecules)
             {
                 mol.BuildAtomList(atomList);
@@ -88,7 +87,7 @@ namespace Chem4Word.ACME.Controls
         /// <param name="selectedAtoms">List of selected atoms to rubber-band</param>
         /// <param name="shear">TranslateTransform describing how atoms are shifted. Omit to obtain an overlay to transform later</param>
         /// <returns>Geometry of deformed atoms</returns>
-        public Geometry PartialGhost(List<Atom> selectedAtoms, Transform shear = null)
+        private Geometry PartialGhost(List<Atom> selectedAtoms, Transform shear = null)
         {
             HashSet<Bond> bondSet = new HashSet<Bond>();
             Dictionary<Atom, Point> transformedPositions = new Dictionary<Atom, Point>();

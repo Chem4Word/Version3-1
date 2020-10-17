@@ -115,6 +115,7 @@
     <Compile Include="FunctionalGroupLoading.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceHelper.cs" />
+    <Compile Include="EditViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chemistry\Chem4Word.ACME\Chem4Word.ACME.csproj">
@@ -124,6 +125,10 @@
     <ProjectReference Include="..\Chemistry\Chem4Word.Model2\Chem4Word.Model2.csproj">
       <Project>{c69bab8f-4881-4d5f-9929-fc8470df1e48}</Project>
       <Name>Chem4Word.Model2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlugIns\Contracts\Chem4Word.Contracts.csproj">
+      <Project>{BDFEE6C1-3F34-4200-9100-C543BF4C3783}</Project>
+      <Name>Chem4Word.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +166,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <EmbeddedResource Include="Resources\CML\cyclohexylidenecyclohexane.xml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\NestedMolecules.xml" />
@@ -197,6 +203,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\CML\Trimethylamine-MoleculeRoot.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Two-Molecules-With-Foliage.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Two-Molecules-For-Joining.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CML\Two-Grouped-Molecules.xml" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

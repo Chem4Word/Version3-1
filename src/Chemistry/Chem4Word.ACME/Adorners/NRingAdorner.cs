@@ -20,7 +20,7 @@ namespace Chem4Word.ACME.Adorners
         public Point StartPoint { get; }
         public bool GreyedOut { get; }
 
-        public NRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, Point startPoint, Point endPoint, bool greyedOut= false) : base(adornedElement, bondThickness, placements,greyedOut:greyedOut)
+        public NRingAdorner([NotNull] UIElement adornedElement, double bondThickness, List<Point> placements, Point startPoint, Point endPoint, bool greyedOut = false) : base(adornedElement, bondThickness, placements, greyedOut: greyedOut)
         {
             PreviewMouseUp += NRingAdorner_PreviewMouseUp;
             PreviewKeyDown += NRingAdorner_PreviewKeyDown;
@@ -80,8 +80,8 @@ namespace Chem4Word.ACME.Adorners
         {
             string ringLabel = ringSize.ToString();
             var symbolText = new GlyphText(ringLabel,
-                                           GlyphUtils.SymbolTypeface, 
-                                           chemistrySymbolSize, 
+                                           GlyphUtils.SymbolTypeface,
+                                           chemistrySymbolSize,
                                            pixelsPerDip);
 
             Pen boundaryPen = new Pen(fillBrush, 2.0);

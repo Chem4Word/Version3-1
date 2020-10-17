@@ -18,6 +18,7 @@ namespace Chem4Word.ACME.Drawing
         private string _colour;
 
         private double _symbolSize;
+
         public LabelTextRunProperties(string colour, double symbolSize)
         {
             _colour = colour;

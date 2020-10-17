@@ -109,11 +109,11 @@ namespace Chem4Word.ACME.Behaviors
             Clashing = false;
             CurrentPoint = e.GetPosition(CurrentEditor);
             //check to see whether we've dragged off the target first
-            if (MouseIsDown & IsDrawing)
+            if (MouseIsDown && IsDrawing)
             {
                 CurrentStatus = "Drag along arrow to size ring: [Esc] to cancel";
                 double xamlBondSize = EditViewModel.Model.XamlBondLength;
-                if (Target != null & GetTargetedVisual(e) != Target) //dragging off a bond or atom
+                if (Target != null && GetTargetedVisual(e) != Target) //dragging off a bond or atom
                 {
                     //first, work out how far we've dragged the mouse
 
@@ -175,7 +175,7 @@ namespace Chem4Word.ACME.Behaviors
                     foreach (Point p in _preferredPlacements)
                     {
                         ChemicalVisual cv = CurrentEditor.GetTargetedVisual(p);
-                        if(cv!=null)
+                        if (cv != null)
                         {
                             //user is trying to fuse wrongly
                             Clashing = true;
@@ -183,7 +183,7 @@ namespace Chem4Word.ACME.Behaviors
                         }
                     }
 
-                    if(Clashing)
+                    if (Clashing)
                     {
                         CurrentStatus = "Can't draw ring here - drag over atom or bond to draw fused ring";
                     }
@@ -209,7 +209,6 @@ namespace Chem4Word.ACME.Behaviors
                 }
             }
         }
-
 
         /// <summary>
         /// Gets a vector projected onto the line connecting the start and end points
@@ -246,8 +245,7 @@ namespace Chem4Word.ACME.Behaviors
             var uncrowdedSideVector = bond.GetUncrowdedSideVector();
             if (uncrowdedSideVector != null)
             {
-                Vector perp = GetProjection(uncrowdedSideVector.Value, midPoint,
-                                               currentPoint);
+                GetProjection(uncrowdedSideVector.Value, midPoint, currentPoint);
                 var distance = Math.Abs((currentPoint - midPoint).Length);
                 return GetRingSize(Math.Abs(bond.BondVector.Length), distance);
             }
@@ -282,7 +280,7 @@ namespace Chem4Word.ACME.Behaviors
 
             for (int i = 4; i <= 100; i++)
             {
-                if ((i - 1) * bondSize <= circ & i * bondSize > circ)
+                if ((i - 1) * bondSize <= circ && i * bondSize > circ)
                 {
                     return i;
                 }
@@ -318,8 +316,6 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Atom hitAtom = CurrentEditor.ActiveAtomVisual?.ParentAtom;
-            Bond hitBond = CurrentEditor.ActiveBondVisual?.ParentBond;
             //save the current targeted visual
             Target = CurrentEditor.ActiveVisual;
             FirstPoint = e.GetPosition(CurrentEditor);
@@ -380,7 +376,6 @@ namespace Chem4Word.ACME.Behaviors
         }
 
         public static void FillExistingAtoms(List<Point> preferredPlacements,
-
                                              List<NewAtomPlacement> newAtomPlacements,
                                              EditorCanvas currentEditor)
         {
@@ -388,8 +383,7 @@ namespace Chem4Word.ACME.Behaviors
             {
                 NewAtomPlacement nap = new NewAtomPlacement
                 {
-                    ExistingAtom =
-                                               (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
+                    ExistingAtom = (currentEditor.GetTargetedVisual(placement) as AtomVisual)?.ParentAtom,
                     Position = placement
                 };
                 newAtomPlacements.Add(nap);
@@ -427,7 +421,6 @@ namespace Chem4Word.ACME.Behaviors
                 perpvector = hitBond.GetUncrowdedSideVector();
             }
 
-            Vector bondDirection = hitBond.BondVector;
             bool followsBond = Vector.AngleBetween(hitBond.BondVector, perpvector.Value) > 0;
 
             preferredPlacements = MarkOutAtoms(hitBond, followsBond, ringSize: ringSize);
@@ -478,20 +471,18 @@ namespace Chem4Word.ACME.Behaviors
         {
             List<Point> placements = new List<Point>();
 
-            Point lastPos, nextPos;
+            Point lastPos;
 
             Vector bondVector;
             if (followsBond)
             {
                 bondVector = startBond.EndAtom.Position - startBond.StartAtom.Position;
                 lastPos = startBond.StartAtom.Position;
-                nextPos = startBond.EndAtom.Position;
             }
             else
             {
                 bondVector = startBond.StartAtom.Position - startBond.EndAtom.Position;
                 lastPos = startBond.EndAtom.Position;
-                nextPos = startBond.StartAtom.Position;
             }
 
             double exteriorAngle = 360.0 / ringSize;

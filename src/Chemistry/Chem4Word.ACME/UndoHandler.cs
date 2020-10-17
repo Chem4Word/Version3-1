@@ -105,10 +105,32 @@ namespace Chem4Word.ACME
             Initialize();
         }
 
-        public void Initialize()
+        private void Initialize()
         {
             _undoStack = new Stack<UndoRecord>();
             _redoStack = new Stack<UndoRecord>();
+        }
+
+        public List<string> ReadUndoStack()
+        {
+            var result = new List<string>();
+            foreach (var item in _undoStack)
+            {
+                result.Add($"{item.Level} - {item.Description}");
+            }
+
+            return result;
+        }
+
+        public List<string> ReadRedoStack()
+        {
+            var result = new List<string>();
+            foreach (var item in _redoStack)
+            {
+                result.Add($"{item.Level} - {item.Description}");
+            }
+
+            return result;
         }
 
         private void WriteTelemetry(string source, string level, string message)
@@ -163,12 +185,12 @@ namespace Chem4Word.ACME
                 }
 
                 _undoStack.Push(new UndoRecord
-                                {
-                                    Level = _transactionLevel,
-                                    Description = desc,
-                                    UndoAction = undoAction,
-                                    RedoAction = redoAction
-                                });
+                {
+                    Level = _transactionLevel,
+                    Description = desc,
+                    UndoAction = undoAction,
+                    RedoAction = redoAction
+                });
             }
             catch (Exception exception)
             {
@@ -195,7 +217,6 @@ namespace Chem4Word.ACME
 
                 //we've concluded a transaction block so terminated it
                 if (_transactionLevel == 0)
-
                 {
                     if (_undoStack.Peek().Equals(_startBracket))
                     {
@@ -217,34 +238,6 @@ namespace Chem4Word.ACME
             }
         }
 
-        /// <summary>
-        /// Rolls back the current undo block
-        /// and removes the last buffer record
-        /// </summary>
-        public void RollbackUndoBlock()
-        {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
-            try
-            {
-                var br = _undoStack.Pop();
-                if (br.Equals(_endBracket))
-                {
-                    Debugger.Break();
-                    throw new InvalidDataException("First rollback action is a buffer record.");
-                }
-
-                while (!br.Equals(_startBracket))
-                {
-                    br.Undo();
-                    br = _undoStack.Pop();
-                }
-                _transactionLevel = 0;
-            }
-            catch (Exception exception)
-            {
-                WriteTelemetryException(module, exception);
-            }
-        }
 
         public void Undo()
         {

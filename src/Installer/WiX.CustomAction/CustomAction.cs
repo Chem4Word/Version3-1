@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace WiX.CustomAction
         [CustomAction]
         public static ActionResult SetupChem4Word(Session session)
         {
-            session.Log("Begin SetupChem4Word()");
+            session.Log($"Begin {nameof(SetupChem4Word)}()");
 
             session.Log($"  Running as {Environment.UserName}");
 
@@ -82,7 +83,7 @@ namespace WiX.CustomAction
                 session.Log($"** Exception: {ex.Message} **");
             }
 
-            session.Log("End SetupChem4Word()");
+            session.Log($"End {nameof(SetupChem4Word)}()");
 
             return ActionResult.Success;
         }
@@ -111,50 +112,98 @@ namespace WiX.CustomAction
         [CustomAction]
         public static ActionResult CleanUserRegistry(Session session)
         {
-            session.Log("Begin CleanUserRegistry()");
+            session.Log($"Begin {nameof(CleanUserRegistry)}()");
 
             session.Log($"  Running as {Environment.UserName}");
 
             try
             {
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Chem4Word V3", true);
-                if (key == null)
+                // Possible locations that (old) add-in may have been registered
+                var listOfKeys = new List<string>()
+                                 {
+                                     "Chemistry Add-in for Word",
+                                     "Chem4Word",
+                                     "Chem4Word V3",
+                                     "Chem4Word.V3"
+                                 };
+                foreach (var key in listOfKeys)
                 {
-                    key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Chem4Word V3");
+                    DeleteUserKey(session, $@"SOFTWARE\{OfficeKey}\Word\Addins\", $"{key}");
+                    DeleteUserKey(session, $@"SOFTWARE\{OfficeKey}\Word\AddinsData\", $"{key}");
                 }
 
-                if (key != null)
-                {
-                    try
-                    {
-                        var values = key.GetValueNames();
-                        // Erase previously stored Update Checks etc
-                        foreach (string value in values)
-                        {
-                            session.Log($"Deleting Value '{value}'");
-                            key.DeleteValue(value);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                    }
-                }
+                // User Settings
+                EraseUserKey(session, @"SOFTWARE\Chem4Word V3");
             }
             catch (Exception ex)
             {
                 session.Log($"** Exception: {ex.Message} **");
             }
 
-            session.Log("End CleanUserRegistry()");
+            session.Log($"End {nameof(CleanUserRegistry)}()");
 
             return ActionResult.Success;
+        }
+
+        private static void EraseUserKey(Session session, string nameOfKey)
+        {
+            session.Log($"  {nameof(EraseUserKey)}({nameOfKey})");
+
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(nameOfKey, true);
+            if (key == null)
+            {
+                key = Registry.CurrentUser.CreateSubKey(nameOfKey);
+            }
+
+            if (key != null)
+            {
+                try
+                {
+                    var values = key.GetValueNames();
+                    // Erase previously stored Update Checks etc
+                    foreach (string value in values)
+                    {
+                        session.Log($"Deleting Value '{value}'");
+                        key.DeleteValue(value);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+        }
+
+        private static void DeleteUserKey(Session session, string nameOfKey, string kkk)
+        {
+            session.Log($"  {nameof(DeleteUserKey)}({nameOfKey}, {kkk})");
+
+            RegistryKey key = Registry.CurrentUser.OpenSubKey($"{nameOfKey}{kkk}", true);
+            if (key != null)
+            {
+                try
+                {
+                    var values = key.GetValueNames();
+                    foreach (string value in values)
+                    {
+                        session.Log($"Deleting Value '{value}'");
+                        key.DeleteValue(value);
+                    }
+
+                    key = Registry.CurrentUser.OpenSubKey($"{nameOfKey}", true);
+                    key?.DeleteSubKey(kkk);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
         }
 
         [CustomAction]
         public static ActionResult RemoveChem4Word(Session session)
         {
-            session.Log("Begin RemoveChem4Word()");
+            session.Log($"Begin {nameof(RemoveChem4Word)}()");
 
             session.Log($"  Running as {Environment.UserName}");
 
@@ -167,7 +216,7 @@ namespace WiX.CustomAction
                 session.Log($"** Exception: {ex.Message} **");
             }
 
-            session.Log("End RemoveChem4Word()");
+            session.Log($"End {nameof(RemoveChem4Word)}()");
 
             return ActionResult.Success;
         }
@@ -175,7 +224,7 @@ namespace WiX.CustomAction
         [CustomAction]
         public static ActionResult FindWord(Session session)
         {
-            session.Log("Begin FindWord()");
+            session.Log($"Begin {nameof(FindWord)}()");
 
             int officeVersion = OfficeHelper.GetWinWordVersionNumber();
             if (officeVersion >= 2010)
@@ -184,7 +233,7 @@ namespace WiX.CustomAction
                 session["WINWORDVERSION"] = officeVersion.ToString();
             }
 
-            session.Log("End FindWord()");
+            session.Log($"End {nameof(FindWord)}()");
 
             return ActionResult.Success;
         }
@@ -192,7 +241,7 @@ namespace WiX.CustomAction
         [CustomAction]
         public static ActionResult WordProcessCount(Session session)
         {
-            session.Log("Begin WordProcessCount()");
+            session.Log($"Begin {nameof(WordProcessCount)}()");
 
             Process[] processes = Process.GetProcessesByName("winword");
 
@@ -201,14 +250,14 @@ namespace WiX.CustomAction
                 session["WINWORDPROCESSCOUNT"] = processes.Length.ToString();
             }
 
-            session.Log("End WordProcessCount()");
+            session.Log($"End {nameof(WordProcessCount)}()");
 
             return ActionResult.Success;
         }
 
         private static void AlterRegistry(Session session, string manifestLocation)
         {
-            session.Log(" Begin AlterRegistry()");
+            session.Log($" Begin {nameof(AlterRegistry)}()");
 
             try
             {
@@ -251,12 +300,12 @@ namespace WiX.CustomAction
                 session.Log($"** Exception: {ex.Message} **");
             }
 
-            session.Log(" End AlterRegistry()");
+            session.Log($" End {nameof(AlterRegistry)}()");
         }
 
         private static void RegisterChem4WordAddIn(Session session, RegistryKey rk, string manifestLocation)
         {
-            session.Log(" End RegisterChem4WordAddIn()");
+            session.Log($" End {nameof(RegisterChem4WordAddIn)}()");
 
             try
             {
@@ -292,7 +341,7 @@ namespace WiX.CustomAction
                 session.Log($"** Exception: {ex.Message} **");
             }
 
-            session.Log(" End RegisterChem4WordAddIn()");
+            session.Log($" End {nameof(RegisterChem4WordAddIn)}()");
         }
     }
 }

@@ -942,9 +942,9 @@ namespace Chem4Word
                     EventsEnabled = true;
                 }
             }
-            catch (Exception exception)
+            catch // (Exception exception)
             {
-                RegistryHelper.StoreException(module, exception);
+                // RegistryHelper.StoreException(module, exception)
             }
         }
 
@@ -1007,9 +1007,9 @@ namespace Chem4Word
                     }
                 }
             }
-            catch (Exception exception)
+            catch // (Exception exception)
             {
-                RegistryHelper.StoreException(module, exception);
+                // RegistryHelper.StoreException(module, exception)
             }
         }
 

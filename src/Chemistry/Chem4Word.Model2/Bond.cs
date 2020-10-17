@@ -31,9 +31,6 @@ namespace Chem4Word.Model2
             get
             {
                 return Parent.Atoms[EndAtomInternalId];
-                //return Parent.Atoms.ContainsKey(EndAtomInternalId)
-                //    ? Parent.Atoms[EndAtomInternalId]
-                //    : null;
             }
         }
 
@@ -41,9 +38,6 @@ namespace Chem4Word.Model2
         {
             get
             {
-                //return Parent.Atoms.ContainsKey(StartAtomInternalId)
-                //    ? Parent.Atoms[StartAtomInternalId]
-                //    : null;
                 return Parent.Atoms[StartAtomInternalId];
             }
         }
@@ -125,7 +119,6 @@ namespace Chem4Word.Model2
                 if (value.Equals("2") || value.Equals("D"))
                 {
                     value = Globals.OrderDouble;
-                    ResetStereo();
                 }
                 if (value.Equals("3") || value.Equals("T"))
                 {
@@ -741,8 +734,8 @@ namespace Chem4Word.Model2
         {
             // Note: Add null checks as this has been found to be blowing up
             if (atomA != null && atomB != null
-                              && StartAtom.Neighbours != null & EndAtom.Neighbours != null
-                              && StartAtom.Neighbours.Count() > 0 && EndAtom.Neighbours.Count() > 0)
+                              && StartAtom.Neighbours != null && EndAtom.Neighbours != null
+                              && StartAtom.Neighbours.Any() && EndAtom.Neighbours.Any())
             {
                 if (StartAtom.Neighbours.Contains(atomA))
                 {
@@ -774,6 +767,7 @@ namespace Chem4Word.Model2
         {
             return InternalId.GetHashCode();
         }
+
         #endregion Overrides
 
         /// <summary>
@@ -788,7 +782,7 @@ namespace Chem4Word.Model2
         //gets the bond angle from the perspective of the designated atom
         public double AngleStartingAt(Atom rootAtom)
         {
-            if (rootAtom != StartAtom & rootAtom != EndAtom)
+            if (rootAtom != StartAtom && rootAtom != EndAtom)
             {
                 throw new ArgumentException("Atom not part of this bond.");
             }
@@ -805,7 +799,7 @@ namespace Chem4Word.Model2
 
         public bool Equals(Bond other)
         {
-            if(other is null)
+            if (other is null)
             {
                 return false;
             }

@@ -1,11 +1,11 @@
 del setup.log
 del remove.log
 
-msiexec /i Chem4Word-Setup.3.1.1.Beta.1.msi /l*v setup.log
+msiexec /i Chem4Word-Setup.3.1.15.Release.5.msi /l*v setup.log
 
 rem pause
 
-msiexec /uninstall Chem4Word-Setup.3.1.1.Beta.1.msi /l*v remove.log
+msiexec /uninstall Chem4Word-Setup.3.1.15.Release.5.msi /l*v remove.log
 
 pause
 

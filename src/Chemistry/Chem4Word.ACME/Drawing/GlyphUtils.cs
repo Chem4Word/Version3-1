@@ -38,8 +38,6 @@ namespace Chem4Word.ACME.Drawing
                                                                        FontWeights.Bold,
                                                                        FontStretches.Normal);
 
-
-
         public static Typeface MoleculelabelTypeface { get; } = new Typeface(new FontFamily("Arial"),
                                                                              FontStyles.Normal,
                                                                              FontWeights.Normal,
@@ -153,7 +151,6 @@ namespace Chem4Word.ACME.Drawing
         public static Rect GetBoundingBox(this GlyphRun glyphRun, Point origin)
         {
             Rect rect = glyphRun.ComputeInkBoundingBox();
-            TranslateTransform tt = new TranslateTransform(origin.X, origin.Y);
             Matrix mat = new Matrix();
             mat.Translate(origin.X, origin.Y);
 

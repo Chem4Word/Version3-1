@@ -77,7 +77,7 @@ namespace WinForms.TestHarness
             scintilla.Styles[Style.Xml.SingleString].ForeColor = Color.Blue;
 
             scintilla.ReadOnly = false;
-            scintilla.Text = Cml;
+            scintilla.Text = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>" + Environment.NewLine + Cml;
             scintilla.ReadOnly = true;
 
             timer1.Enabled = true;

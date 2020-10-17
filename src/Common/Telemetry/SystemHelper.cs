@@ -234,6 +234,10 @@ namespace Chem4Word.Telemetry
                 GetScreens();
 
 #if DEBUG
+                message = $"GetGitStatus started at {SafeDate.ToLongDate(DateTime.Now)}";
+                StartUpTimings.Add(message);
+                Debug.WriteLine(message);
+
                 Thread thread2 = new Thread(GetGitStatus);
                 thread2.SetApartmentState(ApartmentState.STA);
                 thread2.Start(null);
@@ -290,6 +294,10 @@ namespace Chem4Word.Telemetry
                 result.AddRange(changedFiles);
             }
             GitStatus = string.Join(Environment.NewLine, result.ToArray());
+
+            var message = $"GetGitStatus finished at {SafeDate.ToLongDate(DateTime.Now)}";
+            StartUpTimings.Add(message);
+            Debug.WriteLine(message);
         }
 
         private List<string> RunCommand(string exeName, string args, string folder)

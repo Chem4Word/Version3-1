@@ -130,7 +130,7 @@ namespace Chem4Word.ACME.Behaviors
 
                 case BondVisual bv:
                     IdentifyPlacements(bv.ParentBond, out altPlacements, out preferredPlacements, RingSize, e.GetPosition(CurrentEditor));
-                    if ((preferredPlacements != null) | (altPlacements != null))
+                    if ((preferredPlacements != null) || (altPlacements != null))
                     {
                         CurrentAdorner = new FixedRingAdorner(CurrentEditor, EditViewModel.EditBondThickness,
                                                               preferredPlacements ?? altPlacements, Unsaturated);
@@ -146,7 +146,7 @@ namespace Chem4Word.ACME.Behaviors
                     foreach (Point p in preferredPlacements)
                     {
                         ChemicalVisual cv = CurrentEditor.GetTargetedVisual(p);
-                        if(cv!=null)
+                        if (cv != null)
                         {
                             //user is trying to fuse wrongly
                             Clashing = true;
@@ -177,7 +177,6 @@ namespace Chem4Word.ACME.Behaviors
 
         private void CurrentEditor_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            //throw new System.NotImplementedException();
             CurrentStatus = "";
         }
 
@@ -211,7 +210,7 @@ namespace Chem4Word.ACME.Behaviors
                 else if (hitBond != null)
                 {
                     IdentifyPlacements(hitBond, out altPlacements, out preferredPlacements, RingSize, position);
-                    if ((altPlacements == null) & (preferredPlacements == null))
+                    if ((altPlacements == null) && (preferredPlacements == null))
                     {
                         UserInteractions.AlertUser("No room left to draw any more rings!");
                     }
@@ -220,7 +219,6 @@ namespace Chem4Word.ACME.Behaviors
                 {
                     preferredPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenNorth,
                                                        xamlBondSize, RingSize);
-                    //al4tPlacements = MarkOutAtoms(e.GetPosition(AssociatedObject), BasicGeometry.ScreenSouth, xamlBondSize, RingSize);
                     if (preferredPlacements.Count % 2 == 1)
                     {
                         startAt = 1;
@@ -253,8 +251,25 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        public void IdentifyPlacements(Atom hitAtom, double xamlBondSize, out List<Point> preferredPlacements,
-                                              int ringSize)
+        private bool ClashesWithOtherFragments(List<Point> preferredPlacements, Molecule parentMolecule)
+        {
+            if (preferredPlacements == null)
+            {
+                return true;
+            }
+            foreach (Point placement in preferredPlacements)
+            {
+                var atomVisual = CurrentEditor.GetTargetedVisual(placement) as AtomVisual;
+                if (atomVisual != null && atomVisual.ParentAtom.Parent != parentMolecule)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void IdentifyPlacements(Atom hitAtom, double xamlBondSize, out List<Point> preferredPlacements, int ringSize)
         {
             Molecule parentMolecule;
             parentMolecule = hitAtom.Parent;
@@ -285,26 +300,7 @@ namespace Chem4Word.ACME.Behaviors
             }
         }
 
-        private bool ClashesWithOtherFragments(List<Point> preferredPlacements, Molecule parentMolecule)
-        {
-            if (preferredPlacements == null)
-            {
-                return true;
-            }
-            foreach (Point placement in preferredPlacements)
-            {
-                var atomVisual = CurrentEditor.GetTargetedVisual(placement) as AtomVisual;
-                if (atomVisual != null && atomVisual.ParentAtom.Parent != parentMolecule)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements,
-                                              out List<Point> preferredPlacements, int ringSize, Point position)
+        public void IdentifyPlacements(Bond hitBond, out List<Point> altPlacements, out List<Point> preferredPlacements, int ringSize, Point position)
         {
             Molecule parentMolecule;
             List<Point> placements;
@@ -406,20 +402,18 @@ namespace Chem4Word.ACME.Behaviors
         {
             var placements = new List<Point>();
 
-            Point lastPos, nextPos;
+            Point lastPos;
 
             Vector bondVector;
             if (followsBond)
             {
                 bondVector = startBond.EndAtom.Position - startBond.StartAtom.Position;
                 lastPos = startBond.StartAtom.Position;
-                nextPos = startBond.EndAtom.Position;
             }
             else
             {
                 bondVector = startBond.StartAtom.Position - startBond.EndAtom.Position;
                 lastPos = startBond.EndAtom.Position;
-                nextPos = startBond.StartAtom.Position;
             }
 
             var exteriorAngle = 360.0 / ringSize;

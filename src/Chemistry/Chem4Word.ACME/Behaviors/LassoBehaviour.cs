@@ -380,12 +380,9 @@ namespace Chem4Word.ACME.Behaviors
                 //now we need to work out how far away from the static atom the moving atom should be
                 var desiredDisplacement = originalDistance - fragmentSpan;
                 //then we snap it
-
-                var bondSnapper =
-                    new Snapper(staticPoint, EditViewModel, bondLength: _bondLength, lockAngle: 10);
-
+                var bondSnapper = new Snapper(staticPoint, EditViewModel, bondLength: _bondLength, lockAngle: 10);
                 var snappedBondVector = bondSnapper.SnapVector(connectingBond.Angle, desiredDisplacement);
-                //Vector snappedBondVector = desiredDisplacement;
+
                 //subtract the original bond vector to get the actual desired, snapped shift
                 var bondVector = movingPoint - staticPoint;
                 //now calculate the angle between the starting bond and the snapped vector

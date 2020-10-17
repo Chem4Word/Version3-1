@@ -245,7 +245,7 @@ namespace Chem4Word.Model2
         {
             get
             {
-                // This number is used because it is higher than the Maximum value in the periodic table;
+                // This number is used because it is higher than the Maximum value in the periodic table
                 int min = 255;
 
                 var allAtoms = GetAllAtoms();

@@ -23,6 +23,7 @@ namespace Chem4Word.ACME.Drawing
         public double BondThickness { get; set; }
 
         public double Standoff { get; set; }
+
         #endregion Properties
 
         #region Fields
@@ -113,16 +114,16 @@ namespace Chem4Word.ACME.Drawing
 
             if (startAtomVisual.ParentAtom.SymbolText != "" || startAtomVisual.ShowAllCarbons)
             {
-                startAtomHull = startAtomVisual?.Hull;
+                startAtomHull = startAtomVisual.Hull;
             }
             if (endAtomVisual.ParentAtom.SymbolText != "" || endAtomVisual.ShowAllCarbons)
             {
-                endAtomHull = endAtomVisual?.Hull;
+                endAtomHull = endAtomVisual.Hull;
             }
             if ((parentStereo == Globals.BondStereo.Wedge || parentStereo == Globals.BondStereo.Hatch)
                 && parentOrderValue == 1)
             {
-                WedgeBondLayout wbd = new WedgeBondLayout()
+                WedgeBondLayout wbd = new WedgeBondLayout
                 {
                     Start = startAtomPosition,
                     End = endAtomPosition,
@@ -304,192 +305,186 @@ namespace Chem4Word.ACME.Drawing
             Atom startAtom = ParentBond.StartAtom;
             Atom endAtom = ParentBond.EndAtom;
 
-            // Only continue if we have both a start and end atom
-            //if (startAtom != null && endAtom != null)
-            //{
-                //set up the shared variables first
-                Point startPoint = startAtom.Position;
-                Point endPoint = endAtom.Position;
+            //set up the shared variables first
+            Point startPoint = startAtom.Position;
+            Point endPoint = endAtom.Position;
 
-                double bondLength = ParentBond.Model.XamlBondLength;
-                //bool firstVisualExists = ChemicalVisuals.ContainsKey(startAtom);
-                //bool secondVisualExists = ChemicalVisuals.ContainsKey(endAtom);
+            double bondLength = ParentBond.Model.XamlBondLength;
 
-                // Only continue if bond length is not zero and we have both a startVisual and endVisual
-                if (startPoint != endPoint ) // && firstVisualExists && secondVisualExists)
+            // Only continue if bond length is not zero
+            if (startPoint != endPoint)
+            {
+                //now get the geometry of start and end atoms
+                AtomVisual startVisual = (AtomVisual)ChemicalVisuals[startAtom];
+                AtomVisual endVisual = (AtomVisual)ChemicalVisuals[endAtom];
+
+                //first grab the main descriptor
+                BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength, Standoff);
+
+                _enclosingPoly = BondDescriptor.Boundary;
+                //set up the default pens for rendering
+                _mainBondPen = new Pen(Brushes.Black, BondThickness)
                 {
-                    //now get the geometry of start and end atoms
-                    AtomVisual startVisual = (AtomVisual)ChemicalVisuals[startAtom];
-                    AtomVisual endVisual = (AtomVisual)ChemicalVisuals[endAtom];
+                    StartLineCap = PenLineCap.Round,
+                    EndLineCap = PenLineCap.Round,
+                    LineJoin = PenLineJoin.Miter
+                };
 
-                    //first grab the main descriptor
-                    BondDescriptor = GetBondDescriptor(ParentBond, startVisual, endVisual, bondLength, Standoff);
+                _subsidiaryBondPen = _mainBondPen.Clone();
 
-                    _enclosingPoly = BondDescriptor.Boundary;
-                    //set up the default pens for rendering
-                    _mainBondPen = new Pen(Brushes.Black, BondThickness)
-                    {
-                        StartLineCap = PenLineCap.Round,
-                        EndLineCap = PenLineCap.Round,
-                        LineJoin = PenLineJoin.Miter
-                    };
+                switch (ParentBond.Order)
+                {
+                    case Globals.OrderZero:
+                    case Globals.OrderOther:
+                    case "unknown":
+                        // Handle Zero Bond
+                        _mainBondPen.DashStyle = DashStyles.Dot;
 
-                    _subsidiaryBondPen = _mainBondPen.Clone();
+                        using (DrawingContext dc = RenderOpen())
+                        {
+                            dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
+                            //we need to draw another transparent rectangle to expand the bounding box
+                            DrawHitTestOverlay(dc);
+                            dc.Close();
+                        }
 
-                    switch (ParentBond.Order)
-                    {
-                        case Globals.OrderZero:
-                        case Globals.OrderOther:
-                        case "unknown":
-                            // Handle Zero Bond
-                            _mainBondPen.DashStyle = DashStyles.Dot;
+                        DoubleBondLayout dbd = new DoubleBondLayout
+                        {
+                            Start = startPoint,
+                            End = endPoint,
+                            Placement = ParentBond.Placement
+                        };
 
-                            using (DrawingContext dc = RenderOpen())
-                            {
-                                dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
-                                //we need to draw another transparent rectangle to expand the bounding box
-                                DrawHitTestOverlay(dc);
-                                dc.Close();
-                            }
+                        BondGeometry.GetDoubleBondPoints(dbd, bondLength);
+                        _enclosingPoly = dbd.Boundary;
+                        break;
 
-                            DoubleBondLayout dbd = new DoubleBondLayout
-                            {
-                                Start = startPoint,
-                                End = endPoint,
-                                Placement = ParentBond.Placement
-                            };
+                    case Globals.OrderPartial01:
+                        _mainBondPen.DashStyle = DashStyles.Dash;
 
-                            BondGeometry.GetDoubleBondPoints(dbd, bondLength);
-                            _enclosingPoly = dbd.Boundary;
-                            break;
+                        using (DrawingContext dc = RenderOpen())
+                        {
+                            dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
+                            //we need to draw another transparent thicker line on top of the existing one
+                            DrawHitTestOverlay(dc);
+                            dc.Close();
+                        }
 
-                        case Globals.OrderPartial01:
-                            _mainBondPen.DashStyle = DashStyles.Dash;
+                        //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
+                        DoubleBondLayout dbd2 = new DoubleBondLayout
+                        {
+                            Start = startPoint,
+                            End = endPoint,
+                            Placement = ParentBond.Placement
+                        };
 
-                            using (DrawingContext dc = RenderOpen())
-                            {
-                                dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
-                                //we need to draw another transparent thicker line on top of the existing one
-                                DrawHitTestOverlay(dc);
-                                dc.Close();
-                            }
+                        BondGeometry.GetDoubleBondPoints(dbd2, bondLength);
+                        _enclosingPoly = dbd2.Boundary;
 
-                            //grab the enclosing polygon as for a double ParentBond - this overcomes a hit testing bug
-                            DoubleBondLayout dbd2 = new DoubleBondLayout
-                            {
-                                Start = startPoint,
-                                End = endPoint,
-                                Placement = ParentBond.Placement
-                            };
+                        break;
 
-                            BondGeometry.GetDoubleBondPoints(dbd2, bondLength);
-                            _enclosingPoly = dbd2.Boundary;
-
-                            break;
-
-                        case "1":
-                        case Globals.OrderSingle:
-                            // Handle Single bond
-                            switch (ParentBond.Stereo)
-                            {
-                                case Globals.BondStereo.Indeterminate:
-                                case Globals.BondStereo.None:
-                                case Globals.BondStereo.Wedge:
-                                    using (DrawingContext dc = RenderOpen())
-                                    {
-                                        dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
-                                        //we need to draw another transparent rectangle to expand the bounding box
-                                        DrawHitTestOverlay(dc);
-                                        dc.Close();
-                                    }
-
-                                    break;
-
-                                case Globals.BondStereo.Hatch:
-                                    using (DrawingContext dc = RenderOpen())
-                                    {
-                                        dc.DrawGeometry(GetHatchBrush(ParentBond.Angle), _mainBondPen,
-                                                        BondDescriptor.DefiningGeometry);
-                                        //we need to draw another transparent rectangle to expand the bounding box
-                                        DrawHitTestOverlay(dc);
-                                        dc.Close();
-                                    }
-
-                                    break;
-                            }
-
-                            break;
-
-                        case Globals.OrderPartial12:
-                        case Globals.OrderAromatic:
-                        case "2":
-                        case Globals.OrderDouble:
-                            DoubleBondLayout dbd3 = (DoubleBondLayout)BondDescriptor;
-                            Point? centroid = ParentBond.Centroid;
-                            dbd3.PrimaryCentroid = centroid;
-
-                            if (ParentBond.Order == Globals.OrderPartial12 || ParentBond.Order == Globals.OrderAromatic
-                            ) // Handle 1.5 bond
-                            {
-                                _subsidiaryBondPen.DashStyle = DashStyles.Dash;
-                            }
-
-                            _enclosingPoly = dbd3.Boundary;
-
-                            if (ParentBond.Stereo != Globals.BondStereo.Indeterminate)
-                            {
+                    case "1":
+                    case Globals.OrderSingle:
+                        // Handle Single bond
+                        switch (ParentBond.Stereo)
+                        {
+                            case Globals.BondStereo.Indeterminate:
+                            case Globals.BondStereo.None:
+                            case Globals.BondStereo.Wedge:
                                 using (DrawingContext dc = RenderOpen())
                                 {
-                                    dc.DrawLine(_mainBondPen, BondDescriptor.Start, BondDescriptor.End);
-                                    dc.DrawLine(_subsidiaryBondPen,
-                                                dbd3.SecondaryStart,
-                                                dbd3.SecondaryEnd);
+                                    dc.DrawGeometry(Brushes.Black, _mainBondPen, BondDescriptor.DefiningGeometry);
+                                    //we need to draw another transparent rectangle to expand the bounding box
+                                    DrawHitTestOverlay(dc);
                                     dc.Close();
                                 }
+
+                                break;
+
+                            case Globals.BondStereo.Hatch:
+                                using (DrawingContext dc = RenderOpen())
+                                {
+                                    dc.DrawGeometry(GetHatchBrush(ParentBond.Angle), _mainBondPen,
+                                                    BondDescriptor.DefiningGeometry);
+                                    //we need to draw another transparent rectangle to expand the bounding box
+                                    DrawHitTestOverlay(dc);
+                                    dc.Close();
+                                }
+
+                                break;
+                        }
+
+                        break;
+
+                    case Globals.OrderPartial12:
+                    case Globals.OrderAromatic:
+                    case "2":
+                    case Globals.OrderDouble:
+                        DoubleBondLayout dbd3 = (DoubleBondLayout)BondDescriptor;
+                        Point? centroid = ParentBond.Centroid;
+                        dbd3.PrimaryCentroid = centroid;
+
+                        if (ParentBond.Order == Globals.OrderPartial12 || ParentBond.Order == Globals.OrderAromatic
+                        ) // Handle 1.5 bond
+                        {
+                            _subsidiaryBondPen.DashStyle = DashStyles.Dash;
+                        }
+
+                        _enclosingPoly = dbd3.Boundary;
+
+                        if (ParentBond.Stereo != Globals.BondStereo.Indeterminate)
+                        {
+                            using (DrawingContext dc = RenderOpen())
+                            {
+                                dc.DrawLine(_mainBondPen, BondDescriptor.Start, BondDescriptor.End);
+                                dc.DrawLine(_subsidiaryBondPen,
+                                            dbd3.SecondaryStart,
+                                            dbd3.SecondaryEnd);
+                                dc.Close();
+                            }
+                        }
+                        else
+                        {
+                            using (DrawingContext dc = RenderOpen())
+                            {
+                                dc.DrawGeometry(_mainBondPen.Brush, _mainBondPen, BondDescriptor.DefiningGeometry);
+
+                                dc.Close();
+                            }
+                        }
+
+                        break;
+
+                    case Globals.OrderPartial23:
+                    case "3":
+                    case Globals.OrderTriple:
+                        if (ParentBond.Order == Globals.OrderPartial23) // Handle 2.5 bond
+                        {
+                            _subsidiaryBondPen.DashStyle = DashStyles.Dash;
+                        }
+
+                        var tbd = (BondDescriptor as TripleBondLayout);
+                        using (DrawingContext dc = RenderOpen())
+                        {
+                            if (ParentBond.Placement == Globals.BondDirection.Clockwise)
+                            {
+                                dc.DrawLine(_mainBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
+                                dc.DrawLine(_mainBondPen, tbd.Start, tbd.End);
+                                dc.DrawLine(_subsidiaryBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                             }
                             else
                             {
-                                using (DrawingContext dc = RenderOpen())
-                                {
-                                    dc.DrawGeometry(_mainBondPen.Brush, _mainBondPen, BondDescriptor.DefiningGeometry);
-
-                                    dc.Close();
-                                }
+                                dc.DrawLine(_subsidiaryBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
+                                dc.DrawLine(_mainBondPen, tbd.Start, tbd.End);
+                                dc.DrawLine(_mainBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
                             }
 
-                            break;
+                            dc.Close();
+                        }
 
-                        case Globals.OrderPartial23:
-                        case "3":
-                        case Globals.OrderTriple:
-                            if (ParentBond.Order == Globals.OrderPartial23) // Handle 2.5 bond
-                            {
-                                _subsidiaryBondPen.DashStyle = DashStyles.Dash;
-                            }
-
-                            var tbd = (BondDescriptor as TripleBondLayout);
-                            using (DrawingContext dc = RenderOpen())
-                            {
-                                if (ParentBond.Placement == Globals.BondDirection.Clockwise)
-                                {
-                                    dc.DrawLine(_mainBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
-                                    dc.DrawLine(_mainBondPen, tbd.Start, tbd.End);
-                                    dc.DrawLine(_subsidiaryBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
-                                }
-                                else
-                                {
-                                    dc.DrawLine(_subsidiaryBondPen, tbd.SecondaryStart, tbd.SecondaryEnd);
-                                    dc.DrawLine(_mainBondPen, tbd.Start, tbd.End);
-                                    dc.DrawLine(_mainBondPen, tbd.TertiaryStart, tbd.TertiaryEnd);
-                                }
-
-                                dc.Close();
-                            }
-
-                            break;
-                    }
+                        break;
                 }
-            //}
+            }
 
             //local function
             void DrawHitTestOverlay(DrawingContext dc)

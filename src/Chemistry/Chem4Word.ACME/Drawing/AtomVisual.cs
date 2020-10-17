@@ -220,6 +220,7 @@ namespace Chem4Word.ACME.Drawing
         public int ImplicitHydrogenCount { get; set; }
 
         public virtual List<Point> Hull { get; protected set; }
+
         #endregion Visual Properties
 
         #endregion Properties
@@ -308,7 +309,7 @@ namespace Chem4Word.ACME.Drawing
                 increment = 10;
             }
             while (labelText.CollidesWith(mainAtomMetrics.TotalBoundingBox, bb, bb2)
-                   & Math.Abs(angle - 30) > 0.001)
+                   && Math.Abs(angle - 30) > 0.001)
             {
                 rotator = new Matrix();
 
@@ -384,12 +385,12 @@ namespace Chem4Word.ACME.Drawing
             //renders the atom complete with charges, hydrogens and labels.
             //this code is *complex* - alter it at your own risk!
 
-            List<Point> hydrogenPoints = new List<Point>();
+            List<Point> hydrogenPoints;
 
             //private variables used to keep track of onscreen visuals
             AtomTextMetrics hydrogenMetrics = null;
             LabelMetrics isoMetrics = null;
-            SubscriptedGroup subscriptedGroup = null;
+            SubscriptedGroup subscriptedGroup;
             Hull = new List<Point>();
 
             //stage 1:  measure up the main atom symbol in position

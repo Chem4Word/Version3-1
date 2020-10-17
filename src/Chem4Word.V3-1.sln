@@ -86,7 +86,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Editor.ACME", "Pl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{53F5ADDD-80C3-4FE4-88A1-B04239474E4B}"
 	ProjectSection(SolutionItems) = preProject
+		Scripts\Clone-Setup-V2.ps1 = Scripts\Clone-Setup-V2.ps1
+		Scripts\Clone-Setup-V3.ps1 = Scripts\Clone-Setup-V3.ps1
+		Scripts\Clone-Setup-V31.ps1 = Scripts\Clone-Setup-V31.ps1
 		Scripts\DeepClean.ps1 = Scripts\DeepClean.ps1
+		Scripts\GetBackToSquareOne.ps1 = Scripts\GetBackToSquareOne.ps1
 		Scripts\Install-Dev-Certificate.ps1 = Scripts\Install-Dev-Certificate.ps1
 		Scripts\SetAssemblyVersion.ps1 = Scripts\SetAssemblyVersion.ps1
 		Scripts\SignAssembly.ps1 = Scripts\SignAssembly.ps1

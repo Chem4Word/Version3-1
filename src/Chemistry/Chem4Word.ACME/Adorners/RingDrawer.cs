@@ -49,9 +49,10 @@ namespace Chem4Word.ACME.Adorners
 
                         var newAtomPlacement = newPlacements[secondIndex];
 
-                        if (!visited.Contains(oldAtomPlacement) & !visited.Contains(newAtomPlacement) &&
-                            !(oldAtomPlacement.ExistingAtom?.IsUnsaturated ??
-                              false) && !(newAtomPlacement.ExistingAtom?.IsUnsaturated ?? false))
+                        if (!visited.Contains(oldAtomPlacement)
+                            && !visited.Contains(newAtomPlacement)
+                            && !(oldAtomPlacement.ExistingAtom?.IsUnsaturated ?? false)
+                            && !(newAtomPlacement.ExistingAtom?.IsUnsaturated ?? false))
                         {
                             List<Point> dummy = new List<Point>();
 

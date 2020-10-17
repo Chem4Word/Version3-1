@@ -160,7 +160,7 @@ namespace Chem4Word.Model2
 
         public string Id { get; set; }
 
-        public string InternalId { get; set; }
+        public string InternalId { get; }
 
         public IChemistryContainer Parent { get; set; }
 
@@ -476,7 +476,6 @@ namespace Chem4Word.Model2
             NotifyCollectionChangedEventArgs e =
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Bond> { newBond });
             OnBondsChanged(this, e);
-
             UpdateBondsPropertyHandlers(e);
         }
 
@@ -484,7 +483,8 @@ namespace Chem4Word.Model2
         {
             _bonds.Remove(toRemove);
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, new List<Bond> { toRemove });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove,
+                                                     new List<Bond> { toRemove });
             OnBondsChanged(this, e);
             UpdateBondsPropertyHandlers(e);
         }
@@ -493,17 +493,16 @@ namespace Chem4Word.Model2
         {
             _atoms[newAtom.InternalId] = newAtom;
             NotifyCollectionChangedEventArgs e =
-                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new List<Atom> { newAtom });
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add,
+                                                     new List<Atom> { newAtom });
             OnAtomsChanged(this, e);
             UpdateAtomPropertyHandlers(e);
         }
 
         public void RemoveAtom(Atom toRemove)
         {
-            bool bondsExist =
-                Bonds.Any(b =>
-                              b.StartAtomInternalId.Equals(toRemove.InternalId) ||
-                              b.EndAtomInternalId.Equals(toRemove.InternalId));
+            bool bondsExist = Bonds.Any(b => b.StartAtomInternalId.Equals(toRemove.InternalId)
+                                                        || b.EndAtomInternalId.Equals(toRemove.InternalId));
             if (bondsExist)
             {
                 throw new InvalidOperationException("Cannot remove an Atom without first removing the attached Bonds.");
@@ -1204,7 +1203,6 @@ namespace Chem4Word.Model2
                 {
                     result.Add($"Atom {atom} Key != InternalId");
                 }
-
             }
 
             //now check to see that ever bond refers to a valid atom

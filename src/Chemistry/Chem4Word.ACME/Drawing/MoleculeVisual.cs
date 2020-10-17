@@ -59,7 +59,6 @@ namespace Chem4Word.ACME.Drawing
 
                 //now draw the charges and radicals
                 string chargeString = AtomHelpers.GetChargeString(_molecule.FormalCharge);
-                int? spinMult = _molecule.SpinMultiplicity;
 
                 if (_molecule.SpinMultiplicity.HasValue && _molecule.SpinMultiplicity.Value > 1)
                 {

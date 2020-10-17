@@ -562,7 +562,7 @@ namespace Chem4Word.Model2
         /// <summary>
         /// The internal ID is what is used to tie atoms and bonds together
         /// </summary>
-        public string InternalId { get;}
+        public string InternalId { get; }
 
         public bool Singleton => Parent.Atoms.Count == 1 && Parent.Atoms.Values.First() == this;
 
@@ -598,40 +598,15 @@ namespace Chem4Word.Model2
 
         public CompassPoints GetDefaultHOrientation()
         {
-            if (ImplicitHydrogenCount >= 1)
+            var orientation = CompassPoints.East;
+
+            if (ImplicitHydrogenCount >= 1 && Bonds.Any())
             {
-                if (!Bonds.Any())
-                {
-                    return CompassPoints.East;
-                }
-                else if (Bonds.Count() == 1)
-                {
-                    var angle = Vector.AngleBetween(BasicGeometry.ScreenNorth,
-                        Bonds.First().OtherAtom(this).Position - Position);
-                    int clockDirection = BasicGeometry.SnapToClock(angle);
-
-                    if (clockDirection == 0 || clockDirection == 6)
-                    {
-                        return CompassPoints.East;
-                    }
-                    else if (clockDirection >= 6 && clockDirection <= 11)
-                    {
-                        return CompassPoints.East;
-                    }
-                    else
-                    {
-                        return CompassPoints.West;
-                    }
-                }
-                else
-                {
-                    double baFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth,
-                        BalancingVector(true));
-
-                    return BasicGeometry.SnapTo4NESW(baFromNorth);
-                }
+                double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, BalancingVector(true));
+                orientation = Bonds.Count() == 1 ? BasicGeometry.SnapTo2EW(angleFromNorth) : BasicGeometry.SnapTo4NESW(angleFromNorth);
             }
-            return CompassPoints.East;
+
+            return orientation;
         }
 
         //notification methods
@@ -688,7 +663,7 @@ namespace Chem4Word.Model2
 
         public bool Equals(Atom other)
         {
-            if(other is null)
+            if (other is null)
             {
                 return false;
             }

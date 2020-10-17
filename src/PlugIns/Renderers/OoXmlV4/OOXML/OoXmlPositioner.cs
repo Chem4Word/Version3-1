@@ -620,13 +620,12 @@ namespace Chem4Word.Renderer.OoXmlV4.OOXML
 
                 // 2. Create other character groups
 
-                // 2.1 Determine position of implicit hydrogens
-                int bondCount = atom.Bonds.ToList().Count;
-                double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
-                CompassPoints orientation = bondCount == 1 ? BasicGeometry.SnapTo2EW(angleFromNorth) : BasicGeometry.SnapTo4NESW(angleFromNorth);
-                if (atom.Singleton)
+                // 2.1 Determine position of implicit hydrogens if any
+                var orientation = CompassPoints.East;
+                if (!atom.Singleton)
                 {
-                    orientation = CompassPoints.East;
+                    double angleFromNorth = Vector.AngleBetween(BasicGeometry.ScreenNorth, atom.BalancingVector(true));
+                    orientation = atom.Bonds.ToList().Count == 1 ? BasicGeometry.SnapTo2EW(angleFromNorth) : BasicGeometry.SnapTo4NESW(angleFromNorth);
                 }
 
                 // 2.2 Implicit Hydrogens
