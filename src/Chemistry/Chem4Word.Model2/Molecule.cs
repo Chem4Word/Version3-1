@@ -190,13 +190,13 @@ namespace Chem4Word.Model2
         {
             get
             {
-                if (!(Parent is Molecule))
+                if (!(Parent is Molecule molecule))
                 {
                     return this;
                 }
                 else
                 {
-                    return ((Molecule)Parent).RootMolecule;
+                    return molecule.RootMolecule;
                 }
             }
         }
@@ -1094,14 +1094,16 @@ namespace Chem4Word.Model2
 
             foreach (var atom in Atoms.Values)
             {
-                Atom a = new Atom();
+                Atom a = new Atom
+                         {
+                             Id = atom.Id,
+                             Position = atom.Position,
+                             Element = atom.Element,
+                             FormalCharge = atom.FormalCharge,
+                             IsotopeNumber = atom.IsotopeNumber,
+                             ExplicitC = atom.ExplicitC
+                         };
 
-                a.Id = atom.Id;
-                a.Position = atom.Position;
-                a.Element = atom.Element;
-                a.FormalCharge = atom.FormalCharge;
-                a.IsotopeNumber = atom.IsotopeNumber;
-                a.ExplicitC = atom.ExplicitC;
 
                 copy.AddAtom(a);
                 a.Parent = copy;

@@ -2,7 +2,7 @@
 
 $pwd = Split-Path -Path $MyInvocation.MyCommand.Path
 
-$source = "$($pwd)\Chem4Word-Setup.3.1.15.Release.5.msi";
+$source = "$($pwd)\Chem4Word-Setup.3.1.16.Release.6.msi";
 
 $targets = @();
 

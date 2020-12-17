@@ -111,11 +111,11 @@
     <Compile Include="EditorHost.Designer.cs">
       <DependentUpon>EditorHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="FlexForm.cs">
+    <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FlexForm.Designer.cs">
-      <DependentUpon>FlexForm.cs</DependentUpon>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="HexViewer.cs">
       <SubType>Form</SubType>
@@ -141,8 +141,8 @@
     <EmbeddedResource Include="EditorHost.resx">
       <DependentUpon>EditorHost.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FlexForm.resx">
-      <DependentUpon>FlexForm.cs</DependentUpon>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="HexViewer.resx">
       <DependentUpon>HexViewer.cs</DependentUpon>
@@ -202,6 +202,18 @@
     <ProjectReference Include="..\..\PlugIns\Renderers\OoXmlV4\Chem4Word.Renderer.OoXmlV4.csproj">
       <Project>{a73732b0-ff0a-488e-b353-c238a9085c63}</Project>
       <Name>Chem4Word.Renderer.OoXmlV4</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Searchers\Chem4Word.Searcher.ChEBIPlugin\Chem4Word.Searcher.ChEBIPlugin.csproj">
+      <Project>{0eb3eff1-fa71-4e65-8b4f-4c6fc632817b}</Project>
+      <Name>Chem4Word.Searcher.ChEBIPlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Searchers\Chem4Word.Searcher.OpsinPlugIn\Chem4Word.Searcher.OpsinPlugIn.csproj">
+      <Project>{061f7b7b-89ae-4095-b3bb-b297f015a038}</Project>
+      <Name>Chem4Word.Searcher.OpsinPlugIn</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PlugIns\Searchers\Chem4Word.Searcher.PubChemPlugIn\Chem4Word.Searcher.PubChemPlugIn.csproj">
+      <Project>{1049E49F-753E-4C98-ACAF-BE4250C2DC3D}</Project>
+      <Name>Chem4Word.Searcher.PubChemPlugIn</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
