@@ -75,6 +75,8 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
         private void ExecuteSearch()
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             ErrorsAndWarnings.Text = "";
             using (new WaitCursor())
             {
@@ -110,12 +112,10 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                                 var li = new ListViewItem();
                                 li.Text = res.chebiId;
                                 li.Tag = res;
-                                ListViewItem.ListViewSubItem name =
-                                    new ListViewItem.ListViewSubItem(li, res.chebiAsciiName);
+                                ListViewItem.ListViewSubItem name = new ListViewItem.ListViewSubItem(li, res.chebiAsciiName);
                                 li.SubItems.Add(name);
 
-                                ListViewItem.ListViewSubItem score =
-                                    new ListViewItem.ListViewSubItem(li, res.searchScore.ToString());
+                                ListViewItem.ListViewSubItem score = new ListViewItem.ListViewSubItem(li, res.searchScore.ToString());
                                 li.SubItems.Add(score);
                                 ResultsListView.Items.Add(li);
                             }
@@ -129,9 +129,16 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     }
                     catch (Exception ex)
                     {
-                        ErrorsAndWarnings.Text = "The operation has timed out".Equals(ex.Message)
-                            ? "Please try again later - the service has timed out"
-                            : ex.Message;
+                        if (ex.Message.Equals("The operation has timed out"))
+                        {
+                            ErrorsAndWarnings.Text = "Please try again later - the service has timed out";
+                        }
+                        else
+                        {
+                            ErrorsAndWarnings.Text = ex.Message;
+                            Telemetry.Write(module, "Exception", ex.Message);
+                            Telemetry.Write(module, "Exception", ex.StackTrace);
+                        }
                     }
                     finally
                     {
@@ -139,7 +146,6 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     }
                 }
             }
-
             EnableImport();
         }
 
@@ -187,17 +193,18 @@ namespace Chem4Word.Searcher.ChEBIPlugin
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            using (new WaitCursor())
+            if (_lastModel != null)
             {
-                Cml = string.Empty;
-
-                CMLConverter conv = new CMLConverter();
-
-                var expModel = _lastModel;
-
-                if (expModel != null && expModel.TotalAtomsCount > 0)
+                using (new WaitCursor())
                 {
-                    expModel.Relabel(true);
+                    CMLConverter conv = new CMLConverter();
+
+                    double before = _lastModel.MeanBondLength;
+                    _lastModel.ScaleToAverageBondLength(Core.Helpers.Constants.StandardBondLength);
+                    double after = _lastModel.MeanBondLength;
+                    Telemetry.Write(module, "Information", $"Structure rescaled from {before.ToString("#0.00")} to {after.ToString("#0.00")}");
+                    _lastModel.Relabel(true);
+                    var expModel = _lastModel;
 
                     using (new WaitCursor())
                     {
@@ -248,9 +255,12 @@ namespace Chem4Word.Searcher.ChEBIPlugin
 
         private void ShowMolfile_Click(object sender, EventArgs e)
         {
-            MolFileViewer tv = new MolFileViewer(new System.Windows.Point(TopLeft.X + Core.Helpers.Constants.TopLeftOffset, TopLeft.Y + Core.Helpers.Constants.TopLeftOffset), _lastMolfile);
-            tv.ShowDialog();
-            ResultsListView.Focus();
+            if (_lastModel != null)
+            {
+                MolFileViewer tv = new MolFileViewer(new System.Windows.Point(TopLeft.X + Core.Helpers.Constants.TopLeftOffset, TopLeft.Y + Core.Helpers.Constants.TopLeftOffset), _lastMolfile);
+                tv.ShowDialog();
+                ResultsListView.Focus();
+            }
         }
 
         private void ResultsListView_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -374,19 +384,18 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                 if (tag is LiteEntity le && !string.IsNullOrEmpty(le.chebiId))
                 {
                     ChebiId = le.chebiId;
-
                     var chemStructure = GetChemStructure(le);
 
                     if (!string.IsNullOrEmpty(chemStructure))
                     {
                         _lastMolfile = ConvertToWindows(chemStructure);
-                        var sdConverter = new SdFileConverter();
-                        _lastModel = sdConverter.Import(chemStructure);
 
+                        SdFileConverter sdConverter = new SdFileConverter();
+                        _lastModel = sdConverter.Import(chemStructure);
                         if (_lastModel.AllWarnings.Count > 0 || _lastModel.AllErrors.Count > 0)
                         {
                             Telemetry.Write(module, "Exception(Data)", chemStructure);
-                            var lines = new List<string>();
+                            List<string> lines = new List<string>();
                             if (_lastModel.AllErrors.Count > 0)
                             {
                                 Telemetry.Write(module, "Exception(Data)", string.Join(Environment.NewLine, _lastModel.AllErrors));
@@ -408,10 +417,9 @@ namespace Chem4Word.Searcher.ChEBIPlugin
                     }
                     else
                     {
-                        _lastMolfile = string.Empty;
-                        var cmlConverter = new CMLConverter();
-                        _lastModel = cmlConverter.Import(EmptyCml);
-                        display1.Clear();
+                        _lastModel = null;
+                        _lastMolfile = String.Empty;
+                        display1.Chemistry = null;
                         ErrorsAndWarnings.Text = "No structure available.";
                     }
 

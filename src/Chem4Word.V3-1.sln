@@ -46,7 +46,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Searcher.OpsinPlu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Searcher.PubChemPlugIn", "PlugIns\Searchers\Chem4Word.Searcher.PubChemPlugIn\Chem4Word.Searcher.PubChemPlugIn.csproj", "{1049E49F-753E-4C98-ACAF-BE4250C2DC3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Telemetry", "Common\Telemetry\Chem4Word.Telemetry.csproj", "{C89BC92A-4183-48A6-B039-AD76AA1DF48F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chem4Word.Telemetry", "Common\Chem4Word.Telemetry\Chem4Word.Telemetry.csproj", "{C89BC92A-4183-48A6-B039-AD76AA1DF48F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{914705CC-C9EF-4F33-8412-080D84924CE0}"
 EndProject

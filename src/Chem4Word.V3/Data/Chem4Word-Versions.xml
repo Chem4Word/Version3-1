@@ -3,17 +3,24 @@
 <ChangeLog>
   <Id>f3c4f4db-2fff-46db-b14a-feb8e09f7742</Id>
   <Version>
-    <Number>3.1.17 Release 6</Number>
+    <Number>3.1.17 Release 7</Number>
     <IsBeta>false</IsBeta>
-    <Released>16-Dec-2020</Released>
+    <Released>26-Jan-2021</Released>
     <Changes>
-      <Change>ACME: Protect against nulls in GetBondAdornerGeometry()</Change>
       <Change>Prevent import of empty structure in ChEBI search</Change>
-      <Change>ACME: Fix internal exception when copying structure to clipboard</Change>
-      <Change>ACME: Fix internal exception when Atom has no parent</Change>
       <Change>Please download Chem4Word-Setup.exe via https://www.chem4word.co.uk/download/ if you encounter any difficulties updating.</Change>
     </Changes>
     <Url>https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.16.Release.6.msi</Url>
+  </Version>
+  <Version>
+    <Number>3.1.16 Release 6</Number>
+    <IsBeta>false</IsBeta>
+    <Released>17-Dec-2020</Released>
+    <Changes>
+      <Change>ACME: Protect against nulls in GetBondAdornerGeometry()</Change>
+      <Change>ACME: Fix internal exception when copying structure to clipboard</Change>
+      <Change>ACME: Fix internal exception when Atom has no parent</Change>
+    </Changes>
   </Version>
   <Version>
     <Number>3.1.15 Release 5</Number>

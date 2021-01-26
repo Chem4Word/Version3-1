@@ -628,7 +628,7 @@
       <Project>{2e7b1308-8149-4b03-9cb9-48e0b7151560}</Project>
       <Name>Chem4Word.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Common\Telemetry\Chem4Word.Telemetry.csproj">
+    <ProjectReference Include="..\Common\Chem4Word.Telemetry\Chem4Word.Telemetry.csproj">
       <Project>{c89bc92a-4183-48a6-b039-ad76aa1df48f}</Project>
       <Name>Chem4Word.Telemetry</Name>
     </ProjectReference>

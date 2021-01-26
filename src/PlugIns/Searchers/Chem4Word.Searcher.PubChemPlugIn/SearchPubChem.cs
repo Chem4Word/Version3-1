@@ -146,7 +146,6 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
             try
             {
-                Debug.WriteLine("Results_SelectedIndexChanged");
                 lastSelected = FetchStructure();
             }
             catch (Exception ex)
@@ -172,6 +171,8 @@ namespace Chem4Word.Searcher.PubChemPlugIn
 
         private void ExecuteSearch(int direction)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             if (!string.IsNullOrEmpty(SearchFor.Text))
             {
                 Cursor = Cursors.WaitCursor;
@@ -279,15 +280,23 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                     else
                     {
                         StringBuilder sb = new StringBuilder();
-                        sb.AppendLine($"Bad request. Status code: {response.StatusCode}");
+                        sb.AppendLine($"Status code {response.StatusCode} was returned by the server");
+                        Telemetry.Write(module, "Warning", sb.ToString());
                         UserInteractions.AlertUser(sb.ToString());
                     }
                 }
                 catch (Exception ex)
                 {
-                    ErrorsAndWarnings.Text = "The operation has timed out".Equals(ex.Message)
-                                        ? "Please try again later - the service has timed out"
-                                        : ex.Message;
+                    if (ex.Message.Equals("The operation has timed out"))
+                    {
+                        ErrorsAndWarnings.Text = "Please try again later - the service has timed out";
+                    }
+                    else
+                    {
+                        ErrorsAndWarnings.Text = ex.Message;
+                        Telemetry.Write(module, "Exception", ex.Message);
+                        Telemetry.Write(module, "Exception", ex.StackTrace);
+                    }
                 }
                 finally
                 {
@@ -299,6 +308,8 @@ namespace Chem4Word.Searcher.PubChemPlugIn
 
         private void GetData(string idlist)
         {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
             var request = (HttpWebRequest)
                 WebRequest.Create(
                     string.Format(CultureInfo.InvariantCulture,
@@ -357,9 +368,16 @@ namespace Chem4Word.Searcher.PubChemPlugIn
             }
             catch (Exception ex)
             {
-                ErrorsAndWarnings.Text = "The operation has timed out".Equals(ex.Message)
-                    ? "Please try again later - the service has timed out"
-                    : ex.Message;
+                if (ex.Message.Equals("The operation has timed out"))
+                {
+                    ErrorsAndWarnings.Text = "Please try again later - the service has timed out";
+                }
+                else
+                {
+                    ErrorsAndWarnings.Text = ex.Message;
+                    Telemetry.Write(module, "Exception", ex.Message);
+                    Telemetry.Write(module, "Exception", ex.StackTrace);
+                }
             }
             finally
             {
@@ -453,9 +471,16 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                     }
                     catch (Exception ex)
                     {
-                        ErrorsAndWarnings.Text = "The operation has timed out".Equals(ex.Message)
-                                            ? "Please try again later - the service has timed out"
-                                            : ex.Message;
+                        if (ex.Message.Equals("The operation has timed out"))
+                        {
+                            ErrorsAndWarnings.Text = "Please try again later - the service has timed out";
+                        }
+                        else
+                        {
+                            ErrorsAndWarnings.Text = ex.Message;
+                            Telemetry.Write(module, "Exception", ex.Message);
+                            Telemetry.Write(module, "Exception", ex.StackTrace);
+                        }
                     }
                     finally
                     {
