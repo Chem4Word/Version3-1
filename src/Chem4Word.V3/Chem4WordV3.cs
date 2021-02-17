@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2020, The .NET Foundation.
+//  Copyright (c) 2021, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -1077,7 +1077,10 @@ namespace Chem4Word
                         break;
                 }
 
-                if (IsEndOfLife || VersionsBehind > 0 && !VersionAvailableIsBeta)
+                string betaValue = Globals.Chem4WordV3.ThisVersion.Root?.Element("IsBeta")?.Value;
+                bool isBeta = betaValue != null && bool.Parse(betaValue);
+
+                if (IsEndOfLife || isBeta && !VersionAvailableIsBeta)
                 {
                     Ribbon.EditStructure.Enabled = false;
                     Ribbon.EditStructure.Label = "Draw";
@@ -2135,10 +2138,30 @@ namespace Chem4Word
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
-            if (!IsEndOfLife && VersionsBehind < Constants.MaximumVersionsBehind)
+            string betaValue = Globals.Chem4WordV3.ThisVersion.Root?.Element("IsBeta")?.Value;
+            bool isBeta = betaValue != null && bool.Parse(betaValue);
+
+            if (IsEndOfLife || isBeta && !VersionAvailableIsBeta)
+            {
+                if (isBeta && !VersionAvailableIsBeta)
+                {
+                    ChemistryProhibitedReason = Constants.Chem4WordIsBeta;
+                    ChemistryAllowed = false;
+                }
+
+                if (VersionsBehind >= Constants.MaximumVersionsBehind)
+                {
+                    ChemistryProhibitedReason = Constants.Chem4WordTooOld;
+                    ChemistryAllowed = false;
+                }
+            }
+            else
+            //{
+                
+            //}
+            //    if (!IsEndOfLife && VersionsBehind < Constants.MaximumVersionsBehind)
             {
                 bool allowed = true;
-                ChemistryProhibitedReason = VersionAvailableIsBeta ? "" : Constants.Chem4WordIsBeta;
 
                 try
                 {

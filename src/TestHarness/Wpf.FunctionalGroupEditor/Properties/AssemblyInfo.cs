@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Chem4Word")]
 [assembly: AssemblyProduct("Wpf.FunctionalGroupEditor")]
-[assembly: AssemblyCopyright("© Chem4Word 2020. All rights reserved.")]
+[assembly: AssemblyCopyright("© Chem4Word 2021. All rights reserved.")]
 [assembly: AssemblyTrademark("Chem4Word")]
 [assembly: AssemblyCulture("")]
 
@@ -46,6 +46,6 @@ using System.Windows;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("3.1.17.7696")]
-[assembly: AssemblyVersion("3.1.17.7696")]
-[assembly: AssemblyFileVersion("3.1.17.7696")]
+// [assembly: AssemblyVersion("3.1.18.7718")]
+[assembly: AssemblyVersion("3.1.18.7718")]
+[assembly: AssemblyFileVersion("3.1.18.7718")]
