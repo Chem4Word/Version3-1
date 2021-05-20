@@ -53,6 +53,7 @@ namespace Chem4Word
         public bool VersionAvailableIsBeta = false;
         public bool IsEnabled;
         public bool IsEndOfLife;
+        public bool WordIsActivated;
 
         public XDocument AllVersions;
         public XDocument ThisVersion;
@@ -193,7 +194,7 @@ namespace Chem4Word
 
         private void C4WAddIn_Startup(object sender, EventArgs e)
         {
-            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+            string module = $"{MethodBase.GetCurrentMethod().Name}()";
             try
             {
                 // Deliberate crash to test Error Reporting
@@ -211,24 +212,49 @@ namespace Chem4Word
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
 
+                    CheckIfWordIsActivated();
                     PerformStartUpActions();
 
                     sw.Stop();
                     message = $"{module} took {SafeDouble.AsString(sw.ElapsedMilliseconds)}ms";
                     StartUpTimings.Add(message);
                     Debug.WriteLine(message);
+
+                    if (!WordIsActivated)
+                    {
+                        UserInteractions.AlertUser("Microsoft Word is not activated!\nChem4Word uses features of Word which are only available if it is activated.");
+                    }
                 }
                 else
                 {
+#if DEBUG
                     if (Ribbon == null)
                     {
                         RegistryHelper.StoreMessage(module, "Ribbon is null");
                     }
                     RegistryHelper.StoreMessage(module, $"Command line {cmd}");
+#endif
                 }
             }
             catch (Exception exception)
             {
+                Debug.WriteLine($"{module} {exception.Message}");
+                RegistryHelper.StoreException(module, exception);
+            }
+        }
+
+        private void CheckIfWordIsActivated()
+        {
+            string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
+
+            try
+            {
+                bool? flag = Globals.Chem4WordV3.Application.Options.SmartCutPaste;
+                WordIsActivated = flag.HasValue;
+            }
+            catch (Exception exception)
+            {
+                WordIsActivated = false;
                 Debug.WriteLine($"{module} {exception.Message}");
                 RegistryHelper.StoreException(module, exception);
             }
@@ -286,13 +312,9 @@ namespace Chem4Word
                 Debug.WriteLine(message);
                 StartUpTimings.Add(message);
             }
-            catch (ThreadAbortException threadAbortException)
+            catch // (ThreadAbortException threadAbortException)
             {
-                RegistryHelper.StoreException(module, threadAbortException);
-            }
-            catch (Exception exception)
-            {
-                RegistryHelper.StoreException(module, exception);
+                // Do Nothing
             }
         }
 
@@ -1276,7 +1298,8 @@ namespace Chem4Word
             {
                 try
                 {
-                    EvaluateChemistryAllowed();
+                    ClearChemistryContextMenus();
+                    EvaluateChemistryAllowed(inRightClick: true);
                     if (ChemistryAllowed)
                     {
                         if (sel.Start != sel.End)
@@ -1738,7 +1761,7 @@ namespace Chem4Word
                                     break;
                             }
 
-                            HandleNavigatorePane(doc);
+                            HandleNavigatorPane(doc);
 
                             HandleLibraryPane(doc, docxMode);
 
@@ -1848,7 +1871,7 @@ namespace Chem4Word
             #endregion Handle Library Task Panes
         }
 
-        private void HandleNavigatorePane(Word.Document doc)
+        private void HandleNavigatorPane(Word.Document doc)
         {
             #region Handle Navigator Task Panes
 
@@ -2134,14 +2157,16 @@ namespace Chem4Word
             }
         }
 
-        public void EvaluateChemistryAllowed()
+        public void EvaluateChemistryAllowed(bool inRightClick = false)
         {
             string module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod().Name}()";
 
             string betaValue = Globals.Chem4WordV3.ThisVersion.Root?.Element("IsBeta")?.Value;
             bool isBeta = betaValue != null && bool.Parse(betaValue);
 
-            if (IsEndOfLife || isBeta && !VersionAvailableIsBeta)
+            if (IsEndOfLife || VersionsBehind >= Constants.MaximumVersionsBehind
+                            || !WordIsActivated
+                            || isBeta && !VersionAvailableIsBeta)
             {
                 if (isBeta && !VersionAvailableIsBeta)
                 {
@@ -2149,17 +2174,19 @@ namespace Chem4Word
                     ChemistryAllowed = false;
                 }
 
-                if (VersionsBehind >= Constants.MaximumVersionsBehind)
+                if (IsEndOfLife || VersionsBehind >= Constants.MaximumVersionsBehind)
                 {
                     ChemistryProhibitedReason = Constants.Chem4WordTooOld;
                     ChemistryAllowed = false;
                 }
+
+                if (!WordIsActivated)
+                {
+                    ChemistryProhibitedReason = Constants.WordIsNotActivated;
+                    ChemistryAllowed = false;
+                }
             }
             else
-            //{
-                
-            //}
-            //    if (!IsEndOfLife && VersionsBehind < Constants.MaximumVersionsBehind)
             {
                 bool allowed = true;
 
@@ -2227,19 +2254,22 @@ namespace Chem4Word
                             Word.Selection sel = Application.Selection;
                             if (allowed && sel != null)
                             {
-                                if (allowed && sel.Start != sel.End)
+                                if (!inRightClick)
                                 {
-                                    if (!string.IsNullOrEmpty(sel.Text) && sel.Text.Contains("\r"))
+                                    if (allowed && sel.Start != sel.End)
                                     {
-                                        ChemistryProhibitedReason = "selection contains Line Ending";
+                                        if (!string.IsNullOrEmpty(sel.Text) && sel.Text.Contains("\r"))
+                                        {
+                                            ChemistryProhibitedReason = "selection contains Line Ending";
+                                            allowed = false;
+                                        }
+                                    }
+
+                                    if (allowed && sel.Paragraphs.Count > 1)
+                                    {
+                                        ChemistryProhibitedReason = $"selection contains {sel.Paragraphs.Count} paragraphs.";
                                         allowed = false;
                                     }
-                                }
-
-                                if (allowed && sel.Paragraphs.Count > 1)
-                                {
-                                    ChemistryProhibitedReason = $"selection contains {sel.Paragraphs.Count} paragraphs.";
-                                    allowed = false;
                                 }
 
                                 if (allowed && sel.OMaths.Count > 0)

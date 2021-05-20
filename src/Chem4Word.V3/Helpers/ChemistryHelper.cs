@@ -87,6 +87,8 @@ namespace Chem4Word.Helpers
                         cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
                         Insert2D(cc.ID, tempfileName, guid);
 
+                        Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"ContentControl inserted at position {cc.Range.Start}");
+
                         if (isCopy)
                         {
                             doc.CustomXMLParts.Add(cml);
@@ -138,6 +140,8 @@ namespace Chem4Word.Helpers
             Word.ContentControl cc = doc.ContentControls.Add(Word.WdContentControlType.wdContentControlRichText, ref _missing);
 
             SetRichText(cc.ID, text, isFormula);
+
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"ContentControl inserted at position {cc.Range.Start}");
 
             wordSettings.RestoreSettings(app);
 
@@ -258,7 +262,7 @@ namespace Chem4Word.Helpers
             cc.LockContents = true;
         }
 
-        public static void Update2D(string ccId, string tempfileName, string guid)
+        private static void Update2D(string ccId, string tempfileName, string guid)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -293,6 +297,8 @@ namespace Chem4Word.Helpers
                 doc.Bookmarks[bookmarkName].Delete();
             }
 
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"ContentControl updated at position {cc.Range.Start}");
+
             wordSettings.RestoreSettings(app);
 
             cc.Tag = guid;
@@ -321,7 +327,7 @@ namespace Chem4Word.Helpers
             cc.LockContents = true;
         }
 
-        public static void Update1D(string ccId, string text, bool isFormula, string tag)
+        private static void Update1D(string ccId, string text, bool isFormula, string tag)
         {
             string module = $"{Product}.{Class}.{MethodBase.GetCurrentMethod().Name}()";
 
@@ -337,6 +343,8 @@ namespace Chem4Word.Helpers
             cc.Range.Delete();
 
             SetRichText(cc.ID, text, isFormula);
+
+            Globals.Chem4WordV3.Telemetry.Write(module, "Information", $"ContentControl updated at position {cc.Range.Start}");
 
             wordSettings.RestoreSettings(app);
 

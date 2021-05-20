@@ -1081,7 +1081,7 @@ namespace Chem4Word.ACME
                 WriteTelemetry(module, "Debug", $"StartAtom: {startAtomInfo}; EndAtom: {endAtomInfo}; BondOrder; {orderInfo}");
 
                 // Only allow a bond to be created if both atoms are children of the molecule passed in
-                if (a.Parent == mol && b.Parent == mol)
+                if (a.Parent == mol && b.Parent == mol && mol.Atoms.ContainsKey(a.InternalId) && mol.Atoms.ContainsKey(b.InternalId))
                 {
                     //keep a handle on some current properties
                     int theoreticalRings = mol.TheoreticalRings;
@@ -1445,12 +1445,19 @@ namespace Chem4Word.ACME
 
                     tempModel.RescaleForCml();
                     string export = converter.Export(tempModel);
-                    Clipboard.Clear();
-                    IDataObject ido = new DataObject();
-                    ido.SetData(FormatCML, export);
-                    string header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-                    ido.SetData(DataFormats.Text, header + export);
-                    Clipboard.SetDataObject(ido, true);
+                    try
+                    {
+                        Clipboard.Clear();
+                        IDataObject ido = new DataObject();
+                        ido.SetData(FormatCML, export);
+                        string header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+                        ido.SetData(DataFormats.Text, header + export);
+                        Clipboard.SetDataObject(ido, true);
+                    }
+                    catch
+                    {
+                        // Nothing we can do here !
+                    }
                 }
             }
             catch (Exception exception)

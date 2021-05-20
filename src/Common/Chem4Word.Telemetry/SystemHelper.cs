@@ -42,6 +42,8 @@ namespace Chem4Word.Telemetry
 
         public string AddInVersion { get; set; }
 
+        public List<AddInProperties> AllAddIns { get; set; }
+
         public string AssemblyVersionNumber { get; set; }
 
         public string AddInLocation { get; set; }
@@ -226,6 +228,8 @@ namespace Chem4Word.Telemetry
                 #endregion Get IpAddress on Thread
 
                 GetDotNetVersionFromRegistry();
+
+                AllAddIns = InfoHelper.GetListOfAddIns();
 
                 GatherBootUpTimeEtc();
 
