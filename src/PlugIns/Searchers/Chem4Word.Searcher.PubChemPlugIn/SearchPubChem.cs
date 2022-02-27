@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2021, The .NET Foundation.
+//  Copyright (c) 2022, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -92,8 +92,13 @@ namespace Chem4Word.Searcher.PubChemPlugIn
                 if (!string.IsNullOrEmpty(SearchFor.Text))
                 {
                     Telemetry.Write(module, "Information", $"User searched for '{SearchFor.Text}'");
+
+                    ErrorsAndWarnings.Text = "";
+                    display1.Chemistry = null;
+                    display1.Clear();
+
+                    ExecuteSearch(0);
                 }
-                ExecuteSearch(0);
             }
             catch (Exception ex)
             {

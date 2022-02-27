@@ -1,5 +1,5 @@
 ﻿// ---------------------------------------------------------------------------
-//  Copyright (c) 2021, The .NET Foundation.
+//  Copyright (c) 2022, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -407,7 +407,7 @@ namespace Chem4Word.Telemetry
             Screens = string.Join("; ", screens);
         }
 
-        private static string OsBits => Environment.Is64BitOperatingSystem ? "64bit" : "32bit";
+        public static string OsBits => Environment.Is64BitOperatingSystem ? "64bit" : "32bit";
 
         private void GetDotNetVersionFromRegistry()
         {
@@ -421,6 +421,11 @@ namespace Chem4Word.Telemetry
                     int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
 
                     // .Net 4.8
+                    if (releaseKey >= 528449)
+                    {
+                        DotNetVersion = $".NET 4.8 (W11/S2022) [{releaseKey}]";
+                        return;
+                    }
                     if (releaseKey >= 528372)
                     {
                         DotNetVersion = $".NET 4.8 (W10 2004) [{releaseKey}]";

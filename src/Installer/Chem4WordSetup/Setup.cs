@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-//  Copyright (c) 2021, The .NET Foundation.
+//  Copyright (c) 2022, The .NET Foundation.
 //  This software is released under the Apache License, Version 2.0.
 //  The license and further copyright text can be found in the file LICENSE.md
 //  at the root directory of the distribution.
@@ -32,7 +32,7 @@ namespace Chem4WordSetup
         private const string DetectV2AddIn = @"Chemistry Add-in for Word\Chem4Word.AddIn.vsto";
         private const string DetectV3AddIn = @"Chem4Word V3\Chem4Word.V3.vsto";
 
-        private const string DefaultMsiFile = "https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.19.Release.9.msi";
+        private const string DefaultMsiFile = "https://www.chem4word.co.uk/files3-1/Chem4Word-Setup.3.1.20.Release.10.msi";
         private const string VstoInstaller = "https://www.chem4word.co.uk/files3-1/vstor_redist.exe";
 
         private WebClient _webClient;
