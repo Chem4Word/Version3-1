@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Chem4Word")]
 [assembly: AssemblyProduct("Wpf.FunctionalGroupEditor")]
-[assembly: AssemblyCopyright("© Chem4Word 2022. All rights reserved.")]
+[assembly: AssemblyCopyright("© Chem4Word 2023. All rights reserved.")]
 [assembly: AssemblyTrademark("Chem4Word")]
 [assembly: AssemblyCulture("")]
 
@@ -44,5 +44,5 @@ using System.Windows;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("3.1.22.8217")]
-[assembly: AssemblyFileVersion("3.1.22.8217")]
+[assembly: AssemblyVersion("3.1.23.8433")]
+[assembly: AssemblyFileVersion("3.1.23.8433")]

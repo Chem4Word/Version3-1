@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <!-- For automatic upgrade to work only first three parts of version number are used -->
-  <Product Id="*" Name="Chemistry Add-In for Microsoft Word 2020 Release 12" Manufacturer="Chem4Word" Version="3.1.22.8217" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
+  <Product Id="*" Name="Chemistry Add-In for Microsoft Word 2020 Release 13" Manufacturer="Chem4Word" Version="3.1.23.8433" UpgradeCode="865226e7-d29d-49aa-a390-dda49979b102" Language="1033">
     <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of Chem4Word is already installed." />
     <Media Id="1" Cabinet="product.cab" EmbedCab="yes" CompressionLevel="high" />
-    <!-- EULA Must be editied in WordPad NOT Word -->
+    <!-- EULA Must be edited in WordPad NOT Word -->
     <WixVariable Id="WixUILicenseRtf" Value="EULA.rtf" />
     <Property Id="ARPCOMMENTS">This is the WiX installer for Chemistry Add-In for Microsoft Word</Property>
     <Property Id="ARPHELPLINK">https://www.chem4word.co.uk/help</Property>
@@ -33,8 +33,6 @@
         <FileSearch Name="Chem4Word.AddIn.dll" MinVersion="0.0.0.0" MaxVersion="99.99.9999.9999" />
       </DirectorySearch>
     </Property>
-    <!-- Ensure Word 2010 or greater -->
-    <Condition Message="This application requires Microsoft Word 2010 (or greater). Please install it then run this installer again."><![CDATA[Installed OR WINWORDVERSION]]></Condition>
     <!-- Ensure Word not running -->
     <Condition Message="Word is running. Please close it then run this installer again."><![CDATA[Installed OR (NOT WINWORDPROCESSCOUNT)]]></Condition>
     <!-- Ensure Chem4Word 2 removed -->
@@ -51,16 +49,16 @@
     <!-- https://www.codeproject.com/Articles/132918/Creating-Custom-Action-for-WIX-Written-in-Managed -->
     <Binary Id="WiX.CustomAction.dll" SourceFile="..\Wix.CustomAction\bin\x86\$(var.Configuration)\WiX.CustomAction.CA.dll" />
     <CustomAction Id="WordProcessCount" BinaryKey="WiX.CustomAction.dll" DllEntry="WordProcessCount" Return="check" Execute="immediate" />
-    <CustomAction Id="FindWinwordPath" BinaryKey="WiX.CustomAction.dll" DllEntry="FindWord" Return="check" Execute="immediate" />
-    <CustomAction Id="CleanRegistry" BinaryKey="WiX.CustomAction.dll" DllEntry="CleanUserRegistry" Return="check" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="CleanUserRegistry" BinaryKey="WiX.CustomAction.dll" DllEntry="CleanUserRegistry" Return="check" Execute="deferred" Impersonate="yes" />
+    <CustomAction Id="CleanSystemRegistry" BinaryKey="WiX.CustomAction.dll" DllEntry="CleanSystemRegistry" Return="check" Execute="deferred" Impersonate="no" />
     <CustomAction Id="SetupChem4Word" BinaryKey="WiX.CustomAction.dll" DllEntry="SetupChem4Word" Return="check" Execute="deferred" Impersonate="no" />
     <CustomAction Id="RemoveChem4Word" BinaryKey="WiX.CustomAction.dll" DllEntry="RemoveChem4Word" Return="check" Execute="deferred" Impersonate="no" />
     <InstallUISequence>
       <Custom Action="WordProcessCount" Before="LaunchConditions" />
-      <Custom Action="FindWinwordPath" Before="LaunchConditions" />
     </InstallUISequence>
     <InstallExecuteSequence>
-      <Custom Action="CleanRegistry" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="CleanUserRegistry" Before="InstallFinalize">NOT Installed</Custom>
+      <Custom Action="CleanSystemRegistry" Before="InstallFinalize">NOT Installed</Custom>
       <Custom Action="SetupChem4Word" Before="InstallFinalize">NOT Installed</Custom>
       <Custom Action="RemoveChem4Word" Before="InstallFinalize">Installed</Custom>
     </InstallExecuteSequence>
