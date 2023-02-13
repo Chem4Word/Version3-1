@@ -238,7 +238,7 @@ namespace Chem4Word.Renderer.OoXmlV4.Entities
         {
             double xDifference = Start.X - End.X;
             double yDifference = Start.Y - End.Y;
-            double length = Math.Sqrt(Math.Pow(xDifference, 2) + Math.Pow(yDifference, 2));
+            double length = Math.Sqrt(xDifference * xDifference + yDifference * yDifference);
 
             Point newStartPoint = new Point((float)(Start.X - offset * yDifference / length),
                                             (float)(Start.Y + offset * xDifference / length));

@@ -6,6 +6,7 @@
 // ---------------------------------------------------------------------------
 
 using System;
+using System.Reflection;
 using System.Windows.Forms;
 using Chem4Word.Core.Helpers;
 using IChem4Word.Contracts;
@@ -15,6 +16,10 @@ namespace Chem4Word.Core.UI.Forms
     public partial class ReportError : Form
     {
         private IChem4WordTelemetry _telemetry;
+
+        private static readonly string _product = Assembly.GetExecutingAssembly().FullName.Split(',')[0];
+        private static readonly string _class = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+
         private string _exceptionMessage = string.Empty;
         private string _operation = string.Empty;
         private string _callStack = string.Empty;
@@ -93,6 +98,13 @@ namespace Chem4Word.Core.UI.Forms
                     }
                 }
             }
+        }
+
+        private void KBLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var module = $"{_product}.{_class}.{MethodBase.GetCurrentMethod()?.Name}()";
+            _telemetry.Write(module, "Action", "Triggered");
+            System.Diagnostics.Process.Start("https://www.chem4word.co.uk/knowledge-base/");
         }
     }
 }
