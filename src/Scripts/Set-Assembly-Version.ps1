@@ -19,7 +19,7 @@ function Help {
 	"Sets the AssemblyVersion and AssemblyFileVersion of AssemblyInfo.cs files`n"
 	".\SetAssemblyVersion.ps1 [VersionNumber] -path [SearchPath] -released [Released] -name [Name]`n"
 	"   [VersionNumber]     The version number to set, for example: 1.2.3"
-	"   [Released]          The release date, for example: 01-Jan-2022"
+	"   [Released]          The release date, for example: 31-Jan-2023"
 	"   [Name]              The name, for example: Beta 2"
 	"   [SearchPath]        The path to search for AssemblyInfo files.`n"
 }
@@ -43,7 +43,7 @@ function Update-SourceVersion
 		$assemblyVersion = 'AssemblyVersion("' + $version + '")';
 		$fileVersion = 'AssemblyFileVersion("' + $version + '")';
 		$company = 'AssemblyCompany("Chem4Word")'
-        $year = Get-Date -Format "yyyy";
+		$year = Get-Date -Format "yyyy";
 		$copyright = 'AssemblyCopyright("© Chem4Word ' + $year + '. All rights reserved.")'
 		$trademark = 'AssemblyTrademark("Chem4Word")'
 
@@ -172,9 +172,9 @@ $xml.Save($wixProj)
 # ---------------------------------------------------------- #
 
 # Update SignFiles.cmd
-Write-Host " Updating 'SignFiles.cmd'" -ForegroundColor Yellow
+Write-Host " Updating 'Sign-Files.cmd'" -ForegroundColor Yellow
 
-$file = "$($pwd)\..\Scripts\SignFiles.cmd"
+$file = "$($pwd)\..\Scripts\Sign-Files.cmd"
 Write-Host "$($file)" -ForegroundColor Green
 
 $findPattern = 'set release=Chem4Word-Setup.*'
